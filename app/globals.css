@@ -749,10 +749,55 @@ p {
   padding: 30px;
 }
 
+#profit-calculator {
+  padding: 78px 0;
+}
+
+.calc-grid {
+  grid-template-columns: minmax(420px, 0.9fr) minmax(560px, 1fr);
+  align-items: start;
+  gap: 36px;
+}
+
+.calc-grid > div:first-child {
+  padding-top: 24px;
+}
+
+.calc-insights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.calc-insights article {
+  min-height: 132px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--soft-shadow);
+}
+
+.calc-insights span {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--caramel);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.calc-insights strong {
+  display: block;
+  color: var(--brown);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
 .calc-field {
   display: grid;
   gap: 12px;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
 .calc-field label,
@@ -1269,6 +1314,14 @@ td:first-child,
   .form-grid,
   .menu-card,
   .compare-panels {
+    grid-template-columns: 1fr;
+  }
+
+  .calc-grid > div:first-child {
+    padding-top: 0;
+  }
+
+  .calc-insights {
     grid-template-columns: 1fr;
   }
 

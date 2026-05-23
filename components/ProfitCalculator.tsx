@@ -28,6 +28,20 @@ export default function ProfitCalculator() {
           <p className="section-copy">
             사장님 매장 기준으로 하루 판매량과 판매가를 입력하면 예상 월 매출을 바로 확인할 수 있습니다.
           </p>
+          <div className="calc-insights">
+            <article>
+              <span>추가매출 포인트</span>
+              <strong>커피 한 잔 주문을 파이 세트 주문으로 전환</strong>
+            </article>
+            <article>
+              <span>운영 부담</span>
+              <strong>주문 후 조리 구조로 재고 부담 완화</strong>
+            </article>
+            <article>
+              <span>상담 시 확인</span>
+              <strong>판매가, 원가, 매장 동선 기준으로 상세 계산</strong>
+            </article>
+          </div>
         </div>
         <div className="calculator-card">
           <CalcField
