@@ -11,11 +11,7 @@ export default function HeroSection() {
       <div className="container hero-grid">
         <div className="hero-copy">
           <p className="eyebrow">기존 카페 사장님을 위한 디저트 매출 솔루션</p>
-          <h1>
-            음료만 팔던 카페에
-            <br />
-            디저트 추가매출을 만드세요
-          </h1>
+          <h1>디저트 추가매출을 만드세요</h1>
           <p className="lead">
             120겹 파이와 에그120은 기존 카페에 바로 도입 가능한 샵인샵 디저트 아이템입니다.
             초간편 조리, 낮은 폐기 부담, 높은 객단가로 카페의 매출 구조를 바꿉니다.
