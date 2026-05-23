@@ -22,7 +22,7 @@ export default function ProfitCalculator() {
   return (
     <section className="section warm" id="profit-calculator">
       <div className="container calc-grid">
-        <div>
+        <div className="calc-copy-panel">
           <p className="eyebrow">수익성 시뮬레이션</p>
           <h2>하루 몇 개만 팔아도 추가매출이 보입니다</h2>
           <p className="section-copy">
@@ -30,17 +30,21 @@ export default function ProfitCalculator() {
           </p>
           <div className="calc-insights">
             <article>
-              <span>추가매출 포인트</span>
+              <span>01</span>
               <strong>커피 한 잔 주문을 파이 세트 주문으로 전환</strong>
             </article>
             <article>
-              <span>운영 부담</span>
+              <span>02</span>
               <strong>주문 후 조리 구조로 재고 부담 완화</strong>
             </article>
             <article>
-              <span>상담 시 확인</span>
+              <span>03</span>
               <strong>판매가, 원가, 매장 동선 기준으로 상세 계산</strong>
             </article>
+          </div>
+          <div className="calc-mini-summary">
+            <span>기본 시뮬레이션</span>
+            <strong>하루 20개 판매 시 월 234만원 매출</strong>
           </div>
         </div>
         <div className="calculator-card">
