@@ -1,5 +1,7 @@
 "use client";
 
+import VisualImage from "./VisualImage";
+
 export default function ExpoSection() {
   return (
     <section className="section expo" id="expo">
@@ -31,6 +33,10 @@ export default function ExpoSection() {
             </button>
           </div>
         </article>
+        <div className="expo-visuals">
+          <VisualImage src="/images/expo-tasting.jpg" label="박람회 시식 장면" badge="tasting zone" />
+          <VisualImage src="/images/expo-booth.jpg" label="박람회 부스 상담 장면" badge="booth consult" />
+        </div>
       </div>
     </section>
   );

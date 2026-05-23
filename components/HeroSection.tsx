@@ -1,5 +1,7 @@
 "use client";
 
+import VisualImage from "./VisualImage";
+
 const badges = ["샵인샵 가능", "5분 내외 조리", "냉동보관", "객단가 상승", "박람회 검증", "전국 운영 경험"];
 
 const scrollToTarget = (target: string) =>
@@ -31,21 +33,34 @@ export default function HeroSection() {
               박람회 시식 예약하기
             </button>
           </div>
+          <div className="hero-stats" aria-label="도입 핵심 지표">
+            <div>
+              <strong>5분</strong>
+              <span>내외 제조</span>
+            </div>
+            <div>
+              <strong>287+</strong>
+              <span>취급점 경험</span>
+            </div>
+            <div>
+              <strong>3way</strong>
+              <span>홀·포장·배달</span>
+            </div>
+          </div>
         </div>
         <div className="hero-visual" aria-label="제품 이미지 영역">
-          <div className="main-image placeholder-image">
-            <span>120겹 파이 굽는 장면</span>
-            <small>/public/images/hero-pie.jpg</small>
-          </div>
+          <VisualImage
+            src="/images/hero-pie.jpg"
+            label="120겹 파이 굽는 장면"
+            className="main-image float-slow"
+            badge="120 layered pie"
+          />
           <div className="visual-stack">
-            <div className="placeholder-image">
-              <span>치즈 늘어나는 장면</span>
-              <small>/public/images/cheese-pull.jpg</small>
-            </div>
-            <div className="placeholder-image">
-              <span>에그120 이미지</span>
-              <small>/public/images/egg120.jpg</small>
-            </div>
+            <VisualImage src="/images/cheese-pull.jpg" label="치즈 늘어나는 장면" badge="fresh baked" />
+            <VisualImage src="/images/egg120.jpg" label="에그120 이미지" badge="egg120" />
+          </div>
+          <div className="motion-rail" aria-hidden="true">
+            <span>SHOP-IN-SHOP · 5MIN COOKING · LOW WASTE · SET MENU · DELIVERY ·</span>
           </div>
         </div>
       </div>
