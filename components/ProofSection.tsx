@@ -25,9 +25,21 @@ export default function ProofSection() {
           ))}
         </div>
         <div className="image-triplet proof-gallery">
-          <VisualImage src="/images/proof-expo.jpg" label="박람회 현장 이미지" badge="expo" />
-          <VisualImage src="/images/proof-line.jpg" label="줄 서는 장면" badge="tasting" />
-          <VisualImage src="/images/proof-consulting.jpg" label="상담 장면" badge="consulting" />
+          <VisualImage
+            src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=82"
+            label="박람회 현장 이미지"
+            badge="expo"
+          />
+          <VisualImage
+            src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1000&q=82"
+            label="줄 서는 장면"
+            badge="tasting"
+          />
+          <VisualImage
+            src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1000&q=82"
+            label="상담 장면"
+            badge="consulting"
+          />
         </div>
         <div className="center-block">
           <p className="strong-copy">말로 설명하는 브랜드가 아니라 현장에서 맛으로 검증된 브랜드입니다.</p>

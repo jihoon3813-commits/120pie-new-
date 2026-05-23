@@ -13,18 +13,21 @@ export default function VisualImage({
   className?: string;
   badge?: string;
 }) {
+  const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    setReady(false);
+    setFailed(false);
     const image = new Image();
-    image.onload = () => setFailed(false);
+    image.onload = () => setReady(true);
     image.onerror = () => setFailed(true);
     image.src = src;
   }, [src]);
 
   return (
     <div className={`media-frame ${className}`}>
-      {!failed ? (
+      {ready && !failed ? (
         <img src={src} alt={label} onError={() => setFailed(true)} />
       ) : (
         <div className="media-fallback">

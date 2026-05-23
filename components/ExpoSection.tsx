@@ -34,8 +34,16 @@ export default function ExpoSection() {
           </div>
         </article>
         <div className="expo-visuals">
-          <VisualImage src="/images/expo-tasting.jpg" label="박람회 시식 장면" badge="tasting zone" />
-          <VisualImage src="/images/expo-booth.jpg" label="박람회 부스 상담 장면" badge="booth consult" />
+          <VisualImage
+            src="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1000&q=82"
+            label="박람회 시식 장면"
+            badge="tasting zone"
+          />
+          <VisualImage
+            src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1000&q=82"
+            label="박람회 부스 상담 장면"
+            badge="booth consult"
+          />
         </div>
       </div>
     </section>
