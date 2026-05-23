@@ -27,10 +27,10 @@ export default function HeroSection() {
           </div>
           <div className="cta-row">
             <button className="cta" onClick={() => scrollToTarget("#consultation")}>
-              내 매장 도입 상담
+              리모델링 상담받기
             </button>
             <button className="cta ghost" onClick={() => scrollToTarget("#expo")}>
-              박람회 시식 예약
+              전략 보기
             </button>
           </div>
           <div className="hero-stats" aria-label="도입 핵심 지표">
