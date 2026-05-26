@@ -82,7 +82,8 @@
   }
 
   :is(#landing-v3, #landing-v4) #adoption .h-40 {
-    height: 7.5rem;
+    height: auto;
+    aspect-ratio: 16 / 9;
   }
 
   :is(#landing-v3, #landing-v4) main > section :is(.min-h-\[400px\], .min-h-\[320px\]) {

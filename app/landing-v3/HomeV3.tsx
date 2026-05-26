@@ -1030,8 +1030,8 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
              </motion.div>
 
              <div className="w-full bg-neutral-50 border border-neutral-100 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm relative text-center">
-                <div className="brand-master-title bg-amber-400 text-white font-black text-xl sm:text-2xl py-3 px-8 rounded-xl inline-block mb-12 shadow-sm">
-                   120pie &amp; coffee <span className="font-extrabold text-xs ml-2 text-white/80">Master Brand</span>
+                <div className="brand-master-title bg-amber-400 text-white font-black text-xl sm:text-2xl py-3 px-8 rounded-xl inline-block mb-12 shadow-sm text-center">
+                   120pie &amp; coffee <span className="block sm:inline-block font-extrabold text-[10px] sm:text-xs sm:ml-2 text-white/80 mt-1 sm:mt-0">Master Brand</span>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
