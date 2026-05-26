@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>120pie & coffee 랜딩페이지 초안</title>
+  <meta name="description" content="기존 카페에 바로 붙이는 디저트 매출 솔루션, 120겹 파이와 에그120 랜딩페이지 초안" />
+  <style>
+    :root {
+      --bg: #f7f1e8;
+      --bg-2: #fffaf4;
+      --surface: rgba(255,255,255,0.72);
+      --surface-strong: #ffffff;
+      --line: rgba(45, 31, 18, 0.10);
+      --text: #24180f;
+      --muted: #6f6052;
+      --primary: #2d1f12;
+      --accent: #ffba4a;
+      --accent-2: #f18e34;
+      --success: #24553a;
+      --shadow: 0 18px 50px rgba(45,31,18,.10);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --max: 1200px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, Pretendard, "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 186, 74, 0.25), transparent 26%),
+        radial-gradient(circle at top right, rgba(241, 142, 52, 0.18), transparent 18%),
+        linear-gradient(180deg, #fff8ee 0%, #f7f1e8 45%, #f9f6f0 100%);
+      line-height: 1.55;
+    }
+
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    button, input {
+      font: inherit;
+    }
+
+    .container {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+    }
+
+    .section {
+      padding: 88px 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.58);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--success);
+      backdrop-filter: blur(10px);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 0 6px rgba(255, 186, 74, 0.16);
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      font-size: clamp(2.6rem, 6vw, 5.6rem);
+      line-height: .98;
+      letter-spacing: -0.05em;
+      font-weight: 900;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      font-weight: 850;
+    }
+
+    .section-head {
+      display: grid;
+      gap: 14px;
+      max-width: 760px;
+      margin-bottom: 34px;
+    }
+
+    .lead {
+      font-size: clamp(1rem, 1.5vw, 1.15rem);
+      color: var(--muted);
+      max-width: 62ch;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(18px);
+      background: rgba(255, 248, 238, 0.72);
+      border-bottom: 1px solid rgba(45,31,18,0.06);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 78px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), #593a1e);
+      color: #fff;
+      box-shadow: var(--shadow);
+      font-size: 15px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      min-height: 54px;
+      padding: 0 22px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      transition: transform .24s ease, box-shadow .24s ease, background .24s ease;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #4a311d);
+      color: #fff;
+      box-shadow: 0 16px 40px rgba(45,31,18,.22);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,.68);
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    .hero {
+      padding: 38px 0 40px;
+    }
+
+    .hero-wrap {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-copy, .hero-visual {
+      min-height: 620px;
+      border-radius: 34px;
+      border: 1px solid rgba(45,31,18,0.08);
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-copy {
+      padding: 34px;
+      background:
+        radial-gradient(circle at top left, rgba(255,186,74,.26), transparent 32%),
+        linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.72));
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hero-copy-top {
+      display: grid;
+      gap: 22px;
+      align-content: start;
+    }
+
+    .hero-copy p {
+      font-size: 1.08rem;
+      color: var(--muted);
+      max-width: 36ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.62);
+      font-size: 14px;
+      font-weight: 700;
+      color: #4b3a2b;
+    }
+
+    .hero-proof {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .mini-stat {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.58);
+      border: 1px solid var(--line);
+    }
+
+    .mini-stat strong {
+      display: block;
+      font-size: 1.65rem;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin-bottom: 8px;
+    }
+
+    .mini-stat span {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .hero-visual {
+      background: #20160f;
+      display: grid;
+      align-items: end;
+    }
+
+    .hero-visual img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(1.08) contrast(1.02);
+      transform: scale(1.02);
+    }
+
+    .hero-visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.12) 0%, rgba(0,0,0,.48) 100%),
+        radial-gradient(circle at top left, rgba(255,186,74,.35), transparent 32%);
+    }
+
+    .floating-card {
+      position: relative;
+      z-index: 1;
+      margin: 22px;
+      padding: 24px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      max-width: 420px;
+    }
+
+    .floating-card h3 {
+      font-size: clamp(1.4rem, 2vw, 2rem);
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 12px;
+    }
+
+    .floating-card p {
+      color: rgba(255,255,255,.84);
+      margin-bottom: 16px;
+    }
+
+    .floating-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .floating-tags span {
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .stats-strip {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid rgba(45,31,18,.08);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .stat-card {
+      padding: 24px;
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: clamp(1.8rem, 2vw, 2.4rem);
+      letter-spacing: -0.05em;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+
+    .stat-card span {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .pain-card, .benefit-card, .proof-card, .case-card, .support-card, .faq-item, .comparison-card, .process-step {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pain-card {
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(45,31,18,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.84), rgba(255,255,255,.68));
+      box-shadow: var(--shadow);
+    }
+
+    .pain-index {
+      display: inline-grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: rgba(255, 186, 74, 0.24);
+      color: #8d5200;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .pain-card h3,
+    .benefit-card h3,
+    .proof-card h3,
+    .case-card h3,
+    .support-card h3,
+    .comparison-card h3,
+    .process-step h3,
+    .calculator-card h3,
+    .cta-box h3 {
+      font-size: 1.2rem;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    .pain-card p,
+    .benefit-card p,
+    .proof-card p,
+    .case-card p,
+    .support-card p,
+    .comparison-card p,
+    .process-step p,
+    .faq-answer,
+    .calculator-note,
+    .kpi-label,
+    .micro-copy {
+      color: var(--muted);
+    }
+
+    .benefit-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 18px;
+      grid-auto-rows: minmax(210px, auto);
+    }
+
+    .benefit-card {
+      padding: 28px;
+      border-radius: 26px;
+      border: 1px solid rgba(45,31,18,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.70));
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .benefit-card.large {
+      min-height: 260px;
+      background:
+        radial-gradient(circle at top left, rgba(255,186,74,.18), transparent 30%),
+        linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));
+    }
+
+    .benefit-card .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      background: rgba(255,186,74,.18);
+    }
+
+    .benefit-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .benefit-points span {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(45,31,18,.05);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .calculator {
+      display: grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .calculator-card {
+      padding: 30px;
+      border-radius: 28px;
+      border: 1px solid rgba(45,31,18,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.70));
+      box-shadow: var(--shadow);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #4a3a2c;
+    }
+
+    input {
+      width: 100%;
+      min-height: 56px;
+      border-radius: 16px;
+      border: 1px solid rgba(45,31,18,.10);
+      padding: 0 18px;
+      background: rgba(255,255,255,.84);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus {
+      border-color: rgba(241, 142, 52, .55);
+      box-shadow: 0 0 0 4px rgba(255, 186, 74, 0.16);
+    }
+
+    .calculator-result {
+      display: grid;
+      gap: 18px;
+    }
+
+    .result-hero {
+      padding: 26px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--primary), #4e3421);
+      color: #fff;
+      box-shadow: 0 18px 36px rgba(45,31,18,.18);
+    }
+
+    .result-hero strong {
+      display: block;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin: 10px 0 8px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .kpi {
+      padding: 22px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(45,31,18,.08);
+    }
+
+    .kpi-value {
+      font-size: 1.8rem;
+      letter-spacing: -0.04em;
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 6px;
+    }
+
+    .kpi-label { font-size: 14px; font-weight: 700; }
+
+    .before-after {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .comparison-card {
+      padding: 28px;
+      border-radius: 28px;
+      border: 1px solid rgba(45,31,18,.08);
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow);
+    }
+
+    .comparison-card.after {
+      background:
+        radial-gradient(circle at top left, rgba(255,186,74,.22), transparent 28%),
+        rgba(255,255,255,.88);
+    }
+
+    .comparison-tag {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .comparison-card.before .comparison-tag {
+      background: rgba(45,31,18,.08);
+      color: #5f5448;
+    }
+
+    .comparison-card.after .comparison-tag {
+      background: rgba(255,186,74,.22);
+      color: #8d5200;
+    }
+
+    .bullet-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .bullet {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .bullet i {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: rgba(45,31,18,.06);
+      font-style: normal;
+      font-size: 12px;
+      font-weight: 900;
+      flex: 0 0 auto;
+      margin-top: 2px;
+    }
+
+    .process {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .process-step {
+      padding: 28px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.80);
+      border: 1px solid rgba(45,31,18,.08);
+      box-shadow: var(--shadow);
+    }
+
+    .step-no {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #2d1f12;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .tables {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 18px;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 15px 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(45,31,18,.08);
+      vertical-align: top;
+    }
+
+    th {
+      background: rgba(45,31,18,.05);
+      font-size: 13px;
+      font-weight: 900;
+      color: #4d3a2a;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .proof-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .proof-card {
+      padding: 26px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(45,31,18,.08);
+      box-shadow: var(--shadow);
+    }
+
+    .proof-card strong {
+      display: block;
+      font-size: 2rem;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin-bottom: 12px;
+    }
+
+    .cases {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .case-card {
+      padding: 26px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.80);
+      border: 1px solid rgba(45,31,18,.08);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 12px;
+    }
+
+    .case-type {
+      font-size: 13px;
+      font-weight: 900;
+      color: #8d5200;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+    }
+
+    .timeline .process-step {
+      min-height: 220px;
+      padding: 24px;
+    }
+
+    .support-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .support-card {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.80);
+      border: 1px solid rgba(45,31,18,.08);
+      box-shadow: var(--shadow);
+    }
+
+    .support-card .support-kicker {
+      display: inline-flex;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(255,186,74,.18);
+      color: #8d5200;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 14px;
+    }
+
+    .faq {
+      display: grid;
+      gap: 14px;
+    }
+
+    .faq-item {
+      border-radius: 20px;
+      border: 1px solid rgba(45,31,18,.08);
+      background: rgba(255,255,255,.80);
+      box-shadow: var(--shadow);
+      padding: 20px 22px;
+    }
+
+    .faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: "+";
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: rgba(45,31,18,.06);
+      font-size: 18px;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .faq-item[open] summary::after { content: "–"; }
+    .faq-answer {
+      padding-top: 14px;
+      padding-right: 48px;
+    }
+
+    .cta-section {
+      padding-top: 32px;
+      padding-bottom: 100px;
+    }
+
+    .cta-box {
+      position: relative;
+      overflow: hidden;
+      padding: 42px;
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at top left, rgba(255,186,74,.30), transparent 26%),
+        linear-gradient(135deg, #2d1f12, #4d321b);
+      color: #fff;
+      box-shadow: 0 22px 60px rgba(45,31,18,.22);
+    }
+
+    .cta-box::after {
+      content: "";
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      right: -70px;
+      top: -90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.14), transparent 68%);
+    }
+
+    .cta-box p {
+      color: rgba(255,255,255,.82);
+      max-width: 50ch;
+      margin-top: 12px;
+    }
+
+    .cta-box .hero-actions {
+      margin-top: 24px;
+    }
+
+    .cta-box .btn-secondary {
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .site-footer {
+      padding: 24px 0 50px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      justify-content: space-between;
+      border-top: 1px solid rgba(45,31,18,.08);
+      padding-top: 24px;
+    }
+
+    h1 {
+      max-width: 760px;
+      font-size: clamp(2.35rem, 4.8vw, 4.45rem);
+      line-height: 1.04;
+      letter-spacing: -0.035em;
+    }
+
+    h2 {
+      font-size: clamp(1.9rem, 3.25vw, 3rem);
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-copy,
+    .hero-visual {
+      min-height: 580px;
+    }
+
+    .hero-copy {
+      background: #fffaf4;
+    }
+
+    .section {
+      margin: 0;
+      border-top: 1px solid rgba(45,31,18,0.08);
+      background: #fffdf8;
+    }
+
+    main > .section:nth-of-type(2n) {
+      background: #f7f1e8;
+    }
+
+    main > .section:nth-of-type(3n) {
+      background: #fff7eb;
+    }
+
+    .section-head {
+      position: relative;
+      max-width: 850px;
+    }
+
+    .section-head::after {
+      content: "";
+      width: 72px;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .pain-card,
+    .benefit-card,
+    .proof-card,
+    .case-card,
+    .support-card,
+    .comparison-card,
+    .process-step,
+    .calculator-card {
+      background: #ffffff;
+      box-shadow: 0 14px 34px rgba(45,31,18,.07);
+    }
+
+    .pain-card::after,
+    .benefit-card::after,
+    .proof-card::after,
+    .case-card::after,
+    .support-card::after,
+    .process-step::after {
+      content: "";
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: 46px;
+      height: 46px;
+      border: 8px solid rgba(255,186,74,.2);
+      border-left-color: rgba(241,142,52,.72);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: .9;
+    }
+
+    .pain-card p,
+    .benefit-card p,
+    .proof-card p,
+    .case-card p,
+    .support-card p,
+    .process-step p {
+      position: relative;
+      z-index: 1;
+      max-width: calc(100% - 58px);
+    }
+
+    .benefit-card::before,
+    .proof-card::before,
+    .case-card::before,
+    .support-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 118px;
+      height: 118px;
+      border-bottom-left-radius: 100%;
+      background: rgba(255,186,74,.14);
+      pointer-events: none;
+    }
+
+    .pain-index,
+    .icon,
+    .step-no,
+    .case-type,
+    .support-card .support-kicker {
+      position: relative;
+      z-index: 1;
+    }
+
+    .landing-visual-strip {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr .9fr;
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .visual-photo,
+    .visual-infographic {
+      position: relative;
+      overflow: hidden;
+      min-height: 270px;
+      border: 1px solid rgba(45,31,18,.08);
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: 0 16px 40px rgba(45,31,18,.08);
+    }
+
+    .visual-photo img {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+    }
+
+    .visual-photo b {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      padding: 10px 13px;
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(45,31,18,.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .visual-infographic {
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      padding: 24px;
+      background:
+        linear-gradient(135deg, rgba(255,186,74,.18), rgba(255,255,255,.78)),
+        #fff;
+    }
+
+    .visual-infographic span {
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .visual-infographic strong {
+      color: var(--text);
+      font-size: 1.45rem;
+      line-height: 1.2;
+    }
+
+    .visual-infographic .bars {
+      display: grid;
+      gap: 10px;
+    }
+
+    .visual-infographic .bars i {
+      display: block;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+
+    .visual-infographic .bars i:nth-child(2) {
+      width: 78%;
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    }
+
+    .visual-infographic .bars i:nth-child(3) {
+      width: 58%;
+      background: linear-gradient(90deg, #24553a, var(--accent));
+    }
+
+    @media (max-width: 1180px) {
+      .hero-wrap,
+      .calculator,
+      .benefit-grid,
+      .proof-grid,
+      .cases,
+      .timeline,
+      .tables {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .benefit-grid .benefit-card:first-child {
+        grid-column: 1 / -1;
+      }
+
+      .proof-grid,
+      .cases {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .timeline {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .stats-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .support-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .landing-visual-strip {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .landing-visual-strip .visual-infographic {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .nav-links { display: none; }
+      .hero-wrap,
+      .calculator,
+      .before-after,
+      .tables,
+      .benefit-grid,
+      .pain-grid,
+      .process,
+      .proof-grid,
+      .cases,
+      .timeline,
+      .support-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy, .hero-visual { min-height: auto; }
+      .hero-visual { min-height: 500px; }
+      .hero-proof { grid-template-columns: 1fr; }
+      .stats-strip { grid-template-columns: 1fr; }
+      .result-grid { grid-template-columns: 1fr; }
+      .floating-card { max-width: unset; }
+      .section { padding: 72px 0; }
+      .cta-box { padding: 32px; }
+      .landing-visual-strip {
+        grid-template-columns: 1fr;
+      }
+      .landing-visual-strip .visual-infographic {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        width: min(calc(100% - 20px), var(--max));
+      }
+
+      .site-header { position: static; }
+      .nav { min-height: 70px; }
+      .nav-cta .btn-secondary { display: none; }
+      h1 { font-size: clamp(2.25rem, 12vw, 3.35rem); }
+      h2 { font-size: clamp(1.85rem, 9vw, 2.55rem); }
+      .hero { padding-top: 16px; }
+      .hero-copy { padding: 22px; }
+      .hero-visual { min-height: 420px; }
+      .visual-photo,
+      .visual-infographic {
+        min-height: 220px;
+      }
+      .floating-card { margin: 14px; padding: 18px; }
+      .section { padding: 56px 0; }
+      .panel, .comparison-card, .benefit-card, .pain-card, .calculator-card, .proof-card, .case-card, .support-card, .process-step, .faq-item { border-radius: 20px; }
+      .cta-box { border-radius: 24px; padding: 24px; }
+      .hero-actions, .nav-cta { width: 100%; }
+      .hero-actions .btn, .nav-cta .btn, .cta-box .btn { width: 100%; }
+      .chip { width: fit-content; }
+      .section-head { margin-bottom: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="#top" aria-label="120pie 홈으로 이동">
+        <span class="brand-mark">120</span>
+        <span>120pie &amp; coffee</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#why">도입 가치</a>
+        <a href="#simulator">수익 계산</a>
+        <a href="#proof">검증 근거</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-cta">
+        <a class="btn btn-secondary" href="#simulator">수익 계산해보기</a>
+        <a class="btn btn-primary" href="#contact">무료 도입 상담</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-wrap">
+          <div class="hero-copy panel">
+            <div class="hero-copy-top">
+              <span class="eyebrow">기존 카페에 바로 붙이는 디저트 매출 솔루션</span>
+              <h1>간판은 그대로,<br />디저트 매출은 새로.</h1>
+              <p>
+                120겹 파이와 에그120으로 객단가는 올리고, 폐기 부담은 낮추고, 사진 찍히는 시그니처 메뉴까지 더하는 세련된 샵인샵 랜딩페이지 초안입니다.
+              </p>
+              <div class="hero-actions">
+                <a class="btn btn-primary" href="#contact">무료 도입 상담 받기</a>
+                <a class="btn btn-secondary" href="#simulator">내 매장 수익 계산</a>
+              </div>
+              <div class="hero-badges">
+                <span class="chip">샵인샵 가능</span>
+                <span class="chip">5분 내외 조리</span>
+                <span class="chip">냉동보관</span>
+                <span class="chip">홀·포장·배달 대응</span>
+              </div>
+            </div>
+            <div class="hero-proof">
+              <div class="mini-stat">
+                <strong>5분</strong>
+                <span>내외 제조, 피크타임 대응</span>
+              </div>
+              <div class="mini-stat">
+                <strong>287+</strong>
+                <span>전국 취급점 경험</span>
+              </div>
+              <div class="mini-stat">
+                <strong>3WAY</strong>
+                <span>홀·포장·배달 판매 구조</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-visual panel" aria-label="120 layered pie visual">
+            <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=1200&q=82" alt="120 layered pie" />
+            <div class="floating-card">
+              <h3>팔릴 때만 굽는 구조로<br />운영 부담은 낮게</h3>
+              <p>복잡한 제빵 기술 없이도 빠르게 조리하고, 냉동보관 기반으로 재고 부담을 줄이는 수익형 디저트 시스템.</p>
+              <div class="floating-tags">
+                <span>객단가 상승</span>
+                <span>저폐기 운영</span>
+                <span>시그니처 메뉴</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-strip">
+          <div class="stat-card panel">
+            <strong>기존 카페 맞춤</strong>
+            <span>간판을 바꾸지 않고 메뉴만 추가하는 도입 구조</span>
+          </div>
+          <div class="stat-card panel">
+            <strong>초간편 조리</strong>
+            <span>전용 머신 기반으로 누구나 빠르게 제조 가능</span>
+          </div>
+          <div class="stat-card panel">
+            <strong>낮은 폐기 부담</strong>
+            <span>주문 후 조리 구조로 필요한 만큼만 사용</span>
+          </div>
+          <div class="stat-card panel">
+            <strong>SNS 비주얼</strong>
+            <span>사진 찍히는 메뉴로 배달앱과 오프라인에서 차별화</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pain-points">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">카페 사장님들의 실제 고민</span>
+          <h2>음료만으로는 한계가 느껴질 때,<br />문제는 메뉴가 아니라 구조입니다.</h2>
+          <p class="lead">현재 사이트의 핵심 문제 인식을 카드형 레이아웃으로 재구성했습니다. 읽는 즉시 “우리 매장 이야기”처럼 보이도록 구성한 섹션입니다.</p>
+        </div>
+
+        <div class="pain-grid">
+          <article class="pain-card">
+            <span class="pain-index">01</span>
+            <h3>음료 객단가 한계</h3>
+            <p>커피만으로는 추가 매출을 만들기 어렵고 주문 단가가 쉽게 오르지 않습니다.</p>
+          </article>
+          <article class="pain-card">
+            <span class="pain-index">02</span>
+            <h3>디저트 폐기 부담</h3>
+            <p>잘 팔릴지 몰라 미리 준비하기 어려우며, 남는 재고가 스트레스가 됩니다.</p>
+          </article>
+          <article class="pain-card">
+            <span class="pain-index">03</span>
+            <h3>복잡한 운영 난이도</h3>
+            <p>케이크나 베이커리는 보관, 선도, 제조 인력 관리까지 함께 고려해야 합니다.</p>
+          </article>
+          <article class="pain-card">
+            <span class="pain-index">04</span>
+            <h3>저가커피 경쟁 심화</h3>
+            <p>가격 경쟁이 강해질수록 메뉴 차별화와 마진 확보가 더 중요해집니다.</p>
+          </article>
+          <article class="pain-card">
+            <span class="pain-index">05</span>
+            <h3>배달앱 차별화 부족</h3>
+            <p>눈에 띄는 시그니처 메뉴가 없으면 리스트 안에서 선택받기 어렵습니다.</p>
+          </article>
+          <article class="pain-card">
+            <span class="pain-index">06</span>
+            <h3>사진 찍히는 메뉴 필요</h3>
+            <p>SNS 공유와 재방문을 유도하려면 기억에 남는 대표 메뉴가 필요합니다.</p>
+          </article>
+        </div>
+
+        <div class="landing-visual-strip" aria-label="카페 운영 고민 시각 요약">
+          <figure class="visual-photo">
+            <img src="https://images.unsplash.com/photo-1517433367423-c7e5b0f35086?auto=format&fit=crop&w=900&q=82" alt="디저트 진열 이미지" />
+            <b>눈에 띄는 디저트 메뉴</b>
+          </figure>
+          <div class="visual-infographic">
+            <span>POINT 01</span>
+            <strong>음료 중심 매출에서<br />세트 주문 구조로 전환</strong>
+            <div class="bars" aria-hidden="true"><i></i><i></i><i></i></div>
+          </div>
+          <figure class="visual-photo">
+            <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=900&q=82" alt="카페 매장 이미지" />
+            <b>기존 카페에 더하는 구조</b>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="why">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">왜 120pie인가</span>
+          <h2>디저트를 추가하는 것이 아니라,<br />매출 구조를 추가하는 방식.</h2>
+          <p class="lead">기존 사이트의 5가지 도입 가치를 Bento Grid 형태로 재구성했습니다. 강한 효익이 먼저 읽히고, 상세 설명은 짧고 압축적으로 배치했습니다.</p>
+        </div>
+
+        <div class="benefit-grid">
+          <article class="benefit-card large">
+            <div>
+              <div class="icon">📈</div>
+              <h3>객단가 상승</h3>
+              <p>커피 한 잔 주문을 파이 세트 주문으로 전환해 자연스럽게 주문 금액을 끌어올립니다.</p>
+            </div>
+            <div class="benefit-points">
+              <span>세트 판매</span>
+              <span>추가 메뉴 구성</span>
+              <span>매출 상승 포인트</span>
+            </div>
+          </article>
+          <article class="benefit-card">
+            <div>
+              <div class="icon">🏪</div>
+              <h3>샵인샵 가능</h3>
+              <p>기존 카페 공간에 메뉴를 더하는 방식이라 간판을 바꾸지 않아도 시작할 수 있습니다.</p>
+            </div>
+          </article>
+          <article class="benefit-card">
+            <div>
+              <div class="icon">⚡</div>
+              <h3>초간편 조리</h3>
+              <p>전용 머신 기반이라 베이킹 기술이 없어도 빠르게 제조할 수 있습니다.</p>
+            </div>
+          </article>
+          <article class="benefit-card">
+            <div>
+              <div class="icon">🧊</div>
+              <h3>폐기 부담 감소</h3>
+              <p>냉동 보관 후 주문이 들어오면 바로 조리하는 구조라 재고 리스크를 줄입니다.</p>
+            </div>
+          </article>
+          <article class="benefit-card">
+            <div>
+              <div class="icon">📸</div>
+              <h3>시그니처 메뉴 확보</h3>
+              <p>비주얼이 강한 메뉴 구성으로 SNS와 배달앱에서 눈에 띄는 포인트를 만듭니다.</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="landing-visual-strip" aria-label="120pie 도입 효과 이미지">
+          <div class="visual-infographic">
+            <span>POINT 02</span>
+            <strong>냉동보관, 주문 후 조리,<br />매장·배달 동시 대응</strong>
+            <div class="bars" aria-hidden="true"><i></i><i></i><i></i></div>
+          </div>
+          <figure class="visual-photo">
+            <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=82" alt="파이와 디저트 이미지" />
+            <b>시그니처 디저트</b>
+          </figure>
+          <figure class="visual-photo">
+            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=82" alt="카페 운영 이미지" />
+            <b>카페 운영에 맞춘 도입</b>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="simulator">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">수익성 시뮬레이션</span>
+          <h2>하루 몇 개만 팔아도,<br />추가 매출은 바로 보입니다.</h2>
+          <p class="lead">입력 패널과 결과 패널을 분리한 반응형 계산기 섹션입니다. 실제 개발 시 자바스크립트 연동으로 바로 운영 가능한 구조입니다.</p>
+        </div>
+
+        <div class="calculator">
+          <div class="calculator-card">
+            <h3>기본 시뮬레이션</h3>
+            <p class="calculator-note">사장님 매장 기준으로 하루 판매량과 평균 판매가를 입력하면 예상 월 매출 구조를 바로 확인할 수 있습니다.</p>
+            <div class="form-grid">
+              <label>
+                하루 예상 판매 수량
+                <input type="number" value="20" min="0" />
+              </label>
+              <label>
+                평균 판매가
+                <input type="number" value="4500" min="0" />
+              </label>
+              <label>
+                월 영업일
+                <input type="number" value="26" min="0" />
+              </label>
+            </div>
+            <div class="hero-actions" style="margin-top:24px;">
+              <a class="btn btn-primary" href="#contact">내 매장 기준 상담받기</a>
+            </div>
+          </div>
+
+          <div class="calculator-result">
+            <div class="result-hero">
+              <span class="micro-copy">예상 월 매출</span>
+              <strong>2,340,000원</strong>
+              <p>하루 20개 × 평균 4,500원 × 월 26일 기준</p>
+            </div>
+            <div class="result-grid">
+              <div class="kpi">
+                <div class="kpi-value">520개</div>
+                <div class="kpi-label">월 예상 판매수량</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-value">세트 전환형</div>
+                <div class="kpi-label">객단가 상승 구조</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-value">주문 후 조리</div>
+                <div class="kpi-label">재고 부담 완화</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-value">상담 시 안내</div>
+                <div class="kpi-label">예상 매출이익</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="before-after">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">매장 변화 비교</span>
+          <h2>간판을 바꾸지 않아도,<br />팔리는 메뉴 구조는 바뀝니다.</h2>
+        </div>
+
+        <div class="before-after">
+          <article class="comparison-card before">
+            <span class="comparison-tag">Before</span>
+            <h3>음료 중심 매장</h3>
+            <div class="bullet-list">
+              <div class="bullet"><i>–</i><p>객단가가 낮아 매출 한계가 빨리 드러남</p></div>
+              <div class="bullet"><i>–</i><p>디저트 매출이 약해 세트 판매가 어려움</p></div>
+              <div class="bullet"><i>–</i><p>배달앱에서 차별화할 대표 메뉴가 부족함</p></div>
+            </div>
+          </article>
+
+          <article class="comparison-card after">
+            <span class="comparison-tag">After</span>
+            <h3>음료 + 디저트 세트 매장</h3>
+            <div class="bullet-list">
+              <div class="bullet"><i>✓</i><p>파이 세트 구성으로 객단가를 자연스럽게 상승</p></div>
+              <div class="bullet"><i>✓</i><p>비주얼 중심 메뉴로 시그니처 포지션 확보</p></div>
+              <div class="bullet"><i>✓</i><p>홀·포장·배달 모두 활용 가능한 판매 구조</p></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="process">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">운영 방식</span>
+          <h2>베이킹 경험이 없어도,<br />시스템으로 운영 가능합니다.</h2>
+        </div>
+
+        <div class="process">
+          <article class="process-step">
+            <span class="step-no">01</span>
+            <h3>원재료 준비</h3>
+            <p>본사 공급 원재료를 냉동 보관 후 주문 시 사용하는 방식으로 관리 부담을 줄입니다.</p>
+          </article>
+          <article class="process-step">
+            <span class="step-no">02</span>
+            <h3>전용 머신 조리</h3>
+            <p>복잡한 제빵 기술 없이 정해진 시스템대로 조리해 운영 표준화를 만들 수 있습니다.</p>
+          </article>
+          <article class="process-step">
+            <span class="step-no">03</span>
+            <h3>5분 내외 완성</h3>
+            <p>주문 후 빠르게 제공 가능해 피크타임과 배달 주문 대응에 유리합니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="comparison">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">운영 비교</span>
+          <h2>일반 디저트 도입과는<br />운영 논리가 다릅니다.</h2>
+        </div>
+
+        <div class="tables">
+          <div class="calculator-card">
+            <h3>폐기 부담 비교</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>구분</th>
+                  <th>일반 디저트</th>
+                  <th>120pie &amp; coffee</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>보관</td><td>당일 판매 부담</td><td>냉동 보관</td></tr>
+                <tr><td>제조</td><td>미리 준비 필요</td><td>주문 후 조리</td></tr>
+                <tr><td>폐기</td><td>재고 예측 실패 시 부담</td><td>필요한 만큼 사용</td></tr>
+                <tr><td>관리</td><td>쇼케이스/선도 관리</td><td>원재료 중심 관리</td></tr>
+                <tr><td>운영</td><td>숙련도 필요</td><td>전용 시스템 기반</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="calculator-card">
+            <h3>도입 방식 비교</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>비교 항목</th>
+                  <th>일반 디저트 도입</th>
+                  <th>120pie &amp; coffee</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>도입 목적</td><td>메뉴 추가</td><td>매출 구조 개선</td></tr>
+                <tr><td>제조 방식</td><td>완제품/해동 중심</td><td>현장 직접 제조</td></tr>
+                <tr><td>운영 난이도</td><td>관리 부담 있음</td><td>전용 머신 기반</td></tr>
+                <tr><td>차별성</td><td>흔한 메뉴 가능성</td><td>120겹 파이/에그120</td></tr>
+                <tr><td>판매 방식</td><td>홀 판매 중심</td><td>홀·포장·배달 가능</td></tr>
+                <tr><td>카페 적합성</td><td>매장에 따라 제한</td><td>샵인샵 도입 가능</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="proof">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">현장 검증 근거</span>
+          <h2>말로 설명하는 브랜드보다,<br />현장에서 검증된 메뉴 구조.</h2>
+        </div>
+
+        <div class="proof-grid">
+          <article class="proof-card">
+            <strong>287+</strong>
+            <h3>전국 취급점 경험</h3>
+            <p>도입 가능한 매장 형태에 대한 운영 노하우가 축적된 구조를 보여줍니다.</p>
+          </article>
+          <article class="proof-card">
+            <strong>박람회</strong>
+            <h3>현장 시식 검증</h3>
+            <p>예비 점주와 카페 사장님이 직접 맛보고 판단하는 접점을 지속적으로 운영합니다.</p>
+          </article>
+          <article class="proof-card">
+            <strong>SNS</strong>
+            <h3>미디어 노출</h3>
+            <p>비주얼 중심 메뉴의 장점을 살려 자발적 노출과 관심을 만들 수 있는 형태입니다.</p>
+          </article>
+          <article class="proof-card">
+            <strong>CASE</strong>
+            <h3>도입 사례 기반</h3>
+            <p>기존 카페·배달형 매장·예비 창업자까지 폭넓은 운영 시나리오를 제안할 수 있습니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="cases">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">도입 대상 매장</span>
+          <h2>매장 유형별로,<br />도입 방식도 다르게 설계됩니다.</h2>
+        </div>
+
+        <div class="cases">
+          <article class="case-card">
+            <span class="case-type">CASE 1</span>
+            <h3>개인카페</h3>
+            <p>디저트 매출이 약한 매장에 세트 메뉴와 시그니처 비주얼을 더합니다.</p>
+          </article>
+          <article class="case-card">
+            <span class="case-type">CASE 2</span>
+            <h3>저가커피 매장</h3>
+            <p>커피 단품 주문을 커피 + 파이 조합으로 전환해 객단가를 높입니다.</p>
+          </article>
+          <article class="case-card">
+            <span class="case-type">CASE 3</span>
+            <h3>배달형 카페</h3>
+            <p>포장과 배달에 적합한 세트 메뉴를 구성해 플랫폼 차별화를 노립니다.</p>
+          </article>
+          <article class="case-card">
+            <span class="case-type">CASE 4</span>
+            <h3>예비 창업자</h3>
+            <p>복잡한 베이킹 기술보다 운영 시스템 중심으로 시작할 수 있습니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="timeline">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">도입 절차</span>
+          <h2>도입 과정은 간단하고,<br />상담 흐름은 명확합니다.</h2>
+        </div>
+
+        <div class="timeline">
+          <article class="process-step"><span class="step-no">1</span><h3>상담 신청</h3><p>매장 운영 여부와 지역을 남기면 기본 도입 가능성을 확인합니다.</p></article>
+          <article class="process-step"><span class="step-no">2</span><h3>매장 유형 확인</h3><p>기존 카페, 저가커피, 배달형 등 운영 형태를 파악합니다.</p></article>
+          <article class="process-step"><span class="step-no">3</span><h3>수익 구조 상담</h3><p>예상 판매량, 메뉴 구성, 도입 방식을 함께 계산합니다.</p></article>
+          <article class="process-step"><span class="step-no">4</span><h3>계약 및 교육</h3><p>운영 방식과 조리 교육을 진행하며 오픈 준비를 맞춥니다.</p></article>
+          <article class="process-step"><span class="step-no">5</span><h3>장비·원재료 세팅</h3><p>판매에 필요한 기본 장비와 원재료 세팅을 진행합니다.</p></article>
+          <article class="process-step"><span class="step-no">6</span><h3>판매 시작</h3><p>홀·포장·배달까지 실제 판매 구조를 운영에 반영합니다.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="support">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">도입 지원</span>
+          <h2>초기 부담을 낮추는 요소를<br />명확하게 보여주는 섹션.</h2>
+        </div>
+
+        <div class="support-grid">
+          <article class="support-card"><span class="support-kicker">지원</span><h3>가맹비 지원</h3><p>진입 장벽을 낮추는 방향의 메시지를 카드형으로 표현했습니다.</p></article>
+          <article class="support-card"><span class="support-kicker">지원</span><h3>교육비 지원</h3><p>초보자도 운영 가능하다는 메시지와 자연스럽게 연결됩니다.</p></article>
+          <article class="support-card"><span class="support-kicker">지원</span><h3>로열티 부담 완화</h3><p>초기 운영 부담에 민감한 예비 점주 설득용 포인트입니다.</p></article>
+          <article class="support-card"><span class="support-kicker">지원</span><h3>보증금 부담 완화</h3><p>도입 비용 장벽을 낮춰 문의 전환을 유도하는 카드입니다.</p></article>
+          <article class="support-card"><span class="support-kicker">지원</span><h3>배달앱 세팅 지원</h3><p>운영 실행 단계까지 도와준다는 실무형 신뢰를 줍니다.</p></article>
+          <article class="support-card"><span class="support-kicker">지원</span><h3>1:1 운영 지원</h3><p>매장 형태와 도입 범위에 맞는 상담형 지원 메시지를 전달합니다.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">자주 묻는 질문</span>
+          <h2>문의 전에 가장 많이 확인하는 질문을<br />아코디언 구조로 정리했습니다.</h2>
+        </div>
+
+        <div class="faq">
+          <details class="faq-item" open>
+            <summary>기존 카페에서도 도입 가능한가요?</summary>
+            <div class="faq-answer">네. 간판을 바꾸지 않고 기존 카페에 샵인샵 형태로 메뉴를 추가하는 방식으로 도입할 수 있습니다.</div>
+          </details>
+          <details class="faq-item">
+            <summary>베이킹 경험이 없어도 운영할 수 있나요?</summary>
+            <div class="faq-answer">전용 머신과 정해진 제조 프로세스를 기반으로 하기 때문에 복잡한 제빵 기술 없이도 운영이 가능합니다.</div>
+          </details>
+          <details class="faq-item">
+            <summary>배달형 카페에도 맞는 구조인가요?</summary>
+            <div class="faq-answer">홀 판매뿐 아니라 포장·배달까지 고려한 3way 판매 구조를 전제로 설계할 수 있습니다.</div>
+          </details>
+          <details class="faq-item">
+            <summary>폐기 부담은 어떻게 줄이나요?</summary>
+            <div class="faq-answer">냉동 보관 후 주문이 들어오면 조리하는 방식이라 일반 생물 디저트 대비 재고 부담을 줄일 수 있습니다.</div>
+          </details>
+          <details class="faq-item">
+            <summary>수익 구조는 매장마다 다르게 계산되나요?</summary>
+            <div class="faq-answer">네. 판매가, 판매량, 운영 방식, 매장 동선에 따라 달라지기 때문에 상담 시 매장 기준으로 구체적으로 계산하는 구조가 적합합니다.</div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-section" id="contact">
+      <div class="container">
+        <div class="cta-box">
+          <h3>내 매장에 120pie를 도입할 수 있을까요?</h3>
+          <p>매장 형태, 현재 메뉴, 지역, 운영 방식에 따라 도입 가능성과 예상 수익 구조를 상담해드립니다. 이 초안은 실제 운영 랜딩으로 확장하기 쉽게 CTA를 반복 배치한 구조입니다.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#top">무료 도입 상담 신청</a>
+            <a class="btn btn-secondary" href="#proof">박람회 시식 예약 보기</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <span>© 2026 120pie &amp; coffee Landing Draft</span>
+      <span>Responsive HTML/CSS wireframe draft</span>
+    </div>
+  </footer>
+</body>
+</html>

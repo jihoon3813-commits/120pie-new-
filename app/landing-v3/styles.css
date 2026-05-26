@@ -1,0 +1,134 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#landing-v3 {
+  font-family: "Pretendard Variable", Pretendard, ui-sans-serif, system-ui, sans-serif;
+}
+
+.menu-modal-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.menu-modal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  :is(#landing-v3, #landing-v4) > header > div:first-child {
+    min-height: 68px;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section:first-child {
+    padding-top: 2rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section h2 {
+    font-size: 1.65rem;
+    line-height: 1.2;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section .mb-20 {
+    margin-bottom: 2.25rem;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section :is(.mb-16, .mb-14, .mb-12) {
+    margin-bottom: 1.5rem;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section .mb-10 {
+    margin-bottom: 1.25rem;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section :is(.mt-20, .mt-8) {
+    margin-top: 1.75rem;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section :is(.pt-14, .pt-8, .pt-6) {
+    padding-top: 1.25rem;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section :is(.gap-12, .gap-10, .gap-8) {
+    gap: 1.5rem;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section :is(.gap-7, .gap-6, .gap-5, .gap-4) {
+    gap: 1rem;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section :is(.p-8, .p-6) {
+    padding: 1rem;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section .p-5 {
+    padding: 0.875rem;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section :is(.aspect-\[4\/3\], .aspect-video) {
+    aspect-ratio: 16 / 9;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section .h-56 {
+    height: 9.5rem;
+  }
+
+  :is(#landing-v3, #landing-v4) #adoption .h-40 {
+    height: 7.5rem;
+  }
+
+  :is(#landing-v3, #landing-v4) main > section :is(.min-h-\[400px\], .min-h-\[320px\]) {
+    min-height: 14rem;
+  }
+
+  :is(#landing-v3, #landing-v4) #menu .catalog-detail-button {
+    margin-top: 1rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+
+  :is(#landing-v3, #landing-v4) #faq .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.625rem;
+  }
+
+  :is(#landing-v3, #landing-v4) #faq button {
+    padding: 0.9rem 1rem;
+  }
+
+  :is(#landing-v3, #landing-v4) #contact form {
+    gap: 1rem;
+  }
+
+  :is(#landing-v3, #landing-v4) .mobile-horizontal-cards {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(15.5rem, 84vw);
+    grid-template-columns: none;
+    gap: 0.875rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  :is(#landing-v3, #landing-v4) .mobile-horizontal-cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  :is(#landing-v3, #landing-v4) .mobile-horizontal-cards > * {
+    scroll-snap-align: start;
+  }
+
+  :is(#landing-v3, #landing-v4) footer > div {
+    padding-top: 2.5rem;
+    padding-bottom: 2rem;
+  }
+}
