@@ -323,6 +323,19 @@ function AdoptionModal({ exampleId, onClose }: { exampleId: string | null, onClo
   )
 }
 
+const MARQUEE_IMAGES = [
+  { name: "로제미트파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg" },
+  { name: "블루베리파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_tnfg8c.jpg" },
+  { name: "콘치즈파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_qvb2u5.jpg" },
+  { name: "흑임자크림파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%ED%9D%91%EC%9E%84%EC%9E%90%ED%81%AC%EB%A6%BC_g0p6sk.jpg" },
+  { name: "커스터드파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_b0flce.jpg" },
+  { name: "불고기파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B41_ezthee.jpg" },
+  { name: "두바이쫀득파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EB%91%90%EB%B0%94%EC%9D%B4%EC%AA%BD%EB%93%9D%ED%8C%8C%EC%9D%B4_vjl5zb.jpg" },
+  { name: "애플시나몬파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_yurkh5.jpg" },
+  { name: "오리지널 계란빵", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg" },
+  { name: "오리지널 츄러스", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762878/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_koyjlk.jpg" }
+];
+
 // V3 StoresPreviewSection
 function StoresPreviewSection() {
   const previewStores = [
@@ -690,7 +703,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
         {/* ------------------------------------------------------------- */}
         {/* HERO SECTION [RICH BLACK & GOLDEN YELLOW - HIGH IMPACT] */}
         {/* ------------------------------------------------------------- */}
-        <section className="relative py-24 md:py-32 bg-neutral-950 text-white overflow-hidden border-b border-neutral-900/80">
+        <section className="relative py-24 md:py-32 bg-neutral-950 text-white overflow-hidden">
 
           {/* Tonal gold ambient glow background lights */}
           <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-amber-400/10 rounded-full blur-3xl pointer-events-none z-0"></div>
@@ -813,77 +826,90 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
         </section>
 
         {/* ------------------------------------------------------------- */}
-        {/* PAIN POINTS SECTION [PURE WHITE & LIGHT GREY THEME - CLEAR TROUBLES] */}
+        {/* INFINITE SCROLLING DESSERT MENU MARQUEE SECTION (NEW 🚀) */}
         {/* ------------------------------------------------------------- */}
-        <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100" id="pain-points">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
+        <section 
+          id="marquee-slider"
+          className="py-0 !py-0 bg-neutral-950 overflow-hidden relative"
+          style={{
+            backgroundColor: isPinkVariant ? "#ffeaf0" : undefined
+          }}
+        >
+          <style dangerouslySetInnerHTML={{ __html: `
+            @keyframes marquee-left {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            @keyframes marquee-right {
+              0% { transform: translateX(-50%); }
+              100% { transform: translateX(0); }
+            }
+            .animate-marquee-left {
+              display: flex;
+              width: max-content;
+              animation: marquee-left 45s linear infinite;
+            }
+            .animate-marquee-right {
+              display: flex;
+              width: max-content;
+              animation: marquee-right 45s linear infinite;
+            }
+          `}} />
 
-              {/* Left Troubles Cards Grid */}
-              <div className="lg:col-span-8 flex flex-col justify-between">
-                <motion.div className="max-w-xl mb-12" {...fadeIn}>
-                  <span className="text-neutral-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Real Cafe Troubles</span>
-                  <h2 className="text-3xl sm:text-4xl font-black text-black mb-4 tracking-tight leading-tight">
-                    하루 백 잔을 팔아도 제자리걸음이라면,<br />
-                    문제는 잔수가 아닌 <span className="text-amber-500 font-extrabold">낮은 객단가</span>입니다.
-                  </h2>
-                  <p className="text-xs sm:text-sm text-neutral-500 font-bold leading-relaxed">
-                    저가 커피와 치열하게 경쟁하며 음료만 판매하는 방식으로는 성장에 한계가 있습니다.<br />
-                    기존 매장을 크게 바꾸지 않고도, 파이 메뉴 하나로 주문의 가치를 높일 수 있습니다.
-                  </p>
-                </motion.div>
+          {/* Gradual blur fade gradients on left and right edges */}
+          <div 
+            className="absolute top-0 bottom-0 left-0 w-16 sm:w-40 bg-gradient-to-r from-neutral-950 to-transparent z-10 pointer-events-none"
+            style={{
+              backgroundImage: isPinkVariant 
+                ? "linear-gradient(to right, #ffeaf0, transparent)" 
+                : undefined
+            }}
+          ></div>
+          <div 
+            className="absolute top-0 bottom-0 right-0 w-16 sm:w-40 bg-gradient-to-l from-neutral-950 to-transparent z-10 pointer-events-none"
+            style={{
+              backgroundImage: isPinkVariant 
+                ? "linear-gradient(to left, #ffeaf0, transparent)" 
+                : undefined
+            }}
+          ></div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {[
-                    { no: "01", title: "음료 객단가의 물리적 한계", desc: "커피 한 잔당의 마진 단가가 오르지 않고 주변 저가 프랜차이즈 저가 경쟁 시 타격이 매우 큽니다." },
-                    { no: "02", title: "매일 반복되는 상온 빵 폐기", desc: "쇼케이스에 준비할수록 선도가 저하되고 당일 판매 불발 시 원가 폐기율 손실이 커집니다." },
-                    { no: "03", title: "어려운 베이커리 제조 인프라", desc: "매장 내에서 직접 빵을 생산하려면 오븐기 셋업 공간과 전문 제과사 급여비가 심각히 가중됩니다." },
-                    { no: "04", title: "차별화 없는 배달 메뉴 썸네일", desc: "배달앱 리스트에서 사장님 매장만이 가지는 뚜렷한 대표 디저트 세트가 없어 경쟁에서 묻힙니다." },
-                    { no: "05", title: "초기 철거/가맹비 인테리어 거품", desc: "신규 창업이나 브랜드 업종 전환을 하려면 억대 규모의 불필요한 공사비와 본사 마진 거품이 발생합니다." },
-                    { no: "06", title: "인스타그램 자발적 바이럴 부재", desc: "MZ고객들이 사진 찍고 태그하여 지인을 부를 만한 감각적인 브랜드 시각 굿즈 및 대표 캐릭터가 결여되어 있습니다." }
-                  ].map((p, idx) => (
-                    <motion.div
-                      key={idx}
-                      className="bg-neutral-50 border border-neutral-100 p-6 rounded-2xl hover:border-black hover:bg-white transition-all group shadow-sm"
-                      initial={{ opacity: 0, y: 15 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: idx * 0.05 }}
-                    >
-                      <span className="w-8 h-8 rounded bg-neutral-950 text-white font-black text-xs flex items-center justify-center mb-4 group-hover:scale-105 group-hover:bg-amber-400 group-hover:text-neutral-950 transition-all">
-                        {p.no}
-                      </span>
-                      <h3 className="text-base font-black text-black mb-2">{p.title}</h3>
-                      <p className="text-xs text-neutral-500 font-bold leading-relaxed">{p.desc}</p>
-                    </motion.div>
-                  ))}
+          <div className="w-full flex flex-col gap-0 py-0 bg-transparent">
+            {/* Track 1: Moving Left */}
+            <div className="animate-marquee-left gap-0">
+              {[...MARQUEE_IMAGES, ...MARQUEE_IMAGES].map((img, idx) => (
+                <div 
+                  key={`t1-${idx}`} 
+                  className="w-[180px] sm:w-[360px] aspect-square rounded-none overflow-hidden bg-neutral-900 shrink-0 relative group shadow-inner"
+                >
+                  <img 
+                    src={img.src} 
+                    alt={img.name} 
+                    className="w-full h-full object-cover rounded-none transition-transform duration-750 group-hover:scale-[1.04]" 
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none" />
                 </div>
-              </div>
+              ))}
+            </div>
 
-              {/* Right Supporting Video Column */}
-              <motion.div
-                className="lg:col-span-4 bg-neutral-50 border border-neutral-200 rounded-3xl overflow-hidden relative min-h-[400px] flex items-end shadow-inner"
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <video
-                  src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779806860/120pie_%EC%98%81%EC%83%81_2_1_lcu4u7.mp4"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  aria-label="120겹 파이 메뉴 연출 영상"
-                  className={`absolute inset-0 w-full h-full object-cover ${isPinkVariant ? "opacity-100" : "opacity-90 contrast-105"}`}
-                />
-                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-white/70 via-white/5 to-transparent" : "from-black/85 via-black/20 to-transparent"}`}></div>
-                <div className="relative z-10 p-6 text-white text-xs font-bold leading-relaxed">
-                  <span className="text-amber-400 uppercase tracking-widest text-[9px] block mb-1">barista desk support</span>
-                  "음료 제조 중에도 120겹 파이는 본사 자동 타이머 타이틀 하에 구워져 별도 주방 제조 피로도가 거의 없습니다."
-                </div>
-              </motion.div>
-
+            {/* Track 2: Moving Right (Offset images by 5 for diversity) */}
+            <div className="animate-marquee-right gap-0">
+              {(() => {
+                const shiftedImages = [...MARQUEE_IMAGES.slice(5), ...MARQUEE_IMAGES.slice(0, 5)];
+                return [...shiftedImages, ...shiftedImages].map((img, idx) => (
+                  <div 
+                    key={`t2-${idx}`} 
+                    className="w-[180px] sm:w-[360px] aspect-square rounded-none overflow-hidden bg-neutral-900 shrink-0 relative group shadow-inner"
+                  >
+                    <img 
+                      src={img.src} 
+                      alt={img.name} 
+                      className="w-full h-full object-cover rounded-none transition-transform duration-750 group-hover:scale-[1.04]" 
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none" />
+                  </div>
+                ));
+              })()}
             </div>
           </div>
         </section>
@@ -1009,6 +1035,82 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                   </p>
                 </div>
               </motion.article>
+
+            </div>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------------- */}
+        {/* PAIN POINTS SECTION [PURE WHITE & LIGHT GREY THEME - CLEAR TROUBLES] */}
+        {/* ------------------------------------------------------------- */}
+        <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100" id="pain-points">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
+
+              {/* Left Troubles Cards Grid */}
+              <div className="lg:col-span-8 flex flex-col justify-between">
+                <motion.div className="max-w-xl mb-12" {...fadeIn}>
+                  <span className="text-neutral-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Real Cafe Troubles</span>
+                  <h2 className="text-3xl sm:text-4xl font-black text-black mb-4 tracking-tight leading-tight">
+                    하루 백 잔을 팔아도 제자리걸음이라면,<br />
+                    문제는 잔수가 아닌 <span className="text-amber-500 font-extrabold">낮은 객단가</span>입니다.
+                  </h2>
+                  <p className="text-xs sm:text-sm text-neutral-500 font-bold leading-relaxed">
+                    저가 커피와 치열하게 경쟁하며 음료만 판매하는 방식으로는 성장에 한계가 있습니다.<br />
+                    기존 매장을 크게 바꾸지 않고도, 파이 메뉴 하나로 주문의 가치를 높일 수 있습니다.
+                  </p>
+                </motion.div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {[
+                    { no: "01", title: "음료 객단가의 물리적 한계", desc: "커피 한 잔당의 마진 단가가 오르지 않고 주변 저가 프랜차이즈 저가 경쟁 시 타격이 매우 큽니다." },
+                    { no: "02", title: "매일 반복되는 상온 빵 폐기", desc: "쇼케이스에 준비할수록 선도가 저하되고 당일 판매 불발 시 원가 폐기율 손실이 커집니다." },
+                    { no: "03", title: "어려운 베이커리 제조 인프라", desc: "매장 내에서 직접 빵을 생산하려면 오븐기 셋업 공간과 전문 제과사 급여비가 심각히 가중됩니다." },
+                    { no: "04", title: "차별화 없는 배달 메뉴 썸네일", desc: "배달앱 리스트에서 사장님 매장만이 가지는 뚜렷한 대표 디저트 세트가 없어 경쟁에서 묻힙니다." },
+                    { no: "05", title: "초기 철거/가맹비 인테리어 거품", desc: "신규 창업이나 브랜드 업종 전환을 하려면 억대 규모의 불필요한 공사비와 본사 마진 거품이 발생합니다." },
+                    { no: "06", title: "인스타그램 자발적 바이럴 부재", desc: "MZ고객들이 사진 찍고 태그하여 지인을 부를 만한 감각적인 브랜드 시각 굿즈 및 대표 캐릭터가 결여되어 있습니다." }
+                  ].map((p, idx) => (
+                    <motion.div
+                      key={idx}
+                      className="bg-neutral-50 border border-neutral-100 p-6 rounded-2xl hover:border-black hover:bg-white transition-all group shadow-sm"
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: idx * 0.05 }}
+                    >
+                      <span className="w-8 h-8 rounded bg-neutral-950 text-white font-black text-xs flex items-center justify-center mb-4 group-hover:scale-105 group-hover:bg-amber-400 group-hover:text-neutral-950 transition-all">
+                        {p.no}
+                      </span>
+                      <h3 className="text-base font-black text-black mb-2">{p.title}</h3>
+                      <p className="text-xs text-neutral-500 font-bold leading-relaxed">{p.desc}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Supporting Video Column */}
+              <motion.div
+                className="lg:col-span-4 bg-neutral-50 border border-neutral-200 rounded-3xl overflow-hidden relative min-h-[400px] flex items-end shadow-inner"
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <video
+                  src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779807895/120pie_%EC%98%81%EC%83%81_2_2_qz3xdx.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  aria-label="120겹 파이 메뉴 연출 영상"
+                  className={`absolute inset-0 w-full h-full object-cover ${isPinkVariant ? "opacity-100" : "opacity-90 contrast-105"}`}
+                />
+                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-white/70 via-white/5 to-transparent" : "from-black/85 via-black/20 to-transparent"}`}></div>
+                <div className="relative z-10 p-6 text-white text-xs font-bold leading-relaxed">
+                  <span className="text-amber-400 uppercase tracking-widest text-[9px] block mb-1">barista desk support</span>
+                  "음료 제조 중에도 120겹 파이는 본사 자동 타이머 타이틀 하에 구워져 별도 주방 제조 피로도가 거의 없습니다."
+                </div>
+              </motion.div>
 
             </div>
           </div>

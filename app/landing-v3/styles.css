@@ -27,6 +27,11 @@
     padding-bottom: 3rem !important;
   }
 
+  :is(#landing-v3, #landing-v4) main > section#marquee-slider {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
   :is(#landing-v3, #landing-v4) main > section:first-child {
     padding-top: 2rem !important;
     padding-bottom: 2.5rem !important;
