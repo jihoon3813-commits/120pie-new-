@@ -186,11 +186,14 @@
 }
 
 #landing-v4 .hover\:border-black:hover,
-#landing-v4 .hover\:border-amber-400:hover,
 #landing-v4 .hover\:border-amber-400\/35:hover,
 #landing-v4 .hover\:border-amber-400\/40:hover,
 #landing-v4 .hover\:border-amber-400\/60:hover {
   border-color: transparent;
+}
+
+#landing-v4 .hover\:border-amber-400:hover {
+  border-color: var(--pink-accent) !important;
 }
 
 #landing-v4 .from-\[\#0a0a0a\],
@@ -308,4 +311,11 @@
 #landing-v4 select.border:focus,
 #landing-v4 textarea.border:focus {
   border-color: transparent;
+}
+
+#landing-v4 .bento-text-card {
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  border: 1px solid rgba(242, 95, 138, 0.35) !important;
+  box-shadow: none !important;
 }

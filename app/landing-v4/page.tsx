@@ -1,4 +1,4 @@
-import HomeV3 from "../landing-v3/HomeV3";
+import HomeV3 from "../v3/HomeV3";
 
 export const metadata = {
   title: "120pie&coffee | 랜딩 v4",

@@ -686,7 +686,7 @@ export default function HomeV3() {
               >
                 <div>
                   <span className="w-10 h-10 rounded bg-amber-400/10 border border-amber-400/20 flex items-center justify-center mb-6 shadow-sm p-1.5">
-                    <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png" alt="" className="w-full h-full object-contain" />
+                    <img src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"} alt="" className="w-full h-full object-contain" />
                   </span>
                   <h3 className="text-xl sm:text-2xl font-black text-white mb-3">커피와 잘 어울리는 세트 메뉴로 한 잔의 만족을 더합니다</h3>
                   <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
@@ -730,7 +730,7 @@ export default function HomeV3() {
               >
                 <div>
                   <span className="w-8 h-8 rounded bg-neutral-950 border border-neutral-800 flex items-center justify-center mb-4 p-1">
-                    <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png" alt="" className="w-full h-full object-contain" />
+                    <img src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"} alt="" className="w-full h-full object-contain" />
                   </span>
                   <h3 className="text-base font-black text-white mb-2">지금 매장 분위기 그대로 시작</h3>
                   <p className="text-xs text-neutral-400 font-medium leading-relaxed">
@@ -749,7 +749,7 @@ export default function HomeV3() {
               >
                 <div>
                   <span className="w-8 h-8 rounded bg-neutral-950 border border-neutral-800 flex items-center justify-center mb-4 p-1">
-                    <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png" alt="" className="w-full h-full object-contain" />
+                    <img src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"} alt="" className="w-full h-full object-contain" />
                   </span>
                   <h3 className="text-base font-black text-white mb-2">누구나 편하게 준비하는 5분 조리</h3>
                   <p className="text-xs text-neutral-400 font-medium leading-relaxed">
@@ -768,7 +768,7 @@ export default function HomeV3() {
               >
                 <div>
                   <span className="w-8 h-8 rounded bg-neutral-950 border border-neutral-800 flex items-center justify-center mb-4 p-1">
-                    <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png" alt="" className="w-full h-full object-contain" />
+                    <img src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"} alt="" className="w-full h-full object-contain" />
                   </span>
                   <h3 className="text-base font-black text-white mb-2">필요한 만큼 구워 부담은 가볍게</h3>
                   <p className="text-xs text-neutral-400 font-medium leading-relaxed">

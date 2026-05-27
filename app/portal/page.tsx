@@ -57,7 +57,7 @@ interface Order {
   date: string;
   items: { productName: string; quantity: number; price: number }[];
   totalPrice: number;
-  status: "주문완료" | "배송준비중" | "배송중" | "배송완료";
+  status: string;
 }
 
 interface Inquiry {
@@ -149,7 +149,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: "부자재/포장재",
     price: 28000,
     packSize: "1박스 (500개입)",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png",
     stock: "in_stock",
     desc: "120pie & coffee 브랜드 전용 친환경 로고 인쇄 테이크아웃 컵"
   },
@@ -169,7 +169,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: "부자재/포장재",
     price: 9000,
     packSize: "1팩 (500매)",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png",
     stock: "low_stock",
     desc: "음료 및 파이 포장 봉투 부착용 원형 에그군 밀봉 스티커"
   },
@@ -179,7 +179,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: "소모품/집기",
     price: 12000,
     packSize: "1팩 (10롤)",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png",
     stock: "in_stock",
     desc: "본사 제공 전용 가열 타이머 기기에 매칭되는 표준 감열 롤 용지"
   }
@@ -370,6 +370,7 @@ export default function PortalPage() {
   const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   // Order page category tab
   const [activeCategory, setActiveCategory] = useState<string>("전체");
@@ -682,7 +683,7 @@ export default function PortalPage() {
           <div className="text-center space-y-4">
             <div className="inline-flex w-16 h-16 rounded-2xl bg-[#fff1f5] border border-[#f2ccd7] p-2 items-center justify-center shadow-sm">
               <img
-                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
+                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
                 alt="120pie 로고"
                 className="w-full h-full object-contain"
               />
@@ -775,13 +776,12 @@ export default function PortalPage() {
             >
               <Menu size={22} />
             </button>
-            <Link href="/" className="flex items-center gap-2.5 font-black text-lg text-[#2d2026]">
+            <Link href="/" className="flex items-center gap-2 group shrink-0">
               <img
-                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
-                alt="120pie 로고"
-                className="w-8 h-8 object-contain"
+                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
+                alt="120pie & coffee"
+                className="h-6 w-auto object-contain group-hover:scale-102 transition-transform"
               />
-              <span className="hidden sm:inline">120pie &amp; <span className="text-[#f25f8a]">coffee</span></span>
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] font-bold ml-1">점주전용</span>
             </Link>
           </div>
@@ -878,7 +878,7 @@ export default function PortalPage() {
                 <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
                   <div className="flex items-center gap-2">
                     <img
-                      src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
+                      src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
                       alt="로고"
                       className="w-7 h-7"
                     />
@@ -1014,36 +1014,86 @@ export default function PortalPage() {
 
               {/* Banners Block */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div className="lg:col-span-8 bg-[#ffd3df]/60 border border-[#f2ccd7] rounded-2xl relative overflow-hidden flex flex-col justify-end p-6 min-h-[220px] sm:min-h-[260px] aspect-[16/8] shadow-sm">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#fff1f5]/25 z-0"></div>
+                <div 
+                  className={`lg:col-span-8 border border-[#f2ccd7] rounded-2xl relative overflow-hidden flex flex-col justify-end p-6 min-h-[220px] sm:min-h-[260px] lg:h-[300px] shadow-sm w-full ${
+                    banner?.mainImage ? "" : "bg-[#ffd3df]/60"
+                  }`}
+                  style={{
+                    backgroundImage: banner?.mainImage ? `url(${banner.mainImage})` : undefined,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center"
+                  }}
+                >
+                  <div className={`absolute inset-0 z-0 ${banner?.mainImage ? "bg-black/50" : "bg-gradient-to-r from-transparent to-[#fff1f5]/25"}`}></div>
                   <div className="relative z-10 space-y-3 max-w-md">
-                    <span className="bg-[#f25f8a] text-white text-[10px] font-black uppercase px-2.5 py-1 rounded tracking-wider w-fit">Seasonal Spec</span>
-                    <h2 className="text-2xl sm:text-3xl font-black text-[#bf3e67] tracking-tight leading-tight">
-                      여름 대비 스페셜 신메뉴<br />'망고파이' 물류 정식 공급!
+                    <span className="bg-[#f25f8a] text-white text-[10px] font-black uppercase px-2.5 py-1 rounded tracking-wider w-fit">
+                      {banner?.mainTag || "Seasonal Spec"}
+                    </span>
+                    <h2 className={`text-2xl sm:text-3xl font-black tracking-tight leading-tight whitespace-pre-line ${
+                      banner?.mainImage ? "text-white" : "text-[#bf3e67]"
+                    }`}>
+                      {banner?.mainTitle || "여름 대비 스페셜 신메뉴\n'망고파이' 물류 정식 공급!"}
                     </h2>
-                    <p className="text-xs text-[#735965] font-bold leading-relaxed">
-                      지금 바로 냉동생지를 주문하고, 홍보 자료실에서 매장 포스터 및 아크릴 테이블 텐트 시안을 무상으로 다운로드하여 매출을 강화해 보세요!
+                    <p className={`text-xs font-bold leading-relaxed whitespace-pre-line ${
+                      banner?.mainImage ? "text-neutral-200" : "text-[#735965]"
+                    }`}>
+                      {banner?.mainDesc || "지금 바로 냉동생지를 주문하고, 홍보 자료실에서 매장 포스터 및 아크릴 테이블 텐트 시안을 무상으로 다운로드하여 매출을 강화해 보세요!"}
                     </p>
                   </div>
                 </div>
 
-                <div className="lg:col-span-4 bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl p-6 flex flex-col justify-between aspect-square min-h-[220px] sm:min-h-[260px] shadow-sm group">
-                  <div>
-                    <span className="text-[10px] font-extrabold text-[#f25f8a] tracking-widest uppercase block mb-1">Standard Edu</span>
-                    <h3 className="text-lg sm:text-xl font-bold text-[#2d2026] tracking-tight leading-tight">
-                      점주 전용<br />하절기 식품 안전 &amp;<br />위생 자가 점검표
+                <div 
+                  className={`lg:col-span-4 border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl p-6 flex flex-col justify-between min-h-[220px] sm:min-h-[260px] lg:h-[300px] shadow-sm group relative overflow-hidden w-full ${
+                    banner?.sideImage ? "" : "bg-white"
+                  }`}
+                  style={{
+                    backgroundImage: banner?.sideImage ? `url(${banner.sideImage})` : undefined,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center"
+                  }}
+                >
+                  {banner?.sideImage && <div className="absolute inset-0 bg-black/55 z-0"></div>}
+                  <div className="relative z-10">
+                    <span className={`text-[10px] font-extrabold tracking-widest uppercase block mb-1 ${
+                      banner?.sideImage ? "text-[#ffd3df]" : "text-[#f25f8a]"
+                    }`}>
+                      {banner?.sideTag || "Standard Edu"}
+                    </span>
+                    <h3 className={`text-lg sm:text-xl font-bold tracking-tight leading-tight whitespace-pre-line ${
+                      banner?.sideImage ? "text-white" : "text-[#2d2026]"
+                    }`}>
+                      {banner?.sideTitle || "점주 전용\n하절기 식품 안전 &\n위생 자가 점검표"}
                     </h3>
                   </div>
-                  <div className="space-y-4">
-                    <p className="text-xs text-[#735965] font-medium">하절기 위해 해충 및 냉동 식자재 보관 온도를 사전에 정밀 점검하여 위생 과태료 처분을 방지하세요.</p>
+                  <div className="space-y-4 relative z-10">
+                    <p className={`text-xs font-medium leading-relaxed whitespace-pre-line ${
+                      banner?.sideImage ? "text-neutral-200" : "text-[#735965]"
+                    }`}>
+                      {banner?.sideDesc || "하절기 위해 해충 및 냉동 식자재 보관 온도를 사전에 정밀 점검하여 위생 과태료 처분을 방지하세요."}
+                    </p>
                     <button 
                       onClick={() => {
-                        setCurrentMenu("training");
-                        triggerToast("교육자료실로 이동했습니다.");
+                        const link = banner?.sideLink || "training";
+                        if (link.startsWith("http")) {
+                          window.open(link, "_blank");
+                        } else {
+                          const menuMapping: Record<string, string> = {
+                            training: "교육자료실로 이동했습니다.",
+                            material: "홍보자료실로 이동했습니다.",
+                            order: "발주 및 주문 메뉴로 이동했습니다.",
+                            inquiry: "1:1 문의게시판으로 이동했습니다."
+                          };
+                          if (link === "order") {
+                            setCurrentMenu("orders");
+                          } else {
+                            setCurrentMenu(link);
+                          }
+                          triggerToast(menuMapping[link] || "해당 메뉴로 이동했습니다.");
+                        }
                       }}
-                      className="px-4 py-2.5 rounded-lg bg-[#fff1f5] border border-[#f2ccd7] hover:bg-[#ffd3df] text-xs font-bold text-[#bf3e67] transition-all w-fit flex items-center gap-1.5"
+                      className="px-4 py-2.5 rounded-lg bg-[#fff1f5] border border-[#f2ccd7] hover:bg-[#ffd3df] text-xs font-bold text-[#bf3e67] transition-all w-fit flex items-center gap-1.5 cursor-pointer shadow-sm"
                     >
-                      교육자료 다운로드 <ChevronRight size={14} />
+                      {banner?.sideBtnText || "교육자료 다운로드"} <ChevronRight size={14} />
                     </button>
                   </div>
                 </div>
@@ -1165,20 +1215,33 @@ export default function PortalPage() {
                         <p className="text-xs text-[#735965] text-center py-6">주문 내역이 없습니다.</p>
                       ) : (
                         orders.slice(0, 2).map((order) => (
-                          <div key={order.id} className="bg-[#fff1f5]/50 border border-[#f2ccd7] p-4 rounded-xl space-y-2">
+                          <div 
+                            key={order.id} 
+                            onClick={() => setSelectedOrder(order)}
+                            className="bg-[#fff1f5]/50 border border-[#f2ccd7] hover:border-[#f25f8a] p-4 rounded-xl space-y-2 cursor-pointer transition-all hover:bg-[#fff9fb] group"
+                          >
                             <div className="flex justify-between items-center text-[10px]">
                               <span className="text-[#735965] font-bold">{order.date}</span>
                               <span className={`px-2 py-0.5 rounded font-bold ${
-                                order.status === "배송중" ? "bg-blue-50 text-blue-500 border border-blue-200" : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
+                                order.status === "배송중" 
+                                  ? "bg-blue-50 text-blue-500 border border-blue-200 animate-pulse" 
+                                  : order.status === "배송완료" 
+                                  ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
+                                  : order.status === "배송준비중"
+                                  ? "bg-orange-50 text-orange-500 border border-orange-200"
+                                  : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
                               }`}>
                                 {order.status}
                               </span>
                             </div>
                             <div>
-                              <span className="font-bold text-xs text-[#2d2026] truncate block">
+                              <span className="font-bold text-xs text-[#2d2026] group-hover:text-[#f25f8a] transition-colors truncate block">
                                 {order.items[0].productName} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ""}
                               </span>
-                              <strong className="text-xs text-[#bf3e67] font-black mt-1 block">{order.totalPrice.toLocaleString()} 원</strong>
+                              <div className="flex justify-between items-center mt-1">
+                                <strong className="text-xs text-[#bf3e67] font-black">{order.totalPrice.toLocaleString()} 원</strong>
+                                <span className="text-[9px] text-[#bf3e67] font-bold opacity-0 group-hover:opacity-100 transition-opacity">상세보기 &gt;</span>
+                              </div>
                             </div>
                           </div>
                         ))
@@ -1428,17 +1491,22 @@ export default function PortalPage() {
                         <th className="p-4 sm:p-5">주문 품목 요약</th>
                         <th className="p-4 sm:p-5">총 결제 대금</th>
                         <th className="p-4 sm:p-5">배송 상태</th>
+                        <th className="p-4 sm:p-5 text-center">상세 정보</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
                       {orders.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="p-8 text-center text-[#735965]">발주 내역이 존재하지 않습니다.</td>
+                          <td colSpan={6} className="p-8 text-center text-[#735965]">발주 내역이 존재하지 않습니다.</td>
                         </tr>
                       ) : (
                         orders.map((order) => (
-                          <tr key={order.id} className="hover:bg-[#fff9fb] transition-colors">
-                            <td className="p-4 sm:p-5 font-bold text-[#2d2026]">{order.id}</td>
+                          <tr 
+                            key={order.id} 
+                            onClick={() => setSelectedOrder(order)}
+                            className="hover:bg-[#fff9fb] transition-colors cursor-pointer group"
+                          >
+                            <td className="p-4 sm:p-5 font-bold text-[#2d2026] group-hover:text-[#f25f8a] transition-colors">{order.id}</td>
                             <td className="p-4 sm:p-5 text-[#735965] font-semibold">{order.date}</td>
                             <td className="p-4 sm:p-5">
                               <span className="font-bold text-[#2d2026]">
@@ -1452,17 +1520,28 @@ export default function PortalPage() {
                             <td className="p-4 sm:p-5">
                               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
                                 order.status === "배송중" 
-                                  ? "bg-blue-50 text-blue-500 border border-blue-200" 
+                                  ? "bg-blue-50 text-blue-500 border border-blue-200 animate-pulse" 
                                   : order.status === "배송완료" 
                                   ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
+                                  : order.status === "배송준비중"
+                                  ? "bg-orange-50 text-orange-500 border border-orange-200"
                                   : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
                               }`}>
-                                {order.status === "배송중" && <Truck size={12} className="animate-pulse" />}
+                                {order.status === "배송중" && <Truck size={12} />}
                                 {order.status === "배송완료" && <Check size={12} />}
-                                {order.status === "주문완료" && <Clock size={12} />}
                                 {order.status === "배송준비중" && <Clock size={12} />}
+                                {order.status === "주문완료" && <Clock size={12} />}
+                                {!["배송중", "배송완료", "배송준비중", "주문완료"].includes(order.status) && <Clock size={12} />}
                                 {order.status}
                               </span>
+                            </td>
+                            <td className="p-4 sm:p-5 text-center" onClick={(e) => e.stopPropagation()}>
+                              <button 
+                                onClick={() => setSelectedOrder(order)}
+                                className="px-2.5 py-1.5 rounded-lg bg-[#fff1f5] border border-[#f2ccd7] group-hover:bg-[#f25f8a] group-hover:border-[#f25f8a] group-hover:text-white text-[10px] font-bold text-[#bf3e67] transition-all cursor-pointer shadow-sm"
+                              >
+                                상세보기
+                              </button>
                             </td>
                           </tr>
                         ))
@@ -1981,6 +2060,195 @@ export default function PortalPage() {
                 본사 AS 문의 접수하기
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 5. Order Details Modal */}
+      {selectedOrder && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setSelectedOrder(null)}
+        >
+          <div 
+            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
+              <div className="flex-1">
+                <h3 className="text-sm sm:text-base font-black text-[#2d2026] flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <span>발주 상세 내역</span>
+                  <span className="text-[10px] sm:text-xs text-[#735965] font-bold block">강남역삼점 · 발주 코드: <span className="font-mono text-[#bf3e67] font-black">{selectedOrder.id}</span></span>
+                </h3>
+              </div>
+              <button onClick={() => setSelectedOrder(null)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 ml-4">
+                <X size={15} />
+              </button>
+            </div>
+
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+              
+              {/* Status Timeline */}
+              <div className="bg-[#fffdf9] border border-[#f2ccd7] p-5 rounded-2xl">
+                <span className="text-[10px] text-[#735965] font-extrabold block mb-3 uppercase tracking-wider">물류 배송 진행 현황</span>
+                
+                <div className="relative flex items-center justify-between mt-6 px-4">
+                  {/* Progress Line */}
+                  <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-[3px] bg-[#f2ccd7]/40 z-0"></div>
+                  <div 
+                    className="absolute left-6 top-1/2 -translate-y-1/2 h-[3px] bg-[#f25f8a] transition-all duration-500 z-0"
+                    style={{
+                      width: selectedOrder.status === "주문완료" ? "0%" 
+                           : selectedOrder.status === "배송준비중" ? "33%" 
+                           : selectedOrder.status === "배송중" ? "66%" 
+                           : "100%"
+                    }}
+                  ></div>
+
+                  {/* Stage Dots */}
+                  {[
+                    { label: "주문완료", desc: "본사 접수" },
+                    { label: "배송준비중", desc: "상품 적재" },
+                    { label: "배송중", desc: "저온 운송" },
+                    { label: "배송완료", desc: "지점 수령" }
+                  ].map((stage, idx) => {
+                    const isPassed = 
+                      selectedOrder.status === "배송완료" ||
+                      (selectedOrder.status === "배송중" && idx <= 2) ||
+                      (selectedOrder.status === "배송준비중" && idx <= 1) ||
+                      (selectedOrder.status === "주문완료" && idx === 0);
+                    const isCurrent = 
+                      (selectedOrder.status === "주문완료" && idx === 0) ||
+                      (selectedOrder.status === "배송준비중" && idx === 1) ||
+                      (selectedOrder.status === "배송중" && idx === 2) ||
+                      (selectedOrder.status === "배송완료" && idx === 3);
+
+                    return (
+                      <div key={stage.label} className="relative z-10 flex flex-col items-center">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all ${
+                          isCurrent 
+                            ? "bg-[#f25f8a] border-[#f25f8a] text-white scale-110 shadow-sm"
+                            : isPassed 
+                            ? "bg-[#ffd3df] border-[#f25f8a] text-[#bf3e67]"
+                            : "bg-white border-[#f2ccd7] text-[#735965]"
+                        }`}>
+                          {isPassed && !isCurrent ? <Check size={10} /> : <span className="text-[9px] font-bold">{idx + 1}</span>}
+                        </div>
+                        <span className={`text-[10px] font-black mt-2 ${isCurrent ? "text-[#f25f8a]" : "text-[#2d2026]"}`}>{stage.label}</span>
+                        <span className="text-[8px] text-[#735965] font-semibold mt-0.5">{stage.desc}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Order Items Table */}
+              <div className="bg-white border border-[#f2ccd7]/70 rounded-2xl overflow-hidden shadow-sm">
+                <div className="px-4 py-3 bg-[#fff1f5]/30 border-b border-[#f2ccd7]/50 flex justify-between items-center">
+                  <span className="font-extrabold text-[#2d2026]">발주 자재 명세표</span>
+                  <span className="text-[10px] text-[#735965] font-bold">신청 일자: {selectedOrder.date}</span>
+                </div>
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full text-left border-collapse min-w-[480px] sm:min-w-0" style={{ tableLayout: 'fixed' }}>
+                    <colgroup>
+                      <col style={{ width: 'auto' }} />
+                      <col style={{ width: '50px' }} />
+                      <col style={{ width: '72px' }} />
+                      <col style={{ width: '82px' }} />
+                    </colgroup>
+                    <thead>
+                      <tr className="bg-[#fff9fb]/60 border-b border-[#f2ccd7]/50 text-[10px] font-bold text-[#735965]">
+                        <th className="px-3 py-2.5">품목명</th>
+                        <th className="px-2 py-2.5 text-center whitespace-nowrap">수량</th>
+                        <th className="px-2 py-2.5 text-right whitespace-nowrap">단가</th>
+                        <th className="px-3 py-2.5 text-right whitespace-nowrap">금액</th>
+                      </tr>
+                    </thead>
+                  <tbody className="divide-y divide-[#f2ccd7]/40 text-[11px] font-medium text-[#2d2026]">
+                    {selectedOrder.items.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-[#fffdf9]/50 transition-colors">
+                        <td className="px-3 py-2.5 font-bold text-neutral-800 leading-tight break-words text-[11px] sm:text-xs" style={{ wordBreak: 'break-word' }}>
+                          {item.productName}
+                        </td>
+                        <td className="px-2 py-2.5 text-center font-semibold text-[#2d2026] text-[11px]">{item.quantity}</td>
+                        <td className="px-2 py-2.5 text-right font-semibold text-[#735965] text-[11px]">{(item.price).toLocaleString()}</td>
+                        <td className="px-3 py-2.5 text-right font-black text-[#bf3e67] text-[11px]">{(item.price * item.quantity).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                  </div>
+              </div>
+
+              {/* Payment Summary */}
+              <div className="bg-[#fff1f5]/20 border border-[#f2ccd7] rounded-2xl p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] text-[#735965] font-extrabold block">결제 수단 정보</span>
+                  <strong className="text-xs text-[#2d2026] block font-bold">본사 가상계좌 예치금 차감 (실시간 정산 완료)</strong>
+                </div>
+                <div className="text-left sm:text-right border-t sm:border-t-0 border-[#f2ccd7]/60 pt-3 sm:pt-0">
+                  <span className="text-[10px] text-[#735965] font-bold block">총 결제 금액 (VAT 포함)</span>
+                  <strong className="text-base font-black text-[#bf3e67]">{selectedOrder.totalPrice.toLocaleString()} 원</strong>
+                </div>
+              </div>
+
+              {/* Delivery Carrier Info */}
+              <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between border-b border-[#f2ccd7]/50 pb-3">
+                  <span className="font-extrabold text-[#2d2026] flex items-center gap-1.5"><Truck size={14} className="text-[#f25f8a]" /> 배송 및 송장 정보</span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    selectedOrder.status === "배송완료" ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                    : selectedOrder.status === "배송중" ? "bg-blue-50 text-blue-500 border border-blue-100"
+                    : "bg-orange-50 text-orange-500 border border-orange-100"
+                  }`}>{selectedOrder.status}</span>
+                </div>
+
+                {["배송중", "배송완료"].includes(selectedOrder.status) ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold">
+                    <div className="space-y-1">
+                      <span className="text-[10px] text-[#735965] font-extrabold block">배송 수단 / 물류 방식</span>
+                      <p className="text-[#2d2026]">120 물류 전용 냉동 저온탑차 (한진택배 위탁)</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] text-[#735965] font-extrabold block">실시간 송장 번호</span>
+                      <p className="font-mono text-[#bf3e67]">HNJ-120-{selectedOrder.id.replace("ORD-", "")}</p>
+                    </div>
+                    <div className="sm:col-span-2 pt-2 border-t border-[#f2ccd7]/40">
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          if (selectedOrder.status === "배송중") {
+                            triggerToast("실시간 차량 관제: [경기 광주 저온허브] -> [서울 강남권 지사] 이동 중 (오전 배송 예정)");
+                          } else {
+                            triggerToast("물류 배송이 정상 완료되었습니다. (인수처: 점주 본인 직접 서명 수령 완료)");
+                          }
+                        }}
+                        className="w-full py-2.5 rounded-xl bg-[#fff1f5] border border-[#f2ccd7] hover:bg-[#ffd3df] hover:border-[#f25f8a] text-xs font-bold text-[#bf3e67] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                      >
+                        배송 위치 실시간 조회하기 <ChevronRight size={13} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs font-bold text-[#735965] leading-relaxed">
+                    본사 발주 접수가 정상 처리되었습니다. 현재 물류 창고에서 파이 생지 신선도 보존용 드라이아이스 및 패키징 포장 작업 중입니다. 24시간 이내 저온 정기 배송 차량으로 안전하게 출고 및 발송 조치 예정입니다.
+                  </p>
+                )}
+              </div>
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 text-center">
+              <button 
+                type="button"
+                onClick={() => setSelectedOrder(null)}
+                className="px-8 py-3 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
+              >
+                상세내역 창 닫기
+              </button>
+            </div>
           </div>
         </div>
       )}

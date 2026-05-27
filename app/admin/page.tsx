@@ -34,7 +34,9 @@ import {
   Store,
   FileText,
   UserCheck,
-  Sparkles
+  Sparkles,
+  Settings,
+  Map
 } from "lucide-react";
 
 // ==========================================
@@ -83,6 +85,9 @@ interface BannerSettings {
   sideTitle: string;
   sideDesc: string;
   sideBtnText: string;
+  mainImage?: string;
+  sideImage?: string;
+  sideLink?: string;
 }
 
 interface Order {
@@ -90,7 +95,7 @@ interface Order {
   date: string;
   items: { productName: string; quantity: number; price: number }[];
   totalPrice: number;
-  status: "주문완료" | "배송준비중" | "배송중" | "배송완료";
+  status: string;
 }
 
 interface Inquiry {
@@ -130,7 +135,7 @@ const DEFAULT_STORES: StoreInfo[] = [
     id: "owner",
     pw: "owner",
     pwConfirm: "owner",
-    name: "120겹파이 강남역삼점",
+    name: "강남역삼점",
     owner: "김지훈",
     phone: "010-3813-1200",
     status: "승인",
@@ -145,7 +150,7 @@ const DEFAULT_STORES: StoreInfo[] = [
     id: "hongdae",
     pw: "owner123",
     pwConfirm: "owner123",
-    name: "120겹파이 홍대입구점",
+    name: "홍대입구점",
     owner: "이민우",
     phone: "010-4211-5678",
     status: "승인",
@@ -160,7 +165,7 @@ const DEFAULT_STORES: StoreInfo[] = [
     id: "seomyeon",
     pw: "owner456",
     pwConfirm: "owner456",
-    name: "120겹파이 부산서면점",
+    name: "부산서면점",
     owner: "박수진",
     phone: "010-5182-9012",
     status: "대기",
@@ -273,8 +278,43 @@ const DEFAULT_BANNER: BannerSettings = {
   sideTag: "Standard Edu",
   sideTitle: "점주 전용\n하절기 식품 안전 &\n위생 자가 점검표",
   sideDesc: "하절기 위해 해충 및 냉동 식자재 보관 온도를 사전에 정밀 점검하여 위생 과태료 처분을 방지하세요.",
-  sideBtnText: "교육자료 다운로드"
+  sideBtnText: "교육자료 다운로드",
+  mainImage: "",
+  sideImage: "",
+  sideLink: "training"
 };
+
+interface GalleryItem {
+  id: string;
+  name: string;
+  category: string;
+  url: string;
+  regDate: string;
+}
+
+const DEFAULT_GALLERY: GalleryItem[] = [
+  {
+    id: "gal-1",
+    name: "로제미트파이 신메뉴 이미지",
+    category: "신메뉴",
+    url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg",
+    regDate: "2026-05-20"
+  },
+  {
+    id: "gal-2",
+    name: "120겹파이 매장 연출컷",
+    category: "홍보연출",
+    url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779721204/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_du1czf.jpg",
+    regDate: "2026-05-21"
+  },
+  {
+    id: "gal-3",
+    name: "에그120 및 디저트 라인업",
+    category: "메뉴판",
+    url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg",
+    regDate: "2026-05-22"
+  }
+];
 
 export default function AdminPage() {
   // ==========================================
@@ -299,7 +339,9 @@ export default function AdminPage() {
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(null);
-    if (loginId === "admin" && loginPw === "120pie") {
+    const storedAdminId = localStorage.getItem("120_admin_id") || "admin";
+    const storedAdminPw = localStorage.getItem("120_admin_pw") || "120pie";
+    if (loginId === storedAdminId && loginPw === storedAdminPw) {
       localStorage.setItem("120_admin_logged_in", "true");
       setIsLoggedIn(true);
       triggerToast("최고 관리자 인증 성공. 환영합니다!");
@@ -327,6 +369,21 @@ export default function AdminPage() {
   const [trainings, setTrainings] = useState<Material[]>([]);
   const [prs, setPrs] = useState<Material[]>([]);
   const [banner, setBanner] = useState<BannerSettings>(DEFAULT_BANNER);
+
+  // Gallery Management States
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [galleryCategories, setGalleryCategories] = useState<string[]>([]);
+  const [selectedGalleryCategory, setSelectedGalleryCategory] = useState<string>("전체");
+  
+  // Gallery Form / modal states
+  const [showGalleryModal, setShowGalleryModal] = useState<boolean>(false);
+  const [selectedGalleryItem, setSelectedGalleryItem] = useState<GalleryItem | null>(null);
+  
+  const [galleryItemName, setGalleryItemName] = useState<string>("");
+  const [galleryItemCategory, setGalleryItemCategory] = useState<string>("");
+  const [galleryItemUrl, setGalleryItemUrl] = useState<string>("");
+  const [galleryUploadMethod, setGalleryUploadMethod] = useState<"url" | "file">("url");
+  const [newGalleryCategoryName, setNewGalleryCategoryName] = useState<string>("");
 
   // Selected Detail Modals / Control flags
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
@@ -399,6 +456,21 @@ export default function AdminPage() {
   const [bannerSideTitle, setBannerSideTitle] = useState<string>("");
   const [bannerSideDesc, setBannerSideDesc] = useState<string>("");
   const [bannerSideBtnText, setBannerSideBtnText] = useState<string>("");
+  const [bannerMainImage, setBannerMainImage] = useState<string>("");
+  const [bannerSideImage, setBannerSideImage] = useState<string>("");
+  const [bannerSideLink, setBannerSideLink] = useState<string>("training");
+
+  // 4. ORDER DETAILS POPUP & SETTING STATES
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [showOrderModal, setShowOrderModal] = useState<boolean>(false);
+  
+  // Settings & Status Management States
+  const [deliveryStatuses, setDeliveryStatuses] = useState<string[]>(["주문완료", "배송준비중", "배송중", "배송완료"]);
+  const [newStatusName, setNewStatusName] = useState<string>("");
+  const [adminIdSetting, setAdminIdSetting] = useState<string>("admin");
+  const [adminPwSetting, setAdminPwSetting] = useState<string>("");
+  const [adminPwSettingConfirm, setAdminPwSettingConfirm] = useState<string>("");
+  const [kakaoMapKeySetting, setKakaoMapKeySetting] = useState<string>("");
 
   // Toast and navigation
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -428,6 +500,14 @@ export default function AdminPage() {
       setTrainings(loadState("120_trainings", []));
       setPrs(loadState("120_prs", []));
 
+      // Settings and Status Load
+      const ds = loadState("120_delivery_statuses", ["주문완료", "배송준비중", "배송중", "배송완료"]);
+      setDeliveryStatuses(ds);
+      const storedAdminId = localStorage.getItem("120_admin_id") || "admin";
+      setAdminIdSetting(storedAdminId);
+      const storedKakaoKey = localStorage.getItem("120_kakao_api_key") || "";
+      setKakaoMapKeySetting(storedKakaoKey);
+
       // Seeds
       const st = loadState("120_stores", DEFAULT_STORES);
       setStores(st);
@@ -438,6 +518,11 @@ export default function AdminPage() {
       
       const bnr = loadState("120_banners", DEFAULT_BANNER);
       setBanner(bnr);
+
+      const galItems = loadState("120_gallery_items", DEFAULT_GALLERY);
+      setGalleryItems(galItems);
+      const galCats = loadState("120_gallery_categories", ["신메뉴", "홍보연출", "메뉴판", "매장"]);
+      setGalleryCategories(galCats);
       
       // Initialize banner form states
       setBannerMainTag(bnr.mainTag);
@@ -447,6 +532,9 @@ export default function AdminPage() {
       setBannerSideTitle(bnr.sideTitle);
       setBannerSideDesc(bnr.sideDesc);
       setBannerSideBtnText(bnr.sideBtnText);
+      setBannerMainImage(bnr.mainImage || "");
+      setBannerSideImage(bnr.sideImage || "");
+      setBannerSideLink(bnr.sideLink || "training");
     }
   }, []);
 
@@ -475,6 +563,9 @@ export default function AdminPage() {
         if (pr) setProducts(JSON.parse(pr));
         if (cat) setCategories(JSON.parse(cat));
         if (bnr) setBanner(JSON.parse(bnr));
+
+        const ds = localStorage.getItem("120_delivery_statuses");
+        if (ds) setDeliveryStatuses(JSON.parse(ds));
       }
     };
 
@@ -919,6 +1010,29 @@ export default function AdminPage() {
     }
   };
 
+  // Image local file reader helper
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, target: "main" | "side") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+      alert("이미지 크기는 2MB 이하여야 합니다.");
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        if (target === "main") {
+          setBannerMainImage(reader.result);
+        } else {
+          setBannerSideImage(reader.result);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   // ==========================================
   // 4. DYNAMIC BANNER CONTROL HANDLER
   // ==========================================
@@ -931,12 +1045,227 @@ export default function AdminPage() {
       sideTag: bannerSideTag,
       sideTitle: bannerSideTitle,
       sideDesc: bannerSideDesc,
-      sideBtnText: bannerSideBtnText
+      sideBtnText: bannerSideBtnText,
+      mainImage: bannerMainImage,
+      sideImage: bannerSideImage,
+      sideLink: bannerSideLink
     };
     
     setBanner(updatedBanner);
     localStorage.setItem("120_banners", JSON.stringify(updatedBanner));
     triggerToast("본사 대시보드 배너 설정이 실시간으로 동기화 저장되었습니다!");
+  };
+
+  // ==========================================
+  // 5. SETTINGS ACTIONS
+  // ==========================================
+  const handleUpdateAdminAccount = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminIdSetting) {
+      alert("관리자 ID를 입력해 주세요.");
+      return;
+    }
+    if (adminPwSetting) {
+      if (adminPwSetting !== adminPwSettingConfirm) {
+        alert("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        return;
+      }
+      localStorage.setItem("120_admin_pw", adminPwSetting);
+    }
+    localStorage.setItem("120_admin_id", adminIdSetting);
+    setAdminPwSetting("");
+    setAdminPwSettingConfirm("");
+    triggerToast("본사 최고 관리자 계정 정보가 성공적으로 변경되었습니다.");
+  };
+
+  const handleUpdateKakaoMapKey = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem("120_kakao_api_key", kakaoMapKeySetting.trim());
+    triggerToast("카카오맵 API 설정이 성공적으로 저장되었습니다!");
+  };
+
+  // ==========================================
+  // GALLERY MANAGEMENT HANDLERS
+  // ==========================================
+  const handleOpenAddGalleryModal = () => {
+    setSelectedGalleryItem(null);
+    setGalleryItemName("");
+    setGalleryItemCategory(galleryCategories[0] || "신메뉴");
+    setGalleryItemUrl("");
+    setGalleryUploadMethod("url");
+    setShowGalleryModal(true);
+  };
+
+  const handleOpenEditGalleryModal = (item: GalleryItem) => {
+    setSelectedGalleryItem(item);
+    setGalleryItemName(item.name);
+    setGalleryItemCategory(item.category);
+    setGalleryItemUrl(item.url);
+    setGalleryUploadMethod("url");
+    setShowGalleryModal(true);
+  };
+
+  const handleGallerySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedName = galleryItemName.trim();
+    const trimmedUrl = galleryItemUrl.trim();
+    if (!trimmedName || !trimmedUrl) {
+      alert("이미지명과 이미지 경로(URL/파일)는 필수 항목입니다.");
+      return;
+    }
+
+    let updatedList: GalleryItem[];
+    if (selectedGalleryItem) {
+      // Edit existing
+      updatedList = galleryItems.map(item => 
+        item.id === selectedGalleryItem.id
+          ? { ...item, name: trimmedName, category: galleryItemCategory, url: trimmedUrl }
+          : item
+      );
+      triggerToast(`이미지 [${trimmedName}] 정보가 수정되었습니다.`);
+    } else {
+      // Add new
+      const newItem: GalleryItem = {
+        id: `gal-${Date.now()}`,
+        name: trimmedName,
+        category: galleryItemCategory,
+        url: trimmedUrl,
+        regDate: new Date().toISOString().split("T")[0]
+      };
+      updatedList = [newItem, ...galleryItems];
+      triggerToast(`새로운 이미지 [${trimmedName}]가 등록되었습니다.`);
+    }
+
+    setGalleryItems(updatedList);
+    localStorage.setItem("120_gallery_items", JSON.stringify(updatedList));
+    setShowGalleryModal(false);
+  };
+
+  const handleDeleteGalleryItem = (id: string, name: string) => {
+    if (confirm(`이미지 [${name}]을 갤러리에서 삭제하시겠습니까?`)) {
+      const updatedList = galleryItems.filter(item => item.id !== id);
+      setGalleryItems(updatedList);
+      localStorage.setItem("120_gallery_items", JSON.stringify(updatedList));
+      triggerToast(`이미지 [${name}]이 삭제되었습니다.`);
+    }
+  };
+
+  const handleAddGalleryCategory = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newGalleryCategoryName.trim();
+    if (!trimmed) return;
+    if (galleryCategories.includes(trimmed)) {
+      alert("이미 존재하는 카테고리입니다.");
+      return;
+    }
+    const updated = [...galleryCategories, trimmed];
+    setGalleryCategories(updated);
+    localStorage.setItem("120_gallery_categories", JSON.stringify(updated));
+    setNewGalleryCategoryName("");
+    setGalleryItemCategory(trimmed);
+    triggerToast(`카테고리 [${trimmed}]이 추가되었습니다.`);
+  };
+
+  const handleDeleteGalleryCategory = (catToDelete: string) => {
+    if (galleryCategories.length <= 1) {
+      alert("최소 1개 이상의 카테고리는 유지되어야 합니다.");
+      return;
+    }
+    if (confirm(`카테고리 [${catToDelete}]을 삭제하시겠습니까?\n해당 카테고리로 지정되어 있는 이미지들은 '기타' 카테고리로 변경됩니다.`)) {
+      const updatedCats = galleryCategories.filter(c => c !== catToDelete);
+      setGalleryCategories(updatedCats);
+      localStorage.setItem("120_gallery_categories", JSON.stringify(updatedCats));
+
+      // Relabel affected items to '기타'
+      const updatedItems = galleryItems.map(item => 
+        item.category === catToDelete ? { ...item, category: "기타" } : item
+      );
+      setGalleryItems(updatedItems);
+      localStorage.setItem("120_gallery_items", JSON.stringify(updatedItems));
+
+      // If '기타' doesn't exist in updatedCats, add it
+      if (!updatedCats.includes("기타")) {
+        const withEtc = [...updatedCats, "기타"];
+        setGalleryCategories(withEtc);
+        localStorage.setItem("120_gallery_categories", JSON.stringify(withEtc));
+      }
+
+      triggerToast(`카테고리 [${catToDelete}]가 삭제되었습니다.`);
+    }
+  };
+
+  const handleGalleryImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+      alert("이미지 크기는 2MB 이하여야 합니다.");
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        setGalleryItemUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddDeliveryStatus = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newStatusName.trim();
+    if (!trimmed) return;
+    if (deliveryStatuses.includes(trimmed)) {
+      alert("이미 존재하는 배송 상태값입니다.");
+      return;
+    }
+    const updated = [...deliveryStatuses, trimmed];
+    setDeliveryStatuses(updated);
+    localStorage.setItem("120_delivery_statuses", JSON.stringify(updated));
+    setNewStatusName("");
+    triggerToast(`신규 배송 상태값 [${trimmed}]이 등록되었습니다.`);
+  };
+
+  const handleDeleteDeliveryStatus = (statusToDelete: string) => {
+    if (["주문완료", "배송완료"].includes(statusToDelete)) {
+      alert("[주문완료] 및 [배송완료]는 코어 시스템 상태값으로 삭제할 수 없습니다.");
+      return;
+    }
+    if (confirm(`배송 상태값 [${statusToDelete}]을 삭제하시겠습니까?`)) {
+      const updated = deliveryStatuses.filter((s) => s !== statusToDelete);
+      setDeliveryStatuses(updated);
+      localStorage.setItem("120_delivery_statuses", JSON.stringify(updated));
+      triggerToast(`배송 상태값 [${statusToDelete}]이 삭제되었습니다.`);
+    }
+  };
+
+  const handleResetDeliveryStatuses = () => {
+    if (confirm("배송 상태값을 시스템 초기 상태로 리셋하시겠습니까?")) {
+      const defaults = ["주문완료", "배송준비중", "배송중", "배송완료"];
+      setDeliveryStatuses(defaults);
+      localStorage.setItem("120_delivery_statuses", JSON.stringify(defaults));
+      triggerToast("배송 상태값이 초기값으로 리셋되었습니다.");
+    }
+  };
+
+  const handleOpenOrderModal = (order: Order) => {
+    setSelectedOrder(order);
+    setShowOrderModal(true);
+  };
+
+  const updateOrderStatus = (orderId: string, newStatus: string) => {
+    const updatedOrders = orders.map((o) => 
+      o.id === orderId ? { ...o, status: newStatus as any } : o
+    );
+
+    setOrders(updatedOrders);
+    localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
+    triggerToast(`주문 상태가 [${newStatus}]로 변경되었습니다.`);
+    
+    if (selectedOrder && selectedOrder.id === orderId) {
+      setSelectedOrder({ ...selectedOrder, status: newStatus as any });
+    }
   };
 
   // Admin stats
@@ -967,7 +1296,7 @@ export default function AdminPage() {
           <div className="text-center space-y-4">
             <div className="inline-flex w-16 h-16 rounded-2xl bg-[#fff1f5] border border-[#f2ccd7] p-2 items-center justify-center shadow-sm">
               <img
-                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
+                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
                 alt="120pie 로고"
                 className="w-full h-full object-contain"
               />
@@ -1060,13 +1389,13 @@ export default function AdminPage() {
             >
               <Menu size={22} />
             </button>
-            <Link href="/admin" className="flex items-center gap-2.5 font-black text-lg text-[#2d2026]">
+            <Link href="/admin" className="flex items-center gap-2 group shrink-0">
               <img
-                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
-                alt="로고"
-                className="w-8 h-8 object-contain"
+                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
+                alt="120pie & coffee"
+                className="h-6 w-auto object-contain group-hover:scale-102 transition-transform"
               />
-              <span>120pie <span className="text-[#f25f8a]">Head Office</span></span>
+              <span className="font-extrabold text-xs text-[#735965] ml-1.5 hidden sm:inline uppercase tracking-wider">Head Office</span>
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-red-50 text-red-500 border border-red-200 font-bold ml-1">본사 어드민</span>
             </Link>
           </div>
@@ -1115,7 +1444,9 @@ export default function AdminPage() {
                 { key: "notice", label: "공지사항 관리", icon: Megaphone },
                 { key: "inquiry", label: "1:1 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
                 { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
-                { key: "banner", label: "배너 관리", icon: ImageIcon }
+                { key: "banner", label: "배너 관리", icon: Monitor },
+                { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
+                { key: "setting", label: "설정 메뉴", icon: Settings }
               ].map(({ key, label, icon: Icon, badge }) => (
                 <button
                   key={key}
@@ -1164,7 +1495,7 @@ export default function AdminPage() {
                 <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
                   <div className="flex items-center gap-2">
                     <img
-                      src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
+                      src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
                       alt="로고"
                       className="w-7 h-7"
                     />
@@ -1194,7 +1525,9 @@ export default function AdminPage() {
                     { key: "notice", label: "공지사항 관리", icon: Megaphone },
                     { key: "inquiry", label: "1:1 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
                     { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
-                    { key: "banner", label: "배너 관리", icon: ImageIcon }
+                    { key: "banner", label: "배너 관리", icon: Monitor },
+                    { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
+                    { key: "setting", label: "설정 메뉴", icon: Settings }
                   ].map(({ key, label, icon: Icon, badge }) => (
                     <button
                       key={key}
@@ -1371,7 +1704,7 @@ export default function AdminPage() {
               {/* Stores Table */}
               <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full min-w-[1050px] text-left border-collapse">
                     <thead>
                       <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
                         <th className="p-4 sm:p-5">로그인 ID</th>
@@ -1392,26 +1725,30 @@ export default function AdminPage() {
                       ) : (
                         stores.map((store) => (
                           <tr key={store.id} className="hover:bg-[#fff9fb] transition-colors">
-                            <td className="p-4 sm:p-5 font-bold text-[#bf3e67]">{store.id}</td>
-                            <td className="p-4 sm:p-5 font-bold text-[#2d2026]">{store.name}</td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold">{store.owner}</td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold">{store.phone}</td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold max-w-xs truncate" title={store.roadAddress}>
-                              {store.roadAddress}
+                            <td className="p-4 sm:p-5 font-bold text-[#bf3e67] whitespace-nowrap">{store.id}</td>
+                            <td className="p-4 sm:p-5 font-bold text-[#2d2026] whitespace-nowrap">
+                              {store.name.replace("120겹파이 ", "").replace("120겹 파이 ", "")}
+                            </td>
+                            <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{store.owner}</td>
+                            <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{store.phone}</td>
+                            <td className="p-4 sm:p-5 text-[#735965] font-semibold max-w-[320px]" title={store.roadAddress}>
+                              <div className="line-clamp-2 whitespace-normal break-all">
+                                {store.roadAddress}
+                              </div>
                             </td>
                             <td className="p-4 sm:p-5">
-                              <div className="flex flex-wrap gap-1">
+                              <div className="grid grid-cols-3 gap-1 w-[190px]">
                                 {store.adoptionMenu && store.adoptionMenu.map((m) => (
-                                  <span key={m} className="bg-[#ffd3df] text-[#bf3e67] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#f2ccd7]">
+                                  <span key={m} className="bg-[#ffd3df] text-[#bf3e67] text-[9px] font-bold px-1 py-0.5 rounded border border-[#f2ccd7] text-center truncate" title={m}>
                                     {m}
                                   </span>
                                 ))}
                                 {(!store.adoptionMenu || store.adoptionMenu.length === 0) && (
-                                  <span className="text-[10px] text-[#735965] opacity-50">없음</span>
+                                  <span className="text-[10px] text-[#735965] opacity-50 col-span-3">없음</span>
                                 )}
                               </div>
                             </td>
-                            <td className="p-4 sm:p-5">
+                            <td className="p-4 sm:p-5 whitespace-nowrap">
                               <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                                 store.status === "승인" 
                                   ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
@@ -1422,7 +1759,7 @@ export default function AdminPage() {
                                 {store.status}
                               </span>
                             </td>
-                            <td className="p-4 sm:p-5 text-center">
+                            <td className="p-4 sm:p-5 text-center whitespace-nowrap">
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
                                   onClick={() => handleOpenStoreModal(store)}
@@ -1648,13 +1985,13 @@ export default function AdminPage() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
-                        <th className="p-4 sm:p-5">발주 코드</th>
-                        <th className="p-4 sm:p-5">가맹점</th>
+                        <th className="p-4 sm:p-5 text-center">순서</th>
                         <th className="p-4 sm:p-5">주문 일자</th>
-                        <th className="p-4 sm:p-5">요약 품목 / 수량</th>
+                        <th className="p-4 sm:p-5">가맹점</th>
+                        <th className="p-4 sm:p-5">품목</th>
                         <th className="p-4 sm:p-5">결제 금액</th>
                         <th className="p-4 sm:p-5">현재 상태</th>
-                        <th className="p-4 sm:p-5 text-center">배송 상태 제어</th>
+                        <th className="p-4 sm:p-5 text-center">상세보기</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
@@ -1663,44 +2000,40 @@ export default function AdminPage() {
                           <td colSpan={7} className="p-8 text-center text-[#735965]">현재 접수된 가맹점 발주 주문이 존재하지 않습니다.</td>
                         </tr>
                       ) : (
-                        orders.map((order) => (
+                        orders.map((order, idx) => (
                           <tr key={order.id} className="hover:bg-[#fff9fb] transition-colors">
-                            <td className="p-4 sm:p-5 font-bold text-[#bf3e67]">{order.id}</td>
-                            <td className="p-4 sm:p-5 font-bold text-[#2d2026]">강남역삼점</td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold">{order.date}</td>
+                            <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{idx + 1}</td>
+                            <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{order.date}</td>
+                            <td className="p-4 sm:p-5 font-bold text-[#2d2026] whitespace-nowrap">강남역삼점</td>
                             <td className="p-4 sm:p-5">
-                              <span className="font-bold text-[#2d2026]">
+                              <span className="font-bold text-[#2d2026] block">
                                 {order.items[0].productName} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ""}
                               </span>
-                              <span className="text-[10px] text-[#735965] block font-semibold mt-0.5">
+                              <span className="text-[10px] text-[#735965] block font-semibold mt-0.5 max-w-[320px] truncate" title={order.items.map(item => `${item.productName} ${item.quantity}개`).join(", ")}>
                                 {order.items.map(item => `${item.productName} ${item.quantity}개`).join(", ")}
                               </span>
                             </td>
-                            <td className="p-4 sm:p-5 font-bold text-[#2d2026]">{order.totalPrice.toLocaleString()} 원</td>
-                            <td className="p-4 sm:p-5">
+                            <td className="p-4 sm:p-5 font-bold text-[#2d2026] whitespace-nowrap">{order.totalPrice.toLocaleString()} 원</td>
+                            <td className="p-4 sm:p-5 whitespace-nowrap">
                               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
                                 order.status === "배송중" 
                                   ? "bg-blue-50 text-blue-500 border border-blue-200" 
                                   : order.status === "배송완료" 
                                   ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
+                                  : order.status === "배송준비중"
+                                  ? "bg-orange-50 text-orange-500 border border-orange-200"
                                   : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
                               }`}>
                                 {order.status}
                               </span>
                             </td>
-                            <td className="p-4 sm:p-5 text-center">
-                              {order.status === "배송완료" ? (
-                                <span className="text-[#735965] font-semibold text-xs">배송처리완료</span>
-                              ) : (
-                                <button
-                                  onClick={() => advanceOrderStatus(order.id, order.status)}
-                                  className="px-3.5 py-1.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs transition-all shadow-sm flex items-center justify-center gap-1 mx-auto"
-                                >
-                                  {order.status === "주문완료" && <span>배송준비 승인 ➔</span>}
-                                  {order.status === "배송준비중" && <span>배송출고 처리 ➔</span>}
-                                  {order.status === "배송중" && <span>배송완료 완료 ➔</span>}
-                                </button>
-                              )}
+                            <td className="p-4 sm:p-5 text-center whitespace-nowrap">
+                              <button
+                                onClick={() => handleOpenOrderModal(order)}
+                                className="px-3.5 py-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-[10px] font-bold transition-all shadow-sm"
+                              >
+                                상세보기
+                              </button>
                             </td>
                           </tr>
                         ))
@@ -1992,6 +2325,38 @@ export default function AdminPage() {
                       />
                     </div>
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">메인 배너 이미지 등록 (URL)</label>
+                      <input 
+                        type="text"
+                        value={bannerMainImage}
+                        onChange={(e) => setBannerMainImage(e.target.value)}
+                        placeholder="https://example.com/banner.jpg"
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">메인 배너 이미지 업로드 (로컬 파일)</label>
+                      <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
+                        <input 
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, "main")}
+                          className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
+                        />
+                        {bannerMainImage && (
+                          <button
+                            type="button"
+                            onClick={() => setBannerMainImage("")}
+                            className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
+                          >
+                            지우기
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-[#735965]">메인 배너 세부 상세 설명</label>
                     <textarea 
@@ -2034,6 +2399,38 @@ export default function AdminPage() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">사각 배너 이미지 등록 (URL)</label>
+                      <input 
+                        type="text"
+                        value={bannerSideImage}
+                        onChange={(e) => setBannerSideImage(e.target.value)}
+                        placeholder="https://example.com/square.jpg"
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">사각 배너 이미지 업로드 (로컬 파일)</label>
+                      <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
+                        <input 
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, "side")}
+                          className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
+                        />
+                        {bannerSideImage && (
+                          <button
+                            type="button"
+                            onClick={() => setBannerSideImage("")}
+                            className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
+                          >
+                            지우기
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
                       <label className="text-xs font-bold text-[#735965]">사각 배너 상세 세부 설명</label>
                       <textarea 
                         rows={3}
@@ -2054,6 +2451,42 @@ export default function AdminPage() {
                       />
                     </div>
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">사각 배너 연결 대상 설정</label>
+                      <select 
+                        value={bannerSideLink.startsWith("http") ? "custom" : bannerSideLink}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val !== "custom") {
+                            setBannerSideLink(val);
+                          } else {
+                            setBannerSideLink("https://");
+                          }
+                        }}
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      >
+                        <option value="training">교육자료실 (내부 메뉴 연결)</option>
+                        <option value="material">홍보자료실 (내부 메뉴 연결)</option>
+                        <option value="order">자재발주 / 주문하기 (내부 메뉴 연결)</option>
+                        <option value="inquiry">1:1 문의하기 (내부 메뉴 연결)</option>
+                        <option value="custom">직접 URL 웹 주소 입력 연결</option>
+                      </select>
+                    </div>
+                    {bannerSideLink.startsWith("http") && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">직접 입력한 연결 URL 주소</label>
+                        <input 
+                          type="text"
+                          value={bannerSideLink}
+                          onChange={(e) => setBannerSideLink(e.target.value)}
+                          placeholder="https://example.com"
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Save Trigger */}
@@ -2069,12 +2502,524 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* ==========================================
+              MENU: 9. SETTINGS MENU
+             ========================================== */}
+          {currentMenu === "setting" && (
+            <div className="space-y-6 animate-fadeIn">
+              
+              <div>
+                <h2 className="text-xl font-bold text-[#2d2026]">본사 시스템 통합 설정</h2>
+                <p className="text-xs text-[#735965] font-bold mt-1">
+                  본사 어드민 최고 관리자 로그인 계정 및 점주 발주 주문의 배송 상태값 목록을 유연하게 제어합니다.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                
+                {/* 1. Account Management (계정관리) */}
+                <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
+                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
+                    <UserCheck size={18} className="text-[#f25f8a]" />
+                    본사 최고 관리자 계정 변경 관리
+                  </h3>
+                  
+                  <form onSubmit={handleUpdateAdminAccount} className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">관리자 ID *</label>
+                      <input 
+                        type="text"
+                        value={adminIdSetting}
+                        onChange={(e) => setAdminIdSetting(e.target.value)}
+                        required
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">새 비밀번호 (미입력 시 기존 비밀번호 유지)</label>
+                      <input 
+                        type="password"
+                        placeholder="새 비밀번호 입력"
+                        value={adminPwSetting}
+                        onChange={(e) => setAdminPwSetting(e.target.value)}
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">새 비밀번호 확인</label>
+                      <input 
+                        type="password"
+                        placeholder="새 비밀번호 동일 입력"
+                        value={adminPwSettingConfirm}
+                        onChange={(e) => setAdminPwSettingConfirm(e.target.value)}
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full py-3.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5"
+                    >
+                      <Check size={14} />
+                      관리자 계정 정보 적용
+                    </button>
+                  </form>
+                </div>
+
+                {/* 2. Delivery Status Values Management (배송상태값 관리) */}
+                <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
+                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
+                    <Truck size={18} className="text-[#bf3e67]" />
+                    주문 배송 상태값(태그) 관리
+                  </h3>
+                  
+                  <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
+                    가맹점 발주 현황판 및 어드민에서 사용될 배송 상태의 명칭들을 자유롭게 추가 및 수정할 수 있습니다.<br />
+                    <span className="text-[#bf3e67] font-extrabold">* 단, [주문완료] 및 [배송완료]는 코어 시스템 상태값으로 유지되어야 하므로 임의로 삭제할 수 없습니다.</span>
+                  </p>
+
+                  <form onSubmit={handleAddDeliveryStatus} className="flex gap-2">
+                    <input 
+                      type="text"
+                      placeholder="신규 배송 상태값 입력 (e.g. 세관통과중, 배송대기 등)"
+                      value={newStatusName}
+                      onChange={(e) => setNewStatusName(e.target.value)}
+                      required
+                      className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                    />
+                    <button 
+                      type="submit"
+                      className="px-4 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all whitespace-nowrap"
+                    >
+                      추가
+                    </button>
+                  </form>
+
+                  <div className="space-y-3 pt-2">
+                    <label className="text-[11px] font-bold text-[#735965] block">현재 활성화된 배송 상태값 리스트</label>
+                    <div className="flex flex-wrap gap-2 bg-[#fff9fb] border border-[#f2ccd7]/60 p-4 rounded-xl">
+                      {deliveryStatuses.map((st) => {
+                        const isCore = ["주문완료", "배송완료"].includes(st);
+                        return (
+                          <span 
+                            key={st}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap ${
+                              isCore 
+                                ? "bg-[#fff1f5] text-[#bf3e67] border border-[#f2ccd7]" 
+                                : "bg-neutral-100 text-neutral-600 border border-neutral-200"
+                            }`}
+                          >
+                            {st}
+                            {!isCore && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteDeliveryStatus(st)}
+                                className="hover:text-red-500 text-neutral-400 font-extrabold ml-1"
+                                title="삭제"
+                              >
+                                &times;
+                              </button>
+                            )}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-2 border-t border-[#f2ccd7]/40">
+                    <button
+                      type="button"
+                      onClick={handleResetDeliveryStatuses}
+                      className="px-3.5 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-600 text-[10px] font-bold border border-neutral-300 transition-colors"
+                    >
+                      상태값 기본값으로 리셋
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. Kakao Map API Key Integration (외부 지도 API 연동) */}
+                <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 lg:col-span-2">
+                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
+                    <Map size={18} className="text-[#f25f8a]" />
+                    가맹점 현황 지도 연동 설정 (다음/카카오맵 API)
+                  </h3>
+                  
+                  <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
+                    공식 가맹점 안내 페이지의 지도를 구글 맵 대신 국내 환경에 친화적인 <strong>카카오맵(다음지도)</strong>으로 직접 연동할 수 있습니다.<br />
+                    카카오맵 JavaScript API Key를 등록하면 실시간 지점 좌표 변환 및 위치 핀 표시 기능이 활성화됩니다.<br />
+                    <span className="text-[#bf3e67] font-extrabold">* 미등록 상태인 경우, 가맹점 안내 페이지는 구글 지도를 통해 안전하게 자동 대체 작동합니다.</span>
+                  </p>
+
+                  <form onSubmit={handleUpdateKakaoMapKey} className="space-y-4 max-w-xl">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">카카오 개발자 JavaScript 앱 키 (App Key)</label>
+                      <input 
+                        type="text"
+                        placeholder="카카오디벨로퍼스에서 발급받은 JavaScript 키를 입력하세요"
+                        value={kakaoMapKeySetting}
+                        onChange={(e) => setKakaoMapKeySetting(e.target.value)}
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      />
+                      <p className="text-[10px] text-neutral-400 font-medium leading-relaxed">
+                        발급처: <a href="https://developers.kakao.com" target="_blank" rel="noopener noreferrer" className="text-[#f25f8a] underline hover:text-[#df4977]">Kakao Developers Console</a><br />
+                        ⚙️ <strong>플랫폼 설정 방법</strong>: 내 애플리케이션 &gt; 앱 설정 &gt; 플랫폼 &gt; <strong>Web 플랫폼</strong>에 아래 도메인을 등록해주세요.<br />
+                        👉 등록할 사이트 도메인: <code className="bg-neutral-100 text-[#bf3e67] px-1.5 py-0.5 rounded font-mono font-bold text-[11px]">{typeof window !== "undefined" ? window.location.origin : "https://120pie-new.vercel.app"}</code>
+                      </p>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="py-3 px-6 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+                    >
+                      <Check size={14} />
+                      카카오맵 API 설정 저장
+                    </button>
+                  </form>
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
+          {/* ==========================================
+              MENU: GALLERY MANAGEMENT MENU
+             ========================================== */}
+          {currentMenu === "gallery" && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-[#2d2026]">본사 공식 갤러리 관리</h2>
+                  <p className="text-xs text-[#735965] font-bold mt-1">
+                    점주 전용 홍보자료, 신메뉴 연출컷 및 가맹점 인테리어 공식 이미지 데이터를 관리합니다.
+                  </p>
+                </div>
+                <button
+                  onClick={handleOpenAddGalleryModal}
+                  className="px-5 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-xs rounded-xl shadow-md shadow-[#f25f8a]/10 hover:scale-[1.02] transition-all flex items-center gap-1.5 shrink-0"
+                >
+                  <Plus size={14} />
+                  신규 이미지 등록
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                {/* Left: Category Management Panel (4 cols) */}
+                <div className="lg:col-span-4 bg-white border border-[#f2ccd7] rounded-3xl p-6 shadow-sm space-y-6">
+                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
+                    <BookOpen size={16} className="text-[#f25f8a]" />
+                    카테고리 관리
+                  </h3>
+
+                  <form onSubmit={handleAddGalleryCategory} className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="신규 카테고리 입력"
+                      value={newGalleryCategoryName}
+                      onChange={(e) => setNewGalleryCategoryName(e.target.value)}
+                      required
+                      className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                    />
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all whitespace-nowrap"
+                    >
+                      추가
+                    </button>
+                  </form>
+
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-bold text-[#735965] block">등록된 카테고리 리스트 ({galleryCategories.length}개)</label>
+                    <div className="flex flex-wrap gap-2 p-3 bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-2xl min-h-[100px] align-content-start">
+                      {galleryCategories.map((cat) => (
+                        <span
+                          key={cat}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#fff1f5] text-[#bf3e67] border border-[#f2ccd7]"
+                        >
+                          {cat}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteGalleryCategory(cat)}
+                            className="hover:text-red-600 text-neutral-400 font-extrabold ml-1.5"
+                            title="카테고리 삭제"
+                          >
+                            &times;
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-neutral-450 leading-relaxed">
+                      * 카테고리를 삭제하면, 해당 분류로 지정되었던 이미지들은 자동으로 '기타' 분류로 강제 이동 배정됩니다.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right: Images Grid List (8 cols) */}
+                <div className="lg:col-span-8 space-y-6">
+                  {/* Category Selection Tabs Bar */}
+                  <div className="flex flex-wrap gap-1.5 p-1 bg-[#fff1f5] border border-[#f2ccd7] rounded-2xl">
+                    <button
+                      onClick={() => setSelectedGalleryCategory("전체")}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                        selectedGalleryCategory === "전체"
+                          ? "bg-[#f25f8a] text-white shadow-sm font-extrabold"
+                          : "text-[#735965] hover:text-[#bf3e67]"
+                      }`}
+                    >
+                      전체 ({galleryItems.length})
+                    </button>
+                    {galleryCategories.map((cat) => {
+                      const count = galleryItems.filter((item) => item.category === cat).length;
+                      return (
+                        <button
+                          key={cat}
+                          onClick={() => setSelectedGalleryCategory(cat)}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                            selectedGalleryCategory === cat
+                              ? "bg-[#f25f8a] text-white shadow-sm font-extrabold"
+                              : "text-[#735965] hover:text-[#bf3e67]"
+                          }`}
+                        >
+                          {cat} ({count})
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Grid layout */}
+                  {galleryItems.filter(item => selectedGalleryCategory === "전체" || item.category === selectedGalleryCategory).length === 0 ? (
+                    <div className="bg-white border border-[#f2ccd7] border-dashed rounded-3xl p-16 text-center flex flex-col items-center justify-center">
+                      <ImageIcon size={40} className="text-[#f2ccd7] mb-3 animate-pulse" />
+                      <p className="text-sm font-bold text-neutral-450">해당 카테고리에 등록된 갤러리 이미지가 없습니다.</p>
+                      <button
+                        onClick={handleOpenAddGalleryModal}
+                        className="mt-4 px-4 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-[11px] rounded-xl transition-all"
+                      >
+                        신규 이미지 추가하기
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                      {galleryItems
+                        .filter(item => selectedGalleryCategory === "전체" || item.category === selectedGalleryCategory)
+                        .map((item) => (
+                          <div
+                            key={item.id}
+                            className="bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group"
+                          >
+                            {/* Image Container */}
+                            <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 border-b border-[#f2ccd7]/60">
+                              <img
+                                src={item.url}
+                                alt={item.name}
+                                className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                              />
+                              <span className="absolute top-3 left-3 px-2 py-0.5 rounded text-[10px] font-black bg-[#bf3e67] text-white shadow-sm">
+                                {item.category}
+                              </span>
+                            </div>
+
+                            {/* Details body */}
+                            <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
+                              <div className="space-y-1">
+                                <h4 className="font-extrabold text-xs text-[#2d2026] line-clamp-2 leading-relaxed" title={item.name}>
+                                  {item.name}
+                                </h4>
+                                <span className="text-[9px] text-[#735965]/70 font-semibold block">
+                                  등록일: {item.regDate}
+                                </span>
+                              </div>
+
+                              <div className="flex gap-1.5 pt-2 border-t border-neutral-100">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditGalleryModal(item)}
+                                  className="flex-1 py-2 border border-[#f2ccd7] bg-[#fff9fb] hover:bg-[#ffd3df]/40 text-[#735965] hover:text-[#bf3e67] text-[10px] font-bold rounded-xl transition-all"
+                                >
+                                  수정
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteGalleryItem(item.id, item.name)}
+                                  className="px-2.5 py-2 border border-red-200 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl transition-all flex items-center justify-center"
+                                  title="이미지 삭제"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
         </main>
       </div>
 
       {/* ==========================================
           MODALS & FORM POPUPS
          ========================================== */}
+
+      {/* 0. Register/Edit Gallery Item Modal */}
+      {showGalleryModal && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setShowGalleryModal(false)}
+        >
+          <div
+            className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fadeIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
+              <h3 className="text-base font-extrabold text-[#2d2026]">
+                {selectedGalleryItem ? "갤러리 이미지 정보 수정" : "본사 공식 이미지 신규 등록"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowGalleryModal(false)}
+                className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <form onSubmit={handleGallerySubmit} className="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm flex-1">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#735965]">이미지명 *</label>
+                <input
+                  type="text"
+                  placeholder="이미지를 구별할 이름을 입력해 주세요 (e.g. 로제미트파이 연출컷)"
+                  value={galleryItemName}
+                  onChange={(e) => setGalleryItemName(e.target.value)}
+                  required
+                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#735965]">카테고리 분류 *</label>
+                <select
+                  value={galleryItemCategory}
+                  onChange={(e) => setGalleryItemCategory(e.target.value)}
+                  required
+                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] font-bold"
+                >
+                  {galleryCategories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#735965] block">이미지 등록 방식 *</label>
+                <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#fff1f5] border border-[#f2ccd7] rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setGalleryUploadMethod("url")}
+                    className={`py-2 rounded-lg text-xs font-bold transition-all ${
+                      galleryUploadMethod === "url"
+                        ? "bg-[#f25f8a] text-white shadow-sm"
+                        : "text-[#735965] hover:text-[#bf3e67]"
+                    }`}
+                  >
+                    이미지 URL 입력
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGalleryUploadMethod("file")}
+                    className={`py-2 rounded-lg text-xs font-bold transition-all ${
+                      galleryUploadMethod === "file"
+                        ? "bg-[#f25f8a] text-white shadow-sm"
+                        : "text-[#735965] hover:text-[#bf3e67]"
+                    }`}
+                  >
+                    로컬 이미지 업로드
+                  </button>
+                </div>
+              </div>
+
+              {galleryUploadMethod === "url" ? (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-[#735965]">이미지 웹 URL *</label>
+                  <input
+                    type="url"
+                    placeholder="https://example.com/image.jpg 형태로 외부 웹 이미지 경로를 입력해 주세요"
+                    value={galleryItemUrl}
+                    onChange={(e) => setGalleryItemUrl(e.target.value)}
+                    required={galleryUploadMethod === "url"}
+                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-[#735965]">로컬 이미지 파일 업로드 *</label>
+                  <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleGalleryImageUpload}
+                      required={galleryUploadMethod === "file" && !galleryItemUrl}
+                      className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
+                    />
+                    {galleryItemUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setGalleryItemUrl("")}
+                        className="px-2.5 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
+                      >
+                        지우기
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Real-time Image Preview Area */}
+              {galleryItemUrl && (
+                <div className="space-y-2 pt-2">
+                  <span className="text-[10px] font-bold text-[#735965] block">이미지 미리보기</span>
+                  <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-[#f2ccd7] bg-neutral-50 shadow-inner">
+                    <img
+                      src={galleryItemUrl}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                      onError={() => {}}
+                    />
+                    <div className="absolute bottom-2 right-2 bg-emerald-500/90 text-white text-[9px] font-extrabold px-2 py-0.5 rounded shadow flex items-center gap-1">
+                      <Check size={10} />
+                      유효한 경로 확인
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => setShowGalleryModal(false)}
+                  className="flex-1 py-3 border border-[#f2ccd7] hover:bg-[#fff1f5] text-[#735965] font-bold text-xs rounded-xl transition-all"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-xs rounded-xl shadow-sm transition-all"
+                >
+                  {selectedGalleryItem ? "수정 내용 적용" : "갤러리 등록 완료"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* 1. Inquiry Reply Writer Modal */}
       {selectedInquiry && (
@@ -2780,6 +3725,139 @@ export default function AdminPage() {
                 신규 지원 자료 공식 배포 등록
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 7. Order Detail Popup Modal */}
+      {showOrderModal && selectedOrder && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setShowOrderModal(false)}
+        >
+          <div 
+            className="w-full max-w-3xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="p-5 sm:p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
+              <div className="flex-1">
+                <h3 className="text-sm sm:text-base font-black text-[#2d2026] flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                  <span>📦 발주 주문 상세 내역</span>
+                  <span className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full bg-red-50 text-red-500 border border-red-200 font-bold w-fit">
+                    {selectedOrder.id}
+                  </span>
+                </h3>
+              </div>
+              <button 
+                onClick={() => setShowOrderModal(false)} 
+                className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 ml-4"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
+              
+              {/* Delivery Recipient Info */}
+              <div className="space-y-3 bg-[#fff1f5]/50 border border-[#f2ccd7]/60 p-5 rounded-2xl">
+                <h4 className="font-extrabold text-sm text-[#bf3e67] border-b border-[#f2ccd7] pb-2 flex items-center gap-1.5">
+                  <Store size={15} />
+                  수령인 & 배송지 정보 (가맹점 정보)
+                </h4>
+                <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-[#735965]">
+                  <div>
+                    <span className="block text-[10px] text-[#735965]/60 mb-0.5">가맹점명</span>
+                    <strong className="text-[#2d2026]">강남역삼점</strong>
+                  </div>
+                  <div>
+                    <span className="block text-[10px] text-[#735965]/60 mb-0.5">점주 대표자</span>
+                    <strong className="text-[#2d2026]">김지훈</strong>
+                  </div>
+                  <div>
+                    <span className="block text-[10px] text-[#735965]/60 mb-0.5">연락처</span>
+                    <strong className="text-[#2d2026]">010-3813-1200</strong>
+                  </div>
+                  <div>
+                    <span className="block text-[10px] text-[#735965]/60 mb-0.5">주문 신청일</span>
+                    <strong className="text-[#2d2026]">{selectedOrder.date}</strong>
+                  </div>
+                </div>
+                <div className="pt-2 text-xs font-semibold text-[#735965] border-t border-[#f2ccd7]/40">
+                  <span className="block text-[10px] text-[#735965]/60 mb-0.5">배송지 주소</span>
+                  <strong className="text-[#2d2026]">경기 군포시 엘에스로 143 (금정동, 1층 1001호)</strong>
+                </div>
+              </div>
+
+              {/* Order Item List */}
+              <div className="space-y-3">
+                <h4 className="font-extrabold text-sm text-[#bf3e67] flex items-center gap-1.5">
+                  <Package size={15} />
+                  발주 신청 품목 및 정산 내역 ({selectedOrder.items.length})
+                </h4>
+                <div className="border border-[#f2ccd7]/60 rounded-2xl overflow-hidden bg-white">
+                  <div className="overflow-x-auto w-full">
+                    <table className="w-full text-left border-collapse text-[11px] min-w-[480px] sm:min-w-0" style={{ tableLayout: 'fixed' }}>
+                      <thead>
+                        <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[10px] font-bold text-[#735965] uppercase">
+                          <th className="px-3 py-2.5" style={{ width: '40%' }}>품목명</th>
+                          <th className="px-2 py-2.5 text-right" style={{ width: '20%' }}>단가</th>
+                          <th className="px-2 py-2.5 text-center" style={{ width: '15%' }}>수량</th>
+                          <th className="px-3 py-2.5 text-right" style={{ width: '25%' }}>금액</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#f2ccd7]/40">
+                        {selectedOrder.items.map((item, idx) => (
+                          <tr key={idx} className="hover:bg-[#fff9fb]/40 font-medium">
+                            <td className="px-3 py-2.5 font-bold text-[#2d2026] leading-tight break-words text-[11px] sm:text-xs" style={{ wordBreak: 'break-word' }}>
+                              {item.productName}
+                            </td>
+                            <td className="px-2 py-2.5 text-right text-[#735965] text-[11px]">{item.price.toLocaleString()}</td>
+                            <td className="px-2 py-2.5 text-center font-bold text-[#2d2026] text-[11px]">{item.quantity}</td>
+                            <td className="px-3 py-2.5 text-right font-bold text-[#f25f8a] text-[11px]">{(item.price * item.quantity).toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status control and Total price summary */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-[#f2ccd7]/60">
+                <div className="space-y-2 bg-[#fff1f5]/50 border border-[#f2ccd7]/60 p-4 rounded-xl">
+                  <label className="text-xs font-bold text-[#bf3e67] block">상태값 변경 선택</label>
+                  <select
+                    value={selectedOrder.status}
+                    onChange={(e) => updateOrderStatus(selectedOrder.id, e.target.value)}
+                    className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] font-bold focus:outline-none focus:border-[#f25f8a] cursor-pointer"
+                  >
+                    {deliveryStatuses.map((st) => (
+                      <option key={st} value={st}>{st}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="bg-[#fff1f5]/80 border border-[#f2ccd7]/60 p-4 rounded-xl flex flex-col justify-center items-end text-right">
+                  <span className="text-[10px] text-[#735965] font-bold block mb-1">총 결제 합계액 (부가세 포함)</span>
+                  <strong className="text-xl font-black text-[#bf3e67]">
+                    {selectedOrder.totalPrice.toLocaleString()} 원
+                  </strong>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Footer */}
+            <div className="p-5 bg-neutral-50 text-right border-t border-[#f2ccd7]/60">
+              <button 
+                onClick={() => setShowOrderModal(false)}
+                className="px-6 py-2.5 rounded-xl bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-xs font-bold text-[#735965] transition-colors"
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -337,7 +337,7 @@ const MARQUEE_IMAGES = [
 ];
 
 // V3 StoresPreviewSection
-function StoresPreviewSection() {
+function StoresPreviewSection({ isPink = false }: { isPink?: boolean }) {
   const previewStores = [
     { name: "120겹파이 AK플라자 금정점", region: "경기 군포시 엘에스로 143 1층 1001호", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs.jpg" },
     { name: "120겹파이 본점", region: "서울 성북구 돌곶이로14길 35 1층", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg" },
@@ -359,7 +359,7 @@ function StoresPreviewSection() {
               일상 가까운 곳에서 만날 수 있는 120겹파이 매장을 소개합니다.
             </p>
           </div>
-          <Link href="/stores" className="inline-flex items-center gap-2 text-sm font-bold text-neutral-700 hover:text-amber-600 transition-colors shrink-0">
+          <Link href={isPink ? "/stores?theme=pink" : "/stores?theme=black"} className="inline-flex items-center gap-2 text-sm font-bold text-neutral-700 hover:text-amber-600 transition-colors shrink-0">
             전체 매장 보기 <ArrowRight size={16} />
           </Link>
         </div>
@@ -448,18 +448,54 @@ function OwnerSystemSection() {
 
 // V3 GallerySection
 function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: string) => void }) {
-  const tabs = ["전체", "메뉴", "매장", "박람회", "기타"];
+  const [galleryItems, setGalleryItems] = useState<any[]>([]);
 
-  const images = [
-    { id: 1, cat: "메뉴", url: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=400&h=400&fit=crop", title: "120파이 초콜릿/고기 토핑" },
-    { id: 2, cat: "매장", url: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=400&h=400&fit=crop", title: "120pie&coffee 강남본점 전면" },
-    { id: 3, cat: "메뉴", url: "https://images.unsplash.com/photo-1587314168485-3236d6710814?q=80&w=400&h=400&fit=crop", title: "에그120 계란빵 쌀반죽 단면" },
-    { id: 4, cat: "박람회", url: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=400&h=400&fit=crop", title: "프랜차이즈 창업 박람회 성황" },
-    { id: 5, cat: "기타", url: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=400&h=400&fit=crop", title: "본사 상생 협동조합 사무실" },
-    { id: 6, cat: "매장", url: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=400&h=400&fit=crop", title: "기존 샵인샵 도입 완료 윈도우" }
-  ];
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("120_gallery_items");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setGalleryItems(parsed);
+        } catch (e) {
+          console.error("Failed to parse gallery items in HomeV3", e);
+        }
+      } else {
+        const defaultList = [
+          {
+            id: "gal-1",
+            name: "로제미트파이 신메뉴 이미지",
+            category: "신메뉴",
+            url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg",
+            regDate: "2026-05-20"
+          },
+          {
+            id: "gal-2",
+            name: "120겹파이 매장 연출컷",
+            category: "홍보연출",
+            url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779721204/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_du1czf.jpg",
+            regDate: "2026-05-21"
+          },
+          {
+            id: "gal-3",
+            name: "에그120 및 디저트 라인업",
+            category: "메뉴판",
+            url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg",
+            regDate: "2026-05-22"
+          }
+        ];
+        localStorage.setItem("120_gallery_items", JSON.stringify(defaultList));
+        setGalleryItems(defaultList);
+      }
+    }
+  }, []);
 
-  const filteredImages = filter === "전체" ? images : images.filter(img => img.cat === filter);
+  const availableCats = Array.from(new Set(galleryItems.map(item => item.category))).filter(Boolean) as string[];
+  const tabs = ["전체", ...availableCats];
+
+  const filteredImages = filter === "전체" 
+    ? galleryItems 
+    : galleryItems.filter(img => img.category === filter);
 
   return (
     <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100">
@@ -470,7 +506,7 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
             매장과 메뉴의<br />실제 모습을 확인하세요.
           </h2>
           <p className="text-xs sm:text-sm text-neutral-500 font-bold max-w-xl leading-relaxed">
-            운영 중인 매장과 메뉴, 행사 현장의 분위기를 사진으로 살펴볼 수 있습니다.
+            본사 공식 어드민 갤러리에 등록된 실제 매장과 메뉴, 연출 컷을 실시간으로 확인하실 수 있습니다.
           </p>
         </div>
 
@@ -501,11 +537,11 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
                 key={img.id}
                 className="group"
               >
-                <div className="aspect-[4/3] bg-neutral-100 rounded-xl overflow-hidden mb-4">
-                  <img src={img.url} alt={img.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
+                <div className="aspect-[4/3] bg-neutral-100 rounded-xl overflow-hidden mb-4 relative shadow-sm hover:shadow transition-shadow">
+                  <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
                 </div>
-                <span className="text-amber-600 text-[10px] font-bold uppercase tracking-wider mb-2 block font-mono">{img.cat}</span>
-                <h4 className="text-neutral-950 font-extrabold text-sm leading-tight">{img.title}</h4>
+                <span className="text-amber-600 text-[10px] font-bold uppercase tracking-wider mb-2 block font-mono">{img.category}</span>
+                <h4 className="text-neutral-950 font-extrabold text-sm leading-tight line-clamp-1">{img.name}</h4>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -621,13 +657,12 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
       <header className="sticky top-0 z-50 backdrop-blur-md bg-neutral-950/95 border-b border-neutral-900/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between min-h-[94px] gap-3">
           <div className="shrink-0 py-2">
-            <Link className="flex items-center gap-2.5 font-black text-base sm:text-lg tracking-tight text-white group shrink-0" href={isPinkVariant ? "/" : "/landing-v3"} aria-label="120pie 홈으로 이동">
+            <Link className="flex items-center group shrink-0" href={isPinkVariant ? "/" : "/v3"} aria-label="120pie 홈으로 이동">
               <img
-                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
-                alt="120pie 로고"
-                className="w-9 h-9 sm:w-10 sm:h-10 object-contain group-hover:scale-105 transition-transform"
+                src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"}
+                alt="120pie & coffee"
+                className="h-5.5 sm:h-7 w-auto object-contain group-hover:scale-105 transition-transform"
               />
-              <span className="font-extrabold tracking-tight whitespace-nowrap">120pie &amp; <span className="text-amber-400">coffee</span></span>
             </Link>
           </div>
 
@@ -637,7 +672,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
             <a href="#menu" className="hover:text-amber-400 transition-colors">메뉴 카탈로그</a>
             <a href="#simulator" className="hover:text-amber-400 transition-colors">수익 시뮬레이터</a>
             <a href="#adoption" className="hover:text-amber-400 transition-colors">도입 방식 &amp; 성공사례</a>
-            <Link href="/stores" className="hover:text-amber-400 transition-colors">가맹점 현황</Link>
+            <Link href={isPinkVariant ? "/stores?theme=pink" : "/stores?theme=black"} className="hover:text-amber-400 transition-colors">가맹점 현황</Link>
             <a href="#faq" className="hover:text-amber-400 transition-colors">FAQ</a>
           </nav>
 
@@ -646,7 +681,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
               <Link href="/" className={`rounded-full px-2 py-1 transition-colors ${isPinkVariant ? "landing-theme-active bg-amber-400 text-white" : "text-neutral-400 hover:text-white"}`}>
                 핑크
               </Link>
-              <Link href="/landing-v3" className={`rounded-full px-2 py-1 transition-colors ${!isPinkVariant ? "landing-theme-active bg-amber-400 text-neutral-950" : "text-neutral-400 hover:text-amber-400"}`}>
+              <Link href="/v3" className={`rounded-full px-2 py-1 transition-colors ${!isPinkVariant ? "landing-theme-active bg-amber-400 text-neutral-950" : "text-neutral-400 hover:text-amber-400"}`}>
                 블랙
               </Link>
             </div>
@@ -683,7 +718,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                   {item.label}
                 </a>
               ))}
-              <Link href="/stores" className="rounded-xl bg-neutral-900 border border-neutral-800 px-4 py-3 hover:text-amber-400 transition-colors">
+              <Link href={isPinkVariant ? "/stores?theme=pink" : "/stores?theme=black"} className="rounded-xl bg-neutral-900 border border-neutral-800 px-4 py-3 hover:text-amber-400 transition-colors">
                 가맹점 현황
               </Link>
               <Link href="/portal" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-neutral-900 border border-neutral-800 px-4 py-3 hover:text-amber-400 transition-colors">
@@ -826,95 +861,6 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
         </section>
 
         {/* ------------------------------------------------------------- */}
-        {/* INFINITE SCROLLING DESSERT MENU MARQUEE SECTION (NEW 🚀) */}
-        {/* ------------------------------------------------------------- */}
-        <section 
-          id="marquee-slider"
-          className="py-0 !py-0 bg-neutral-950 overflow-hidden relative"
-          style={{
-            backgroundColor: isPinkVariant ? "#ffeaf0" : undefined
-          }}
-        >
-          <style dangerouslySetInnerHTML={{ __html: `
-            @keyframes marquee-left {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
-            }
-            @keyframes marquee-right {
-              0% { transform: translateX(-50%); }
-              100% { transform: translateX(0); }
-            }
-            .animate-marquee-left {
-              display: flex;
-              width: max-content;
-              animation: marquee-left 45s linear infinite;
-            }
-            .animate-marquee-right {
-              display: flex;
-              width: max-content;
-              animation: marquee-right 45s linear infinite;
-            }
-          `}} />
-
-          {/* Gradual blur fade gradients on left and right edges */}
-          <div 
-            className="absolute top-0 bottom-0 left-0 w-16 sm:w-40 bg-gradient-to-r from-neutral-950 to-transparent z-10 pointer-events-none"
-            style={{
-              backgroundImage: isPinkVariant 
-                ? "linear-gradient(to right, #ffeaf0, transparent)" 
-                : undefined
-            }}
-          ></div>
-          <div 
-            className="absolute top-0 bottom-0 right-0 w-16 sm:w-40 bg-gradient-to-l from-neutral-950 to-transparent z-10 pointer-events-none"
-            style={{
-              backgroundImage: isPinkVariant 
-                ? "linear-gradient(to left, #ffeaf0, transparent)" 
-                : undefined
-            }}
-          ></div>
-
-          <div className="w-full flex flex-col gap-0 py-0 bg-transparent">
-            {/* Track 1: Moving Left */}
-            <div className="animate-marquee-left gap-0">
-              {[...MARQUEE_IMAGES, ...MARQUEE_IMAGES].map((img, idx) => (
-                <div 
-                  key={`t1-${idx}`} 
-                  className="w-[180px] sm:w-[360px] aspect-square rounded-none overflow-hidden bg-neutral-900 shrink-0 relative group shadow-inner"
-                >
-                  <img 
-                    src={img.src} 
-                    alt={img.name} 
-                    className="w-full h-full object-cover rounded-none transition-transform duration-750 group-hover:scale-[1.04]" 
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none" />
-                </div>
-              ))}
-            </div>
-
-            {/* Track 2: Moving Right (Offset images by 5 for diversity) */}
-            <div className="animate-marquee-right gap-0">
-              {(() => {
-                const shiftedImages = [...MARQUEE_IMAGES.slice(5), ...MARQUEE_IMAGES.slice(0, 5)];
-                return [...shiftedImages, ...shiftedImages].map((img, idx) => (
-                  <div 
-                    key={`t2-${idx}`} 
-                    className="w-[180px] sm:w-[360px] aspect-square rounded-none overflow-hidden bg-neutral-900 shrink-0 relative group shadow-inner"
-                  >
-                    <img 
-                      src={img.src} 
-                      alt={img.name} 
-                      className="w-full h-full object-cover rounded-none transition-transform duration-750 group-hover:scale-[1.04]" 
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none" />
-                  </div>
-                ));
-              })()}
-            </div>
-          </div>
-        </section>
-
-        {/* ------------------------------------------------------------- */}
         {/* WHY SECTION [RICH BLACK THEME & DYNAMIC GOLD BENTO GRID] */}
         {/* ------------------------------------------------------------- */}
         <section className="py-24 bg-neutral-950 text-white border-b border-neutral-900/80 relative" id="why">
@@ -932,36 +878,35 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
               </p>
             </motion.div>
 
-            {/* Bento Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[minmax(200px,_auto)]">
+            {/* Bento Grid: 4 Alternating Pairs (Total 8 Cards: 4 Text Cards + 4 Video Cards) */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
 
-              {/* Bento Card 1: Value Core */}
+              {/* PAIR 1 (Set Menu): Text (7 cols) */}
               <motion.article
-                className="md:col-span-7 bg-neutral-900/60 border border-neutral-850 p-8 rounded-2xl flex flex-col justify-between hover:border-amber-400/40 transition-colors"
+                className={`md:col-span-7 bg-neutral-900/60 border border-neutral-850 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card ${
+                  isPinkVariant ? "hover:border-pink-400/40" : "hover:border-amber-400/40"
+                }`}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
               >
                 <div>
-                  <span className="w-10 h-10 rounded bg-amber-400/10 border border-amber-400/20 flex items-center justify-center mb-6 shadow-sm p-1.5">
-                    <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png" alt="" className="w-full h-full object-contain" />
-                  </span>
                   <h3 className="text-xl sm:text-2xl font-black text-white mb-3">커피와 잘 어울리는 세트 메뉴로 한 잔의 만족을 더합니다</h3>
                   <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
                     아메리카노에 120겹 파이 또는 에그120을 함께 제안해 보세요. 고객은 간편하게 디저트를 즐기고, 매장은 자연스럽게 주문 구성을 넓힐 수 있습니다.
                   </p>
                 </div>
-                <div className="flex flex-wrap gap-2 mt-6">
-                  <span className="px-2.5 py-1 rounded bg-neutral-950 border border-neutral-850 text-[10px] font-bold text-amber-400">커피와 좋은 조합</span>
-                  <span className="px-2.5 py-1 rounded bg-neutral-950 border border-neutral-850 text-[10px] font-bold text-amber-400">간편한 세트 구성</span>
-                  <span className="px-2.5 py-1 rounded bg-neutral-950 border border-neutral-850 text-[10px] font-bold text-amber-400">새로운 매출 기회</span>
+                <div className="flex flex-wrap gap-x-4 gap-y-2 mt-6">
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#커피와 좋은 조합</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#간편한 세트 구성</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#새로운 매출 기회</span>
                 </div>
               </motion.article>
 
-              {/* Bento Card 2: Embedded Crisp Dough Image */}
+              {/* PAIR 1 (Set Menu): Video Card (5 cols) */}
               <motion.div
-                className="md:col-span-5 bg-neutral-900 border border-neutral-850 rounded-2xl overflow-hidden relative shadow-lg"
+                className="md:col-span-5 bg-neutral-900 border border-neutral-850 rounded-2xl overflow-hidden relative shadow-lg min-h-[280px]"
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -974,143 +919,127 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                   loop
                   playsInline
                   aria-label="120겹 파이 세트 메뉴 영상"
-                  className={`absolute inset-0 w-full h-full object-cover scale-[1.2] hover:scale-[1.23] transition-all duration-500 opacity-100`}
+                  className="absolute inset-0 w-full h-full object-cover scale-[1.2] hover:scale-[1.23] transition-all duration-500 opacity-100"
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-white/10 via-transparent to-transparent" : "from-neutral-950 via-neutral-950/20 to-transparent"}`}></div>
+                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-pink-950/20 via-transparent to-transparent" : "from-neutral-950 via-neutral-950/20 to-transparent"}`}></div>
               </motion.div>
 
-              {/* Bento Card 3: 샵인샵 */}
-              <motion.article
-                className="md:col-span-4 bg-neutral-900/60 border border-neutral-850 p-6 rounded-2xl flex flex-col justify-between hover:border-amber-400/40 transition-colors"
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <div>
-                  <span className="w-8 h-8 rounded bg-neutral-950 border border-neutral-800 flex items-center justify-center mb-4 p-1">
-                    <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png" alt="" className="w-full h-full object-contain" />
-                  </span>
-                  <h3 className="text-base font-black text-white mb-2">지금 매장 분위기 그대로 시작</h3>
-                  <p className="text-xs text-neutral-400 font-medium leading-relaxed">
-                    큰 공사나 간판 교체 없이, 작은 쇼케이스와 브랜드 안내만 더해 기존 카페 공간에 자연스럽게 어우러집니다.
-                  </p>
-                </div>
-              </motion.article>
-
-              {/* Bento Card 4: 초간편 조리 */}
-              <motion.article
-                className="md:col-span-4 bg-neutral-900/60 border border-neutral-850 p-6 rounded-2xl flex flex-col justify-between hover:border-amber-400/40 transition-colors"
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              >
-                <div>
-                  <span className="w-8 h-8 rounded bg-neutral-950 border border-neutral-800 flex items-center justify-center mb-4 p-1">
-                    <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png" alt="" className="w-full h-full object-contain" />
-                  </span>
-                  <h3 className="text-base font-black text-white mb-2">누구나 편하게 준비하는 5분 조리</h3>
-                  <p className="text-xs text-neutral-400 font-medium leading-relaxed">
-                    복잡한 기술 없이 오븐에 넣고 버튼만 누르면 됩니다. 바쁜 운영 중에도 일정한 맛과 품질을 편하게 준비할 수 있습니다.
-                  </p>
-                </div>
-              </motion.article>
-
-              {/* Bento Card 5: 폐기 없음 */}
-              <motion.article
-                className="md:col-span-4 bg-neutral-900/60 border border-neutral-850 p-6 rounded-2xl flex flex-col justify-between hover:border-amber-400/40 transition-colors"
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-              >
-                <div>
-                  <span className="w-8 h-8 rounded bg-neutral-950 border border-neutral-800 flex items-center justify-center mb-4 p-1">
-                    <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png" alt="" className="w-full h-full object-contain" />
-                  </span>
-                  <h3 className="text-base font-black text-white mb-2">필요한 만큼 구워 부담은 가볍게</h3>
-                  <p className="text-xs text-neutral-400 font-medium leading-relaxed">
-                    냉동 보관된 생지를 판매 흐름에 맞춰 필요한 만큼만 구워, 재고와 폐기 부담을 한결 편안하게 관리할 수 있습니다.
-                  </p>
-                </div>
-              </motion.article>
-
-            </div>
-          </div>
-        </section>
-
-        {/* ------------------------------------------------------------- */}
-        {/* PAIN POINTS SECTION [PURE WHITE & LIGHT GREY THEME - CLEAR TROUBLES] */}
-        {/* ------------------------------------------------------------- */}
-        <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100" id="pain-points">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
-
-              {/* Left Troubles Cards Grid */}
-              <div className="lg:col-span-8 flex flex-col justify-between">
-                <motion.div className="max-w-xl mb-12" {...fadeIn}>
-                  <span className="text-neutral-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Real Cafe Troubles</span>
-                  <h2 className="text-3xl sm:text-4xl font-black text-black mb-4 tracking-tight leading-tight">
-                    하루 백 잔을 팔아도 제자리걸음이라면,<br />
-                    문제는 잔수가 아닌 <span className="text-amber-500 font-extrabold">낮은 객단가</span>입니다.
-                  </h2>
-                  <p className="text-xs sm:text-sm text-neutral-500 font-bold leading-relaxed">
-                    저가 커피와 치열하게 경쟁하며 음료만 판매하는 방식으로는 성장에 한계가 있습니다.<br />
-                    기존 매장을 크게 바꾸지 않고도, 파이 메뉴 하나로 주문의 가치를 높일 수 있습니다.
-                  </p>
-                </motion.div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {[
-                    { no: "01", title: "음료 객단가의 물리적 한계", desc: "커피 한 잔당의 마진 단가가 오르지 않고 주변 저가 프랜차이즈 저가 경쟁 시 타격이 매우 큽니다." },
-                    { no: "02", title: "매일 반복되는 상온 빵 폐기", desc: "쇼케이스에 준비할수록 선도가 저하되고 당일 판매 불발 시 원가 폐기율 손실이 커집니다." },
-                    { no: "03", title: "어려운 베이커리 제조 인프라", desc: "매장 내에서 직접 빵을 생산하려면 오븐기 셋업 공간과 전문 제과사 급여비가 심각히 가중됩니다." },
-                    { no: "04", title: "차별화 없는 배달 메뉴 썸네일", desc: "배달앱 리스트에서 사장님 매장만이 가지는 뚜렷한 대표 디저트 세트가 없어 경쟁에서 묻힙니다." },
-                    { no: "05", title: "초기 철거/가맹비 인테리어 거품", desc: "신규 창업이나 브랜드 업종 전환을 하려면 억대 규모의 불필요한 공사비와 본사 마진 거품이 발생합니다." },
-                    { no: "06", title: "인스타그램 자발적 바이럴 부재", desc: "MZ고객들이 사진 찍고 태그하여 지인을 부를 만한 감각적인 브랜드 시각 굿즈 및 대표 캐릭터가 결여되어 있습니다." }
-                  ].map((p, idx) => (
-                    <motion.div
-                      key={idx}
-                      className="bg-neutral-50 border border-neutral-100 p-6 rounded-2xl hover:border-black hover:bg-white transition-all group shadow-sm"
-                      initial={{ opacity: 0, y: 15 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: idx * 0.05 }}
-                    >
-                      <span className="w-8 h-8 rounded bg-neutral-950 text-white font-black text-xs flex items-center justify-center mb-4 group-hover:scale-105 group-hover:bg-amber-400 group-hover:text-neutral-950 transition-all">
-                        {p.no}
-                      </span>
-                      <h3 className="text-base font-black text-black mb-2">{p.title}</h3>
-                      <p className="text-xs text-neutral-500 font-bold leading-relaxed">{p.desc}</p>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right Supporting Video Column */}
+              {/* PAIR 2 (Shop in Shop): Image Card (5 cols) */}
               <motion.div
-                className="lg:col-span-4 bg-neutral-50 border border-neutral-200 rounded-3xl overflow-hidden relative min-h-[400px] flex items-end shadow-inner"
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                className="md:col-span-5 bg-neutral-900 border border-neutral-850 rounded-2xl overflow-hidden relative shadow-lg min-h-[280px]"
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
               >
-                <video
-                  src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779807895/120pie_%EC%98%81%EC%83%81_2_2_qz3xdx.mp4"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  aria-label="120겹 파이 메뉴 연출 영상"
-                  className={`absolute inset-0 w-full h-full object-cover ${isPinkVariant ? "opacity-100" : "opacity-90 contrast-105"}`}
+                <img
+                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779808274/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A0%ED%94%8C_%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%97%B0%EC%B6%9C_rrdtor.jpg"
+                  alt="120겹 파이 크림치즈 애플 블루베리 연출"
+                  className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-white/70 via-white/5 to-transparent" : "from-black/85 via-black/20 to-transparent"}`}></div>
-                <div className="relative z-10 p-6 text-white text-xs font-bold leading-relaxed">
-                  <span className="text-amber-400 uppercase tracking-widest text-[9px] block mb-1">barista desk support</span>
-                  "음료 제조 중에도 120겹 파이는 본사 자동 타이머 타이틀 하에 구워져 별도 주방 제조 피로도가 거의 없습니다."
-                </div>
+                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-pink-950/20 via-transparent to-transparent" : "from-neutral-950 via-neutral-950/20 to-transparent"}`}></div>
               </motion.div>
+
+              {/* PAIR 2 (Shop in Shop): Text Card (7 cols) */}
+              <motion.article
+                className={`md:col-span-7 bg-neutral-900/60 border border-neutral-850 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card ${
+                  isPinkVariant ? "hover:border-pink-400/40" : "hover:border-amber-400/40"
+                }`}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3">지금 매장의 아름다운 분위기 그대로 시작하는 샵인샵</h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
+                    큰 리모델링 철거 공사나 값비싼 브랜드 간판 전면 교체 없이도, 기존의 소중한 단골 고객과 개인 카페 인테리어 정체성을 온전히 지키며 가볍게 120겹 파이와 에그120을 도입할 수 있습니다.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-2 mt-6">
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#기존 공간 극대화</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#간편한 쇼케이스 셋업</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#듀얼 브랜딩 시너지</span>
+                </div>
+              </motion.article>
+
+              {/* PAIR 3 (Easy Cooking): Text Card (7 cols) */}
+              <motion.article
+                className={`md:col-span-7 bg-neutral-900/60 border border-neutral-850 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card ${
+                  isPinkVariant ? "hover:border-pink-400/40" : "hover:border-amber-400/40"
+                }`}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3">누구나 5분이면 완벽한 맛을 재현하는 초간편 시스템</h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
+                    전문적인 제과 기술이나 주방 설비 가중이 전혀 필요 없습니다. 본사에서 공급받은 냉동 생지를 간편하게 전용 미니 오븐에 넣고 타이머 스위치만 누르면 갓 구워낸 프리미엄 바삭함을 고객에게 즉시 제공합니다.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-2 mt-6">
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#초간편 5분 조리</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#작업 동선 최소화</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#원터치 퀄리티 일관성</span>
+                </div>
+              </motion.article>
+
+              {/* PAIR 3 (Easy Cooking): Video Card (5 cols) */}
+              <motion.div
+                className="md:col-span-5 bg-neutral-900 border border-neutral-850 rounded-2xl overflow-hidden relative shadow-lg min-h-[280px]"
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <img
+                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779721204/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_du1czf.jpg"
+                  alt="120겹 파이 초간편 5분 조리 연출"
+                  className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
+                />
+                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-pink-950/20 via-transparent to-transparent" : "from-neutral-950 via-neutral-950/20 to-transparent"}`}></div>
+              </motion.div>
+
+              {/* PAIR 4 (Zero Waste): Video Card (5 cols) */}
+              <motion.div
+                className="md:col-span-5 bg-neutral-900 border border-neutral-850 rounded-2xl overflow-hidden relative shadow-lg min-h-[280px]"
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <img
+                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779847988/7c2cce19-579e-4810-9b4d-692bf40cae03.png"
+                  alt="에그120 계란빵 조리 및 폐기율 제로 연출"
+                  className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
+                />
+                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-pink-950/20 via-transparent to-transparent" : "from-neutral-950 via-neutral-950/20 to-transparent"}`}></div>
+              </motion.div>
+
+              {/* PAIR 4 (Zero Waste): Text Card (7 cols) */}
+              <motion.article
+                className={`md:col-span-7 bg-neutral-900/60 border border-neutral-850 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card ${
+                  isPinkVariant ? "hover:border-pink-400/40" : "hover:border-amber-400/40"
+                }`}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3">냉동 보관 생지 시스템으로 재고와 폐기율 부담 제로</h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
+                    그날 아침 구워 당일 반드시 소진해야 하는 일반 상온 제빵 구조와 다릅니다. 본사 냉동 생지를 주문 수량이나 매장 판매 흐름에 맞추어 실시간으로 필요한 만큼만 즉석에서 구워내기 때문에 유통/재고 폐기 손실이 원천적으로 0%에 수렴합니다.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-2 mt-6">
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#냉동 보관 시스템</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#실시간 즉석 조리</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#폐기율 0% 도전</span>
+                </div>
+              </motion.article>
 
             </div>
           </div>
@@ -1263,25 +1192,35 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                     label: "OFFICE",
                     title: "떡볶이 + 120파이",
                     desc: "든든한 간식과 식사 대용 메뉴를 찾는 오피스·학원가 매장에 어울리는 구성입니다.",
-                    location: "오피스 · 대학가"
+                    location: "오피스 · 대학가",
+                    image: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779849846/%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%9C%84%EC%97%90_%EC%9C%84_202605271143_npntmg.jpg"
                   },
                   {
                     label: "TREND",
                     title: "에그120 + 시그니처 음료",
                     desc: "사진 찍기 좋은 디저트 메뉴로 젊은 고객의 방문과 공유를 기대하는 매장에 적합합니다.",
-                    location: "로드샵 · 번화가"
+                    location: "로드샵 · 번화가",
+                    image: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850141/%EB%91%90_%EB%A9%94%EB%89%B4_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271147_1_rkb6ns.jpg"
                   },
                   {
                     label: "DELIVERY",
                     title: "츄러스 + 핫도그 + 파이",
                     desc: "함께 나눠 먹기 좋은 구성을 통해 포장과 배달 주문을 넓히기 좋은 조합입니다.",
-                    location: "주거 · 배달 상권"
+                    location: "주거 · 배달 상권",
+                    image: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850228/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm.jpg"
                   }
                 ].map((set) => (
-                  <article key={set.label} className="border-t border-neutral-700 pt-6">
+                  <article key={set.label} className="group text-left border-t border-neutral-700 pt-6 transition-colors hover:border-amber-400 flex flex-col">
+                    <div className="aspect-[4/3] overflow-hidden rounded-xl bg-neutral-900 mb-6">
+                      <img
+                        src={set.image}
+                        alt={set.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
+                      />
+                    </div>
                     <span className="text-[10px] font-bold text-amber-400 tracking-[0.22em] block mb-4">{set.label}</span>
                     <h4 className="text-lg font-black text-white mb-3">{set.title}</h4>
-                    <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-medium mb-7">{set.desc}</p>
+                    <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-medium mb-7 flex-1">{set.desc}</p>
                     <span className="text-[11px] font-bold text-neutral-500">추천 상권: {set.location}</span>
                   </article>
                 ))}
@@ -1292,6 +1231,82 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
 
           {/* Menu Modal Render */}
           {selectedMenu && <MenuModal menuId={selectedMenu} onClose={() => setSelectedMenu(null)} onInquiry={() => setInquiryModalOpen(true)} />}
+        </section>
+
+        {/* ------------------------------------------------------------- */}
+        {/* PAIN POINTS SECTION [PURE WHITE & LIGHT GREY THEME - CLEAR TROUBLES] */}
+        {/* ------------------------------------------------------------- */}
+        <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100" id="pain-points">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
+
+              {/* Left Troubles Cards Grid */}
+              <div className="lg:col-span-8 flex flex-col justify-between">
+                <motion.div className="max-w-xl mb-12" {...fadeIn}>
+                  <span className="text-neutral-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Real Cafe Troubles</span>
+                  <h2 className="text-3xl sm:text-4xl font-black text-black mb-4 tracking-tight leading-tight">
+                    하루 백 잔을 팔아도 제자리걸음이라면,<br />
+                    문제는 잔수가 아닌 <span className="text-amber-500 font-extrabold">낮은 객단가</span>입니다.
+                  </h2>
+                  <p className="text-xs sm:text-sm text-neutral-500 font-bold leading-relaxed">
+                    저가 커피와 치열하게 경쟁하며 음료만 판매하는 방식으로는 성장에 한계가 있습니다.<br />
+                    기존 매장을 크게 바꾸지 않고도, 파이 메뉴 하나로 주문의 가치를 높일 수 있습니다.
+                  </p>
+                </motion.div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {[
+                    { no: "01", title: "음료 객단가의 물리적 한계", desc: "커피 한 잔당의 마진 단가가 오르지 않고 주변 저가 프랜차이즈 저가 경쟁 시 타격이 매우 큽니다." },
+                    { no: "02", title: "매일 반복되는 상온 빵 폐기", desc: "쇼케이스에 준비할수록 선도가 저하되고 당일 판매 불발 시 원가 폐기율 손실이 커집니다." },
+                    { no: "03", title: "어려운 베이커리 제조 인프라", desc: "매장 내에서 직접 빵을 생산하려면 오븐기 셋업 공간과 전문 제과사 급여비가 심각히 가중됩니다." },
+                    { no: "04", title: "차별화 없는 배달 메뉴 썸네일", desc: "배달앱 리스트에서 사장님 매장만이 가지는 뚜렷한 대표 디저트 세트가 없어 경쟁에서 묻힙니다." },
+                    { no: "05", title: "초기 철거/가맹비 인테리어 거품", desc: "신규 창업이나 브랜드 업종 전환을 하려면 억대 규모의 불필요한 공사비와 본사 마진 거품이 발생합니다." },
+                    { no: "06", title: "인스타그램 자발적 바이럴 부재", desc: "MZ고객들이 사진 찍고 태그하여 지인을 부를 만한 감각적인 브랜드 시각 굿즈 및 대표 캐릭터가 결여되어 있습니다." }
+                  ].map((p, idx) => (
+                    <motion.div
+                      key={idx}
+                      className="bg-neutral-50 border border-neutral-100 p-6 rounded-2xl hover:border-black hover:bg-white transition-all group shadow-sm"
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: idx * 0.05 }}
+                    >
+                      <span className="w-8 h-8 rounded bg-neutral-950 text-white font-black text-xs flex items-center justify-center mb-4 group-hover:scale-105 group-hover:bg-amber-400 group-hover:text-neutral-950 transition-all">
+                        {p.no}
+                      </span>
+                      <h3 className="text-base font-black text-black mb-2">{p.title}</h3>
+                      <p className="text-xs text-neutral-500 font-bold leading-relaxed">{p.desc}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Supporting Video Column */}
+              <motion.div
+                className="lg:col-span-4 bg-neutral-50 border border-neutral-200 rounded-3xl overflow-hidden relative min-h-[400px] flex items-end shadow-inner"
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <video
+                  src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779807895/120pie_%EC%98%81%EC%83%81_2_2_qz3xdx.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  aria-label="120겹 파이 메뉴 연출 영상"
+                  className={`absolute inset-0 w-full h-full object-cover ${isPinkVariant ? "opacity-100" : "opacity-90 contrast-105"}`}
+                />
+                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-white/70 via-white/5 to-transparent" : "from-black/85 via-black/20 to-transparent"}`}></div>
+                <div className="relative z-10 p-6 text-white text-xs font-bold leading-relaxed">
+                  <span className="text-amber-400 uppercase tracking-widest text-[9px] block mb-1">barista desk support</span>
+                  "음료 제조 중에도 120겹 파이는 본사 자동 타이머 타이틀 하에 구워져 별도 주방 제조 피로도가 거의 없습니다."
+                </div>
+              </motion.div>
+
+            </div>
+          </div>
         </section>
 
         {/* ------------------------------------------------------------- */}
@@ -1619,22 +1634,134 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="border-t border-neutral-700 pt-6">
-                  <div className="text-neutral-400 font-bold mb-3 text-xs tracking-wider">월 매출 변화 사례</div>
-                  <div className="text-4xl sm:text-5xl font-black text-white mb-4"><AnimatedNumber value={300} suffix="%" /></div>
-                  <p className="text-neutral-400 text-xs sm:text-sm font-medium leading-relaxed">도입 사례 중 확인된 매출 변화 수치입니다.</p>
+                {/* 1. 일 매출 변화 사례 Infographic */}
+                <div className="bg-neutral-900/40 border border-neutral-850 p-6 rounded-2xl flex flex-col justify-between group hover:border-amber-400 transition-all duration-300">
+                  <div className="flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className={`font-bold text-xs tracking-wider ${isPinkVariant ? "text-pink-500" : "text-amber-400"}`}>일 매출 변화 사례</span>
+                      <TrendingUp size={16} className={isPinkVariant ? "text-pink-500" : "text-amber-400"} />
+                    </div>
+                    <div className="text-4xl sm:text-5xl font-black text-white mb-6">
+                      <AnimatedNumber value={300} suffix="%" />
+                    </div>
+                    {/* Infographic Double Horizontal Bars */}
+                    <div className="space-y-3 mb-6 bg-neutral-950/40 p-4 rounded-xl border border-neutral-900">
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] text-neutral-500 font-bold">
+                          <span>기존 카페 평균</span>
+                          <span>100%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden">
+                          <div className="w-1/3 h-full bg-neutral-600 rounded-full" />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] font-bold items-center">
+                          <span className={isPinkVariant ? "text-pink-500" : "text-amber-400"}>120pie 도입 후</span>
+                          <span className={`${isPinkVariant ? "text-pink-500" : "text-amber-400"} animate-pulse text-[11px]`}>300%</span>
+                        </div>
+                        <div className="w-full h-2 bg-neutral-900 rounded-full overflow-hidden relative">
+                          <motion.div 
+                            className={`h-full bg-gradient-to-r ${
+                              isPinkVariant 
+                                ? "from-pink-500 to-pink-400 shadow-[0_0_10px_rgba(242,95,138,0.3)]" 
+                                : "from-amber-500 to-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.3)]"
+                            } rounded-full`}
+                            initial={{ width: "33.3%" }}
+                            whileInView={{ width: "100%" }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1.2, ease: "easeOut" }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-neutral-400 text-xs sm:text-sm font-medium leading-relaxed">
+                    도입 사례 중 확인된 매출 변화 수치입니다.
+                  </p>
                 </div>
 
-                <div className="border-t border-amber-400 pt-6">
-                  <div className="text-amber-400 font-bold mb-3 text-xs tracking-wider">일 최고 매출 사례</div>
-                  <div className="text-4xl sm:text-5xl font-black text-white mb-4"><AnimatedNumber value={350} suffix="만 원" /></div>
-                  <p className="text-neutral-400 text-xs sm:text-sm font-medium leading-relaxed">단독 매장 운영 사례를 기준으로 한 수치입니다.</p>
+                {/* 2. 일 최고 매출 사례 Infographic */}
+                <div className="bg-neutral-900/40 border border-neutral-850 p-6 rounded-2xl flex flex-col justify-between group hover:border-amber-400 transition-all duration-300">
+                  <div className="flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className={`font-bold text-xs tracking-wider ${isPinkVariant ? "text-pink-500" : "text-amber-400"}`}>일 최고 매출 사례</span>
+                      <Award size={16} className={isPinkVariant ? "text-pink-500" : "text-amber-400"} />
+                    </div>
+                    <div className="flex items-center gap-5 mb-6">
+                      {/* Circular SVG Gauge */}
+                      <div className="w-14 h-14 shrink-0 relative flex items-center justify-center">
+                        <svg className="w-full h-full transform -rotate-90">
+                          <circle cx="28" cy="28" r="24" className="stroke-neutral-800 border-neutral-200" strokeWidth="4.5" fill="none" />
+                          <motion.circle 
+                            cx="28" 
+                            cy="28" 
+                            r="24" 
+                            className={isPinkVariant ? "stroke-pink-500" : "stroke-amber-400"} 
+                            strokeWidth="4.5" 
+                            fill="none"
+                            strokeDasharray={151}
+                            initial={{ strokeDashoffset: 151 }}
+                            whileInView={{ strokeDashoffset: 30 }} // Draws ~80%
+                            viewport={{ once: true }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                          />
+                        </svg>
+                        <Store className={`absolute ${isPinkVariant ? "text-pink-500" : "text-amber-400"}`} size={16} />
+                      </div>
+                      <div className="text-3xl sm:text-4xl font-black text-white">
+                        <AnimatedNumber value={350} suffix="만원" />
+                      </div>
+                    </div>
+                    <div className="text-[10px] text-neutral-500 font-bold mb-6 flex items-center gap-1.5 bg-neutral-950/40 p-3.5 rounded-xl border border-neutral-900">
+                      <Sparkles size={11} className={`${isPinkVariant ? "text-pink-500" : "text-amber-400"} animate-spin-slow`} />
+                      <span>단독 매장 운영사례 기준 최고치 달성 지표</span>
+                    </div>
+                  </div>
+                  <p className="text-neutral-400 text-xs sm:text-sm font-medium leading-relaxed">
+                    단독 매장 운영 사례를 기준으로 한 수치입니다.
+                  </p>
                 </div>
 
-                <div className="border-t border-neutral-700 pt-6">
-                  <div className="text-neutral-400 font-bold mb-3 text-xs tracking-wider">투자 회수 사례</div>
-                  <div className="text-4xl sm:text-5xl font-black text-white mb-4"><AnimatedNumber value={2} suffix="개월" /></div>
-                  <p className="text-neutral-400 text-xs sm:text-sm font-medium leading-relaxed">도입 규모와 매장 매출에 따라 달라질 수 있습니다.</p>
+                {/* 3. 투자 회수 사례 Infographic */}
+                <div className="bg-neutral-900/40 border border-neutral-850 p-6 rounded-2xl flex flex-col justify-between group hover:border-amber-400 transition-all duration-300">
+                  <div className="flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className={`font-bold text-xs tracking-wider ${isPinkVariant ? "text-pink-500" : "text-amber-400"}`}>투자 회수 사례</span>
+                      <ShieldCheck size={16} className={isPinkVariant ? "text-pink-500" : "text-amber-400"} />
+                    </div>
+                    <div className="text-4xl sm:text-5xl font-black text-white mb-6">
+                      <AnimatedNumber value={2} suffix="개월" />
+                    </div>
+                    {/* Timeline Grid Infographic */}
+                    <div className="mb-6 bg-neutral-950/40 p-4 rounded-xl border border-neutral-900">
+                      <div className="flex justify-between items-center text-[10px] text-neutral-500 font-bold mb-2">
+                        <span className={isPinkVariant ? "text-pink-500" : "text-amber-400"}>120pie 회수 (2개월)</span>
+                        <span>타 프랜차이즈 평균</span>
+                      </div>
+                      <div className="flex gap-1.5 items-center w-full">
+                        {Array.from({ length: 6 }).map((_, i) => (
+                          <motion.div
+                            key={i}
+                            className={`h-3 flex-1 rounded-sm ${
+                              i < 2 
+                                ? (isPinkVariant 
+                                    ? "bg-gradient-to-b from-pink-500 to-pink-400 shadow-[0_0_8px_rgba(242,95,138,0.4)]" 
+                                    : "bg-gradient-to-b from-amber-400 to-amber-500 shadow-[0_0_8px_rgba(251,191,36,0.4)]") 
+                                : "bg-neutral-800"
+                            }`}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.3, delay: i * 0.1 }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-neutral-400 text-xs sm:text-sm font-medium leading-relaxed">
+                    도입 규모와 매장 매출에 따라 달라질 수 있습니다.
+                  </p>
                 </div>
               </div>
             </div>
@@ -1648,7 +1775,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
         {/* ------------------------------------------------------------- */}
         {/* STORES PREVIEW SECTION [V3 FUSION] */}
         {/* ------------------------------------------------------------- */}
-        <StoresPreviewSection />
+        <StoresPreviewSection isPink={isPinkVariant} />
 
         {/* ------------------------------------------------------------- */}
         {/* OWNER SUPPORT SYSTEM SECTION [V3 FUSION] */}
@@ -1763,7 +1890,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                         <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 flex items-center gap-3">
                           <div className="w-9 h-9 shrink-0 flex items-center justify-center">
                             <img
-                              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
+                              src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"}
                               alt="120pie 로고"
                               className="w-full h-full object-contain"
                             />
@@ -1800,7 +1927,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                         <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 flex items-center gap-3">
                           <div className="w-9 h-9 shrink-0 flex items-center justify-center">
                             <img
-                              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
+                              src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"}
                               alt="120pie 로고"
                               className="w-full h-full object-contain"
                             />
@@ -2008,11 +2135,11 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 pb-12 border-b border-neutral-800/80">
             <div className="lg:col-span-7">
-              <div className="inline-flex w-20 h-20 rounded-2xl bg-[#f3f0ea] p-2.5 items-center justify-center mb-7">
+              <div className="mb-7">
                 <img
-                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
+                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
                   alt="120pie 로고"
-                  className="w-full h-full object-contain grayscale"
+                  className="h-7 sm:h-8 w-auto object-contain grayscale opacity-40 hover:opacity-75 transition-opacity duration-200"
                 />
               </div>
               <p className="text-base text-white font-bold tracking-tight mb-5">(주)고우웰라이프</p>
