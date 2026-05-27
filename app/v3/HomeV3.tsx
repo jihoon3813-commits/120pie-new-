@@ -732,16 +732,16 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
               exit={{ scale: 0.95, opacity: 0, y: 15 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative max-w-5xl w-full max-h-[85dvh] flex flex-col items-center justify-center bg-neutral-950/40 rounded-2xl overflow-hidden border border-neutral-800 shadow-[0_25px_60px_rgba(0,0,0,0.8)] cursor-default"
+              className="relative w-fit max-w-[95vw] sm:max-w-4xl max-h-[85dvh] flex flex-col bg-[#fffbfb] rounded-2xl overflow-hidden border border-[#f2ccd7]/60 shadow-[0_25px_60px_rgba(191,62,103,0.2)] cursor-default animate-scaleUp"
             >
               <img
                 src={selectedImage.url}
                 alt={selectedImage.name}
-                className="max-w-full max-h-[72dvh] sm:max-h-[75vh] object-contain block"
+                className="max-w-full max-h-[68dvh] sm:max-h-[70vh] object-contain block w-auto h-auto mx-auto"
               />
-              <div className="w-full bg-neutral-950/80 px-6 py-4 border-t border-neutral-850 backdrop-blur-md text-left flex flex-col gap-1 shrink-0">
-                <span className="text-amber-400 font-bold tracking-widest text-[10px] uppercase font-mono">{selectedImage.category}</span>
-                <h3 className="text-sm sm:text-base font-extrabold text-white">{selectedImage.name}</h3>
+              <div className="w-full bg-[#fff1f5] px-6 py-4 border-t border-[#f2ccd7]/40 text-left flex flex-col gap-1 shrink-0">
+                <span className="text-[#f25f8a] font-extrabold tracking-widest text-[10px] uppercase font-mono">{selectedImage.category}</span>
+                <h3 className="text-sm sm:text-base font-black text-[#735965]">{selectedImage.name}</h3>
               </div>
             </motion.div>
           </motion.div>
