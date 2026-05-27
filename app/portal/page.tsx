@@ -30,7 +30,11 @@ import {
   AlertCircle,
   Check,
   Send,
-  ArrowRightLeft
+  ArrowRightLeft,
+  Camera,
+  Video,
+  Phone,
+  MessageCircle
 } from "lucide-react";
 
 // ==========================================
@@ -384,6 +388,12 @@ export default function PortalPage() {
   // Toast status simulation
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Popup & Floating Action states
+  const [popupSettings, setPopupSettings] = useState<any>(null);
+  const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [floatingSettings, setFloatingSettings] = useState<any>(null);
+  const [floatingOpen, setFloatingOpen] = useState<boolean>(false);
+
   // Mobile menu control
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
@@ -416,6 +426,36 @@ export default function PortalPage() {
       setCategories(loadState("120_categories", ["냉동생지/자재", "부자재/포장재", "소모품/집기"]));
       setBanner(loadState("120_banners", null));
       setActiveStoreId(localStorage.getItem("120_active_store_id") || "owner");
+
+      // Load Popup & Floating values
+      const loadedPop = loadState("120_popups", {
+        isActive: true,
+        title: "여름 스페셜 '망고파이' 물류 정식 출시!",
+        desc: "신메뉴 출시 기념 특전! 지금 물류 메뉴에서 망고파이 생지 3박스 이상 주문 시 캐릭터 홍보 포스터 패키지 및 아크릴 테이블 텐트 시안 무상 증정!",
+        image: "",
+        link: "order",
+        btnText: "지금 바로 신메뉴 생지 주문하러 가기"
+      });
+      setPopupSettings(loadedPop);
+
+      const loadedFloat = loadState("120_floatings", {
+        isActive: true,
+        instaUrl: "https://instagram.com",
+        youtubeUrl: "https://youtube.com",
+        chatUrl: "https://kakao.com",
+        phoneNo: "1688-1200",
+        kakaoUrl: "https://kakao.com"
+      });
+      setFloatingSettings(loadedFloat);
+
+      // Check if popup should be shown today
+      if (loadedPop?.isActive) {
+        const closedDate = localStorage.getItem("120_popup_closed_date");
+        const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+        if (closedDate !== todayStr) {
+          setShowPopup(true);
+        }
+      }
 
       const pr = loadState("120_products", INITIAL_PRODUCTS);
       const mapped = pr.map((p: any) => ({
@@ -2250,6 +2290,180 @@ export default function PortalPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          REAL-TIME POPUP MODAL (ON-ENTRY)
+         ========================================== */}
+      {showPopup && popupSettings && (
+        <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+          <div 
+            className="w-full max-w-md bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header / Background visual */}
+            <div 
+              className={`p-6 text-white min-h-[160px] flex flex-col justify-end relative ${
+                popupSettings.image ? "" : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a]"
+              }`}
+              style={popupSettings.image ? {
+                backgroundImage: `url(${popupSettings.image})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center"
+              } : undefined}
+            >
+              {popupSettings.image && <div className="absolute inset-0 bg-black/40"></div>}
+              <div className="relative z-10 space-y-1">
+                <span className="bg-[#ffd3df] text-[#bf3e67] text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-widest w-fit">
+                  Urgent HQ Announcement
+                </span>
+                <h4 className="text-base sm:text-lg font-black leading-snug whitespace-pre-line">
+                  {popupSettings.title}
+                </h4>
+              </div>
+            </div>
+
+            {/* Body Description */}
+            <div className="p-6 overflow-y-auto text-xs sm:text-sm text-[#735965] font-semibold leading-relaxed whitespace-pre-line">
+              {popupSettings.desc}
+            </div>
+
+            {/* Action buttons & 'Today close' bar */}
+            <div className="border-t border-[#f2ccd7]/60">
+              {popupSettings.link && (
+                <div className="p-4 border-b border-[#f2ccd7]/40 bg-[#fff1f5]/20 text-center">
+                  <button
+                    onClick={() => {
+                      const link = popupSettings.link;
+                      if (link.startsWith("http")) {
+                        window.open(link, "_blank");
+                      } else {
+                        const menuMapping: Record<string, string> = {
+                          order: "orders",
+                          training: "training",
+                          material: "material",
+                          inquiry: "inquiry"
+                        };
+                        setCurrentMenu(menuMapping[link] || "dashboard");
+                        setShowPopup(false);
+                      }
+                    }}
+                    className="w-full py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    {popupSettings.btnText || "자세히 보기"}
+                  </button>
+                </div>
+              )}
+
+              {/* Close Footer bar */}
+              <div className="bg-[#fff9fb] p-3 flex justify-between items-center px-5 text-[11px] font-bold text-[#735965]">
+                <button
+                  onClick={() => {
+                    const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+                    localStorage.setItem("120_popup_closed_date", todayStr);
+                    setShowPopup(false);
+                  }}
+                  className="hover:text-[#bf3e67] transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <Check size={13} className="text-[#f25f8a]" /> 오늘 하루 안보기
+                </button>
+                <button
+                  onClick={() => setShowPopup(false)}
+                  className="hover:text-red-500 font-extrabold transition-colors cursor-pointer"
+                >
+                  닫기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          INTERACTIVE MULTI FLOATING BUTTONS
+         ========================================== */}
+      {floatingSettings?.isActive && (
+        <div className="fixed right-6 bottom-6 z-[90] flex flex-col items-end gap-3 font-bold text-xs select-none">
+          {/* Expanded Menu Actions Tray */}
+          {floatingOpen && (
+            <div className="flex flex-col items-end gap-2.5 mb-1.5 animate-slideUp">
+              {/* Instagram */}
+              {floatingSettings.instaUrl && (
+                <a
+                  href={floatingSettings.instaUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-white border border-[#f2ccd7] hover:border-pink-500 hover:bg-[#fff9fb] p-2.5 rounded-full flex items-center justify-center text-[#bf3e67] shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                >
+                  <Camera size={17} />
+                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">공식 인스타</span>
+                </a>
+              )}
+
+              {/* Youtube */}
+              {floatingSettings.youtubeUrl && (
+                <a
+                  href={floatingSettings.youtubeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-white border border-[#f2ccd7] hover:border-red-500 hover:bg-[#fff9fb] p-2.5 rounded-full flex items-center justify-center text-red-500 shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                >
+                  <Video size={17} />
+                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">유튜브 채널</span>
+                </a>
+              )}
+
+              {/* Phone Direct Inquiry */}
+              {floatingSettings.phoneNo && (
+                <a
+                  href={`tel:${floatingSettings.phoneNo}`}
+                  className="bg-white border border-[#f2ccd7] hover:border-blue-500 hover:bg-[#fff9fb] p-2.5 rounded-full flex items-center justify-center text-blue-500 shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                >
+                  <Phone size={17} />
+                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">본사 전화문의</span>
+                </a>
+              )}
+
+              {/* Kakao talk Channel / Custom Chat link */}
+              {floatingSettings.kakaoUrl && (
+                <a
+                  href={floatingSettings.kakaoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-[#ffe500] hover:bg-[#ffd600] p-2.5 rounded-full flex items-center justify-center text-[#3c1e1e] shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border border-yellow-400"
+                >
+                  <MessageCircle size={17} />
+                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">1:1 카톡문의</span>
+                </a>
+              )}
+
+              {/* Fast Chat Consultation */}
+              {floatingSettings.chatUrl && (
+                <a
+                  href={floatingSettings.chatUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] hover:border-[#f25f8a] p-2.5 rounded-full flex items-center justify-center text-[#bf3e67] shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                >
+                  <ArrowRightLeft size={17} className="rotate-90" />
+                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">빠른 실시간 상담</span>
+                </a>
+              )}
+            </div>
+          )}
+
+          {/* Trigger Controller (Main Toggle button) */}
+          <button
+            onClick={() => setFloatingOpen(!floatingOpen)}
+            className={`w-12 h-12 rounded-full flex items-center justify-center text-white transition-all shadow-[0_6px_20px_rgba(242,95,138,0.4)] hover:scale-105 active:scale-95 cursor-pointer ${
+              floatingOpen 
+                ? "bg-[#735965] hover:bg-[#5d4752] rotate-90" 
+                : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a] hover:from-[#df4977] hover:to-[#ff7b9f]"
+            }`}
+          >
+            {floatingOpen ? <X size={20} /> : <Headphones size={20} className="animate-wiggle" />}
+          </button>
         </div>
       )}
 

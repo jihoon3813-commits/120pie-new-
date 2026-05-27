@@ -90,6 +90,42 @@ interface BannerSettings {
   sideLink?: string;
 }
 
+interface PopupSettings {
+  isActive: boolean;
+  title: string;
+  desc: string;
+  image?: string;
+  link?: string;
+  btnText: string;
+}
+
+interface FloatingSettings {
+  isActive: boolean;
+  instaUrl: string;
+  youtubeUrl: string;
+  chatUrl: string;
+  phoneNo: string;
+  kakaoUrl: string;
+}
+
+const DEFAULT_POPUP: PopupSettings = {
+  isActive: true,
+  title: "여름 스페셜 '망고파이' 물류 정식 출시!",
+  desc: "신메뉴 출시 기념 특전! 지금 물류 메뉴에서 망고파이 생지 3박스 이상 주문 시 캐릭터 홍보 포스터 패키지 및 아크릴 테이블 텐트 시안 무상 증정!",
+  image: "",
+  link: "order",
+  btnText: "지금 바로 신메뉴 생지 주문하러 가기"
+};
+
+const DEFAULT_FLOATING: FloatingSettings = {
+  isActive: true,
+  instaUrl: "https://instagram.com",
+  youtubeUrl: "https://youtube.com",
+  chatUrl: "https://kakao.com",
+  phoneNo: "1688-1200",
+  kakaoUrl: "https://kakao.com"
+};
+
 interface Order {
   id: string;
   date: string;
@@ -460,6 +496,25 @@ export default function AdminPage() {
   const [bannerSideImage, setBannerSideImage] = useState<string>("");
   const [bannerSideLink, setBannerSideLink] = useState<string>("training");
 
+  // SUB MENU & REAL-TIME POPUP & FLOATING STATES
+  const [bannerSubMenu, setBannerSubMenu] = useState<"banner" | "popup" | "floating">("banner");
+  
+  // Popup States
+  const [popupActive, setPopupActive] = useState<boolean>(true);
+  const [popupTitle, setPopupTitle] = useState<string>("");
+  const [popupDesc, setPopupDesc] = useState<string>("");
+  const [popupImage, setPopupImage] = useState<string>("");
+  const [popupLink, setPopupLink] = useState<string>("");
+  const [popupBtnText, setPopupBtnText] = useState<string>("");
+
+  // Floating button States
+  const [floatingActive, setFloatingActive] = useState<boolean>(true);
+  const [floatingInsta, setFloatingInsta] = useState<string>("");
+  const [floatingYoutube, setFloatingYoutube] = useState<string>("");
+  const [floatingChat, setFloatingChat] = useState<string>("");
+  const [floatingPhone, setFloatingPhone] = useState<string>("");
+  const [floatingKakao, setFloatingKakao] = useState<string>("");
+
   // 4. ORDER DETAILS POPUP & SETTING STATES
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderModal, setShowOrderModal] = useState<boolean>(false);
@@ -518,6 +573,22 @@ export default function AdminPage() {
       
       const bnr = loadState("120_banners", DEFAULT_BANNER);
       setBanner(bnr);
+
+      const pop = loadState("120_popups", DEFAULT_POPUP);
+      setPopupActive(pop.isActive);
+      setPopupTitle(pop.title);
+      setPopupDesc(pop.desc);
+      setPopupImage(pop.image || "");
+      setPopupLink(pop.link || "");
+      setPopupBtnText(pop.btnText || "");
+
+      const flt = loadState("120_floatings", DEFAULT_FLOATING);
+      setFloatingActive(flt.isActive);
+      setFloatingInsta(flt.instaUrl || "");
+      setFloatingYoutube(flt.youtubeUrl || "");
+      setFloatingChat(flt.chatUrl || "");
+      setFloatingPhone(flt.phoneNo || "");
+      setFloatingKakao(flt.kakaoUrl || "");
 
       const galItems = loadState("120_gallery_items", DEFAULT_GALLERY);
       setGalleryItems(galItems);
@@ -1034,7 +1105,7 @@ export default function AdminPage() {
   };
 
   // ==========================================
-  // 4. DYNAMIC BANNER CONTROL HANDLER
+  // 4. DYNAMIC BANNER, POPUP & FLOATING CONTROL HANDLERS
   // ==========================================
   const handleUpdateBanners = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1054,6 +1125,50 @@ export default function AdminPage() {
     setBanner(updatedBanner);
     localStorage.setItem("120_banners", JSON.stringify(updatedBanner));
     triggerToast("본사 대시보드 배너 설정이 실시간으로 동기화 저장되었습니다!");
+  };
+
+  const handlePopupImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("이미지 크기는 2MB 이하여야 합니다.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        setPopupImage(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUpdatePopup = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedPopup: PopupSettings = {
+      isActive: popupActive,
+      title: popupTitle,
+      desc: popupDesc,
+      image: popupImage,
+      link: popupLink,
+      btnText: popupBtnText
+    };
+    localStorage.setItem("120_popups", JSON.stringify(updatedPopup));
+    triggerToast("실시간 점주 공지 팝업 설정이 성공적으로 저장 및 배포되었습니다!");
+  };
+
+  const handleUpdateFloating = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedFloating: FloatingSettings = {
+      isActive: floatingActive,
+      instaUrl: floatingInsta,
+      youtubeUrl: floatingYoutube,
+      chatUrl: floatingChat,
+      phoneNo: floatingPhone,
+      kakaoUrl: floatingKakao
+    };
+    localStorage.setItem("120_floatings", JSON.stringify(updatedFloating));
+    triggerToast("홈페이지 플로팅 채널 연동 정보가 실시간으로 저장 및 갱신되었습니다!");
   };
 
   // ==========================================
@@ -1444,7 +1559,7 @@ export default function AdminPage() {
                 { key: "notice", label: "공지사항 관리", icon: Megaphone },
                 { key: "inquiry", label: "1:1 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
                 { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
-                { key: "banner", label: "배너 관리", icon: Monitor },
+                { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
                 { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
                 { key: "setting", label: "설정 메뉴", icon: Settings }
               ].map(({ key, label, icon: Icon, badge }) => (
@@ -1525,7 +1640,7 @@ export default function AdminPage() {
                     { key: "notice", label: "공지사항 관리", icon: Megaphone },
                     { key: "inquiry", label: "1:1 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
                     { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
-                    { key: "banner", label: "배너 관리", icon: Monitor },
+                    { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
                     { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
                     { key: "setting", label: "설정 메뉴", icon: Settings }
                   ].map(({ key, label, icon: Icon, badge }) => (
@@ -2286,141 +2401,109 @@ export default function AdminPage() {
               MENU: 8. BANNER MANAGEMENT
              ========================================== */}
           {currentMenu === "banner" && (
-            <div className="space-y-6 animate-fadeIn">
+            <div className="space-y-6 animate-fadeIn text-xs sm:text-sm">
               
               <div>
-                <h2 className="text-xl font-bold text-[#2d2026]">가맹점 대시보드 실시간 배너 관리</h2>
+                <h2 className="text-xl font-bold text-[#2d2026]">팝업 / 배너 / 플로팅 관리 센터</h2>
                 <p className="text-xs text-[#735965] font-bold mt-1">
-                  점주전용 포털의 홈 대시보드 배너(메인 가로 배너 16:8 및 우측 사각배너 1:1)의 헤드라인 및 내용을 어드민에서 실시간으로 정밀 통제합니다.
+                  메인 웹 및 점주 포털에 표출될 핵심 팝업 메시지, 대시보드 메인 광고 배너 및 우측 간편 소셜 플로팅 단추의 연동 정보를 제어합니다.
                 </p>
               </div>
 
-              <form onSubmit={handleUpdateBanners} className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-                
-                {/* 1. Main Banner Panel */}
-                <div className="space-y-4">
-                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-2.5 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#f25f8a]"></span>
-                    대시보드 메인 16:8 배너 영역 제어
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">메인 배너 태그 라벨</label>
-                      <input 
-                        type="text"
-                        value={bannerMainTag}
-                        onChange={(e) => setBannerMainTag(e.target.value)}
-                        required
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">메인 배너 타이틀 헤드라인</label>
-                      <textarea 
-                        rows={2}
-                        value={bannerMainTitle}
-                        onChange={(e) => setBannerMainTitle(e.target.value)}
-                        required
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">메인 배너 이미지 등록 (URL)</label>
-                      <input 
-                        type="text"
-                        value={bannerMainImage}
-                        onChange={(e) => setBannerMainImage(e.target.value)}
-                        placeholder="https://example.com/banner.jpg"
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">메인 배너 이미지 업로드 (로컬 파일)</label>
-                      <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
-                        <input 
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleImageUpload(e, "main")}
-                          className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
-                        />
-                        {bannerMainImage && (
-                          <button
-                            type="button"
-                            onClick={() => setBannerMainImage("")}
-                            className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
-                          >
-                            지우기
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-[#735965]">메인 배너 세부 상세 설명</label>
-                    <textarea 
-                      rows={3}
-                      value={bannerMainDesc}
-                      onChange={(e) => setBannerMainDesc(e.target.value)}
-                      required
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
-                    />
-                  </div>
-                </div>
+              {/* Sub tabs navigation */}
+              <div className="flex border-b border-[#f2ccd7] gap-2 p-1 bg-[#fff1f5]/60 rounded-xl w-fit">
+                {[
+                  { id: "popup", label: "📢 실시간 점주 팝업", color: "bg-[#f25f8a]" },
+                  { id: "banner", label: "🖼️ 홈 대시보드 배너", color: "bg-[#bf3e67]" },
+                  { id: "floating", label: "📱 우측 플로팅 연동", color: "bg-[#735965]" }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setBannerSubMenu(tab.id as any)}
+                    className={`px-4 py-2.5 rounded-lg text-xs font-black transition-all ${
+                      bannerSubMenu === tab.id
+                        ? `${tab.color} text-white shadow-sm scale-105`
+                        : "text-[#735965] hover:bg-[#ffd3df]/50"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
 
-                {/* 2. Square Banner Panel */}
-                <div className="space-y-4 pt-4 border-t border-[#f2ccd7]/60">
-                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-2.5 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#bf3e67]"></span>
-                    대시보드 우측 사각 1:1 배너 영역 제어
-                  </h3>
+              {/* 1. REAL-TIME POPUP MANAGEMENT */}
+              {bannerSubMenu === "popup" && (
+                <form onSubmit={handleUpdatePopup} className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-fadeIn">
+                  <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-4">
+                    <div className="space-y-1">
+                      <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#f25f8a]"></span>
+                        실시간 점주 공지 팝업 관리
+                      </h3>
+                      <p className="text-[10px] text-[#735965] font-bold">점주 포털 홈 접속 시 화면 최상단에 모달 팝업으로 표출될 긴급 혜택 공지입니다.</p>
+                    </div>
+                    {/* Switch Toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setPopupActive(!popupActive)}
+                      className={`w-12 h-6 rounded-full p-1 transition-all duration-300 ${
+                        popupActive ? "bg-[#f25f8a] flex justify-end" : "bg-[#735965]/20 flex justify-start"
+                      }`}
+                    >
+                      <span className="w-4 h-4 rounded-full bg-white shadow-sm block transition-all"></span>
+                    </button>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">사각 배너 태그 라벨</label>
-                      <input 
+                      <label className="text-xs font-bold text-[#735965]">팝업 메인 타이틀</label>
+                      <input
                         type="text"
-                        value={bannerSideTag}
-                        onChange={(e) => setBannerSideTag(e.target.value)}
-                        required
+                        value={popupTitle}
+                        onChange={(e) => setPopupTitle(e.target.value)}
+                        required={popupActive}
+                        placeholder="이벤트 헤드라인 문구를 입력하세요"
                         className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">사각 배너 타이틀 헤드라인</label>
-                      <textarea 
-                        rows={2}
-                        value={bannerSideTitle}
-                        onChange={(e) => setBannerSideTitle(e.target.value)}
-                        required
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
+                      <label className="text-xs font-bold text-[#735965]">하단 연결 유도 버튼 텍스트</label>
+                      <input
+                        type="text"
+                        value={popupBtnText}
+                        onChange={(e) => setPopupBtnText(e.target.value)}
+                        required={popupActive}
+                        placeholder="예: 지금 바로 신메뉴 생지 주문하기"
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
                       />
                     </div>
                   </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">사각 배너 이미지 등록 (URL)</label>
-                      <input 
+                      <label className="text-xs font-bold text-[#735965]">배경 이미지 파일 (URL)</label>
+                      <input
                         type="text"
-                        value={bannerSideImage}
-                        onChange={(e) => setBannerSideImage(e.target.value)}
-                        placeholder="https://example.com/square.jpg"
+                        value={popupImage}
+                        onChange={(e) => setPopupImage(e.target.value)}
+                        placeholder="https://example.com/popup.jpg (미지정 시 핑크 그라데이션 자동 적용)"
                         className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">사각 배너 이미지 업로드 (로컬 파일)</label>
+                      <label className="text-xs font-bold text-[#735965]">로컬 이미지 직접 업로드</label>
                       <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
-                        <input 
+                        <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleImageUpload(e, "side")}
+                          onChange={handlePopupImageUpload}
                           className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
                         />
-                        {bannerSideImage && (
+                        {popupImage && (
                           <button
                             type="button"
-                            onClick={() => setBannerSideImage("")}
+                            onClick={() => setPopupImage("")}
                             className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
                           >
                             지우기
@@ -2429,76 +2512,360 @@ export default function AdminPage() {
                       </div>
                     </div>
                   </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">사각 배너 상세 세부 설명</label>
-                      <textarea 
-                        rows={3}
-                        value={bannerSideDesc}
-                        onChange={(e) => setBannerSideDesc(e.target.value)}
-                        required
+                      <label className="text-xs font-bold text-[#735965]">팝업 상세 본문 및 긴급 특전 사항</label>
+                      <textarea
+                        rows={4}
+                        value={popupDesc}
+                        onChange={(e) => setPopupDesc(e.target.value)}
+                        required={popupActive}
+                        placeholder="팝업 내에 표시될 상세 공지 본문을 넉넉하게 기술해 주세요."
                         className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">사각 배너 클릭 유도 버튼 텍스트</label>
-                      <input 
-                        type="text"
-                        value={bannerSideBtnText}
-                        onChange={(e) => setBannerSideBtnText(e.target.value)}
-                        required
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">사각 배너 연결 대상 설정</label>
-                      <select 
-                        value={bannerSideLink.startsWith("http") ? "custom" : bannerSideLink}
+                      <label className="text-xs font-bold text-[#735965]">버튼 클릭 시 이동 메뉴 설정</label>
+                      <select
+                        value={popupLink.startsWith("http") ? "custom" : popupLink}
                         onChange={(e) => {
                           const val = e.target.value;
                           if (val !== "custom") {
-                            setBannerSideLink(val);
+                            setPopupLink(val);
                           } else {
-                            setBannerSideLink("https://");
+                            setPopupLink("https://");
                           }
                         }}
                         className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
                       >
-                        <option value="training">교육자료실 (내부 메뉴 연결)</option>
-                        <option value="material">홍보자료실 (내부 메뉴 연결)</option>
-                        <option value="order">자재발주 / 주문하기 (내부 메뉴 연결)</option>
-                        <option value="inquiry">1:1 문의하기 (내부 메뉴 연결)</option>
-                        <option value="custom">직접 URL 웹 주소 입력 연결</option>
+                        <option value="order">자재 발주하기 (내부 메뉴 연동)</option>
+                        <option value="training">교육자료실 (내부 메뉴 연동)</option>
+                        <option value="material">홍보자료실 (내부 메뉴 연동)</option>
+                        <option value="inquiry">1:1 문의게시판 (내부 메뉴 연동)</option>
+                        <option value="custom">외부 웹주소 URL 직접 지정</option>
                       </select>
+                      {popupLink.startsWith("http") && (
+                        <div className="pt-2">
+                          <input
+                            type="text"
+                            value={popupLink}
+                            onChange={(e) => setPopupLink(e.target.value)}
+                            placeholder="https://example.com"
+                            className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                          />
+                        </div>
+                      )}
                     </div>
-                    {bannerSideLink.startsWith("http") && (
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-[0_4px_16px_rgba(242,95,138,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01]"
+                  >
+                    <Sparkles size={16} />
+                    실시간 점주 공지 팝업 설정 동기화 배포
+                  </button>
+                </form>
+              )}
+
+              {/* 2. REAL-TIME BANNER MANAGEMENT */}
+              {bannerSubMenu === "banner" && (
+                <form onSubmit={handleUpdateBanners} className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-fadeIn">
+                  
+                  {/* 1. Main Banner Panel */}
+                  <div className="space-y-4">
+                    <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-2.5 flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#f25f8a]"></span>
+                      대시보드 메인 16:8 배너 영역 제어
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">직접 입력한 연결 URL 주소</label>
+                        <label className="text-xs font-bold text-[#735965]">메인 배너 태그 라벨</label>
                         <input 
                           type="text"
-                          value={bannerSideLink}
-                          onChange={(e) => setBannerSideLink(e.target.value)}
-                          placeholder="https://example.com"
+                          value={bannerMainTag}
+                          onChange={(e) => setBannerMainTag(e.target.value)}
                           required
                           className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
                         />
                       </div>
-                    )}
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">메인 배너 타이틀 헤드라인</label>
+                        <textarea 
+                          rows={2}
+                          value={bannerMainTitle}
+                          onChange={(e) => setBannerMainTitle(e.target.value)}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">메인 배너 이미지 등록 (URL)</label>
+                        <input 
+                          type="text"
+                          value={bannerMainImage}
+                          onChange={(e) => setBannerMainImage(e.target.value)}
+                          placeholder="https://example.com/banner.jpg"
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">메인 배너 이미지 업로드 (로컬 파일)</label>
+                        <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
+                          <input 
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e, "main")}
+                            className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
+                          />
+                          {bannerMainImage && (
+                            <button
+                              type="button"
+                              onClick={() => setBannerMainImage("")}
+                              className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
+                            >
+                              지우기
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">메인 배너 세부 상세 설명</label>
+                      <textarea 
+                        rows={3}
+                        value={bannerMainDesc}
+                        onChange={(e) => setBannerMainDesc(e.target.value)}
+                        required
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* Save Trigger */}
-                <button
-                  type="submit"
-                  className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-[0_4px_16px_rgba(242,95,138,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01]"
-                >
-                  <Sparkles size={16} />
-                  본사 대시보드 배너 설정 일괄 실시간 저장
-                </button>
+                  {/* 2. Square Banner Panel */}
+                  <div className="space-y-4 pt-4 border-t border-[#f2ccd7]/60">
+                    <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-2.5 flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#bf3e67]"></span>
+                      대시보드 우측 사각 1:1 배너 영역 제어
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">사각 배너 태그 라벨</label>
+                        <input 
+                          type="text"
+                          value={bannerSideTag}
+                          onChange={(e) => setBannerSideTag(e.target.value)}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">사각 배너 타이틀 헤드라인</label>
+                        <textarea 
+                          rows={2}
+                          value={bannerSideTitle}
+                          onChange={(e) => setBannerSideTitle(e.target.value)}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">사각 배너 이미지 등록 (URL)</label>
+                        <input 
+                          type="text"
+                          value={bannerSideImage}
+                          onChange={(e) => setBannerSideImage(e.target.value)}
+                          placeholder="https://example.com/square.jpg"
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">사각 배너 이미지 업로드 (로컬 파일)</label>
+                        <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
+                          <input 
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e, "side")}
+                            className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
+                          />
+                          {bannerSideImage && (
+                            <button
+                              type="button"
+                              onClick={() => setBannerSideImage("")}
+                              className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
+                            >
+                              지우기
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">사각 배너 상세 세부 설명</label>
+                        <textarea 
+                          rows={3}
+                          value={bannerSideDesc}
+                          onChange={(e) => setBannerSideDesc(e.target.value)}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">사각 배너 클릭 유도 버튼 텍스트</label>
+                        <input 
+                          type="text"
+                          value={bannerSideBtnText}
+                          onChange={(e) => setBannerSideBtnText(e.target.value)}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965]">사각 배너 연결 대상 설정</label>
+                        <select 
+                          value={bannerSideLink.startsWith("http") ? "custom" : bannerSideLink}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val !== "custom") {
+                              setBannerSideLink(val);
+                            } else {
+                              setBannerSideLink("https://");
+                            }
+                          }}
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        >
+                          <option value="training">교육자료실 (내부 메뉴 연결)</option>
+                          <option value="material">홍보자료실 (내부 메뉴 연결)</option>
+                          <option value="order">자재발주 / 주문하기 (내부 메뉴 연결)</option>
+                          <option value="inquiry">1:1 문의하기 (내부 메뉴 연결)</option>
+                          <option value="custom">직접 URL 웹 주소 입력 연결</option>
+                        </select>
+                      </div>
+                      {bannerSideLink.startsWith("http") && (
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-[#735965]">직접 입력한 연결 URL 주소</label>
+                          <input 
+                            type="text"
+                            value={bannerSideLink}
+                            onChange={(e) => setBannerSideLink(e.target.value)}
+                            placeholder="https://example.com"
+                            required
+                            className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-              </form>
+                  {/* Save Trigger */}
+                  <button
+                    type="submit"
+                    className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-[0_4px_16px_rgba(242,95,138,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01]"
+                  >
+                    <Sparkles size={16} />
+                    본사 대시보드 배너 설정 일괄 실시간 저장
+                  </button>
+                </form>
+              )}
+
+              {/* 3. REAL-TIME FLOATING BUTTON CHANNELS */}
+              {bannerSubMenu === "floating" && (
+                <form onSubmit={handleUpdateFloating} className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-fadeIn">
+                  <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-4">
+                    <div className="space-y-1">
+                      <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#735965]"></span>
+                        홈페이지 우측 핵심 플로팅 버튼 연동 제어
+                      </h3>
+                      <p className="text-[10px] text-[#735965] font-bold">사용자 페이지 우측 하단에 고정 표시될 소셜 연동(인스타, 유튜브, 카카오톡 채널, 전화, 카톡 상담) 트레이 연동 설정입니다.</p>
+                    </div>
+                    {/* Switch Toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setFloatingActive(!floatingActive)}
+                      className={`w-12 h-6 rounded-full p-1 transition-all duration-300 ${
+                        floatingActive ? "bg-[#f25f8a] flex justify-end" : "bg-[#735965]/20 flex justify-start"
+                      }`}
+                    >
+                      <span className="w-4 h-4 rounded-full bg-white shadow-sm block transition-all"></span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">공식 인스타그램 주소 (Instagram)</label>
+                      <input
+                        type="text"
+                        value={floatingInsta}
+                        onChange={(e) => setFloatingInsta(e.target.value)}
+                        placeholder="https://instagram.com/account"
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">공식 유튜브 채널 주소 (YouTube)</label>
+                      <input
+                        type="text"
+                        value={floatingYoutube}
+                        onChange={(e) => setFloatingYoutube(e.target.value)}
+                        placeholder="https://youtube.com/c/channel"
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">빠른상담 연결 주소 (예: 카카오 상담페이지)</label>
+                      <input
+                        type="text"
+                        value={floatingChat}
+                        onChange={(e) => setFloatingChat(e.target.value)}
+                        placeholder="https://pf.kakao.com/_xxxx"
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">다이렉트 전화문의 유도 번호 (전화 연결)</label>
+                      <input
+                        type="text"
+                        value={floatingPhone}
+                        onChange={(e) => setFloatingPhone(e.target.value)}
+                        placeholder="예: 1688-1200"
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-[#735965]">실시간 카카오톡 채팅방/오픈채팅 연결 주소 (카톡상담)</label>
+                    <input
+                      type="text"
+                      value={floatingKakao}
+                      onChange={(e) => setFloatingKakao(e.target.value)}
+                      placeholder="https://open.kakao.com/o/sxxxx"
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-4 bg-[#735965] hover:bg-[#5d4752] text-white font-bold text-sm rounded-xl transition-all shadow-[0_4px_16px_rgba(115,89,101,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01]"
+                  >
+                    <Sparkles size={16} />
+                    홈페이지 플로팅 채널 연동 정보 반영 및 저장
+                  </button>
+                </form>
+              )}
+
             </div>
           )}
 
