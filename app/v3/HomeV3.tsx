@@ -663,7 +663,7 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
 
               {/* Modal Scroll Area Grid */}
               <div className="p-6 sm:p-8 overflow-y-auto flex-1 bg-[#fffbfb] menu-modal-scroll max-h-[60vh]">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                   {modalImages.map(img => (
                     <div
                       key={img.id}
