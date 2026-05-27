@@ -624,7 +624,7 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-neutral-900 border border-neutral-800 rounded-3xl w-full max-w-5xl overflow-hidden relative shadow-[0_20px_50px_rgba(0,0,0,0.5)] my-auto flex flex-col max-h-[85vh] sm:max-h-[80vh]"
+              className="bg-white border border-[#f2ccd7]/50 rounded-3xl w-full max-w-5xl overflow-hidden relative shadow-[0_20px_50px_rgba(191,62,103,0.15)] my-auto flex flex-col max-h-[85vh] sm:max-h-[80vh]"
             >
               {/* Modal Header */}
               <div className="p-6 border-b border-[#f2ccd7]/15 bg-gradient-to-r from-neutral-950 via-[#271018] to-neutral-950 flex justify-between items-center shrink-0 relative overflow-hidden">
@@ -659,21 +659,21 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
               </div>
 
               {/* Modal Scroll Area Grid */}
-              <div className="p-6 sm:p-8 overflow-y-auto flex-1 bg-neutral-950 menu-modal-scroll max-h-[60vh]">
+              <div className="p-6 sm:p-8 overflow-y-auto flex-1 bg-[#fffbfb] menu-modal-scroll max-h-[60vh]">
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
                   {modalImages.map(img => (
                     <div
                       key={img.id}
                       onClick={() => setSelectedImage(img)}
-                      className="bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-850 shadow-md hover:border-amber-400/40 transition-all cursor-zoom-in group"
+                      className="bg-white rounded-2xl overflow-hidden border border-[#f2ccd7]/35 shadow-sm hover:border-[#f25f8a]/50 hover:shadow-md transition-all cursor-zoom-in group"
                     >
-                      <div className="aspect-[4/3] overflow-hidden relative bg-neutral-950">
+                      <div className="aspect-[4/3] overflow-hidden relative bg-[#fffbfb]">
                         <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-550" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent"></div>
                       </div>
-                      <div className="p-4 bg-neutral-900">
-                        <span className="text-amber-400 text-[9px] font-bold uppercase tracking-wider block mb-1 font-mono">{img.category}</span>
-                        <h4 className="font-extrabold text-white text-xs leading-snug line-clamp-1">{img.name}</h4>
+                      <div className="p-4 bg-white">
+                        <span className="text-[#f25f8a] text-[10px] font-extrabold uppercase tracking-wider block mb-1 font-mono">{img.category}</span>
+                        <h4 className="font-extrabold text-[#735965] text-xs leading-snug line-clamp-1">{img.name}</h4>
                       </div>
                     </div>
                   ))}
@@ -681,13 +681,13 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 sm:p-5 bg-neutral-900 border-t border-neutral-800 text-center shrink-0 flex items-center justify-between gap-4">
-                <span className="text-[10px] text-neutral-400 font-bold">
+              <div className="p-4 sm:p-5 bg-white border-t border-[#f2ccd7]/30 text-center shrink-0 flex items-center justify-between gap-4">
+                <span className="text-[10px] text-[#735965] font-bold">
                   총 {modalImages.length}개의 실제 도입 이미지 및 연출 컷이 등록되어 있습니다.
                 </span>
                 <button
                   onClick={() => setShowMoreModal(false)}
-                  className="px-5 py-2 bg-neutral-850 hover:bg-neutral-750 text-white hover:text-white font-bold text-xs rounded-lg transition-colors cursor-pointer border border-neutral-800"
+                  className="px-6 py-2 bg-white border border-[#f2ccd7] hover:border-[#f25f8a] text-[#f25f8a] hover:bg-[#fff9fb] font-extrabold text-xs rounded-xl transition-all shadow-sm hover:scale-[1.01] active:scale-95 cursor-pointer"
                 >
                   닫기
                 </button>
