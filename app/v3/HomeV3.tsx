@@ -514,7 +514,8 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
     return aIdx - bIdx;
   });
 
-  const tabs = ["대표", "전체", ...availableCats];
+  // Remove "전체" tab as requested
+  const tabs = ["대표", ...availableCats];
 
   const filteredImages = (() => {
     if (filter === "대표") {
@@ -528,6 +529,13 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
       return galleryItems;
     }
     return galleryItems.filter(img => img.category === filter);
+  })();
+
+  const modalImages = (() => {
+    if (filter === "대표") {
+      return galleryItems; // Show all gallery items inside modal when clicking more on representative images
+    }
+    return filteredImages;
   })();
 
   const limit = isMobile ? 8 : 16;
@@ -586,13 +594,15 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
         </motion.div>
 
         {/* View More Trigger Button */}
-        {filteredImages.length > limit && (
+        {(filter === "대표" ? galleryItems.length > visibleImages.length : filteredImages.length > limit) && (
           <div className="flex justify-center mt-12">
             <button
               onClick={() => setShowMoreModal(true)}
               className="px-8 py-3.5 bg-neutral-950 hover:bg-neutral-900 text-white font-black text-xs sm:text-sm rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-98 cursor-pointer flex items-center gap-2 border border-neutral-900"
             >
-              + 전체 사진 더보기 ({filteredImages.length}개 전체보기)
+              {filter === "대표"
+                ? `+ 전체 사진 더보기 (전체 ${galleryItems.length}개 보기)`
+                : `+ ${filter} 사진 더보기 (${filteredImages.length}개 전체보기)`}
             </button>
           </div>
         )}
@@ -617,16 +627,32 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
               className="bg-neutral-900 border border-neutral-800 rounded-3xl w-full max-w-5xl overflow-hidden relative shadow-[0_20px_50px_rgba(0,0,0,0.5)] my-auto flex flex-col max-h-[85vh] sm:max-h-[80vh]"
             >
               {/* Modal Header */}
-              <div className="p-6 border-b border-neutral-800 bg-neutral-950/50 flex justify-between items-center shrink-0">
-                <div>
-                  <span className="inline-block px-2 py-0.5 rounded bg-amber-400 text-neutral-950 text-[9px] font-black uppercase tracking-wider mb-1">ALL IMAGES</span>
-                  <h3 className="text-base sm:text-lg font-black text-white">
-                    갤러리 전체 사진 <span className="text-amber-400 font-bold">({filteredImages.length})</span>
+              <div className="p-6 border-b border-[#f2ccd7]/15 bg-gradient-to-r from-neutral-950 via-[#271018] to-neutral-950 flex justify-between items-center shrink-0 relative overflow-hidden">
+                {/* Glowing decorative gradient accent overlay */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#f25f8a] via-amber-400 to-[#f25f8a]"></div>
+                <div className="relative z-10">
+                  <span className="inline-block px-2.5 py-0.5 rounded bg-gradient-to-r from-[#f25f8a] to-amber-500 text-white text-[9px] font-black uppercase tracking-wider mb-1 shadow-sm">
+                    {filter === "대표" ? "120PIE PORTFOLIO" : `${filter.toUpperCase()} GALLERY`}
+                  </span>
+                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    {filter === "대표" ? (
+                      <>대표 이미지 및 전체 갤러리</>
+                    ) : (
+                      <>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f25f8a] to-amber-400">
+                          {filter}
+                        </span>{" "}
+                        갤러리 전체 사진
+                      </>
+                    )}
+                    <span className="text-xs font-extrabold px-2 py-0.5 rounded-full bg-white/10 text-amber-300 font-mono">
+                      {modalImages.length}
+                    </span>
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowMoreModal(false)}
-                  className="text-neutral-400 hover:text-white bg-neutral-800 hover:bg-neutral-750 rounded-full p-2.5 transition-colors cursor-pointer"
+                  className="relative z-10 text-neutral-400 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 rounded-full p-2.5 transition-all hover:rotate-90 duration-300 cursor-pointer shadow-inner"
                 >
                   <X size={16} />
                 </button>
@@ -635,7 +661,7 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
               {/* Modal Scroll Area Grid */}
               <div className="p-6 sm:p-8 overflow-y-auto flex-1 bg-neutral-950 menu-modal-scroll max-h-[60vh]">
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
-                  {filteredImages.map(img => (
+                  {modalImages.map(img => (
                     <div
                       key={img.id}
                       onClick={() => setSelectedImage(img)}
@@ -656,10 +682,12 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
 
               {/* Modal Footer */}
               <div className="p-4 sm:p-5 bg-neutral-900 border-t border-neutral-800 text-center shrink-0 flex items-center justify-between gap-4">
-                <span className="text-[10px] text-neutral-400 font-bold">총 {filteredImages.length}개의 실제 도입 이미지 및 연출 컷이 등록되어 있습니다.</span>
+                <span className="text-[10px] text-neutral-400 font-bold">
+                  총 {modalImages.length}개의 실제 도입 이미지 및 연출 컷이 등록되어 있습니다.
+                </span>
                 <button
                   onClick={() => setShowMoreModal(false)}
-                  className="px-5 py-2 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                  className="px-5 py-2 bg-neutral-850 hover:bg-neutral-750 text-white hover:text-white font-bold text-xs rounded-lg transition-colors cursor-pointer border border-neutral-800"
                 >
                   닫기
                 </button>
