@@ -3667,7 +3667,7 @@ export default function AdminPage() {
                                     ? "bg-amber-400 text-neutral-950 border border-amber-300 hover:bg-amber-500 hover:scale-105 animate-pulse-subtle"
                                     : "bg-black/50 text-white/90 border border-white/10 opacity-60 group-hover:opacity-100 hover:bg-[#f25f8a] hover:text-white hover:border-[#f2ccd7] hover:scale-105 hover:opacity-100"
                                 }`}
-                                title={item.isFeatured ? "대표 이미지 해제" : "대표 이미지 지정 (최대 8개)"}
+                                title={item.isFeatured ? "대표 이미지 해제" : "대표 이미지 지정 (최대 9개)"}
                               >
                                 {item.isFeatured ? "★ 대표 이미지" : "☆ 대표 지정"}
                               </button>
