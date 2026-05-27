@@ -39,5 +39,6 @@ export default defineSchema({
     url: v.string(),
     regDate: v.string(),
     orderIndex: v.optional(v.number()),
+    isFeatured: v.optional(v.boolean()),
   }),
 });

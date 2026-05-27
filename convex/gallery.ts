@@ -23,6 +23,7 @@ export const add = mutation({
     url: v.string(),
     regDate: v.string(),
     orderIndex: v.optional(v.number()),
+    isFeatured: v.optional(v.boolean()),
   },
   handler: async (ctx: any, args: any) => {
     return await ctx.db.insert("gallery", args);
@@ -47,5 +48,15 @@ export const updateOrder = mutation({
       const id = args.orderedIds[i];
       await ctx.db.patch(id, { orderIndex: i });
     }
+  },
+});
+
+export const toggleFeatured = mutation({
+  args: {
+    id: v.id("gallery"),
+    isFeatured: v.boolean(),
+  },
+  handler: async (ctx: any, args: any) => {
+    await ctx.db.patch(args.id, { isFeatured: args.isFeatured });
   },
 });

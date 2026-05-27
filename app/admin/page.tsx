@@ -343,6 +343,7 @@ interface GalleryItem {
   category: string;
   url: string;
   regDate: string;
+  isFeatured?: boolean;
 }
 
 const DEFAULT_GALLERY: GalleryItem[] = [];
@@ -359,6 +360,7 @@ export default function AdminPage() {
   const addGalleryItemMutation = useMutation(api.gallery.add);
   const removeGalleryItemMutation = useMutation(api.gallery.remove);
   const updateOrderMutation = useMutation(api.gallery.updateOrder);
+  const toggleFeaturedMutation = useMutation(api.gallery.toggleFeatured);
 
   useEffect(() => {
     if (convexPopup) {
@@ -1385,7 +1387,9 @@ export default function AdminPage() {
             name: trimmedName,
             category: galleryItemCategory,
             url: trimmedUrl,
-            regDate: selectedGalleryItem.regDate
+            regDate: selectedGalleryItem.regDate,
+            isFeatured: selectedGalleryItem.isFeatured,
+            orderIndex: (selectedGalleryItem as any).orderIndex
           });
         } catch (e) {
           console.error(e);
@@ -1546,6 +1550,31 @@ export default function AdminPage() {
 
   const handleDragEnd = () => {
     setDraggedId(null);
+  };
+
+  const handleToggleFeatured = async (item: GalleryItem) => {
+    const currentFeaturedCount = galleryItems.filter(i => i.isFeatured).length;
+    const willBeFeatured = !item.isFeatured;
+
+    if (willBeFeatured && currentFeaturedCount >= 8) {
+      alert("대표 이미지는 최대 8개까지만 지정할 수 있습니다!");
+      return;
+    }
+
+    const updated = galleryItems.map(i => 
+      i.id === item.id ? { ...i, isFeatured: willBeFeatured } : i
+    );
+    setGalleryItems(updated);
+    localStorage.setItem("120_gallery_items", JSON.stringify(updated));
+
+    if (item._id) {
+      try {
+        await toggleFeaturedMutation({ id: item._id as any, isFeatured: willBeFeatured });
+        triggerToast(`이미지 [${item.name}]이 대표 이미지로 ${willBeFeatured ? '지정' : '해제'}되었습니다.`);
+      } catch (e) {
+        console.error("Failed to toggle featured status in Convex", e);
+      }
+    }
   };
 
   const handleGalleryImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -3589,6 +3618,21 @@ export default function AdminPage() {
                               <span className="absolute top-3 left-3 px-2 py-0.5 rounded text-[10px] font-black bg-[#bf3e67] text-white shadow-sm">
                                 {item.category}
                               </span>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleFeatured(item);
+                                }}
+                                className={`absolute top-3 right-3 px-2.5 py-1 rounded-xl text-[10px] font-black flex items-center gap-1 shadow-sm transition-all duration-200 cursor-pointer backdrop-blur-sm z-10 ${
+                                  item.isFeatured
+                                    ? "bg-amber-400 text-neutral-950 border border-amber-300 hover:bg-amber-500 hover:scale-105 animate-pulse-subtle"
+                                    : "bg-black/50 text-white/90 border border-white/10 opacity-60 group-hover:opacity-100 hover:bg-[#f25f8a] hover:text-white hover:border-[#f2ccd7] hover:scale-105 hover:opacity-100"
+                                }`}
+                                title={item.isFeatured ? "대표 이미지 해제" : "대표 이미지 지정 (최대 8개)"}
+                              >
+                                {item.isFeatured ? "★ 대표 이미지" : "☆ 대표 지정"}
+                              </button>
                             </div>
 
                             {/* Details body */}

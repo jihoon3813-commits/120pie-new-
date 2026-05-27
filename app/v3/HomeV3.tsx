@@ -480,7 +480,8 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
         name: item.name,
         category: item.category,
         url: item.url,
-        regDate: item.regDate
+        regDate: item.regDate,
+        isFeatured: item.isFeatured
       }));
       setGalleryItems(mapped);
     } else {
@@ -501,11 +502,21 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
   }, [convexGallery]);
 
   const availableCats = Array.from(new Set(galleryItems.map(item => item.category))).filter(Boolean) as string[];
-  const tabs = ["전체", ...availableCats];
+  const tabs = ["대표", "전체", ...availableCats];
 
-  const filteredImages = filter === "전체" 
-    ? galleryItems 
-    : galleryItems.filter(img => img.category === filter);
+  const filteredImages = (() => {
+    if (filter === "대표") {
+      const featured = galleryItems.filter(img => img.isFeatured === true);
+      if (featured.length > 0) {
+        return featured;
+      }
+      return galleryItems.slice(0, 8);
+    }
+    if (filter === "전체") {
+      return galleryItems;
+    }
+    return galleryItems.filter(img => img.category === filter);
+  })();
 
   const limit = isMobile ? 8 : 16;
   const visibleImages = filteredImages.slice(0, limit);
@@ -711,7 +722,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
   const mobileHeroVideoRef = useRef<HTMLVideoElement>(null);
 
   // 갤러리 필터 상태
-  const [galleryFilter, setGalleryFilter] = useState<string>("전체");
+  const [galleryFilter, setGalleryFilter] = useState<string>("대표");
 
   // Popup & Floating states for premium integration
   const [popupSettings, setPopupSettings] = useState<any>(null);
