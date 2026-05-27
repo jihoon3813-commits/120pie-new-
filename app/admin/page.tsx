@@ -459,6 +459,7 @@ export default function AdminPage() {
   
   // Gallery Form / modal states
   const [showGalleryModal, setShowGalleryModal] = useState<boolean>(false);
+  const [keepGalleryModalOpen, setKeepGalleryModalOpen] = useState<boolean>(false);
   const [selectedGalleryItem, setSelectedGalleryItem] = useState<GalleryItem | null>(null);
   
   const [galleryItemName, setGalleryItemName] = useState<string>("");
@@ -1415,7 +1416,14 @@ export default function AdminPage() {
     setGalleryItems(updatedList);
     try {
       localStorage.setItem("120_gallery_items", JSON.stringify(updatedList));
-      setShowGalleryModal(false);
+      if (!selectedGalleryItem && keepGalleryModalOpen) {
+        setGalleryItemName("");
+        setGalleryItemUrl("");
+        const fileInput = document.getElementById("gallery-file-input") as HTMLInputElement;
+        if (fileInput) fileInput.value = "";
+      } else {
+        setShowGalleryModal(false);
+      }
     } catch (err) {
       console.error(err);
       alert("갤러리 저장 중 오류가 발생했습니다. 이미지 용량을 초과했을 수 있으니, 더 작은 파일이나 URL 방식으로 업로드해 주세요.");
@@ -3673,6 +3681,7 @@ export default function AdminPage() {
                   <label className="text-xs font-bold text-[#735965]">로컬 이미지 파일 업로드 *</label>
                   <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
                     <input
+                      id="gallery-file-input"
                       type="file"
                       accept="image/*"
                       onChange={handleGalleryImageUpload}
@@ -3711,17 +3720,29 @@ export default function AdminPage() {
                 </div>
               )}
 
+              {!selectedGalleryItem && (
+                <label className="flex items-center gap-2 text-xs font-bold text-[#735965] py-2 px-1 select-none cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={keepGalleryModalOpen}
+                    onChange={(e) => setKeepGalleryModalOpen(e.target.checked)}
+                    className="w-4 h-4 rounded border-[#f2ccd7] text-[#f25f8a] focus:ring-[#f25f8a] accent-[#f25f8a] cursor-pointer"
+                  />
+                  등록 완료 후 창을 닫지 않고 계속 추가 등록하기
+                </label>
+              )}
+
               <div className="flex gap-3 pt-4 border-t border-neutral-100">
                 <button
                   type="button"
                   onClick={() => setShowGalleryModal(false)}
-                  className="flex-1 py-3 border border-[#f2ccd7] hover:bg-[#fff1f5] text-[#735965] font-bold text-xs rounded-xl transition-all"
+                  className="flex-1 py-3 border border-[#f2ccd7] hover:bg-[#fff1f5] text-[#735965] font-bold text-xs rounded-xl transition-all cursor-pointer"
                 >
-                  취소
+                  취소 / 닫기
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-xs rounded-xl shadow-sm transition-all"
+                  className="flex-1 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-xs rounded-xl shadow-sm transition-all cursor-pointer"
                 >
                   {selectedGalleryItem ? "수정 내용 적용" : "갤러리 등록 완료"}
                 </button>
