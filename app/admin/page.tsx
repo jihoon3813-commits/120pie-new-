@@ -358,6 +358,7 @@ export default function AdminPage() {
   const updateFloatingMutation = useMutation(api.floatings.update);
   const addGalleryItemMutation = useMutation(api.gallery.add);
   const removeGalleryItemMutation = useMutation(api.gallery.remove);
+  const updateOrderMutation = useMutation(api.gallery.updateOrder);
 
   useEffect(() => {
     if (convexPopup) {
@@ -460,6 +461,7 @@ export default function AdminPage() {
   // Gallery Form / modal states
   const [showGalleryModal, setShowGalleryModal] = useState<boolean>(false);
   const [keepGalleryModalOpen, setKeepGalleryModalOpen] = useState<boolean>(false);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
   const [selectedGalleryItem, setSelectedGalleryItem] = useState<GalleryItem | null>(null);
   
   const [galleryItemName, setGalleryItemName] = useState<string>("");
@@ -1503,6 +1505,47 @@ export default function AdminPage() {
     setGalleryCategories(updated);
     localStorage.setItem("120_gallery_categories", JSON.stringify(updated));
     triggerToast("갤러리 카테고리 순서가 실시간으로 재정렬되었습니다.");
+  };
+
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    setDraggedId(id);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetId) return;
+
+    const draggedIdx = galleryItems.findIndex(item => item.id === draggedId);
+    const targetIdx = galleryItems.findIndex(item => item.id === targetId);
+    if (draggedIdx === -1 || targetIdx === -1) return;
+
+    const updated = [...galleryItems];
+    const [draggedItem] = updated.splice(draggedIdx, 1);
+    updated.splice(targetIdx, 0, draggedItem);
+
+    setGalleryItems(updated);
+    localStorage.setItem("120_gallery_items", JSON.stringify(updated));
+
+    const orderedIds = updated.filter(item => item._id).map(item => item._id);
+    if (orderedIds.length > 0) {
+      try {
+        await updateOrderMutation({ orderedIds: orderedIds as any });
+      } catch (e) {
+        console.error("Failed to update gallery order in Convex", e);
+      }
+    }
+
+    setDraggedId(null);
+    triggerToast("갤러리 이미지 전시 순서가 실시간으로 재정렬 및 배포되었습니다!");
+  };
+
+  const handleDragEnd = () => {
+    setDraggedId(null);
   };
 
   const handleGalleryImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -3525,7 +3568,16 @@ export default function AdminPage() {
                         .map((item) => (
                           <div
                             key={item.id}
-                            className="bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group"
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, item.id)}
+                            onDragOver={(e) => handleDragOver(e, item.id)}
+                            onDragEnd={handleDragEnd}
+                            onDrop={(e) => handleDrop(e, item.id)}
+                            className={`bg-white border rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group cursor-move select-none ${
+                              draggedId === item.id
+                                ? "border-[#f25f8a] opacity-40 scale-95 border-dashed"
+                                : "border-[#f2ccd7]"
+                            }`}
                           >
                             {/* Image Container */}
                             <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 border-b border-[#f2ccd7]/60">

@@ -38,5 +38,6 @@ export default defineSchema({
     category: v.string(),
     url: v.string(),
     regDate: v.string(),
+    orderIndex: v.optional(v.number()),
   }),
 });
