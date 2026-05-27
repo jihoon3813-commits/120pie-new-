@@ -1594,8 +1594,8 @@ export default function AdminPage() {
     const currentFeaturedCount = galleryItems.filter(i => i.isFeatured).length;
     const willBeFeatured = !item.isFeatured;
 
-    if (willBeFeatured && currentFeaturedCount >= 8) {
-      alert("대표 이미지는 최대 8개까지만 지정할 수 있습니다!");
+    if (willBeFeatured && currentFeaturedCount >= 9) {
+      alert("대표 이미지는 최대 9개까지만 지정할 수 있습니다!");
       return;
     }
 

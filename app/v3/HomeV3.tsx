@@ -523,7 +523,7 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
       if (featured.length > 0) {
         return featured;
       }
-      return galleryItems.slice(0, 8);
+      return galleryItems.slice(0, 9); // Fallback to 9 images
     }
     if (filter === "전체") {
       return galleryItems;
@@ -538,7 +538,12 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
     return filteredImages;
   })();
 
-  const limit = isMobile ? 8 : 16;
+  const limit = (() => {
+    if (filter === "대표") {
+      return isMobile ? 6 : 9; // 2x3 = 6 on mobile, 3x3 = 9 on PC
+    }
+    return isMobile ? 8 : 16; // 2x4 = 8 on mobile, 4*4 = 16 on PC
+  })();
   const visibleImages = filteredImages.slice(0, limit);
 
   return (
@@ -569,8 +574,15 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
           ))}
         </div>
 
-        {/* 4x4 (desktop) / 2x4 (mobile) grid layout */}
-        <motion.div layout className="grid grid-cols-2 md:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-6 sm:gap-y-10">
+        {/* grid layout: 대표 tab is 3*3 (PC) / 2*3 (Mobile), other tabs are 4*4 (PC) / 2*4 (Mobile) */}
+        <motion.div
+          layout
+          className={`grid gap-x-4 sm:gap-x-6 gap-y-6 sm:gap-y-10 ${
+            filter === "대표"
+              ? "grid-cols-2 md:grid-cols-3"
+              : "grid-cols-2 md:grid-cols-4"
+          }`}
+        >
           <AnimatePresence mode="popLayout">
             {visibleImages.map(img => (
               <motion.div
