@@ -461,6 +461,7 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
   const [showMoreModal, setShowMoreModal] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const convexGallery = useQuery(api.gallery.list);
+  const convexGalleryCategories = useQuery(api.gallery.getCategories);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -501,7 +502,18 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
     }
   }, [convexGallery]);
 
+  const galleryCategories = convexGalleryCategories || ["신메뉴", "홍보연출", "메뉴판", "매장"];
   const availableCats = Array.from(new Set(galleryItems.map(item => item.category))).filter(Boolean) as string[];
+  
+  availableCats.sort((a, b) => {
+    const aIdx = galleryCategories.indexOf(a);
+    const bIdx = galleryCategories.indexOf(b);
+    if (aIdx === -1 && bIdx === -1) return 0;
+    if (aIdx === -1) return 1;
+    if (bIdx === -1) return -1;
+    return aIdx - bIdx;
+  });
+
   const tabs = ["대표", "전체", ...availableCats];
 
   const filteredImages = (() => {

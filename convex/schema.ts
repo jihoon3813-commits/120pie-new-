@@ -41,4 +41,7 @@ export default defineSchema({
     orderIndex: v.optional(v.number()),
     isFeatured: v.optional(v.boolean()),
   }),
+  galleryCategories: defineTable({
+    categories: v.array(v.string()),
+  }),
 });

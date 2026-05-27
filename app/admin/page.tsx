@@ -361,6 +361,8 @@ export default function AdminPage() {
   const removeGalleryItemMutation = useMutation(api.gallery.remove);
   const updateOrderMutation = useMutation(api.gallery.updateOrder);
   const toggleFeaturedMutation = useMutation(api.gallery.toggleFeatured);
+  const convexGalleryCategories = useQuery(api.gallery.getCategories);
+  const updateCategoriesMutation = useMutation(api.gallery.updateCategories);
 
   useEffect(() => {
     if (convexPopup) {
@@ -402,6 +404,15 @@ export default function AdminPage() {
       setGalleryItems(convexGallery);
     }
   }, [convexGallery]);
+
+  useEffect(() => {
+    if (convexGalleryCategories) {
+      setGalleryCategories(convexGalleryCategories);
+      if (!galleryItemCategory && convexGalleryCategories.length > 0) {
+        setGalleryItemCategory(convexGalleryCategories[0]);
+      }
+    }
+  }, [convexGalleryCategories]);
   // ==========================================
   // HQ ADMIN AUTHENTICATION STATE & LOGIC
   // ==========================================
@@ -1459,7 +1470,7 @@ export default function AdminPage() {
     }
   };
 
-  const handleAddGalleryCategory = (e: React.FormEvent) => {
+  const handleAddGalleryCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = newGalleryCategoryName.trim();
     if (!trimmed) return;
@@ -1470,20 +1481,23 @@ export default function AdminPage() {
     const updated = [...galleryCategories, trimmed];
     setGalleryCategories(updated);
     localStorage.setItem("120_gallery_categories", JSON.stringify(updated));
+    try {
+      await updateCategoriesMutation({ categories: updated });
+    } catch (e) {
+      console.error("Failed to sync gallery categories in Convex", e);
+    }
     setNewGalleryCategoryName("");
     setGalleryItemCategory(trimmed);
     triggerToast(`카테고리 [${trimmed}]이 추가되었습니다.`);
   };
 
-  const handleDeleteGalleryCategory = (catToDelete: string) => {
+  const handleDeleteGalleryCategory = async (catToDelete: string) => {
     if (galleryCategories.length <= 1) {
       alert("최소 1개 이상의 카테고리는 유지되어야 합니다.");
       return;
     }
     if (confirm(`카테고리 [${catToDelete}]을 삭제하시겠습니까?\n해당 카테고리로 지정되어 있는 이미지들은 '기타' 카테고리로 변경됩니다.`)) {
-      const updatedCats = galleryCategories.filter(c => c !== catToDelete);
-      setGalleryCategories(updatedCats);
-      localStorage.setItem("120_gallery_categories", JSON.stringify(updatedCats));
+      let updatedCats = galleryCategories.filter(c => c !== catToDelete);
 
       // Relabel affected items to '기타'
       const updatedItems = galleryItems.map(item => 
@@ -1494,15 +1508,21 @@ export default function AdminPage() {
 
       // If '기타' doesn't exist in updatedCats, add it
       if (!updatedCats.includes("기타")) {
-        const withEtc = [...updatedCats, "기타"];
-        setGalleryCategories(withEtc);
-        localStorage.setItem("120_gallery_categories", JSON.stringify(withEtc));
+        updatedCats = [...updatedCats, "기타"];
       }
 
+      setGalleryCategories(updatedCats);
+      localStorage.setItem("120_gallery_categories", JSON.stringify(updatedCats));
+
+      try {
+        await updateCategoriesMutation({ categories: updatedCats });
+      } catch (e) {
+        console.error("Failed to sync gallery categories in Convex", e);
+      }
     }
   };
 
-  const handleAdjustGalleryCategoryOrder = (currentIndex: number, direction: "up" | "down") => {
+  const handleAdjustGalleryCategoryOrder = async (currentIndex: number, direction: "up" | "down") => {
     const targetIdx = direction === "up" ? currentIndex - 1 : currentIndex + 1;
     if (targetIdx < 0 || targetIdx >= galleryCategories.length) return;
 
@@ -1513,6 +1533,11 @@ export default function AdminPage() {
 
     setGalleryCategories(updated);
     localStorage.setItem("120_gallery_categories", JSON.stringify(updated));
+    try {
+      await updateCategoriesMutation({ categories: updated });
+    } catch (e) {
+      console.error("Failed to sync gallery categories in Convex", e);
+    }
     triggerToast("갤러리 카테고리 순서가 실시간으로 재정렬되었습니다.");
   };
 

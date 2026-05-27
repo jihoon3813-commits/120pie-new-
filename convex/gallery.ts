@@ -60,3 +60,25 @@ export const toggleFeatured = mutation({
     await ctx.db.patch(args.id, { isFeatured: args.isFeatured });
   },
 });
+
+export const getCategories = query({
+  args: {},
+  handler: async (ctx: any) => {
+    const doc = await ctx.db.query("galleryCategories").first();
+    return doc ? doc.categories : ["신메뉴", "홍보연출", "메뉴판", "매장"];
+  },
+});
+
+export const updateCategories = mutation({
+  args: {
+    categories: v.array(v.string()),
+  },
+  handler: async (ctx: any, args: any) => {
+    const doc = await ctx.db.query("galleryCategories").first();
+    if (doc) {
+      await ctx.db.patch(doc._id, { categories: args.categories });
+    } else {
+      await ctx.db.insert("galleryCategories", { categories: args.categories });
+    }
+  },
+});
