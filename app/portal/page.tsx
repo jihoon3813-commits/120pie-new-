@@ -408,10 +408,15 @@ export default function PortalPage() {
           try {
             return JSON.parse(stored);
           } catch (err) {
-            console.error(err);
+            console.error(`Failed to parse key ${key}:`, err);
+            return initialData;
           }
         }
-        localStorage.setItem(key, JSON.stringify(initialData));
+        try {
+          localStorage.setItem(key, JSON.stringify(initialData));
+        } catch (e) {
+          console.warn(e);
+        }
         return initialData;
       };
 
@@ -477,43 +482,57 @@ export default function PortalPage() {
   useEffect(() => {
     const handleStorageChange = () => {
       if (typeof window !== "undefined") {
-        const o = localStorage.getItem("120_orders");
-        const i = localStorage.getItem("120_inquiries");
-        const n = localStorage.getItem("120_notices");
-        const t = localStorage.getItem("120_trainings");
-        const p = localStorage.getItem("120_prs");
+        const parseSafely = (key: string, fallback: any) => {
+          const val = localStorage.getItem(key);
+          if (!val) return fallback;
+          try {
+            return JSON.parse(val);
+          } catch (e) {
+            console.warn(`[LocalStorage] Failed to parse key "${key}":`, e);
+            return fallback;
+          }
+        };
 
-        const st = localStorage.getItem("120_stores");
-        const pr = localStorage.getItem("120_products");
-        const cat = localStorage.getItem("120_categories");
+        setOrders(parseSafely("120_orders", INITIAL_ORDERS));
+        setInquiries(parseSafely("120_inquiries", INITIAL_INQUIRIES));
+        setNotices(parseSafely("120_notices", INITIAL_NOTICES));
+        setTrainings(parseSafely("120_trainings", INITIAL_TRAINING));
+        setPrs(parseSafely("120_prs", INITIAL_PR));
+
+        setStores(parseSafely("120_stores", []));
+        setCategories(parseSafely("120_categories", ["냉동생지/자재", "부자재/포장재", "소모품/집기"]));
+        
         const bnr = localStorage.getItem("120_banners");
+        if (bnr) {
+          try {
+            setBanner(JSON.parse(bnr));
+          } catch (e) {
+            console.warn(e);
+          }
+        }
+        
         const activeId = localStorage.getItem("120_active_store_id") || "owner";
-
-        if (o) setOrders(JSON.parse(o));
-        if (i) setInquiries(JSON.parse(i));
-        if (n) setNotices(JSON.parse(n));
-        if (t) setTrainings(JSON.parse(t));
-        if (p) setPrs(JSON.parse(p));
-
-        if (st) setStores(JSON.parse(st));
-        if (cat) setCategories(JSON.parse(cat));
-        if (bnr) setBanner(JSON.parse(bnr));
         setActiveStoreId(activeId);
 
+        const pr = localStorage.getItem("120_products");
         if (pr) {
-          const parsedProducts = JSON.parse(pr);
-          const mapped = parsedProducts.map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            category: p.category,
-            price: p.discountedPrice !== undefined ? p.discountedPrice : p.price,
-            packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
-            img: p.img,
-            stock: p.stock || "in_stock",
-            desc: p.desc || "",
-            orderIndex: p.orderIndex || 99
-          })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
-          setProducts(mapped);
+          try {
+            const parsedProducts = JSON.parse(pr);
+            const mapped = parsedProducts.map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              category: p.category,
+              price: p.discountedPrice !== undefined ? p.discountedPrice : p.price,
+              packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
+              img: p.img,
+              stock: p.stock || "in_stock",
+              desc: p.desc || "",
+              orderIndex: p.orderIndex || 99
+            })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+            setProducts(mapped);
+          } catch (e) {
+            console.warn(e);
+          }
         }
       }
     };
