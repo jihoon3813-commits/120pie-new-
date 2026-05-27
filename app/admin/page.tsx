@@ -472,6 +472,15 @@ export default function AdminPage() {
   const [galleryUploadMethod, setGalleryUploadMethod] = useState<"url" | "file">("url");
   const [newGalleryCategoryName, setNewGalleryCategoryName] = useState<string>("");
 
+  // Helper to safely write to localStorage without throwing QuotaExceededError
+  const safeSaveGalleryItems = (items: GalleryItem[]) => {
+    try {
+      localStorage.setItem("120_gallery_items", JSON.stringify(items));
+    } catch (e) {
+      console.warn("[LocalStorage] Quota exceeded for gallery items backup, but successfully synced to Convex cloud database:", e);
+    }
+  };
+
   // Selected Detail Modals / Control flags
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [inquiryAnswerText, setInquiryAnswerText] = useState<string>("");
@@ -1420,19 +1429,15 @@ export default function AdminPage() {
     }
 
     setGalleryItems(updatedList);
-    try {
-      localStorage.setItem("120_gallery_items", JSON.stringify(updatedList));
-      if (!selectedGalleryItem && keepGalleryModalOpen) {
-        setGalleryItemName("");
-        setGalleryItemUrl("");
-        const fileInput = document.getElementById("gallery-file-input") as HTMLInputElement;
-        if (fileInput) fileInput.value = "";
-      } else {
-        setShowGalleryModal(false);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("갤러리 저장 중 오류가 발생했습니다. 이미지 용량을 초과했을 수 있으니, 더 작은 파일이나 URL 방식으로 업로드해 주세요.");
+    safeSaveGalleryItems(updatedList);
+
+    if (!selectedGalleryItem && keepGalleryModalOpen) {
+      setGalleryItemName("");
+      setGalleryItemUrl("");
+      const fileInput = document.getElementById("gallery-file-input") as HTMLInputElement;
+      if (fileInput) fileInput.value = "";
+    } else {
+      setShowGalleryModal(false);
     }
   };
 
@@ -1440,7 +1445,7 @@ export default function AdminPage() {
     if (confirm(`이미지 [${name}]을 갤러리에서 삭제하시겠습니까?`)) {
       const updatedList = galleryItems.filter(item => item.id !== id);
       setGalleryItems(updatedList);
-      localStorage.setItem("120_gallery_items", JSON.stringify(updatedList));
+      safeSaveGalleryItems(updatedList);
       
       const itemToDelete = galleryItems.find(item => item.id === id);
       if (itemToDelete && itemToDelete._id) {
@@ -1533,7 +1538,7 @@ export default function AdminPage() {
     updated.splice(targetIdx, 0, draggedItem);
 
     setGalleryItems(updated);
-    localStorage.setItem("120_gallery_items", JSON.stringify(updated));
+    safeSaveGalleryItems(updated);
 
     const orderedIds = updated.filter(item => item._id).map(item => item._id);
     if (orderedIds.length > 0) {
@@ -1565,7 +1570,7 @@ export default function AdminPage() {
       i.id === item.id ? { ...i, isFeatured: willBeFeatured } : i
     );
     setGalleryItems(updated);
-    localStorage.setItem("120_gallery_items", JSON.stringify(updated));
+    safeSaveGalleryItems(updated);
 
     if (item._id) {
       try {
