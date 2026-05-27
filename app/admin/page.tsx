@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -97,6 +99,13 @@ interface PopupSettings {
   image?: string;
   link?: string;
   btnText: string;
+  titleColor?: string;
+  titleSize?: string;
+  descColor?: string;
+  descSize?: string;
+  btnBgColor?: string;
+  btnTextColor?: string;
+  btnTextSize?: string;
 }
 
 interface FloatingSettings {
@@ -114,12 +123,19 @@ const DEFAULT_POPUP: PopupSettings = {
   desc: "신메뉴 출시 기념 특전! 지금 물류 메뉴에서 망고파이 생지 3박스 이상 주문 시 캐릭터 홍보 포스터 패키지 및 아크릴 테이블 텐트 시안 무상 증정!",
   image: "",
   link: "order",
-  btnText: "지금 바로 신메뉴 생지 주문하러 가기"
+  btnText: "지금 바로 신메뉴 생지 주문하러 가기",
+  titleColor: "#ffffff",
+  titleSize: "18px",
+  descColor: "#735965",
+  descSize: "12px",
+  btnBgColor: "#f25f8a",
+  btnTextColor: "#ffffff",
+  btnTextSize: "12px"
 };
 
 const DEFAULT_FLOATING: FloatingSettings = {
   isActive: true,
-  instaUrl: "https://instagram.com",
+  instaUrl: "https://www.instagram.com/120pie77/",
   youtubeUrl: "https://youtube.com",
   chatUrl: "https://kakao.com",
   phoneNo: "1688-1200",
@@ -322,6 +338,7 @@ const DEFAULT_BANNER: BannerSettings = {
 
 interface GalleryItem {
   id: string;
+  _id?: any;
   name: string;
   category: string;
   url: string;
@@ -353,6 +370,57 @@ const DEFAULT_GALLERY: GalleryItem[] = [
 ];
 
 export default function AdminPage() {
+  // Convex Hooks
+  const convexPopup = useQuery(api.popups.get);
+  const convexFloating = useQuery(api.floatings.get);
+  const convexInquiries = useQuery(api.inquiries.list);
+  const convexGallery = useQuery(api.gallery.list);
+
+  const updatePopupMutation = useMutation(api.popups.update);
+  const updateFloatingMutation = useMutation(api.floatings.update);
+  const addGalleryItemMutation = useMutation(api.gallery.add);
+  const removeGalleryItemMutation = useMutation(api.gallery.remove);
+
+  useEffect(() => {
+    if (convexPopup) {
+      setPopupActive(convexPopup.isActive);
+      setPopupTitle(convexPopup.title);
+      setPopupDesc(convexPopup.desc);
+      setPopupImage(convexPopup.image || "");
+      setPopupLink(convexPopup.link || "");
+      setPopupBtnText(convexPopup.btnText || "");
+      setPopupTitleColor(convexPopup.titleColor || "#ffffff");
+      setPopupTitleSize(convexPopup.titleSize || "18px");
+      setPopupDescColor(convexPopup.descColor || "#735965");
+      setPopupDescSize(convexPopup.descSize || "12px");
+      setPopupBtnBgColor(convexPopup.btnBgColor || "#f25f8a");
+      setPopupBtnTextColor(convexPopup.btnTextColor || "#ffffff");
+      setPopupBtnTextSize(convexPopup.btnTextSize || "12px");
+    }
+  }, [convexPopup]);
+
+  useEffect(() => {
+    if (convexFloating) {
+      setFloatingActive(convexFloating.isActive);
+      setFloatingInsta(convexFloating.instaUrl || "");
+      setFloatingYoutube(convexFloating.youtubeUrl || "");
+      setFloatingChat(convexFloating.chatUrl || "");
+      setFloatingPhone(convexFloating.phoneNo || "");
+      setFloatingKakao(convexFloating.kakaoUrl || "");
+    }
+  }, [convexFloating]);
+
+  useEffect(() => {
+    if (convexInquiries) {
+      setInquiries(convexInquiries);
+    }
+  }, [convexInquiries]);
+
+  useEffect(() => {
+    if (convexGallery) {
+      setGalleryItems(convexGallery);
+    }
+  }, [convexGallery]);
   // ==========================================
   // HQ ADMIN AUTHENTICATION STATE & LOGIC
   // ==========================================
@@ -506,6 +574,13 @@ export default function AdminPage() {
   const [popupImage, setPopupImage] = useState<string>("");
   const [popupLink, setPopupLink] = useState<string>("");
   const [popupBtnText, setPopupBtnText] = useState<string>("");
+  const [popupTitleColor, setPopupTitleColor] = useState<string>("#ffffff");
+  const [popupTitleSize, setPopupTitleSize] = useState<string>("18px");
+  const [popupDescColor, setPopupDescColor] = useState<string>("#735965");
+  const [popupDescSize, setPopupDescSize] = useState<string>("12px");
+  const [popupBtnBgColor, setPopupBtnBgColor] = useState<string>("#f25f8a");
+  const [popupBtnTextColor, setPopupBtnTextColor] = useState<string>("#ffffff");
+  const [popupBtnTextSize, setPopupBtnTextSize] = useState<string>("12px");
 
   // Floating button States
   const [floatingActive, setFloatingActive] = useState<boolean>(true);
@@ -581,6 +656,13 @@ export default function AdminPage() {
       setPopupImage(pop.image || "");
       setPopupLink(pop.link || "");
       setPopupBtnText(pop.btnText || "");
+      setPopupTitleColor(pop.titleColor || "#ffffff");
+      setPopupTitleSize(pop.titleSize || "18px");
+      setPopupDescColor(pop.descColor || "#735965");
+      setPopupDescSize(pop.descSize || "12px");
+      setPopupBtnBgColor(pop.btnBgColor || "#f25f8a");
+      setPopupBtnTextColor(pop.btnTextColor || "#ffffff");
+      setPopupBtnTextSize(pop.btnTextSize || "12px");
 
       const flt = loadState("120_floatings", DEFAULT_FLOATING);
       setFloatingActive(flt.isActive);
@@ -1081,23 +1163,71 @@ export default function AdminPage() {
     }
   };
 
+  // Browser-side image compression helper to avoid LocalStorage quota errors
+  const compressImage = (base64Str: string, maxWidth = 800, maxHeight = 800, quality = 0.7): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64Str;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        } else {
+          resolve(base64Str);
+        }
+      };
+      img.onerror = () => {
+        resolve(base64Str);
+      };
+    });
+  };
+
   // Image local file reader helper
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, target: "main" | "side") => {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    if (file.size > 2 * 1024 * 1024) {
-      alert("이미지 크기는 2MB 이하여야 합니다.");
+    if (file.size > 10 * 1024 * 1024) {
+      alert("이미지 크기는 10MB 이하여야 합니다.");
       return;
     }
     
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       if (typeof reader.result === "string") {
-        if (target === "main") {
-          setBannerMainImage(reader.result);
-        } else {
-          setBannerSideImage(reader.result);
+        try {
+          const compressed = await compressImage(reader.result, 800, 800, 0.7);
+          if (target === "main") {
+            setBannerMainImage(compressed);
+          } else {
+            setBannerSideImage(compressed);
+          }
+        } catch (err) {
+          console.error("Image compression error:", err);
+          if (target === "main") {
+            setBannerMainImage(reader.result);
+          } else {
+            setBannerSideImage(reader.result);
+          }
         }
       }
     };
@@ -1123,27 +1253,38 @@ export default function AdminPage() {
     };
     
     setBanner(updatedBanner);
-    localStorage.setItem("120_banners", JSON.stringify(updatedBanner));
-    triggerToast("본사 대시보드 배너 설정이 실시간으로 동기화 저장되었습니다!");
+    try {
+      localStorage.setItem("120_banners", JSON.stringify(updatedBanner));
+      triggerToast("본사 대시보드 배너 설정이 실시간으로 동기화 저장되었습니다!");
+    } catch (err) {
+      console.error(err);
+      alert("배너 설정 저장 중 오류가 발생했습니다. 이미지 용량을 줄이거나 다른 이미지를 사용해 주세요.");
+    }
   };
 
   const handlePopupImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      alert("이미지 크기는 2MB 이하여야 합니다.");
+    if (file.size > 10 * 1024 * 1024) {
+      alert("이미지 크기는 10MB 이하여야 합니다.");
       return;
     }
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       if (typeof reader.result === "string") {
-        setPopupImage(reader.result);
+        try {
+          const compressed = await compressImage(reader.result, 800, 800, 0.7);
+          setPopupImage(compressed);
+        } catch (err) {
+          console.error("Popup image compression error:", err);
+          setPopupImage(reader.result);
+        }
       }
     };
     reader.readAsDataURL(file);
   };
 
-  const handleUpdatePopup = (e: React.FormEvent) => {
+  const handleUpdatePopup = async (e: React.FormEvent) => {
     e.preventDefault();
     const updatedPopup: PopupSettings = {
       isActive: popupActive,
@@ -1151,13 +1292,26 @@ export default function AdminPage() {
       desc: popupDesc,
       image: popupImage,
       link: popupLink,
-      btnText: popupBtnText
+      btnText: popupBtnText,
+      titleColor: popupTitleColor,
+      titleSize: popupTitleSize,
+      descColor: popupDescColor,
+      descSize: popupDescSize,
+      btnBgColor: popupBtnBgColor,
+      btnTextColor: popupBtnTextColor,
+      btnTextSize: popupBtnTextSize
     };
-    localStorage.setItem("120_popups", JSON.stringify(updatedPopup));
-    triggerToast("실시간 점주 공지 팝업 설정이 성공적으로 저장 및 배포되었습니다!");
+    try {
+      localStorage.setItem("120_popups", JSON.stringify(updatedPopup));
+      await updatePopupMutation(updatedPopup);
+      triggerToast("실시간 점주 공지 팝업 설정이 성공적으로 저장 및 배포되었습니다!");
+    } catch (err) {
+      console.error(err);
+      alert("팝업 저장 오류: 브라우저 용량 제한을 초과했습니다. 이미지 파일 크기를 줄이거나 URL 방식 또는 다른 이미지를 지정해 주세요.");
+    }
   };
 
-  const handleUpdateFloating = (e: React.FormEvent) => {
+  const handleUpdateFloating = async (e: React.FormEvent) => {
     e.preventDefault();
     const updatedFloating: FloatingSettings = {
       isActive: floatingActive,
@@ -1167,12 +1321,16 @@ export default function AdminPage() {
       phoneNo: floatingPhone,
       kakaoUrl: floatingKakao
     };
-    localStorage.setItem("120_floatings", JSON.stringify(updatedFloating));
-    triggerToast("홈페이지 플로팅 채널 연동 정보가 실시간으로 저장 및 갱신되었습니다!");
+    try {
+      localStorage.setItem("120_floatings", JSON.stringify(updatedFloating));
+      await updateFloatingMutation(updatedFloating);
+      triggerToast("홈페이지 플로팅 채널 연동 정보가 실시간으로 저장 및 갱신되었습니다!");
+    } catch (err) {
+      console.error(err);
+      alert("플로팅 설정 저장 중 오류가 발생했습니다.");
+    }
   };
 
-  // ==========================================
-  // 5. SETTINGS ACTIONS
   // ==========================================
   const handleUpdateAdminAccount = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1220,7 +1378,7 @@ export default function AdminPage() {
     setShowGalleryModal(true);
   };
 
-  const handleGallerySubmit = (e: React.FormEvent) => {
+  const handleGallerySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedName = galleryItemName.trim();
     const trimmedUrl = galleryItemUrl.trim();
@@ -1237,6 +1395,21 @@ export default function AdminPage() {
           ? { ...item, name: trimmedName, category: galleryItemCategory, url: trimmedUrl }
           : item
       );
+      
+      // Convex Sync
+      if (selectedGalleryItem._id) {
+        try {
+          await removeGalleryItemMutation({ id: selectedGalleryItem._id as any });
+          await addGalleryItemMutation({
+            name: trimmedName,
+            category: galleryItemCategory,
+            url: trimmedUrl,
+            regDate: selectedGalleryItem.regDate
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
       triggerToast(`이미지 [${trimmedName}] 정보가 수정되었습니다.`);
     } else {
       // Add new
@@ -1248,19 +1421,43 @@ export default function AdminPage() {
         regDate: new Date().toISOString().split("T")[0]
       };
       updatedList = [newItem, ...galleryItems];
+      try {
+        await addGalleryItemMutation({
+          name: trimmedName,
+          category: galleryItemCategory,
+          url: trimmedUrl,
+          regDate: newItem.regDate
+        });
+      } catch (e) {
+        console.error("Failed to add gallery item to Convex", e);
+      }
       triggerToast(`새로운 이미지 [${trimmedName}]가 등록되었습니다.`);
     }
 
     setGalleryItems(updatedList);
-    localStorage.setItem("120_gallery_items", JSON.stringify(updatedList));
-    setShowGalleryModal(false);
+    try {
+      localStorage.setItem("120_gallery_items", JSON.stringify(updatedList));
+      setShowGalleryModal(false);
+    } catch (err) {
+      console.error(err);
+      alert("갤러리 저장 중 오류가 발생했습니다. 이미지 용량을 초과했을 수 있으니, 더 작은 파일이나 URL 방식으로 업로드해 주세요.");
+    }
   };
 
-  const handleDeleteGalleryItem = (id: string, name: string) => {
+  const handleDeleteGalleryItem = async (id: string, name: string) => {
     if (confirm(`이미지 [${name}]을 갤러리에서 삭제하시겠습니까?`)) {
       const updatedList = galleryItems.filter(item => item.id !== id);
       setGalleryItems(updatedList);
       localStorage.setItem("120_gallery_items", JSON.stringify(updatedList));
+      
+      const itemToDelete = galleryItems.find(item => item.id === id);
+      if (itemToDelete && itemToDelete._id) {
+        try {
+          await removeGalleryItemMutation({ id: itemToDelete._id as any });
+        } catch (e) {
+          console.error("Failed to delete gallery item from Convex", e);
+        }
+      }
       triggerToast(`이미지 [${name}]이 삭제되었습니다.`);
     }
   };
@@ -1313,15 +1510,21 @@ export default function AdminPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    if (file.size > 2 * 1024 * 1024) {
-      alert("이미지 크기는 2MB 이하여야 합니다.");
+    if (file.size > 10 * 1024 * 1024) {
+      alert("이미지 크기는 10MB 이하여야 합니다.");
       return;
     }
     
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       if (typeof reader.result === "string") {
-        setGalleryItemUrl(reader.result);
+        try {
+          const compressed = await compressImage(reader.result, 800, 800, 0.7);
+          setGalleryItemUrl(compressed);
+        } catch (err) {
+          console.error("Gallery image compression error:", err);
+          setGalleryItemUrl(reader.result);
+        }
       }
     };
     reader.readAsDataURL(file);
@@ -2446,7 +2649,11 @@ export default function AdminPage() {
                     {/* Switch Toggle */}
                     <button
                       type="button"
-                      onClick={() => setPopupActive(!popupActive)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setPopupActive(!popupActive);
+                      }}
                       className={`w-12 h-6 rounded-full p-1 transition-all duration-300 ${
                         popupActive ? "bg-[#f25f8a] flex justify-end" : "bg-[#735965]/20 flex justify-start"
                       }`}
@@ -2462,7 +2669,6 @@ export default function AdminPage() {
                         type="text"
                         value={popupTitle}
                         onChange={(e) => setPopupTitle(e.target.value)}
-                        required={popupActive}
                         placeholder="이벤트 헤드라인 문구를 입력하세요"
                         className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
                       />
@@ -2473,7 +2679,6 @@ export default function AdminPage() {
                         type="text"
                         value={popupBtnText}
                         onChange={(e) => setPopupBtnText(e.target.value)}
-                        required={popupActive}
                         placeholder="예: 지금 바로 신메뉴 생지 주문하기"
                         className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
                       />
@@ -2520,8 +2725,7 @@ export default function AdminPage() {
                         rows={4}
                         value={popupDesc}
                         onChange={(e) => setPopupDesc(e.target.value)}
-                        required={popupActive}
-                        placeholder="팝업 내에 표시될 상세 공지 본문을 넉넉하게 기술해 주세요."
+                        placeholder="팝업 내에 표시될 상세 공지 본문을 넉눌하게 기술해 주세요."
                         className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
                       />
                     </div>
@@ -2556,6 +2760,134 @@ export default function AdminPage() {
                           />
                         </div>
                       )}
+                    </div>
+                  </div>
+
+                  {/* Styling Customization Section */}
+                  <div className="border-t border-[#f2ccd7]/60 pt-6 space-y-4">
+                    <h4 className="font-extrabold text-xs text-[#bf3e67] flex items-center gap-1.5">
+                      🎨 팝업 디자인 & 데코 스타일 상세 설정
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {/* Title Styles */}
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-[#735965] block">메인 타이틀 글자 색상</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={popupTitleColor}
+                            onChange={(e) => setPopupTitleColor(e.target.value)}
+                            className="w-10 h-10 border border-[#f2ccd7] rounded-xl cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={popupTitleColor}
+                            onChange={(e) => setPopupTitleColor(e.target.value)}
+                            className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs font-mono text-[#2d2026]"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-[#735965] block">메인 타이틀 글자 크기</label>
+                        <select
+                          value={popupTitleSize}
+                          onChange={(e) => setPopupTitleSize(e.target.value)}
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] focus:outline-none"
+                        >
+                          <option value="14px">매우 작게 (14px)</option>
+                          <option value="16px">작게 (16px)</option>
+                          <option value="18px">보통 (18px - 기본)</option>
+                          <option value="20px">크게 (20px)</option>
+                          <option value="24px">매우 크게 (24px)</option>
+                          <option value="28px">대형 (28px)</option>
+                        </select>
+                      </div>
+
+                      {/* Desc Styles */}
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-[#735965] block">상세 설명 글자 색상</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={popupDescColor}
+                            onChange={(e) => setPopupDescColor(e.target.value)}
+                            className="w-10 h-10 border border-[#f2ccd7] rounded-xl cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={popupDescColor}
+                            onChange={(e) => setPopupDescColor(e.target.value)}
+                            className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs font-mono text-[#2d2026]"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-[#735965] block">상세 설명 글자 크기</label>
+                        <select
+                          value={popupDescSize}
+                          onChange={(e) => setPopupDescSize(e.target.value)}
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] focus:outline-none"
+                        >
+                          <option value="11px">작게 (11px)</option>
+                          <option value="12px">보통 (12px - 기본)</option>
+                          <option value="13px">약간 크게 (13px)</option>
+                          <option value="14px">크게 (14px)</option>
+                          <option value="16px">매우 크게 (16px)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      {/* Button/Box Styles */}
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-[#735965] block">하단 버튼(박스) 배경 색상</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={popupBtnBgColor}
+                            onChange={(e) => setPopupBtnBgColor(e.target.value)}
+                            className="w-10 h-10 border border-[#f2ccd7] rounded-xl cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={popupBtnBgColor}
+                            onChange={(e) => setPopupBtnBgColor(e.target.value)}
+                            className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs font-mono text-[#2d2026]"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-[#735965] block">버튼 글씨 색상</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={popupBtnTextColor}
+                            onChange={(e) => setPopupBtnTextColor(e.target.value)}
+                            className="w-10 h-10 border border-[#f2ccd7] rounded-xl cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={popupBtnTextColor}
+                            onChange={(e) => setPopupBtnTextColor(e.target.value)}
+                            className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs font-mono text-[#2d2026]"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-[#735965] block">버튼 글씨 크기</label>
+                        <select
+                          value={popupBtnTextSize}
+                          onChange={(e) => setPopupBtnTextSize(e.target.value)}
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] focus:outline-none"
+                        >
+                          <option value="11px">작게 (11px)</option>
+                          <option value="12px">보통 (12px - 기본)</option>
+                          <option value="13px">약간 크게 (13px)</option>
+                          <option value="14px">크게 (14px)</option>
+                          <option value="16px">매우 크게 (16px)</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
 

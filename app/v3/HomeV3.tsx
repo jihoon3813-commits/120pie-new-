@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, useInView, AnimatePresence } from "motion/react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import {
   ArrowRight,
   TrendingUp,
@@ -30,7 +32,9 @@ import {
   Camera,
   Video,
   Phone,
-  MessageCircle
+  MessageCircle,
+  Plus,
+  MessageSquare
 } from "lucide-react";
 
 // 뷰포트 감지 카운팅 애니메이션 컴포넌트 (V3 다크 옐로우 맞춤 에디션)
@@ -629,36 +633,56 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
     void video.play().catch(() => undefined);
   }, [isPinkVariant]);
 
-  // Dynamic Popup & Floating data loading
+  // Convex Hooks
+  const convexPopup = useQuery(api.popups.get);
+  const convexFloating = useQuery(api.floatings.get);
+  const addInquiry = useMutation(api.inquiries.add);
+
+  // Dynamic Popup & Floating data loading synced with Convex (fallback to localStorage if not yet loaded)
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedPop = localStorage.getItem("120_popups");
-      if (storedPop) {
-        try {
-          const pop = JSON.parse(storedPop);
-          setPopupSettings(pop);
-          if (pop.isActive) {
-            const closedDate = localStorage.getItem("120_popup_closed_date");
-            const todayStr = new Date().toISOString().split("T")[0];
-            if (closedDate !== todayStr) {
-              setShowPopup(true);
-            }
-          }
-        } catch (e) {
-          console.error(e);
+    if (convexPopup) {
+      setPopupSettings(convexPopup);
+      if (convexPopup.isActive) {
+        const closedDate = localStorage.getItem("120_popup_closed_date");
+        const todayStr = new Date().toISOString().split("T")[0];
+        if (closedDate !== todayStr) {
+          setShowPopup(true);
         }
       }
-
-      const storedFloat = localStorage.getItem("120_floatings");
-      if (storedFloat) {
-        try {
-          setFloatingSettings(JSON.parse(storedFloat));
-        } catch (e) {
-          console.error(e);
+    } else {
+      if (typeof window !== "undefined") {
+        const storedPop = localStorage.getItem("120_popups");
+        if (storedPop) {
+          try {
+            const parsed = JSON.parse(storedPop);
+            setPopupSettings(parsed);
+            if (parsed.isActive) {
+              const closedDate = localStorage.getItem("120_popup_closed_date");
+              const todayStr = new Date().toISOString().split("T")[0];
+              if (closedDate !== todayStr) {
+                setShowPopup(true);
+              }
+            }
+          } catch (e) {}
         }
       }
     }
-  }, []);
+  }, [convexPopup]);
+
+  useEffect(() => {
+    if (convexFloating) {
+      setFloatingSettings(convexFloating);
+    } else {
+      if (typeof window !== "undefined") {
+        const storedFloat = localStorage.getItem("120_floatings");
+        if (storedFloat) {
+          try {
+            setFloatingSettings(JSON.parse(storedFloat));
+          } catch (e) {}
+        }
+      }
+    }
+  }, [convexFloating]);
 
   const formatPhoneNumber = (value: string) => {
     const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -672,13 +696,35 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
     setFormData(prev => ({ ...prev, [name]: name === "phone" ? formatPhoneNumber(value) : value }));
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.phone) {
       alert("성함과 연락처를 입력해 주세요.");
       return;
     }
-    setFormSubmitted(true);
+    
+    try {
+      await addInquiry({
+        name: formData.name,
+        phone: formData.phone,
+        storeType: formData.storeType,
+        existingStoreName: formData.existingStoreName || "",
+        message: formData.message || "",
+        regDate: new Date().toISOString().split("T")[0]
+      });
+      setFormSubmitted(true);
+    } catch (err) {
+      console.error("Failed to submit inquiry to Convex", err);
+      const stored = localStorage.getItem("120_inquiries");
+      const list = stored ? JSON.parse(stored) : [];
+      const newInq = {
+        id: "inq-" + Date.now(),
+        ...formData,
+        regDate: new Date().toISOString().split("T")[0]
+      };
+      localStorage.setItem("120_inquiries", JSON.stringify([...list, newInq]));
+      setFormSubmitted(true);
+    }
   };
 
   // 모션 페이드인 애니메이션 프리셋
@@ -2261,7 +2307,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
           >
             {/* Header / Background visual */}
             <div 
-              className={`p-6 text-white min-h-[160px] flex flex-col justify-end relative ${
+              className={`w-full relative flex flex-col justify-end p-6 text-white ${
+                popupSettings.image ? "aspect-[4/3]" : "min-h-[160px]"
+              } ${
                 popupSettings.image ? "" : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a]"
               }`}
               style={popupSettings.image ? {
@@ -2270,19 +2318,31 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                 backgroundPosition: "center"
               } : undefined}
             >
-              {popupSettings.image && <div className="absolute inset-0 bg-black/40"></div>}
+              {popupSettings.image && <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>}
               <div className="relative z-10 space-y-1">
                 <span className="bg-[#ffd3df] text-[#bf3e67] text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-widest w-fit">
                   HQ Announcement
                 </span>
-                <h4 className="text-base sm:text-lg font-black leading-snug whitespace-pre-line">
+                <h4 
+                  className="font-black leading-snug whitespace-pre-line"
+                  style={{
+                    color: popupSettings.titleColor || "#ffffff",
+                    fontSize: popupSettings.titleSize || "18px"
+                  }}
+                >
                   {popupSettings.title}
                 </h4>
               </div>
             </div>
 
             {/* Body Description */}
-            <div className="p-6 overflow-y-auto text-xs sm:text-sm text-[#735965] font-semibold leading-relaxed whitespace-pre-line">
+            <div 
+              className="p-6 overflow-y-auto font-semibold leading-relaxed whitespace-pre-line"
+              style={{
+                color: popupSettings.descColor || "#735965",
+                fontSize: popupSettings.descSize || "12px"
+              }}
+            >
               {popupSettings.desc}
             </div>
 
@@ -2301,7 +2361,12 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                         setShowPopup(false);
                       }
                     }}
-                    className="w-full py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
+                    className="w-full py-3 font-extrabold rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
+                    style={{
+                      backgroundColor: popupSettings.btnBgColor || "#f25f8a",
+                      color: popupSettings.btnTextColor || "#ffffff",
+                      fontSize: popupSettings.btnTextSize || "12px"
+                    }}
                   >
                     {popupSettings.btnText || "자세히 보기"}
                   </button>
@@ -2335,72 +2400,89 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
       {/* ==========================================
           INTERACTIVE MULTI FLOATING BUTTONS
          ========================================== */}
+      {/* ==========================================
+          INTERACTIVE MULTI FLOATING BUTTONS
+         ========================================== */}
       {floatingSettings?.isActive && (
-        <div className="fixed right-6 bottom-6 z-[90] flex flex-col items-end gap-3 font-bold text-xs select-none text-white">
+        <div className="fixed right-6 bottom-6 z-[90] flex flex-col items-end gap-3 font-bold text-xs select-none text-white animate-fadeIn">
           {/* Expanded Menu Actions Tray */}
           {floatingOpen && (
             <div className="flex flex-col items-end gap-2.5 mb-1.5 animate-slideUp">
               {/* Instagram */}
-              {floatingSettings.instaUrl && (
+              {floatingSettings?.instaUrl && (
                 <a
                   href={floatingSettings.instaUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-white border border-[#f2ccd7] hover:border-pink-500 hover:bg-[#fff9fb] p-2.5 rounded-full flex items-center justify-center text-[#bf3e67] shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                  className="bg-[#cf2a7a] hover:bg-[#b01e63] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
-                  <Camera size={17} />
-                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">공식 인스타</span>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#ffffff" }} className="w-[16px] h-[16px] text-white">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                  </svg>
+                  <span className="absolute right-12 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#2d2026", color: "#ffffff" }}>공식 인스타</span>
                 </a>
               )}
 
               {/* Youtube */}
-              {floatingSettings.youtubeUrl && (
+              {floatingSettings?.youtubeUrl && (
                 <a
                   href={floatingSettings.youtubeUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-white border border-[#f2ccd7] hover:border-red-500 hover:bg-[#fff9fb] p-2.5 rounded-full flex items-center justify-center text-red-500 shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                  className="bg-[#ff0000] hover:bg-[#cc0000] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
-                  <Video size={17} />
-                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">유튜브 채널</span>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style={{ color: "#ffffff" }} className="w-[16px] h-[16px] text-white">
+                    <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  </svg>
+                  <span className="absolute right-12 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#2d2026", color: "#ffffff" }}>유튜브 채널</span>
                 </a>
               )}
 
               {/* Phone Direct Inquiry */}
-              {floatingSettings.phoneNo && (
+              {floatingSettings?.phoneNo && (
                 <a
                   href={`tel:${floatingSettings.phoneNo}`}
-                  className="bg-white border border-[#f2ccd7] hover:border-blue-500 hover:bg-[#fff9fb] p-2.5 rounded-full flex items-center justify-center text-blue-500 shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                  className="bg-[#007aff] hover:bg-[#0062cc] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
-                  <Phone size={17} />
-                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">본사 전화문의</span>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#ffffff" }} className="w-[16px] h-[16px] text-white">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                  <span className="absolute right-12 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#2d2026", color: "#ffffff" }}>본사 전화문의</span>
                 </a>
               )}
 
               {/* Kakao talk Channel / Custom Chat link */}
-              {floatingSettings.kakaoUrl && (
+              {floatingSettings?.kakaoUrl && (
                 <a
                   href={floatingSettings.kakaoUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-[#ffe500] hover:bg-[#ffd600] p-2.5 rounded-full flex items-center justify-center text-[#3c1e1e] shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border border-yellow-400"
+                  className="bg-[#fae100] hover:bg-[#e6cf00] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border border-yellow-400"
                 >
-                  <MessageCircle size={17} />
-                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">1:1 카톡문의</span>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style={{ color: "#3c2929" }} className="w-[16px] h-[16px] text-[#3c2929]">
+                    <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.557 1.707 4.8 4.27 6.054-.188.702-.68 2.531-.777 2.922-.12.483.18.477.38.343.155-.104 2.476-1.683 3.473-2.358.536.082 1.087.124 1.654.124 4.97 0 9-3.186 9-7.115C21 6.185 16.97 3 12 3z" />
+                  </svg>
+                  <span className="absolute right-12 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#2d2026", color: "#ffffff" }}>1:1 카톡문의</span>
                 </a>
               )}
 
-              {/* Fast Chat Consultation */}
-              {floatingSettings.chatUrl && (
-                <a
-                  href={floatingSettings.chatUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] hover:border-[#f25f8a] p-2.5 rounded-full flex items-center justify-center text-[#bf3e67] shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+              {/* Fast Chat Consultation - triggers internal consultation modal */}
+              {floatingSettings?.chatUrl && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setInquiryModalOpen(true);
+                    setFloatingOpen(false);
+                  }}
+                  className="bg-[#f25f8a] hover:bg-[#df4977] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
-                  <span className="text-[#bf3e67] text-[15px] font-bold">⇄</span>
-                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">빠른 실시간 상담</span>
-                </a>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#ffffff" }} className="w-[16px] h-[16px] text-white">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                  <span className="absolute right-12 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#2d2026", color: "#ffffff" }}>빠른 실시간 상담</span>
+                </button>
               )}
             </div>
           )}
@@ -2408,13 +2490,17 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
           {/* Trigger Controller (Main Toggle button) */}
           <button
             onClick={() => setFloatingOpen(!floatingOpen)}
-            className={`w-12 h-12 rounded-full flex items-center justify-center text-white transition-all shadow-[0_6px_20px_rgba(242,95,138,0.4)] hover:scale-105 active:scale-95 cursor-pointer ${
-              floatingOpen 
-                ? "bg-[#735965] hover:bg-[#5d4752] rotate-90" 
-                : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a] hover:from-[#df4977] hover:to-[#ff7b9f]"
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer border-0 shadow-[0_6px_20px_rgba(242,95,138,0.45)] hover:scale-105 active:scale-95 ${
+              floatingOpen
+                ? "bg-[#735965] hover:bg-[#5d4752] rotate-45 text-white"
+                : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a] hover:from-[#df4977] hover:to-[#ff7b9f] text-white"
             }`}
           >
-            {floatingOpen ? <X size={20} /> : <Headphones size={20} className="animate-wiggle" />}
+            {floatingOpen ? (
+              <X size={20} className="!text-white" style={{ color: "#ffffff" }} />
+            ) : (
+              <Plus size={20} className="!text-white animate-pulse" style={{ color: "#ffffff" }} />
+            )}
           </button>
         </div>
       )}

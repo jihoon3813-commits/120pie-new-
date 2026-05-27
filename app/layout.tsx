@@ -42,6 +42,8 @@ export const metadata = {
   }
 };
 
+import ConvexClientProvider from "./ConvexClientProvider";
+
 export default function RootLayout({
   children
 }: Readonly<{
@@ -49,7 +51,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <ConvexClientProvider>
+          {children}
+        </ConvexClientProvider>
+      </body>
     </html>
   );
 }

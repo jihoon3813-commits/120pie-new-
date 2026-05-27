@@ -440,7 +440,7 @@ export default function PortalPage() {
 
       const loadedFloat = loadState("120_floatings", {
         isActive: true,
-        instaUrl: "https://instagram.com",
+        instaUrl: "https://www.instagram.com/120pie77/",
         youtubeUrl: "https://youtube.com",
         chatUrl: "https://kakao.com",
         phoneNo: "1688-1200",
@@ -2304,7 +2304,9 @@ export default function PortalPage() {
           >
             {/* Header / Background visual */}
             <div 
-              className={`p-6 text-white min-h-[160px] flex flex-col justify-end relative ${
+              className={`w-full relative flex flex-col justify-end p-6 text-white ${
+                popupSettings.image ? "aspect-[4/3]" : "min-h-[160px]"
+              } ${
                 popupSettings.image ? "" : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a]"
               }`}
               style={popupSettings.image ? {
@@ -2313,19 +2315,31 @@ export default function PortalPage() {
                 backgroundPosition: "center"
               } : undefined}
             >
-              {popupSettings.image && <div className="absolute inset-0 bg-black/40"></div>}
+              {popupSettings.image && <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>}
               <div className="relative z-10 space-y-1">
                 <span className="bg-[#ffd3df] text-[#bf3e67] text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-widest w-fit">
                   Urgent HQ Announcement
                 </span>
-                <h4 className="text-base sm:text-lg font-black leading-snug whitespace-pre-line">
+                <h4 
+                  className="font-black leading-snug whitespace-pre-line"
+                  style={{
+                    color: popupSettings.titleColor || "#ffffff",
+                    fontSize: popupSettings.titleSize || "18px"
+                  }}
+                >
                   {popupSettings.title}
                 </h4>
               </div>
             </div>
 
             {/* Body Description */}
-            <div className="p-6 overflow-y-auto text-xs sm:text-sm text-[#735965] font-semibold leading-relaxed whitespace-pre-line">
+            <div 
+              className="p-6 overflow-y-auto font-semibold leading-relaxed whitespace-pre-line"
+              style={{
+                color: popupSettings.descColor || "#735965",
+                fontSize: popupSettings.descSize || "12px"
+              }}
+            >
               {popupSettings.desc}
             </div>
 
@@ -2349,7 +2363,12 @@ export default function PortalPage() {
                         setShowPopup(false);
                       }
                     }}
-                    className="w-full py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
+                    className="w-full py-3 font-extrabold rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
+                    style={{
+                      backgroundColor: popupSettings.btnBgColor || "#f25f8a",
+                      color: popupSettings.btnTextColor || "#ffffff",
+                      fontSize: popupSettings.btnTextSize || "12px"
+                    }}
                   >
                     {popupSettings.btnText || "자세히 보기"}
                   </button>
@@ -2384,7 +2403,7 @@ export default function PortalPage() {
           INTERACTIVE MULTI FLOATING BUTTONS
          ========================================== */}
       {floatingSettings?.isActive && (
-        <div className="fixed right-6 bottom-6 z-[90] flex flex-col items-end gap-3 font-bold text-xs select-none">
+        <div className="fixed right-6 bottom-6 z-[90] flex flex-col items-end gap-3 font-bold text-xs select-none text-white animate-fadeIn">
           {/* Expanded Menu Actions Tray */}
           {floatingOpen && (
             <div className="flex flex-col items-end gap-2.5 mb-1.5 animate-slideUp">
@@ -2394,9 +2413,9 @@ export default function PortalPage() {
                   href={floatingSettings.instaUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-white border border-[#f2ccd7] hover:border-pink-500 hover:bg-[#fff9fb] p-2.5 rounded-full flex items-center justify-center text-[#bf3e67] shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                  className="bg-[#cf2a7a] hover:bg-[#b01e63] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
-                  <Camera size={17} />
+                  <Camera size={17} className="!text-white" style={{ color: "#ffffff" }} />
                   <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">공식 인스타</span>
                 </a>
               )}
@@ -2407,9 +2426,9 @@ export default function PortalPage() {
                   href={floatingSettings.youtubeUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-white border border-[#f2ccd7] hover:border-red-500 hover:bg-[#fff9fb] p-2.5 rounded-full flex items-center justify-center text-red-500 shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                  className="bg-[#ff0000] hover:bg-[#cc0000] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
-                  <Video size={17} />
+                  <Video size={17} className="!text-white" style={{ color: "#ffffff" }} />
                   <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">유튜브 채널</span>
                 </a>
               )}
@@ -2418,9 +2437,9 @@ export default function PortalPage() {
               {floatingSettings.phoneNo && (
                 <a
                   href={`tel:${floatingSettings.phoneNo}`}
-                  className="bg-white border border-[#f2ccd7] hover:border-blue-500 hover:bg-[#fff9fb] p-2.5 rounded-full flex items-center justify-center text-blue-500 shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                  className="bg-[#007aff] hover:bg-[#0062cc] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
-                  <Phone size={17} />
+                  <Phone size={17} className="text-white" />
                   <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">본사 전화문의</span>
                 </a>
               )}
@@ -2431,24 +2450,27 @@ export default function PortalPage() {
                   href={floatingSettings.kakaoUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-[#ffe500] hover:bg-[#ffd600] p-2.5 rounded-full flex items-center justify-center text-[#3c1e1e] shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border border-yellow-400"
+                  className="bg-[#fae100] hover:bg-[#e6cf00] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border border-yellow-400"
                 >
-                  <MessageCircle size={17} />
+                  <MessageCircle size={17} className="text-white" />
                   <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">1:1 카톡문의</span>
                 </a>
               )}
 
-              {/* Fast Chat Consultation */}
+              {/* Fast Chat Consultation - triggers internal 1:1 Inquiry Board */}
               {floatingSettings.chatUrl && (
-                <a
-                  href={floatingSettings.chatUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] hover:border-[#f25f8a] p-2.5 rounded-full flex items-center justify-center text-[#bf3e67] shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group"
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentMenu("inquiry");
+                    setShowInquiryModal(true);
+                    setFloatingOpen(false);
+                  }}
+                  className="bg-[#f25f8a] hover:bg-[#df4977] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
-                  <ArrowRightLeft size={17} className="rotate-90" />
-                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">빠른 실시간 상담</span>
-                </a>
+                  <MessageSquare size={17} className="text-white" />
+                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">1:1 빠른 문의접수</span>
+                </button>
               )}
             </div>
           )}
@@ -2456,13 +2478,13 @@ export default function PortalPage() {
           {/* Trigger Controller (Main Toggle button) */}
           <button
             onClick={() => setFloatingOpen(!floatingOpen)}
-            className={`w-12 h-12 rounded-full flex items-center justify-center text-white transition-all shadow-[0_6px_20px_rgba(242,95,138,0.4)] hover:scale-105 active:scale-95 cursor-pointer ${
+            className={`w-12 h-12 rounded-full flex items-center justify-center text-white transition-all shadow-[0_6px_20px_rgba(242,95,138,0.4)] hover:scale-105 active:scale-95 cursor-pointer border-0 ${
               floatingOpen 
-                ? "bg-[#735965] hover:bg-[#5d4752] rotate-90" 
+                ? "bg-[#735965] hover:bg-[#5d4752] rotate-45" 
                 : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a] hover:from-[#df4977] hover:to-[#ff7b9f]"
             }`}
           >
-            {floatingOpen ? <X size={20} /> : <Headphones size={20} className="animate-wiggle" />}
+            {floatingOpen ? <X size={20} className="text-white" /> : <Plus size={20} className="text-white animate-pulse" />}
           </button>
         </div>
       )}
