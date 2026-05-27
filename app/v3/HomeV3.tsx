@@ -741,6 +741,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [floatingSettings, setFloatingSettings] = useState<any>(null);
   const [floatingOpen, setFloatingOpen] = useState<boolean>(false);
+  const popupClosedInSessionRef = useRef<boolean>(false);
 
   // 컨택트 폼 입력 상태
   const [formData, setFormData] = useState<InquiryFormData>({
@@ -792,6 +793,8 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
 
   // Dynamic Popup & Floating data loading synced with Convex (fallback to localStorage if not yet loaded)
   useEffect(() => {
+    if (popupClosedInSessionRef.current) return;
+
     if (convexPopup) {
       setPopupSettings(convexPopup);
       if (convexPopup.isActive) {
@@ -2510,6 +2513,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                       } else {
                         // On landing, internally open consultation inquiry modal
                         setInquiryModalOpen(true);
+                        popupClosedInSessionRef.current = true;
                         setShowPopup(false);
                       }
                     }}
@@ -2531,6 +2535,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                   onClick={() => {
                     const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
                     localStorage.setItem("120_popup_closed_date", todayStr);
+                    popupClosedInSessionRef.current = true;
                     setShowPopup(false);
                   }}
                   className="hover:text-[#bf3e67] transition-colors flex items-center gap-1 cursor-pointer"
@@ -2538,7 +2543,10 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                   <span className="text-[#f25f8a]">✔</span> 오늘 하루 안보기
                 </button>
                 <button
-                  onClick={() => setShowPopup(false)}
+                  onClick={() => {
+                    popupClosedInSessionRef.current = true;
+                    setShowPopup(false);
+                  }}
                   className="hover:text-red-500 font-extrabold transition-colors cursor-pointer"
                 >
                   닫기
