@@ -457,6 +457,7 @@ function OwnerSystemSection() {
 // V3 GallerySection
 function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: string) => void }) {
   const [galleryItems, setGalleryItems] = useState<any[]>([]);
+  const [selectedImage, setSelectedImage] = useState<any | null>(null);
   const convexGallery = useQuery(api.gallery.list);
 
   useEffect(() => {
@@ -531,9 +532,10 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 key={img.id}
-                className="group"
+                onClick={() => setSelectedImage(img)}
+                className="group cursor-zoom-in"
               >
-                <div className="aspect-[4/3] bg-neutral-100 rounded-xl overflow-hidden mb-4 relative shadow-sm hover:shadow transition-shadow">
+                <div className="aspect-[4/3] bg-neutral-100 rounded-xl overflow-hidden mb-4 relative shadow-sm hover:shadow transition-all group-hover:shadow-md">
                   <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
                 </div>
                 <span className="text-amber-600 text-[10px] font-bold uppercase tracking-wider mb-2 block font-mono">{img.category}</span>
@@ -543,6 +545,45 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
           </AnimatePresence>
         </motion.div>
       </div>
+
+      {/* Premium Original Image Modal Viewer */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6 bg-neutral-950/90 backdrop-blur-md cursor-zoom-out select-none"
+          >
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-5 right-5 text-white/70 hover:text-white bg-neutral-900/60 hover:bg-neutral-900/80 rounded-full p-2.5 z-[130] transition-colors border border-white/10"
+            >
+              <X size={20} />
+            </button>
+
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 15 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-5xl w-full max-h-[85dvh] flex flex-col items-center justify-center bg-neutral-950/40 rounded-2xl overflow-hidden border border-neutral-800 shadow-[0_25px_60px_rgba(0,0,0,0.8)] cursor-default"
+            >
+              <img
+                src={selectedImage.url}
+                alt={selectedImage.name}
+                className="max-w-full max-h-[72dvh] sm:max-h-[75vh] object-contain block"
+              />
+              <div className="w-full bg-neutral-950/80 px-6 py-4 border-t border-neutral-850 backdrop-blur-md text-left flex flex-col gap-1 shrink-0">
+                <span className="text-amber-400 font-bold tracking-widest text-[10px] uppercase font-mono">{selectedImage.category}</span>
+                <h3 className="text-sm sm:text-base font-extrabold text-white">{selectedImage.name}</h3>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
