@@ -1480,8 +1480,21 @@ export default function AdminPage() {
         localStorage.setItem("120_gallery_categories", JSON.stringify(withEtc));
       }
 
-      triggerToast(`카테고리 [${catToDelete}]가 삭제되었습니다.`);
     }
+  };
+
+  const handleAdjustGalleryCategoryOrder = (currentIndex: number, direction: "up" | "down") => {
+    const targetIdx = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (targetIdx < 0 || targetIdx >= galleryCategories.length) return;
+
+    const updated = [...galleryCategories];
+    const temp = updated[currentIndex];
+    updated[currentIndex] = updated[targetIdx];
+    updated[targetIdx] = temp;
+
+    setGalleryCategories(updated);
+    localStorage.setItem("120_gallery_categories", JSON.stringify(updated));
+    triggerToast("갤러리 카테고리 순서가 실시간으로 재정렬되었습니다.");
   };
 
   const handleGalleryImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -3409,22 +3422,42 @@ export default function AdminPage() {
 
                   <div className="space-y-3">
                     <label className="text-[11px] font-bold text-[#735965] block">등록된 카테고리 리스트 ({galleryCategories.length}개)</label>
-                    <div className="flex flex-wrap gap-2 p-3 bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-2xl min-h-[100px] align-content-start">
-                      {galleryCategories.map((cat) => (
-                        <span
+                    <div className="space-y-2 p-3 bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-2xl min-h-[120px] max-h-[300px] overflow-y-auto">
+                      {galleryCategories.map((cat, idx) => (
+                        <div
                           key={cat}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-[#fff1f5] text-[#bf3e67] border border-[#f2ccd7]"
+                          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#fff1f5] text-[#bf3e67] border border-[#f2ccd7] group"
                         >
-                          {cat}
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteGalleryCategory(cat)}
-                            className="hover:text-red-600 text-neutral-400 font-extrabold ml-1.5"
-                            title="카테고리 삭제"
-                          >
-                            &times;
-                          </button>
-                        </span>
+                          <span>{cat}</span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleAdjustGalleryCategoryOrder(idx, "up")}
+                              disabled={idx === 0}
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              title="위로 이동"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleAdjustGalleryCategoryOrder(idx, "down")}
+                              disabled={idx === galleryCategories.length - 1}
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              title="아래로 이동"
+                            >
+                              ▼
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteGalleryCategory(cat)}
+                              className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 ml-1 font-bold text-sm leading-none transition-colors cursor-pointer"
+                              title="카테고리 삭제"
+                            >
+                              &times;
+                            </button>
+                          </div>
+                        </div>
                       ))}
                     </div>
                     <p className="text-[10px] text-neutral-450 leading-relaxed">
