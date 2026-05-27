@@ -457,46 +457,34 @@ function OwnerSystemSection() {
 // V3 GallerySection
 function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: string) => void }) {
   const [galleryItems, setGalleryItems] = useState<any[]>([]);
+  const convexGallery = useQuery(api.gallery.list);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("120_gallery_items");
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          setGalleryItems(parsed);
-        } catch (e) {
-          console.error("Failed to parse gallery items in HomeV3", e);
-        }
-      } else {
-        const defaultList = [
-          {
-            id: "gal-1",
-            name: "로제미트파이 신메뉴 이미지",
-            category: "신메뉴",
-            url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg",
-            regDate: "2026-05-20"
-          },
-          {
-            id: "gal-2",
-            name: "120겹파이 매장 연출컷",
-            category: "홍보연출",
-            url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779721204/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_du1czf.jpg",
-            regDate: "2026-05-21"
-          },
-          {
-            id: "gal-3",
-            name: "에그120 및 디저트 라인업",
-            category: "메뉴판",
-            url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg",
-            regDate: "2026-05-22"
+    if (convexGallery) {
+      const mapped = convexGallery.map((item: any) => ({
+        id: item._id || item.id || `gal-${Math.random()}`,
+        name: item.name,
+        category: item.category,
+        url: item.url,
+        regDate: item.regDate
+      }));
+      setGalleryItems(mapped);
+    } else {
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("120_gallery_items");
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            setGalleryItems(parsed);
+          } catch (e) {
+            console.error("Failed to parse gallery items in HomeV3", e);
           }
-        ];
-        localStorage.setItem("120_gallery_items", JSON.stringify(defaultList));
-        setGalleryItems(defaultList);
+        } else {
+          setGalleryItems([]);
+        }
       }
     }
-  }, []);
+  }, [convexGallery]);
 
   const availableCats = Array.from(new Set(galleryItems.map(item => item.category))).filter(Boolean) as string[];
   const tabs = ["전체", ...availableCats];
