@@ -407,12 +407,14 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (convexGalleryCategories) {
-      setGalleryCategories(convexGalleryCategories);
-      if (!galleryItemCategory && convexGalleryCategories.length > 0) {
-        setGalleryItemCategory(convexGalleryCategories[0]);
+      const activeCats = (convexGallery || []).map((item: any) => item.category).filter(Boolean);
+      const merged = Array.from(new Set([...convexGalleryCategories, ...activeCats])) as string[];
+      setGalleryCategories(merged);
+      if (!galleryItemCategory && merged.length > 0) {
+        setGalleryItemCategory(merged[0]);
       }
     }
-  }, [convexGalleryCategories]);
+  }, [convexGalleryCategories, convexGallery]);
   // ==========================================
   // HQ ADMIN AUTHENTICATION STATE & LOGIC
   // ==========================================
@@ -678,7 +680,9 @@ export default function AdminPage() {
       const galItems = loadState("120_gallery_items", DEFAULT_GALLERY);
       setGalleryItems(galItems);
       const galCats = loadState("120_gallery_categories", ["신메뉴", "홍보연출", "메뉴판", "매장"]);
-      setGalleryCategories(galCats);
+      const activeCats = (galItems || []).map((item: any) => item.category).filter(Boolean);
+      const mergedCats = Array.from(new Set([...galCats, ...activeCats])) as string[];
+      setGalleryCategories(mergedCats);
       
       // Initialize banner form states
       setBannerMainTag(bnr.mainTag);
