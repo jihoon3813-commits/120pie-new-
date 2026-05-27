@@ -401,7 +401,11 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (convexGallery) {
-      setGalleryItems(convexGallery);
+      const mapped = convexGallery.map((item: any) => ({
+        ...item,
+        id: item._id || item.id
+      }));
+      setGalleryItems(mapped);
     }
   }, [convexGallery]);
 
