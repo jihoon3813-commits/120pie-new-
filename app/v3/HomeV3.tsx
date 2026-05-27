@@ -458,7 +458,20 @@ function OwnerSystemSection() {
 function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: string) => void }) {
   const [galleryItems, setGalleryItems] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState<any | null>(null);
+  const [showMoreModal, setShowMoreModal] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   const convexGallery = useQuery(api.gallery.list);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
 
   useEffect(() => {
     if (convexGallery) {
@@ -494,6 +507,9 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
     ? galleryItems 
     : galleryItems.filter(img => img.category === filter);
 
+  const limit = isMobile ? 8 : 16;
+  const visibleImages = filteredImages.slice(0, limit);
+
   return (
     <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -522,9 +538,10 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
           ))}
         </div>
 
-        <motion.div layout className="mobile-horizontal-cards grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10">
+        {/* 4x4 (desktop) / 2x4 (mobile) grid layout */}
+        <motion.div layout className="grid grid-cols-2 md:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-6 sm:gap-y-10">
           <AnimatePresence mode="popLayout">
-            {filteredImages.map(img => (
+            {visibleImages.map(img => (
               <motion.div
                 layout
                 initial={{ opacity: 0 }}
@@ -544,7 +561,90 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
             ))}
           </AnimatePresence>
         </motion.div>
+
+        {/* View More Trigger Button */}
+        {filteredImages.length > limit && (
+          <div className="flex justify-center mt-12">
+            <button
+              onClick={() => setShowMoreModal(true)}
+              className="px-8 py-3.5 bg-neutral-950 hover:bg-neutral-900 text-white font-black text-xs sm:text-sm rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-98 cursor-pointer flex items-center gap-2 border border-neutral-900"
+            >
+              + 전체 사진 더보기 ({filteredImages.length}개 전체보기)
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Premium All Images Modal Viewer (더보기) */}
+      <AnimatePresence>
+        {showMoreModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowMoreModal(false)}
+            className="fixed inset-0 z-[105] flex items-center justify-center p-3 sm:p-6 bg-neutral-950/80 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-neutral-900 border border-neutral-800 rounded-3xl w-full max-w-5xl overflow-hidden relative shadow-[0_20px_50px_rgba(0,0,0,0.5)] my-auto flex flex-col max-h-[85vh] sm:max-h-[80vh]"
+            >
+              {/* Modal Header */}
+              <div className="p-6 border-b border-neutral-800 bg-neutral-950/50 flex justify-between items-center shrink-0">
+                <div>
+                  <span className="inline-block px-2 py-0.5 rounded bg-amber-400 text-neutral-950 text-[9px] font-black uppercase tracking-wider mb-1">ALL IMAGES</span>
+                  <h3 className="text-base sm:text-lg font-black text-white">
+                    갤러리 전체 사진 <span className="text-amber-400 font-bold">({filteredImages.length})</span>
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setShowMoreModal(false)}
+                  className="text-neutral-400 hover:text-white bg-neutral-800 hover:bg-neutral-750 rounded-full p-2.5 transition-colors cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Modal Scroll Area Grid */}
+              <div className="p-6 sm:p-8 overflow-y-auto flex-1 bg-neutral-950 menu-modal-scroll max-h-[60vh]">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+                  {filteredImages.map(img => (
+                    <div
+                      key={img.id}
+                      onClick={() => setSelectedImage(img)}
+                      className="bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-850 shadow-md hover:border-amber-400/40 transition-all cursor-zoom-in group"
+                    >
+                      <div className="aspect-[4/3] overflow-hidden relative bg-neutral-950">
+                        <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-550" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent"></div>
+                      </div>
+                      <div className="p-4 bg-neutral-900">
+                        <span className="text-amber-400 text-[9px] font-bold uppercase tracking-wider block mb-1 font-mono">{img.category}</span>
+                        <h4 className="font-extrabold text-white text-xs leading-snug line-clamp-1">{img.name}</h4>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-4 sm:p-5 bg-neutral-900 border-t border-neutral-800 text-center shrink-0 flex items-center justify-between gap-4">
+                <span className="text-[10px] text-neutral-400 font-bold">총 {filteredImages.length}개의 실제 도입 이미지 및 연출 컷이 등록되어 있습니다.</span>
+                <button
+                  onClick={() => setShowMoreModal(false)}
+                  className="px-5 py-2 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                >
+                  닫기
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Premium Original Image Modal Viewer */}
       <AnimatePresence>
