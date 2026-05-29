@@ -957,7 +957,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   };
 
   return (
-    <div id={isPinkVariant ? "landing-v4" : "landing-v3"} className="flex flex-col w-full bg-[#0a0a0a] text-neutral-200 scroll-smooth overflow-x-hidden font-sans antialiased">
+    <div id={isPinkVariant ? "landing-v4" : isYellowVariant ? "landing-v5" : "landing-v3"} className={`flex flex-col w-full scroll-smooth overflow-x-hidden font-sans antialiased transition-colors duration-300 ${
+      isPinkVariant 
+        ? "bg-[#fff9fb] text-neutral-900" 
+        : isYellowVariant 
+          ? "bg-[#fffdf2] text-[#0d233a]" 
+          : "bg-[#0a0a0a] text-neutral-200"
+    }`}>
 
       {/* ------------------------------------------------------------- */}
       {/* HEADER (Sticky Minimal Tri-Tone) */}
@@ -974,13 +980,26 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             </Link>
           </div>
 
-          <nav className="hidden lg:flex items-center gap-3 xl:gap-5 text-[11px] xl:text-sm font-bold text-neutral-400">
+          <nav className="hidden lg:flex items-center gap-2.5 xl:gap-4 text-[10px] xl:text-[13px] font-bold text-neutral-400 shrink-0">
             <a href="#why" className="hover:text-amber-400 transition-colors">도입 가치</a>
             <a href="#structure" className="hover:text-amber-400 transition-colors">브랜드 구조</a>
             <a href="#menu" className="hover:text-amber-400 transition-colors">메뉴 카탈로그</a>
-            <a href="#simulator" className="hover:text-amber-400 transition-colors">수익 시뮬레이터</a>
             <a href="#adoption" className="hover:text-amber-400 transition-colors">도입 방식 &amp; 성공사례</a>
-            <Link href={isPinkVariant ? "/stores?theme=pink" : "/stores?theme=black"} className="hover:text-amber-400 transition-colors">가맹점 현황</Link>
+            <Link href={isYellowVariant ? "/stores?theme=yellow" : isPinkVariant ? "/stores?theme=pink" : "/stores?theme=yellow"} className={`hover:scale-105 transition-transform shrink-0 ${
+              isPinkVariant 
+                ? "text-rose-500 hover:text-rose-600 font-extrabold" 
+                : "text-amber-400 hover:text-amber-300 font-extrabold"
+            }`}>
+              가맹점 현황
+            </Link>
+            <Link href={isYellowVariant ? "/costs?theme=yellow" : isPinkVariant ? "/costs?theme=pink" : "/costs?theme=yellow"} className={`hover:scale-105 transition-transform shrink-0 ${
+              isPinkVariant 
+                ? "text-rose-500 hover:text-rose-600 font-extrabold" 
+                : "text-amber-400 hover:text-amber-300 font-extrabold"
+            }`}>
+              비용 안내
+            </Link>
+            <span className="w-px h-3 bg-neutral-800 mx-1 hidden lg:block" />
             <a href="#faq" className="hover:text-amber-400 transition-colors">FAQ</a>
           </nav>
 
