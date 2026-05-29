@@ -1,6 +1,8 @@
 import "./globals.css";
 import "./v3/styles.css";
 import "./landing-v4/styles.css";
+import "./landing-v5/styles.css";
+import "./landing-v5/portal.css";
 
 export const metadata = {
   title: "120pie&coffee | 카페 사장님을 위한 디저트 매출 솔루션",

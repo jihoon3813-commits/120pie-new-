@@ -18,102 +18,102 @@
 }
 
 @media (max-width: 639px) {
-  :is(#landing-v3, #landing-v4) > header > div:first-child {
+  :is(#landing-v3, #landing-v4, #landing-v5) > header > div:first-child {
     min-height: 68px;
   }
 
-  :is(#landing-v3, #landing-v4) main > section {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section {
     padding-top: 3rem !important;
     padding-bottom: 3rem !important;
   }
 
-  :is(#landing-v3, #landing-v4) main > section#marquee-slider {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section#marquee-slider {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
   }
 
-  :is(#landing-v3, #landing-v4) main > section:first-child {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section:first-child {
     padding-top: 2rem !important;
     padding-bottom: 2.5rem !important;
   }
 
-  :is(#landing-v3, #landing-v4) main > section h2 {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section h2 {
     font-size: 1.65rem;
     line-height: 1.2;
   }
 
-  :is(#landing-v3, #landing-v4) main > section .mb-20 {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section .mb-20 {
     margin-bottom: 2.25rem;
   }
 
-  :is(#landing-v3, #landing-v4) main > section :is(.mb-16, .mb-14, .mb-12) {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section :is(.mb-16, .mb-14, .mb-12) {
     margin-bottom: 1.5rem;
   }
 
-  :is(#landing-v3, #landing-v4) main > section .mb-10 {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section .mb-10 {
     margin-bottom: 1.25rem;
   }
 
-  :is(#landing-v3, #landing-v4) main > section :is(.mt-20, .mt-8) {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section :is(.mt-20, .mt-8) {
     margin-top: 1.75rem;
   }
 
-  :is(#landing-v3, #landing-v4) main > section :is(.pt-14, .pt-8, .pt-6) {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section :is(.pt-14, .pt-8, .pt-6) {
     padding-top: 1.25rem;
   }
 
-  :is(#landing-v3, #landing-v4) main > section :is(.gap-12, .gap-10, .gap-8) {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section :is(.gap-12, .gap-10, .gap-8) {
     gap: 1.5rem;
   }
 
-  :is(#landing-v3, #landing-v4) main > section :is(.gap-7, .gap-6, .gap-5, .gap-4) {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section :is(.gap-7, .gap-6, .gap-5, .gap-4) {
     gap: 1rem;
   }
 
-  :is(#landing-v3, #landing-v4) main > section :is(.p-8, .p-6) {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section :is(.p-8, .p-6) {
     padding: 1rem;
   }
 
-  :is(#landing-v3, #landing-v4) main > section .p-5 {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section .p-5 {
     padding: 0.875rem;
   }
 
-  :is(#landing-v3, #landing-v4) main > section :is(.aspect-\[4\/3\], .aspect-video) {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section :is(.aspect-\[4\/3\], .aspect-video) {
     aspect-ratio: 16 / 9;
   }
 
-  :is(#landing-v3, #landing-v4) main > section .h-56 {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section .h-56 {
     height: 9.5rem;
   }
 
-  :is(#landing-v3, #landing-v4) #adoption .h-40 {
+  :is(#landing-v3, #landing-v4, #landing-v5) #adoption .h-40 {
     height: auto;
     aspect-ratio: 16 / 9;
   }
 
-  :is(#landing-v3, #landing-v4) main > section :is(.min-h-\[400px\], .min-h-\[320px\]) {
+  :is(#landing-v3, #landing-v4, #landing-v5) main > section :is(.min-h-\[400px\], .min-h-\[320px\]) {
     min-height: 14rem;
   }
 
-  :is(#landing-v3, #landing-v4) #menu .catalog-detail-button {
+  :is(#landing-v3, #landing-v4, #landing-v5) #menu .catalog-detail-button {
     margin-top: 1rem;
     padding-top: 0.55rem;
     padding-bottom: 0.55rem;
   }
 
-  :is(#landing-v3, #landing-v4) #faq .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  :is(#landing-v3, #landing-v4, #landing-v5) #faq .space-y-4 > :not([hidden]) ~ :not([hidden]) {
     margin-top: 0.625rem;
   }
 
-  :is(#landing-v3, #landing-v4) #faq button {
+  :is(#landing-v3, #landing-v4, #landing-v5) #faq button {
     padding: 0.9rem 1rem;
   }
 
-  :is(#landing-v3, #landing-v4) #contact form {
+  :is(#landing-v3, #landing-v4, #landing-v5) #contact form {
     gap: 1rem;
   }
 
-  :is(#landing-v3, #landing-v4) .mobile-horizontal-cards {
+  :is(#landing-v3, #landing-v4, #landing-v5) .mobile-horizontal-cards {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: minmax(15.5rem, 84vw);
@@ -125,15 +125,15 @@
     scrollbar-width: none;
   }
 
-  :is(#landing-v3, #landing-v4) .mobile-horizontal-cards::-webkit-scrollbar {
+  :is(#landing-v3, #landing-v4, #landing-v5) .mobile-horizontal-cards::-webkit-scrollbar {
     display: none;
   }
 
-  :is(#landing-v3, #landing-v4) .mobile-horizontal-cards > * {
+  :is(#landing-v3, #landing-v4, #landing-v5) .mobile-horizontal-cards > * {
     scroll-snap-align: start;
   }
 
-  :is(#landing-v3, #landing-v4) footer > div {
+  :is(#landing-v3, #landing-v4, #landing-v5) footer > div {
     padding-top: 2.5rem;
     padding-bottom: 2rem;
   }

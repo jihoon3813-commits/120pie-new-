@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, MapPin, Store, ExternalLink } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 
 const logoUrlBlack = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png";
 const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png";
@@ -97,7 +98,8 @@ export default function StoresPageClient() {
   const [stores, setStores] = useState<StoreInfo[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string>("전체");
   const [selectedStoreId, setSelectedStoreId] = useState<string>("");
-  const [theme, setTheme] = useState<"pink" | "black">("pink");
+  const [theme, setTheme] = useState<"pink" | "yellow">("yellow");
+  const [inquiryForcedOpen, setInquiryForcedOpen] = useState(false);
 
   // Load theme and stores dynamically from browser environment
   useEffect(() => {
@@ -105,10 +107,10 @@ export default function StoresPageClient() {
       try {
         const params = new URLSearchParams(window.location.search);
         const urlTheme = params.get("theme");
-        if (urlTheme === "black") {
-          setTheme("black");
+        if (urlTheme === "pink") {
+          setTheme("pink");
         } else {
-          setTheme("pink"); // Default to pink
+          setTheme("yellow"); // Default to yellow
         }
 
         const stored = localStorage.getItem("120_stores");
@@ -127,7 +129,7 @@ export default function StoresPageClient() {
   }, []);
 
   // Update theme state and URL parameters smoothly on toggle click
-  const handleThemeChange = (newTheme: "pink" | "black") => {
+  const handleThemeChange = (newTheme: "pink" | "yellow") => {
     setTheme(newTheme);
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
@@ -138,35 +140,36 @@ export default function StoresPageClient() {
 
   // Dynamic Theme Token Classes Mapping
   const isPink = theme === "pink";
-  const logoUrl = isPink ? logoUrlPink : logoUrlBlack;
+  const isYellow = theme === "yellow";
+  const logoUrl = isPink ? logoUrlBlack : "/logo_yellow_blue.png";
   
   // Theme Background & Header Tokens
-  const pageBg = isPink ? "bg-[#fffdf9] text-neutral-900" : "bg-[#0c0a0c] text-neutral-100";
-  const headerBg = isPink ? "bg-white/80 border-b border-neutral-200/60" : "bg-[#0c0a0c]/80 border-b border-neutral-900";
+  const pageBg = isPink ? "bg-[#0a0a0a] text-neutral-200" : "bg-[#fffdf4] text-[#0d233a]";
+  const headerBg = isPink ? "bg-neutral-950/80 border-b border-neutral-900" : "bg-[#fffdf4]/80 border-b border-[#e6dfc3]";
   
   // Theme Typography Tokens
-  const textTitle = isPink ? "text-neutral-950" : "text-white";
-  const textDesc = isPink ? "text-neutral-600" : "text-neutral-400";
-  const labelAccent = isPink ? "text-rose-500" : "text-amber-400";
+  const textTitle = isPink ? "text-white" : "text-[#0d233a]";
+  const textDesc = isPink ? "text-neutral-400" : "text-[#576575]";
+  const labelAccent = isPink ? "text-amber-400 font-extrabold" : "text-[#0d233a] font-extrabold";
   
   // Theme Section and Container Tokens
-  const sectionBg = isPink ? "bg-white border border-neutral-200/80 shadow-md shadow-amber-900/[0.01]" : "bg-[#141214] border border-neutral-900 shadow-2xl backdrop-blur-md";
-  const cardBg = isPink ? "bg-white border border-neutral-200 shadow-md shadow-amber-900/[0.01]" : "bg-[#141214] border border-neutral-900 shadow-2xl backdrop-blur-md";
-  const innerCardBg = isPink ? "bg-[#fffaf1] border border-amber-100/60" : "bg-neutral-950/40 border border-neutral-900";
-  const borderHighlight = isPink ? "border-rose-100" : "border-amber-400/20";
+  const sectionBg = isPink ? "bg-neutral-900 border border-neutral-850 shadow-md shadow-black/20" : "bg-white border border-[#e6dfc3] shadow-md shadow-[#0d233a]/[0.02]";
+  const cardBg = isPink ? "bg-neutral-900 border border-neutral-850 shadow-md shadow-black/20" : "bg-white border border-[#e6dfc3] shadow-md shadow-[#0d233a]/[0.02]";
+  const innerCardBg = isPink ? "bg-neutral-950 border border-neutral-850" : "bg-[#fff9e6] border border-[#ffd500]/20";
+  const borderHighlight = isPink ? "border-neutral-850" : "border-[#ffd500]/20";
   
   // Theme Tab Control Tokens
-  const tabsWrapperBg = isPink ? "bg-[#f4ebe0] border border-neutral-200/50" : "bg-neutral-900/40 border border-neutral-900";
-  const backBtnClass = isPink ? "bg-rose-500 text-white hover:bg-rose-600 shadow-rose-500/10" : "bg-amber-400 text-neutral-950 hover:bg-amber-300 shadow-amber-400/10";
+  const tabsWrapperBg = isPink ? "bg-neutral-900 border border-neutral-850" : "bg-[#fff9e6] border border-[#ffd500]/15";
+  const backBtnClass = isPink ? "bg-amber-400 text-neutral-950 hover:bg-amber-300 shadow-amber-400/10" : "bg-[#ffd500] text-[#0d233a] hover:bg-[#e6bd00] shadow-[#ffd500]/10";
   
   // Theme Table Row Tokens
-  const rowSelectedBgClass = isPink ? "bg-rose-500/[0.03] hover:bg-rose-500/[0.05]" : "bg-amber-400/5 hover:bg-amber-400/10";
-  const rowBorder = isPink ? "border-neutral-100" : "border-neutral-900/80";
-  const textStoreName = isPink ? "text-neutral-900" : "text-white";
-  const textStoreAddr = isPink ? "text-neutral-600" : "text-neutral-350";
-  const textStorePhone = isPink ? "text-neutral-750" : "text-neutral-300";
-  const activeDotClass = isPink ? "bg-rose-500" : "bg-amber-400";
-  const backUrl = isPink ? "/" : "/v3";
+  const rowSelectedBgClass = isPink ? "bg-neutral-950 hover:bg-neutral-950" : "bg-[#ffd500]/5 hover:bg-[#ffd500]/10";
+  const rowBorder = isPink ? "border-neutral-850" : "border-[#e6dfc3]/80";
+  const textStoreName = isPink ? "text-white" : "text-[#0d233a]";
+  const textStoreAddr = isPink ? "text-neutral-400" : "text-[#576575]";
+  const textStorePhone = isPink ? "text-neutral-450" : "text-[#0d233a]";
+  const activeDotClass = isPink ? "bg-amber-400" : "bg-[#ffd500]";
+  const backUrl = isPink ? "/v3" : "/";
 
   // Filter approved stores
   const approvedStores = stores.filter(s => s.status === "승인");
@@ -217,31 +220,31 @@ export default function StoresPageClient() {
     <div className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg}`}>
       {/* Dynamic Header */}
       <header className={`sticky top-0 z-20 backdrop-blur-md transition-colors duration-300 ${headerBg}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[78px] flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[60px] sm:min-h-[78px] flex items-center justify-between gap-2 sm:gap-4">
           <Link href={backUrl} className="flex items-center group shrink-0">
-            <img src={logoUrl} alt="120pie & coffee" className="h-6 sm:h-8 w-auto object-contain group-hover:scale-102 transition-transform" />
+            <img src={logoUrl} alt="120pie & coffee" className="h-[22px] sm:h-[32px] w-auto object-contain group-hover:scale-102 transition-transform" />
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Dynamic theme switcher on the page itself */}
             <div className="flex items-center rounded-full border border-neutral-300 dark:border-neutral-800 bg-neutral-900/5 dark:bg-neutral-900/60 p-0.5 text-[10px] font-black">
               <button
                 type="button"
-                onClick={() => handleThemeChange("pink")}
-                className={`rounded-full px-2.5 py-1.5 transition-colors ${
-                  isPink 
-                    ? "bg-[#f25f8a] text-white shadow-sm font-extrabold" 
+                onClick={() => handleThemeChange("yellow")}
+                className={`rounded-full px-2.5 py-1 sm:px-2.5 sm:py-1.5 transition-colors cursor-pointer border-0 ${
+                  isYellow 
+                    ? "bg-amber-400 text-neutral-950 shadow-sm font-extrabold" 
                     : "text-neutral-400 hover:text-white"
                 }`}
               >
-                핑크
+                옐로
               </button>
               <button
                 type="button"
-                onClick={() => handleThemeChange("black")}
-                className={`rounded-full px-2.5 py-1.5 transition-colors ${
-                  !isPink 
+                onClick={() => handleThemeChange("pink")}
+                className={`rounded-full px-2.5 py-1 sm:px-2.5 sm:py-1.5 transition-colors cursor-pointer border-0 ${
+                  isPink 
                     ? "bg-amber-400 text-neutral-950 shadow-sm font-extrabold" 
-                    : "text-[#735965] hover:text-[#bf3e67]"
+                    : "text-neutral-400 hover:text-white"
                 }`}
               >
                 블랙
@@ -253,8 +256,10 @@ export default function StoresPageClient() {
             }`}>
               점주전용 포탈
             </Link>
-            <Link href={backUrl} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black transition-all ${backBtnClass}`}>
-              <ArrowLeft size={14} /> 메인 랜딩으로 돌아가기
+            <Link href={backUrl} className={`inline-flex items-center gap-1 sm:gap-2 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-black transition-all ${backBtnClass}`}>
+              <ArrowLeft size={13} className="sm:w-3.5 sm:h-3.5" />
+              <span className="hidden sm:inline">메인 랜딩으로 돌아가기</span>
+              <span className="sm:hidden">메인으로</span>
             </Link>
           </div>
         </div>
@@ -341,7 +346,7 @@ export default function StoresPageClient() {
                                 </span>
                                 <div className="flex items-center gap-1.5">
                                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all ${isSelected ? activeDotClass : "bg-neutral-450 group-hover:bg-neutral-500"}`} />
-                                  <span className={`font-black text-xs sm:text-sm break-all leading-snug transition-colors ${isSelected ? isPink ? "text-rose-500" : "text-amber-400" : textStoreName}`}>
+                                  <span className={`font-black text-xs sm:text-sm break-all leading-snug transition-colors ${isSelected ? isPink ? "text-rose-500" : "text-[#0d233a]" : textStoreName}`}>
                                     {cleanStoreName(store.name)}
                                   </span>
                                 </div>
@@ -475,8 +480,12 @@ export default function StoresPageClient() {
                 </div>
               )}
             </aside>
-            
           </div>
+          <FloatingAndInquiry
+            forceOpenModal={inquiryForcedOpen}
+            onModalClose={() => setInquiryForcedOpen(false)}
+            isPink={false}
+          />
         </div>
       </main>
     </div>

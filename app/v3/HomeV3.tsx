@@ -64,7 +64,7 @@ function AnimatedNumber({ value, suffix = "" }: { value: number, suffix?: string
 }
 
 // 1. [MENU DETAIL MODAL] - V3 프리미엄 Glassmorphism 버전
-function MenuModal({ menuId, onClose, onInquiry }: { menuId: string | null, onClose: () => void, onInquiry: () => void }) {
+function MenuModal({ menuId, onClose, onInquiry, isPink = false }: { menuId: string | null, onClose: () => void, onInquiry: () => void, isPink?: boolean }) {
   if (!menuId) return null;
 
   const details: Record<string, { title: string, desc: string, items: { name: string, desc: string, img: string }[] }> = {
@@ -172,7 +172,11 @@ function MenuModal({ menuId, onClose, onInquiry }: { menuId: string | null, onCl
           {/* Footer */}
           <div className="p-5 sm:p-6 bg-neutral-900 text-center border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
             <span className="text-[10px] sm:text-xs text-neutral-400 font-bold">메뉴 구성과 판매 방식은 매장 상황에 맞춰 안내해드립니다.</span>
-            <button type="button" onClick={() => { onClose(); onInquiry(); }} className="pink-primary-button w-full sm:w-auto px-6 py-3 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black rounded-lg transition-colors text-xs shadow-[0_4px_16px_rgba(251,191,36,0.25)]">
+            <button type="button" onClick={() => { onClose(); onInquiry(); }} className={`pink-primary-button w-full sm:w-auto px-6 py-3 font-black rounded-lg transition-colors text-xs border-0 cursor-pointer ${
+              isPink 
+                ? "bg-rose-500 hover:bg-rose-600 text-white shadow-[0_4px_16px_rgba(244,63,94,0.25)]" 
+                : "bg-amber-400 hover:bg-amber-300 text-neutral-950 shadow-[0_4px_16px_rgba(251,191,36,0.25)]"
+            }`}>
               메뉴 도입 상담받기 &rarr;
             </button>
           </div>
@@ -196,7 +200,8 @@ function InquiryModal({
   formData,
   onChange,
   onSubmit,
-  submitted
+  submitted,
+  isPink = false
 }: {
   open: boolean;
   onClose: () => void;
@@ -204,6 +209,7 @@ function InquiryModal({
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
   submitted: boolean;
+  isPink?: boolean;
 }) {
   if (!open) return null;
 
@@ -221,40 +227,68 @@ function InquiryModal({
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.96, opacity: 0, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-neutral-900 border border-neutral-800 rounded-3xl w-full max-w-xl overflow-hidden relative shadow-[0_20px_50px_rgba(0,0,0,0.35)]"
+          className={`w-full max-w-xl overflow-hidden relative shadow-[0_20px_50px_rgba(0,0,0,0.35)] rounded-3xl border ${
+            isPink 
+              ? "bg-[#fffdf9] border-[#f2ccd7] text-neutral-900" 
+              : "bg-neutral-900 border-neutral-800 text-white"
+          }`}
         >
-          <button type="button" onClick={onClose} aria-label="닫기" className="absolute top-5 right-5 text-neutral-400 hover:text-white bg-neutral-800/80 rounded-full p-2.5 z-10 transition-colors">
+          <button type="button" onClick={onClose} aria-label="닫기" className={`absolute top-5 right-5 rounded-full p-2.5 z-10 transition-colors border-0 cursor-pointer ${
+            isPink 
+              ? "text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/60" 
+              : "text-neutral-400 hover:text-white bg-neutral-800/80"
+          }`}>
             <X size={18} />
           </button>
-          <div className="p-7 sm:p-9 border-b border-neutral-800 text-center">
-            <span className="text-amber-400 font-bold tracking-widest text-[10px] uppercase block mb-2 font-mono">Easy Inquiry</span>
-            <h3 className="text-2xl font-black text-white mb-2">편하게 상담받아 보세요</h3>
-            <p className="text-xs sm:text-sm text-neutral-400 font-medium">매장에 잘 맞는 메뉴 구성과 시작 방법을 안내드립니다.</p>
+          <div className={`p-7 sm:p-9 border-b text-center ${isPink ? "border-[#f2ccd7]" : "border-neutral-800"}`}>
+            <span className={`font-bold tracking-widest text-[10px] uppercase block mb-2 font-mono ${isPink ? "text-rose-500" : "text-amber-400"}`}>Easy Inquiry</span>
+            <h3 className={`text-2xl font-black mb-2 ${isPink ? "text-neutral-950" : "text-white"}`}>편하게 상담받아 보세요</h3>
+            <p className={`text-xs sm:text-sm font-medium ${isPink ? "text-neutral-600" : "text-neutral-400"}`}>매장에 잘 맞는 메뉴 구성과 시작 방법을 안내드립니다.</p>
           </div>
           {submitted ? (
             <div className="p-10 text-center">
-              <h4 className="text-xl font-black text-white mb-3">문의가 잘 접수되었습니다!</h4>
-              <p className="text-sm text-neutral-400 leading-relaxed">남겨주신 연락처로 편하게 안내드리겠습니다.</p>
+              <h4 className={`text-xl font-black mb-3 ${isPink ? "text-neutral-950" : "text-white"}`}>문의가 잘 접수되었습니다!</h4>
+              <p className={`text-sm leading-relaxed ${isPink ? "text-neutral-600" : "text-neutral-400"}`}>남겨주신 연락처로 편하게 안내드리겠습니다.</p>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="p-6 sm:p-8 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input type="text" name="name" value={formData.name} onChange={onChange} placeholder="성함" required className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400" />
-                <input type="tel" inputMode="numeric" autoComplete="tel" maxLength={13} name="phone" value={formData.phone} onChange={onChange} placeholder="연락처" required className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400" />
+                <input type="text" name="name" value={formData.name} onChange={onChange} placeholder="성함" required className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors ${
+                  isPink 
+                    ? "bg-white border-[#f3d3de] text-neutral-900 placeholder-neutral-400 focus:border-rose-500" 
+                    : "bg-neutral-950 border-neutral-800 text-white placeholder-neutral-600 focus:border-amber-400"
+                }`} />
+                <input type="tel" inputMode="numeric" autoComplete="tel" maxLength={13} name="phone" value={formData.phone} onChange={onChange} placeholder="연락처" required className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors ${
+                  isPink 
+                    ? "bg-white border-[#f3d3de] text-neutral-900 placeholder-neutral-400 focus:border-rose-500" 
+                    : "bg-neutral-950 border-neutral-800 text-white placeholder-neutral-600 focus:border-amber-400"
+                }`} />
               </div>
-              <select name="storeType" value={formData.storeType} onChange={onChange} className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 appearance-none">
+              <select name="storeType" value={formData.storeType} onChange={onChange} className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors appearance-none ${
+                isPink 
+                  ? "bg-white border-[#f3d3de] text-neutral-900 focus:border-rose-500" 
+                  : "bg-neutral-950 border-neutral-800 text-white focus:border-amber-400"
+              }`}>
                 <option value="샵인샵 도입">간단한 메뉴 추가로 시작</option>
                 <option value="브랜드 병기 도입">브랜드 안내와 함께 운영</option>
                 <option value="공동간판 제휴">함께 보이는 간판 협업</option>
                 <option value="단독 매장 전환">전용 매장으로 전환 상담</option>
                 <option value="신규 무점포/창업">새로운 매장 창업 상담</option>
               </select>
-              <textarea name="message" value={formData.message} onChange={onChange} rows={3} placeholder="매장 형태나 궁금한 점을 편하게 남겨주세요." className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400 resize-none" />
-              <label className="flex items-start gap-2 text-[10px] text-neutral-500 font-bold">
-                <input type="checkbox" required defaultChecked className="mt-0.5 accent-amber-400" />
+              <textarea name="message" value={formData.message} onChange={onChange} rows={3} placeholder="매장 형태나 궁금한 점을 편하게 남겨주세요." className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors resize-none ${
+                isPink 
+                  ? "bg-white border-[#f3d3de] text-neutral-900 placeholder-neutral-400 focus:border-rose-500" 
+                  : "bg-neutral-950 border-neutral-800 text-white placeholder-neutral-600 focus:border-amber-400"
+              }`} />
+              <label className={`flex items-start gap-2 text-[10px] font-bold cursor-pointer select-none ${isPink ? "text-neutral-500" : "text-neutral-500"}`}>
+                <input type="checkbox" required defaultChecked className={`mt-0.5 ${isPink ? "accent-rose-500" : "accent-amber-400"}`} />
                 상담 안내를 위한 개인정보 수집 및 연락에 동의합니다. (필수)
               </label>
-              <button type="submit" className="pink-primary-button w-full py-4 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-sm rounded-xl transition-colors shadow-[0_4px_24px_rgba(251,191,36,0.3)]">
+              <button type="submit" className={`pink-primary-button w-full py-4 font-black text-sm rounded-xl transition-colors border-0 cursor-pointer ${
+                isPink 
+                  ? "bg-rose-500 hover:bg-rose-600 text-white shadow-[0_4px_24px_rgba(244,63,94,0.3)]" 
+                  : "bg-amber-400 hover:bg-amber-300 text-neutral-950 shadow-[0_4px_24px_rgba(251,191,36,0.3)]"
+              }`}>
                 무료 상담 문의하기
               </button>
             </form>
@@ -742,8 +776,9 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
   );
 }
 
-export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
+export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5" }) {
   const isPinkVariant = variant === "v4";
+  const isYellowVariant = variant === "v5";
   // 수익성 시뮬레이션 상태 변수
   const [quantity, setQuantity] = useState<number>(20);
   const [price, setPrice] = useState<number>(4500);
@@ -951,22 +986,30 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
 
           <div className="flex items-center gap-2.5">
             <div className="flex items-center rounded-full border border-neutral-800 bg-neutral-900/60 p-0.5 text-[10px] font-black">
-              <Link href="/" className={`rounded-full px-2 py-1 transition-colors ${isPinkVariant ? "landing-theme-active bg-amber-400 text-white" : "text-neutral-400 hover:text-white"}`}>
-                핑크
+              <Link href="/" className={`rounded-full px-2.5 py-1 transition-colors ${isYellowVariant ? "landing-theme-active bg-amber-400 text-neutral-950 font-extrabold shadow-sm" : "text-neutral-400 hover:text-white"}`}>
+                옐로
               </Link>
-              <Link href="/v3" className={`rounded-full px-2 py-1 transition-colors ${!isPinkVariant ? "landing-theme-active bg-amber-400 text-neutral-950" : "text-neutral-400 hover:text-amber-400"}`}>
+              <Link href="/v3" className={`rounded-full px-2.5 py-1 transition-colors ${(!isPinkVariant && !isYellowVariant) ? "landing-theme-active bg-amber-400 text-neutral-950 font-extrabold shadow-sm" : "text-neutral-400 hover:text-amber-400"}`}>
                 블랙
               </Link>
             </div>
             <Link className="hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-neutral-800 bg-neutral-900 text-xs font-bold text-neutral-350 hover:bg-neutral-800 hover:text-white transition-colors" href="/portal" target="_blank" rel="noopener noreferrer">
               점주전용
             </Link>
-            <button type="button" onClick={() => setInquiryModalOpen(true)} className="pink-primary-button hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-amber-400 text-neutral-950 text-xs sm:text-sm font-black hover:bg-amber-300 hover:scale-[1.02] transition-all shadow-[0_4px_16px_rgba(251,191,36,0.2)]">
+            <button type="button" onClick={() => setInquiryModalOpen(true)} className={`pink-primary-button hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-xs sm:text-sm font-black hover:scale-[1.02] transition-all border-0 cursor-pointer ${
+              isPinkVariant 
+                ? "bg-rose-500 hover:bg-rose-600 text-white shadow-[0_4px_16px_rgba(244,63,94,0.2)]" 
+                : "bg-amber-400 hover:bg-amber-300 text-neutral-950 shadow-[0_4px_16px_rgba(251,191,36,0.2)]"
+            }`}>
               상담 신청 <ArrowRight size={14} className="ml-1.5 shrink-0" />
             </button>
             <button
               type="button"
-              className="pink-primary-button lg:hidden inline-flex items-center gap-1.5 rounded-lg bg-amber-400 px-3 py-2.5 text-xs font-black text-neutral-950"
+              className={`pink-primary-button lg:hidden inline-flex items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-black border-0 cursor-pointer ${
+                isPinkVariant 
+                  ? "bg-rose-500 text-white hover:bg-rose-600" 
+                  : "bg-amber-400 text-neutral-950 hover:bg-amber-300"
+              }`}
               aria-expanded={mobileNavOpen}
               aria-controls="mobile-landing-nav"
               onClick={() => setMobileNavOpen(open => !open)}
@@ -998,7 +1041,11 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                 점주전용
               </Link>
             </div>
-            <button type="button" onClick={() => { setMobileNavOpen(false); setInquiryModalOpen(true); }} className="pink-primary-button mt-3 flex w-full items-center justify-center rounded-xl bg-amber-400 px-4 py-3.5 text-sm font-black text-neutral-950">
+            <button type="button" onClick={() => { setMobileNavOpen(false); setInquiryModalOpen(true); }} className={`pink-primary-button mt-3 flex w-full items-center justify-center rounded-xl px-4 py-3.5 text-sm font-black border-0 cursor-pointer ${
+              isPinkVariant 
+                ? "bg-rose-500 text-white hover:bg-rose-600 shadow-[0_4px_16px_rgba(244,63,94,0.25)]" 
+                : "bg-amber-400 text-neutral-950 hover:bg-amber-300 shadow-[0_4px_16px_rgba(251,191,36,0.25)]"
+            }`}>
               상담 신청 <ArrowRight size={15} className="ml-1.5" />
             </button>
           </nav>
@@ -1074,7 +1121,11 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                 </motion.div>
 
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mt-2">
-                  <button type="button" onClick={() => setInquiryModalOpen(true)} className="pink-primary-button w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-amber-400 text-neutral-950 font-black rounded-xl hover:bg-amber-300 transition-all shadow-[0_4px_20px_rgba(251,191,36,0.3)] hover:scale-[1.02]">
+                  <button type="button" onClick={() => setInquiryModalOpen(true)} className={`pink-primary-button w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 font-black rounded-xl hover:scale-[1.02] transition-all border-0 cursor-pointer ${
+                    isPinkVariant 
+                      ? "bg-rose-500 hover:bg-rose-600 text-white shadow-[0_4px_20px_rgba(244,63,94,0.3)]" 
+                      : "bg-amber-400 hover:bg-amber-300 text-neutral-950 shadow-[0_4px_20px_rgba(251,191,36,0.3)]"
+                  }`}>
                     리모델링 견적 문의 <ArrowRight size={18} className="ml-2" />
                   </button>
                   <a className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-neutral-900 border border-neutral-800 text-white font-extrabold rounded-xl hover:bg-neutral-800 transition-colors" href="#simulator">
@@ -1503,7 +1554,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
           </div>
 
           {/* Menu Modal Render */}
-          {selectedMenu && <MenuModal menuId={selectedMenu} onClose={() => setSelectedMenu(null)} onInquiry={() => setInquiryModalOpen(true)} />}
+          {selectedMenu && <MenuModal menuId={selectedMenu} onClose={() => setSelectedMenu(null)} onInquiry={() => setInquiryModalOpen(true)} isPink={isPinkVariant} />}
         </section>
 
         {/* ------------------------------------------------------------- */}
@@ -1714,7 +1765,11 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
                       aria-label="120겹파이 로제 양송이 메뉴 영상"
                       className="absolute inset-0 w-full h-full object-cover"
                     />
-                    <span className="pink-primary-button absolute bottom-4 right-4 rounded-full bg-amber-400 px-3.5 py-2 text-[11px] font-black text-white shadow-sm transition-transform group-hover:scale-105">
+                    <span className={`pink-primary-button absolute bottom-4 right-4 rounded-full px-3.5 py-2 text-[11px] font-black shadow-sm transition-transform group-hover:scale-105 transition-colors ${
+                      isPinkVariant 
+                        ? "bg-rose-500 text-white" 
+                        : "bg-amber-400 text-[#0d233a]"
+                    }`}>
                       영상 크게보기 · 소리 재생
                     </span>
                   </div>
@@ -2388,7 +2443,11 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
 
                   <button
                     type="submit"
-                    className="pink-primary-button w-full py-4 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-sm sm:text-base rounded-xl transition-all shadow-[0_4px_24px_rgba(251,191,36,0.3)] hover:scale-[1.01]"
+                    className={`pink-primary-button w-full py-4 font-black text-sm sm:text-base rounded-xl transition-all hover:scale-[1.01] border-0 cursor-pointer ${
+                      isPinkVariant 
+                        ? "bg-rose-500 hover:bg-rose-600 text-white shadow-[0_4px_24px_rgba(244,63,94,0.3)]" 
+                        : "bg-amber-400 hover:bg-amber-300 text-neutral-950 shadow-[0_4px_24px_rgba(251,191,36,0.3)]"
+                    }`}
                   >
                     무료 상담 문의하기
                   </button>
@@ -2480,6 +2539,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" }) {
         onChange={handleFormChange}
         onSubmit={handleFormSubmit}
         submitted={formSubmitted}
+        isPink={isPinkVariant}
       />
 
       {/* ==========================================

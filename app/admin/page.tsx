@@ -1701,7 +1701,7 @@ export default function AdminPage() {
 
   if (checkingAuth) {
     return (
-      <div className="h-screen bg-[#fff9fb] flex items-center justify-center font-bold text-[#bf3e67]">
+      <div id="admin-portal" className="h-screen bg-[#fff9fb] flex items-center justify-center font-bold text-[#bf3e67]">
         인증 상태 확인 중...
       </div>
     );
@@ -1709,7 +1709,7 @@ export default function AdminPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="h-screen w-screen bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans select-none antialiased justify-center items-center p-4">
+      <div id="admin-portal" className="h-screen w-screen bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans select-none antialiased justify-center items-center p-4">
         {toastMessage && (
           <div className="fixed bottom-6 right-6 z-[150] bg-[#f25f8a] text-white px-5 py-3.5 rounded-xl font-bold text-sm shadow-[0_8px_30px_rgba(242,95,138,0.25)] flex items-center gap-2.5 animate-bounce">
             <CheckCircle2 size={16} />
@@ -1723,7 +1723,7 @@ export default function AdminPage() {
           <div className="text-center space-y-4">
             <div className="inline-flex w-16 h-16 rounded-2xl bg-[#fff1f5] border border-[#f2ccd7] p-2 items-center justify-center shadow-sm">
               <img
-                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
+                src="/logo_yellow_blue.png"
                 alt="120pie 로고"
                 className="w-full h-full object-contain"
               />
@@ -1795,7 +1795,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans select-none antialiased">
+    <div id="admin-portal" className="h-screen overflow-hidden bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans select-none antialiased">
       
       {/* TOAST SYSTEM */}
       {toastMessage && (
@@ -1818,7 +1818,7 @@ export default function AdminPage() {
             </button>
             <Link href="/admin" className="flex items-center gap-2 group shrink-0">
               <img
-                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
+                src="/logo_yellow_blue.png"
                 alt="120pie & coffee"
                 className="h-6 w-auto object-contain group-hover:scale-102 transition-transform"
               />
