@@ -1315,6 +1315,13 @@ export default function AdminPage() {
     try {
       localStorage.setItem("120_popups", JSON.stringify(updatedPopup));
       await updatePopupMutation(updatedPopup);
+      if (popupActive) {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("120_popup_closed_date");
+          localStorage.removeItem("120_popup_closed_title");
+          sessionStorage.removeItem("120_popup_closed_session");
+        }
+      }
       triggerToast("실시간 점주 공지 팝업 설정이 성공적으로 저장 및 배포되었습니다!");
     } catch (err) {
       console.error(err);

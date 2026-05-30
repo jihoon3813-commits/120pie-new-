@@ -1012,17 +1012,26 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   useEffect(() => {
     // Check if closed in current tab session or closed for today
     if (typeof window !== "undefined") {
-      const closedInSession = sessionStorage.getItem("120_popup_closed_session");
-      if (closedInSession === "true") {
-        setShowPopup(false);
-        return;
-      }
+      const closedTitle = localStorage.getItem("120_popup_closed_title");
+      const currentTitle = convexPopup?.title || (localStorage.getItem("120_popups") ? JSON.parse(localStorage.getItem("120_popups") || "{}").title : "");
       
-      const closedDate = localStorage.getItem("120_popup_closed_date");
-      const todayStr = new Date().toISOString().split("T")[0];
-      if (closedDate === todayStr) {
-        setShowPopup(false);
-        return;
+      if (currentTitle && closedTitle && currentTitle !== closedTitle) {
+        localStorage.removeItem("120_popup_closed_date");
+        localStorage.removeItem("120_popup_closed_title");
+        sessionStorage.removeItem("120_popup_closed_session");
+      } else {
+        const closedInSession = sessionStorage.getItem("120_popup_closed_session");
+        if (closedInSession === "true") {
+          setShowPopup(false);
+          return;
+        }
+        
+        const closedDate = localStorage.getItem("120_popup_closed_date");
+        const todayStr = new Date().toISOString().split("T")[0];
+        if (closedDate === todayStr) {
+          setShowPopup(false);
+          return;
+        }
       }
     }
 
@@ -3447,6 +3456,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                         popupClosedInSessionRef.current = true;
                         if (typeof window !== "undefined") {
                           sessionStorage.setItem("120_popup_closed_session", "true");
+                          if (popupSettings?.title) {
+                            localStorage.setItem("120_popup_closed_title", popupSettings.title);
+                          }
                         }
                         setShowPopup(false);
                       }
@@ -3472,6 +3484,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     popupClosedInSessionRef.current = true;
                     if (typeof window !== "undefined") {
                       sessionStorage.setItem("120_popup_closed_session", "true");
+                      if (popupSettings?.title) {
+                        localStorage.setItem("120_popup_closed_title", popupSettings.title);
+                      }
                     }
                     setShowPopup(false);
                   }}
@@ -3484,6 +3499,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     popupClosedInSessionRef.current = true;
                     if (typeof window !== "undefined") {
                       sessionStorage.setItem("120_popup_closed_session", "true");
+                      if (popupSettings?.title) {
+                        localStorage.setItem("120_popup_closed_title", popupSettings.title);
+                      }
                     }
                     setShowPopup(false);
                   }}
