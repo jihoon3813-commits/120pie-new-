@@ -321,3 +321,26 @@
   border: 1px solid rgba(13, 35, 58, 0.25) !important;
   box-shadow: none !important;
 }
+
+/* Fix for dark buttons and indicators in the yellow landing page to keep their text/icons white */
+#landing-v5 .bg-\[\#0d233a\],
+#landing-v5 .bg-\[\#163554\],
+#landing-v5 .bg-\[\#bf3e67\],
+#landing-v5 .bg-\[\#f25f8a\],
+#landing-v5 .bg-\[\#df4977\],
+#landing-v5 .bg-\[\#cf2a7a\],
+#landing-v5 .bg-\[\#b01e63\],
+#landing-v5 .bg-\[\#ff0000\],
+#landing-v5 .bg-\[\#cc0000\],
+#landing-v5 .bg-\[\#007aff\],
+#landing-v5 .bg-\[\#0062cc\] {
+  color: #ffffff !important;
+}
+
+#landing-v5 :is(.bg-\[\#0d233a\], .bg-\[\#163554\], .bg-\[\#bf3e67\], .bg-\[\#f25f8a\], .bg-\[\#df4977\], .bg-\[\#cf2a7a\], .bg-\[\#b01e63\], .bg-\[\#ff0000\], .bg-\[\#cc0000\], .bg-\[\#007aff\], .bg-\[\#0062cc\]) :is(.text-white, span, svg, svg *, button) {
+  color: #ffffff !important;
+}
+
+#landing-v5 :is(.bg-\[\#0d233a\], .bg-\[\#163554\], .bg-\[\#bf3e67\], .bg-\[\#f25f8a\], .bg-\[\#df4977\], .bg-\[\#cf2a7a\], .bg-\[\#b01e63\], .bg-\[\#ff0000\], .bg-\[\#cc0000\], .bg-\[\#007aff\], .bg-\[\#0062cc\]).text-white {
+  color: #ffffff !important;
+}
