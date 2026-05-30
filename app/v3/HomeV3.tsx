@@ -379,7 +379,7 @@ const MARQUEE_IMAGES = [
 ];
 
 // V3 StoresPreviewSection
-function StoresPreviewSection({ isPink = false }: { isPink?: boolean }) {
+function StoresPreviewSection({ isPink = false, isYellow = false }: { isPink?: boolean, isYellow?: boolean }) {
   const previewStores = [
     { name: "120겹파이 AK플라자 금정점", region: "경기 군포시 엘에스로 143 1층 1001호", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs.jpg" },
     { name: "120겹파이 본점", region: "서울 성북구 돌곶이로14길 35 1층", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg" },
@@ -387,33 +387,63 @@ function StoresPreviewSection({ isPink = false }: { isPink?: boolean }) {
   ];
 
   return (
-    <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100">
+    <section className={`py-24 border-b transition-all duration-300 ${
+      isPink 
+        ? "bg-[#fffbfd] text-neutral-900 border-rose-100" 
+        : isYellow 
+          ? "bg-[#fffdf2] text-[#0d233a] border-[#e6dfc3]" 
+          : "bg-white text-neutral-900 border-neutral-100"
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between md:items-end mb-14 gap-8">
           <div className="max-w-3xl">
-            <span className="text-neutral-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">
+            <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+              isPink ? "text-rose-500" : isYellow ? "text-amber-600" : "text-neutral-400"
+            }`}>
               Stores
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-neutral-950 leading-tight mb-4">
+            <h2 className={`text-3xl sm:text-4xl font-black tracking-tight leading-tight mb-4 ${
+              isPink ? "text-[#4c2d3a]" : isYellow ? "text-[#0d233a]" : "text-neutral-950"
+            }`}>
               가까운 곳에서 만나는<br />120pie 매장
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-500 font-bold leading-relaxed max-w-xl">
+            <p className={`text-xs sm:text-sm font-bold leading-relaxed max-w-xl ${
+              isPink ? "text-[#7c5d6c]" : isYellow ? "text-[#576575]" : "text-neutral-500"
+            }`}>
               일상 가까운 곳에서 만날 수 있는 120겹파이 매장을 소개합니다.
             </p>
           </div>
-          <Link href={isPink ? "/stores?theme=pink" : "/stores?theme=black"} className="inline-flex items-center gap-2 text-sm font-bold text-neutral-700 hover:text-amber-600 transition-colors shrink-0">
+          <Link 
+            href={isPink ? "/stores?theme=pink" : isYellow ? "/stores?theme=yellow" : "/stores?theme=black"} 
+            className={`inline-flex items-center gap-2 text-sm font-bold transition-colors shrink-0 ${
+              isPink 
+                ? "text-[#7c5d6c] hover:text-rose-600" 
+                : isYellow 
+                  ? "text-[#576575] hover:text-amber-600" 
+                  : "text-neutral-700 hover:text-amber-600"
+            }`}
+          >
             전체 매장 보기 <ArrowRight size={16} />
           </Link>
         </div>
 
         <div className="mobile-horizontal-cards grid grid-cols-1 md:grid-cols-3 gap-6">
           {previewStores.map((store, i) => (
-            <article key={i} className="group border-t border-neutral-200 pt-5">
+            <article 
+              key={i} 
+              className={`group border-t pt-5 transition-colors ${
+                isPink ? "border-rose-100" : isYellow ? "border-[#e6dfc3]" : "border-neutral-200"
+              }`}
+            >
               <div className="h-56 overflow-hidden rounded-xl bg-neutral-100 mb-5">
                 <img src={store.img} alt={store.name} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
               </div>
-              <h3 className="font-black text-xl text-neutral-950 mb-2">{store.name}</h3>
-              <div className="text-neutral-500 font-bold text-xs sm:text-sm flex items-center gap-1.5">
+              <h3 className={`font-black text-xl mb-2 ${
+                isPink ? "text-[#4c2d3a]" : isYellow ? "text-[#0d233a]" : "text-neutral-950"
+              }`}>{store.name}</h3>
+              <div className={`font-bold text-xs sm:text-sm flex items-center gap-1.5 ${
+                isPink ? "text-[#7c5d6c]" : isYellow ? "text-[#576575]" : "text-neutral-500"
+              }`}>
                 <MapPin size={14} className="text-neutral-400 shrink-0" />
                 {store.region}
               </div>
@@ -426,50 +456,71 @@ function StoresPreviewSection({ isPink = false }: { isPink?: boolean }) {
 }
 
 // V3 OwnerSystemSection
-function OwnerSystemSection() {
+function OwnerSystemSection({ isPink = false, isYellow = false }: { isPink?: boolean, isYellow?: boolean }) {
   return (
-    <section className="py-24 bg-[#fffaf1] text-neutral-900 border-b border-amber-100 overflow-hidden">
+    <section className={`py-24 overflow-hidden border-b transition-all duration-300 ${
+      isPink 
+        ? "bg-[#fff5f7] text-neutral-900 border-rose-100" 
+        : isYellow 
+          ? "bg-[#fffdf2] text-[#0d233a] border-[#e6dfc3]" 
+          : "bg-[#0a0a0a] text-white border-neutral-900"
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
 
           <div className="lg:col-span-6">
-            <span className="text-amber-700 font-bold tracking-widest text-xs mb-2 block uppercase font-mono">
+            <span className={`font-bold tracking-widest text-xs mb-2 block uppercase font-mono ${
+              isPink ? "text-rose-500" : isYellow ? "text-amber-600" : "text-amber-400"
+            }`}>
               Partner Support
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-4 text-neutral-950 leading-tight">
+            <h2 className={`text-3xl sm:text-4xl font-black tracking-tight mb-4 leading-tight ${
+              isPink ? "text-[#4c2d3a]" : isYellow ? "text-[#0d233a]" : "text-white"
+            }`}>
               사장님은 매장 운영에<br />집중하세요.
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 mb-10 font-bold leading-relaxed max-w-xl">
+            <p className={`text-xs sm:text-sm mb-10 font-bold leading-relaxed max-w-xl ${
+              isPink ? "text-[#7c5d6c]" : isYellow ? "text-[#576575]" : "text-neutral-400"
+            }`}>
               재료 발주부터 문의 응대, 홍보 자료까지 필요한 업무를 한곳에서 확인할 수 있도록 지원합니다.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-              <div className="border-t border-amber-200 pt-5">
-                <Package size={19} className="text-amber-600 mb-4" />
-                <h4 className="font-extrabold text-neutral-950 text-sm mb-2">간편 발주</h4>
-                <p className="text-xs text-neutral-500 leading-relaxed font-medium">필요한 재료를 손쉽게 주문합니다.</p>
+              <div className={`border-t pt-5 ${isPink ? "border-[#f2ccd7]" : isYellow ? "border-[#e6dfc3]" : "border-neutral-800"}`}>
+                <Package size={19} className={isPink ? "text-rose-500 mb-4" : isYellow ? "text-[#0d233a] mb-4" : "text-amber-400 mb-4"} />
+                <h4 className={`font-extrabold text-sm mb-2 ${isPink ? "text-[#4c2d3a]" : isYellow ? "text-[#0d233a]" : "text-white"}`}>간편 발주</h4>
+                <p className={`text-xs leading-relaxed font-medium ${isPink ? "text-[#7c5d6c]" : isYellow ? "text-[#576575]" : "text-neutral-400"}`}>필요한 재료를 손쉽게 주문합니다.</p>
               </div>
-              <div className="border-t border-amber-200 pt-5">
-                <Headphones size={19} className="text-amber-600 mb-4" />
-                <h4 className="font-extrabold text-neutral-950 text-sm mb-2">문의 지원</h4>
-                <p className="text-xs text-neutral-500 leading-relaxed font-medium">운영 중 궁금한 점을 바로 문의합니다.</p>
+              <div className={`border-t pt-5 ${isPink ? "border-[#f2ccd7]" : isYellow ? "border-[#e6dfc3]" : "border-neutral-800"}`}>
+                <Headphones size={19} className={isPink ? "text-rose-500 mb-4" : isYellow ? "text-[#0d233a] mb-4" : "text-amber-400 mb-4"} />
+                <h4 className={`font-extrabold text-sm mb-2 ${isPink ? "text-[#4c2d3a]" : isYellow ? "text-[#0d233a]" : "text-white"}`}>문의 지원</h4>
+                <p className={`text-xs leading-relaxed font-medium ${isPink ? "text-[#7c5d6c]" : isYellow ? "text-[#576575]" : "text-neutral-400"}`}>운영 중 궁금한 점을 바로 문의합니다.</p>
               </div>
-              <div className="border-t border-amber-200 pt-5">
-                <Monitor size={19} className="text-amber-600 mb-4" />
-                <h4 className="font-extrabold text-neutral-950 text-sm mb-2">홍보 자료</h4>
-                <p className="text-xs text-neutral-500 leading-relaxed font-medium">매장에 필요한 안내물을 제공합니다.</p>
+              <div className={`border-t pt-5 ${isPink ? "border-[#f2ccd7]" : isYellow ? "border-[#e6dfc3]" : "border-neutral-800"}`}>
+                <Monitor size={19} className={isPink ? "text-rose-500 mb-4" : isYellow ? "text-[#0d233a] mb-4" : "text-amber-400 mb-4"} />
+                <h4 className={`font-extrabold text-sm mb-2 ${isPink ? "text-[#4c2d3a]" : isYellow ? "text-[#0d233a]" : "text-white"}`}>홍보 자료</h4>
+                <p className={`text-xs leading-relaxed font-medium ${isPink ? "text-[#7c5d6c]" : isYellow ? "text-[#576575]" : "text-neutral-400"}`}>매장에 필요한 안내물을 제공합니다.</p>
               </div>
             </div>
 
             <div>
-              <Link href="/portal" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-amber-700 transition-colors">
+              <Link 
+                href="/portal" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className={`inline-flex items-center gap-2 text-sm font-bold transition-colors ${
+                  isPink ? "text-rose-600 hover:text-rose-700" : isYellow ? "text-[#0d233a] hover:text-amber-600" : "text-amber-400 hover:text-amber-300"
+                }`}
+              >
                 점주 지원 살펴보기 <ArrowRight size={16} />
               </Link>
             </div>
           </div>
 
           <div className="lg:col-span-6">
-            <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-white">
+            <div className={`relative aspect-[4/3] rounded-xl overflow-hidden ${
+              isPink ? "bg-white border border-[#f2ccd7]" : isYellow ? "bg-white border border-[#e6dfc3]" : "bg-neutral-900"
+            }`}>
               <video
                 src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779775703/120pie_%EC%8B%9C%EC%8A%A4%ED%85%9C_vda0xm.mp4"
                 autoPlay
@@ -489,7 +540,7 @@ function OwnerSystemSection() {
 }
 
 // V3 GallerySection
-function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: string) => void }) {
+function GallerySection({ filter, setFilter, isPink = false, isYellow = false }: { filter: string, setFilter: (t: string) => void, isPink?: boolean, isYellow?: boolean }) {
   const [galleryItems, setGalleryItems] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState<any | null>(null);
   const [showMoreModal, setShowMoreModal] = useState<boolean>(false);
@@ -576,26 +627,48 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
   const visibleImages = filteredImages.slice(0, limit);
 
   return (
-    <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100">
+    <section className={`py-24 border-b transition-all duration-300 ${
+      isPink 
+        ? "bg-[#fffbfd] text-neutral-900 border-rose-100" 
+        : isYellow 
+          ? "bg-[#fffdf2] text-[#0d233a] border-[#e6dfc3]" 
+          : "bg-white text-neutral-900 border-neutral-100"
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-12">
-          <span className="text-neutral-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Gallery</span>
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-4 text-neutral-950 leading-tight">
+          <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+            isPink ? "text-rose-500" : isYellow ? "text-amber-600" : "text-neutral-400"
+          }`}>Gallery</span>
+          <h2 className={`text-3xl sm:text-4xl font-black tracking-tight mb-4 leading-tight ${
+            isPink ? "text-[#4c2d3a]" : isYellow ? "text-[#0d233a]" : "text-neutral-955"
+          }`}>
             매장과 메뉴의<br />실제 모습을 확인하세요.
           </h2>
-          <p className="text-xs sm:text-sm text-neutral-500 font-bold max-w-xl leading-relaxed">
+          <p className={`text-xs sm:text-sm font-bold max-w-xl leading-relaxed ${
+            isPink ? "text-[#7c5d6c]" : isYellow ? "text-[#576575]" : "text-neutral-500"
+          }`}>
             본사 공식 어드민 갤러리에 등록된 실제 매장과 메뉴, 연출 컷을 실시간으로 확인하실 수 있습니다.
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-12 border-b border-neutral-200 pb-5">
+        <div className={`flex flex-wrap gap-2 mb-12 border-b pb-5 ${
+          isPink ? "border-[#f2ccd7]" : isYellow ? "border-[#e6dfc3]" : "border-neutral-200"
+        }`}>
           {tabs.map(t => (
             <button
               key={t}
               onClick={() => setFilter(t)}
               className={`px-4 py-2 rounded-md font-bold text-xs transition-colors ${filter === t
-                  ? "bg-neutral-950 text-white"
-                  : "text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100"
+                  ? (isPink 
+                      ? "bg-rose-500 text-white shadow-sm" 
+                      : isYellow 
+                        ? "bg-[#0d233a] text-white shadow-sm" 
+                        : "bg-neutral-950 text-white")
+                  : (isPink 
+                      ? "text-[#7c5d6c] hover:text-[#4c2d3a] hover:bg-[#fff5f7]" 
+                      : isYellow 
+                        ? "text-[#576575] hover:text-[#0d233a] hover:bg-[#fffdf2]" 
+                        : "text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100")
                 }`}
             >
               {t}
@@ -620,11 +693,17 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
                 onClick={() => setSelectedImage(img)}
                 className="group cursor-zoom-in"
               >
-                <div className="aspect-[4/3] bg-neutral-100 rounded-xl overflow-hidden mb-4 relative shadow-sm hover:shadow transition-all group-hover:shadow-md">
+                <div className={`aspect-[4/3] rounded-xl overflow-hidden mb-4 relative shadow-sm hover:shadow transition-all group-hover:shadow-md ${
+                  isPink ? "bg-rose-50/10 border border-[#f2ccd7]/30" : isYellow ? "bg-amber-50/10 border border-[#e6dfc3]/30" : "bg-neutral-100"
+                }`}>
                   <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
                 </div>
-                <span className="text-amber-600 text-[10px] font-bold uppercase tracking-wider mb-2 block font-mono">{img.category}</span>
-                <h4 className="text-neutral-950 font-extrabold text-sm leading-tight line-clamp-1">{img.name}</h4>
+                <span className={`${
+                  isPink ? "text-rose-500" : isYellow ? "text-amber-600" : "text-amber-600"
+                } text-[10px] font-bold uppercase tracking-wider mb-2 block font-mono`}>{img.category}</span>
+                <h4 className={`font-extrabold text-sm leading-tight line-clamp-1 ${
+                  isPink ? "text-[#4c2d3a]" : isYellow ? "text-[#0d233a]" : "text-neutral-950"
+                }`}>{img.name}</h4>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -635,7 +714,13 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
           <div className="flex justify-center mt-12">
             <button
               onClick={() => setShowMoreModal(true)}
-              className="px-8 py-3.5 bg-neutral-950 hover:bg-neutral-900 text-white font-black text-xs sm:text-sm rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-98 cursor-pointer flex items-center gap-2 border border-neutral-900"
+              className={`px-8 py-3.5 font-black text-xs sm:text-sm rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-98 cursor-pointer flex items-center gap-2 border ${
+                isPink 
+                  ? "bg-rose-500 hover:bg-rose-600 text-white border-rose-500" 
+                  : isYellow 
+                    ? "bg-[#0d233a] hover:bg-[#163554] text-white border-[#0d233a]" 
+                    : "bg-neutral-950 hover:bg-neutral-900 text-white border-neutral-900"
+              }`}
             >
               {filter === "대표"
                 ? `+ 전체 사진 더보기 (전체 ${galleryItems.length}개 보기)`
@@ -661,14 +746,38 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white border border-[#f2ccd7]/50 rounded-3xl w-full max-w-5xl overflow-hidden relative shadow-[0_20px_50px_rgba(191,62,103,0.15)] my-auto flex flex-col max-h-[85vh] sm:max-h-[80vh]"
+              className={`bg-white border rounded-3xl w-full max-w-5xl overflow-hidden relative my-auto flex flex-col max-h-[85vh] sm:max-h-[80vh] ${
+                isPink 
+                  ? "border-[#f2ccd7]/50 shadow-[0_20px_50px_rgba(191,62,103,0.15)]" 
+                  : isYellow 
+                    ? "border-[#e6dfc3]/50 shadow-[0_20px_50px_rgba(13,35,58,0.15)]" 
+                    : "border-neutral-800 shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
+              }`}
             >
               {/* Modal Header */}
-              <div className="p-6 border-b border-[#f2ccd7]/15 bg-gradient-to-r from-neutral-950 via-[#271018] to-neutral-950 flex justify-between items-center shrink-0 relative overflow-hidden">
+              <div className={`p-6 border-b flex justify-between items-center shrink-0 relative overflow-hidden ${
+                isPink 
+                  ? "border-[#f2ccd7]/15 bg-gradient-to-r from-neutral-950 via-[#271018] to-neutral-950" 
+                  : isYellow 
+                    ? "border-[#e6dfc3]/15 bg-gradient-to-r from-[#0d233a] via-[#163554] to-[#0d233a]" 
+                    : "border-neutral-900 bg-neutral-950"
+              }`}>
                 {/* Glowing decorative gradient accent overlay */}
-                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#f25f8a] via-amber-400 to-[#f25f8a]"></div>
+                <div className={`absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r ${
+                  isPink 
+                    ? "from-[#f25f8a] via-amber-400 to-[#f25f8a]" 
+                    : isYellow 
+                      ? "from-amber-600 via-amber-400 to-amber-600" 
+                      : "from-amber-400 via-neutral-700 to-amber-400"
+                }`}></div>
                 <div className="relative z-10">
-                  <span className="inline-block px-2.5 py-0.5 rounded bg-gradient-to-r from-[#f25f8a] to-amber-500 text-white text-[9px] font-black uppercase tracking-wider mb-1 shadow-sm">
+                  <span className={`inline-block px-2.5 py-0.5 rounded text-white text-[9px] font-black uppercase tracking-wider mb-1 shadow-sm bg-gradient-to-r ${
+                    isPink 
+                      ? "from-[#f25f8a] to-amber-500" 
+                      : isYellow 
+                        ? "from-amber-600 to-amber-400" 
+                        : "from-amber-500 to-amber-400"
+                  }`}>
                     {filter === "대표" ? "120PIE PORTFOLIO" : `${filter.toUpperCase()} GALLERY`}
                   </span>
                   <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
@@ -676,7 +785,9 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
                       <>대표 이미지 및 전체 갤러리</>
                     ) : (
                       <>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f25f8a] to-amber-400">
+                        <span className={`text-transparent bg-clip-text bg-gradient-to-r ${
+                          isPink ? "from-[#f25f8a] to-amber-400" : isYellow ? "from-amber-400 to-amber-200" : "from-amber-400 to-amber-200"
+                        }`}>
                           {filter}
                         </span>{" "}
                         갤러리 전체 사진
@@ -696,21 +807,33 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
               </div>
 
               {/* Modal Scroll Area Grid */}
-              <div className="p-6 sm:p-8 overflow-y-auto flex-1 bg-[#fffbfb] menu-modal-scroll max-h-[60vh]">
+              <div className={`p-6 sm:p-8 overflow-y-auto flex-1 menu-modal-scroll max-h-[60vh] ${
+                isPink ? "bg-[#fffbfb]" : isYellow ? "bg-[#fffdf2]" : "bg-neutral-900"
+              }`}>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                   {modalImages.map(img => (
                     <div
                       key={img.id}
                       onClick={() => setSelectedImage(img)}
-                      className="bg-white rounded-2xl overflow-hidden border border-[#f2ccd7]/35 shadow-sm hover:border-[#f25f8a]/50 hover:shadow-md transition-all cursor-zoom-in group"
+                      className={`rounded-2xl overflow-hidden border shadow-sm transition-all cursor-zoom-in group ${
+                        isPink 
+                          ? "bg-white border-[#f2ccd7]/35 hover:border-[#f25f8a]/50 hover:shadow-md" 
+                          : isYellow 
+                            ? "bg-white border-[#e6dfc3]/35 hover:border-[#0d233a]/50 hover:shadow-md" 
+                            : "bg-neutral-800 border-neutral-700 hover:border-amber-400"
+                      }`}
                     >
-                      <div className="aspect-[4/3] overflow-hidden relative bg-[#fffbfb]">
+                      <div className={`aspect-[4/3] overflow-hidden relative ${isPink ? "bg-[#fffbfb]" : isYellow ? "bg-[#fffdf2]" : "bg-neutral-950"}`}>
                         <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-550" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent"></div>
                       </div>
-                      <div className="p-4 bg-white">
-                        <span className="text-[#f25f8a] text-[10px] font-extrabold uppercase tracking-wider block mb-1 font-mono">{img.category}</span>
-                        <h4 className="font-extrabold text-[#735965] text-xs leading-snug line-clamp-1">{img.name}</h4>
+                      <div className={`p-4 ${isPink || isYellow ? "bg-white" : "bg-neutral-800"}`}>
+                        <span className={`${
+                          isPink ? "text-rose-500" : isYellow ? "text-amber-600" : "text-amber-400"
+                        } text-[10px] font-extrabold uppercase tracking-wider block mb-1 font-mono`}>{img.category}</span>
+                        <h4 className={`font-extrabold text-xs leading-snug line-clamp-1 ${
+                          isPink ? "text-[#735965]" : isYellow ? "text-[#0d233a]" : "text-white"
+                        }`}>{img.name}</h4>
                       </div>
                     </div>
                   ))}
@@ -718,13 +841,25 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 sm:p-5 bg-white border-t border-[#f2ccd7]/30 text-center shrink-0 flex items-center justify-between gap-4">
-                <span className="text-[10px] text-[#735965] font-bold">
+              <div className={`p-4 sm:p-5 border-t text-center shrink-0 flex items-center justify-between gap-4 ${
+                isPink 
+                  ? "bg-white border-[#f2ccd7]/30 text-[#735965]" 
+                  : isYellow 
+                    ? "bg-white border-[#e6dfc3]/30 text-[#576575]" 
+                    : "bg-neutral-950 border-neutral-800 text-neutral-400"
+              }`}>
+                <span className="text-[10px] font-bold">
                   총 {modalImages.length}개의 실제 도입 이미지 및 연출 컷이 등록되어 있습니다.
                 </span>
                 <button
                   onClick={() => setShowMoreModal(false)}
-                  className="px-6 py-2 bg-white border border-[#f2ccd7] hover:border-[#f25f8a] text-[#f25f8a] hover:bg-[#fff9fb] font-extrabold text-xs rounded-xl transition-all shadow-sm hover:scale-[1.01] active:scale-95 cursor-pointer"
+                  className={`px-6 py-2 border font-extrabold text-xs rounded-xl transition-all shadow-sm hover:scale-[1.01] active:scale-95 cursor-pointer ${
+                    isPink 
+                      ? "bg-white border-[#f2ccd7] hover:border-[#f25f8a] text-rose-500 hover:bg-[#fff9fb]" 
+                      : isYellow 
+                        ? "bg-white border-[#e6dfc3] hover:border-[#0d233a] text-[#0d233a] hover:bg-[#fffdf2]" 
+                        : "bg-neutral-950 border-neutral-800 hover:border-amber-400 text-white"
+                  }`}
                 >
                   닫기
                 </button>
@@ -757,16 +892,32 @@ function GallerySection({ filter, setFilter }: { filter: string, setFilter: (t: 
               exit={{ scale: 0.95, opacity: 0, y: 15 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-fit max-w-[95vw] sm:max-w-4xl max-h-[85dvh] flex flex-col bg-[#fffbfb] rounded-2xl overflow-hidden border border-[#f2ccd7]/60 shadow-[0_25px_60px_rgba(191,62,103,0.2)] cursor-default animate-scaleUp"
+              className={`relative w-fit max-w-[95vw] sm:max-w-4xl max-h-[85dvh] flex flex-col rounded-2xl overflow-hidden border shadow-[0_25px_60px_rgba(0,0,0,0.2)] cursor-default animate-scaleUp ${
+                isPink 
+                  ? "bg-[#fffbfb] border-[#f2ccd7]/60 shadow-[0_25px_60px_rgba(191,62,103,0.2)]" 
+                  : isYellow 
+                    ? "bg-[#fffdf2] border-[#e6dfc3]/60 shadow-[0_25px_60px_rgba(13,35,58,0.2)]" 
+                    : "bg-neutral-900 border-neutral-800"
+              }`}
             >
               <img
                 src={selectedImage.url}
                 alt={selectedImage.name}
                 className="max-w-full max-h-[68dvh] sm:max-h-[70vh] object-contain block w-auto h-auto mx-auto"
               />
-              <div className="w-full bg-[#fff1f5] px-6 py-4 border-t border-[#f2ccd7]/40 text-left flex flex-col gap-1 shrink-0">
-                <span className="text-[#f25f8a] font-extrabold tracking-widest text-[10px] uppercase font-mono">{selectedImage.category}</span>
-                <h3 className="text-sm sm:text-base font-black text-[#735965]">{selectedImage.name}</h3>
+              <div className={`w-full px-6 py-4 border-t text-left flex flex-col gap-1 shrink-0 ${
+                isPink 
+                  ? "bg-[#fff1f5] border-[#f2ccd7]/40 text-[#735965]" 
+                  : isYellow 
+                    ? "bg-[#fff9e6] border-[#e6dfc3]/40 text-[#0d233a]" 
+                    : "bg-neutral-950 border-neutral-800 text-white"
+              }`}>
+                <span className={`${
+                  isPink ? "text-rose-500" : isYellow ? "text-amber-600" : "text-amber-400"
+                } font-extrabold tracking-widest text-[10px] uppercase font-mono`}>{selectedImage.category}</span>
+                <h3 className={`text-sm sm:text-base font-black ${
+                  isPink ? "text-[#735965]" : isYellow ? "text-[#0d233a]" : "text-white"
+                }`}>{selectedImage.name}</h3>
               </div>
             </motion.div>
           </motion.div>
@@ -859,16 +1010,30 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
   // Dynamic Popup & Floating data loading synced with Convex (fallback to localStorage if not yet loaded)
   useEffect(() => {
+    // Check if closed in current tab session or closed for today
+    if (typeof window !== "undefined") {
+      const closedInSession = sessionStorage.getItem("120_popup_closed_session");
+      if (closedInSession === "true") {
+        setShowPopup(false);
+        return;
+      }
+      
+      const closedDate = localStorage.getItem("120_popup_closed_date");
+      const todayStr = new Date().toISOString().split("T")[0];
+      if (closedDate === todayStr) {
+        setShowPopup(false);
+        return;
+      }
+    }
+
     if (popupClosedInSessionRef.current) return;
 
     if (convexPopup) {
       setPopupSettings(convexPopup);
       if (convexPopup.isActive) {
-        const closedDate = localStorage.getItem("120_popup_closed_date");
-        const todayStr = new Date().toISOString().split("T")[0];
-        if (closedDate !== todayStr) {
-          setShowPopup(true);
-        }
+        setShowPopup(true);
+      } else {
+        setShowPopup(false);
       }
     } else {
       if (typeof window !== "undefined") {
@@ -878,11 +1043,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             const parsed = JSON.parse(storedPop);
             setPopupSettings(parsed);
             if (parsed.isActive) {
-              const closedDate = localStorage.getItem("120_popup_closed_date");
-              const todayStr = new Date().toISOString().split("T")[0];
-              if (closedDate !== todayStr) {
-                setShowPopup(true);
-              }
+              setShowPopup(true);
+            } else {
+              setShowPopup(false);
             }
           } catch (e) {}
         }
@@ -1206,17 +1369,27 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* WHY SECTION [RICH BLACK THEME & DYNAMIC GOLD BENTO GRID] */}
         {/* ------------------------------------------------------------- */}
-        <section className="py-24 bg-neutral-950 text-white border-b border-neutral-900/80 relative" id="why">
+        <section className={`py-24 border-b relative transition-colors duration-300 ${
+          isPinkVariant 
+            ? "bg-[#fff9fb] text-[#735965] border-[#f2ccd7]/40" 
+            : isYellowVariant 
+              ? "bg-[#fffdf2] text-[#0d233a] border-[#e6dfc3]/40" 
+              : "bg-neutral-950 text-white border-neutral-900/80"
+        }`} id="why">
           <div className="absolute top-0 right-0 w-[350px] h-[350px] bg-amber-400/5 rounded-full blur-3xl pointer-events-none"></div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div className="max-w-3xl mb-16" {...fadeIn}>
               <span className="text-amber-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Why 120pie Hybrid</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 tracking-tight leading-tight">
+              <h2 className={`text-3xl sm:text-4xl font-black mb-4 tracking-tight leading-tight ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+              }`}>
                 지금의 카페에 자연스럽게 더해지는,<br />
                 기분 좋은 <span className="text-amber-400">디저트 메뉴</span>를 제안합니다.
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-400 font-bold leading-relaxed max-w-xl">
+              <p className={`text-xs sm:text-sm font-bold leading-relaxed max-w-xl ${
+                isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+              }`}>
                 120겹 파이와 에그120을 매장과 배달 메뉴에 편안하게 더해, 고객에게는 새로운 선택을, 사장님께는 든든한 매출 기회를 전합니다.
               </p>
             </motion.div>
@@ -1226,8 +1399,12 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
               {/* PAIR 1 (Set Menu): Text (7 cols) */}
               <motion.article
-                className={`md:col-span-7 bg-neutral-900/60 border border-neutral-850 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card ${
-                  isPinkVariant ? "hover:border-pink-400/40" : "hover:border-amber-400/40"
+                className={`md:col-span-7 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card border ${
+                  isPinkVariant 
+                    ? "bg-[#fff5f7] border-[#f2ccd7]/80 hover:border-pink-400/40" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3]/80 hover:border-amber-400/40" 
+                      : "bg-neutral-900/60 border-neutral-850 hover:border-amber-400/40"
                 }`}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -1235,21 +1412,31 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5 }}
               >
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3">커피와 잘 어울리는 세트 메뉴로 한 잔의 만족을 더합니다</h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
+                  <h3 className={`text-xl sm:text-2xl font-black mb-3 ${
+                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                  }`}>커피와 잘 어울리는 세트 메뉴로 한 잔의 만족을 더합니다</h3>
+                  <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                  }`}>
                     아메리카노에 120겹 파이 또는 에그120을 함께 제안해 보세요. 고객은 간편하게 디저트를 즐기고, 매장은 자연스럽게 주문 구성을 넓힐 수 있습니다.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-2 mt-6">
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#커피와 좋은 조합</span>
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#간편한 세트 구성</span>
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#새로운 매출 기회</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#커피와 좋은 조합</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#간편한 세트 구성</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#새로운 매출 기회</span>
                 </div>
               </motion.article>
 
               {/* PAIR 1 (Set Menu): Video Card (5 cols) */}
               <motion.div
-                className="md:col-span-5 bg-neutral-900 border border-neutral-850 rounded-2xl overflow-hidden relative shadow-lg min-h-[280px]"
+                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg min-h-[280px] ${
+                  isPinkVariant 
+                    ? "bg-[#fff5f7] border-[#f2ccd7]/80" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3]/80" 
+                      : "bg-neutral-900 border-neutral-850"
+                }`}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -1262,14 +1449,26 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   loop
                   playsInline
                   aria-label="120겹 파이 세트 메뉴 영상"
-                  className="absolute inset-0 w-full h-full object-cover scale-[1.2] hover:scale-[1.23] transition-all duration-500 opacity-100"
+                  className="absolute inset-0 w-full h-full object-cover scale-[1.2] hover:scale-[1.23] transition-all duration-550 opacity-100"
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-pink-950/20 via-transparent to-transparent" : "from-neutral-950 via-neutral-950/20 to-transparent"}`}></div>
+                <div className={`absolute inset-0 bg-gradient-to-t ${
+                  isPinkVariant 
+                    ? "from-pink-950/20 via-transparent to-transparent" 
+                    : isYellowVariant 
+                      ? "from-[#fffdf2]/40 via-transparent to-transparent" 
+                      : "from-neutral-950 via-neutral-950/20 to-transparent"
+                }`}></div>
               </motion.div>
 
               {/* PAIR 2 (Shop in Shop): Image Card (5 cols) */}
               <motion.div
-                className="md:col-span-5 bg-neutral-900 border border-neutral-850 rounded-2xl overflow-hidden relative shadow-lg min-h-[280px]"
+                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg min-h-[280px] ${
+                  isPinkVariant 
+                    ? "bg-[#fff5f7] border-[#f2ccd7]/80" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3]/80" 
+                      : "bg-neutral-900 border-neutral-850"
+                }`}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -1280,13 +1479,23 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   alt="120겹 파이 크림치즈 애플 블루베리 연출"
                   className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-pink-950/20 via-transparent to-transparent" : "from-neutral-950 via-neutral-950/20 to-transparent"}`}></div>
+                <div className={`absolute inset-0 bg-gradient-to-t ${
+                  isPinkVariant 
+                    ? "from-pink-950/20 via-transparent to-transparent" 
+                    : isYellowVariant 
+                      ? "from-[#fffdf2]/40 via-transparent to-transparent" 
+                      : "from-neutral-950 via-neutral-950/20 to-transparent"
+                }`}></div>
               </motion.div>
 
               {/* PAIR 2 (Shop in Shop): Text Card (7 cols) */}
               <motion.article
-                className={`md:col-span-7 bg-neutral-900/60 border border-neutral-850 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card ${
-                  isPinkVariant ? "hover:border-pink-400/40" : "hover:border-amber-400/40"
+                className={`md:col-span-7 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card border ${
+                  isPinkVariant 
+                    ? "bg-[#fff5f7] border-[#f2ccd7]/80 hover:border-pink-400/40" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3]/80 hover:border-amber-400/40" 
+                      : "bg-neutral-900/60 border-neutral-850 hover:border-amber-400/40"
                 }`}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -1294,22 +1503,30 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5 }}
               >
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3">지금 매장의 아름다운 분위기 그대로 시작하는 샵인샵</h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
+                  <h3 className={`text-xl sm:text-2xl font-black mb-3 ${
+                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                  }`}>지금 매장의 아름다운 분위기 그대로 시작하는 샵인샵</h3>
+                  <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                  }`}>
                     큰 리모델링 철거 공사나 값비싼 브랜드 간판 전면 교체 없이도, 기존의 소중한 단골 고객과 개인 카페 인테리어 정체성을 온전히 지키며 가볍게 120겹 파이와 에그120을 도입할 수 있습니다.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-2 mt-6">
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#기존 공간 극대화</span>
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#간편한 쇼케이스 셋업</span>
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#듀얼 브랜딩 시너지</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#기존 공간 극대화</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#간편한 쇼케이스 셋업</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#듀얼 브랜딩 시너지</span>
                 </div>
               </motion.article>
 
               {/* PAIR 3 (Easy Cooking): Text Card (7 cols) */}
               <motion.article
-                className={`md:col-span-7 bg-neutral-900/60 border border-neutral-850 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card ${
-                  isPinkVariant ? "hover:border-pink-400/40" : "hover:border-amber-400/40"
+                className={`md:col-span-7 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card border ${
+                  isPinkVariant 
+                    ? "bg-[#fff5f7] border-[#f2ccd7]/80 hover:border-pink-400/40" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3]/80 hover:border-amber-400/40" 
+                      : "bg-neutral-900/60 border-neutral-850 hover:border-amber-400/40"
                 }`}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -1317,21 +1534,31 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5 }}
               >
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3">누구나 5분이면 완벽한 맛을 재현하는 초간편 시스템</h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
+                  <h3 className={`text-xl sm:text-2xl font-black mb-3 ${
+                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                  }`}>누구나 5분이면 완벽한 맛을 재현하는 초간편 시스템</h3>
+                  <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                  }`}>
                     전문적인 제과 기술이나 주방 설비 가중이 전혀 필요 없습니다. 본사에서 공급받은 냉동 생지를 간편하게 전용 미니 오븐에 넣고 타이머 스위치만 누르면 갓 구워낸 프리미엄 바삭함을 고객에게 즉시 제공합니다.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-2 mt-6">
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#초간편 5분 조리</span>
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#작업 동선 최소화</span>
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#원터치 퀄리티 일관성</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#초간편 5분 조리</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#작업 동선 최소화</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#원터치 퀄리티 일관성</span>
                 </div>
               </motion.article>
 
               {/* PAIR 3 (Easy Cooking): Video Card (5 cols) */}
               <motion.div
-                className="md:col-span-5 bg-neutral-900 border border-neutral-850 rounded-2xl overflow-hidden relative shadow-lg min-h-[280px]"
+                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg min-h-[280px] ${
+                  isPinkVariant 
+                    ? "bg-[#fff5f7] border-[#f2ccd7]/80" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3]/80" 
+                      : "bg-neutral-900 border-neutral-850"
+                }`}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -1340,14 +1567,26 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 <img
                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779721204/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_du1czf.jpg"
                   alt="120겹 파이 초간편 5분 조리 연출"
-                  className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
+                  className="w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-pink-950/20 via-transparent to-transparent" : "from-neutral-950 via-neutral-950/20 to-transparent"}`}></div>
+                <div className={`absolute inset-0 bg-gradient-to-t ${
+                  isPinkVariant 
+                    ? "from-pink-950/20 via-transparent to-transparent" 
+                    : isYellowVariant 
+                      ? "from-[#fffdf2]/40 via-transparent to-transparent" 
+                      : "from-neutral-950 via-neutral-950/20 to-transparent"
+                }`}></div>
               </motion.div>
 
               {/* PAIR 4 (Zero Waste): Video Card (5 cols) */}
               <motion.div
-                className="md:col-span-5 bg-neutral-900 border border-neutral-850 rounded-2xl overflow-hidden relative shadow-lg min-h-[280px]"
+                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg min-h-[280px] ${
+                  isPinkVariant 
+                    ? "bg-[#fff5f7] border-[#f2ccd7]/80" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3]/80" 
+                      : "bg-neutral-900 border-neutral-850"
+                }`}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -1356,15 +1595,25 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 <img
                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779847988/7c2cce19-579e-4810-9b4d-692bf40cae03.png"
                   alt="에그120 계란빵 조리 및 폐기율 제로 연출"
-                  className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
+                  className="w-full h-full object-cover hover:scale-[1.05] transition-all duration-550 opacity-100"
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-pink-950/20 via-transparent to-transparent" : "from-neutral-950 via-neutral-950/20 to-transparent"}`}></div>
+                <div className={`absolute inset-0 bg-gradient-to-t ${
+                  isPinkVariant 
+                    ? "from-pink-950/20 via-transparent to-transparent" 
+                    : isYellowVariant 
+                      ? "from-[#fffdf2]/40 via-transparent to-transparent" 
+                      : "from-neutral-950 via-neutral-950/20 to-transparent"
+                }`}></div>
               </motion.div>
 
               {/* PAIR 4 (Zero Waste): Text Card (7 cols) */}
               <motion.article
-                className={`md:col-span-7 bg-neutral-900/60 border border-neutral-850 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card ${
-                  isPinkVariant ? "hover:border-pink-400/40" : "hover:border-amber-400/40"
+                className={`md:col-span-7 p-8 rounded-2xl flex flex-col justify-between transition-colors bento-text-card border ${
+                  isPinkVariant 
+                    ? "bg-[#fff5f7] border-[#f2ccd7]/80 hover:border-pink-400/40" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3]/80 hover:border-amber-400/40" 
+                      : "bg-neutral-900/60 border-neutral-850 hover:border-amber-400/40"
                 }`}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -1372,15 +1621,19 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5 }}
               >
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-black text-white mb-3">냉동 보관 생지 시스템으로 재고와 폐기율 부담 제로</h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
+                  <h3 className={`text-xl sm:text-2xl font-black mb-3 ${
+                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                  }`}>냉동 보관 생지 시스템으로 재고와 폐기율 부담 제로</h3>
+                  <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                  }`}>
                     그날 아침 구워 당일 반드시 소진해야 하는 일반 상온 제빵 구조와 다릅니다. 본사 냉동 생지를 주문 수량이나 매장 판매 흐름에 맞추어 실시간으로 필요한 만큼만 즉석에서 구워내기 때문에 유통/재고 폐기 손실이 원천적으로 0%에 수렴합니다.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-2 mt-6">
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#냉동 보관 시스템</span>
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#실시간 즉석 조리</span>
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : "text-amber-400"}`}>#폐기율 0% 도전</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#냉동 보관 시스템</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#실시간 즉석 조리</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#폐기율 0% 도전</span>
                 </div>
               </motion.article>
 
@@ -1391,60 +1644,104 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* BRAND PORTFOLIO STRUCTURE SECTION */}
         {/* ------------------------------------------------------------- */}
-        <section id="structure" className="py-24 bg-white text-neutral-900 overflow-hidden relative border-b border-neutral-100">
+        <section id="structure" className={`py-24 overflow-hidden relative border-b transition-colors duration-300 ${
+          isPinkVariant 
+            ? "bg-[#fff9fb] border-[#f2ccd7]/40 text-[#735965]" 
+            : isYellowVariant 
+              ? "bg-[#fffdf2] border-[#e6dfc3]/40 text-[#0d233a]" 
+              : "bg-white text-neutral-900 border-neutral-100"
+        }`}>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <motion.div className="max-w-3xl mb-16" {...fadeIn}>
               <span className="text-neutral-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Brand Architecture</span>
-              <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-4 text-neutral-950 leading-tight">하나의 브랜드 안에서, 메뉴 선택은 더 다채롭게</h2>
-              <p className="text-xs sm:text-sm text-neutral-500 font-bold leading-relaxed max-w-xl">
+              <h2 className={`text-3xl sm:text-4xl font-black tracking-tight mb-4 leading-tight ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-950"
+              }`}>하나의 브랜드 안에서, 메뉴 선택은 더 다채롭게</h2>
+              <p className={`text-xs sm:text-sm font-bold leading-relaxed max-w-xl ${
+                isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+              }`}>
                 120pie&coffee는 120겹파이와 에그120을 중심으로, 매장의 분위기와 손님 취향에 잘 어울리는 메뉴 구성을 함께 제안합니다.
               </p>
             </motion.div>
 
-            <div className="w-full bg-neutral-50 border border-neutral-100 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm relative text-center">
-              <div className="brand-master-title bg-amber-400 text-white font-black text-xl sm:text-2xl py-3 px-8 rounded-xl inline-block mb-12 shadow-sm text-center">
+            <div className={`w-full border rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm relative text-center transition-colors ${
+              isPinkVariant 
+                ? "bg-[#fff5f7] border-[#f2ccd7]" 
+                : isYellowVariant 
+                  ? "bg-[#fffdf2]/40 border-[#e6dfc3]" 
+                  : "bg-neutral-50 border-neutral-100"
+            }`}>
+              <div className={`brand-master-title font-black text-xl sm:text-2xl py-3 px-8 rounded-xl inline-block mb-12 shadow-sm text-center ${
+                isPinkVariant 
+                  ? "bg-rose-500 text-white" 
+                  : isYellowVariant 
+                    ? "bg-[#0d233a] text-white" 
+                    : "bg-amber-400 text-white"
+              }`}>
                 120pie &amp; coffee <span className="block sm:inline-block font-extrabold text-[10px] sm:text-xs sm:ml-2 text-white/80 mt-1 sm:mt-0">Master Brand</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
                 {/* Connect Line Graphic (Hidden on mobile) */}
-                <div className="hidden md:block absolute top-[-48px] left-[16.6%] right-[16.6%] h-12 border-t border-l border-r border-neutral-200 rounded-t-xl z-0"></div>
-                <div className="hidden md:block absolute top-[-48px] left-1/2 w-px h-12 bg-neutral-200 z-0"></div>
+                <div className={`hidden md:block absolute top-[-48px] left-[16.6%] right-[16.6%] h-12 border-t border-l border-r rounded-t-xl z-0 ${
+                  isPinkVariant ? "border-[#f2ccd7]/80" : isYellowVariant ? "border-[#e6dfc3]/80" : "border-neutral-200"
+                }`}></div>
+                <div className={`hidden md:block absolute top-[-48px] left-1/2 w-px h-12 z-0 ${
+                  isPinkVariant ? "bg-[#f2ccd7]/80" : isYellowVariant ? "bg-[#e6dfc3]/80" : "bg-neutral-200"
+                }`}></div>
 
                 {/* Module Card 1 */}
-                <div className="bg-white rounded-2xl border border-neutral-200 relative z-10 flex flex-col items-center overflow-hidden hover:border-amber-400/60 transition-colors shadow-sm">
+                <div className={`rounded-2xl border relative z-10 flex flex-col items-center overflow-hidden transition-all shadow-sm ${
+                  isPinkVariant 
+                    ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3] hover:border-amber-400" 
+                      : "bg-white border-neutral-200 hover:border-amber-400/60"
+                }`}>
                   <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
                     <video src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779758245/120pie_%EC%98%81%EC%83%81_4_bt9dyp.mp4" autoPlay muted loop playsInline aria-label="120겹파이 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <div className="text-[10px] font-bold text-amber-500 mb-1.5 tracking-widest uppercase">Signature Pie</div>
-                    <div className="text-lg font-black text-neutral-950 mb-1">120겹파이 시리즈</div>
-                    <div className="text-xs text-neutral-500 text-center font-bold leading-relaxed">겉은 바삭하고 속은 든든한 대표 파이 메뉴</div>
+                    <div className={`text-[10px] font-bold mb-1.5 tracking-widest uppercase ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-500"}`}>Signature Pie</div>
+                    <div className={`text-lg font-black mb-1 ${isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-950"}`}>120겹파이 시리즈</div>
+                    <div className={`text-xs text-center font-bold leading-relaxed ${isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"}`}>겉은 바삭하고 속은 든든한 대표 파이 메뉴</div>
                   </div>
                 </div>
 
                 {/* Module Card 2 */}
-                <div className="bg-white rounded-2xl border border-neutral-200 relative z-10 flex flex-col items-center overflow-hidden hover:border-amber-400/60 transition-colors shadow-sm">
+                <div className={`rounded-2xl border relative z-10 flex flex-col items-center overflow-hidden transition-all shadow-sm ${
+                  isPinkVariant 
+                    ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3] hover:border-amber-400" 
+                      : "bg-white border-neutral-200 hover:border-amber-400/60"
+                }`}>
                   <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
                     <video src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779806130/egg120_%EC%98%81%EC%83%81_1_jwv7fe.mp4" autoPlay muted loop playsInline aria-label="에그120 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <div className="text-[10px] font-bold text-emerald-500 mb-1.5 tracking-widest uppercase">Sweet Choice</div>
-                    <div className="text-lg font-black text-neutral-950 mb-1">에그120 계란빵</div>
-                    <div className="text-xs text-neutral-500 text-center font-bold leading-relaxed">부드러운 맛으로 가볍게 곁들이기 좋은 메뉴</div>
+                    <div className={`text-[10px] font-bold mb-1.5 tracking-widest uppercase ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-emerald-600" : "text-emerald-500"}`}>Sweet Choice</div>
+                    <div className={`text-lg font-black mb-1 ${isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-950"}`}>에그120 계란빵</div>
+                    <div className={`text-xs text-center font-bold leading-relaxed ${isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"}`}>부드러운 맛으로 가볍게 곁들이기 좋은 메뉴</div>
                   </div>
                 </div>
 
                 {/* Module Card 3 */}
-                <div className="bg-white rounded-2xl border border-neutral-200 relative z-10 flex flex-col items-center overflow-hidden hover:border-amber-400/60 transition-colors shadow-sm">
+                <div className={`rounded-2xl border relative z-10 flex flex-col items-center overflow-hidden transition-all shadow-sm ${
+                  isPinkVariant 
+                    ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3] hover:border-amber-400" 
+                      : "bg-white border-neutral-200 hover:border-amber-400/60"
+                }`}>
                   <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
                     <video src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779805882/%EC%B8%84%EB%9F%AC%EC%8A%A4120_%EC%98%81%EC%83%81_1_qpxlyo.mp4" autoPlay muted loop playsInline aria-label="츄러스 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <div className="text-[10px] font-bold text-blue-500 mb-1.5 tracking-widest uppercase">More Favorites</div>
-                    <div className="text-lg font-black text-neutral-950 mb-1">츄러스 · 핫도그 · 떡볶이</div>
-                    <div className="text-xs text-neutral-500 text-center font-bold leading-relaxed">매장과 상권에 맞춰 더해볼 수 있는 인기 메뉴</div>
+                    <div className={`text-[10px] font-bold mb-1.5 tracking-widest uppercase ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-blue-600" : "text-blue-500"}`}>More Favorites</div>
+                    <div className={`text-lg font-black mb-1 ${isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-950"}`}>츄러스 · 핫도그 · 떡볶이</div>
+                    <div className={`text-xs text-center font-bold leading-relaxed ${isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"}`}>매장과 상권에 맞춰 더해볼 수 있는 인기 메뉴</div>
                   </div>
                 </div>
               </div>
@@ -1455,15 +1752,25 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* MODULAR MENU CATALOG SECTION [INTEGRATING EXCLUDED MENU DATA - V2 STYLE - KEY] */}
         {/* ------------------------------------------------------------- */}
-        <section id="menu" className="py-24 bg-neutral-950 text-white relative border-b border-neutral-900/80">
+        <section id="menu" className={`py-24 border-b relative transition-colors duration-300 ${
+          isPinkVariant 
+            ? "bg-[#fff9fb] text-[#735965] border-[#f2ccd7]/40" 
+            : isYellowVariant 
+              ? "bg-[#fffdf2] text-[#0d233a] border-[#e6dfc3]/40" 
+              : "bg-neutral-950 text-white border-neutral-900/80"
+        }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <motion.div className="max-w-3xl mb-14" {...fadeIn}>
               <span className="text-amber-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Product Catalog</span>
-              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white mb-4 leading-tight">
+              <h2 className={`text-3xl sm:text-4xl font-black tracking-tight mb-4 leading-tight ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+              }`}>
                 커피와 함께 팔기 좋은,<br />우리 가게의 대표 메뉴
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-400 font-bold leading-relaxed max-w-xl">
+              <p className={`text-xs sm:text-sm font-bold leading-relaxed max-w-xl ${
+                isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+              }`}>
                 파이부터 계란빵, 사이드 메뉴까지. 매장의 손님과 상권에 잘 맞는 구성을 부담 없이 더해보세요.
               </p>
             </motion.div>
@@ -1500,19 +1807,39 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   type="button"
                   key={menu.id}
                   onClick={() => setSelectedMenu(menu.id)}
-                  className="group text-left border-t border-neutral-700 pt-5 transition-colors hover:border-amber-400 flex flex-col"
+                  className={`group text-left border-t pt-5 transition-colors flex flex-col ${
+                    isPinkVariant 
+                      ? "border-[#f2ccd7] hover:border-rose-400 text-[#735965]" 
+                      : isYellowVariant 
+                        ? "border-[#e6dfc3] hover:border-[#0d233a] text-[#576575]" 
+                        : "border-neutral-700 hover:border-amber-400 text-neutral-400"
+                  }`}
                 >
-                  <div className="aspect-[4/3] overflow-hidden rounded-xl bg-neutral-900 mb-6">
+                  <div className={`aspect-[4/3] overflow-hidden rounded-xl mb-6 w-full ${
+                    isPinkVariant ? "bg-rose-50/50" : isYellowVariant ? "bg-[#fffdf2]/80" : "bg-neutral-900"
+                  }`}>
                     <img
                       src={menu.image}
                       alt={menu.alt}
                       className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
                     />
                   </div>
-                  <span className="text-[10px] font-bold text-amber-400 tracking-[0.22em] uppercase block mb-3">{menu.eyebrow}</span>
-                  <h3 className="text-xl font-black text-white mb-3">{menu.title}</h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed flex-1">{menu.desc}</p>
-                  <span className="catalog-detail-button text-xs font-bold mt-7 inline-flex items-center gap-2 rounded-full border border-amber-400 px-4 py-2.5 text-amber-400 group-hover:bg-amber-400 group-hover:text-white transition-colors">
+                  <span className={`text-[10px] font-bold tracking-[0.22em] uppercase block mb-3 ${
+                    isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
+                  }`}>{menu.eyebrow}</span>
+                  <h3 className={`text-xl font-black mb-3 ${
+                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                  }`}>{menu.title}</h3>
+                  <p className={`text-xs sm:text-sm font-medium leading-relaxed flex-1 ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                  }`}>{menu.desc}</p>
+                  <span className={`catalog-detail-button text-xs font-bold mt-7 inline-flex items-center gap-2 rounded-full border px-4 py-2.5 transition-colors ${
+                    isPinkVariant 
+                      ? "border-rose-500 text-rose-500 group-hover:bg-rose-500 group-hover:text-white" 
+                      : isYellowVariant 
+                        ? "border-[#0d233a] text-[#0d233a] group-hover:bg-[#0d233a] group-hover:text-white" 
+                        : "border-amber-400 text-amber-400 group-hover:bg-amber-400 group-hover:text-white"
+                  }`}>
                     메뉴 자세히 보기 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
                   </span>
                 </button>
@@ -1520,12 +1847,20 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             </div>
 
             {/* Recommended combinations */}
-            <div className="mt-20 border-t border-neutral-800 pt-14">
-              <span className="text-amber-400 font-bold tracking-widest text-xs mb-3 block font-mono uppercase">
+            <div className={`mt-20 border-t pt-14 ${
+              isPinkVariant ? "border-[#f2ccd7]/60" : isYellowVariant ? "border-[#e6dfc3]/60" : "border-neutral-800"
+            }`}>
+              <span className={`font-bold tracking-widest text-xs mb-3 block font-mono uppercase ${
+                isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
+              }`}>
                 Recommended Sets
               </span>
-              <h3 className="text-2xl sm:text-3xl font-black mb-4 text-white">상권에 맞는 메뉴 조합</h3>
-              <p className="text-xs sm:text-sm text-neutral-400 mb-12 max-w-xl font-medium leading-relaxed">
+              <h3 className={`text-2xl sm:text-3xl font-black mb-4 ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+              }`}>상권에 맞는 메뉴 조합</h3>
+              <p className={`text-xs sm:text-sm mb-12 max-w-xl font-medium leading-relaxed ${
+                isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+              }`}>
                 매장의 주 고객과 이용 시간대에 맞춰, 부담 없이 시작할 수 있는 메뉴 구성을 제안합니다.
               </p>
 
@@ -1553,18 +1888,34 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     image: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850228/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm.jpg"
                   }
                 ].map((set) => (
-                  <article key={set.label} className="group text-left border-t border-neutral-700 pt-6 transition-colors hover:border-amber-400 flex flex-col">
-                    <div className="aspect-[4/3] overflow-hidden rounded-xl bg-neutral-900 mb-6">
+                  <article key={set.label} className={`group text-left border-t pt-6 transition-colors flex flex-col ${
+                    isPinkVariant 
+                      ? "border-[#f2ccd7] hover:border-rose-500" 
+                      : isYellowVariant 
+                        ? "border-[#e6dfc3] hover:border-[#0d233a]" 
+                        : "border-neutral-700 hover:border-amber-400"
+                  }`}>
+                    <div className={`aspect-[4/3] overflow-hidden rounded-xl mb-6 w-full ${
+                      isPinkVariant ? "bg-rose-50/50" : isYellowVariant ? "bg-[#fffdf2]/80" : "bg-neutral-900"
+                    }`}>
                       <img
                         src={set.image}
                         alt={set.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
                       />
                     </div>
-                    <span className="text-[10px] font-bold text-amber-400 tracking-[0.22em] block mb-4">{set.label}</span>
-                    <h4 className="text-lg font-black text-white mb-3">{set.title}</h4>
-                    <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-medium mb-7 flex-1">{set.desc}</p>
-                    <span className="text-[11px] font-bold text-neutral-500">추천 상권: {set.location}</span>
+                    <span className={`text-[10px] font-bold tracking-[0.22em] block mb-4 ${
+                      isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
+                    }`}>{set.label}</span>
+                    <h4 className={`text-lg font-black mb-3 ${
+                      isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                    }`}>{set.title}</h4>
+                    <p className={`text-xs sm:text-sm leading-relaxed font-medium mb-7 flex-1 ${
+                      isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                    }`}>{set.desc}</p>
+                    <span className={`text-[11px] font-bold ${
+                      isPinkVariant ? "text-neutral-500" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+                    }`}>추천 상권: {set.location}</span>
                   </article>
                 ))}
               </div>
@@ -1579,7 +1930,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* PAIN POINTS SECTION [PURE WHITE & LIGHT GREY THEME - CLEAR TROUBLES] */}
         {/* ------------------------------------------------------------- */}
-        <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100" id="pain-points">
+        <section className={`py-24 border-b transition-colors duration-300 ${
+          isPinkVariant 
+            ? "bg-[#fff9fb] border-[#f2ccd7]/40 text-[#735965]" 
+            : isYellowVariant 
+              ? "bg-[#fffdf2] border-[#e6dfc3]/40 text-[#0d233a]" 
+              : "bg-white text-neutral-900 border-neutral-100"
+        }`} id="pain-points">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
 
@@ -1587,11 +1944,15 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               <div className="lg:col-span-8 flex flex-col justify-between">
                 <motion.div className="max-w-xl mb-12" {...fadeIn}>
                   <span className="text-neutral-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Real Cafe Troubles</span>
-                  <h2 className="text-3xl sm:text-4xl font-black text-black mb-4 tracking-tight leading-tight">
+                  <h2 className={`text-3xl sm:text-4xl font-black mb-4 tracking-tight leading-tight ${
+                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-black"
+                  }`}>
                     하루 백 잔을 팔아도 제자리걸음이라면,<br />
                     문제는 잔수가 아닌 <span className="text-amber-500 font-extrabold">낮은 객단가</span>입니다.
                   </h2>
-                  <p className="text-xs sm:text-sm text-neutral-500 font-bold leading-relaxed">
+                  <p className={`text-xs sm:text-sm font-bold leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+                  }`}>
                     저가 커피와 치열하게 경쟁하며 음료만 판매하는 방식으로는 성장에 한계가 있습니다.<br />
                     기존 매장을 크게 바꾸지 않고도, 파이 메뉴 하나로 주문의 가치를 높일 수 있습니다.
                   </p>
@@ -1608,17 +1969,33 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   ].map((p, idx) => (
                     <motion.div
                       key={idx}
-                      className="bg-neutral-50 border border-neutral-100 p-6 rounded-2xl hover:border-black hover:bg-white transition-all group shadow-sm"
+                      className={`p-6 rounded-2xl border transition-all group shadow-sm ${
+                        isPinkVariant 
+                          ? "bg-white border-[#f2ccd7]/60 hover:border-rose-400 hover:bg-white" 
+                          : isYellowVariant 
+                            ? "bg-white border-[#e6dfc3]/60 hover:border-[#0d233a] hover:bg-white" 
+                            : "bg-neutral-50 border-neutral-100 hover:border-black hover:bg-white"
+                      }`}
                       initial={{ opacity: 0, y: 15 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: idx * 0.05 }}
                     >
-                      <span className="w-8 h-8 rounded bg-neutral-950 text-white font-black text-xs flex items-center justify-center mb-4 group-hover:scale-105 group-hover:bg-amber-400 group-hover:text-neutral-950 transition-all">
+                      <span className={`w-8 h-8 rounded font-black text-xs flex items-center justify-center mb-4 group-hover:scale-105 transition-all ${
+                        isPinkVariant 
+                          ? "bg-rose-100 text-rose-600 group-hover:bg-rose-500 group-hover:text-white" 
+                          : isYellowVariant 
+                            ? "bg-[#fff9e6] text-amber-700 group-hover:bg-[#0d233a] group-hover:text-white" 
+                            : "bg-neutral-950 text-white group-hover:bg-amber-400 group-hover:text-neutral-950"
+                      }`}>
                         {p.no}
                       </span>
-                      <h3 className="text-base font-black text-black mb-2">{p.title}</h3>
-                      <p className="text-xs text-neutral-500 font-bold leading-relaxed">{p.desc}</p>
+                      <h3 className={`text-base font-black mb-2 ${
+                        isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-black"
+                      }`}>{p.title}</h3>
+                      <p className={`text-xs font-bold leading-relaxed ${
+                        isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+                      }`}>{p.desc}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -1626,7 +2003,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
               {/* Right Supporting Video Column */}
               <motion.div
-                className="lg:col-span-4 bg-neutral-50 border border-neutral-200 rounded-3xl overflow-hidden relative min-h-[400px] flex items-end shadow-inner"
+                className={`lg:col-span-4 border rounded-3xl overflow-hidden relative min-h-[400px] flex items-end shadow-inner ${
+                  isPinkVariant 
+                    ? "bg-white border-[#f2ccd7]/80" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3]/80" 
+                      : "bg-neutral-50 border-neutral-200"
+                }`}
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -1641,7 +2024,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   aria-label="120겹 파이 메뉴 연출 영상"
                   className={`absolute inset-0 w-full h-full object-cover ${isPinkVariant ? "opacity-100" : "opacity-90 contrast-105"}`}
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t ${isPinkVariant ? "from-white/70 via-white/5 to-transparent" : "from-black/85 via-black/20 to-transparent"}`}></div>
+                <div className={`absolute inset-0 bg-gradient-to-t ${
+                  isPinkVariant 
+                    ? "from-black/60 via-transparent to-transparent" 
+                    : isYellowVariant 
+                      ? "from-black/60 via-transparent to-transparent" 
+                      : "from-black/85 via-black/20 to-transparent"
+                }`}></div>
                 <div className="relative z-10 p-6 text-white text-xs font-bold leading-relaxed">
                   <span className="text-amber-400 uppercase tracking-widest text-[9px] block mb-1">barista desk support</span>
                   "음료 제조 중에도 120겹 파이는 본사 자동 타이머 타이틀 하에 구워져 별도 주방 제조 피로도가 거의 없습니다."
@@ -1655,13 +2044,21 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* SIMULATOR SECTION */}
         {/* ------------------------------------------------------------- */}
-        <section className="py-24 bg-[#fffaf1] border-b border-amber-100 text-neutral-950" id="simulator">
+        <section className={`py-24 border-b transition-colors duration-300 ${
+          isPinkVariant 
+            ? "bg-[#fff9fb] border-[#f2ccd7]/40 text-neutral-950" 
+            : isYellowVariant 
+              ? "bg-[#fffdf2] border-[#e6dfc3]/40 text-neutral-950" 
+              : "bg-[#fffaf1] border-amber-100 text-neutral-950"
+        }`} id="simulator">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div className="max-w-3xl mb-16" {...fadeIn}>
-              <span className="text-amber-700 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Sales Calculator</span>
+              <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+                isPinkVariant ? "text-rose-600" : isYellowVariant ? "text-amber-700" : "text-amber-700"
+              }`}>Sales Calculator</span>
               <h2 className="text-3xl sm:text-4xl font-black text-neutral-950 mb-4 tracking-tight leading-tight">
                 파이를 하루 몇 개만 더해도,<br />
-                <span className="text-amber-600">우리 매장의 추가 매출</span>을 확인할 수 있습니다.
+                <span className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-600"}>우리 매장의 추가 매출</span>을 확인할 수 있습니다.
               </h2>
               <p className="text-sm text-neutral-700 font-medium leading-relaxed max-w-xl">
                 예상 판매 수량과 단가를 조정해, 파이 메뉴가 만드는 월 매출 변화를 간편하게 살펴보세요.
@@ -1671,7 +2068,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
 
               {/* Left Input panel */}
-              <div className="lg:col-span-5 bg-white border border-amber-200/70 p-6 sm:p-8 rounded-2xl flex flex-col justify-between shadow-sm">
+              <div className={`lg:col-span-5 bg-white border p-6 sm:p-8 rounded-2xl flex flex-col justify-between shadow-sm transition-colors ${
+                isPinkVariant 
+                  ? "border-[#f2ccd7]/80" 
+                  : isYellowVariant 
+                    ? "border-[#e6dfc3]/80" 
+                    : "border-amber-200/70"
+              }`}>
                 <div>
                   <h3 className="text-lg font-black text-neutral-950 mb-2">우리 매장 기준으로 계산하기</h3>
                   <p className="text-sm text-neutral-600 font-medium leading-relaxed mb-7">
@@ -1730,7 +2133,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-neutral-100">
-                  <button type="button" onClick={() => setInquiryModalOpen(true)} className="w-full inline-flex items-center justify-center px-6 py-3.5 bg-neutral-950 text-white font-black text-xs rounded-lg hover:bg-neutral-800 transition-colors shadow-sm">
+                  <button type="button" onClick={() => setInquiryModalOpen(true)} className={`w-full inline-flex items-center justify-center px-6 py-3.5 font-black text-xs rounded-lg transition-colors shadow-sm cursor-pointer border-0 ${
+                    isPinkVariant 
+                      ? "bg-rose-500 text-white hover:bg-rose-600" 
+                      : isYellowVariant 
+                        ? "bg-[#0d233a] text-white hover:bg-[#163554]" 
+                        : "bg-neutral-950 text-white hover:bg-neutral-800"
+                  }`}>
                     우리 매장에 맞게 상담받기
                   </button>
                 </div>
@@ -1740,12 +2149,22 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               <div className="lg:col-span-7 flex flex-col gap-6 justify-between">
 
                 {/* Result Dash */}
-                <div className="bg-amber-400 text-neutral-950 p-8 rounded-2xl shadow-sm flex flex-col justify-between min-h-[176px]">
+                <div className={`p-8 rounded-2xl shadow-sm flex flex-col justify-between min-h-[176px] transition-colors ${
+                  isPinkVariant 
+                    ? "bg-rose-500 text-white" 
+                    : isYellowVariant 
+                      ? "bg-amber-400 text-neutral-950" 
+                      : "bg-amber-400 text-neutral-950"
+                }`}>
                   <div>
-                    <span className="text-xs font-bold tracking-widest text-neutral-900/70 block mb-2">
+                    <span className={`text-xs font-bold tracking-widest block mb-2 ${
+                      isPinkVariant ? "text-rose-100" : "text-neutral-900/70"
+                    }`}>
                       월 예상 추가 매출
                     </span>
-                    <h3 className="text-base font-bold text-neutral-900/80 mb-5">
+                    <h3 className={`text-base font-bold mb-5 ${
+                      isPinkVariant ? "text-rose-100" : "text-neutral-900/80"
+                    }`}>
                       파이 메뉴를 추가했을 때
                     </h3>
                   </div>
@@ -1753,7 +2172,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     <strong className="simulator-amount text-3xl sm:text-4xl font-black tracking-tight block mb-2 leading-none">
                       {monthlySales.toLocaleString()} 원
                     </strong>
-                    <p className="text-xs font-bold text-neutral-900/70">
+                    <p className={`text-xs font-bold ${
+                      isPinkVariant ? "text-rose-100" : "text-neutral-900/70"
+                    }`}>
                       하루 {quantity}개 x {price.toLocaleString()}원 x 월 {days}일 기준
                     </p>
                   </div>
@@ -1762,7 +2183,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 {/* Split layout */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
                   <div
-                    className="group bg-white border border-amber-100 rounded-2xl overflow-hidden relative min-h-[180px] cursor-zoom-in order-last sm:order-first"
+                    className={`group bg-white border rounded-2xl overflow-hidden relative min-h-[180px] cursor-zoom-in order-last sm:order-first transition-colors ${
+                      isPinkVariant ? "border-[#f2ccd7]" : isYellowVariant ? "border-[#e6dfc3]" : "border-amber-100"
+                    }`}
                     role="button"
                     tabIndex={0}
                     onMouseEnter={() => setSimulatorVideoExpanded(true)}
@@ -1794,16 +2217,22 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   </div>
 
                   <div className="grid grid-cols-1 gap-4 justify-between order-first sm:order-last">
-                    <div className="bg-white border border-amber-200/70 p-5 rounded-2xl shadow-sm">
+                    <div className={`bg-white border p-5 rounded-2xl shadow-sm transition-colors ${
+                      isPinkVariant ? "border-[#f2ccd7]/80" : isYellowVariant ? "border-[#e6dfc3]/80" : "border-amber-200/70"
+                    }`}>
                       <span className="text-xs text-neutral-600 font-bold block mb-2">월 예상 판매 수량</span>
                       <strong className="text-xl font-black text-neutral-900 block mb-0.5">{monthlyQuantity.toLocaleString()} 개</strong>
                       <span className="text-xs text-neutral-500 font-medium">선택한 조건으로 계산한 수량입니다.</span>
                     </div>
 
-                    <div className="bg-white border border-amber-200/70 p-5 rounded-2xl shadow-sm flex flex-col justify-between">
+                    <div className={`bg-white border p-5 rounded-2xl shadow-sm flex flex-col justify-between transition-colors ${
+                      isPinkVariant ? "border-[#f2ccd7]/80" : isYellowVariant ? "border-[#e6dfc3]/80" : "border-amber-200/70"
+                    }`}>
                       <div>
                         <span className="text-xs text-neutral-600 font-bold block mb-2">예상 순이익</span>
-                        <strong className="text-base font-black text-amber-700 block">상담 시 자세히 안내</strong>
+                        <strong className={`text-base font-black block ${
+                          isPinkVariant ? "text-rose-600" : isYellowVariant ? "text-[#0d233a]" : "text-amber-700"
+                        }`}>상담 시 자세히 안내</strong>
                       </div>
                       <span className="text-xs text-neutral-500 font-medium mt-2">원가와 도입 방식에 따라 달라집니다.</span>
                     </div>
@@ -1838,13 +2267,23 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* BEFORE AFTER SECTION [PURE WHITE THEME - CONTRAST COMPARE] */}
         {/* ------------------------------------------------------------- */}
-        <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100" id="before-after">
+        <section className={`py-24 border-b transition-colors duration-300 ${
+          isPinkVariant 
+            ? "bg-[#fff9fb] border-[#f2ccd7]/40 text-[#735965]" 
+            : isYellowVariant 
+              ? "bg-[#fffdf2] border-[#e6dfc3]/40 text-[#0d233a]" 
+              : "bg-white text-neutral-900 border-neutral-100"
+        }`} id="before-after">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div className="max-w-3xl mb-16" {...fadeIn}>
-              <span className="text-neutral-500 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Contrast Compare</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-black mb-4 tracking-tight leading-tight">
+              <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+                isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-neutral-500"
+              }`}>Contrast Compare</span>
+              <h2 className={`text-3xl sm:text-4xl font-black mb-4 tracking-tight leading-tight ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-black"
+              }`}>
                 커피만 팔던 매장에,<br />
-                <span className="text-amber-500 font-extrabold">디저트를 찾는 이유</span>를 더합니다.
+                <span className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-500 font-extrabold"}>디저트를 찾는 이유</span>를 더합니다.
               </h2>
             </motion.div>
 
@@ -1852,7 +2291,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
               {/* Before Column (Monochrome Grey Coffee Image) */}
               <motion.article
-                className="bg-neutral-50 border border-neutral-200 rounded-2xl p-6 sm:p-8 flex flex-col gap-6 justify-between hover:border-black transition-colors"
+                className={`border rounded-2xl p-6 sm:p-8 flex flex-col gap-6 justify-between transition-colors ${
+                  isPinkVariant 
+                    ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3] hover:border-[#0d233a]" 
+                      : "bg-neutral-50 border border-neutral-200 hover:border-black"
+                }`}
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -1863,11 +2308,17 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     <span className="px-3.5 py-1 rounded bg-neutral-200 text-[10px] font-bold text-neutral-600 uppercase tracking-widest">
                       Before
                     </span>
-                    <span className="text-neutral-500 font-black text-lg">음료 중심의 기존 매장</span>
+                    <span className={`font-black text-lg ${
+                      isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+                    }`}>음료 중심의 기존 매장</span>
                   </div>
-                  <h3 className="text-xl font-black text-neutral-800 mb-6 leading-tight">커피 한 잔만으로는 아쉬운 매출</h3>
+                  <h3 className={`text-xl font-black mb-6 leading-tight ${
+                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-800"
+                  }`}>커피 한 잔만으로는 아쉬운 매출</h3>
 
-                  <div className="space-y-3.5 mb-6 text-xs sm:text-sm text-neutral-500 font-bold leading-relaxed">
+                  <div className={`space-y-3.5 mb-6 text-xs sm:text-sm font-bold leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+                  }`}>
                     <div className="flex gap-2"><span>•</span><p>음료 주문만으로는 한 번의 결제 금액을 높이기 어렵습니다.</p></div>
                     <div className="flex gap-2"><span>•</span><p>미리 준비한 디저트는 팔리지 않으면 폐기 부담으로 이어집니다.</p></div>
                     <div className="flex gap-2"><span>•</span><p>손님이 기억하고 공유할 만한 대표 메뉴가 부족합니다.</p></div>
@@ -1885,7 +2336,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
               {/* After Column (Rich Gold-Accented Brunch Table Image) */}
               <motion.article
-                className="bg-neutral-950 text-white border-2 border-amber-400 rounded-2xl p-6 sm:p-8 flex flex-col gap-6 justify-between shadow-2xl"
+                className={`border-2 rounded-2xl p-6 sm:p-8 flex flex-col gap-6 justify-between shadow-2xl transition-all duration-300 ${
+                  isPinkVariant 
+                    ? "bg-[#fff5f7] border-rose-500 text-[#735965]" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#0d233a] text-[#0d233a]" 
+                      : "bg-neutral-950 text-white border-amber-400"
+                }`}
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -1893,24 +2350,42 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               >
                 <div>
                   <div className="flex justify-between items-center mb-6">
-                    <span className="px-3.5 py-1 rounded bg-amber-400 text-neutral-950 text-[10px] font-black uppercase tracking-widest">
+                    <span className={`px-3.5 py-1 rounded text-[10px] font-black uppercase tracking-widest ${
+                      isPinkVariant 
+                        ? "bg-rose-500 text-white" 
+                        : isYellowVariant 
+                          ? "bg-[#0d233a] text-white" 
+                          : "bg-amber-400 text-neutral-950"
+                    }`}>
                       After
                     </span>
-                    <span className="text-amber-400 font-black text-lg">120pie를 더한 우리 매장</span>
+                    <span className={`font-black text-lg ${
+                      isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-amber-400"
+                    }`}>120pie를 더한 우리 매장</span>
                   </div>
-                  <h3 className="text-xl font-black text-white mb-6 leading-tight">커피와 파이를 함께 찾는 카페로</h3>
+                  <h3 className={`text-xl font-black mb-6 leading-tight ${
+                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                  }`}>커피와 파이를 함께 찾는 카페로</h3>
 
-                  <div className="space-y-3.5 mb-6 text-xs sm:text-sm text-neutral-300 font-medium leading-relaxed">
+                  <div className={`space-y-3.5 mb-6 text-xs sm:text-sm font-medium leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-300"
+                  }`}>
                     <div className="flex gap-3 items-start">
-                      <CheckCircle2 size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                      <CheckCircle2 size={16} className={`shrink-0 mt-0.5 ${
+                        isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-400"
+                      }`} />
                       <p>커피와 잘 어울리는 파이 메뉴로 자연스럽게 세트 주문을 제안할 수 있습니다.</p>
                     </div>
                     <div className="flex gap-3 items-start">
-                      <CheckCircle2 size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                      <CheckCircle2 size={16} className={`shrink-0 mt-0.5 ${
+                        isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-400"
+                      }`} />
                       <p>필요한 만큼 구워 판매해 디저트 운영과 폐기 부담을 줄일 수 있습니다.</p>
                     </div>
                     <div className="flex gap-3 items-start">
-                      <CheckCircle2 size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                      <CheckCircle2 size={16} className={`shrink-0 mt-0.5 ${
+                        isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-400"
+                      }`} />
                       <p>파이 맛집으로 기억되는 메뉴를 더해 재방문과 입소문을 기대할 수 있습니다.</p>
                     </div>
                   </div>
@@ -1932,15 +2407,27 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* ADOPTION STEPS & RESULTS SECTION */}
         {/* ------------------------------------------------------------- */}
-        <section id="adoption" className="py-24 bg-neutral-950 text-white relative border-b border-neutral-900/80">
+        <section id="adoption" className={`py-24 border-b relative transition-colors duration-300 ${
+          isPinkVariant 
+            ? "bg-[#fff9fb] text-[#735965] border-[#f2ccd7]/40" 
+            : isYellowVariant 
+              ? "bg-[#fffdf2] text-[#0d233a] border-[#e6dfc3]/40" 
+              : "bg-neutral-950 text-white border-neutral-900/80"
+        }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <motion.div className="max-w-3xl mb-14" {...fadeIn}>
-              <span className="text-amber-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Adoption Guide</span>
-              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white mb-4 leading-tight">
+              <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+                isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
+              }`}>Adoption Guide</span>
+              <h2 className={`text-3xl sm:text-4xl font-black tracking-tight mb-4 leading-tight ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+              }`}>
                 작은 공간에서 시작해,<br />매장에 맞게 넓혀갑니다.
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-400 font-bold max-w-xl leading-relaxed">
+              <p className={`text-xs sm:text-sm font-bold max-w-xl leading-relaxed ${
+                isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+              }`}>
                 간판과 매장을 한 번에 바꾸지 않아도 됩니다. 파이 메뉴를 먼저 도입하고, 반응에 따라 브랜드 노출과 매장 변화를 선택할 수 있습니다.
               </p>
             </motion.div>
@@ -1952,18 +2439,34 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 { num: "03", title: "필요하면 외부 표기 추가", desc: "원하는 매장에 한해 기존 간판 옆에 브랜드 표기를 더할 수 있습니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772298/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm.jpg" },
                 { num: "04", title: "검증 후 확장 선택", desc: "매출과 고객 반응을 확인한 뒤, 매장 전환 여부를 차분히 결정합니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg" }
               ].map((step) => (
-                <article key={step.num} className="group border-t border-neutral-700 pt-5 flex flex-col h-full">
-                  <div className="h-40 overflow-hidden rounded-xl mb-6 bg-neutral-900">
+                <article key={step.num} className={`group border-t pt-5 flex flex-col h-full transition-colors ${
+                  isPinkVariant ? "border-[#f2ccd7]/60" : isYellowVariant ? "border-[#e6dfc3]/60" : "border-neutral-700"
+                }`}>
+                  <div className={`h-40 overflow-hidden rounded-xl mb-6 ${
+                    isPinkVariant ? "bg-rose-50/50" : isYellowVariant ? "bg-[#fffdf2]/85" : "bg-neutral-900"
+                  }`}>
                     <img src={step.img} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" />
                   </div>
-                  <span className="text-[10px] font-bold text-amber-400 tracking-[0.24em] mb-3">STEP {step.num}</span>
-                  <h3 className="text-lg font-black text-white mb-3 leading-tight">{step.title}</h3>
-                  <p className="text-xs sm:text-sm font-medium leading-relaxed text-neutral-400 flex-1">
+                  <span className={`text-[10px] font-bold tracking-[0.24em] mb-3 ${
+                    isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
+                  }`}>STEP {step.num}</span>
+                  <h3 className={`text-lg font-black mb-3 leading-tight ${
+                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                  }`}>{step.title}</h3>
+                  <p className={`text-xs sm:text-sm font-medium leading-relaxed flex-1 ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                  }`}>
                     {step.desc}
                   </p>
                   <button
                     onClick={() => setSelectedAdoptionStep(step.num)}
-                    className="text-left text-xs font-bold text-neutral-200 mt-7 inline-flex items-center gap-2 group-hover:text-amber-400 transition-colors"
+                    className={`text-left text-xs font-bold mt-7 inline-flex items-center gap-2 transition-colors ${
+                      isPinkVariant 
+                        ? "text-[#7c5d6c] hover:text-rose-500" 
+                        : isYellowVariant 
+                          ? "text-[#576575] hover:text-[#0d233a]" 
+                          : "text-neutral-200 hover:text-amber-400"
+                    }`}
                   >
                     도입 예시 보기 <ArrowRight size={14} />
                   </button>
@@ -1971,69 +2474,111 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               ))}
             </div>
 
-            <div className="border-t border-neutral-800 pt-14">
+            <div className={`border-t pt-14 ${
+              isPinkVariant ? "border-[#f2ccd7]/60" : isYellowVariant ? "border-[#e6dfc3]/60" : "border-neutral-800"
+            }`}>
               <div className="max-w-2xl mb-12">
-                <span className="text-amber-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Reference Figures</span>
-                <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-3">도입 상담에서 확인할 수 있는 지표</h3>
-                <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
+                <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+                  isPinkVariant ? "text-rose-600" : isYellowVariant ? "text-amber-600" : "text-amber-400"
+                }`}>Reference Figures</span>
+                <h3 className={`text-2xl sm:text-3xl font-black leading-tight mb-3 ${
+                  isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                }`}>도입 상담에서 확인할 수 있는 지표</h3>
+                <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                  isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                }`}>
                   매장 조건과 도입 방식에 따라 결과는 달라집니다. 상담 시 실제 사례와 함께 자세히 안내드립니다.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* 1. 일 매출 변화 사례 Infographic */}
-                <div className="bg-neutral-900/40 border border-neutral-850 p-6 rounded-2xl flex flex-col justify-between group hover:border-amber-400 transition-all duration-300">
+                <div className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all duration-300 ${
+                  isPinkVariant 
+                    ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3] hover:border-[#0d233a]" 
+                      : "bg-neutral-900/40 border-neutral-850 hover:border-amber-400"
+                }`}>
                   <div className="flex flex-col">
                     <div className="flex justify-between items-center mb-4">
-                      <span className={`font-bold text-xs tracking-wider ${isPinkVariant ? "text-pink-500" : "text-amber-400"}`}>일 매출 변화 사례</span>
-                      <TrendingUp size={16} className={isPinkVariant ? "text-pink-500" : "text-amber-400"} />
+                      <span className={`font-bold text-xs tracking-wider ${isPinkVariant ? "text-rose-500" : "text-amber-600"}`}>일 매출 변화 사례</span>
+                      <TrendingUp size={16} className={isPinkVariant ? "text-rose-500" : "text-amber-600"} />
                     </div>
-                    <div className="text-4xl sm:text-5xl font-black text-white mb-6">
+                    <div className={`text-4xl sm:text-5xl font-black mb-6 ${
+                      isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                    }`}>
                       <AnimatedNumber value={300} suffix="%" />
                     </div>
                     {/* Infographic Double Horizontal Bars */}
-                    <div className="space-y-3 mb-6 bg-neutral-950/40 p-4 rounded-xl border border-neutral-900">
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] text-neutral-500 font-bold">
-                          <span>기존 카페 평균</span>
-                          <span>100%</span>
+                    <div className={`p-4 rounded-xl border ${
+                      isPinkVariant 
+                        ? "bg-[#fff5f7] border-[#f2ccd7]/80 text-[#735965]" 
+                        : isYellowVariant 
+                          ? "bg-[#fffdf2]/80 border-[#e6dfc3]/80 text-[#0d233a]" 
+                          : "bg-neutral-950/40 border-neutral-900 text-neutral-450"
+                    }`}>
+                      <div className="space-y-3">
+                        <div className="space-y-1">
+                          <div className={`flex justify-between text-[10px] font-bold ${
+                            isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+                          }`}>
+                            <span>기존 카페 평균</span>
+                            <span>100%</span>
+                          </div>
+                          <div className={`w-full h-1.5 rounded-full overflow-hidden ${
+                            isPinkVariant ? "bg-rose-100/50" : isYellowVariant ? "bg-[#fff9e6]" : "bg-neutral-900"
+                          }`}>
+                            <div className={`h-full rounded-full ${
+                              isPinkVariant ? "bg-[#7c5d6c]/40" : isYellowVariant ? "bg-[#576575]/40" : "bg-neutral-600"
+                            }`} style={{ width: "33.3%" }} />
+                          </div>
                         </div>
-                        <div className="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden">
-                          <div className="w-1/3 h-full bg-neutral-600 rounded-full" />
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] font-bold items-center">
-                          <span className={isPinkVariant ? "text-pink-500" : "text-amber-400"}>120pie 도입 후</span>
-                          <span className={`${isPinkVariant ? "text-pink-500" : "text-amber-400"} animate-pulse text-[11px]`}>300%</span>
-                        </div>
-                        <div className="w-full h-2 bg-neutral-900 rounded-full overflow-hidden relative">
-                          <motion.div 
-                            className={`h-full bg-gradient-to-r ${
-                              isPinkVariant 
-                                ? "from-pink-500 to-pink-400 shadow-[0_0_10px_rgba(242,95,138,0.3)]" 
-                                : "from-amber-500 to-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.3)]"
-                            } rounded-full`}
-                            initial={{ width: "33.3%" }}
-                            whileInView={{ width: "100%" }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 1.2, ease: "easeOut" }}
-                          />
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] font-bold items-center">
+                            <span className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-400"}>120pie 도입 후</span>
+                            <span className={`${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-400"} animate-pulse text-[11px]`}>300%</span>
+                          </div>
+                          <div className={`w-full h-2 rounded-full overflow-hidden relative ${
+                            isPinkVariant ? "bg-rose-100/50" : isYellowVariant ? "bg-[#fff9e6]" : "bg-neutral-900"
+                          }`}>
+                            <motion.div 
+                              className={`h-full bg-gradient-to-r ${
+                                isPinkVariant 
+                                  ? "from-pink-500 to-pink-400 shadow-[0_0_10px_rgba(242,95,138,0.3)]" 
+                                  : isYellowVariant 
+                                    ? "from-[#0d233a] to-[#1a4066] shadow-[0_0_10px_rgba(13,35,58,0.3)]" 
+                                    : "from-amber-500 to-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.3)]"
+                              } rounded-full`}
+                              initial={{ width: "33.3%" }}
+                              whileInView={{ width: "100%" }}
+                              viewport={{ once: true }}
+                              transition={{ duration: 1.2, ease: "easeOut" }}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <p className="text-neutral-400 text-xs sm:text-sm font-medium leading-relaxed">
+                  <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                  }`}>
                     도입 사례 중 확인된 매출 변화 수치입니다.
                   </p>
                 </div>
 
                 {/* 2. 일 최고 매출 사례 Infographic */}
-                <div className="bg-neutral-900/40 border border-neutral-850 p-6 rounded-2xl flex flex-col justify-between group hover:border-amber-400 transition-all duration-300">
+                <div className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all duration-300 ${
+                  isPinkVariant 
+                    ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3] hover:border-[#0d233a]" 
+                      : "bg-neutral-900/40 border-neutral-850 hover:border-amber-400"
+                }`}>
                   <div className="flex flex-col">
                     <div className="flex justify-between items-center mb-4">
-                      <span className={`font-bold text-xs tracking-wider ${isPinkVariant ? "text-pink-500" : "text-amber-400"}`}>일 최고 매출 사례</span>
-                      <Award size={16} className={isPinkVariant ? "text-pink-500" : "text-amber-400"} />
+                      <span className={`font-bold text-xs tracking-wider ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>일 최고 매출 사례</span>
+                      <Award size={16} className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"} />
                     </div>
                     <div className="flex items-center gap-5 mb-6">
                       {/* Circular SVG Gauge */}
@@ -2044,7 +2589,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                             cx="28" 
                             cy="28" 
                             r="24" 
-                            className={isPinkVariant ? "stroke-pink-500" : "stroke-amber-400"} 
+                            className={isPinkVariant ? "stroke-pink-500" : isYellowVariant ? "stroke-[#0d233a]" : "stroke-amber-400"} 
                             strokeWidth="4.5" 
                             fill="none"
                             strokeDasharray={151}
@@ -2054,36 +2599,62 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                             transition={{ duration: 1.5, ease: "easeOut" }}
                           />
                         </svg>
-                        <Store className={`absolute ${isPinkVariant ? "text-pink-500" : "text-amber-400"}`} size={16} />
+                        <Store className={`absolute ${isPinkVariant ? "text-pink-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-400"}`} size={16} />
                       </div>
-                      <div className="text-3xl sm:text-4xl font-black text-white">
+                      <div className={`text-3xl sm:text-4xl font-black ${
+                        isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                      }`}>
                         <AnimatedNumber value={350} suffix="만원" />
                       </div>
                     </div>
-                    <div className="text-[10px] text-neutral-500 font-bold mb-6 flex items-center gap-1.5 bg-neutral-950/40 p-3.5 rounded-xl border border-neutral-900">
-                      <Sparkles size={11} className={`${isPinkVariant ? "text-pink-500" : "text-amber-400"} animate-spin-slow`} />
+                    <div className={`p-3.5 rounded-xl border text-[10px] font-bold mb-6 flex items-center gap-1.5 ${
+                      isPinkVariant 
+                        ? "bg-[#fff5f7] border-[#f2ccd7]/80 text-[#735965]" 
+                        : isYellowVariant 
+                          ? "bg-[#fffdf2]/80 border-[#e6dfc3]/80 text-[#0d233a]" 
+                          : "bg-neutral-950/40 border-neutral-900 text-neutral-500"
+                    }`}>
+                      <Sparkles size={11} className={`${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"} animate-spin-slow`} />
                       <span>단독 매장 운영사례 기준 최고치 달성 지표</span>
                     </div>
                   </div>
-                  <p className="text-neutral-400 text-xs sm:text-sm font-medium leading-relaxed">
+                  <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                  }`}>
                     단독 매장 운영 사례를 기준으로 한 수치입니다.
                   </p>
                 </div>
 
                 {/* 3. 투자 회수 사례 Infographic */}
-                <div className="bg-neutral-900/40 border border-neutral-850 p-6 rounded-2xl flex flex-col justify-between group hover:border-amber-400 transition-all duration-300">
+                <div className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all duration-300 ${
+                  isPinkVariant 
+                    ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
+                    : isYellowVariant 
+                      ? "bg-white border-[#e6dfc3] hover:border-[#0d233a]" 
+                      : "bg-neutral-900/40 border-neutral-850 hover:border-amber-400"
+                }`}>
                   <div className="flex flex-col">
                     <div className="flex justify-between items-center mb-4">
-                      <span className={`font-bold text-xs tracking-wider ${isPinkVariant ? "text-pink-500" : "text-amber-400"}`}>투자 회수 사례</span>
-                      <ShieldCheck size={16} className={isPinkVariant ? "text-pink-500" : "text-amber-400"} />
+                      <span className={`font-bold text-xs tracking-wider ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>투자 회수 사례</span>
+                      <ShieldCheck size={16} className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"} />
                     </div>
-                    <div className="text-4xl sm:text-5xl font-black text-white mb-6">
+                    <div className={`text-4xl sm:text-5xl font-black mb-6 ${
+                      isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                    }`}>
                       <AnimatedNumber value={2} suffix="개월" />
                     </div>
                     {/* Timeline Grid Infographic */}
-                    <div className="mb-6 bg-neutral-950/40 p-4 rounded-xl border border-neutral-900">
-                      <div className="flex justify-between items-center text-[10px] text-neutral-500 font-bold mb-2">
-                        <span className={isPinkVariant ? "text-pink-500" : "text-amber-400"}>120pie 회수 (2개월)</span>
+                    <div className={`p-4 rounded-xl border ${
+                      isPinkVariant 
+                        ? "bg-[#fff5f7] border-[#f2ccd7]/80 text-[#735965]" 
+                        : isYellowVariant 
+                          ? "bg-[#fffdf2]/80 border-[#e6dfc3]/80 text-[#0d233a]" 
+                          : "bg-neutral-950/40 border-neutral-900 text-neutral-500"
+                    }`}>
+                      <div className={`flex justify-between items-center text-[10px] font-bold mb-2 ${
+                        isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+                      }`}>
+                        <span className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-400"}>120pie 회수 (2개월)</span>
                         <span>타 프랜차이즈 평균</span>
                       </div>
                       <div className="flex gap-1.5 items-center w-full">
@@ -2094,7 +2665,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                               i < 2 
                                 ? (isPinkVariant 
                                     ? "bg-gradient-to-b from-pink-500 to-pink-400 shadow-[0_0_8px_rgba(242,95,138,0.4)]" 
-                                    : "bg-gradient-to-b from-amber-400 to-amber-500 shadow-[0_0_8px_rgba(251,191,36,0.4)]") 
+                                    : isYellowVariant 
+                                      ? "bg-gradient-to-b from-[#0d233a] to-[#163554] shadow-[0_0_8px_rgba(13,35,58,0.4)]" 
+                                      : "bg-gradient-to-b from-amber-400 to-amber-500 shadow-[0_0_8px_rgba(251,191,36,0.4)]") 
                                 : "bg-neutral-800"
                             }`}
                             initial={{ opacity: 0, scale: 0.8 }}
@@ -2106,7 +2679,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                       </div>
                     </div>
                   </div>
-                  <p className="text-neutral-400 text-xs sm:text-sm font-medium leading-relaxed">
+                  <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                  }`}>
                     도입 규모와 매장 매출에 따라 달라질 수 있습니다.
                   </p>
                 </div>
@@ -2122,30 +2697,46 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* STORES PREVIEW SECTION [V3 FUSION] */}
         {/* ------------------------------------------------------------- */}
-        <StoresPreviewSection isPink={isPinkVariant} />
+        <StoresPreviewSection isPink={isPinkVariant} isYellow={isYellowVariant} />
 
         {/* ------------------------------------------------------------- */}
         {/* OWNER SUPPORT SYSTEM SECTION [V3 FUSION] */}
         {/* ------------------------------------------------------------- */}
-        <OwnerSystemSection />
+        <OwnerSystemSection isPink={isPinkVariant} isYellow={isYellowVariant} />
 
         {/* ------------------------------------------------------------- */}
         {/* GALLERY SECTION [V3 FUSION] */}
         {/* ------------------------------------------------------------- */}
-        <GallerySection filter={galleryFilter} setFilter={setGalleryFilter} />
+        <GallerySection filter={galleryFilter} setFilter={setGalleryFilter} isPink={isPinkVariant} isYellow={isYellowVariant} />
 
         {/* ------------------------------------------------------------- */}
         {/* PROCESS SECTION [RICH BLACK THEME - CRISPY PROCESS] */}
         {/* ------------------------------------------------------------- */}
-        <section className="py-24 bg-neutral-950 text-white border-b border-neutral-900 relative" id="process">
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-amber-400/5 rounded-full blur-3xl pointer-events-none"></div>
+        <section className={`py-24 border-b relative transition-all duration-300 ${
+          isPinkVariant 
+            ? "bg-[#fff5f7] text-[#4c2d3a] border-[#f2ccd7]" 
+            : isYellowVariant 
+              ? "bg-[#fffdf2] text-[#0d233a] border-[#e6dfc3]" 
+              : "bg-neutral-950 text-white border-neutral-900"
+        }`} id="process">
+          <div className={`absolute top-0 right-0 w-[400px] h-[400px] rounded-full blur-3xl pointer-events-none ${
+            isPinkVariant 
+              ? "bg-rose-400/5" 
+              : isYellowVariant 
+                ? "bg-amber-400/5" 
+                : "bg-amber-400/5"
+          }`}></div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div className="max-w-xl mb-12" {...fadeIn}>
-              <span className="text-amber-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Simple Operation</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 tracking-tight leading-tight">
+              <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+                isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
+              }`}>Simple Operation</span>
+              <h2 className={`text-3xl sm:text-4xl font-black mb-4 tracking-tight leading-tight ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+              }`}>
                 복잡한 제빵 과정 없이,<br />
-                주문 후 <span className="text-amber-400">간편하게 구워 판매합니다.</span>
+                주문 후 <span className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"}>간편하게 구워 판매합니다.</span>
               </h2>
             </motion.div>
 
@@ -2160,18 +2751,34 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   ].map((p, idx) => (
                     <motion.div
                       key={idx}
-                      className="bg-neutral-900/60 border border-neutral-900 p-6 rounded-xl flex items-start gap-5 hover:border-amber-400/40 transition-colors"
+                      className={`p-6 rounded-xl flex items-start gap-5 transition-colors border ${
+                        isPinkVariant 
+                          ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
+                          : isYellowVariant 
+                            ? "bg-white border-[#e6dfc3] hover:border-[#0d233a]" 
+                            : "bg-neutral-900/60 border-neutral-900 hover:border-amber-400/40"
+                      }`}
                       initial={{ opacity: 0, y: 10 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.45, delay: idx * 0.05 }}
                     >
-                      <span className="w-9 h-9 rounded bg-amber-400 text-neutral-950 font-black text-sm flex items-center justify-center shrink-0 shadow-md">
+                      <span className={`w-9 h-9 rounded font-black text-sm flex items-center justify-center shrink-0 shadow-md ${
+                        isPinkVariant 
+                          ? "bg-rose-500 text-white" 
+                          : isYellowVariant 
+                            ? "bg-[#0d233a] text-white" 
+                            : "bg-amber-400 text-neutral-950"
+                      }`}>
                         {p.step}
                       </span>
                       <div>
-                        <h3 className="text-base font-black text-white mb-1">{p.title}</h3>
-                        <p className="text-xs text-neutral-400 font-medium leading-relaxed">{p.desc}</p>
+                        <h3 className={`text-base font-black mb-1 ${
+                          isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                        }`}>{p.title}</h3>
+                        <p className={`text-xs font-medium leading-relaxed ${
+                          isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                        }`}>{p.desc}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -2180,7 +2787,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
               {/* Right Column: Close-up Food Baking Process Image */}
               <motion.div
-                className="lg:col-span-4 min-h-[320px] bg-neutral-900 rounded-2xl overflow-hidden relative shadow-2xl"
+                className={`lg:col-span-4 min-h-[320px] rounded-2xl overflow-hidden relative shadow-2xl ${
+                  isPinkVariant 
+                    ? "bg-white border border-[#f2ccd7]" 
+                    : isYellowVariant 
+                      ? "bg-white border border-[#e6dfc3]" 
+                      : "bg-neutral-900 border border-neutral-800"
+                }`}
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -2204,22 +2817,40 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* COMPARISON TABLES [PURE WHITE THEME - DUST ACCENT] */}
         {/* ------------------------------------------------------------- */}
-        <section className="py-24 bg-white text-neutral-900 border-b border-neutral-100" id="comparison">
+        <section className={`py-24 border-b transition-all duration-300 ${
+          isPinkVariant 
+            ? "bg-white text-neutral-900 border-rose-100" 
+            : isYellowVariant 
+              ? "bg-white text-[#0d233a] border-[#e6dfc3]" 
+              : "bg-white text-neutral-900 border-neutral-100"
+        }`} id="comparison">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div className="max-w-3xl mb-16" {...fadeIn}>
-              <span className="text-neutral-500 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Simple Comparison</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-black mb-4 tracking-tight leading-tight">
+              <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+                isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-neutral-500"
+              }`}>Simple Comparison</span>
+              <h2 className={`text-3xl sm:text-4xl font-black mb-4 tracking-tight leading-tight ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-black"
+              }`}>
                 미리 준비해두는 디저트보다,<br />
-                <span className="text-amber-500">필요할 때 구워 파는 방식</span>이 부담을 줄입니다.
+                <span className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-500"}>필요할 때 구워 파는 방식</span>이 부담을 줄입니다.
               </h2>
             </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
               {/* Comparison Card 1 */}
-              <div className="bg-neutral-50 border border-neutral-200 p-6 sm:p-8 rounded-2xl shadow-sm">
-                <h3 className="text-base font-black text-black mb-6 flex items-center gap-2">
-                  <Award size={18} className="text-neutral-950" /> 보관과 판매 방식 비교
+              <div className={`border p-6 sm:p-8 rounded-2xl shadow-sm ${
+                isPinkVariant 
+                  ? "bg-[#fffbfd] border-[#f2ccd7]/80" 
+                  : isYellowVariant 
+                    ? "bg-[#fffdf2] border-[#e6dfc3]/80" 
+                    : "bg-neutral-50 border-neutral-200"
+              }`}>
+                <h3 className={`text-base font-black mb-6 flex items-center gap-2 ${
+                  isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-black"
+                }`}>
+                  <Award size={18} className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-neutral-955"} /> 보관과 판매 방식 비교
                 </h3>
                 <div className="space-y-5">
                   {[
@@ -2227,14 +2858,30 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     { label: "판매 방식", before: "미리 준비해 진열합니다.", after: "주문 후 간편하게 구워냅니다." },
                     { label: "남은 재고 부담", before: "팔리지 않으면 폐기로 이어질 수 있습니다.", after: "판매할 수량만 구워 부담을 줄입니다." }
                   ].map((item) => (
-                    <div key={item.label} className="border-t border-neutral-200 pt-4">
-                      <h4 className="text-sm font-black text-neutral-900 mb-3">{item.label}</h4>
+                    <div key={item.label} className={`border-t pt-4 ${
+                      isPinkVariant ? "border-[#f2ccd7]/50" : isYellowVariant ? "border-[#e6dfc3]/50" : "border-neutral-200"
+                    }`}>
+                      <h4 className={`text-sm font-black mb-3 ${
+                        isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-900"
+                      }`}>{item.label}</h4>
                       <div className="grid gap-2.5">
-                        <div className="rounded-lg bg-white border border-neutral-200 px-4 py-3">
-                          <span className="text-[10px] font-bold text-neutral-400 tracking-wider block mb-1">진열 디저트</span>
-                          <p className="text-xs sm:text-sm text-neutral-500 font-medium leading-relaxed">{item.before}</p>
+                        <div className={`rounded-lg px-4 py-3 border bg-white ${
+                          isPinkVariant ? "border-[#f2ccd7]/40" : isYellowVariant ? "border-[#e6dfc3]/40" : "border-neutral-200"
+                        }`}>
+                          <span className={`text-[10px] font-bold tracking-wider block mb-1 ${
+                            isPinkVariant ? "text-rose-400" : isYellowVariant ? "text-amber-600" : "text-neutral-400"
+                          }`}>진열 디저트</span>
+                          <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                            isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+                          }`}>{item.before}</p>
                         </div>
-                        <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 flex items-center gap-3">
+                        <div className={`rounded-lg px-4 py-3 flex items-center gap-3 border ${
+                          isPinkVariant 
+                            ? "bg-[#fff5f7] border-rose-100" 
+                            : isYellowVariant 
+                              ? "bg-[#fffdf2] border-[#e6dfc3]" 
+                              : "bg-amber-50 border-amber-200"
+                        }`}>
                           <div className="w-9 h-9 shrink-0 flex items-center justify-center">
                             <img
                               src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"}
@@ -2243,8 +2890,12 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                             />
                           </div>
                           <div className="min-w-0">
-                            <span className="text-[10px] font-bold text-amber-600 tracking-wider block mb-1">120pie 파이</span>
-                            <p className="text-xs sm:text-sm text-neutral-900 font-bold leading-relaxed">{item.after}</p>
+                            <span className={`text-[10px] font-bold tracking-wider block mb-1 ${
+                              isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-600"
+                            }`}>120pie 파이</span>
+                            <p className={`text-xs sm:text-sm font-bold leading-relaxed ${
+                              isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-900"
+                            }`}>{item.after}</p>
                           </div>
                         </div>
                       </div>
@@ -2254,9 +2905,17 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               </div>
 
               {/* Comparison Card 2 */}
-              <div className="bg-neutral-50 border border-neutral-200 p-6 sm:p-8 rounded-2xl shadow-sm">
-                <h3 className="text-base font-black text-black mb-6 flex items-center gap-2">
-                  <ShieldCheck size={18} className="text-neutral-950" /> 시작할 때 필요한 변화
+              <div className={`border p-6 sm:p-8 rounded-2xl shadow-sm ${
+                isPinkVariant 
+                  ? "bg-[#fffbfd] border-[#f2ccd7]/80" 
+                  : isYellowVariant 
+                    ? "bg-[#fffdf2] border-[#e6dfc3]/80" 
+                    : "bg-neutral-50 border-neutral-200"
+              }`}>
+                <h3 className={`text-base font-black mb-6 flex items-center gap-2 ${
+                  isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-black"
+                }`}>
+                  <ShieldCheck size={18} className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-neutral-955"} /> 시작할 때 필요한 변화
                 </h3>
                 <div className="space-y-5">
                   {[
@@ -2264,14 +2923,30 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     { label: "매장 변화", before: "공사나 간판 변경이 필요할 수 있습니다.", after: "기존 매장을 크게 바꾸지 않고 시작합니다." },
                     { label: "확장 방식", before: "처음부터 큰 결정을 해야 합니다.", after: "반응을 확인한 뒤 확장을 선택합니다." }
                   ].map((item) => (
-                    <div key={item.label} className="border-t border-neutral-200 pt-4">
-                      <h4 className="text-sm font-black text-neutral-900 mb-3">{item.label}</h4>
+                    <div key={item.label} className={`border-t pt-4 ${
+                      isPinkVariant ? "border-[#f2ccd7]/50" : isYellowVariant ? "border-[#e6dfc3]/50" : "border-neutral-200"
+                    }`}>
+                      <h4 className={`text-sm font-black mb-3 ${
+                        isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-900"
+                      }`}>{item.label}</h4>
                       <div className="grid gap-2.5">
-                        <div className="rounded-lg bg-white border border-neutral-200 px-4 py-3">
-                          <span className="text-[10px] font-bold text-neutral-400 tracking-wider block mb-1">새 브랜드 전환</span>
-                          <p className="text-xs sm:text-sm text-neutral-500 font-medium leading-relaxed">{item.before}</p>
+                        <div className={`rounded-lg px-4 py-3 border bg-white ${
+                          isPinkVariant ? "border-[#f2ccd7]/40" : isYellowVariant ? "border-[#e6dfc3]/40" : "border-neutral-200"
+                        }`}>
+                          <span className={`text-[10px] font-bold tracking-wider block mb-1 ${
+                            isPinkVariant ? "text-rose-400" : isYellowVariant ? "text-amber-600" : "text-neutral-400"
+                          }`}>새 브랜드 전환</span>
+                          <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                            isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+                          }`}>{item.before}</p>
                         </div>
-                        <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 flex items-center gap-3">
+                        <div className={`rounded-lg px-4 py-3 flex items-center gap-3 border ${
+                          isPinkVariant 
+                            ? "bg-[#fff5f7] border-rose-100" 
+                            : isYellowVariant 
+                              ? "bg-[#fffdf2] border-[#e6dfc3]" 
+                              : "bg-amber-50 border-amber-200"
+                        }`}>
                           <div className="w-9 h-9 shrink-0 flex items-center justify-center">
                             <img
                               src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"}
@@ -2280,8 +2955,12 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                             />
                           </div>
                           <div className="min-w-0">
-                            <span className="text-[10px] font-bold text-amber-600 tracking-wider block mb-1">120pie 도입</span>
-                            <p className="text-xs sm:text-sm text-neutral-900 font-bold leading-relaxed">{item.after}</p>
+                            <span className={`text-[10px] font-bold tracking-wider block mb-1 ${
+                              isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-600"
+                            }`}>120pie 도입</span>
+                            <p className={`text-xs sm:text-sm font-bold leading-relaxed ${
+                              isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-900"
+                            }`}>{item.after}</p>
                           </div>
                         </div>
                       </div>
@@ -2297,11 +2976,21 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* FAQ SECTION [RICH BLACK THEME - MODERN MINIMAL ACCORDION] */}
         {/* ------------------------------------------------------------- */}
-        <section className="py-24 bg-neutral-950 text-white border-b border-neutral-900 scroll-mt-16" id="faq">
+        <section className={`py-24 border-b scroll-mt-16 transition-all duration-300 ${
+          isPinkVariant 
+            ? "bg-[#fff5f7] text-[#4c2d3a] border-[#f2ccd7]" 
+            : isYellowVariant 
+              ? "bg-[#fffdf2] text-[#0d233a] border-[#e6dfc3]" 
+              : "bg-neutral-950 text-white border-neutral-900"
+        }`} id="faq">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div className="text-center mb-16" {...fadeIn}>
-              <span className="text-amber-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">FAQ</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-white">자주 묻는 질문</h2>
+              <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+                isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
+              }`}>FAQ</span>
+              <h2 className={`text-3xl sm:text-4xl font-black ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+              }`}>자주 묻는 질문</h2>
             </motion.div>
 
             <div className="space-y-4">
@@ -2315,14 +3004,28 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               ].map((faq, i) => (
                 <div
                   key={i}
-                  className="bg-neutral-900 border border-neutral-850 rounded-2xl overflow-hidden hover:border-amber-400/35 transition-colors"
+                  className={`rounded-2xl overflow-hidden border transition-all ${
+                    isPinkVariant 
+                      ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
+                      : isYellowVariant 
+                        ? "bg-white border-[#e6dfc3] hover:border-[#0d233a]" 
+                        : "bg-neutral-900 border-neutral-850 hover:border-amber-400/35"
+                  }`}
                 >
                   <button
                     onClick={() => setOpenFaqIdx(openFaqIdx === i ? null : i)}
-                    className="w-full px-6 sm:px-8 py-5 text-left font-extrabold text-white flex justify-between items-center hover:bg-neutral-850 transition-colors"
+                    className={`w-full px-6 sm:px-8 py-5 text-left font-extrabold flex justify-between items-center transition-colors ${
+                      isPinkVariant 
+                        ? "text-[#4c2d3a] hover:bg-[#fff9fb]" 
+                        : isYellowVariant 
+                          ? "text-[#0d233a] hover:bg-[#fffdf2]" 
+                          : "text-white hover:bg-neutral-850"
+                    }`}
                   >
                     <span className="text-sm sm:text-base pr-4 leading-tight">{faq.q}</span>
-                    <ChevronDown size={18} className={`text-amber-400 transition-transform duration-300 shrink-0 ${openFaqIdx === i ? "rotate-180" : ""}`} />
+                    <ChevronDown size={18} className={`transition-transform duration-300 shrink-0 ${
+                      isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-400"
+                    } ${openFaqIdx === i ? "rotate-180" : ""}`} />
                   </button>
                   <AnimatePresence initial={false}>
                     {openFaqIdx === i && (
@@ -2333,7 +3036,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                         transition={{ duration: 0.25 }}
                         className="overflow-hidden"
                       >
-                        <div className="px-6 sm:px-8 py-5 pt-0 text-neutral-400 text-xs sm:text-sm font-medium leading-relaxed border-t border-neutral-850 bg-neutral-950/40">
+                        <div className={`px-6 sm:px-8 py-5 pt-0 text-xs sm:text-sm font-medium leading-relaxed border-t ${
+                          isPinkVariant 
+                            ? "text-[#7c5d6c] border-[#f2ccd7]/40 bg-[#fffbfd]/55" 
+                            : isYellowVariant 
+                              ? "text-[#576575] border-[#e6dfc3]/40 bg-[#fffdf2]/55" 
+                              : "text-neutral-400 border-neutral-850 bg-neutral-955/40"
+                        }`}>
                           {faq.a}
                         </div>
                       </motion.div>
@@ -2348,21 +3057,41 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {/* ------------------------------------------------------------- */}
         {/* FINAL CONTACT / CTA SECTION [V3 PRECISE MINI FORM INTEGRATION - PREMIUM] */}
         {/* ------------------------------------------------------------- */}
-        <section id="contact" className="py-24 bg-gradient-to-b from-[#0a0a0a] to-[#050505] text-white relative">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-amber-400/5 rounded-full blur-3xl pointer-events-none"></div>
+        <section id="contact" className={`py-24 relative transition-all duration-300 ${
+          isPinkVariant 
+            ? "bg-gradient-to-b from-[#fff5f7] to-[#fff1f4] text-[#4c2d3a]" 
+            : isYellowVariant 
+              ? "bg-gradient-to-b from-[#fffdf2] to-[#fff9e6] text-[#0d233a]" 
+              : "bg-gradient-to-b from-[#0a0a0a] to-[#050505] text-white"
+        }`}>
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full blur-3xl pointer-events-none ${
+            isPinkVariant ? "bg-rose-400/5" : isYellowVariant ? "bg-amber-400/5" : "bg-amber-400/5"
+          }`}></div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-16 max-w-3xl mx-auto">
-              <span className="text-amber-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Easy Inquiry</span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-4 leading-tight">
+              <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+                isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-[#0d233a]" : "text-amber-400"
+              }`}>Easy Inquiry</span>
+              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4 leading-tight ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+              }`}>
                 우리 매장에 어울리는 디저트 메뉴,<br />편하게 상담받아 보세요
               </h2>
-              <p className="text-xs sm:text-base text-neutral-400 font-medium leading-relaxed max-w-xl mx-auto">
+              <p className={`text-xs sm:text-base font-medium leading-relaxed max-w-xl mx-auto ${
+                isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+              }`}>
                 작은 메뉴 추가부터 브랜드 협업까지, 매장에 맞는 시작 방법을 함께 살펴봅니다. 간단한 정보를 남겨주시면 안내 자료와 상담 내용을 보내드립니다.
               </p>
             </div>
 
-            <div className="max-w-xl mx-auto bg-neutral-900 border border-neutral-850 rounded-3xl p-6 sm:p-10 shadow-2xl relative">
+            <div className={`max-w-xl mx-auto border rounded-3xl p-6 sm:p-10 shadow-2xl relative transition-all duration-300 ${
+              isPinkVariant 
+                ? "bg-white border-[#f2ccd7]" 
+                : isYellowVariant 
+                  ? "bg-white border-[#e6dfc3]" 
+                  : "bg-neutral-900 border-neutral-850"
+            }`}>
 
               {formSubmitted ? (
                 <motion.div
@@ -2370,11 +3099,21 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center py-10 flex flex-col items-center justify-center gap-4"
                 >
-                  <div className="w-16 h-16 rounded-full bg-amber-400 flex items-center justify-center text-neutral-950 font-bold text-3xl shadow-[0_4px_16px_rgba(251,191,36,0.3)]">
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center font-bold text-3xl shadow-lg ${
+                    isPinkVariant 
+                      ? "bg-rose-500 text-white shadow-rose-300/30" 
+                      : isYellowVariant 
+                        ? "bg-[#0d233a] text-white shadow-[#0d233a]/30" 
+                        : "bg-amber-400 text-neutral-950 shadow-[0_4px_16px_rgba(251,191,36,0.3)]"
+                  }`}>
                     ✓
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-white mt-4">문의가 잘 접수되었습니다!</h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 max-w-sm font-medium leading-relaxed">
+                  <h3 className={`text-xl sm:text-2xl font-black mt-4 ${
+                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                  }`}>문의가 잘 접수되었습니다!</h3>
+                  <p className={`text-xs sm:text-sm max-w-sm font-medium leading-relaxed ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                  }`}>
                     남겨주신 연락처로 매장 상황에 잘 맞는 메뉴 구성과 도입 방법을 차분히 안내드리겠습니다.
                   </p>
                 </motion.div>
@@ -2382,7 +3121,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 <form onSubmit={handleFormSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-neutral-355">성함 <span className="text-amber-400">*</span></label>
+                      <label className={`text-xs font-bold ${
+                        isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-355"
+                      }`}>성함 <span className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"}>*</span></label>
                       <input
                         type="text"
                         name="name"
@@ -2390,12 +3131,20 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                         onChange={handleFormChange}
                         placeholder="홍길동 사장님"
                         required
-                        className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400 transition-colors"
+                        className={`w-full border rounded-xl px-4 py-3 text-xs sm:text-sm transition-all duration-200 ${
+                          isPinkVariant 
+                            ? "bg-rose-50/20 border-[#f2ccd7] text-[#4c2d3a] placeholder-[#bca9b2] focus:outline-none focus:border-rose-400 focus:bg-white" 
+                            : isYellowVariant 
+                              ? "bg-[#fffdf2]/40 border-[#e6dfc3] text-[#0d233a] placeholder-[#adaba3] focus:outline-none focus:border-[#0d233a] focus:bg-white" 
+                              : "bg-neutral-955 border border-neutral-800 text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400"
+                        }`}
                       />
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-neutral-355">연락처 <span className="text-amber-400">*</span></label>
+                      <label className={`text-xs font-bold ${
+                        isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-355"
+                      }`}>연락처 <span className={isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"}>*</span></label>
                       <input
                         type="tel"
                         inputMode="numeric"
@@ -2406,19 +3155,33 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                         onChange={handleFormChange}
                         placeholder="010-1234-5678"
                         required
-                        className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400 transition-colors"
+                        className={`w-full border rounded-xl px-4 py-3 text-xs sm:text-sm transition-all duration-200 ${
+                          isPinkVariant 
+                            ? "bg-rose-50/20 border-[#f2ccd7] text-[#4c2d3a] placeholder-[#bca9b2] focus:outline-none focus:border-rose-400 focus:bg-white" 
+                            : isYellowVariant 
+                              ? "bg-[#fffdf2]/40 border-[#e6dfc3] text-[#0d233a] placeholder-[#adaba3] focus:outline-none focus:border-[#0d233a] focus:bg-white" 
+                              : "bg-neutral-955 border border-neutral-800 text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400"
+                        }`}
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-neutral-355">관심 있는 도입 방식</label>
+                      <label className={`text-xs font-bold ${
+                        isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-355"
+                      }`}>관심 있는 도입 방식</label>
                       <select
                         name="storeType"
                         value={formData.storeType}
                         onChange={handleFormChange}
-                        className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-xs sm:text-sm text-white focus:outline-none focus:border-amber-400 transition-colors appearance-none"
+                        className={`w-full border rounded-xl px-4 py-3 text-xs sm:text-sm transition-all duration-200 appearance-none ${
+                          isPinkVariant 
+                            ? "bg-rose-50/20 border-[#f2ccd7] text-[#4c2d3a] focus:outline-none focus:border-rose-400 focus:bg-white" 
+                            : isYellowVariant 
+                              ? "bg-[#fffdf2]/40 border-[#e6dfc3] text-[#0d233a] focus:outline-none focus:border-[#0d233a] focus:bg-white" 
+                              : "bg-neutral-955 border border-neutral-800 text-white focus:outline-none focus:border-amber-400"
+                        }`}
                       >
                         <option value="샵인샵 도입">간단한 메뉴 추가로 시작</option>
                         <option value="브랜드 병기 도입">브랜드 안내와 함께 운영</option>
@@ -2429,33 +3192,57 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-neutral-355">기존 매장명 (선택)</label>
+                      <label className={`text-xs font-bold ${
+                        isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-355"
+                      }`}>기존 매장명 (선택)</label>
                       <input
                         type="text"
                         name="existingStoreName"
                         value={formData.existingStoreName}
                         onChange={handleFormChange}
                         placeholder="예: 마포커피 본점"
-                        className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400 transition-colors"
+                        className={`w-full border rounded-xl px-4 py-3 text-xs sm:text-sm transition-all duration-200 ${
+                          isPinkVariant 
+                            ? "bg-rose-50/20 border-[#f2ccd7] text-[#4c2d3a] placeholder-[#bca9b2] focus:outline-none focus:border-rose-400 focus:bg-white" 
+                            : isYellowVariant 
+                              ? "bg-[#fffdf2]/40 border-[#e6dfc3] text-[#0d233a] placeholder-[#adaba3] focus:outline-none focus:border-[#0d233a] focus:bg-white" 
+                              : "bg-neutral-955 border border-neutral-800 text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400"
+                        }`}
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-neutral-355">궁금하신 내용 (선택)</label>
+                    <label className={`text-xs font-bold ${
+                      isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-355"
+                    }`}>궁금하신 내용 (선택)</label>
                     <textarea
                       name="message"
                       value={formData.message}
                       onChange={handleFormChange}
                       rows={3}
                       placeholder="매장 형태나 궁금한 점을 편하게 남겨주세요."
-                      className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400 transition-colors resize-none"
+                      className={`w-full border rounded-xl px-4 py-3 text-xs sm:text-sm transition-all duration-200 resize-none ${
+                        isPinkVariant 
+                          ? "bg-rose-50/20 border-[#f2ccd7] text-[#4c2d3a] placeholder-[#bca9b2] focus:outline-none focus:border-rose-400 focus:bg-white" 
+                          : isYellowVariant 
+                            ? "bg-[#fffdf2]/40 border-[#e6dfc3] text-[#0d233a] placeholder-[#adaba3] focus:outline-none focus:border-[#0d233a] focus:bg-white" 
+                            : "bg-neutral-955 border border-neutral-800 text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400"
+                      }`}
                     />
                   </div>
 
                   <div className="flex items-start gap-2 pt-2">
-                    <input type="checkbox" id="privacy" required defaultChecked className="mt-1 accent-amber-400" />
-                    <label htmlFor="privacy" className="text-[10px] text-neutral-500 leading-normal font-bold">
+                    <input 
+                      type="checkbox" 
+                      id="privacy" 
+                      required 
+                      defaultChecked 
+                      className={`mt-1 ${isPinkVariant ? "accent-rose-500" : isYellowVariant ? "accent-[#0d233a]" : "accent-amber-400"}`} 
+                    />
+                    <label htmlFor="privacy" className={`text-[10px] leading-normal font-bold ${
+                      isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+                    }`}>
                       상담 안내를 위한 개인정보 수집 및 연락에 동의합니다. (필수)
                     </label>
                   </div>
@@ -2465,7 +3252,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     className={`pink-primary-button w-full py-4 font-black text-sm sm:text-base rounded-xl transition-all hover:scale-[1.01] border-0 cursor-pointer ${
                       isPinkVariant 
                         ? "bg-rose-500 hover:bg-rose-600 text-white shadow-[0_4px_24px_rgba(244,63,94,0.3)]" 
-                        : "bg-amber-400 hover:bg-amber-300 text-neutral-950 shadow-[0_4px_24px_rgba(251,191,36,0.3)]"
+                        : isYellowVariant 
+                          ? "bg-[#0d233a] hover:bg-[#163554] text-white shadow-[0_4px_24px_rgba(13,35,58,0.3)]" 
+                          : "bg-amber-400 hover:bg-amber-300 text-neutral-955 shadow-[0_4px_24px_rgba(251,191,36,0.3)]"
                     }`}
                   >
                     무료 상담 문의하기
@@ -2482,19 +3271,33 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
       {/* ------------------------------------------------------------- */}
       {/* FOOTER */}
       {/* ------------------------------------------------------------- */}
-      <footer className="bg-[#090909] border-t border-neutral-900 text-neutral-400">
+      <footer className={`border-t transition-all duration-300 ${
+        isPinkVariant 
+          ? "bg-[#fff1f4] border-rose-100 text-[#7c5d6c]" 
+          : isYellowVariant 
+            ? "bg-[#fff9e6] border-[#e6dfc3] text-[#576575]" 
+            : "bg-[#090909] border-neutral-900 text-neutral-400"
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 pb-12 border-b border-neutral-800/80">
+          <div className={`grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 pb-12 border-b ${
+            isPinkVariant ? "border-rose-200/50" : isYellowVariant ? "border-[#e6dfc3]" : "border-neutral-800/80"
+          }`}>
             <div className="lg:col-span-7">
               <div className="mb-7">
                 <img
-                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
+                  src={isPinkVariant 
+                    ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" 
+                    : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"}
                   alt="120pie 로고"
-                  className="h-7 sm:h-8 w-auto object-contain grayscale opacity-40 hover:opacity-75 transition-opacity duration-200"
+                  className="h-7 sm:h-8 w-auto object-contain opacity-40 hover:opacity-75 transition-opacity duration-200"
                 />
               </div>
-              <p className="text-base text-white font-bold tracking-tight mb-5">(주)고우웰라이프</p>
-              <div className="space-y-2.5 text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">
+              <p className={`text-base font-bold tracking-tight mb-5 ${
+                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+              }`}>(주)고우웰라이프</p>
+              <div className={`space-y-2.5 text-xs sm:text-sm font-medium leading-relaxed ${
+                isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+              }`}>
                 <p>대표 : 이사근 | 사업자번호: 787-88-00444</p>
                 <p>경기 군포시 엘에스로 143 1층 1001호</p>
                 <p>E-mail: lifenjoy0296@gmail.com | Tel: 1588-0883</p>
@@ -2502,47 +3305,65 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               </div>
             </div>
 
-            <div className="lg:col-span-5 lg:border-l lg:border-neutral-800/80 lg:pl-12 flex flex-col justify-between gap-10">
+            <div className={`lg:col-span-5 lg:border-l lg:pl-12 flex flex-col justify-between gap-10 ${
+              isPinkVariant ? "lg:border-rose-200/50" : isYellowVariant ? "lg:border-[#e6dfc3]" : "lg:border-neutral-800/80"
+            }`}>
               <div>
-                <span className="text-[10px] tracking-[0.24em] uppercase text-neutral-500 font-bold block mb-5">
+                <span className={`text-[10px] tracking-[0.24em] uppercase font-bold block mb-5 ${
+                  isPinkVariant ? "text-rose-400" : isYellowVariant ? "text-amber-600" : "text-neutral-500"
+                }`}>
                   Customer Center
                 </span>
                 <a
                   href="tel:1588-0883"
-                  className="text-3xl sm:text-4xl font-black text-white tracking-tight hover:text-amber-400 transition-colors block mb-3"
+                  className={`text-3xl sm:text-4xl font-black tracking-tight transition-colors block mb-3 ${
+                    isPinkVariant ? "text-[#4c2d3a] hover:text-rose-500" : isYellowVariant ? "text-[#0d233a] hover:text-amber-600" : "text-white hover:text-amber-400"
+                  }`}
                 >
                   1588-0883
                 </a>
-                <p className="inline-flex items-center gap-2 text-sm text-neutral-300 font-bold">
-                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <p className={`inline-flex items-center gap-2 text-sm font-bold ${
+                  isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-300"
+                }`}>
+                  <span className={`w-2 h-2 rounded-full ${
+                    isPinkVariant ? "bg-rose-500" : isYellowVariant ? "bg-[#0d233a]" : "bg-amber-400"
+                  }`} />
                   24시간 상담가능
                 </p>
               </div>
 
-              <div className="flex gap-6 text-sm text-neutral-400 font-bold">
-                <span className="hover:text-white transition-colors cursor-pointer">이용약관</span>
-                <span className="hover:text-white transition-colors cursor-pointer">개인정보처리방침</span>
+              <div className={`flex gap-6 text-sm font-bold ${
+                isPinkVariant ? "text-[#7c5d6c] hover:text-[#4c2d3a]" : isYellowVariant ? "text-[#576575] hover:text-[#0d233a]" : "text-neutral-400 hover:text-white"
+              }`}>
+                <span className="transition-colors cursor-pointer">이용약관</span>
+                <span className="transition-colors cursor-pointer">개인정보처리방침</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-6 text-neutral-500 text-xs font-medium flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className={`pt-6 text-xs font-medium flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${
+            isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+          }`}>
             <p>Copyright(c)2026 GOWELL-LIFE Co.,Ltd. All Right Reserved.</p>
             <div className="flex items-center gap-3">
               <Link
                 href="/portal"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-neutral-500 hover:text-neutral-300 hover:underline transition-colors text-[11px]"
+                className={`hover:underline transition-colors text-[11px] ${
+                  isPinkVariant ? "text-[#7c5d6c] hover:text-[#4c2d3a]" : isYellowVariant ? "text-[#576575] hover:text-[#0d233a]" : "text-neutral-500 hover:text-neutral-300"
+                }`}
               >
                 점주포털
               </Link>
-              <span className="text-neutral-800">|</span>
+              <span className={isPinkVariant ? "text-rose-200/50" : isYellowVariant ? "text-[#e6dfc3]" : "text-neutral-800"}>|</span>
               <Link
                 href="/admin"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-neutral-500 hover:text-neutral-300 hover:underline transition-colors text-[11px]"
+                className={`hover:underline transition-colors text-[11px] ${
+                  isPinkVariant ? "text-[#7c5d6c] hover:text-[#4c2d3a]" : isYellowVariant ? "text-[#576575] hover:text-[#0d233a]" : "text-neutral-500 hover:text-neutral-300"
+                }`}
               >
                 본사 어드민
               </Link>
@@ -2624,6 +3445,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                         // On landing, internally open consultation inquiry modal
                         setInquiryModalOpen(true);
                         popupClosedInSessionRef.current = true;
+                        if (typeof window !== "undefined") {
+                          sessionStorage.setItem("120_popup_closed_session", "true");
+                        }
                         setShowPopup(false);
                       }
                     }}
@@ -2646,6 +3470,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
                     localStorage.setItem("120_popup_closed_date", todayStr);
                     popupClosedInSessionRef.current = true;
+                    if (typeof window !== "undefined") {
+                      sessionStorage.setItem("120_popup_closed_session", "true");
+                    }
                     setShowPopup(false);
                   }}
                   className="hover:text-[#bf3e67] transition-colors flex items-center gap-1 cursor-pointer"
@@ -2655,6 +3482,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 <button
                   onClick={() => {
                     popupClosedInSessionRef.current = true;
+                    if (typeof window !== "undefined") {
+                      sessionStorage.setItem("120_popup_closed_session", "true");
+                    }
                     setShowPopup(false);
                   }}
                   className="hover:text-red-500 font-extrabold transition-colors cursor-pointer"
