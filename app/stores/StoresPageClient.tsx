@@ -222,7 +222,7 @@ export default function StoresPageClient() {
       <header className={`sticky top-0 z-20 backdrop-blur-md transition-colors duration-300 ${headerBg}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[60px] sm:min-h-[78px] flex items-center justify-between gap-2 sm:gap-4">
           <Link href={backUrl} className="flex items-center group shrink-0">
-            <img src={logoUrl} alt="120pie & coffee" className="h-[22px] sm:h-[32px] w-auto object-contain group-hover:scale-102 transition-transform" />
+            <img src={logoUrl} alt="120pie & coffee" className="h-5 sm:h-8 w-auto object-contain group-hover:scale-102 transition-transform" />
           </Link>
           <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Dynamic theme switcher on the page itself */}
@@ -484,7 +484,7 @@ export default function StoresPageClient() {
           <FloatingAndInquiry
             forceOpenModal={inquiryForcedOpen}
             onModalClose={() => setInquiryForcedOpen(false)}
-            isPink={false}
+            isPink={isPink}
           />
         </div>
       </main>

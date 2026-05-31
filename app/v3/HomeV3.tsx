@@ -930,6 +930,60 @@ function GallerySection({ filter, setFilter, isPink = false, isYellow = false }:
 export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5" }) {
   const isPinkVariant = variant === "v4";
   const isYellowVariant = variant === "v5";
+
+  // Dynamic Header Variables
+  const headerBgClass = isYellowVariant
+    ? "bg-[#fffdf2]/90 border-b border-[#e6dfc3]/60 shadow-[#0d233a]/[0.02]"
+    : isPinkVariant
+      ? "bg-[#0f0a0c]/90 border-b border-[#f2ccd7]/15 shadow-rose-950/20"
+      : "bg-neutral-950/95 border-b border-neutral-900/60";
+
+  const logoImgSrc = isPinkVariant
+    ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png"
+    : isYellowVariant
+      ? "/logo_yellow_blue.png"
+      : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png";
+
+  const logoTargetUrl = isPinkVariant ? "/pink" : isYellowVariant ? "/" : "/v3";
+
+  const navLinkTextClass = isYellowVariant
+    ? "text-[#576575] hover:text-[#0d233a]"
+    : isPinkVariant
+      ? "text-neutral-400 hover:text-rose-400"
+      : "text-neutral-400 hover:text-amber-400";
+
+  const switcherWrapperClass = isYellowVariant
+    ? "border-[#e6dfc3] bg-neutral-900/5"
+    : isPinkVariant
+      ? "border-[#f2ccd7]/20 bg-neutral-900/60"
+      : "border-neutral-800 bg-neutral-900/60";
+
+  const switcherBtnYellowClass = isYellowVariant
+    ? "landing-theme-active bg-amber-400 text-neutral-950 font-extrabold shadow-sm"
+    : "text-neutral-400 hover:text-white";
+
+  const switcherBtnBlackClass = (!isPinkVariant && !isYellowVariant)
+    ? "landing-theme-active bg-amber-400 text-neutral-950 font-extrabold shadow-sm"
+    : isYellowVariant
+      ? "text-neutral-500 hover:text-[#0d233a]"
+      : "text-neutral-400 hover:text-amber-400";
+
+  const portalBtnClass = isYellowVariant
+    ? "border-[#e6dfc3] bg-white text-[#576575] hover:bg-[#fffcf0] hover:text-[#0d233a] transition-all"
+    : "border-neutral-800 bg-neutral-900 text-neutral-350 hover:bg-neutral-800 hover:text-white transition-all";
+
+  const mobileNavDrawerBgClass = isYellowVariant
+    ? "bg-[#fffdf2]/98 border-t border-[#e6dfc3]/60"
+    : isPinkVariant
+      ? "bg-[#0f0a0c]/98 border-t border-[#f2ccd7]/15"
+      : "bg-neutral-950/98 border-t border-neutral-900/60";
+
+  const mobileNavLinkClass = isYellowVariant
+    ? "bg-white border border-[#e6dfc3]/60 text-[#576575] hover:text-[#0d233a] hover:bg-[#fffdf4]"
+    : isPinkVariant
+      ? "bg-[#181114] border border-[#f2ccd7]/10 text-neutral-400 hover:text-rose-400"
+      : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-amber-400";
+
   // 수익성 시뮬레이션 상태 변수
   const [quantity, setQuantity] = useState<number>(20);
   const [price, setPrice] = useState<number>(4500);
@@ -1140,19 +1194,19 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
       {/* ------------------------------------------------------------- */}
       {/* HEADER (Sticky Minimal Tri-Tone) */}
       {/* ------------------------------------------------------------- */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-neutral-950/95 border-b border-neutral-900/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between min-h-[94px] gap-3">
+      <header className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 ${headerBgClass}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between min-h-[60px] sm:min-h-[80px] lg:min-h-[94px] gap-2.5 sm:gap-4">
           <div className="shrink-0 py-2">
-            <Link className="flex items-center group shrink-0" href={isPinkVariant ? "/" : "/v3"} aria-label="120pie 홈으로 이동">
+            <Link className="flex items-center group shrink-0" href={logoTargetUrl} aria-label="120pie 홈으로 이동">
               <img
-                src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"}
+                src={logoImgSrc}
                 alt="120pie & coffee"
-                className="h-5.5 sm:h-7 w-auto object-contain group-hover:scale-105 transition-transform"
+                className="h-5 sm:h-7 lg:h-8 w-auto object-contain group-hover:scale-102 transition-all duration-200"
               />
             </Link>
           </div>
 
-          <nav className="hidden lg:flex items-center gap-2.5 xl:gap-4 text-[10px] xl:text-[13px] font-bold text-neutral-400 shrink-0">
+          <nav className={`hidden lg:flex items-center gap-2.5 xl:gap-4 text-[10px] xl:text-[13px] font-bold shrink-0 ${navLinkTextClass}`}>
             <a href="#why" className="hover:text-amber-400 transition-colors">도입 가치</a>
             <a href="#structure" className="hover:text-amber-400 transition-colors">브랜드 구조</a>
             <a href="#menu" className="hover:text-amber-400 transition-colors">메뉴 카탈로그</a>
@@ -1176,15 +1230,15 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
           </nav>
 
           <div className="flex items-center gap-2.5">
-            <div className="flex items-center rounded-full border border-neutral-800 bg-neutral-900/60 p-0.5 text-[10px] font-black">
-              <Link href="/" className={`rounded-full px-2.5 py-1 transition-colors ${isYellowVariant ? "landing-theme-active bg-amber-400 text-neutral-950 font-extrabold shadow-sm" : "text-neutral-400 hover:text-white"}`}>
+            <div className={`flex items-center rounded-full border p-0.5 text-[10px] font-black ${switcherWrapperClass}`}>
+              <Link href="/" className={`rounded-full px-2.5 py-1 transition-colors ${switcherBtnYellowClass}`}>
                 옐로
               </Link>
-              <Link href="/v3" className={`rounded-full px-2.5 py-1 transition-colors ${(!isPinkVariant && !isYellowVariant) ? "landing-theme-active bg-amber-400 text-neutral-950 font-extrabold shadow-sm" : "text-neutral-400 hover:text-amber-400"}`}>
+              <Link href="/v3" className={`rounded-full px-2.5 py-1 transition-colors ${switcherBtnBlackClass}`}>
                 블랙
               </Link>
             </div>
-            <Link className="hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-neutral-800 bg-neutral-900 text-xs font-bold text-neutral-350 hover:bg-neutral-800 hover:text-white transition-colors" href="/portal" target="_blank" rel="noopener noreferrer">
+            <Link className={`hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-lg border text-xs font-bold ${portalBtnClass}`} href="/portal" target="_blank" rel="noopener noreferrer">
               점주전용
             </Link>
             <button type="button" onClick={() => setInquiryModalOpen(true)} className={`pink-primary-button hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-xs sm:text-sm font-black hover:scale-[1.02] transition-all border-0 cursor-pointer ${
@@ -1196,7 +1250,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             </button>
             <button
               type="button"
-              className={`pink-primary-button lg:hidden inline-flex items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-black border-0 cursor-pointer ${
+              className={`pink-primary-button lg:hidden inline-flex items-center justify-center rounded-lg p-2.5 text-xs font-black border-0 cursor-pointer ${
                 isPinkVariant 
                   ? "bg-rose-500 text-white hover:bg-rose-600" 
                   : "bg-amber-400 text-neutral-950 hover:bg-amber-300"
@@ -1205,14 +1259,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               aria-controls="mobile-landing-nav"
               onClick={() => setMobileNavOpen(open => !open)}
             >
-              {mobileNavOpen ? <X size={15} /> : <Menu size={15} />}
-              {mobileNavOpen ? "닫기" : "더보기"}
+              {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </div>
         {mobileNavOpen && (
-          <nav id="mobile-landing-nav" className="lg:hidden border-t border-neutral-900/60 px-4 pb-4 pt-3 bg-neutral-950/95">
-            <div className="grid grid-cols-2 gap-2 text-sm font-bold text-neutral-500">
+          <nav id="mobile-landing-nav" className={`lg:hidden border-t px-4 pb-5 pt-3.5 transition-all duration-300 ${mobileNavDrawerBgClass}`}>
+            <div className="grid grid-cols-2 gap-2 text-sm font-bold">
               {[
                 { label: "도입 가치", href: "#why" },
                 { label: "브랜드 구조", href: "#structure" },
@@ -1221,14 +1274,14 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 { label: "도입 방식", href: "#adoption" },
                 { label: "FAQ", href: "#faq" }
               ].map(item => (
-                <a key={item.href} href={item.href} onClick={() => setMobileNavOpen(false)} className="rounded-xl bg-neutral-900 border border-neutral-800 px-4 py-3 hover:text-amber-400 transition-colors">
+                <a key={item.href} href={item.href} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
                   {item.label}
                 </a>
               ))}
-              <Link href={isPinkVariant ? "/stores?theme=pink" : "/stores?theme=black"} className="rounded-xl bg-neutral-900 border border-neutral-800 px-4 py-3 hover:text-amber-400 transition-colors">
+              <Link href={isPinkVariant ? "/stores?theme=pink" : "/stores?theme=yellow"} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
                 가맹점 현황
               </Link>
-              <Link href="/portal" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-neutral-900 border border-neutral-800 px-4 py-3 hover:text-amber-400 transition-colors">
+              <Link href="/portal" target="_blank" rel="noopener noreferrer" onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
                 점주전용
               </Link>
             </div>
