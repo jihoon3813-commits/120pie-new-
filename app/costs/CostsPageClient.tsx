@@ -415,7 +415,9 @@ export default function CostsPageClient() {
 
             <div className="grid grid-cols-1 gap-12 items-stretch mb-12">
               {PACKAGES.map((pkg) => (
-                <div key={pkg.id} className={`rounded-3xl p-6 sm:p-10 flex flex-col gap-10 transition-all duration-300 hover:border-amber-400/40 ${cardBg}`}>
+                <div key={pkg.id} className={`rounded-3xl p-6 sm:p-10 flex flex-col gap-10 transition-all duration-300 ${cardBg} ${
+                  isPink ? "hover:border-rose-500/40" : "hover:border-[#ffd500]/60"
+                }`}>
                   
                   {/* Top Section: Shopping Mall Product Detail Style (Image on Left, Product Info on Right) */}
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
@@ -474,22 +476,26 @@ export default function CostsPageClient() {
                         </div>
 
                         {/* Quick Spec list (Shopping Mall Style) */}
-                        <div className="grid grid-cols-2 gap-4 mb-6 text-xs border border-neutral-200/40 dark:border-neutral-900 rounded-2xl p-4 bg-neutral-50/50 dark:bg-[#fff9e6]/40">
+                        <div className={`grid grid-cols-2 gap-4 mb-6 text-xs border rounded-2xl p-4 ${
+                          isPink 
+                            ? "bg-neutral-950/60 border-neutral-850 text-neutral-400" 
+                            : "bg-[#fffcf0] border-[#ffd500]/20 text-[#576575]"
+                        }`}>
                           <div>
-                            <span className="block text-[9px] font-bold text-neutral-450 dark:text-neutral-500 mb-0.5">도입 혜택</span>
-                            <span className={`font-black ${isPink ? "text-rose-600" : "text-[#0d233a]"}`}>가맹비/교육비/로열티 면제</span>
+                            <span className={`block text-[9px] font-bold mb-0.5 ${isPink ? "text-neutral-500" : "text-neutral-450"}`}>도입 혜택</span>
+                            <span className={`font-black ${isPink ? "text-rose-400" : "text-[#0d233a]"}`}>가맹비/교육비/로열티 면제</span>
                           </div>
                           <div>
-                            <span className="block text-[9px] font-bold text-neutral-450 dark:text-neutral-500 mb-0.5">조리 방식</span>
-                            <span className={`font-black ${isPink ? "text-neutral-800" : "text-[#0d233a]"}`}>5분 완벽 베이킹 시스템</span>
+                            <span className={`block text-[9px] font-bold mb-0.5 ${isPink ? "text-neutral-500" : "text-neutral-450"}`}>조리 방식</span>
+                            <span className={`font-black ${isPink ? "text-neutral-200" : "text-[#0d233a]"}`}>5분 완벽 베이킹 시스템</span>
                           </div>
                           <div>
-                            <span className="block text-[9px] font-bold text-neutral-450 dark:text-neutral-500 mb-0.5">물류 시스템</span>
-                            <span className={`font-black ${isPink ? "text-neutral-800" : "text-[#0d233a]"}`}>주 3회 전국 신선 콜드체인</span>
+                            <span className={`block text-[9px] font-bold mb-0.5 ${isPink ? "text-neutral-500" : "text-neutral-450"}`}>물류 시스템</span>
+                            <span className={`font-black ${isPink ? "text-neutral-200" : "text-[#0d233a]"}`}>주 3회 전국 신선 콜드체인</span>
                           </div>
                           <div>
-                            <span className="block text-[9px] font-bold text-neutral-450 dark:text-neutral-500 mb-0.5">지원 범위</span>
-                            <span className={`font-black ${isPink ? "text-neutral-800" : "text-[#0d233a]"}`}>기기설치 및 1:1 조리 교육</span>
+                            <span className={`block text-[9px] font-bold mb-0.5 ${isPink ? "text-neutral-500" : "text-neutral-450"}`}>지원 범위</span>
+                            <span className={`font-black ${isPink ? "text-neutral-200" : "text-[#0d233a]"}`}>기기설치 및 1:1 조리 교육</span>
                           </div>
                         </div>
                       </div>
@@ -500,7 +506,7 @@ export default function CostsPageClient() {
                           <span className="text-xs sm:text-sm font-bold text-neutral-450 dark:text-neutral-500">초기 패키지 특별 공급가</span>
                           <div className="text-right">
                             <span className="text-[10px] line-through text-neutral-400 dark:text-neutral-600 mr-2 font-mono">정상가 {pkg.normalPrice}</span>
-                            <strong className={`text-2xl sm:text-3xl font-black tracking-tight ${isPink ? "text-rose-600" : "text-amber-400"}`}>
+                            <strong className={`text-2xl sm:text-3xl font-black tracking-tight ${isPink ? "text-rose-500" : "text-amber-600"}`}>
                               {pkg.price} <span className="text-[11px] sm:text-xs font-bold text-neutral-400 ml-1">(부가세 포함)</span>
                             </strong>
                           </div>
@@ -515,7 +521,7 @@ export default function CostsPageClient() {
                   {/* Bottom Section: Detailed Components in 2 columns (2열 상세 구성) */}
                   <div className="flex flex-col gap-6">
                     <div className="flex justify-between items-center flex-wrap gap-4">
-                      <h4 className={`text-sm sm:text-base font-black tracking-tight flex items-center gap-2 ${isPink ? "text-neutral-800" : "text-neutral-200"}`}>
+                      <h4 className={`text-sm sm:text-base font-black tracking-tight flex items-center gap-2 ${isPink ? "text-white" : "text-[#0d233a]"}`}>
                         <Layers size={16} className={labelAccent} /> 패키지 포함 구성품 상세 안내
                       </h4>
                     </div>
@@ -524,12 +530,12 @@ export default function CostsPageClient() {
                       {pkg.items.map((item, idx) => (
                         <div key={idx} className={`flex gap-3.5 items-center sm:items-start group/item p-3 sm:p-4 rounded-2xl transition-all duration-300 ${
                           isPink 
-                            ? "bg-white/45 hover:bg-white/80 border border-rose-100/50 shadow-sm shadow-amber-900/[0.01]" 
-                            : "bg-[#161316]/50 hover:bg-[#1a161b]/80 border border-neutral-900 shadow-md"
+                            ? "bg-neutral-950/45 hover:bg-neutral-950/80 border border-neutral-850 hover:border-rose-500/20 shadow-md shadow-black/10" 
+                            : "bg-gradient-to-br from-[#fffdf8] to-[#fffcf0] hover:from-[#fffdf4] hover:to-[#fff9e6] border border-[#e6dfc3] hover:border-[#ffd500]/60 shadow-sm shadow-[#0d233a]/[0.01]"
                         }`}>
                           {/* Premium Compact Thumbnail (Now visible on mobile too!) */}
                           <div className={`w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden shrink-0 border relative shadow-sm transition-transform duration-300 group-hover/item:scale-[1.03] ${
-                            isPink ? "border-transparent bg-neutral-100" : "border-neutral-850 bg-neutral-950"
+                            isPink ? "border-neutral-800 bg-neutral-950" : "border-[#e6dfc3] bg-white"
                           }`}>
                             <img 
                               src={getCloudinaryResizedUrl(item.imageUrl, 150, 150)} 
@@ -543,21 +549,21 @@ export default function CostsPageClient() {
                               <span className={`text-xs sm:text-sm font-black font-mono shrink-0 mt-0.5 ${labelAccent}`}>{String(idx+1).padStart(2, "0")}</span>
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
-                                  <strong className={`block text-[13px] sm:text-[15px] font-black leading-snug ${isPink ? "text-neutral-900" : "text-white"}`}>
+                                  <strong className={`block text-[13px] sm:text-[15px] font-black leading-snug ${isPink ? "text-white" : "text-[#0d233a]"}`}>
                                     {item.title}
                                   </strong>
                                   {item.qty && (
                                     <span className={`px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-mono font-black tracking-wider shrink-0 shadow-sm border whitespace-nowrap ${
                                       isPink 
-                                        ? "bg-rose-500/10 text-rose-600 border-rose-250/40" 
-                                        : "bg-amber-400/10 text-amber-400 border-amber-400/20"
+                                        ? "bg-rose-500/10 text-rose-400 border-rose-500/20" 
+                                        : "bg-[#ffd500]/10 text-amber-600 border-[#ffd500]/25"
                                     }`}>
                                       {item.qty}
                                     </span>
                                   )}
                                 </div>
                                 <p className={`text-[11px] sm:text-xs font-semibold leading-relaxed mt-1 whitespace-normal break-all ${
-                                  isPink ? "text-neutral-500" : "text-neutral-400"
+                                  isPink ? "text-neutral-400" : "text-[#576575]"
                                 }`}>
                                   {item.desc}
                                 </p>
@@ -593,13 +599,13 @@ export default function CostsPageClient() {
             {/* Combined/Double Package Special Offer Banner - Premium Neon Infographic Card */}
             <div className={`rounded-3xl p-6 sm:p-10 border transition-all duration-500 relative overflow-hidden mb-16 ${
               isPink 
-                ? "bg-gradient-to-br from-rose-50/90 via-rose-100/40 to-amber-50/60 border-rose-300 shadow-xl" 
-                : "bg-gradient-to-br from-[#181519]/95 via-[#1a1215]/80 to-[#0e141a]/95 border-neutral-800 shadow-2xl"
+                ? "bg-gradient-to-br from-[#181519]/95 via-[#1a1215]/80 to-[#0e141a]/95 border-neutral-800 shadow-2xl" 
+                : "bg-gradient-to-br from-[#fffdf4] via-[#fff9e6] to-[#fff3cc] border-[#ffd500]/40 shadow-xl"
             }`}
             style={{
               boxShadow: isPink 
-                ? "0 0 25px -5px rgba(244, 63, 94, 0.25), 0 0 15px -3px rgba(245, 158, 11, 0.15)"
-                : "0 0 30px -5px rgba(245, 158, 11, 0.35), 0 0 20px -5px rgba(244, 63, 94, 0.2)"
+                ? "0 0 30px -5px rgba(245, 158, 11, 0.35), 0 0 20px -5px rgba(244, 63, 94, 0.2)"
+                : "0 0 25px -5px rgba(251, 191, 36, 0.25), 0 0 15px -3px rgba(13, 35, 58, 0.05)"
             }}>
               {/* Background decorative glows */}
               <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/10 dark:bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
@@ -627,7 +633,7 @@ export default function CostsPageClient() {
                   
                   {/* Left: Package 01 */}
                   <div className={`w-full md:w-[44%] rounded-2xl p-5 flex items-center gap-5 border transition-all duration-300 hover:scale-[1.02] shadow-sm ${
-                    isPink ? "bg-white border-rose-100" : "bg-neutral-950/90 border-neutral-900"
+                    isPink ? "bg-neutral-950/90 border-neutral-900" : "bg-white border-[#ffd500]/25 shadow-sm"
                   }`}>
                     <img 
                       src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_r90tky.jpg" 
@@ -636,8 +642,8 @@ export default function CostsPageClient() {
                     />
                     <div className="min-w-0">
                       <span className={`block text-[10px] font-black uppercase tracking-wider ${labelAccent}`}>Category 01</span>
-                      <strong className={`block text-sm sm:text-base font-black truncate leading-snug ${isPink ? "text-neutral-800" : "text-white"}`}>120겹파이 올인원 패키지</strong>
-                      <span className={`text-xs sm:text-sm font-mono font-black ${isPink ? "text-neutral-600" : "text-neutral-300"}`}>4,400,000 원 <span className="text-[10px] font-bold text-neutral-400 block sm:inline sm:ml-1">(부가세 포함)</span></span>
+                      <strong className={`block text-sm sm:text-base font-black truncate leading-snug ${isPink ? "text-white" : "text-[#0d233a]"}`}>120겹파이 올인원 패키지</strong>
+                      <span className={`text-xs sm:text-sm font-mono font-black ${isPink ? "text-neutral-300" : "text-[#576575]"}`}>4,400,000 원 <span className="text-[10px] font-bold text-neutral-400 block sm:inline sm:ml-1">(부가세 포함)</span></span>
                     </div>
                   </div>
 
@@ -645,8 +651,8 @@ export default function CostsPageClient() {
                   <div className="flex justify-center shrink-0">
                     <span className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xl border shadow-sm transition-all duration-300 ${
                       isPink 
-                        ? "bg-white border-rose-200 text-rose-500 hover:bg-rose-50" 
-                        : "bg-neutral-950 border-neutral-800 text-amber-400 hover:border-amber-400/40"
+                        ? "bg-neutral-950 border-neutral-800 text-rose-400 hover:border-rose-500/40" 
+                        : "bg-white border-[#ffd500] text-amber-600 hover:bg-[#fffdf4]"
                     }`}>
                       +
                     </span>
@@ -654,7 +660,7 @@ export default function CostsPageClient() {
 
                   {/* Right: Package 02 */}
                   <div className={`w-full md:w-[44%] rounded-2xl p-5 flex items-center gap-5 border transition-all duration-300 hover:scale-[1.02] shadow-sm ${
-                    isPink ? "bg-white border-rose-100" : "bg-neutral-950/90 border-neutral-900"
+                    isPink ? "bg-neutral-950/90 border-neutral-900" : "bg-white border-[#ffd500]/25 shadow-sm"
                   }`}>
                     <img 
                       src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779722364/egg120_%EB%A9%94%EC%9D%B8_%EB%B0%B0%EB%84%88_owuycx.jpg" 
@@ -663,8 +669,8 @@ export default function CostsPageClient() {
                     />
                     <div className="min-w-0">
                       <span className={`block text-[10px] font-black uppercase tracking-wider ${labelAccent}`}>Category 02</span>
-                      <strong className={`block text-sm sm:text-base font-black truncate leading-snug ${isPink ? "text-neutral-800" : "text-white"}`}>egg120 프리미엄 패키지</strong>
-                      <span className={`text-xs sm:text-sm font-mono font-black ${isPink ? "text-neutral-600" : "text-neutral-300"}`}>3,300,000 원 <span className="text-[10px] font-bold text-neutral-400 block sm:inline sm:ml-1">(부가세 포함)</span></span>
+                      <strong className={`block text-sm sm:text-base font-black truncate leading-snug ${isPink ? "text-white" : "text-[#0d233a]"}`}>egg120 프리미엄 패키지</strong>
+                      <span className={`text-xs sm:text-sm font-mono font-black ${isPink ? "text-neutral-300" : "text-[#576575]"}`}>3,300,000 원 <span className="text-[10px] font-bold text-neutral-400 block sm:inline sm:ml-1">(부가세 포함)</span></span>
                     </div>
                   </div>
                 </div>
@@ -672,17 +678,17 @@ export default function CostsPageClient() {
                 {/* Arrow & BIG SUM indication in flow */}
                 <div className="w-full max-w-xl flex flex-col items-center mb-8">
                   <div className={`flex flex-col items-center mb-4`}>
-                    <div className={`w-0.5 h-6 ${isPink ? "bg-rose-300" : "bg-neutral-800"}`} />
+                    <div className={`w-0.5 h-6 ${isPink ? "bg-rose-500/30" : "bg-[#ffd500]/50"}`} />
                     <div className={`w-2 h-2 rotate-45 border-b border-r -mt-1.5 ${
-                      isPink ? "border-rose-300" : "border-neutral-800"
+                      isPink ? "border-rose-500/30" : "border-[#ffd500]/50"
                     }`} />
                   </div>
                   
                   {/* Huge Sum Label */}
                   <div className={`px-10 py-3 rounded-2xl border-2 text-center transition-all duration-300 shadow-md ${
                     isPink 
-                      ? "bg-rose-100/50 border-rose-300 text-rose-700 shadow-rose-200/10" 
-                      : "bg-[#181114] border-rose-500/30 text-rose-300 shadow-rose-950/20"
+                      ? "bg-[#181114] border-rose-500/30 text-rose-300 shadow-rose-950/20" 
+                      : "bg-[#fff9e6] border-[#ffd500]/40 text-amber-700 shadow-sm"
                   }`}>
                     <span className="block text-[10px] uppercase font-bold tracking-widest opacity-85 mb-1">두 패키지 개별 도입 합계</span>
                     <strong className="text-2xl sm:text-3xl font-black font-mono leading-none tracking-tight">7,700,000 원 <span className="text-xs font-bold block mt-1 opacity-80">(부가세 포함)</span></strong>
@@ -692,25 +698,25 @@ export default function CostsPageClient() {
                 {/* Final Premium Neon Glow Discount Box */}
                 <div className={`w-full max-w-2xl rounded-2xl p-6 sm:p-8 border-2 text-center relative overflow-hidden transition-all duration-500 ${
                   isPink 
-                    ? "bg-white/95 border-rose-500" 
-                    : "bg-[#140e11]/90 border-amber-400"
+                    ? "bg-[#140e11]/90 border-rose-500" 
+                    : "bg-white/95 border-[#ffd500]"
                 }`}
                 style={{
                   boxShadow: isPink
-                    ? "0 0 20px rgba(244, 63, 94, 0.4), inset 0 0 10px rgba(244, 63, 94, 0.05)"
-                    : "0 0 25px rgba(245, 158, 11, 0.5), inset 0 0 10px rgba(245, 158, 11, 0.08)",
+                    ? "0 0 25px rgba(244, 63, 94, 0.5), inset 0 0 10px rgba(244, 63, 94, 0.08)"
+                    : "0 0 20px rgba(251, 191, 36, 0.4), inset 0 0 10px rgba(251, 191, 36, 0.05)",
                   animation: "neonPulse 3s infinite alternate"
                 }}>
                   {/* CSS Pulse Keyframes injected dynamically or styled natively */}
                   <style>{`
                     @keyframes neonPulse {
                       0% {
-                        box-shadow: ${isPink ? "0 0 15px rgba(244, 63, 94, 0.3)" : "0 0 20px rgba(245, 158, 11, 0.4)"};
-                        border-color: ${isPink ? "#f43f5e" : "#fbbf24"};
+                        box-shadow: ${isPink ? "0 0 15px rgba(244, 63, 94, 0.3)" : "0 0 15px rgba(251, 191, 36, 0.3)"};
+                        border-color: ${isPink ? "#f43f5e" : "#ffd500"};
                       }
                       100% {
-                        box-shadow: ${isPink ? "0 0 25px rgba(244, 63, 94, 0.6)" : "0 0 35px rgba(245, 158, 11, 0.7)"};
-                        border-color: ${isPink ? "#ec4899" : "#f59e0b"};
+                        box-shadow: ${isPink ? "0 0 35px rgba(244, 63, 94, 0.7)" : "0 0 25px rgba(251, 191, 36, 0.5)"};
+                        border-color: ${isPink ? "#ec4899" : "#ffb700"};
                       }
                     }
                   `}</style>
@@ -738,14 +744,16 @@ export default function CostsPageClient() {
                     {/* Pricing Info */}
                     <div className="text-center sm:text-left flex-1">
                       <span className={`block text-[11px] font-black tracking-widest uppercase mb-1 ${
-                        isPink ? "text-neutral-400" : "text-neutral-500"
+                        isPink ? "text-neutral-450" : "text-[#576575]"
                       }`}>
                         하이브리드 결합 최종 메가 특가
                       </span>
                       <div className="flex flex-wrap items-baseline justify-center sm:justify-start gap-3">
-                        <span className="text-sm line-through text-neutral-450 dark:text-neutral-600 font-mono font-bold">7,700,000 원</span>
+                        <span className={`text-sm line-through font-mono font-bold ${
+                          isPink ? "text-neutral-500" : "text-neutral-400"
+                        }`}>7,700,000 원</span>
                         <strong className={`text-3xl sm:text-4xl font-black tracking-tight ${
-                          isPink ? "text-rose-600" : "text-amber-400"
+                          isPink ? "text-rose-500" : "text-[#0d233a]"
                         }`}>
                           6,900,000 원 <span className="text-[10px] sm:text-xs font-bold text-neutral-400 block sm:inline sm:ml-1">(부가세 포함)</span>
                         </strong>
@@ -782,7 +790,7 @@ export default function CostsPageClient() {
                   </p>
                 </div>
                 <div className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-xs font-black shrink-0 ${
-                  isPink ? "bg-white border-rose-100 text-rose-600" : "bg-neutral-900 border-amber-400/20 text-amber-300"
+                  isPink ? "bg-neutral-900 border-neutral-800 text-rose-400" : "bg-white border-[#ffd500]/30 text-amber-600 shadow-sm"
                 }`}>
                   <Truck size={15} /> 전국 신선 3일 콜드체인 직배송
                 </div>
@@ -792,7 +800,9 @@ export default function CostsPageClient() {
             {/* 🌟 Friends Menus Cards - Rendering all 4 items at once without filters */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-stretch">
               {FRIENDS_MENUS.map((menu, idx) => (
-                <div key={idx} className={`rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 hover:border-amber-400/40 ${cardBg} group/card`}>
+                <div key={idx} className={`rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 ${cardBg} ${
+                  isPink ? "hover:border-rose-500/40" : "hover:border-[#ffd500]/60"
+                } group/card`}>
                   <div>
                     {/* Top Details & Badge */}
                     <div className="flex justify-between items-center mb-4">
