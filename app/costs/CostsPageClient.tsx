@@ -102,7 +102,7 @@ const PACKAGES: PackageInfo[] = [
       },
       {
         title: "프로페셔널 오븐 설치 및 1:1 조리 교육",
-        desc: "본사 엔지니어 기기 셋팅 출장 지원 및 비숙련자도 5분 내 완벽 조리가 가능한 1:1 현장 교육 및 가이드",
+        desc: "본사 엔지니어 기기 셋팅 출장 지원 및 비숙련자도 3분 내 완벽 조리가 가능한 1:1 현장 교육 및 가이드",
         imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns.png",
         qty: "지원"
       }
@@ -487,7 +487,7 @@ export default function CostsPageClient() {
                           </div>
                           <div>
                             <span className={`block text-[9px] font-bold mb-0.5 ${isPink ? "text-neutral-500" : "text-neutral-450"}`}>조리 방식</span>
-                            <span className={`font-black ${isPink ? "text-neutral-200" : "text-[#0d233a]"}`}>5분 완벽 베이킹 시스템</span>
+                            <span className={`font-black ${isPink ? "text-neutral-200" : "text-[#0d233a]"}`}>3분 완벽 베이킹 시스템</span>
                           </div>
                           <div>
                             <span className={`block text-[9px] font-bold mb-0.5 ${isPink ? "text-neutral-500" : "text-neutral-450"}`}>물류 시스템</span>

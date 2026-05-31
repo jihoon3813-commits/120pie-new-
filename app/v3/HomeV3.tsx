@@ -1326,14 +1326,14 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
                 <div className="grid grid-cols-2 gap-2.5 mt-2 w-full max-w-sm mx-auto sm:flex sm:flex-wrap sm:max-w-none sm:mx-0">
                   <span className="px-2.5 sm:px-3.5 py-1.5 rounded-full border border-neutral-850 bg-neutral-900/60 text-[11px] sm:text-xs font-bold text-neutral-350 text-center whitespace-nowrap">#1,000만원대 소자본 전환</span>
-                  <span className="px-2.5 sm:px-3.5 py-1.5 rounded-full border border-neutral-850 bg-neutral-900/60 text-[11px] sm:text-xs font-bold text-neutral-350 text-center whitespace-nowrap">#5분 굽기 초간편 조리</span>
+                  <span className="px-2.5 sm:px-3.5 py-1.5 rounded-full border border-neutral-850 bg-neutral-900/60 text-[11px] sm:text-xs font-bold text-neutral-350 text-center whitespace-nowrap">#3분 굽기 초간편 조리</span>
                   <span className="px-2.5 sm:px-3.5 py-1.5 rounded-full border border-neutral-850 bg-neutral-900/60 text-[11px] sm:text-xs font-bold text-neutral-350 text-center whitespace-nowrap">#폐기율 0% 콜드 생지</span>
                   <span className="px-2.5 sm:px-3.5 py-1.5 rounded-full border border-neutral-850 bg-neutral-900/60 text-[11px] sm:text-xs font-bold text-neutral-350 text-center whitespace-nowrap">#홀·포장·배달 올라운드</span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 border-t border-neutral-900/80 pt-8 mt-6">
                   <div className="bg-neutral-900/40 border border-neutral-850 p-4 rounded-xl flex flex-col justify-center text-center">
-                    <strong className="text-2xl sm:text-3xl font-black text-amber-400 mb-1">5분</strong>
+                    <strong className="text-2xl sm:text-3xl font-black text-amber-400 mb-1">3분</strong>
                     <span className="text-[10px] sm:text-xs text-neutral-500 font-extrabold">내외 초간편 조리</span>
                   </div>
                   <div className="bg-neutral-900/40 border border-neutral-850 p-4 rounded-xl flex flex-col justify-center text-center">
@@ -1545,7 +1545,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 <div>
                   <h3 className={`text-xl sm:text-2xl font-black mb-3 ${
                     isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
-                  }`}>누구나 5분이면 완벽한 맛을 재현하는 초간편 시스템</h3>
+                  }`}>누구나 3분이면 완벽한 맛을 재현하는 초간편 시스템</h3>
                   <p className={`text-xs sm:text-sm font-medium leading-relaxed ${
                     isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
                   }`}>
@@ -1553,7 +1553,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-2 mt-6">
-                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#초간편 5분 조리</span>
+                  <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#초간편 3분 조리</span>
                   <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#작업 동선 최소화</span>
                   <span className={`text-xs sm:text-[13px] font-extrabold ${isPinkVariant ? "text-pink-400" : isYellowVariant ? "text-amber-600" : "text-amber-400"}`}>#원터치 퀄리티 일관성</span>
                 </div>
@@ -1575,7 +1575,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               >
                 <img
                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779721204/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_du1czf.jpg"
-                  alt="120겹 파이 초간편 5분 조리 연출"
+                  alt="120겹 파이 초간편 3분 조리 연출"
                   className="w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
                 />
                 <div className={`absolute inset-0 bg-gradient-to-t ${

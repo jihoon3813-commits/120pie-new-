@@ -2,7 +2,7 @@
 
 import VisualImage from "./VisualImage";
 
-const badges = ["샵인샵 가능", "5분 내외 조리", "냉동보관", "객단가 상승", "박람회 검증", "전국 운영 경험"];
+const badges = ["샵인샵 가능", "3분 내외 조리", "냉동보관", "객단가 상승", "박람회 검증", "전국 운영 경험"];
 
 const scrollToTarget = (target: string) =>
   document.querySelector(target)?.scrollIntoView({ behavior: "smooth" });
@@ -35,7 +35,7 @@ export default function HeroSection() {
           </div>
           <div className="hero-stats" aria-label="도입 핵심 지표">
             <div>
-              <strong>5분</strong>
+              <strong>3분</strong>
               <span>내외 제조</span>
             </div>
             <div>
@@ -68,7 +68,7 @@ export default function HeroSection() {
             />
           </div>
           <div className="motion-rail" aria-hidden="true">
-            <span>SHOP-IN-SHOP · 5MIN COOKING · LOW WASTE · SET MENU · DELIVERY ·</span>
+            <span>SHOP-IN-SHOP · 3MIN COOKING · LOW WASTE · SET MENU · DELIVERY ·</span>
           </div>
         </div>
       </div>
