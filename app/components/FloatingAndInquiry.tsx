@@ -233,7 +233,7 @@ export default function FloatingAndInquiry({
   // Main floating button styles
   const triggerBtnClosed = isPink
     ? "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a] hover:from-[#df4977] hover:to-[#ff7b9f] shadow-[0_6px_20px_rgba(242,95,138,0.45)]"
-    : "bg-gradient-to-tr from-[#0d233a] to-[#133252] hover:from-[#133252] hover:to-[#1c446e] shadow-[0_6px_20px_rgba(13,35,58,0.25)]"; // Consistent brand pink theme is stunning, but we can customize or keep consistent
+    : "bg-gradient-to-tr from-[#0d233a] to-[#133252] hover:from-[#133252] hover:to-[#1c446e] shadow-[0_6px_20px_rgba(13,35,58,0.25)]";
 
   return (
     <>
@@ -250,21 +250,25 @@ export default function FloatingAndInquiry({
 
       {/* Floating Buttons */}
       {floatingSettings?.isActive && (
-        <div className="fixed right-6 bottom-6 z-[90] flex flex-col items-end gap-3 font-bold text-xs select-none text-white">
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 z-[90] flex flex-row items-center gap-2.5 p-2 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.12)] border transition-all duration-300 select-none text-white ${
+          isPink 
+            ? "bg-[#140e11]/90 border-[#f25f8a]/20 shadow-rose-950/20" 
+            : "bg-white/95 border-[#ffd500]/30 shadow-[#0d233a]/[0.05]"
+        }`}>
           {/* Instagram */}
           {floatingSettings?.instaUrl && (
             <a
               href={floatingSettings.instaUrl}
               target="_blank"
               rel="noreferrer"
-              className="bg-[#cf2a7a] hover:bg-[#b01e63] p-3 rounded-full flex items-center justify-center text-white shadow-lg transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
+              className="bg-[#cf2a7a] hover:bg-[#b01e63] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
             >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#ffffff" }} className="w-[18px] h-[18px] text-white">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#ffffff" }} className="w-[16px] h-[16px] text-white">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
               </svg>
-              <span className="absolute right-14 text-white text-[10px] font-extrabold px-2.5 py-1.5 rounded shadow-md opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>공식 인스타</span>
+              <span className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>공식 인스타</span>
             </a>
           )}
 
@@ -274,12 +278,12 @@ export default function FloatingAndInquiry({
               href={floatingSettings.youtubeUrl}
               target="_blank"
               rel="noreferrer"
-              className="bg-[#ff0000] hover:bg-[#cc0000] p-3 rounded-full flex items-center justify-center text-white shadow-lg transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
+              className="bg-[#ff0000] hover:bg-[#cc0000] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
             >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style={{ color: "#ffffff" }} className="w-[18px] h-[18px] text-white">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style={{ color: "#ffffff" }} className="w-[16px] h-[16px] text-white">
                 <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
               </svg>
-              <span className="absolute right-14 text-white text-[10px] font-extrabold px-2.5 py-1.5 rounded shadow-md opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>유튜브 채널</span>
+              <span className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>유튜브 채널</span>
             </a>
           )}
 
@@ -287,12 +291,12 @@ export default function FloatingAndInquiry({
           {floatingSettings?.phoneNo && (
             <a
               href={`tel:${floatingSettings.phoneNo}`}
-              className="bg-[#007aff] hover:bg-[#0062cc] p-3 rounded-full flex items-center justify-center text-white shadow-lg transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
+              className="bg-[#007aff] hover:bg-[#0062cc] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
             >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#ffffff" }} className="w-[18px] h-[18px] text-white">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.5 19.5 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#ffffff" }} className="w-[16px] h-[16px] text-white">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
               </svg>
-              <span className="absolute right-14 text-white text-[10px] font-extrabold px-2.5 py-1.5 rounded shadow-md opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>본사 전화문의</span>
+              <span className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>본사 전화문의</span>
             </a>
           )}
 
@@ -302,12 +306,12 @@ export default function FloatingAndInquiry({
               href={floatingSettings.kakaoUrl}
               target="_blank"
               rel="noreferrer"
-              className="bg-[#fae100] hover:bg-[#e6cf00] p-3 rounded-full flex items-center justify-center text-white shadow-lg transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border border-yellow-400"
+              className="bg-[#fae100] hover:bg-[#e6cf00] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border border-yellow-400"
             >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style={{ color: "#3c2929" }} className="w-[18px] h-[18px] text-[#3c2929]">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style={{ color: "#3c2929" }} className="w-[16px] h-[16px] text-[#3c2929]">
                 <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.557 1.707 4.8 4.27 6.054-.188.702-.68 2.531-.777 2.922-.12.483.18.477.38.343.155-.104 2.476-1.683 3.473-2.358.536.082 1.087.124 1.654.124 4.97 0 9-3.186 9-7.115C21 6.185 16.97 3 12 3z" />
               </svg>
-              <span className="absolute right-14 text-white text-[10px] font-extrabold px-2.5 py-1.5 rounded shadow-md opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>1:1 카톡문의</span>
+              <span className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>1:1 카톡문의</span>
             </a>
           )}
 
@@ -318,12 +322,12 @@ export default function FloatingAndInquiry({
                 e.preventDefault();
                 setInquiryModalOpen(true);
               }}
-              className={`p-3 rounded-full flex items-center justify-center text-white shadow-lg transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0 ${isPink ? "bg-[#f25f8a] hover:bg-[#df4977]" : "bg-[#ffd500] hover:bg-[#e6bd00]"}`}
+              className={`p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0 ${isPink ? "bg-[#f25f8a] hover:bg-[#df4977]" : "bg-[#ffd500] hover:bg-[#e6bd00]"}`}
             >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: isPink ? "#ffffff" : "#0d233a" }} className={`w-[18px] h-[18px] ${isPink ? "text-white" : "text-[#0d233a]"}`}>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: isPink ? "#ffffff" : "#0d233a" }} className={`w-[16px] h-[16px] ${isPink ? "text-white" : "text-[#0d233a]"}`}>
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
-              <span className="absolute right-14 text-white text-[10px] font-extrabold px-2.5 py-1.5 rounded shadow-md opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>빠른 실시간 상담</span>
+              <span className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>빠른 실시간 상담</span>
             </button>
           )}
         </div>

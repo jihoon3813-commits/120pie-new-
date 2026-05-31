@@ -873,7 +873,7 @@ export default function CostsPageClient() {
           <FloatingAndInquiry
             forceOpenModal={inquiryForcedOpen}
             onModalClose={() => setInquiryForcedOpen(false)}
-            isPink={false}
+            isPink={isPink}
           />
         </div>
       </main>
