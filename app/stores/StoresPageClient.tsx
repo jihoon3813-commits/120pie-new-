@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowUpRight, MapPin, Store, ExternalLink } from "lucide-rea
 import { useState, useEffect, useRef } from "react";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 
-const logoUrlBlack = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png";
+const logoUrlBlack = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png";
 const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png";
 
 interface StoreInfo {

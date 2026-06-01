@@ -12,7 +12,7 @@ const getCloudinaryResizedUrl = (url: string, width = 300, height = 300) => {
   return url;
 };
 
-const logoUrlBlack = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png";
+const logoUrlBlack = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png";
 const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png";
 
 // Inline Item Detail Interface with Qty

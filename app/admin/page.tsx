@@ -1935,7 +1935,7 @@ export default function AdminPage() {
                 <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
                   <div className="flex items-center gap-2">
                     <img
-                      src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
+                      src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png"
                       alt="로고"
                       className="w-7 h-7"
                     />
