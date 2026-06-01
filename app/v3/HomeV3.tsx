@@ -3608,7 +3608,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 className="bg-[#03C75A] hover:bg-[#02b350] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
               >
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style={{ color: "#ffffff" }} className="w-[16px] h-[16px] text-white">
-                  <path d="M16.273 19.143L8.538 9.385V19.143H4.425V4.857h4.088l7.653 9.637V4.857h4.088v14.286h-3.981z" />
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.8 14.5H8.5V7.5h1.7v3.2h.1c.3-.6.8-1 1.5-1.2.5-.1.9-.1 1.4 0 1 .3 1.7.9 2 1.9.3.9.3 2 0 3-.3 1-1 1.6-2 1.9-.5.1-.9.1-1.4 0-.7-.2-1.2-.6-1.5-1.2h-.1v2.2zm2.9-4.8c0-.7-.1-1.3-.4-1.7-.3-.4-.8-.6-1.3-.6s-1 .2-1.3.6c-.3.4-.4 1-.4 1.7 0 .6.1 1.2.4 1.6.3.4.8.6 1.3.6s1-.2 1.3-.6c.3-.4.4-1 .4-1.6z" />
                 </svg>
                 <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>네이버 블로그</span>
               </a>
@@ -3704,7 +3704,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     className="bg-[#03C75A] hover:bg-[#02b350] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-115 active:scale-90 cursor-pointer relative group border-0"
                   >
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style={{ color: "#ffffff" }} className="w-[16px] h-[16px] text-white">
-                      <path d="M16.273 19.143L8.538 9.385V19.143H4.425V4.857h4.088l7.653 9.637V4.857h4.088v14.286h-3.981z" />
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.8 14.5H8.5V7.5h1.7v3.2h.1c.3-.6.8-1 1.5-1.2.5-.1.9-.1 1.4 0 1 .3 1.7.9 2 1.9.3.9.3 2 0 3-.3 1-1 1.6-2 1.9-.5.1-.9.1-1.4 0-.7-.2-1.2-.6-1.5-1.2h-.1v2.2zm2.9-4.8c0-.7-.1-1.3-.4-1.7-.3-.4-.8-.6-1.3-.6s-1 .2-1.3.6c-.3.4-.4 1-.4 1.7 0 .6.1 1.2.4 1.6.3.4.8.6 1.3.6s1-.2 1.3-.6c.3-.4.4-1 .4-1.6z" />
                     </svg>
                     <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>네이버 블로그</span>
                   </a>
