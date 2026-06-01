@@ -72,7 +72,7 @@ export default function RootLayout({
     "logo": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "1588-0883",
+      "telephone": "1566-3594",
       "contactType": "customer service",
       "areaServed": "KR",
       "availableLanguage": "Korean"

@@ -3362,7 +3362,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               }`}>
                 <p>대표 : 이사근 | 사업자번호: 787-88-00444</p>
                 <p>경기 군포시 엘에스로 143 1층 1001호</p>
-                <p>E-mail: lifenjoy0296@gmail.com | Tel: 1588-0883</p>
+                <p>E-mail: lifenjoy0296@gmail.com | Tel: 1566-3594</p>
                 <p>개인정보보호책임자: 이사근</p>
               </div>
             </div>
@@ -3377,12 +3377,12 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   Customer Center
                 </span>
                 <a
-                  href="tel:1588-0883"
+                  href="tel:1566-3594"
                   className={`text-3xl sm:text-4xl font-black tracking-tight transition-colors block mb-3 ${
                     isPinkVariant ? "text-[#4c2d3a] hover:text-rose-500" : isYellowVariant ? "text-[#0d233a] hover:text-amber-600" : "text-white hover:text-amber-400"
                   }`}
                 >
-                  1588-0883
+                  1566-3594
                 </a>
                 <p className={`inline-flex items-center gap-2 text-sm font-bold ${
                   isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-300"
