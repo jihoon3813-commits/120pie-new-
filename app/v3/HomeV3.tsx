@@ -3360,7 +3360,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               }`}>
                 <p>대표 : 이사근 | 사업자번호: 787-88-00444</p>
                 <p>경기 군포시 엘에스로 143 1층 1001호</p>
-                <p>E-mail: lifenjoy0296@gmail.com | Tel: 1566-3594</p>
+                <p>E-mail: 120piecoffee@gmail.com | Tel: 1566-3594</p>
                 <p>개인정보보호책임자: 이사근</p>
               </div>
             </div>
