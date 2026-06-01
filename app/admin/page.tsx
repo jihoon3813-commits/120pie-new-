@@ -139,7 +139,7 @@ const DEFAULT_FLOATING: FloatingSettings = {
   instaUrl: "https://www.instagram.com/120pie77/",
   youtubeUrl: "https://youtube.com",
   chatUrl: "https://kakao.com",
-  phoneNo: "1688-1200",
+  phoneNo: "1566-3594",
   kakaoUrl: "https://kakao.com",
   blogUrl: "https://blog.naver.com/120pie_coffee"
 };
@@ -3293,7 +3293,7 @@ export default function AdminPage() {
                         type="text"
                         value={floatingPhone}
                         onChange={(e) => setFloatingPhone(e.target.value)}
-                        placeholder="예: 1688-1200"
+                        placeholder="예: 1566-3594"
                         className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
                       />
                     </div>

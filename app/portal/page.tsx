@@ -448,7 +448,7 @@ export default function PortalPage() {
         instaUrl: "https://www.instagram.com/120pie77/",
         youtubeUrl: "https://youtube.com",
         chatUrl: "https://kakao.com",
-        phoneNo: "1688-1200",
+        phoneNo: "1566-3594",
         kakaoUrl: "https://kakao.com"
       });
       setFloatingSettings(loadedFloat);
