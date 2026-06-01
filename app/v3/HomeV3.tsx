@@ -3347,11 +3347,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             <div className="lg:col-span-7">
               <div className="mb-7">
                 <img
-                  src={isPinkVariant 
-                    ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" 
-                    : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png"}
+                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
                   alt="120pie 로고"
-                  className="h-7 sm:h-8 w-auto object-contain opacity-40 hover:opacity-75 transition-opacity duration-200"
+                  className="h-7 sm:h-8 w-auto object-contain opacity-40 hover:opacity-75 transition-opacity duration-200 grayscale"
                 />
               </div>
               <p className={`text-base font-bold tracking-tight mb-5 ${
