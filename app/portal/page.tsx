@@ -2439,6 +2439,21 @@ export default function PortalPage() {
                 </a>
               )}
 
+              {/* Naver Blog */}
+              {floatingSettings.blogUrl && (
+                <a
+                  href={floatingSettings.blogUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-[#03C75A] hover:bg-[#02b350] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
+                >
+                  <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" className="!text-white" style={{ color: "#ffffff" }}>
+                    <path d="M16.273 19.143L8.538 9.385V19.143H4.425V4.857h4.088l7.653 9.637V4.857h4.088v14.286h-3.981z" />
+                  </svg>
+                  <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">네이버 블로그</span>
+                </a>
+              )}
+
               {/* Youtube */}
               {floatingSettings.youtubeUrl && (
                 <a

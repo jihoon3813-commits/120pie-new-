@@ -12,7 +12,8 @@ export const get = query({
         youtubeUrl: "https://youtube.com",
         chatUrl: "https://kakao.com",
         phoneNo: "1688-1200",
-        kakaoUrl: "https://kakao.com"
+        kakaoUrl: "https://kakao.com",
+        blogUrl: "https://blog.naver.com/120pie_coffee"
       };
     }
     return floating;
@@ -27,6 +28,7 @@ export const update = mutation({
     chatUrl: v.optional(v.string()),
     phoneNo: v.optional(v.string()),
     kakaoUrl: v.optional(v.string()),
+    blogUrl: v.optional(v.string()),
   },
   handler: async (ctx: any, args: any) => {
     const existing = await ctx.db.query("floatings").first();

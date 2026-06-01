@@ -24,6 +24,7 @@ export default defineSchema({
     chatUrl: v.optional(v.string()),
     phoneNo: v.optional(v.string()),
     kakaoUrl: v.optional(v.string()),
+    blogUrl: v.optional(v.string()),
   }),
   inquiries: defineTable({
     name: v.string(),

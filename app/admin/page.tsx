@@ -115,6 +115,7 @@ interface FloatingSettings {
   chatUrl: string;
   phoneNo: string;
   kakaoUrl: string;
+  blogUrl?: string;
 }
 
 const DEFAULT_POPUP: PopupSettings = {
@@ -139,7 +140,8 @@ const DEFAULT_FLOATING: FloatingSettings = {
   youtubeUrl: "https://youtube.com",
   chatUrl: "https://kakao.com",
   phoneNo: "1688-1200",
-  kakaoUrl: "https://kakao.com"
+  kakaoUrl: "https://kakao.com",
+  blogUrl: "https://blog.naver.com/120pie_coffee"
 };
 
 interface Order {
@@ -390,6 +392,7 @@ export default function AdminPage() {
       setFloatingChat(convexFloating.chatUrl || "");
       setFloatingPhone(convexFloating.phoneNo || "");
       setFloatingKakao(convexFloating.kakaoUrl || "");
+      setFloatingBlog(convexFloating.blogUrl || "");
     }
   }, [convexFloating]);
 
@@ -598,6 +601,7 @@ export default function AdminPage() {
   const [floatingChat, setFloatingChat] = useState<string>("");
   const [floatingPhone, setFloatingPhone] = useState<string>("");
   const [floatingKakao, setFloatingKakao] = useState<string>("");
+  const [floatingBlog, setFloatingBlog] = useState<string>("");
 
   // 4. ORDER DETAILS POPUP & SETTING STATES
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -680,6 +684,7 @@ export default function AdminPage() {
       setFloatingChat(flt.chatUrl || "");
       setFloatingPhone(flt.phoneNo || "");
       setFloatingKakao(flt.kakaoUrl || "");
+      setFloatingBlog(flt.blogUrl || "");
 
       const galItems = loadState("120_gallery_items", DEFAULT_GALLERY);
       setGalleryItems(galItems);
@@ -1337,7 +1342,8 @@ export default function AdminPage() {
       youtubeUrl: floatingYoutube,
       chatUrl: floatingChat,
       phoneNo: floatingPhone,
-      kakaoUrl: floatingKakao
+      kakaoUrl: floatingKakao,
+      blogUrl: floatingBlog
     };
     try {
       localStorage.setItem("120_floatings", JSON.stringify(updatedFloating));
@@ -3293,15 +3299,27 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-[#735965]">실시간 카카오톡 채팅방/오픈채팅 연결 주소 (카톡상담)</label>
-                    <input
-                      type="text"
-                      value={floatingKakao}
-                      onChange={(e) => setFloatingKakao(e.target.value)}
-                      placeholder="https://open.kakao.com/o/sxxxx"
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">실시간 카카오톡 채팅방/오픈채팅 연결 주소 (카톡상담)</label>
+                      <input
+                        type="text"
+                        value={floatingKakao}
+                        onChange={(e) => setFloatingKakao(e.target.value)}
+                        placeholder="https://open.kakao.com/o/sxxxx"
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965]">공식 네이버 블로그 주소 (Blog)</label>
+                      <input
+                        type="text"
+                        value={floatingBlog}
+                        onChange={(e) => setFloatingBlog(e.target.value)}
+                        placeholder="https://blog.naver.com/xxxx"
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      />
+                    </div>
                   </div>
 
                   <button
