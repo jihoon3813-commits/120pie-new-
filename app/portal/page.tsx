@@ -50,6 +50,7 @@ interface Product {
   stock: "in_stock" | "low_stock" | "out_of_stock";
   desc: string;
   labels?: string[];
+  shippingType?: "free" | "A" | "B" | "C";
 }
 
 interface CartItem {
@@ -403,7 +404,9 @@ export default function PortalPage() {
   const [shippingPolicy, setShippingPolicy] = useState<string>("");
   const [returnPolicy, setReturnPolicy] = useState<string>("");
   const [freeShippingThreshold, setFreeShippingThreshold] = useState<number>(100000);
-  const [basicShippingFee, setBasicShippingFee] = useState<number>(3000);
+  const [shippingFeeA, setShippingFeeA] = useState<number>(3000);
+  const [shippingFeeB, setShippingFeeB] = useState<number>(4000);
+  const [shippingFeeC, setShippingFeeC] = useState<number>(5000);
 
   // ==========================================
   // INITIALIZATION WITH LOCAL STORAGE
@@ -481,7 +484,8 @@ export default function PortalPage() {
         stock: p.stock || "in_stock",
         desc: p.desc || "",
         orderIndex: p.orderIndex || 99,
-        labels: p.labels || []
+        labels: p.labels || [],
+        shippingType: p.shippingType || "A"
       })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
       setProducts(mapped);
 
@@ -489,14 +493,17 @@ export default function PortalPage() {
         shippingPolicy: "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다.",
         returnPolicy: "식재료 특성상 단순 변심으로 인한 반품은 불가하며, 오배송 건은 수령 즉시 본사 접수 바랍니다.",
         freeShippingThreshold: "100,000",
-        basicShippingFee: "3,000"
+        shippingFeeA: "3,000",
+        shippingFeeB: "4,000",
+        shippingFeeC: "5,000"
       });
       setShippingPolicy(policySettings.shippingPolicy);
       setReturnPolicy(policySettings.returnPolicy);
       const parsedThreshold = parseInt(policySettings.freeShippingThreshold.replace(/,/g, "")) || 100000;
-      const parsedFee = parseInt(policySettings.basicShippingFee.replace(/,/g, "")) || 3000;
       setFreeShippingThreshold(parsedThreshold);
-      setBasicShippingFee(parsedFee);
+      setShippingFeeA(parseInt((policySettings.shippingFeeA || "3,000").replace(/,/g, "")) || 3000);
+      setShippingFeeB(parseInt((policySettings.shippingFeeB || "4,000").replace(/,/g, "")) || 4000);
+      setShippingFeeC(parseInt((policySettings.shippingFeeC || "5,000").replace(/,/g, "")) || 5000);
     }
   }, []);
 
@@ -550,7 +557,8 @@ export default function PortalPage() {
               stock: p.stock || "in_stock",
               desc: p.desc || "",
               orderIndex: p.orderIndex || 99,
-              labels: p.labels || []
+              labels: p.labels || [],
+              shippingType: p.shippingType || "A"
             })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
             setProducts(mapped);
           } catch (e) {
@@ -565,9 +573,10 @@ export default function PortalPage() {
             setShippingPolicy(parsed.shippingPolicy || "");
             setReturnPolicy(parsed.returnPolicy || "");
             const parsedThreshold = parseInt((parsed.freeShippingThreshold || "100000").toString().replace(/,/g, "")) || 100000;
-            const parsedFee = parseInt((parsed.basicShippingFee || "3000").toString().replace(/,/g, "")) || 3000;
             setFreeShippingThreshold(parsedThreshold);
-            setBasicShippingFee(parsedFee);
+            setShippingFeeA(parseInt((parsed.shippingFeeA || "3,000").toString().replace(/,/g, "")) || 3000);
+            setShippingFeeB(parseInt((parsed.shippingFeeB || "4,000").toString().replace(/,/g, "")) || 4000);
+            setShippingFeeC(parseInt((parsed.shippingFeeC || "5,000").toString().replace(/,/g, "")) || 5000);
           } catch (e) {
             console.error(e);
           }
@@ -639,7 +648,53 @@ export default function PortalPage() {
     return acc + (p ? p.price * item.quantity : 0);
   }, 0);
 
-  const shippingFee = cartSubtotal >= freeShippingThreshold || cartSubtotal === 0 ? 0 : basicShippingFee;
+  // Get dynamic shipping fee based on selected type: free, A, B, C (Choose maximum)
+  const getAppliedShippingFee = () => {
+    if (cartSubtotal >= freeShippingThreshold || cart.length === 0) return 0;
+    
+    let maxFee = 0;
+    cart.forEach((item) => {
+      const p = products.find((prod) => prod.id === item.productId);
+      const type = p?.shippingType || "A";
+      let fee = 0;
+      if (type === "A") fee = shippingFeeA;
+      else if (type === "B") fee = shippingFeeB;
+      else if (type === "C") fee = shippingFeeC;
+      else if (type === "free") fee = 0;
+      
+      if (fee > maxFee) {
+        maxFee = fee;
+      }
+    });
+    return maxFee;
+  };
+
+  const getAppliedShippingType = () => {
+    if (cartSubtotal >= freeShippingThreshold || cart.length === 0) return "무료배송";
+    
+    let maxFee = -1;
+    let maxType = "free";
+    cart.forEach((item) => {
+      const p = products.find((prod) => prod.id === item.productId);
+      const type = p?.shippingType || "A";
+      let fee = 0;
+      if (type === "A") fee = shippingFeeA;
+      else if (type === "B") fee = shippingFeeB;
+      else if (type === "C") fee = shippingFeeC;
+      else if (type === "free") fee = 0;
+      
+      if (fee > maxFee) {
+        maxFee = fee;
+        maxType = type;
+      }
+    });
+    
+    if (maxType === "free") return "무료배송";
+    return `${maxType}타입`;
+  };
+
+  const shippingFee = getAppliedShippingFee();
+  const shippingTypeLabel = getAppliedShippingType();
   const cartTotal = cartSubtotal + shippingFee;
 
   // ==========================================
@@ -1560,8 +1615,13 @@ export default function PortalPage() {
                           <span>{cartSubtotal.toLocaleString()} 원</span>
                         </div>
                         <div className="flex justify-between text-[#735965] font-bold">
-                          <span>배송비 ({freeShippingThreshold.toLocaleString()}원 이상 무료)</span>
-                          <span>{shippingFee === 0 ? "무료" : `${basicShippingFee.toLocaleString()} 원`}</span>
+                          <div className="flex flex-col">
+                            <span>배송비 ({freeShippingThreshold.toLocaleString()}원 이상 무료)</span>
+                            {shippingFee > 0 && (
+                              <span className="text-[10px] text-[#bf3e67] font-bold">({shippingTypeLabel} 적용)</span>
+                            )}
+                          </div>
+                          <span>{shippingFee === 0 ? "무료" : `${shippingFee.toLocaleString()} 원`}</span>
                         </div>
                         <div className="flex justify-between text-[#2d2026] font-black text-sm border-t border-[#f2ccd7] pt-3">
                           <span>최종 발주 금액</span>
@@ -1951,7 +2011,7 @@ export default function PortalPage() {
           onClick={() => setSelectedNotice(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
+            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
@@ -1993,7 +2053,7 @@ export default function PortalPage() {
           onClick={() => setSelectedInquiry(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
+            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
@@ -2061,7 +2121,7 @@ export default function PortalPage() {
           onClick={() => setSelectedMaterial(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
+            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
@@ -2119,7 +2179,7 @@ export default function PortalPage() {
           onClick={() => setShowInquiryModal(false)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            className="w-full max-w-xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
@@ -2187,7 +2247,7 @@ export default function PortalPage() {
           onClick={() => setSelectedOrder(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
+            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -2376,7 +2436,7 @@ export default function PortalPage() {
           onClick={() => setSelectedProductDetail(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col animate-scaleUp"
+            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -2400,9 +2460,9 @@ export default function PortalPage() {
             <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
               
               {/* Product Core Info: Thumbnail & Spec Table */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
                 {/* 1. Thumbnail Image */}
-                <div className="md:col-span-5 border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm bg-[#fff1f5]/30 aspect-square flex items-center justify-center relative">
+                <div className="md:col-span-5 border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm bg-[#fff1f5]/30 flex flex-col justify-center items-center relative h-full min-h-[300px] md:min-h-0">
                   <img 
                     src={selectedProductDetail.img} 
                     alt={selectedProductDetail.name} 
@@ -2426,42 +2486,66 @@ export default function PortalPage() {
                 </div>
 
                 {/* 2. Spec Table */}
-                <div className="md:col-span-7 bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm h-fit">
-                  <div className="px-4 py-3 bg-[#fff1f5]/30 border-b border-[#f2ccd7]/50">
+                <div className="md:col-span-7 bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm h-full flex flex-col justify-between">
+                  <div className="px-4 py-3 bg-[#fff1f5]/30 border-b border-[#f2ccd7]/50 shrink-0">
                     <span className="font-extrabold text-[#2d2026]">품목 기본 명세 규격표</span>
                   </div>
-                  <table className="w-full text-left border-collapse">
-                    <tbody className="divide-y divide-[#f2ccd7]/40 text-xs text-[#2d2026]">
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965] w-[110px]">제품명</td>
-                        <td className="px-4 py-3.5 font-bold text-neutral-800">{selectedProductDetail.name}</td>
-                      </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">카테고리</td>
-                        <td className="px-4 py-3.5">
-                          <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-bold px-2 py-0.5 rounded border border-[#f2ccd7]">
-                            {selectedProductDetail.category}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">발주 규격</td>
-                        <td className="px-4 py-3.5 font-semibold text-[#f25f8a]">{selectedProductDetail.packSize}</td>
-                      </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">제품 식별코드</td>
-                        <td className="px-4 py-3.5 font-mono font-bold text-[#735965]">{selectedProductDetail.id}</td>
-                      </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">공급 단가</td>
-                        <td className="px-4 py-3.5 font-black text-[#bf3e67]">{selectedProductDetail.price.toLocaleString()} 원</td>
-                      </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">품목 정보 설명</td>
-                        <td className="px-4 py-3.5 font-medium text-[#735965] leading-relaxed whitespace-pre-line">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div className="flex-1 flex flex-col">
+                    <table className="w-full text-left border-collapse flex-1 table-fixed">
+                      <tbody className="divide-y divide-[#f2ccd7]/40 text-xs text-[#2d2026] h-full">
+                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965] w-[100px]">제품명</td>
+                          <td className="px-4 py-2.5 font-bold text-neutral-800 break-all">{selectedProductDetail.name}</td>
+                        </tr>
+                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">카테고리</td>
+                          <td className="px-4 py-2.5">
+                            <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-bold px-2 py-0.5 rounded border border-[#f2ccd7]">
+                              {selectedProductDetail.category}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">발주 규격</td>
+                          <td className="px-4 py-2.5 font-semibold text-[#f25f8a]">{selectedProductDetail.packSize}</td>
+                        </tr>
+                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">제품 식별코드</td>
+                          <td className="px-4 py-2.5 font-mono font-bold text-[#735965]">{selectedProductDetail.id}</td>
+                        </tr>
+                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">공급 단가</td>
+                          <td className="px-4 py-2.5 font-black text-[#bf3e67]">{selectedProductDetail.price.toLocaleString()} 원</td>
+                        </tr>
+                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">배송 정책</td>
+                          <td className="px-4 py-2.5">
+                            {(() => {
+                              const type = selectedProductDetail.shippingType || "A";
+                              if (type === "free") {
+                                return (
+                                  <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2.5 py-1 rounded-full border border-emerald-200">
+                                    무료 배송
+                                  </span>
+                                );
+                              }
+                              const typeMap: Record<string, string> = { A: "A타입", B: "B타입", C: "C타입" };
+                              const feeMap: Record<string, number> = { A: shippingFeeA, B: shippingFeeB, C: shippingFeeC };
+                              return (
+                                <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-black px-2.5 py-1 rounded-full border border-[#f2ccd7]">
+                                  {typeMap[type]} ({feeMap[type]?.toLocaleString()}원)
+                                </span>
+                              );
+                            })()}
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">품목 정보 설명</td>
+                          <td className="px-4 py-2.5 font-medium text-[#735965] leading-relaxed break-words">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
 
@@ -2472,11 +2556,11 @@ export default function PortalPage() {
                     <span className="w-1.5 h-3.5 rounded-full bg-[#f25f8a]"></span>
                     <span className="font-extrabold text-[#2d2026] text-xs sm:text-sm">🔍 제품 상세 정보 안내</span>
                   </div>
-                  <div className="border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm bg-neutral-50 flex items-center justify-center p-2 min-h-[200px]">
+                  <div className="border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm bg-neutral-50 flex items-center justify-center p-2 min-h-[200px]">
                     <img 
                       src={selectedProductDetail.detailImg} 
                       alt={`${selectedProductDetail.name} 상세페이지`} 
-                      className="w-full h-auto object-contain rounded-2xl"
+                      className="w-full h-auto object-contain rounded-lg"
                     />
                   </div>
                 </div>
@@ -2486,22 +2570,43 @@ export default function PortalPage() {
               <div className="flex flex-col gap-5">
                 
                 {/* Delivery policy card */}
-                <div className="bg-[#fff9fb] border border-[#f2ccd7] rounded-3xl p-6 sm:p-7 space-y-3.5 shadow-sm">
+                <div className="bg-[#fff9fb] border border-[#f2ccd7] rounded-xl p-6 sm:p-7 space-y-3.5 shadow-sm">
                   <div className="flex items-center gap-2 border-b border-[#f2ccd7]/60 pb-2.5">
                     <Truck size={16} className="text-[#f25f8a]" />
                     <span className="font-extrabold text-[#2d2026] text-sm">🚚 본사 물류 배송 정책</span>
                   </div>
-                  <div className="text-xs text-[#735965] font-semibold leading-relaxed whitespace-pre-line space-y-3">
-                    <p>{shippingPolicy || "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다."}</p>
-                    <div className="pt-3 border-t border-[#f2ccd7]/40 text-[11px] text-[#bf3e67] font-black flex items-center gap-1.5">
-                      <span>💡</span>
-                      <span>무료배송 기준: {freeShippingThreshold.toLocaleString()}원 이상 발주 시 배송비 무료 (미만 시 {basicShippingFee.toLocaleString()}원 부과)</span>
+                  <div className="text-xs text-[#735965] font-semibold leading-relaxed space-y-3">
+                    <p className="whitespace-pre-line">{shippingPolicy || "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다."}</p>
+                    
+                    <div className="pt-3 border-t border-[#f2ccd7]/40 space-y-2">
+                      <div className="text-[11px] text-[#bf3e67] font-black flex items-center gap-1.5">
+                        <span>💡</span>
+                        <span>무료배송 기준: {freeShippingThreshold.toLocaleString()}원 이상 발주 시 전액 무료</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-2 pt-1 text-[10px]">
+                        <div className="bg-white border border-[#f2ccd7] p-2 rounded-xl text-center">
+                          <span className="block text-[#735965] font-extrabold">A타입 배송비</span>
+                          <span className="block text-[#bf3e67] font-black mt-0.5">{shippingFeeA.toLocaleString()}원</span>
+                        </div>
+                        <div className="bg-white border border-[#f2ccd7] p-2 rounded-xl text-center">
+                          <span className="block text-[#735965] font-extrabold">B타입 배송비</span>
+                          <span className="block text-[#bf3e67] font-black mt-0.5">{shippingFeeB.toLocaleString()}원</span>
+                        </div>
+                        <div className="bg-white border border-[#f2ccd7] p-2 rounded-xl text-center">
+                          <span className="block text-[#735965] font-extrabold">C타입 배송비</span>
+                          <span className="block text-[#bf3e67] font-black mt-0.5">{shippingFeeC.toLocaleString()}원</span>
+                        </div>
+                      </div>
+                      <p className="text-[9px] text-[#735965]/80 leading-normal">
+                        * 장바구니에 담긴 제품들의 배송 타입(무료/A/B/C) 중 가장 높은 단가의 배송비 1회만 청구됩니다.
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Return policy card */}
-                <div className="bg-[#fffdf9] border border-amber-200 rounded-3xl p-6 sm:p-7 space-y-3.5 shadow-sm">
+                <div className="bg-[#fffdf9] border border-amber-200 rounded-xl p-6 sm:p-7 space-y-3.5 shadow-sm">
                   <div className="flex items-center gap-2 border-b border-amber-200/60 pb-2.5">
                     <ArrowRightLeft size={16} className="text-amber-500" />
                     <span className="font-extrabold text-[#2d2026] text-sm">🔄 교환 및 반품 규정 안내</span>
@@ -2538,7 +2643,7 @@ export default function PortalPage() {
       {showPopup && popupSettings && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div 
-            className="w-full max-w-md bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp"
+            className="w-full max-w-md bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header / Background visual */}
