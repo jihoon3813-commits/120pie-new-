@@ -38,7 +38,7 @@ import {
   RotateCcw
 } from "lucide-react";
 
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 // ==========================================
@@ -264,10 +264,16 @@ const INITIAL_PR: Material[] = [
 ];
 
 export default function PortalPage() {
-  // Convex Hooks for Popups, Floatings, and Stores
+  // Convex Hooks for Popups, Floatings, Products, and Orders
   const convexPopup = useQuery(api.popups.get);
   const convexFloating = useQuery(api.floatings.get);
   const convexStores = useQuery(api.stores.get);
+  const convexProducts = useQuery(api.products.get);
+  const convexOrders = useQuery(api.orders.list);
+
+  const saveOrderMutation = useMutation(api.orders.createOrUpdate);
+  const syncProductsMutation = useMutation(api.products.syncProducts);
+  const syncOrdersMutation = useMutation(api.orders.syncOrders);
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
@@ -484,7 +490,6 @@ export default function PortalPage() {
         return initialData;
       };
 
-      setOrders(loadState("120_orders", INITIAL_ORDERS));
       setInquiries(loadState("120_inquiries", INITIAL_INQUIRIES));
       setNotices(loadState("120_notices", INITIAL_NOTICES));
       setTrainings(loadState("120_trainings", INITIAL_TRAINING));
@@ -496,9 +501,6 @@ export default function PortalPage() {
       setBanner(loadState("120_banners", null));
       setActiveStoreId(localStorage.getItem("120_active_store_id") || "owner");
 
-      // Popup & Floating values are dynamically synced in real-time via Convex below.
-
-
       let pr = loadState("120_products", INITIAL_PRODUCTS);
       // Self-healing: Narrow down bad seed detection to misnamed prod-6 to protect newly registered custom products (e.g. prod-7)
       const hasBadSeed = pr.some((p: any) => p.id === "prod-6" && p.name === "시그니처 테이크아웃 컵 16oz");
@@ -507,6 +509,42 @@ export default function PortalPage() {
         pr = INITIAL_PRODUCTS;
         localStorage.setItem("120_products", JSON.stringify(INITIAL_PRODUCTS));
       }
+
+      // [Migration] Automatic migration from LocalStorage to Convex Cloud DB in portal page
+      if (convexProducts !== undefined && convexProducts.length === 0) {
+        const storedPrRaw = localStorage.getItem("120_products");
+        if (storedPrRaw) {
+          try {
+            const parsedPr = JSON.parse(storedPrRaw);
+            if (parsedPr && parsedPr.length > 0) {
+              console.log("[Migration] Moving local products to Convex cloud DB from portal...");
+              syncProductsMutation({ products: parsedPr }).then(() => {
+                console.log("[Migration] Products migration completed in portal!");
+              });
+            }
+          } catch (e) {
+            console.error("[Migration] Failed to migrate products in portal:", e);
+          }
+        }
+      }
+
+      if (convexOrders !== undefined && convexOrders.length === 0) {
+        const storedOrdRaw = localStorage.getItem("120_orders");
+        if (storedOrdRaw) {
+          try {
+            const parsedOrd = JSON.parse(storedOrdRaw);
+            if (parsedOrd && parsedOrd.length > 0) {
+              console.log("[Migration] Moving local orders to Convex cloud DB from portal...");
+              syncOrdersMutation({ orders: parsedOrd }).then(() => {
+                console.log("[Migration] Orders migration completed in portal!");
+              });
+            }
+          } catch (e) {
+            console.error("[Migration] Failed to migrate orders in portal:", e);
+          }
+        }
+      }
+
       // Self-healing: Merge options and ensure missing seed products are injected
       const healedPr = pr.map((p: any) => {
         const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id) as any;
@@ -532,7 +570,7 @@ export default function PortalPage() {
           stock: p.stock || initialMatch?.stock || "in_stock",
           labels: Array.isArray(p.labels) ? p.labels : (initialMatch?.labels || []),
           shippingType: p.shippingType || initialMatch?.shippingType || "A",
-          options: p.options && p.options.length > 0 ? p.options : (initialMatch?.options || undefined)
+          options: p.options && p.options.length > 0 ? p.options : (initialMatch?.options || [])
         };
       });
       const finalPr = [...healedPr];
@@ -595,7 +633,6 @@ export default function PortalPage() {
           }
         };
 
-        setOrders(parseSafely("120_orders", INITIAL_ORDERS));
         setInquiries(parseSafely("120_inquiries", INITIAL_INQUIRIES));
         setNotices(parseSafely("120_notices", INITIAL_NOTICES));
         setTrainings(parseSafely("120_trainings", INITIAL_TRAINING));
@@ -615,68 +652,6 @@ export default function PortalPage() {
         
         const activeId = localStorage.getItem("120_active_store_id") || "owner";
         setActiveStoreId(activeId);
-
-        const pr = localStorage.getItem("120_products");
-        if (pr) {
-          try {
-            let parsedProducts = JSON.parse(pr);
-            // Self-healing: Narrow down bad seed detection to misnamed prod-6 to protect newly registered custom products (e.g. prod-7) in polling loop
-            const hasBadSeed = parsedProducts.some((p: any) => p.id === "prod-6" && p.name === "시그니처 테이크아웃 컵 16oz");
-            if (hasBadSeed) {
-              console.log("[Self-healing] Bad seed detected in storage poll. Restoring original customized product seed data...");
-              parsedProducts = INITIAL_PRODUCTS;
-              localStorage.setItem("120_products", JSON.stringify(INITIAL_PRODUCTS));
-            }
-
-            const mapped = parsedProducts.map((p: any) => {
-              const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id) as any;
-              const healedPrice = typeof p.price === "number" ? p.price : (initialMatch?.price || 0);
-              const healedDisc = typeof p.discountAmount === "number" ? p.discountAmount : (initialMatch?.discountAmount || 0);
-              const healedP = {
-                id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
-                orderIndex: typeof p.orderIndex === "number" ? p.orderIndex : (initialMatch?.orderIndex || 99),
-                name: p.name || initialMatch?.name || "이름 없는 상품",
-                category: p.category || initialMatch?.category || "냉동생지/자재",
-                modelName: p.modelName || initialMatch?.modelName || `MODEL-${p.id || "GENERIC"}`,
-                unit: p.unit || initialMatch?.unit || "박스",
-                qty: typeof p.qty === "number" ? p.qty : (initialMatch?.qty || 1),
-                supplyPrice: typeof p.supplyPrice === "number" ? p.supplyPrice : (initialMatch?.supplyPrice || 0),
-                price: healedPrice,
-                discountAmount: healedDisc,
-                discountedPrice: typeof p.discountedPrice === "number" ? p.discountedPrice : (healedPrice - healedDisc),
-                img: p.img || initialMatch?.img || "",
-                detailImg: p.detailImg || initialMatch?.detailImg || "",
-                detailText: p.detailText || initialMatch?.detailText || "",
-                isActive: typeof p.isActive === "boolean" ? p.isActive : true,
-                desc: p.desc || initialMatch?.desc || "",
-                stock: p.stock || initialMatch?.stock || "in_stock",
-                labels: Array.isArray(p.labels) ? p.labels : (initialMatch?.labels || []),
-                shippingType: p.shippingType || initialMatch?.shippingType || "A",
-                options: p.options && p.options.length > 0 ? p.options : (initialMatch?.options || [])
-              };
-
-              return {
-                id: healedP.id,
-                name: healedP.name,
-                category: healedP.category,
-                price: healedP.discountedPrice !== undefined ? healedP.discountedPrice : healedP.price,
-                packSize: `${healedP.unit || '박스'} (${healedP.qty || 1}개입)`,
-                img: healedP.img,
-                detailImg: healedP.detailImg,
-                detailText: healedP.detailText,
-                stock: healedP.stock || "in_stock",
-                desc: healedP.desc || "",
-                orderIndex: healedP.orderIndex || 99,
-                labels: healedP.labels || [],
-                shippingType: healedP.shippingType || "A",
-                options: healedP.options
-              };
-            }).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
-            setProducts(mapped);
-          } catch (e) {
-            console.warn(e);
-          }
-        }
 
         const ps = localStorage.getItem("120_shipping_settings");
         if (ps) {
@@ -851,6 +826,24 @@ export default function PortalPage() {
     const updatedOrders = [newOrder, ...orders];
     setOrders(updatedOrders);
     localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
+
+    // Save to Convex Cloud DB
+    saveOrderMutation({
+      id: newOrder.id,
+      date: newOrder.date,
+      items: newOrder.items.map((it: any) => ({
+        productName: it.productName,
+        quantity: it.quantity,
+        price: it.price
+      })),
+      totalPrice: newOrder.totalPrice,
+      status: newOrder.status,
+      storeId: activeStoreId || "owner"
+    }).then(() => {
+      console.log("[Convex] Order submitted successfully.");
+    }).catch(err => {
+      console.error("[Convex] Failed to submit order to cloud DB:", err);
+    });
 
     clearCart();
     triggerToast("발주 주문이 정상적으로 완료되었습니다!");
