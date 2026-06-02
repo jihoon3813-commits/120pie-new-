@@ -26,6 +26,8 @@ export const createOrUpdate = mutation({
     totalPrice: v.number(),
     status: v.string(),
     storeId: v.optional(v.string()),
+    courier: v.optional(v.string()),
+    trackingNo: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -63,6 +65,8 @@ export const syncOrders = mutation({
         totalPrice: v.number(),
         status: v.string(),
         storeId: v.optional(v.string()),
+        courier: v.optional(v.string()),
+        trackingNo: v.optional(v.string()),
       })
     ),
   },
@@ -80,6 +84,8 @@ export const syncOrders = mutation({
         totalPrice: ord.totalPrice,
         status: ord.status,
         storeId: ord.storeId,
+        courier: ord.courier,
+        trackingNo: ord.trackingNo,
       };
 
       if (existing) {
@@ -122,6 +128,36 @@ export const seedOrders = mutation({
         totalPrice: 0,
         status: "대기",
       });
+      return true;
+    }
+    return false;
+  },
+});
+
+// 송장번호 및 배송 정보 단독 업데이트 mutation
+export const updateTracking = mutation({
+  args: {
+    id: v.string(),
+    courier: v.string(),
+    trackingNo: v.string(),
+    status: v.optional(v.string()),
+  },
+  handler: async (ctx: any, args: any) => {
+    const existing = await ctx.db
+      .query("orders")
+      .filter((q: any) => q.eq(q.field("id"), args.id))
+      .first();
+
+    if (existing) {
+      const patchData: any = {
+        courier: args.courier,
+        trackingNo: args.trackingNo,
+      };
+      
+      // 송장이 입력되면 자동으로 배송중으로 상태를 영리하게 전이시킵니다.
+      patchData.status = args.status || "배송중";
+      
+      await ctx.db.patch(existing._id, patchData);
       return true;
     }
     return false;

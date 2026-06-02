@@ -164,6 +164,7 @@ interface Inquiry {
   status: "답변대기" | "답변완료";
   content: string;
   answer?: string;
+  _id?: any;
 }
 
 interface Notice {
@@ -173,6 +174,7 @@ interface Notice {
   date: string;
   views: number;
   content: string;
+  _id?: any;
 }
 
 interface Material {
@@ -498,6 +500,19 @@ export default function AdminPage() {
   const saveOrderMutation = useMutation(api.orders.createOrUpdate);
   const syncOrdersMutation = useMutation(api.orders.syncOrders);
   const updateOrderStatusMutation = useMutation(api.orders.updateStatus);
+  const updateTrackingMutation = useMutation(api.orders.updateTracking);
+
+  const convexMaterials = useQuery(api.materials.list);
+  const saveMaterialMutation = useMutation(api.materials.createOrUpdate);
+  const deleteMaterialMutation = useMutation(api.materials.deleteMaterial);
+
+  const convexStoreInquiries = useQuery(api.storeInquiries.list);
+  const answerInquiryMutation = useMutation(api.storeInquiries.answerInquiry);
+  const deleteInquiryMutation = useMutation(api.storeInquiries.deleteInquiry);
+
+  const convexNotices = useQuery(api.notices.list);
+  const saveNoticeMutation = useMutation(api.notices.createOrUpdate);
+  const deleteNoticeMutation = useMutation(api.notices.deleteNotice);
 
   const convexPopupsList = useQuery(api.popups.list);
   const createOrUpdatePopupMutation = useMutation(api.popups.createOrUpdate);
@@ -561,10 +576,11 @@ export default function AdminPage() {
   }, [convexFloating]);
 
   useEffect(() => {
-    if (convexInquiries) {
-      setInquiries(convexInquiries);
+    if (convexStoreInquiries) {
+      setInquiries(convexStoreInquiries as any);
+      localStorage.setItem("120_inquiries", JSON.stringify(convexStoreInquiries));
     }
-  }, [convexInquiries]);
+  }, [convexStoreInquiries]);
 
   useEffect(() => {
     if (convexGallery) {
@@ -586,6 +602,33 @@ export default function AdminPage() {
       }
     }
   }, [convexGalleryCategories, convexGallery]);
+
+  useEffect(() => {
+    if (convexMaterials) {
+      const trs = convexMaterials.filter((m: any) => m.type === "training");
+      const pr = convexMaterials.filter((m: any) => m.type === "pr");
+      setTrainings(trs as any);
+      setPrs(pr as any);
+      localStorage.setItem("120_trainings", JSON.stringify(trs));
+      localStorage.setItem("120_prs", JSON.stringify(pr));
+    }
+  }, [convexMaterials]);
+
+  useEffect(() => {
+    if (convexNotices) {
+      const mapped = convexNotices.map((n: any) => ({
+        id: n.id,
+        _id: n._id,
+        tag: n.tag as "필독" | "일반" | "이벤트" | "물류",
+        title: n.title,
+        date: n.date,
+        views: n.views,
+        content: n.content
+      }));
+      setNotices(mapped);
+      localStorage.setItem("120_notices", JSON.stringify(mapped));
+    }
+  }, [convexNotices]);
   // ==========================================
   // HQ ADMIN AUTHENTICATION STATE & LOGIC
   // ==========================================
@@ -683,6 +726,8 @@ export default function AdminPage() {
   const [newMaterialSize, setNewMaterialSize] = useState<string>("15.5 MB");
   const [newMaterialDesc, setNewMaterialDesc] = useState<string>("");
   const [newMaterialImg, setNewMaterialImg] = useState<string>("");
+  const [newMaterialFileUrl, setNewMaterialFileUrl] = useState<string>("");
+  const [newMaterialFileName, setNewMaterialFileName] = useState<string>("");
 
   // 1. STORE MANAGEMENT STATES
   const [selectedStore, setSelectedStore] = useState<StoreInfo | null>(null);
@@ -799,6 +844,8 @@ export default function AdminPage() {
   // 4. ORDER DETAILS POPUP & SETTING STATES
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderModal, setShowOrderModal] = useState<boolean>(false);
+  const [selectedCourier, setSelectedCourier] = useState<string>("CJ대한통운");
+  const [inputTrackingNo, setInputTrackingNo] = useState<string>("");
   
   // Settings & Status Management States
   const [deliveryStatuses, setDeliveryStatuses] = useState<string[]>(["주문완료", "배송준비중", "배송중", "배송완료"]);
@@ -1106,8 +1153,9 @@ export default function AdminPage() {
       return;
     }
 
+    const newNoticeId = `NOT-${Math.floor(100 + Math.random() * 900)}`;
     const newNotice: Notice = {
-      id: `NOT-${Math.floor(100 + Math.random() * 900)}`,
+      id: newNoticeId,
       tag: newNoticeTag,
       title: newNoticeTitle,
       date: new Date().toISOString().split("T")[0],
@@ -1119,17 +1167,41 @@ export default function AdminPage() {
     setNotices(updatedNotices);
     localStorage.setItem("120_notices", JSON.stringify(updatedNotices));
 
+    // Save to Convex Cloud DB
+    saveNoticeMutation({
+      id: newNoticeId,
+      tag: newNoticeTag,
+      title: newNoticeTitle,
+      content: newNoticeContent,
+      date: newNotice.date,
+      views: 0
+    }).then(() => {
+      console.log("[Convex] Notice created successfully.");
+    }).catch(err => {
+      console.error("[Convex] Failed to create notice:", err);
+    });
+
     setNewNoticeTitle("");
     setNewNoticeContent("");
     setShowNoticeModal(false);
     triggerToast("신규 공지사항이 정식 배포되었습니다!");
   };
 
-  const handleDeleteNotice = (id: string) => {
+  const handleDeleteNotice = (id: string, _id?: any) => {
     if (confirm("정말 이 공지사항을 삭제하시겠습니까?")) {
       const updated = notices.filter((n) => n.id !== id);
       setNotices(updated);
       localStorage.setItem("120_notices", JSON.stringify(updated));
+
+      // Delete from Convex Cloud DB
+      if (_id) {
+        deleteNoticeMutation({ _id }).then(() => {
+          console.log("[Convex] Notice deleted successfully.");
+        }).catch(err => {
+          console.error("[Convex] Failed to delete notice from cloud DB:", err);
+        });
+      }
+
       triggerToast("공지사항이 정상적으로 삭제되었습니다.");
     }
   };
@@ -1159,13 +1231,28 @@ export default function AdminPage() {
       return;
     }
 
+    const todayStr = new Date().toISOString().split("T")[0];
+
+    // Convex Cloud DB 업데이트
+    if (selectedInquiry._id) {
+      answerInquiryMutation({
+        _id: selectedInquiry._id,
+        answer: inquiryAnswerText,
+        answerDate: todayStr
+      }).then(() => {
+        console.log("[Convex] Inquiry answer saved successfully.");
+      }).catch((err) => {
+        console.error("[Convex] Failed to answer inquiry:", err);
+      });
+    }
+
     const updatedInquiries = inquiries.map((inq) => 
       inq.id === selectedInquiry.id 
-        ? { ...inq, status: "답변완료" as const, answer: inquiryAnswerText } 
+        ? { ...inq, status: "답변완료" as const, answer: inquiryAnswerText, answerDate: todayStr } 
         : inq
     );
 
-    setInquiries(updatedInquiries);
+    setInquiries(updatedInquiries as any);
     localStorage.setItem("120_inquiries", JSON.stringify(updatedInquiries));
     
     setSelectedInquiry(null);
@@ -1174,8 +1261,41 @@ export default function AdminPage() {
   };
 
   // ==========================================
-  // MATERIALS & PR ACTIONS: Add & Delete
+  // MATERIALS & PR ACTIONS: Add & Delete (File Upload & Convex Integration)
   // ==========================================
+  const handleMaterialFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 40 * 1024 * 1024) {
+      alert("파일 크기는 최대 40MB 이하여야 합니다.");
+      return;
+    }
+
+    // 포맷 자동 검출
+    const ext = file.name.split(".").pop()?.toUpperCase() || "PDF";
+    setNewMaterialFormat(ext);
+
+    // 크기 자동 감지 (MB/KB 포맷 변환)
+    const sizeInMB = file.size / (1024 * 1024);
+    if (sizeInMB >= 1) {
+      setNewMaterialSize(`${sizeInMB.toFixed(1)} MB`);
+    } else {
+      const sizeInKB = file.size / 1024;
+      setNewMaterialSize(`${sizeInKB.toFixed(0)} KB`);
+    }
+
+    setNewMaterialFileName(file.name);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        setNewMaterialFileUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleCreateMaterial = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMaterialTitle || !newMaterialDesc) {
@@ -1183,41 +1303,71 @@ export default function AdminPage() {
       return;
     }
 
-    const newMat: Material = {
-      id: `${materialType === "training" ? "TRN" : "PR"}-${Math.floor(100 + Math.random() * 900)}`,
+    const todayStr = new Date().toISOString().split("T")[0];
+
+    const payload: any = {
       title: newMaterialTitle,
-      date: new Date().toISOString().split("T")[0],
+      date: todayStr,
       size: newMaterialSize,
       format: newMaterialFormat,
       desc: newMaterialDesc,
-      img: newMaterialImg || undefined
+      img: newMaterialImg || undefined,
+      fileUrl: newMaterialFileUrl || undefined,
+      fileName: newMaterialFileName || undefined,
+      type: materialType,
+    };
+
+    // Convex Cloud DB 등록
+    saveMaterialMutation(payload).then(() => {
+      console.log("[Convex] Material registered.");
+    }).catch((err) => {
+      console.error("[Convex] Failed to save material:", err);
+    });
+
+    // 로컬 상태 즉각 동기화 (레이턴시 보완)
+    const newMat = {
+      ...payload,
+      id: `${materialType === "training" ? "TRN" : "PR"}-${Math.floor(100 + Math.random() * 900)}`
     };
 
     if (materialType === "training") {
       const updated = [newMat, ...trainings];
-      setTrainings(updated);
+      setTrainings(updated as any);
       localStorage.setItem("120_trainings", JSON.stringify(updated));
     } else {
       const updated = [newMat, ...prs];
-      setPrs(updated);
+      setPrs(updated as any);
       localStorage.setItem("120_prs", JSON.stringify(updated));
     }
 
+    // 폼 초기화
     setNewMaterialTitle("");
     setNewMaterialDesc("");
     setNewMaterialImg("");
+    setNewMaterialFileUrl("");
+    setNewMaterialFileName("");
     setShowMaterialModal(false);
     triggerToast(`신규 ${materialType === "training" ? "교육" : "홍보"}자료가 성공적으로 등록되었습니다!`);
   };
 
   const handleDeleteMaterial = (id: string, type: "training" | "pr") => {
-    if (confirm("정말 이 자료를 영구 삭제하시겠습니까?")) {
+    if (confirm("정말 이 자료를 영구 삭제하시겠습니까? 관련 다운로드 파일도 서버에서 완전히 삭제됩니다.")) {
+      // Convex _id를 가지고 있는지 확인하여 DB 삭제
+      const match = (type === "training" ? trainings : prs).find((item: any) => item.id === id || item._id === id);
+      if (match && (match as any)._id) {
+        deleteMaterialMutation({ _id: (match as any)._id }).then(() => {
+          console.log("[Convex] Material deleted successfully.");
+        }).catch((err) => {
+          console.error("[Convex] Failed to delete material:", err);
+        });
+      }
+
       if (type === "training") {
-        const updated = trainings.filter((t) => t.id !== id);
+        const updated = trainings.filter((t: any) => t.id !== id && t._id !== id);
         setTrainings(updated);
         localStorage.setItem("120_trainings", JSON.stringify(updated));
       } else {
-        const updated = prs.filter((p) => p.id !== id);
+        const updated = prs.filter((p: any) => p.id !== id && p._id !== id);
         setPrs(updated);
         localStorage.setItem("120_prs", JSON.stringify(updated));
       }
@@ -2422,7 +2572,50 @@ export default function AdminPage() {
 
   const handleOpenOrderModal = (order: Order) => {
     setSelectedOrder(order);
+    setSelectedCourier((order as any).courier || "CJ대한통운");
+    setInputTrackingNo((order as any).trackingNo || "");
     setShowOrderModal(true);
+  };
+
+  const handleUpdateOrderTracking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedOrder) return;
+    if (!inputTrackingNo.trim()) {
+      alert("송장번호를 입력해 주세요.");
+      return;
+    }
+
+    try {
+      // 1. Convex Cloud DB에 송장 정보 업데이트
+      await updateTrackingMutation({
+        id: selectedOrder.id,
+        courier: selectedCourier,
+        trackingNo: inputTrackingNo.trim(),
+        status: "배송중", // 송장 등록 시 자동으로 배송중으로 상태 전이
+      });
+
+      // 2. React State 동기화 및 LocalStorage 갱신
+      const updated = orders.map((o) => 
+        o.id === selectedOrder.id 
+          ? { ...o, courier: selectedCourier, trackingNo: inputTrackingNo.trim(), status: "배송중" } 
+          : o
+      );
+      setOrders(updated as any);
+      localStorage.setItem("120_orders", JSON.stringify(updated));
+
+      // 3. 현재 열려있는 모달 주문서 상태 동시 업데이트
+      setSelectedOrder({
+        ...selectedOrder,
+        courier: selectedCourier,
+        trackingNo: inputTrackingNo.trim(),
+        status: "배송중"
+      } as any);
+
+      triggerToast("송장 번호 등록 및 배송중 처리가 실시간 반영되었습니다!");
+    } catch (err) {
+      console.error("Failed to update tracking info:", err);
+      alert("송장 정보 갱신 중 오류가 발생했습니다.");
+    }
   };
 
   const updateOrderStatus = (orderId: string, newStatus: string) => {
@@ -3638,7 +3831,7 @@ export default function AdminPage() {
                             <td className="p-4 sm:p-5 font-bold text-[#735965]">{n.views} 회</td>
                             <td className="p-4 sm:p-5 text-center">
                               <button
-                                onClick={() => handleDeleteNotice(n.id)}
+                                onClick={() => handleDeleteNotice(n.id, n._id)}
                                 className="p-1.5 rounded-lg border border-[#f2ccd7] bg-white hover:bg-[#fff1f5] text-red-500 hover:border-red-300 transition-all text-xs"
                                 title="삭제"
                               >
@@ -6221,6 +6414,38 @@ export default function AdminPage() {
                 />
               </div>
 
+              {/* 실제 가맹지원 파일 직접 업로드 필드 (추가) */}
+              <div className="flex flex-col gap-2">
+                <label className="font-bold text-[#2d2026] flex items-center gap-1">
+                  📂 실제 자료 파일 직접 업로드
+                  <span className="text-[10px] text-[#f25f8a] font-extrabold">(필수)</span>
+                </label>
+                <div className="flex items-center gap-3 bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
+                  <input
+                    type="file"
+                    onChange={handleMaterialFileUpload}
+                    className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] cursor-pointer flex-1"
+                  />
+                  {newMaterialFileName && (
+                    <div className="text-[10px] font-bold text-[#bf3e67] bg-[#ffd3df] px-2 py-1 rounded max-w-[150px] truncate" title={newMaterialFileName}>
+                      {newMaterialFileName}
+                    </div>
+                  )}
+                  {newMaterialFileUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewMaterialFileUrl("");
+                        setNewMaterialFileName("");
+                      }}
+                      className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200"
+                    >
+                      지우기
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <div className="flex flex-col gap-2">
                 <label className="font-bold text-[#2d2026]">자료 세부 설명 요약</label>
                 <textarea 
@@ -6344,9 +6569,9 @@ export default function AdminPage() {
                 <div className="space-y-2 bg-[#fff1f5]/50 border border-[#f2ccd7]/60 p-4 rounded-xl">
                   <label className="text-xs font-bold text-[#bf3e67] block">상태값 변경 선택</label>
                   <select
-                    value={selectedOrder.status}
-                    onChange={(e) => updateOrderStatus(selectedOrder.id, e.target.value)}
-                    className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] font-bold focus:outline-none focus:border-[#f25f8a] cursor-pointer"
+                     value={selectedOrder.status}
+                     onChange={(e) => updateOrderStatus(selectedOrder.id, e.target.value)}
+                     className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] font-bold focus:outline-none focus:border-[#f25f8a] cursor-pointer"
                   >
                     {deliveryStatuses.map((st) => (
                       <option key={st} value={st}>{st}</option>
@@ -6361,6 +6586,56 @@ export default function AdminPage() {
                   </strong>
                 </div>
               </div>
+
+              {/* 배송 및 송장 정보 관리 (신설) */}
+              <form onSubmit={handleUpdateOrderTracking} className="space-y-3 bg-[#fff1f5]/50 border border-[#f2ccd7]/60 p-4 rounded-xl">
+                <h4 className="font-extrabold text-xs text-[#bf3e67] flex items-center gap-1.5 border-b border-[#f2ccd7]/40 pb-2">
+                  🚚 배송 물류 송장 정보 등록/수정
+                </h4>
+                
+                {/* 기존 송장 정보가 있으면 렌더링 */}
+                {(selectedOrder as any).courier && (selectedOrder as any).trackingNo && (
+                  <div className="bg-white border border-[#f2ccd7]/40 px-3 py-2 rounded-lg text-[10px] font-extrabold text-[#bf3e67] w-fit">
+                    현재 등록된 배송 정보: {(selectedOrder as any).courier} [{(selectedOrder as any).trackingNo}]
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-[#735965] block">택배사 선택</label>
+                    <select
+                      value={selectedCourier}
+                      onChange={(e) => setSelectedCourier(e.target.value)}
+                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-2.5 py-2 text-xs text-[#2d2026] font-bold focus:outline-none cursor-pointer"
+                    >
+                      <option value="CJ대한통운">CJ대한통운</option>
+                      <option value="한진택배">한진택배</option>
+                      <option value="롯데택배">롯데택배</option>
+                      <option value="로젠택배">로젠택배</option>
+                      <option value="우체국택배">우체국택배</option>
+                      <option value="본사 직배송 차량">본사 직배송 차량</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-[#735965] block">송장번호 입력</label>
+                    <input
+                      type="text"
+                      placeholder="하이픈(-) 없이 입력"
+                      value={inputTrackingNo}
+                      onChange={(e) => setInputTrackingNo(e.target.value)}
+                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-2.5 py-2 text-xs text-[#2d2026] focus:outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-2 bg-[#bf3e67] hover:bg-[#a02c52] text-white text-xs font-black rounded-lg transition-all shadow-sm"
+                  >
+                    송장 등록 및 배송중 변경
+                  </button>
+                </div>
+              </form>
 
             </div>
 

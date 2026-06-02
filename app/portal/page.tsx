@@ -70,6 +70,8 @@ interface Order {
   items: { productName: string; quantity: number; price: number }[];
   totalPrice: number;
   status: string;
+  courier?: string;
+  trackingNo?: string;
 }
 
 interface Inquiry {
@@ -89,6 +91,7 @@ interface Notice {
   date: string;
   views: number;
   content: string;
+  _id?: any;
 }
 
 interface Material {
@@ -99,6 +102,8 @@ interface Material {
   format: string;
   desc: string;
   img?: string;
+  fileUrl?: string;
+  fileName?: string;
 }
 
 // ==========================================
@@ -264,22 +269,60 @@ const INITIAL_PR: Material[] = [
 ];
 
 export default function PortalPage() {
-  // Convex Hooks for Popups, Floatings, Products, and Orders
-  const convexPopup = useQuery(api.popups.get, { targetPage: "portal" });
-  const convexFloating = useQuery(api.floatings.get);
-  const convexStores = useQuery(api.stores.get);
-  const convexProducts = useQuery(api.products.get);
-  const convexOrders = useQuery(api.orders.list);
-
-  const saveOrderMutation = useMutation(api.orders.createOrUpdate);
-  const syncProductsMutation = useMutation(api.products.syncProducts);
-  const syncOrdersMutation = useMutation(api.orders.syncOrders);
-
+  // ==========================================
+  // STATE MANAGEMENT (LOCAL STORAGE SYNCD)
+  // ==========================================
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
   const [loginId, setLoginId] = useState<string>("");
   const [loginPw, setLoginPw] = useState<string>("");
   const [loginError, setLoginError] = useState<string | null>(null);
+
+  const [currentMenu, setCurrentMenu] = useState<string>("dashboard");
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  
+  // Dynamic collections synced via localStorage
+  const [products, setProducts] = useState<Product[]>([]);
+  const [stores, setStores] = useState<any[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [banner, setBanner] = useState<any>(null);
+  const [activeStoreId, setActiveStoreId] = useState<string>("owner");
+
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [trainings, setTrainings] = useState<Material[]>([]);
+  const [prs, setPrs] = useState<Material[]>([]);
+
+  // Selected Detail Modals
+  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
+  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedProductDetail, setSelectedProductDetail] = useState<any | null>(null);
+  const [selectedProductOption, setSelectedProductOption] = useState<string>("");
+  const [localSelectedOptions, setLocalSelectedOptions] = useState<{ optionName: string; quantity: number }[]>([]);
+  const [localSingleQty, setLocalSingleQty] = useState<number>(1);
+
+  // ==========================================
+  // CONVEX REAL-TIME SYNC HOOKS
+  // ==========================================
+  const convexPopup = useQuery(api.popups.get, { targetPage: "portal" });
+  const convexFloating = useQuery(api.floatings.get);
+  const convexStores = useQuery(api.stores.get);
+  const convexProducts = useQuery(api.products.get);
+  const convexOrders = useQuery(api.orders.list);
+  const convexMaterials = useQuery(api.materials.list);
+  const convexStoreInquiries = useQuery(api.storeInquiries.listByStore, { storeId: activeStoreId || "owner" });
+  const convexNotices = useQuery(api.notices.list);
+
+  const saveOrderMutation = useMutation(api.orders.createOrUpdate);
+  const syncProductsMutation = useMutation(api.products.syncProducts);
+  const syncOrdersMutation = useMutation(api.orders.syncOrders);
+  const createInquiryMutation = useMutation(api.storeInquiries.createOrUpdate);
+  const incrementNoticeViewsMutation = useMutation(api.notices.incrementViews);
+
+
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -298,6 +341,102 @@ export default function PortalPage() {
       localStorage.setItem("120_stores", JSON.stringify(convexStores));
     }
   }, [convexStores]);
+
+  // Sync Convex notices to React state and localStorage (Fallback to local mock if empty)
+  useEffect(() => {
+    if (convexNotices !== undefined && convexNotices !== null) {
+      const mappedNotices = convexNotices.map((n: any) => ({
+        id: n.id,
+        _id: n._id,
+        tag: n.tag as "필독" | "일반" | "신메뉴" | "물류",
+        title: n.title,
+        date: n.date,
+        views: n.views,
+        content: n.content
+      }));
+      if (mappedNotices.length > 0) {
+        setNotices(mappedNotices);
+        localStorage.setItem("120_notices", JSON.stringify(mappedNotices));
+      }
+    }
+  }, [convexNotices]);
+
+  // Sync Convex materials to React state and localStorage (Fallback to local mock if empty)
+  useEffect(() => {
+    if (convexMaterials !== undefined && convexMaterials !== null) {
+      const trainList = convexMaterials.filter((m: any) => m.type === "training");
+      const prList = convexMaterials.filter((m: any) => m.type === "pr");
+      
+      if (trainList.length > 0) {
+        setTrainings(trainList.map((m: any) => ({
+          id: m._id,
+          title: m.title,
+          date: m.date,
+          size: m.size,
+          format: m.format,
+          desc: m.desc,
+          img: m.img,
+          fileUrl: m.fileUrl,
+          fileName: m.fileName
+        })));
+        localStorage.setItem("120_trainings", JSON.stringify(trainList));
+      }
+      
+      if (prList.length > 0) {
+        setPrs(prList.map((m: any) => ({
+          id: m._id,
+          title: m.title,
+          date: m.date,
+          size: m.size,
+          format: m.format,
+          desc: m.desc,
+          img: m.img,
+          fileUrl: m.fileUrl,
+          fileName: m.fileName
+        })));
+        localStorage.setItem("120_prs", JSON.stringify(prList));
+      }
+    }
+  }, [convexMaterials]);
+
+  // Sync Convex store inquiries to React state and localStorage
+  useEffect(() => {
+    if (convexStoreInquiries !== undefined && convexStoreInquiries !== null) {
+      const mappedInquiries = convexStoreInquiries.map((inq: any) => ({
+        id: inq.id,
+        category: inq.category,
+        title: inq.title,
+        date: inq.date,
+        status: inq.status as "답변대기" | "답변완료",
+        content: inq.content,
+        answer: inq.answer
+      }));
+      setInquiries(mappedInquiries);
+      localStorage.setItem("120_inquiries", JSON.stringify(mappedInquiries));
+    }
+  }, [convexStoreInquiries]);
+
+  // Sync Convex orders to React state and localStorage (Filter by storeId)
+  useEffect(() => {
+    if (convexOrders !== undefined && convexOrders !== null) {
+      const myOrders = convexOrders.filter((o: any) => o.storeId === activeStoreId || o.storeId === "owner");
+      const mappedOrders = myOrders.map((o: any) => ({
+        id: o.id,
+        date: o.date,
+        items: o.items.map((it: any) => ({
+          productName: it.productName,
+          quantity: it.quantity,
+          price: it.price
+        })),
+        totalPrice: o.totalPrice,
+        status: o.status,
+        courier: o.courier,
+        trackingNo: o.trackingNo
+      }));
+      setOrders(mappedOrders.length > 0 ? mappedOrders : INITIAL_ORDERS);
+      localStorage.setItem("120_orders", JSON.stringify(mappedOrders));
+    }
+  }, [convexOrders, activeStoreId]);
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -403,34 +542,7 @@ export default function PortalPage() {
     }
   };
 
-  // ==========================================
-  // STATE MANAGEMENT (LOCAL STORAGE SYNCD)
-  // ==========================================
-  const [currentMenu, setCurrentMenu] = useState<string>("dashboard");
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  
-  // Dynamic collections synced via localStorage
-  const [products, setProducts] = useState<Product[]>([]);
-  const [stores, setStores] = useState<any[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [banner, setBanner] = useState<any>(null);
-  const [activeStoreId, setActiveStoreId] = useState<string>("owner");
 
-  const [notices, setNotices] = useState<Notice[]>([]);
-  const [trainings, setTrainings] = useState<Material[]>([]);
-  const [prs, setPrs] = useState<Material[]>([]);
-
-  // Selected Detail Modals
-  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
-  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
-  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [selectedProductDetail, setSelectedProductDetail] = useState<any | null>(null);
-  const [selectedProductOption, setSelectedProductOption] = useState<string>("");
-  const [localSelectedOptions, setLocalSelectedOptions] = useState<{ optionName: string; quantity: number }[]>([]);
-  const [localSingleQty, setLocalSingleQty] = useState<number>(1);
 
   useEffect(() => {
     setSelectedProductOption("");
@@ -874,6 +986,22 @@ export default function PortalPage() {
     setInquiries(updatedInquiries);
     localStorage.setItem("120_inquiries", JSON.stringify(updatedInquiries));
 
+    // Save to Convex Cloud DB
+    createInquiryMutation({
+      id: newInquiryId,
+      storeId: activeStoreId || "owner",
+      storeName: activeStore?.name || "강남역삼점",
+      category: inquiryCategory,
+      title: inquiryTitle,
+      content: inquiryContent,
+      date: newInquiry.date,
+      status: "답변대기"
+    }).then(() => {
+      console.log("[Convex] Inquiry submitted successfully.");
+    }).catch(err => {
+      console.error("[Convex] Failed to submit inquiry to cloud DB:", err);
+    });
+
     setInquiryTitle("");
     setInquiryContent("");
     setShowInquiryModal(false);
@@ -882,13 +1010,72 @@ export default function PortalPage() {
   };
 
   // ==========================================
-  // SIMULATE DOWNLOAD
+  // NOTICE SELECTION & VIEW INCREMENT
   // ==========================================
-  const simulateDownload = (title: string) => {
-    triggerToast(`'${title}' 파일 다운로드를 준비하는 중...`);
-    setTimeout(() => {
-      triggerToast(`다운로드가 완료되었습니다.`);
-    }, 1200);
+  const handleNoticeClick = (notice: Notice) => {
+    setSelectedNotice(notice);
+    if (notice._id) {
+      incrementNoticeViewsMutation({ _id: notice._id }).then(() => {
+        console.log("[Convex] Notice view count advanced.");
+      }).catch(err => {
+        console.error("[Convex] Failed to increment notice views:", err);
+      });
+    }
+  };
+
+  // ==========================================
+  // FILE DOWNLOAD ENGINE (Data URL base64)
+  // ==========================================
+  const handleDownload = (title: string, fileUrl?: string, fileName?: string) => {
+    if (fileUrl) {
+      triggerToast(`'${fileName || title}' 다운로드를 시작합니다.`);
+      try {
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = fileName || title;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        triggerToast("다운로드가 완료되었습니다.");
+      } catch (err) {
+        console.error("Download failed:", err);
+        triggerToast("다운로드 중 오류가 발생했습니다.");
+      }
+    } else {
+      triggerToast(`'${title}' 파일 다운로드를 준비하는 중...`);
+      setTimeout(() => {
+        triggerToast(`다운로드가 완료되었습니다.`);
+      }, 1000);
+    }
+  };
+
+  // ==========================================
+  // REAL-TIME COURIER TRACKING ROUTER
+  // ==========================================
+  const handleTrackingClick = (courier?: string, trackingNo?: string) => {
+    if (!trackingNo) {
+      triggerToast("송장 번호가 등록되지 않았습니다.");
+      return;
+    }
+    
+    const courierNormalized = courier?.trim() || "";
+    
+    if (courierNormalized === "CJ대한통운") {
+      window.open(`https://www.doortodoor.co.kr/tracking/jsp/cmn/Tracking_auto.jsp?QueryNum=${trackingNo}`, "_blank");
+    } else if (courierNormalized === "우체국택배") {
+      window.open(`https://service.epost.go.kr/trace.RetrieveDomconsortObscl.postal?sid1=${trackingNo}`, "_blank");
+    } else if (courierNormalized === "한진택배") {
+      window.open(`https://www.hanjin.com/ko/delivery/delivery/tracking.do?wblnum=${trackingNo}`, "_blank");
+    } else if (courierNormalized === "롯데택배") {
+      window.open(`https://www.lotteglogis.com/home/reservation/tracking/linkTracking?InvNo=${trackingNo}`, "_blank");
+    } else if (courierNormalized === "로젠택배") {
+      window.open(`https://www.ilogen.com/web/personal/trace/${trackingNo}`, "_blank");
+    } else if (courierNormalized === "본사직배송") {
+      triggerToast("본사 저온 탑차 직배송 상품입니다. 본사 정기 배송 편으로 당일 도착 예정입니다.");
+    } else {
+      // Fallback
+      window.open(`https://www.hanjin.com/ko/delivery/delivery/tracking.do?wblnum=${trackingNo}`, "_blank");
+    }
   };
 
   // ==========================================
@@ -1890,7 +2077,7 @@ export default function PortalPage() {
                   notices.map((n) => (
                     <button
                       key={n.id}
-                      onClick={() => setSelectedNotice(n)}
+                      onClick={() => handleNoticeClick(n)}
                       className="w-full text-left bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm group"
                     >
                       <div className="space-y-2">
@@ -2036,7 +2223,7 @@ export default function PortalPage() {
                             상세보기
                           </button>
                           <button
-                            onClick={() => simulateDownload(t.title)}
+                            onClick={() => handleDownload(t.title, t.fileUrl, t.fileName)}
                             className="px-4 py-2.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shrink-0"
                           >
                             <Download size={13} /> 다운로드
@@ -2103,7 +2290,7 @@ export default function PortalPage() {
                             상세보기
                           </button>
                           <button
-                            onClick={() => simulateDownload(p.title)}
+                            onClick={() => handleDownload(p.title, p.fileUrl, p.fileName)}
                             className="px-4 py-2.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shrink-0"
                           >
                             <Download size={13} /> 다운로드
@@ -2302,7 +2489,7 @@ export default function PortalPage() {
               <button 
                 onClick={() => {
                   setSelectedMaterial(null);
-                  simulateDownload(selectedMaterial.title);
+                  handleDownload(selectedMaterial.title, selectedMaterial.fileUrl, selectedMaterial.fileName);
                 }}
                 className="px-6 py-2.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold transition-all flex items-center gap-1.5"
               >
@@ -2525,20 +2712,28 @@ export default function PortalPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold">
                     <div className="space-y-1">
                       <span className="text-[10px] text-[#735965] font-extrabold block">배송 수단 / 물류 방식</span>
-                      <p className="text-[#2d2026]">120 물류 전용 냉동 저온탑차 (한진택배 위탁)</p>
+                      <p className="text-[#2d2026]">
+                        {selectedOrder.courier ? `${selectedOrder.courier} 위탁 배송` : "120 물류 전용 냉동 저온탑차 (한진택배 위탁)"}
+                      </p>
                     </div>
                     <div className="space-y-1">
                       <span className="text-[10px] text-[#735965] font-extrabold block">실시간 송장 번호</span>
-                      <p className="font-mono text-[#bf3e67]">HNJ-120-{selectedOrder.id.replace("ORD-", "")}</p>
+                      <p className="font-mono text-[#bf3e67]">
+                        {selectedOrder.trackingNo || `HNJ-120-${selectedOrder.id.replace("ORD-", "")}`}
+                      </p>
                     </div>
                     <div className="sm:col-span-2 pt-2 border-t border-[#f2ccd7]/40">
                       <button 
                         type="button"
                         onClick={() => {
-                          if (selectedOrder.status === "배송중") {
-                            triggerToast("실시간 차량 관제: [경기 광주 저온허브] -> [서울 강남권 지사] 이동 중 (오전 배송 예정)");
+                          if (selectedOrder.courier && selectedOrder.trackingNo) {
+                            handleTrackingClick(selectedOrder.courier, selectedOrder.trackingNo);
                           } else {
-                            triggerToast("물류 배송이 정상 완료되었습니다. (인수처: 점주 본인 직접 서명 수령 완료)");
+                            if (selectedOrder.status === "배송중") {
+                              triggerToast("실시간 차량 관제: [경기 광주 저온허브] -> [서울 강남권 지사] 이동 중 (오전 배송 예정)");
+                            } else {
+                              triggerToast("물류 배송이 정상 완료되었습니다. (인수처: 점주 본인 직접 서명 수령 완료)");
+                            }
                           }
                         }}
                         className="w-full py-2.5 rounded-xl bg-[#fff1f5] border border-[#f2ccd7] hover:bg-[#ffd3df] hover:border-[#f25f8a] text-xs font-bold text-[#bf3e67] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"

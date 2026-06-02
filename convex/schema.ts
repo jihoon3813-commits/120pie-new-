@@ -100,5 +100,38 @@ export default defineSchema({
     totalPrice: v.number(),
     status: v.string(), // "대기" | "배송중" | "배송완료" 등
     storeId: v.optional(v.string()), // 발주 넣은 가맹점의 ID
+    courier: v.optional(v.string()),    // 택배사명 (e.g. "CJ대한통운", "한진택배" 등)
+    trackingNo: v.optional(v.string()), // 송장번호
+  }),
+  materials: defineTable({
+    title: v.string(),
+    date: v.string(), // YYYY-MM-DD
+    size: v.string(), // e.g. "12.4 MB"
+    format: v.string(), // e.g. "PDF" | "ZIP" | "PNG"
+    desc: v.string(),
+    img: v.optional(v.string()), // 썸네일 이미지 (Base64)
+    fileUrl: v.optional(v.string()), // 실제 파일 바이너리 (Base64 Data URL)
+    fileName: v.optional(v.string()), // 업로드된 실제 파일명
+    type: v.string(), // "training" (교육자료) | "pr" (홍보자료)
+  }),
+  storeInquiries: defineTable({
+    id: v.string(), // e.g. "INQ-234"
+    storeId: v.string(), // 가맹점 로그인 ID
+    storeName: v.string(), // 가맹점명
+    category: v.string(), // "물류" | "정산" | "마케팅" | "조리/AS" | "기타"
+    title: v.string(),
+    content: v.string(),
+    date: v.string(), // YYYY-MM-DD
+    status: v.string(), // "답변대기" | "답변완료"
+    answer: v.optional(v.string()), // 본사 답변 내용
+    answerDate: v.optional(v.string()), // 답변 작성일자 (YYYY-MM-DD)
+  }),
+  notices: defineTable({
+    id: v.string(), // e.g. "NOT-01"
+    tag: v.string(), // "필독" | "일반" | "신메뉴" | "물류" | "이벤트"
+    title: v.string(),
+    content: v.string(),
+    date: v.string(), // YYYY-MM-DD
+    views: v.number(),
   }),
 });
