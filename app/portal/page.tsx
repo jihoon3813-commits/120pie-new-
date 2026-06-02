@@ -2184,7 +2184,6 @@ export default function PortalPage() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
-                        <th className="p-4 sm:p-5">발주 코드</th>
                         <th className="p-4 sm:p-5">신청 일자</th>
                         <th className="p-4 sm:p-5">주문 품목 요약</th>
                         <th className="p-4 sm:p-5">총 결제 대금</th>
@@ -2195,7 +2194,7 @@ export default function PortalPage() {
                     <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
                       {orders.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="p-8 text-center text-[#735965]">발주 내역이 존재하지 않습니다.</td>
+                          <td colSpan={5} className="p-8 text-center text-[#735965]">발주 내역이 존재하지 않습니다.</td>
                         </tr>
                       ) : (
                         orders.map((order) => (
@@ -2204,7 +2203,6 @@ export default function PortalPage() {
                             onClick={() => setSelectedOrder(order)}
                             className="hover:bg-[#fff9fb] transition-colors cursor-pointer group"
                           >
-                            <td className="p-4 sm:p-5 font-bold text-[#2d2026] group-hover:text-[#f25f8a] transition-colors">{order.id}</td>
                             <td className="p-4 sm:p-5 text-[#735965] font-semibold">{order.date}</td>
                             <td className="p-4 sm:p-5">
                               <span className="font-bold text-[#2d2026]">
