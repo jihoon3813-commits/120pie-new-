@@ -500,6 +500,10 @@ export default function AdminPage() {
   const updateOrderStatusMutation = useMutation(api.orders.updateStatus);
 
   const updatePopupMutation = useMutation(api.popups.update);
+  const convexPopupsList = useQuery(api.popups.list);
+  const createOrUpdatePopupMutation = useMutation(api.popups.createOrUpdate);
+  const deletePopupMutation = useMutation(api.popups.deletePopup);
+  const togglePopupActiveMutation = useMutation(api.popups.toggleActive);
   const updateFloatingMutation = useMutation(api.floatings.update);
   const addGalleryItemMutation = useMutation(api.gallery.add);
   const removeGalleryItemMutation = useMutation(api.gallery.remove);
@@ -764,6 +768,12 @@ export default function AdminPage() {
   const [bannerSubMenu, setBannerSubMenu] = useState<"banner" | "popup" | "floating">("banner");
   
   // Popup States
+  const [showPopupModal, setShowPopupModal] = useState<boolean>(false);
+  const [selectedPopupForEdit, setSelectedPopupForEdit] = useState<any | null>(null);
+  const [popupStartDate, setPopupStartDate] = useState<string>("");
+  const [popupEndDate, setPopupEndDate] = useState<string>("");
+  const [popupTargetPage, setPopupTargetPage] = useState<string>("all");
+
   const [popupActive, setPopupActive] = useState<boolean>(true);
   const [popupTitle, setPopupTitle] = useState<string>("");
   const [popupDesc, setPopupDesc] = useState<string>("");
@@ -1890,37 +1900,121 @@ export default function AdminPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleUpdatePopup = async (e: React.FormEvent) => {
+  // ==========================================
+  // POPUP HISTORY CRUD & MODAL HANDLERS
+  // ==========================================
+  const handleOpenPopupModal = (pop?: any) => {
+    if (pop) {
+      setSelectedPopupForEdit(pop);
+      setPopupActive(pop.isActive);
+      setPopupTitle(pop.title);
+      setPopupDesc(pop.desc);
+      setPopupImage(pop.image || "");
+      setPopupLink(pop.link || "");
+      setPopupBtnText(pop.btnText || "");
+      setPopupTitleColor(pop.titleColor || "#ffffff");
+      setPopupTitleSize(pop.titleSize || "18px");
+      setPopupDescColor(pop.descColor || "#735965");
+      setPopupDescSize(pop.descSize || "12px");
+      setPopupBtnBgColor(pop.btnBgColor || "#f25f8a");
+      setPopupBtnTextColor(pop.btnTextColor || "#ffffff");
+      setPopupBtnTextSize(pop.btnTextSize || "12px");
+      setPopupStartDate(pop.startDate || "");
+      setPopupEndDate(pop.endDate || "");
+      setPopupTargetPage(pop.targetPage || "all");
+    } else {
+      setSelectedPopupForEdit(null);
+      setPopupActive(true);
+      setPopupTitle("");
+      setPopupDesc("");
+      setPopupImage("");
+      setPopupLink("order");
+      setPopupBtnText("자재 주문하러 가기");
+      setPopupTitleColor("#ffffff");
+      setPopupTitleSize("18px");
+      setPopupDescColor("#735965");
+      setPopupDescSize("12px");
+      setPopupBtnBgColor("#f25f8a");
+      setPopupBtnTextColor("#ffffff");
+      setPopupBtnTextSize("12px");
+      setPopupStartDate(new Date().toISOString().split("T")[0]);
+      setPopupEndDate("");
+      setPopupTargetPage("all");
+    }
+    setShowPopupModal(true);
+  };
+
+  const handleSavePopup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedPopup: PopupSettings = {
-      isActive: popupActive,
-      title: popupTitle,
-      desc: popupDesc,
-      image: popupImage,
-      link: popupLink,
-      btnText: popupBtnText,
-      titleColor: popupTitleColor,
-      titleSize: popupTitleSize,
-      descColor: popupDescColor,
-      descSize: popupDescSize,
-      btnBgColor: popupBtnBgColor,
-      btnTextColor: popupBtnTextColor,
-      btnTextSize: popupBtnTextSize
-    };
+    if (!popupTitle || !popupDesc) {
+      alert("팝업 제목과 상세 본문을 모두 입력해 주세요.");
+      return;
+    }
+
     try {
-      localStorage.setItem("120_popups", JSON.stringify(updatedPopup));
-      await updatePopupMutation(updatedPopup);
-      if (popupActive) {
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("120_popup_closed_date");
-          localStorage.removeItem("120_popup_closed_title");
-          sessionStorage.removeItem("120_popup_closed_session");
-        }
+      const payload: any = {
+        isActive: popupActive,
+        title: popupTitle,
+        desc: popupDesc,
+        image: popupImage || undefined,
+        link: popupLink || undefined,
+        btnText: popupBtnText || undefined,
+        titleColor: popupTitleColor || undefined,
+        titleSize: popupTitleSize || undefined,
+        descColor: popupDescColor || undefined,
+        descSize: popupDescSize || undefined,
+        btnBgColor: popupBtnBgColor || undefined,
+        btnTextColor: popupBtnTextColor || undefined,
+        btnTextSize: popupBtnTextSize || undefined,
+        startDate: popupStartDate || undefined,
+        endDate: popupEndDate || undefined,
+        targetPage: popupTargetPage,
+      };
+
+      if (selectedPopupForEdit) {
+        payload._id = selectedPopupForEdit._id;
       }
-      triggerToast("실시간 점주 공지 팝업 설정이 성공적으로 저장 및 배포되었습니다!");
+
+      await createOrUpdatePopupMutation(payload);
+      
+      // Clear tab-specific local flags to force fresh loading on user-side
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("120_popup_closed_date");
+        localStorage.removeItem("120_popup_closed_title");
+        sessionStorage.removeItem("120_popup_closed_session");
+      }
+
+      setShowPopupModal(false);
+      triggerToast(
+        selectedPopupForEdit
+          ? "공지 팝업 수정이 성공적으로 완료되었습니다!"
+          : "신규 공지 팝업이 성공적으로 등록 및 배포되었습니다!"
+      );
     } catch (err) {
-      console.error(err);
-      alert("팝업 저장 오류: 브라우저 용량 제한을 초과했습니다. 이미지 파일 크기를 줄이거나 URL 방식 또는 다른 이미지를 지정해 주세요.");
+      console.error("Popup save error:", err);
+      alert("팝업 저장 중 오류가 발생했습니다. 이미지 파일 용량을 줄이거나 다시 시도해 주세요.");
+    }
+  };
+
+  const handleDeletePopup = async (popId: any) => {
+    if (confirm("정말 이 팝업 데이터를 영구 삭제하시겠습니까? 삭제된 팝업은 더 이상 점주 포털 및 랜딩 페이지에 노출되지 않습니다.")) {
+      try {
+        await deletePopupMutation({ _id: popId });
+        triggerToast("선택하신 공지 팝업이 성공적으로 삭제되었습니다.");
+      } catch (err) {
+        console.error("Popup delete error:", err);
+        alert("팝업 삭제에 실패했습니다.");
+      }
+    }
+  };
+
+  const handleTogglePopupActive = async (popId: any, currentActive: boolean) => {
+    try {
+      await togglePopupActiveMutation({ _id: popId, isActive: !currentActive });
+      triggerToast(!currentActive ? "팝업이 활성화되어 실시간 노출 대상에 편입되었습니다." : "팝업이 비활성화(숨김) 처리되었습니다.");
+    } catch (err) {
+      console.error("Popup toggle active error:", err);
+      alert("팝업 상태 변경에 실패했습니다.");
     }
   };
 
@@ -3761,270 +3855,534 @@ export default function AdminPage() {
                 ))}
               </div>
 
-              {/* 1. REAL-TIME POPUP MANAGEMENT */}
+              {/* 1. REAL-TIME POPUP MANAGEMENT (HISTORY LIST & MODAL CONTROL) */}
               {bannerSubMenu === "popup" && (
-                <form onSubmit={handleUpdatePopup} className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-fadeIn">
-                  <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-4">
+                <div className="space-y-6 animate-fadeIn">
+                  {/* Header & New Button */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-[#f2ccd7] rounded-3xl p-6 shadow-sm">
                     <div className="space-y-1">
                       <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#f25f8a]"></span>
-                        실시간 점주 공지 팝업 관리
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#f25f8a] animate-pulse"></span>
+                        실시간 팝업 히스토리 & 노출 제어
                       </h3>
-                      <p className="text-[10px] text-[#735965] font-bold">점주 포털 홈 접속 시 화면 최상단에 모달 팝업으로 표출될 긴급 혜택 공지입니다.</p>
+                      <p className="text-[10px] text-[#735965] font-bold">
+                        랜딩 페이지와 점주 포털 홈에 노출되는 모든 팝업을 등록하고, 게시 기간 및 대상 페이지별로 스마트하게 이력을 관리합니다.
+                      </p>
                     </div>
-                    {/* Switch Toggle */}
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setPopupActive(!popupActive);
-                      }}
-                      className={`w-12 h-6 rounded-full p-1 transition-all duration-300 ${
-                        popupActive ? "bg-[#f25f8a] flex justify-end" : "bg-[#735965]/20 flex justify-start"
-                      }`}
+                      onClick={() => handleOpenPopupModal()}
+                      className="px-4 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-black rounded-xl transition-all shadow-[0_4px_12px_rgba(242,95,138,0.2)] flex items-center justify-center gap-1.5 self-start sm:self-center hover:scale-[1.03]"
                     >
-                      <span className="w-4 h-4 rounded-full bg-white shadow-sm block transition-all"></span>
+                      <Plus size={14} />
+                      신규 팝업 등록
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">팝업 메인 타이틀</label>
-                      <input
-                        type="text"
-                        value={popupTitle}
-                        onChange={(e) => setPopupTitle(e.target.value)}
-                        placeholder="이벤트 헤드라인 문구를 입력하세요"
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">하단 연결 유도 버튼 텍스트</label>
-                      <input
-                        type="text"
-                        value={popupBtnText}
-                        onChange={(e) => setPopupBtnText(e.target.value)}
-                        placeholder="예: 지금 바로 신메뉴 생지 주문하기"
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                      />
+                  {/* Popups History List Table */}
+                  <div className="bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-[#fff1f5]/60 border-b border-[#f2ccd7]/60">
+                            <th className="p-4 text-[11px] font-black text-[#735965] w-20 text-center">노출 여부</th>
+                            <th className="p-4 text-[11px] font-black text-[#735965]">팝업 제목 및 본문 요약</th>
+                            <th className="p-4 text-[11px] font-black text-[#735965] w-32">게시 대상 페이지</th>
+                            <th className="p-4 text-[11px] font-black text-[#735965] w-48">게시 기간 (기간 필터)</th>
+                            <th className="p-4 text-[11px] font-black text-[#735965] w-28">등록 일자</th>
+                            <th className="p-4 text-[11px] font-black text-[#735965] w-24 text-center">관리</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#f2ccd7]/30 text-xs">
+                          {convexPopupsList === undefined ? (
+                            <tr>
+                              <td colSpan={6} className="p-8 text-center text-[#735965] font-bold">
+                                팝업 히스토리 데이터를 실시간 조회하는 중입니다...
+                              </td>
+                            </tr>
+                          ) : convexPopupsList.length === 0 ? (
+                            <tr>
+                              <td colSpan={6} className="p-8 text-center text-[#735965] font-bold">
+                                등록된 팝업 히스토리가 없습니다. 우측 상단의 [신규 팝업 등록] 버튼을 눌러 첫 팝업을 발행해 보세요!
+                              </td>
+                            </tr>
+                          ) : (
+                            convexPopupsList.map((pop: any) => {
+                              const today = new Date().toISOString().split("T")[0];
+                              const isStarted = !pop.startDate || pop.startDate <= today;
+                              const isEnded = pop.endDate && pop.endDate < today;
+                              const isPeriodActive = isStarted && !isEnded;
+                              
+                              let pageBadge = "bg-gray-100 text-gray-700";
+                              let pageText = "전체 페이지";
+                              if (pop.targetPage === "landing") {
+                                pageBadge = "bg-[#bf3e67]/10 text-[#bf3e67]";
+                                pageText = "💻 랜딩 페이지";
+                              } else if (pop.targetPage === "portal") {
+                                pageBadge = "bg-[#f25f8a]/10 text-[#f25f8a]";
+                                pageText = "📢 점주 포털";
+                              }
+
+                              return (
+                                <tr key={pop._id} className="hover:bg-[#fff9fb]/40 transition-colors">
+                                  <td className="p-4 text-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleTogglePopupActive(pop._id, pop.isActive)}
+                                      className={`w-10 h-5 rounded-full p-0.5 mx-auto transition-all duration-300 flex ${
+                                        pop.isActive ? "bg-[#f25f8a] justify-end" : "bg-[#735965]/20 justify-start"
+                                      }`}
+                                    >
+                                      <span className="w-4 h-4 rounded-full bg-white shadow-sm block"></span>
+                                    </button>
+                                  </td>
+                                  <td className="p-4 space-y-1">
+                                    <div className="font-extrabold text-[#2d2026] flex items-center gap-1.5">
+                                      {pop.title}
+                                      {pop.isActive && isPeriodActive && (
+                                        <span className="px-1.5 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-black animate-pulse">
+                                          현재 게시중
+                                        </span>
+                                      )}
+                                      {pop.isActive && !isPeriodActive && !isEnded && (
+                                        <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[9px] font-black">
+                                          대기중
+                                        </span>
+                                      )}
+                                      {isEnded && (
+                                        <span className="px-1.5 py-0.5 rounded-full bg-gray-400 text-white text-[9px] font-black">
+                                          기간 종료
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="text-[10px] text-[#735965] line-clamp-1 font-medium">{pop.desc}</div>
+                                  </td>
+                                  <td className="p-4">
+                                    <span className={`px-2 py-1 rounded-lg text-[10px] font-bold ${pageBadge}`}>
+                                      {pageText}
+                                    </span>
+                                  </td>
+                                  <td className="p-4 font-mono text-[10px] text-[#735965]">
+                                    {pop.startDate || "무제한"} ~ {pop.endDate || "무제한"}
+                                  </td>
+                                  <td className="p-4 text-[10px] text-[#735965] font-bold">
+                                    {pop.createdAt ? pop.createdAt.substring(0, 10) : "-"}
+                                  </td>
+                                  <td className="p-4">
+                                    <div className="flex items-center justify-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleOpenPopupModal(pop)}
+                                        className="p-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]/60 transition-all"
+                                        title="편집"
+                                      >
+                                        <Settings size={13} />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeletePopup(pop._id)}
+                                        className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 transition-all"
+                                        title="삭제"
+                                      >
+                                        <Trash2 size={13} />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">배경 이미지 파일 (URL)</label>
-                      <input
-                        type="text"
-                        value={popupImage}
-                        onChange={(e) => setPopupImage(e.target.value)}
-                        placeholder="https://example.com/popup.jpg (미지정 시 핑크 그라데이션 자동 적용)"
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">로컬 이미지 직접 업로드</label>
-                      <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handlePopupImageUpload}
-                          className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
-                        />
-                        {popupImage && (
-                          <button
-                            type="button"
-                            onClick={() => setPopupImage("")}
-                            className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
-                          >
-                            지우기
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  {/* 팝업 등록 및 수정 모달 */}
+                  {showPopupModal && (
+                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+                      <div className="bg-white border border-[#f2ccd7] rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row overflow-hidden animate-scaleUp">
+                        {/* Left: Input Form (60%) */}
+                        <form onSubmit={handleSavePopup} className="p-6 md:p-8 space-y-5 flex-1 border-r border-[#f2ccd7]/40 overflow-y-auto">
+                          <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-3">
+                            <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full bg-[#f25f8a]"></span>
+                              {selectedPopupForEdit ? "공지 팝업 설정 수정" : "신규 공지 팝업 등록 및 발행"}
+                            </h3>
+                            <button
+                              type="button"
+                              onClick={() => setShowPopupModal(false)}
+                              className="p-1.5 rounded-xl hover:bg-[#ffd3df]/50 text-[#735965] transition-colors"
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">팝업 상세 본문 및 긴급 특전 사항</label>
-                      <textarea
-                        rows={4}
-                        value={popupDesc}
-                        onChange={(e) => setPopupDesc(e.target.value)}
-                        placeholder="팝업 내에 표시될 상세 공지 본문을 넉눌하게 기술해 주세요."
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">버튼 클릭 시 이동 메뉴 설정</label>
-                      <select
-                        value={popupLink.startsWith("http") ? "custom" : popupLink}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val !== "custom") {
-                            setPopupLink(val);
-                          } else {
-                            setPopupLink("https://");
-                          }
-                        }}
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                      >
-                        <option value="order">자재 발주하기 (내부 메뉴 연동)</option>
-                        <option value="training">교육자료실 (내부 메뉴 연동)</option>
-                        <option value="material">홍보자료실 (내부 메뉴 연동)</option>
-                        <option value="inquiry">1:1 문의게시판 (내부 메뉴 연동)</option>
-                        <option value="custom">외부 웹주소 URL 직접 지정</option>
-                      </select>
-                      {popupLink.startsWith("http") && (
-                        <div className="pt-2">
-                          <input
-                            type="text"
-                            value={popupLink}
-                            onChange={(e) => setPopupLink(e.target.value)}
-                            placeholder="https://example.com"
-                            className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                          {/* Target Page & Active State */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] font-black text-[#735965] block">게시 대상 페이지 (필수)</label>
+                              <select
+                                value={popupTargetPage}
+                                onChange={(e) => setPopupTargetPage(e.target.value)}
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] font-bold focus:outline-none focus:border-[#f25f8a]"
+                              >
+                                <option value="all">전체 페이지 노출 (landing + portal)</option>
+                                <option value="landing">💻 홈페이지 메인 랜딩 (landing)</option>
+                                <option value="portal">📢 가맹점 점주 포털 홈 (portal)</option>
+                              </select>
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] font-black text-[#735965] block">즉시 활성화 설정</label>
+                              <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setPopupActive(!popupActive)}
+                                  className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 flex ${
+                                    popupActive ? "bg-[#f25f8a] justify-end" : "bg-[#735965]/20 justify-start"
+                                  }`}
+                                >
+                                  <span className="w-4 h-4 rounded-full bg-white shadow-sm block"></span>
+                                </button>
+                                <span className="text-[11px] font-black text-[#735965]">
+                                  {popupActive ? "활성화 (노출 대상 편입)" : "비활성화 (임시 저장)"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
 
-                  {/* Styling Customization Section */}
-                  <div className="border-t border-[#f2ccd7]/60 pt-6 space-y-4">
-                    <h4 className="font-extrabold text-xs text-[#bf3e67] flex items-center gap-1.5">
-                      🎨 팝업 디자인 & 데코 스타일 상세 설정
-                    </h4>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {/* Title Styles */}
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-[#735965] block">메인 타이틀 글자 색상</label>
-                        <div className="flex gap-2">
-                          <input
-                            type="color"
-                            value={popupTitleColor}
-                            onChange={(e) => setPopupTitleColor(e.target.value)}
-                            className="w-10 h-10 border border-[#f2ccd7] rounded-xl cursor-pointer"
-                          />
-                          <input
-                            type="text"
-                            value={popupTitleColor}
-                            onChange={(e) => setPopupTitleColor(e.target.value)}
-                            className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs font-mono text-[#2d2026]"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-[#735965] block">메인 타이틀 글자 크기</label>
-                        <select
-                          value={popupTitleSize}
-                          onChange={(e) => setPopupTitleSize(e.target.value)}
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] focus:outline-none"
-                        >
-                          <option value="14px">매우 작게 (14px)</option>
-                          <option value="16px">작게 (16px)</option>
-                          <option value="18px">보통 (18px - 기본)</option>
-                          <option value="20px">크게 (20px)</option>
-                          <option value="24px">매우 크게 (24px)</option>
-                          <option value="28px">대형 (28px)</option>
-                        </select>
-                      </div>
+                          {/* Display Period Dates */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-[#f2ccd7]/30 pb-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] font-black text-[#735965] block">게시 시작 날짜 (미설정 시 즉시게시)</label>
+                              <input
+                                type="date"
+                                value={popupStartDate}
+                                onChange={(e) => setPopupStartDate(e.target.value)}
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] font-black text-[#735965] block">게시 종료 날짜 (미설정 시 무기한)</label>
+                              <input
+                                type="date"
+                                value={popupEndDate}
+                                onChange={(e) => setPopupEndDate(e.target.value)}
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                              />
+                            </div>
+                          </div>
 
-                      {/* Desc Styles */}
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-[#735965] block">상세 설명 글자 색상</label>
-                        <div className="flex gap-2">
-                          <input
-                            type="color"
-                            value={popupDescColor}
-                            onChange={(e) => setPopupDescColor(e.target.value)}
-                            className="w-10 h-10 border border-[#f2ccd7] rounded-xl cursor-pointer"
-                          />
-                          <input
-                            type="text"
-                            value={popupDescColor}
-                            onChange={(e) => setPopupDescColor(e.target.value)}
-                            className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs font-mono text-[#2d2026]"
-                          />
+                          {/* Core Text Inputs */}
+                          <div className="space-y-3">
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] font-black text-[#735965] block">팝업 메인 헤드라인 타이틀</label>
+                              <input
+                                type="text"
+                                value={popupTitle}
+                                onChange={(e) => setPopupTitle(e.target.value)}
+                                placeholder="예: 여름 스페셜 '망고파이' 정식 출시!"
+                                required
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] font-black text-[#735965] block">팝업 상세 공지 본문 내용</label>
+                              <textarea
+                                rows={3}
+                                value={popupDesc}
+                                onChange={(e) => setPopupDesc(e.target.value)}
+                                placeholder="팝업 중앙에 표출될 상세 혜택이나 공지 내용을 입력하세요."
+                                required
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Image & URL Config */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] font-black text-[#735965] block">팝업 배경 이미지 파일 (URL)</label>
+                              <input
+                                type="text"
+                                value={popupImage}
+                                onChange={(e) => setPopupImage(e.target.value)}
+                                placeholder="https://example.com/popup.jpg (미지정 시 기본 핑크 그라데이션)"
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] font-black text-[#735965] block">이미지 직접 업로드</label>
+                              <div className="flex items-center gap-2 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-1.5">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handlePopupImageUpload}
+                                  className="text-[10px] text-[#735965] file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[9px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] cursor-pointer flex-1"
+                                />
+                                {popupImage && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setPopupImage("")}
+                                    className="px-1.5 py-0.5 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[9px] font-bold border border-red-200"
+                                  >
+                                    지우기
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Link Menu Trigger */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] font-black text-[#735965] block">클릭 시 이동 버튼 문구</label>
+                              <input
+                                type="text"
+                                value={popupBtnText}
+                                onChange={(e) => setPopupBtnText(e.target.value)}
+                                placeholder="예: 지금 주문하러 가기"
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] font-black text-[#735965] block">클릭 시 이동할 메뉴/외부주소</label>
+                              <select
+                                value={popupLink.startsWith("http") ? "custom" : popupLink}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  if (val !== "custom") {
+                                    setPopupLink(val);
+                                  } else {
+                                    setPopupLink("https://");
+                                  }
+                                }}
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                              >
+                                <option value="order">자재 발주하기 (내부 메뉴 연동)</option>
+                                <option value="training">교육자료실 (내부 메뉴 연동)</option>
+                                <option value="material">홍보자료실 (내부 메뉴 연동)</option>
+                                <option value="inquiry">1:1 문의게시판 (내부 메뉴 연동)</option>
+                                <option value="custom">외부 웹주소 URL 직접 지정</option>
+                              </select>
+                              {popupLink.startsWith("http") && (
+                                <div className="pt-1.5">
+                                  <input
+                                    type="text"
+                                    value={popupLink}
+                                    onChange={(e) => setPopupLink(e.target.value)}
+                                    placeholder="https://example.com"
+                                    className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Styling Accordion Detail settings */}
+                          <div className="border-t border-[#f2ccd7]/60 pt-4 space-y-3">
+                            <h4 className="font-extrabold text-[11px] text-[#bf3e67] flex items-center gap-1.5">
+                              🎨 팝업 스타일 및 색상 상세 커스터마이징
+                            </h4>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-[#735965]">제목 글자색</label>
+                                <div className="flex gap-1.5">
+                                  <input
+                                    type="color"
+                                    value={popupTitleColor}
+                                    onChange={(e) => setPopupTitleColor(e.target.value)}
+                                    className="w-8 h-8 border border-[#f2ccd7] rounded-lg cursor-pointer"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={popupTitleColor}
+                                    onChange={(e) => setPopupTitleColor(e.target.value)}
+                                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1 text-[10px] font-mono"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-[#735965]">제목 글자크기</label>
+                                <select
+                                  value={popupTitleSize}
+                                  onChange={(e) => setPopupTitleSize(e.target.value)}
+                                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1.5 text-[10px]"
+                                >
+                                  <option value="16px">작게 (16px)</option>
+                                  <option value="18px">보통 (18px)</option>
+                                  <option value="20px">크게 (20px)</option>
+                                  <option value="24px">매우 크게 (24px)</option>
+                                </select>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-[#735965]">본문 글자색</label>
+                                <div className="flex gap-1.5">
+                                  <input
+                                    type="color"
+                                    value={popupDescColor}
+                                    onChange={(e) => setPopupDescColor(e.target.value)}
+                                    className="w-8 h-8 border border-[#f2ccd7] rounded-lg cursor-pointer"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={popupDescColor}
+                                    onChange={(e) => setPopupDescColor(e.target.value)}
+                                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1 text-[10px] font-mono"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-[#735965]">본문 글자크기</label>
+                                <select
+                                  value={popupDescSize}
+                                  onChange={(e) => setPopupDescSize(e.target.value)}
+                                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1.5 text-[10px]"
+                                >
+                                  <option value="11px">작게 (11px)</option>
+                                  <option value="12px">보통 (12px)</option>
+                                  <option value="14px">크게 (14px)</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-[#735965]">이동버튼 배경색</label>
+                                <div className="flex gap-1.5">
+                                  <input
+                                    type="color"
+                                    value={popupBtnBgColor}
+                                    onChange={(e) => setPopupBtnBgColor(e.target.value)}
+                                    className="w-8 h-8 border border-[#f2ccd7] rounded-lg cursor-pointer"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={popupBtnBgColor}
+                                    onChange={(e) => setPopupBtnBgColor(e.target.value)}
+                                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1 text-[10px] font-mono"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-[#735965]">이동버튼 글씨색</label>
+                                <div className="flex gap-1.5">
+                                  <input
+                                    type="color"
+                                    value={popupBtnTextColor}
+                                    onChange={(e) => setPopupBtnTextColor(e.target.value)}
+                                    className="w-8 h-8 border border-[#f2ccd7] rounded-lg cursor-pointer"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={popupBtnTextColor}
+                                    onChange={(e) => setPopupBtnTextColor(e.target.value)}
+                                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1 text-[10px] font-mono"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-[#735965]">이동버튼 글씨크기</label>
+                                <select
+                                  value={popupBtnTextSize}
+                                  onChange={(e) => setPopupBtnTextSize(e.target.value)}
+                                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1.5 text-[10px]"
+                                >
+                                  <option value="11px">작게 (11px)</option>
+                                  <option value="12px">보통 (12px)</option>
+                                  <option value="14px">크게 (14px)</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-3 border-t border-[#f2ccd7]/60 pt-4">
+                            <button
+                              type="button"
+                              onClick={() => setShowPopupModal(false)}
+                              className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl transition-all"
+                            >
+                              취소
+                            </button>
+                            <button
+                              type="submit"
+                              className="flex-2 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-[0_4px_12px_rgba(242,95,138,0.2)] flex items-center justify-center gap-1.5"
+                            >
+                              <Sparkles size={13} />
+                              {selectedPopupForEdit ? "수정사항 저장" : "새 팝업 게시 발행"}
+                            </button>
+                          </div>
+                        </form>
+
+                        {/* Right: Live Preview Panel (40%) */}
+                        <div className="p-6 md:p-8 bg-[#fff9fb]/80 border-t md:border-t-0 md:border-l border-[#f2ccd7]/40 w-full md:w-80 flex flex-col items-center justify-center min-h-[350px] md:min-h-0">
+                          <h4 className="font-extrabold text-xs text-[#735965] border-b border-[#f2ccd7] pb-2.5 mb-6 w-full text-center">
+                            📱 실시간 레이아웃 모바일 미리보기
+                          </h4>
+
+                          {/* Preview Popup Modal Card */}
+                          <div className="w-[260px] rounded-3xl overflow-hidden shadow-2xl border border-[#f2ccd7] bg-white relative animate-scaleUp">
+                            {/* Card Background (Image or Fallback Gradient) */}
+                            <div 
+                              className="p-5 min-h-[220px] flex flex-col justify-between relative bg-cover bg-center"
+                              style={{ 
+                                backgroundImage: popupImage ? `url(${popupImage})` : "none",
+                                backgroundBlendMode: "overlay",
+                                backgroundColor: popupImage ? "rgba(0,0,0,0.25)" : "transparent",
+                                ...(popupImage ? {} : {
+                                  background: "linear-gradient(135deg, #ffe1ea 0%, #ffd3df 100%)"
+                                })
+                              }}
+                            >
+                              {/* Close Mock Button */}
+                              <div className="absolute top-3 right-3 text-[#735965] opacity-60">
+                                <X size={14} />
+                              </div>
+
+                              <div className="space-y-2 pt-2">
+                                <h5 
+                                  className="font-black leading-tight break-all" 
+                                  style={{ color: popupTitleColor, fontSize: popupTitleSize }}
+                                >
+                                  {popupTitle || "망고파이 컵 16oz 한정 출시!"}
+                                </h5>
+                                <p 
+                                  className="leading-relaxed font-bold break-all whitespace-pre-line"
+                                  style={{ color: popupDescColor, fontSize: popupDescSize }}
+                                >
+                                  {popupDesc || "여름 신상 120pie 망고 컬렉션! 지금 포털에서 주문 시 전용 컵홀더 1박스 무상 증정!"}
+                                </p>
+                              </div>
+
+                              {/* Button Area */}
+                              <div className="mt-4 pt-2">
+                                <div 
+                                  className="w-full py-2.5 rounded-xl font-black text-center shadow-md cursor-pointer text-xs"
+                                  style={{ 
+                                    backgroundColor: popupBtnBgColor, 
+                                    color: popupBtnTextColor,
+                                    fontSize: popupBtnTextSize
+                                  }}
+                                >
+                                  {popupBtnText || "자재 주문하러 가기"}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Bottom Close bar */}
+                            <div className="bg-[#2d2026] text-white/80 py-2.5 px-4 text-[10px] font-black flex justify-between items-center border-t border-white/10">
+                              <span className="cursor-pointer hover:underline opacity-80">오늘 하루 보지 않기</span>
+                              <span className="cursor-pointer hover:underline">닫기</span>
+                            </div>
+                          </div>
+
+                          <p className="text-[10px] text-[#735965] font-black text-center mt-6 leading-relaxed max-w-[200px]">
+                            * 실제 노출 시에는 지정된 게시 기간({popupStartDate || "오늘"}~{popupEndDate || "무한"}) 동안 {popupTargetPage === "landing" ? "랜딩 페이지" : popupTargetPage === "portal" ? "점주 포털" : "모든 페이지"}에 활성화 노출됩니다.
+                          </p>
                         </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-[#735965] block">상세 설명 글자 크기</label>
-                        <select
-                          value={popupDescSize}
-                          onChange={(e) => setPopupDescSize(e.target.value)}
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] focus:outline-none"
-                        >
-                          <option value="11px">작게 (11px)</option>
-                          <option value="12px">보통 (12px - 기본)</option>
-                          <option value="13px">약간 크게 (13px)</option>
-                          <option value="14px">크게 (14px)</option>
-                          <option value="16px">매우 크게 (16px)</option>
-                        </select>
                       </div>
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {/* Button/Box Styles */}
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-[#735965] block">하단 버튼(박스) 배경 색상</label>
-                        <div className="flex gap-2">
-                          <input
-                            type="color"
-                            value={popupBtnBgColor}
-                            onChange={(e) => setPopupBtnBgColor(e.target.value)}
-                            className="w-10 h-10 border border-[#f2ccd7] rounded-xl cursor-pointer"
-                          />
-                          <input
-                            type="text"
-                            value={popupBtnBgColor}
-                            onChange={(e) => setPopupBtnBgColor(e.target.value)}
-                            className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs font-mono text-[#2d2026]"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-[#735965] block">버튼 글씨 색상</label>
-                        <div className="flex gap-2">
-                          <input
-                            type="color"
-                            value={popupBtnTextColor}
-                            onChange={(e) => setPopupBtnTextColor(e.target.value)}
-                            className="w-10 h-10 border border-[#f2ccd7] rounded-xl cursor-pointer"
-                          />
-                          <input
-                            type="text"
-                            value={popupBtnTextColor}
-                            onChange={(e) => setPopupBtnTextColor(e.target.value)}
-                            className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs font-mono text-[#2d2026]"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-[#735965] block">버튼 글씨 크기</label>
-                        <select
-                          value={popupBtnTextSize}
-                          onChange={(e) => setPopupBtnTextSize(e.target.value)}
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] focus:outline-none"
-                        >
-                          <option value="11px">작게 (11px)</option>
-                          <option value="12px">보통 (12px - 기본)</option>
-                          <option value="13px">약간 크게 (13px)</option>
-                          <option value="14px">크게 (14px)</option>
-                          <option value="16px">매우 크게 (16px)</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-[0_4px_16px_rgba(242,95,138,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01]"
-                  >
-                    <Sparkles size={16} />
-                    실시간 점주 공지 팝업 설정 동기화 배포
-                  </button>
-                </form>
+                  )}
+                </div>
               )}
 
               {/* 2. REAL-TIME BANNER MANAGEMENT */}

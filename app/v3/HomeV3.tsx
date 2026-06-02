@@ -1058,7 +1058,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   }, [isPinkVariant]);
 
   // Convex Hooks
-  const convexPopup = useQuery(api.popups.get);
+  const convexPopup = useQuery(api.popups.get, { targetPage: "landing" });
   const convexFloating = useQuery(api.floatings.get);
   const addInquiry = useMutation(api.inquiries.add);
 

@@ -265,7 +265,7 @@ const INITIAL_PR: Material[] = [
 
 export default function PortalPage() {
   // Convex Hooks for Popups, Floatings, Products, and Orders
-  const convexPopup = useQuery(api.popups.get);
+  const convexPopup = useQuery(api.popups.get, { targetPage: "portal" });
   const convexFloating = useQuery(api.floatings.get);
   const convexStores = useQuery(api.stores.get);
   const convexProducts = useQuery(api.products.get);

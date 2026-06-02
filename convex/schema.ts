@@ -16,6 +16,10 @@ export default defineSchema({
     btnBgColor: v.optional(v.string()),
     btnTextColor: v.optional(v.string()),
     btnTextSize: v.optional(v.string()),
+    startDate: v.optional(v.string()),  // 게시 시작일 YYYY-MM-DD
+    endDate: v.optional(v.string()),    // 게시 종료일 YYYY-MM-DD
+    targetPage: v.optional(v.string()),              // 게시 대상 페이지: "landing" | "portal" | "all"
+    createdAt: v.optional(v.string()),  // 생성 일자
   }),
   floatings: defineTable({
     isActive: v.boolean(),
