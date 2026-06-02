@@ -416,6 +416,35 @@ export default function PortalPage() {
     }
   }, [convexStoreInquiries]);
 
+  // Sync Convex products to React state and localStorage (Precedence over mock seed)
+  useEffect(() => {
+    if (convexProducts !== undefined && convexProducts !== null) {
+      const mapped = convexProducts.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        category: p.category,
+        price: p.discountedPrice !== undefined ? p.discountedPrice : p.price,
+        packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
+        img: p.img,
+        detailImg: p.detailImg,
+        detailText: p.detailText,
+        stock: p.stock || "in_stock",
+        desc: p.desc || "",
+        orderIndex: p.orderIndex || 99,
+        labels: p.labels || [],
+        shippingType: p.shippingType || "A",
+        options: p.options || []
+      })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+      setProducts(mapped);
+      
+      try {
+        localStorage.setItem("120_products", JSON.stringify(convexProducts));
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  }, [convexProducts]);
+
   // Sync Convex orders to React state and localStorage (Filter by storeId)
   useEffect(() => {
     if (convexOrders !== undefined && convexOrders !== null) {
@@ -613,14 +642,9 @@ export default function PortalPage() {
       setBanner(loadState("120_banners", null));
       setActiveStoreId(localStorage.getItem("120_active_store_id") || "owner");
 
-      let pr = loadState("120_products", INITIAL_PRODUCTS);
-      // Self-healing: Narrow down bad seed detection to misnamed prod-6 to protect newly registered custom products (e.g. prod-7)
-      const hasBadSeed = pr.some((p: any) => p.id === "prod-6" && p.name === "시그니처 테이크아웃 컵 16oz");
-      if (hasBadSeed) {
-        console.log("[Self-healing] Bad seed detected. Restoring original customized product seed data...");
-        pr = INITIAL_PRODUCTS;
-        localStorage.setItem("120_products", JSON.stringify(INITIAL_PRODUCTS));
-      }
+      let pr = loadState("120_products", []);
+      // Filter out legacy mock seed products (prod-1 to prod-6) to ensure they are completely deleted
+      pr = pr.filter((p: any) => p && !["prod-1", "prod-2", "prod-3", "prod-4", "prod-5", "prod-6"].includes(p.id));
 
       // [Migration] Automatic migration from LocalStorage to Convex Cloud DB in portal page
       if (convexProducts !== undefined && convexProducts.length === 0) {
@@ -628,9 +652,10 @@ export default function PortalPage() {
         if (storedPrRaw) {
           try {
             const parsedPr = JSON.parse(storedPrRaw);
-            if (parsedPr && parsedPr.length > 0) {
+            const filteredMigration = parsedPr.filter((p: any) => p && !["prod-1", "prod-2", "prod-3", "prod-4", "prod-5", "prod-6"].includes(p.id));
+            if (filteredMigration && filteredMigration.length > 0) {
               console.log("[Migration] Moving local products to Convex cloud DB from portal...");
-              syncProductsMutation({ products: parsedPr }).then(() => {
+              syncProductsMutation({ products: filteredMigration }).then(() => {
                 console.log("[Migration] Products migration completed in portal!");
               });
             }
@@ -657,50 +682,15 @@ export default function PortalPage() {
         }
       }
 
-      // Self-healing: Merge options and ensure missing seed products are injected
-      const healedPr = pr.map((p: any) => {
-        const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id) as any;
-        const healedPrice = typeof p.price === "number" ? p.price : (initialMatch?.price || 0);
-        const healedDisc = typeof p.discountAmount === "number" ? p.discountAmount : (initialMatch?.discountAmount || 0);
-        return {
-          id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
-          orderIndex: typeof p.orderIndex === "number" ? p.orderIndex : (initialMatch?.orderIndex || 99),
-          name: p.name || initialMatch?.name || "이름 없는 상품",
-          category: p.category || initialMatch?.category || "냉동생지/자재",
-          modelName: p.modelName || initialMatch?.modelName || `MODEL-${p.id || "GENERIC"}`,
-          unit: p.unit || initialMatch?.unit || "박스",
-          qty: typeof p.qty === "number" ? p.qty : (initialMatch?.qty || 1),
-          supplyPrice: typeof p.supplyPrice === "number" ? p.supplyPrice : (initialMatch?.supplyPrice || 0),
-          price: healedPrice,
-          discountAmount: healedDisc,
-          discountedPrice: typeof p.discountedPrice === "number" ? p.discountedPrice : (healedPrice - healedDisc),
-          img: p.img || initialMatch?.img || "",
-          detailImg: p.detailImg || initialMatch?.detailImg || "",
-          detailText: p.detailText || initialMatch?.detailText || "",
-          isActive: typeof p.isActive === "boolean" ? p.isActive : true,
-          desc: p.desc || initialMatch?.desc || "",
-          stock: p.stock || initialMatch?.stock || "in_stock",
-          labels: Array.isArray(p.labels) ? p.labels : (initialMatch?.labels || []),
-          shippingType: p.shippingType || initialMatch?.shippingType || "A",
-          options: p.options && p.options.length > 0 ? p.options : (initialMatch?.options || [])
-        };
-      });
-      const finalPr = [...healedPr];
-      INITIAL_PRODUCTS.forEach((ip) => {
-        if (!finalPr.some((p) => p.id === ip.id)) {
-          finalPr.push(ip);
-        }
-      });
-
-      const mapped = finalPr.map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        category: p.category,
-        price: p.discountedPrice !== undefined ? p.discountedPrice : p.price,
+      const mapped = pr.map((p: any) => ({
+        id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
+        name: p.name || "이름 없는 상품",
+        category: p.category || "냉동생지/자재",
+        price: p.discountedPrice !== undefined ? p.discountedPrice : (p.price || 0),
         packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
-        img: p.img,
-        detailImg: p.detailImg,
-        detailText: p.detailText,
+        img: p.img || "",
+        detailImg: p.detailImg || "",
+        detailText: p.detailText || "",
         stock: p.stock || "in_stock",
         desc: p.desc || "",
         orderIndex: p.orderIndex || 99,
@@ -708,9 +698,9 @@ export default function PortalPage() {
         shippingType: p.shippingType || "A",
         options: p.options || []
       })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+      
       setProducts(mapped);
-      // Sync self-healed data back to localStorage for seamless cross-tab consistency
-      localStorage.setItem("120_products", JSON.stringify(finalPr));
+      localStorage.setItem("120_products", JSON.stringify(pr));
 
       const policySettings = loadState("120_shipping_settings", {
         shippingPolicy: "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다.",

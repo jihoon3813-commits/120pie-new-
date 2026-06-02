@@ -895,14 +895,9 @@ export default function AdminPage() {
       const st = loadState("120_stores", DEFAULT_STORES);
       setStores(st);
       
-      let pr = loadState("120_products", DEFAULT_PRODUCTS);
-      // Self-healing: Narrow down bad seed detection to misnamed prod-6 to protect newly registered custom products (e.g. prod-7)
-      const hasBadSeed = pr.some((p: any) => p.id === "prod-6" && p.name === "시그니처 테이크아웃 컵 16oz");
-      if (hasBadSeed) {
-        console.log("[Self-healing] Bad seed detected. Restoring original customized product seed data...");
-        pr = DEFAULT_PRODUCTS;
-        localStorage.setItem("120_products", JSON.stringify(DEFAULT_PRODUCTS));
-      }
+      let pr = loadState("120_products", []);
+      // Filter out legacy mock seed products (prod-1 to prod-6) to ensure they are completely deleted
+      pr = pr.filter((p: any) => p && !["prod-1", "prod-2", "prod-3", "prod-4", "prod-5", "prod-6"].includes(p.id));
 
       // [Migration] Automatic migration from LocalStorage to Convex Cloud DB
       if (convexProducts !== undefined && convexProducts.length === 0) {
@@ -910,9 +905,10 @@ export default function AdminPage() {
         if (storedPrRaw) {
           try {
             const parsedPr = JSON.parse(storedPrRaw);
-            if (parsedPr && parsedPr.length > 0) {
+            const filteredMigration = parsedPr.filter((p: any) => p && !["prod-1", "prod-2", "prod-3", "prod-4", "prod-5", "prod-6"].includes(p.id));
+            if (filteredMigration && filteredMigration.length > 0) {
               console.log("[Migration] Moving local products to Convex cloud DB...");
-              syncProductsMutation({ products: parsedPr }).then(() => {
+              syncProductsMutation({ products: filteredMigration }).then(() => {
                 console.log("[Migration] Products migration completed!");
               });
             }
@@ -939,43 +935,32 @@ export default function AdminPage() {
         }
       }
 
-      // Self-healing: Merge options and ensure missing seed products are injected
-      const healedPr = pr.map((p: any) => {
-        const defaultMatch = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id);
-        const healedPrice = typeof p.price === "number" ? p.price : (defaultMatch?.price || 0);
-        const healedDisc = typeof p.discountAmount === "number" ? p.discountAmount : (defaultMatch?.discountAmount || 0);
-        return {
-          id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
-          orderIndex: typeof p.orderIndex === "number" ? p.orderIndex : (defaultMatch?.orderIndex || 99),
-          name: p.name || defaultMatch?.name || "이름 없는 상품",
-          category: p.category || defaultMatch?.category || "냉동생지/자재",
-          modelName: p.modelName || defaultMatch?.modelName || `MODEL-${p.id || "GENERIC"}`,
-          unit: p.unit || defaultMatch?.unit || "박스",
-          qty: typeof p.qty === "number" ? p.qty : (defaultMatch?.qty || 1),
-          supplyPrice: typeof p.supplyPrice === "number" ? p.supplyPrice : (defaultMatch?.supplyPrice || 0),
-          price: healedPrice,
-          discountAmount: healedDisc,
-          discountedPrice: typeof p.discountedPrice === "number" ? p.discountedPrice : (healedPrice - healedDisc),
-          img: p.img || defaultMatch?.img || "",
-          detailImg: p.detailImg || defaultMatch?.detailImg || "",
-          detailText: p.detailText || defaultMatch?.detailText || "",
-          isActive: typeof p.isActive === "boolean" ? p.isActive : true,
-          desc: p.desc || defaultMatch?.desc || "",
-          stock: p.stock || defaultMatch?.stock || "in_stock",
-          labels: Array.isArray(p.labels) ? p.labels : (defaultMatch?.labels || []),
-          shippingType: p.shippingType || defaultMatch?.shippingType || "A",
-          options: p.options && p.options.length > 0 ? p.options : (defaultMatch?.options || undefined)
-        };
-      });
-      const finalPr = [...healedPr];
-      DEFAULT_PRODUCTS.forEach((dp) => {
-        if (!finalPr.some((p) => p.id === dp.id)) {
-          finalPr.push(dp);
-        }
-      });
-      const sortedPr = [...finalPr].sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+      const healedPr = pr.map((p: any) => ({
+        id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
+        orderIndex: typeof p.orderIndex === "number" ? p.orderIndex : 99,
+        name: p.name || "이름 없는 상품",
+        category: p.category || "냉동생지/자재",
+        modelName: p.modelName || `MODEL-${p.id || "GENERIC"}`,
+        unit: p.unit || "박스",
+        qty: typeof p.qty === "number" ? p.qty : 1,
+        supplyPrice: typeof p.supplyPrice === "number" ? p.supplyPrice : 0,
+        price: typeof p.price === "number" ? p.price : 0,
+        discountAmount: typeof p.discountAmount === "number" ? p.discountAmount : 0,
+        discountedPrice: typeof p.discountedPrice === "number" ? p.discountedPrice : (typeof p.price === "number" ? p.price : 0),
+        img: p.img || "",
+        detailImg: p.detailImg || "",
+        detailText: p.detailText || "",
+        isActive: typeof p.isActive === "boolean" ? p.isActive : true,
+        desc: p.desc || "",
+        stock: p.stock || "in_stock",
+        labels: Array.isArray(p.labels) ? p.labels : [],
+        shippingType: p.shippingType || "A",
+        options: p.options || undefined
+      }));
+
+      const sortedPr = [...healedPr].sort((a: any, b: any) => a.orderIndex - b.orderIndex);
       setProducts(sortedPr);
-      localStorage.setItem("120_products", JSON.stringify(finalPr));
+      localStorage.setItem("120_products", JSON.stringify(healedPr));
       const cat = loadState("120_categories", ["냉동생지/자재", "부자재/포장재", "소모품/집기"]);
       setCategories(cat);
       const lab = loadState("120_labels", ["BEST", "추천", "신제품"]);

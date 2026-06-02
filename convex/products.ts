@@ -265,3 +265,20 @@ export const seedProducts = mutation({
     return true;
   },
 });
+
+export const deleteSeedProducts = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const targets = ["prod-1", "prod-2", "prod-3", "prod-4", "prod-5", "prod-6"];
+    for (const id of targets) {
+      const existing = await ctx.db
+        .query("products")
+        .filter((q) => q.eq(q.field("id"), id))
+        .first();
+      if (existing) {
+        await ctx.db.delete(existing._id);
+      }
+    }
+    return true;
+  },
+});
