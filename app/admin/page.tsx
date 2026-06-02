@@ -5312,12 +5312,16 @@ export default function AdminPage() {
                       <div className="h-4 w-px bg-[#f2ccd7] mx-1"></div>
 
                       <select
-                        onMouseDown={(e) => e.preventDefault()}
-                        onChange={(e) => executeEditorCommand("fontSize", e.target.value)}
+                        onChange={(e) => {
+                          if (!e.target.value) return;
+                          executeEditorCommand("fontSize", e.target.value);
+                          e.target.value = ""; // Reset to placeholder
+                        }}
                         className="bg-white border border-[#f2ccd7] rounded px-1 py-1 text-[10px] sm:text-xs focus:outline-none cursor-pointer"
                         title="글자 크기"
-                        defaultValue="3"
+                        defaultValue=""
                       >
+                        <option value="">글자 크기</option>
                         <option value="1">매우 작게</option>
                         <option value="2">작게</option>
                         <option value="3">보통</option>
@@ -5327,12 +5331,16 @@ export default function AdminPage() {
                       </select>
 
                       <select
-                        onMouseDown={(e) => e.preventDefault()}
-                        onChange={(e) => executeEditorCommand("foreColor", e.target.value)}
+                        onChange={(e) => {
+                          if (!e.target.value) return;
+                          executeEditorCommand("foreColor", e.target.value);
+                          e.target.value = ""; // Reset to placeholder
+                        }}
                         className="bg-white border border-[#f2ccd7] rounded px-1 py-1 text-[10px] sm:text-xs focus:outline-none font-bold cursor-pointer"
                         title="글자 색상"
-                        defaultValue="#2d2026"
+                        defaultValue=""
                       >
+                        <option value="">글자 색상</option>
                         <option value="#2d2026" style={{ color: "#2d2026" }}>기본색상</option>
                         <option value="#f25f8a" style={{ color: "#f25f8a" }}>핑크</option>
                         <option value="#bf3e67" style={{ color: "#bf3e67" }}>로즈</option>
