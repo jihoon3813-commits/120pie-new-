@@ -108,3 +108,23 @@ export const updateStatus = mutation({
     return false;
   },
 });
+
+// 대시보드 테이블 노출용 초기화/시드 데이터 mutation
+export const seedOrders = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const existing = await ctx.db.query("orders").collect();
+    if (existing.length === 0) {
+      await ctx.db.insert("orders", {
+        id: "ORD-INIT-001",
+        date: "2026-06-02",
+        items: [],
+        totalPrice: 0,
+        status: "대기",
+      });
+      return true;
+    }
+    return false;
+  },
+});
+
