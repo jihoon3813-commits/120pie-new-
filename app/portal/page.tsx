@@ -2436,7 +2436,7 @@ export default function PortalPage() {
           onClick={() => setSelectedProductDetail(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col animate-scaleUp"
+            className="w-full max-w-3xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -2460,9 +2460,9 @@ export default function PortalPage() {
             <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
               
               {/* Product Core Info: Thumbnail & Spec Table */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 {/* 1. Thumbnail Image */}
-                <div className="md:col-span-5 border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm bg-[#fff1f5]/30 flex flex-col justify-center items-center relative h-full min-h-[300px] md:min-h-0">
+                <div className="md:col-span-5 border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm bg-[#fff1f5]/30 aspect-square flex items-center justify-center relative w-full">
                   <img 
                     src={selectedProductDetail.img} 
                     alt={selectedProductDetail.name} 
@@ -2486,66 +2486,63 @@ export default function PortalPage() {
                 </div>
 
                 {/* 2. Spec Table */}
-                <div className="md:col-span-7 bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm h-full flex flex-col justify-between">
+                <div className="md:col-span-7 bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm flex flex-col w-full">
                   <div className="px-4 py-3 bg-[#fff1f5]/30 border-b border-[#f2ccd7]/50 shrink-0">
                     <span className="font-extrabold text-[#2d2026]">품목 기본 명세 규격표</span>
                   </div>
-                  <div className="flex-1 flex flex-col">
-                    <table className="w-full text-left border-collapse flex-1 table-fixed">
-                      <tbody className="divide-y divide-[#f2ccd7]/40 text-xs text-[#2d2026] h-full">
-                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965] w-[100px]">제품명</td>
-                          <td className="px-4 py-2.5 font-bold text-neutral-800 break-all">{selectedProductDetail.name}</td>
-                        </tr>
-                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">카테고리</td>
-                          <td className="px-4 py-2.5">
-                            <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-bold px-2 py-0.5 rounded border border-[#f2ccd7]">
-                              {selectedProductDetail.category}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">발주 규격</td>
-                          <td className="px-4 py-2.5 font-semibold text-[#f25f8a]">{selectedProductDetail.packSize}</td>
-                        </tr>
-                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">제품 식별코드</td>
-                          <td className="px-4 py-2.5 font-mono font-bold text-[#735965]">{selectedProductDetail.id}</td>
-                        </tr>
-                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">공급 단가</td>
-                          <td className="px-4 py-2.5 font-black text-[#bf3e67]">{selectedProductDetail.price.toLocaleString()} 원</td>
-                        </tr>
-                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">배송 정책</td>
-                          <td className="px-4 py-2.5">
-                            {(() => {
-                              const type = selectedProductDetail.shippingType || "A";
-                              if (type === "free") {
-                                return (
-                                  <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2.5 py-1 rounded-full border border-emerald-200">
-                                    무료 배송
-                                  </span>
-                                );
-                              }
-                              const typeMap: Record<string, string> = { A: "A타입", B: "B타입", C: "C타입" };
-                              const feeMap: Record<string, number> = { A: shippingFeeA, B: shippingFeeB, C: shippingFeeC };
+                  <table className="w-full text-left border-collapse table-fixed">
+                    <tbody className="divide-y divide-[#f2ccd7]/40 text-xs text-[#2d2026]">
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965] w-[100px]">제품명</td>
+                        <td className="px-4 py-3.5 font-bold text-neutral-800 break-all">{selectedProductDetail.name}</td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">카테고리</td>
+                        <td className="px-4 py-3.5">
+                          <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-bold px-2 py-0.5 rounded border border-[#f2ccd7]">
+                            {selectedProductDetail.category}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">발주 규격</td>
+                        <td className="px-4 py-3.5 font-semibold text-[#f25f8a]">{selectedProductDetail.packSize}</td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">제품 식별코드</td>
+                        <td className="px-4 py-3.5 font-mono font-bold text-[#735965]">{selectedProductDetail.id}</td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">공급 단가</td>
+                        <td className="px-4 py-3.5 font-black text-[#bf3e67]">{selectedProductDetail.price.toLocaleString()} 원</td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">배송 정책</td>
+                        <td className="px-4 py-3.5">
+                          {(() => {
+                            const type = selectedProductDetail.shippingType || "A";
+                            if (type === "free") {
                               return (
-                                <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-black px-2.5 py-1 rounded-full border border-[#f2ccd7]">
-                                  {typeMap[type]} ({feeMap[type]?.toLocaleString()}원)
+                                <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2.5 py-1 rounded-full border border-emerald-200">
+                                  무료 배송
                                 </span>
                               );
-                            })()}
-                          </td>
-                        </tr>
-                        <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                          <td className="px-4 py-2.5 bg-[#fff1f5]/20 font-bold text-[#735965]">품목 정보 설명</td>
-                          <td className="px-4 py-2.5 font-medium text-[#735965] leading-relaxed break-words">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                            }
+                            const feeMap: Record<string, number> = { A: shippingFeeA, B: shippingFeeB, C: shippingFeeC };
+                            return (
+                              <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-black px-2.5 py-1 rounded-full border border-[#f2ccd7]">
+                                {feeMap[type]?.toLocaleString()}원
+                              </span>
+                            );
+                          })()}
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">품목 정보 설명</td>
+                        <td className="px-4 py-3.5 font-medium text-[#735965] leading-relaxed break-words">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
@@ -2578,29 +2575,11 @@ export default function PortalPage() {
                   <div className="text-xs text-[#735965] font-semibold leading-relaxed space-y-3">
                     <p className="whitespace-pre-line">{shippingPolicy || "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다."}</p>
                     
-                    <div className="pt-3 border-t border-[#f2ccd7]/40 space-y-2">
+                    <div className="pt-3 border-t border-[#f2ccd7]/40">
                       <div className="text-[11px] text-[#bf3e67] font-black flex items-center gap-1.5">
                         <span>💡</span>
-                        <span>무료배송 기준: {freeShippingThreshold.toLocaleString()}원 이상 발주 시 전액 무료</span>
+                        <span>무료배송 기준: {freeShippingThreshold.toLocaleString()}원 이상 발주 시 전액 무료 (미만 시 본사 규정 배송비 적용)</span>
                       </div>
-                      
-                      <div className="grid grid-cols-3 gap-2 pt-1 text-[10px]">
-                        <div className="bg-white border border-[#f2ccd7] p-2 rounded-xl text-center">
-                          <span className="block text-[#735965] font-extrabold">A타입 배송비</span>
-                          <span className="block text-[#bf3e67] font-black mt-0.5">{shippingFeeA.toLocaleString()}원</span>
-                        </div>
-                        <div className="bg-white border border-[#f2ccd7] p-2 rounded-xl text-center">
-                          <span className="block text-[#735965] font-extrabold">B타입 배송비</span>
-                          <span className="block text-[#bf3e67] font-black mt-0.5">{shippingFeeB.toLocaleString()}원</span>
-                        </div>
-                        <div className="bg-white border border-[#f2ccd7] p-2 rounded-xl text-center">
-                          <span className="block text-[#735965] font-extrabold">C타입 배송비</span>
-                          <span className="block text-[#bf3e67] font-black mt-0.5">{shippingFeeC.toLocaleString()}원</span>
-                        </div>
-                      </div>
-                      <p className="text-[9px] text-[#735965]/80 leading-normal">
-                        * 장바구니에 담긴 제품들의 배송 타입(무료/A/B/C) 중 가장 높은 단가의 배송비 1회만 청구됩니다.
-                      </p>
                     </div>
                   </div>
                 </div>
