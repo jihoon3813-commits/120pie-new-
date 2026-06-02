@@ -4375,17 +4375,17 @@ export default function AdminPage() {
                                     <div className="font-extrabold text-[#2d2026] flex items-center gap-1.5">
                                       {pop.title}
                                       {pop.isActive && isPeriodActive && (
-                                        <span className="px-1.5 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-black animate-pulse">
+                                        <span className="px-2.5 py-1 rounded-full bg-emerald-500 text-white text-[9px] font-black animate-pulse whitespace-nowrap shrink-0 inline-block">
                                           현재 게시중
                                         </span>
                                       )}
                                       {pop.isActive && !isPeriodActive && !isEnded && (
-                                        <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[9px] font-black">
+                                        <span className="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[9px] font-black whitespace-nowrap shrink-0 inline-block">
                                           대기중
                                         </span>
                                       )}
                                       {isEnded && (
-                                        <span className="px-1.5 py-0.5 rounded-full bg-gray-400 text-white text-[9px] font-black">
+                                        <span className="px-2.5 py-1 rounded-full bg-gray-400 text-white text-[9px] font-black whitespace-nowrap shrink-0 inline-block">
                                           기간 종료
                                         </span>
                                       )}

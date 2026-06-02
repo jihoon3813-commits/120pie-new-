@@ -27,6 +27,7 @@ import {
   Headphones,
   Monitor,
   X,
+  Check,
   ArrowUpRight,
   Menu,
   Camera,
@@ -1064,14 +1065,14 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
   // Dynamic Popup & Floating data loading synced with Convex (fallback to localStorage if not yet loaded)
   useEffect(() => {
-    // Check if closed in current tab session or closed for today
+    // Check if closed in current tab session or closed for 7 days
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
       const isTestPopup = urlParams.get("test_popup") === "true";
       const isResetPopup = urlParams.get("reset_popup") === "true";
 
       if (isResetPopup) {
-        localStorage.removeItem("120_popup_closed_date");
+        localStorage.removeItem("120_popup_closed_until");
         localStorage.removeItem("120_popup_closed_title");
         sessionStorage.removeItem("120_popup_closed_session");
         popupClosedInSessionRef.current = false;
@@ -1084,7 +1085,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         const currentTitle = convexPopup?.title || (localStorage.getItem("120_popups") ? JSON.parse(localStorage.getItem("120_popups") || "{}").title : "");
         
         if (currentTitle && closedTitle && currentTitle !== closedTitle) {
-          localStorage.removeItem("120_popup_closed_date");
+          localStorage.removeItem("120_popup_closed_until");
           localStorage.removeItem("120_popup_closed_title");
           sessionStorage.removeItem("120_popup_closed_session");
         } else {
@@ -1094,9 +1095,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             return;
           }
           
-          const closedDate = localStorage.getItem("120_popup_closed_date");
-          const todayStr = new Date().toISOString().split("T")[0];
-          if (closedDate === todayStr) {
+          const closedUntil = localStorage.getItem("120_popup_closed_until");
+          const isExpired = !closedUntil || Date.now() > parseInt(closedUntil, 10);
+          if (!isExpired) {
             setShowPopup(false);
             return;
           }
@@ -3549,8 +3550,8 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               <div className="bg-[#fff9fb] p-3 flex justify-between items-center px-5 text-[11px] font-bold text-[#735965]">
                 <button
                   onClick={() => {
-                    const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-                    localStorage.setItem("120_popup_closed_date", todayStr);
+                    const sevenDaysLater = Date.now() + 7 * 24 * 60 * 60 * 1000;
+                    localStorage.setItem("120_popup_closed_until", sevenDaysLater.toString());
                     popupClosedInSessionRef.current = true;
                     if (typeof window !== "undefined") {
                       sessionStorage.setItem("120_popup_closed_session", "true");
@@ -3562,7 +3563,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   }}
                   className="hover:text-[#bf3e67] transition-colors flex items-center gap-1 cursor-pointer"
                 >
-                  <span className="text-[#f25f8a]">✔</span> 오늘 하루 안보기
+                  <Check size={13} className="text-[#f25f8a]" /> 7일 동안 보지 않기
                 </button>
                 <button
                   onClick={() => {

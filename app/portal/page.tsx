@@ -36,8 +36,7 @@ import {
   Phone,
   MessageCircle,
   ClipboardList,
-  ExternalLink,
-  RotateCcw
+  ExternalLink
 } from "lucide-react";
 
 import { useQuery, useMutation } from "convex/react";
@@ -588,9 +587,9 @@ export default function PortalPage() {
         if (urlParams.get("test_popup") === "true") {
           setShowPopup(true);
         } else {
-          const closedDate = localStorage.getItem("120_popup_closed_date");
-          const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-          if (closedDate !== todayStr) {
+          const closedUntil = localStorage.getItem("120_popup_closed_until");
+          const isExpired = !closedUntil || Date.now() > parseInt(closedUntil, 10);
+          if (isExpired) {
             setShowPopup(true);
           } else {
             setShowPopup(false);
@@ -616,30 +615,7 @@ export default function PortalPage() {
   // ==========================================
   // SYSTEM DATA RESET SYNC
   // ==========================================
-  const handleDataReset = () => {
-    if (
-      window.confirm(
-        "모든 발주 데이터 및 캐시를 공장 초기 상태로 동기화(초기화)하시겠습니까?\n이 작업은 데이터 꼬임이나 캐싱 문제를 완벽하게 해결합니다."
-      )
-    ) {
-      localStorage.removeItem("120_products");
-      localStorage.removeItem("120_categories");
-      localStorage.removeItem("120_banners");
-      localStorage.removeItem("120_popups");
-      localStorage.removeItem("120_floatings");
-      localStorage.removeItem("120_orders");
-      localStorage.removeItem("120_inquiries");
-      localStorage.removeItem("120_notices");
-      localStorage.removeItem("120_trainings");
-      localStorage.removeItem("120_prs");
-      localStorage.removeItem("120_shipping_settings");
-      localStorage.removeItem("120_owner_logged_in");
-      localStorage.removeItem("120_active_store_id");
-      localStorage.removeItem("120_popup_closed_date");
-      alert("시스템 데이터가 성공적으로 동기화 및 초기화되었습니다. 새로고침 후 다시 로그인해 주세요.");
-      window.location.reload();
-    }
-  };
+
 
 
 
@@ -702,6 +678,14 @@ export default function PortalPage() {
       window.history.pushState({ modal: true }, "");
     }
   }, [selectedOrder, selectedProductDetail, trackingModalOpen, showInquiryModal]);
+
+  // 모달 닫기 시 가상 history 스택을 동기화하기 위한 헬퍼 함수
+  const closeModal = (closeFn: () => void) => {
+    closeFn();
+    if (typeof window !== "undefined" && window.history.state?.modal) {
+      window.history.back();
+    }
+  };
 
   // ==========================================
   // INITIALIZATION WITH LOCAL STORAGE
@@ -1462,13 +1446,6 @@ export default function PortalPage() {
 
           <div className="border-t border-[#f2ccd7] pt-6 space-y-2">
             <button
-              onClick={handleDataReset}
-              className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#bf3e67] bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] transition-all text-left cursor-pointer shadow-sm"
-            >
-              <RotateCcw size={17} />
-              <span>시스템 데이터 동기화</span>
-            </button>
-            <button
               onClick={handleLogout}
               className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#735965] hover:text-red-500 hover:bg-red-50 transition-colors text-left"
             >
@@ -1546,13 +1523,6 @@ export default function PortalPage() {
               </div>
 
               <div className="border-t border-[#f2ccd7] pt-6 space-y-2">
-                <button
-                  onClick={handleDataReset}
-                  className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#bf3e67] bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] transition-all text-left cursor-pointer shadow-sm"
-                >
-                  <RotateCcw size={17} />
-                  <span>시스템 데이터 동기화</span>
-                </button>
                 <button
                   onClick={handleLogout}
                   className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#735965] hover:text-red-500 hover:bg-red-50 transition-colors text-left"
@@ -2004,49 +1974,50 @@ export default function PortalPage() {
                         {/* 2. Desktop Grid Card View */}
                         <div 
                           onClick={() => setSelectedProductDetail(p)}
-                          className="hidden sm:flex bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex-col justify-between shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 aspect-square w-full"
+                          className="hidden sm:flex bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex-col justify-between shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 aspect-square w-full relative min-h-0"
                         >
-                          {/* Thumbnail image & stock state badge */}
+                          {/* Thumbnail image & stock state badge (Strictly 52% height) */}
                           <div className="h-[52%] w-full relative bg-[#fff1f5] overflow-hidden shrink-0 border-b border-[#f2ccd7]/40">
                             <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-                            <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[80%]">
+                            <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1 max-w-[80%]">
                               {p.stock === "low_stock" && (
-                                <span className="bg-orange-500 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">품절임박</span>
+                                <span className="bg-orange-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">품절임박</span>
                               )}
                               {p.stock === "out_of_stock" && (
-                                <span className="bg-red-500 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">일시품절</span>
+                                <span className="bg-red-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">일시품절</span>
                               )}
                             </div>
-                            <span className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-[10px] text-[#bf3e67] font-extrabold px-2 py-1 rounded border border-[#f2ccd7]">
+                            <span className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm text-[9px] text-[#bf3e67] font-extrabold px-1.5 py-0.5 rounded border border-[#f2ccd7] whitespace-nowrap">
                               {p.category}
                             </span>
                           </div>
 
-                          {/* Product Info Block */}
-                          <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between min-h-0 relative">
+                          {/* Product Info Block (Strictly 48% height) */}
+                          <div className="h-[48%] w-full shrink-0 flex flex-col justify-between p-3.5 min-h-0 relative overflow-hidden bg-white">
                             {p.labels && p.labels.length > 0 && (
-                              <div className="absolute top-4 right-4 flex flex-wrap gap-1 w-fit justify-end">
+                              <div className="absolute top-3.5 right-3.5 flex flex-wrap gap-1 w-fit justify-end z-10">
                                 {p.labels.map((l) => {
                                   let bgStyle = "bg-neutral-500/90 text-white";
                                   if (l === "BEST") bgStyle = "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm font-black";
                                   else if (l === "추천") bgStyle = "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm font-black";
                                   else if (l === "신제품") bgStyle = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-black";
                                   return (
-                                    <span key={l} className={`font-bold text-[8px] px-1.5 py-0.5 rounded shadow-sm ${bgStyle}`}>
+                                    <span key={l} className={`font-bold text-[7px] px-1.5 py-0.5 rounded shadow-sm ${bgStyle} whitespace-nowrap`}>
                                       {l}
                                     </span>
                                   );
                                 })}
                               </div>
                             )}
-                            <div className="space-y-0.5 pr-12 min-h-0 overflow-hidden">
-                              <span className="text-[9px] text-[#735965] font-bold block">{p.packSize}</span>
-                              <h3 className="font-bold text-sm text-[#2d2026] leading-tight truncate">{p.name}</h3>
-                              <p className="text-[10px] text-[#735965] font-medium leading-relaxed truncate mt-1">{p.desc}</p>
+                            
+                            <div className="space-y-0.5 pr-12 min-h-0 overflow-hidden text-left">
+                              <span className="text-[8px] text-[#735965] font-bold block whitespace-nowrap truncate">{p.packSize}</span>
+                              <h3 className="font-extrabold text-xs text-[#2d2026] leading-tight truncate">{p.name}</h3>
+                              <p className="text-[9px] text-[#735965] font-medium leading-relaxed truncate mt-0.5">{p.desc}</p>
                             </div>
 
-                            <div className="flex items-center justify-between mt-2 border-t border-[#f2ccd7]/60 pt-2.5">
-                              <strong className="text-sm text-[#2d2026] font-black">{p.price.toLocaleString()} 원</strong>
+                            <div className="flex items-center justify-between mt-1 border-t border-[#f2ccd7]/40 pt-2 shrink-0">
+                              <strong className="text-xs text-[#2d2026] font-black whitespace-nowrap">{p.price.toLocaleString()}원</strong>
                               
                               {p.options && p.options.length > 0 ? (
                                 <button
@@ -2054,24 +2025,24 @@ export default function PortalPage() {
                                     e.stopPropagation();
                                     setSelectedProductDetail(p);
                                   }}
-                                  className="px-3 py-1.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-[10px] font-bold transition-all shadow-sm"
+                                  className="px-2.5 py-1.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-[9px] font-black transition-all shadow-sm shrink-0 whitespace-nowrap"
                                 >
                                   옵션 선택
                                 </button>
                               ) : cartQty > 0 ? (
-                                <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-lg p-0.5" onClick={(e) => e.stopPropagation()}>
+                                <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-lg p-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
                                   <button 
                                     onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
                                     className="p-0.5 hover:text-[#bf3e67] text-[#735965] transition-colors"
                                   >
-                                    <Minus size={12} />
+                                    <Minus size={10} />
                                   </button>
-                                  <span className="px-2 text-[10px] font-bold text-[#2d2026] w-5 text-center">{cartQty}</span>
+                                  <span className="px-1.5 text-[9px] font-bold text-[#2d2026] w-4 text-center">{cartQty}</span>
                                   <button 
                                     onClick={() => updateCartQty(p.id, undefined, cartQty + 1)}
                                     className="p-0.5 hover:text-[#bf3e67] text-[#735965] transition-colors"
                                   >
-                                    <Plus size={12} />
+                                    <Plus size={10} />
                                   </button>
                                 </div>
                               ) : (
@@ -2080,7 +2051,7 @@ export default function PortalPage() {
                                     e.stopPropagation();
                                     addToCart(p.id);
                                   }}
-                                  className="px-3 py-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-[10px] font-bold text-[#bf3e67] transition-all"
+                                  className="px-2.5 py-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-[9px] font-black text-[#bf3e67] transition-all shrink-0 whitespace-nowrap"
                                 >
                                   담기
                                 </button>
@@ -2104,7 +2075,7 @@ export default function PortalPage() {
                       <h3 className="font-extrabold text-base text-[#2d2026]">발주 장바구니</h3>
                     </div>
                     {cart.length > 0 && (
-                      <button onClick={clearCart} className="text-[10px] font-bold text-[#735965] hover:text-red-500 transition-colors flex items-center gap-1">
+                      <button onClick={clearCart} className="text-[10px] font-bold text-[#735965] hover:text-red-500 transition-colors flex items-center gap-1 cursor-pointer">
                         <Trash2 size={12} /> 비우기
                       </button>
                     )}
@@ -2137,15 +2108,15 @@ export default function PortalPage() {
                                 <span className="text-[10px] text-[#735965] font-semibold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
                               </div>
                               <div className="flex flex-col items-end gap-1.5 shrink-0">
-                                <button onClick={() => removeCartItem(p.id, item.selectedOption)} className="text-[#735965]/60 hover:text-red-500 transition-colors p-1" aria-label="삭제">
+                                <button onClick={() => removeCartItem(p.id, item.selectedOption)} className="text-[#735965]/60 hover:text-red-500 transition-colors p-1 cursor-pointer" aria-label="삭제">
                                   <X size={13} />
                                 </button>
                                 <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
-                                  <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors">
+                                  <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
                                     <Minus size={11} />
                                   </button>
                                   <span className="px-2 text-[10px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
-                                  <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors">
+                                  <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
                                     <Plus size={11} />
                                   </button>
                                 </div>
@@ -2179,7 +2150,7 @@ export default function PortalPage() {
                       {/* Order action button */}
                       <button 
                         onClick={placeOrder}
-                        className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
+                        className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-0"
                       >
                         <CheckCircle2 size={16} />
                         자재 발주 신청하기
@@ -2729,7 +2700,7 @@ export default function PortalPage() {
           >
             <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
               <h3 className="text-base font-bold text-[#2d2026]">신규 1:1 가맹상담 문의 접수</h3>
-              <button onClick={() => setShowInquiryModal(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
+              <button onClick={() => closeModal(() => setShowInquiryModal(false))} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
                 <X size={15} />
               </button>
             </div>
@@ -2803,7 +2774,7 @@ export default function PortalPage() {
                   <span className="text-[10px] sm:text-xs text-[#735965] font-bold block">강남역삼점 · 발주 코드: <span className="font-mono text-[#bf3e67] font-black">{selectedOrder.id}</span></span>
                 </h3>
               </div>
-              <button onClick={() => setSelectedOrder(null)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 ml-4">
+              <button onClick={() => closeModal(() => setSelectedOrder(null))} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 ml-4">
                 <X size={15} />
               </button>
             </div>
@@ -2970,7 +2941,7 @@ export default function PortalPage() {
             <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 text-center">
               <button 
                 type="button"
-                onClick={() => setSelectedOrder(null)}
+                onClick={() => closeModal(() => setSelectedOrder(null))}
                 className="px-8 py-3 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
               >
                 상세내역 창 닫기
@@ -3058,8 +3029,10 @@ export default function PortalPage() {
                 </div>
                 <button 
                   onClick={() => {
-                    setTrackingModalOpen(false);
-                    setTrackingInfo(null);
+                    closeModal(() => {
+                      setTrackingModalOpen(false);
+                      setTrackingInfo(null);
+                    });
                   }}
                   className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 cursor-pointer transition-all"
                 >
@@ -3216,8 +3189,10 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => {
-                    setTrackingModalOpen(false);
-                    setTrackingInfo(null);
+                    closeModal(() => {
+                      setTrackingModalOpen(false);
+                      setTrackingInfo(null);
+                    });
                   }}
                   className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#f25f8a] to-[#bf3e67] text-white text-xs font-extrabold shadow-md hover:opacity-90 transition-all cursor-pointer"
                 >
@@ -3250,7 +3225,7 @@ export default function PortalPage() {
                 </h3>
               </div>
               <button 
-                onClick={() => setSelectedProductDetail(null)} 
+                onClick={() => closeModal(() => setSelectedProductDetail(null))} 
                 className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0"
               >
                 <X size={15} />
@@ -3582,7 +3557,7 @@ export default function PortalPage() {
                       } else {
                         addToCart(selectedProductDetail.id, undefined, localSingleQty);
                       }
-                      setSelectedProductDetail(null);
+                      closeModal(() => setSelectedProductDetail(null));
                     }}
                     className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-extrabold transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
                   >
@@ -3591,7 +3566,7 @@ export default function PortalPage() {
                   </button>
                   <button 
                     type="button"
-                    onClick={() => setSelectedProductDetail(null)}
+                    onClick={() => closeModal(() => setSelectedProductDetail(null))}
                     className="px-6 py-3 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
                   >
                     닫기
@@ -3683,16 +3658,16 @@ export default function PortalPage() {
               )}
 
               {/* Close Footer bar */}
-              <div className="bg-[#fff9fb] p-3 flex justify-between items-center px-5 text-[11px] font-bold text-[#735965]">
+              <div className="bg-[#fff9fb] p-3 flex justify-between items-center px-5 text-[11px] font-bold text-[#735965] select-none">
                 <button
                   onClick={() => {
-                    const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-                    localStorage.setItem("120_popup_closed_date", todayStr);
+                    const sevenDaysLater = Date.now() + 7 * 24 * 60 * 60 * 1000;
+                    localStorage.setItem("120_popup_closed_until", sevenDaysLater.toString());
                     setShowPopup(false);
                   }}
                   className="hover:text-[#bf3e67] transition-colors flex items-center gap-1 cursor-pointer"
                 >
-                  <Check size={13} className="text-[#f25f8a]" /> 오늘 하루 안보기
+                  <Check size={13} className="text-[#f25f8a]" /> 7일 동안 보지 않기
                 </button>
                 <button
                   onClick={() => setShowPopup(false)}
@@ -3811,22 +3786,22 @@ export default function PortalPage() {
         </div>
       )}
 
-      {/* MOBILE BOTTOM FLOATING CART BAR (Always visible when items are added in order menu) */}
+      {/* MOBILE BOTTOM FLOATING CART BAR (Always visible above bottom navigation when items are added in order menu) */}
       {cart.length > 0 && currentMenu === "order" && (
-        <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-[#f2ccd7] px-4 py-3.5 pb-safe shadow-[0_-8px_30px_rgba(242,204,215,0.3)] flex items-center justify-between animate-slideUp">
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-[#735965] select-none">총 {cart.reduce((sum, item) => sum + item.quantity, 0)}개 상품 담김</span>
-            <span className="text-sm font-black text-[#bf3e67] select-none">{cartTotal.toLocaleString()} 원</span>
+        <div className="lg:hidden fixed bottom-[57px] inset-x-0 z-40 bg-white border-t border-[#f2ccd7] px-4 py-3 shadow-[0_-4px_20px_rgba(242,204,215,0.25)] flex items-center justify-between animate-slideUp select-none">
+          <div className="flex flex-col text-left">
+            <span className="text-[9px] font-black text-[#735965]">총 {cart.reduce((sum, item) => sum + item.quantity, 0)}개 품목 담김</span>
+            <span className="text-sm font-black text-[#bf3e67]">{cartTotal.toLocaleString()}원</span>
           </div>
           <button
             onClick={() => {
               // Smooth scroll to shopping cart at the bottom
               window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
             }}
-            className="px-5 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-black rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border-0"
+            className="px-4 py-2 bg-[#f25f8a] hover:bg-[#df4977] text-white text-[10px] font-black rounded-xl shadow-sm flex items-center gap-1 transition-all cursor-pointer border-0"
           >
-            <ShoppingBag size={14} className="text-white" />
-            발주 장바구니 확인
+            <ShoppingBag size={12} className="text-white" />
+            장바구니 확인
           </button>
         </div>
       )}
