@@ -2487,38 +2487,38 @@ export default function PortalPage() {
 
                 {/* 2. Spec Table */}
                 <div className="md:col-span-7 bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm flex flex-col w-full">
-                  <div className="px-4 py-3 bg-[#fff1f5]/30 border-b border-[#f2ccd7]/50 shrink-0">
+                  <div className="px-4 py-2.5 bg-[#fff1f5]/30 border-b border-[#f2ccd7]/50 shrink-0">
                     <span className="font-extrabold text-[#2d2026]">품목 기본 명세 규격표</span>
                   </div>
                   <table className="w-full text-left border-collapse table-fixed">
                     <tbody className="divide-y divide-[#f2ccd7]/40 text-xs text-[#2d2026]">
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965] w-[100px]">제품명</td>
-                        <td className="px-4 py-3.5 font-bold text-neutral-800 break-all">{selectedProductDetail.name}</td>
+                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965] w-[100px]">제품명</td>
+                        <td className="px-4 py-2 font-bold text-neutral-800 break-all">{selectedProductDetail.name}</td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">카테고리</td>
-                        <td className="px-4 py-3.5">
+                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">카테고리</td>
+                        <td className="px-4 py-2">
                           <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-bold px-2 py-0.5 rounded border border-[#f2ccd7]">
                             {selectedProductDetail.category}
                           </span>
                         </td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">발주 규격</td>
-                        <td className="px-4 py-3.5 font-semibold text-[#f25f8a]">{selectedProductDetail.packSize}</td>
+                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">발주 규격</td>
+                        <td className="px-4 py-2 font-semibold text-[#f25f8a]">{selectedProductDetail.packSize}</td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">제품 식별코드</td>
-                        <td className="px-4 py-3.5 font-mono font-bold text-[#735965]">{selectedProductDetail.id}</td>
+                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">제품 식별코드</td>
+                        <td className="px-4 py-2 font-mono font-bold text-[#735965]">{selectedProductDetail.id}</td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">공급 단가</td>
-                        <td className="px-4 py-3.5 font-black text-[#bf3e67]">{selectedProductDetail.price.toLocaleString()} 원</td>
+                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">공급 단가</td>
+                        <td className="px-4 py-2 font-black text-[#bf3e67]">{selectedProductDetail.price.toLocaleString()} 원</td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">배송 정책</td>
-                        <td className="px-4 py-3.5">
+                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">배송 정책</td>
+                        <td className="px-4 py-2">
                           {(() => {
                             const type = selectedProductDetail.shippingType || "A";
                             if (type === "free") {
@@ -2538,8 +2538,8 @@ export default function PortalPage() {
                         </td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">품목 정보 설명</td>
-                        <td className="px-4 py-3.5 font-medium text-[#735965] leading-relaxed break-words">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
+                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">품목 정보 설명</td>
+                        <td className="px-4 py-2 font-medium text-[#735965] leading-relaxed break-words">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
                       </tr>
                     </tbody>
                   </table>
