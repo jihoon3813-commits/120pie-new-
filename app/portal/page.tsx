@@ -482,6 +482,7 @@ export default function PortalPage() {
         packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
         img: p.img,
         detailImg: p.detailImg,
+        detailText: p.detailText,
         stock: p.stock || "in_stock",
         desc: p.desc || "",
         orderIndex: p.orderIndex || 99,
@@ -556,6 +557,7 @@ export default function PortalPage() {
               packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
               img: p.img,
               detailImg: p.detailImg,
+              detailText: p.detailText,
               stock: p.stock || "in_stock",
               desc: p.desc || "",
               orderIndex: p.orderIndex || 99,
@@ -2549,19 +2551,51 @@ export default function PortalPage() {
               </div>
 
               {/* 3. Detailed Page (If available) */}
-              {selectedProductDetail.detailImg && (
+              {(selectedProductDetail.detailImg || selectedProductDetail.detailText) && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 border-b border-[#f2ccd7]/60 pb-2">
                     <span className="w-1.5 h-3.5 rounded-full bg-[#f25f8a]"></span>
                     <span className="font-extrabold text-[#2d2026] text-xs sm:text-sm">🔍 제품 상세 정보 안내</span>
                   </div>
-                  <div className="border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm bg-neutral-50 flex items-center justify-center p-2 min-h-[200px]">
-                    <img 
-                      src={selectedProductDetail.detailImg} 
-                      alt={`${selectedProductDetail.name} 상세페이지`} 
-                      className="w-full h-auto object-contain rounded-lg"
-                    />
-                  </div>
+                  
+                  {/* Rich Text / HTML Description */}
+                  {selectedProductDetail.detailText && (
+                    <div className="space-y-1">
+                      <style>{`
+                        .rich-content-view ul {
+                          list-style-type: disc !important;
+                          padding-left: 1.5rem !important;
+                          margin: 0.5rem 0 !important;
+                        }
+                        .rich-content-view ol {
+                          list-style-type: decimal !important;
+                          padding-left: 1.5rem !important;
+                          margin: 0.5rem 0 !important;
+                        }
+                        .rich-content-view font[size="1"] { font-size: 10px !important; }
+                        .rich-content-view font[size="2"] { font-size: 12px !important; }
+                        .rich-content-view font[size="3"] { font-size: 14px !important; }
+                        .rich-content-view font[size="4"] { font-size: 16px !important; }
+                        .rich-content-view font[size="5"] { font-size: 18px !important; }
+                        .rich-content-view font[size="6"] { font-size: 24px !important; }
+                      `}</style>
+                      <div 
+                        className="border border-[#f2ccd7] rounded-xl p-5 bg-[#fff9fb]/10 shadow-sm text-xs sm:text-sm text-[#2d2026] leading-relaxed whitespace-normal break-words overflow-x-auto min-h-[80px] rich-content-view"
+                        dangerouslySetInnerHTML={{ __html: selectedProductDetail.detailText }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Detail Image */}
+                  {selectedProductDetail.detailImg && (
+                    <div className="border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm bg-neutral-50 flex items-center justify-center p-2 min-h-[200px]">
+                      <img 
+                        src={selectedProductDetail.detailImg} 
+                        alt={`${selectedProductDetail.name} 상세페이지`} 
+                        className="w-full h-auto object-contain rounded-lg"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 

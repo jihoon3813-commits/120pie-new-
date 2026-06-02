@@ -74,6 +74,7 @@ interface Product {
   discountedPrice: number; // 할인판매가
   img: string; // 썸네일 이미지
   detailImg?: string; // 상세페이지 이미지
+  detailText?: string; // 상세페이지 텍스트 설명
   isActive: boolean; // 판매 활성화여부
   desc: string; // 설명
   stock: "in_stock" | "low_stock" | "out_of_stock"; // 재고상태 호환용
@@ -560,6 +561,7 @@ export default function AdminPage() {
   const [productDiscountAmount, setProductDiscountAmount] = useState<string>("0");
   const [productImg, setProductImg] = useState<string>("");
   const [productDetailImg, setProductDetailImg] = useState<string>("");
+  const [productDetailText, setProductDetailText] = useState<string>("");
   const [productIsActive, setProductIsActive] = useState<boolean>(true);
   const [productShippingType, setProductShippingType] = useState<"free" | "A" | "B" | "C">("A");
 
@@ -1132,9 +1134,18 @@ export default function AdminPage() {
       setProductDiscountAmount(prod.discountAmount.toLocaleString());
       setProductImg(prod.img);
       setProductDetailImg(prod.detailImg || "");
+      setProductDetailText(prod.detailText || "");
       setProductIsActive(prod.isActive);
       setProductLabels(prod.labels || []);
       setProductShippingType(prod.shippingType || "A");
+
+      // Load rich editor content on microtask
+      setTimeout(() => {
+        const editorDiv = document.getElementById("product-detail-rich-editor");
+        if (editorDiv) {
+          editorDiv.innerHTML = prod.detailText || "";
+        }
+      }, 50);
     } else {
       setSelectedProduct(null);
       setProductCategory(categories[0] || "냉동생지/자재");
@@ -1147,9 +1158,18 @@ export default function AdminPage() {
       setProductDiscountAmount("0");
       setProductImg("");
       setProductDetailImg("");
+      setProductDetailText("");
       setProductIsActive(true);
       setProductLabels([]);
       setProductShippingType("A");
+
+      // Reset rich editor content on microtask
+      setTimeout(() => {
+        const editorDiv = document.getElementById("product-detail-rich-editor");
+        if (editorDiv) {
+          editorDiv.innerHTML = "";
+        }
+      }, 50);
     }
     setShowProductModal(true);
   };
@@ -1181,6 +1201,7 @@ export default function AdminPage() {
       discountedPrice: discountedPriceVal < 0 ? 0 : discountedPriceVal,
       img: productImg,
       detailImg: productDetailImg || undefined,
+      detailText: productDetailText || undefined,
       isActive: productIsActive,
       desc: `${productModelName} - ${productCategory} 표준 규격`,
       stock: "in_stock",
@@ -5064,6 +5085,147 @@ export default function AdminPage() {
                         className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer w-full max-w-[180px]"
                       />
                     </div>
+                  </div>
+                </div>
+
+                {/* 3. Rich Text Editor for Detailed Page Content */}
+                <div className="flex flex-col gap-1.5 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl space-y-2">
+                  <label className="font-bold text-[#2d2026]">상세페이지 텍스트 편집 (크기, 색상, 정렬 등)</label>
+                  <style>{`
+                    #product-detail-rich-editor:empty:before {
+                      content: attr(data-placeholder);
+                      color: #735965;
+                      opacity: 0.4;
+                      font-style: italic;
+                      display: block;
+                    }
+                  `}</style>
+                  <div className="border border-[#f2ccd7] rounded-xl overflow-hidden bg-white shadow-sm">
+                    {/* Editor Toolbar */}
+                    <div className="bg-[#fff1f5] border-b border-[#f2ccd7] p-2 flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs">
+                      <button
+                        type="button"
+                        onClick={() => document.execCommand("bold", false)}
+                        className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] font-bold hover:bg-[#ffd3df] transition-colors cursor-pointer"
+                        title="굵게"
+                      >
+                        가
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => document.execCommand("italic", false)}
+                        className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] italic hover:bg-[#ffd3df] transition-colors cursor-pointer"
+                        title="기울임"
+                      >
+                        가
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => document.execCommand("underline", false)}
+                        className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] underline hover:bg-[#ffd3df] transition-colors cursor-pointer"
+                        title="밑줄"
+                      >
+                        가
+                      </button>
+                      
+                      <div className="h-4 w-px bg-[#f2ccd7] mx-1"></div>
+
+                      <button
+                        type="button"
+                        onClick={() => document.execCommand("justifyLeft", false)}
+                        className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
+                        title="왼쪽 정렬"
+                      >
+                        왼쪽
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => document.execCommand("justifyCenter", false)}
+                        className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
+                        title="가운데 정렬"
+                      >
+                        가운데
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => document.execCommand("justifyRight", false)}
+                        className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
+                        title="오른쪽 정렬"
+                      >
+                        오른쪽
+                      </button>
+
+                      <div className="h-4 w-px bg-[#f2ccd7] mx-1"></div>
+
+                      <select
+                        onChange={(e) => document.execCommand("fontSize", false, e.target.value)}
+                        className="bg-white border border-[#f2ccd7] rounded px-1 py-1 text-[10px] sm:text-xs focus:outline-none cursor-pointer"
+                        title="글자 크기"
+                        defaultValue="3"
+                      >
+                        <option value="1">매우 작게</option>
+                        <option value="2">작게</option>
+                        <option value="3">보통</option>
+                        <option value="4">크게</option>
+                        <option value="5">매우 크게</option>
+                        <option value="6">최대 크게</option>
+                      </select>
+
+                      <select
+                        onChange={(e) => document.execCommand("foreColor", false, e.target.value)}
+                        className="bg-white border border-[#f2ccd7] rounded px-1 py-1 text-[10px] sm:text-xs focus:outline-none font-bold cursor-pointer"
+                        title="글자 색상"
+                        defaultValue="#2d2026"
+                      >
+                        <option value="#2d2026" style={{ color: "#2d2026" }}>기본색상</option>
+                        <option value="#f25f8a" style={{ color: "#f25f8a" }}>핑크</option>
+                        <option value="#bf3e67" style={{ color: "#bf3e67" }}>로즈</option>
+                        <option value="#3b82f6" style={{ color: "#3b82f6" }}>블루</option>
+                        <option value="#10b981" style={{ color: "#10b981" }}>그린</option>
+                        <option value="#f59e0b" style={{ color: "#f59e0b" }}>골드/옐로우</option>
+                        <option value="#ef4444" style={{ color: "#ef4444" }}>레드</option>
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => document.execCommand("insertUnorderedList", false)}
+                        className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
+                        title="글머리 기호"
+                      >
+                        • 리스트
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm("상세페이지 텍스트 내용을 초기화하시겠습니까?")) {
+                            setProductDetailText("");
+                            const editorDiv = document.getElementById("product-detail-rich-editor");
+                            if (editorDiv) editorDiv.innerHTML = "";
+                          }
+                        }}
+                        className="px-2 py-1 rounded bg-white border border-red-200 text-red-500 hover:bg-red-50 ml-auto font-bold cursor-pointer"
+                        title="초기화"
+                      >
+                        비우기
+                      </button>
+                    </div>
+
+                    {/* ContentEditable Editor Area */}
+                    <div
+                      id="product-detail-rich-editor"
+                      contentEditable
+                      suppressContentEditableWarning
+                      onInput={(e: React.FormEvent<HTMLDivElement>) => {
+                        setProductDetailText(e.currentTarget.innerHTML);
+                      }}
+                      onBlur={(e: React.FocusEvent<HTMLDivElement>) => {
+                        setProductDetailText(e.currentTarget.innerHTML);
+                      }}
+                      className="p-4 min-h-[140px] max-h-[260px] overflow-y-auto focus:outline-none bg-white text-xs sm:text-sm text-[#2d2026] leading-relaxed"
+                      data-placeholder="이곳에 제품 상세 안내 텍스트를 자유롭게 입력하고 편집하세요..."
+                      style={{ minHeight: "140px" }}
+                    />
                   </div>
                 </div>
               </div>
