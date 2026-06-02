@@ -2352,43 +2352,46 @@ export default function AdminPage() {
                       추가
                     </button>
                   </form>
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {categories.map((catName, idx) => (
-                      <span 
-                        key={catName} 
-                        className="inline-flex items-center gap-1.5 bg-[#fff1f5] border border-[#f2ccd7] text-[#bf3e67] px-3 py-1.5 rounded-lg text-xs font-bold"
-                      >
-                        {catName}
-                        <div className="flex items-center gap-0.5 ml-1">
-                          <button
-                            type="button"
-                            onClick={() => handleAdjustCategoryOrder(idx, "up")}
-                            disabled={idx === 0}
-                            className="w-4 h-4 flex items-center justify-center rounded bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[8px] transition-colors cursor-pointer"
-                            title="위로 이동"
-                          >
-                            ▲
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleAdjustCategoryOrder(idx, "down")}
-                            disabled={idx === categories.length - 1}
-                            className="w-4 h-4 flex items-center justify-center rounded bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[8px] transition-colors cursor-pointer"
-                            title="아래로 이동"
-                          >
-                            ▼
-                          </button>
-                        </div>
-                        <button 
-                          type="button"
-                          onClick={() => handleDeleteCategory(catName)}
-                          className="hover:text-red-500 text-[#735965] transition-colors font-extrabold ml-1"
-                          title="삭제"
+                  <div className="space-y-2.5 max-w-md pt-2">
+                    <label className="text-[11px] font-bold text-[#735965] block">등록된 카테고리 목록 (순서 조정 및 삭제)</label>
+                    <div className="space-y-2 p-3.5 bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-2xl max-h-[300px] overflow-y-auto">
+                      {categories.map((catName, idx) => (
+                        <div
+                          key={catName}
+                          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#fff1f5] text-[#bf3e67] border border-[#f2ccd7] group"
                         >
-                          &times;
-                        </button>
-                      </span>
-                    ))}
+                          <span>{catName}</span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleAdjustCategoryOrder(idx, "up")}
+                              disabled={idx === 0}
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              title="위로 이동"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleAdjustCategoryOrder(idx, "down")}
+                              disabled={idx === categories.length - 1}
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              title="아래로 이동"
+                            >
+                              ▼
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCategory(catName)}
+                              className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 ml-1 font-bold text-sm leading-none transition-colors cursor-pointer"
+                              title="카테고리 삭제"
+                            >
+                              &times;
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
