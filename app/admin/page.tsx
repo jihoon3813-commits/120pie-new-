@@ -499,7 +499,6 @@ export default function AdminPage() {
   const syncOrdersMutation = useMutation(api.orders.syncOrders);
   const updateOrderStatusMutation = useMutation(api.orders.updateStatus);
 
-  const updatePopupMutation = useMutation(api.popups.update);
   const convexPopupsList = useQuery(api.popups.list);
   const createOrUpdatePopupMutation = useMutation(api.popups.createOrUpdate);
   const deletePopupMutation = useMutation(api.popups.deletePopup);
