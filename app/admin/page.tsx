@@ -374,6 +374,55 @@ interface GalleryItem {
 const DEFAULT_GALLERY: GalleryItem[] = [];
 
 export default function AdminPage() {
+  // Rich Text Editor Selection Preservation & Command Execution
+  const savedRangeRef = React.useRef<Range | null>(null);
+
+  const saveSelection = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      const editor = document.getElementById("product-detail-rich-editor");
+      if (editor && editor.contains(range.commonAncestorContainer)) {
+        savedRangeRef.current = range;
+      }
+    }
+  };
+
+  const restoreSelection = () => {
+    if (savedRangeRef.current) {
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(savedRangeRef.current);
+      }
+    }
+  };
+
+  const executeEditorCommand = (command: string, value: string = "") => {
+    const editor = document.getElementById("product-detail-rich-editor");
+    if (!editor) return;
+
+    editor.focus();
+    restoreSelection();
+
+    // justifyAlign command self-healing: ensure text block is formatted as block-level element
+    if (command.startsWith("justify")) {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        const parent = sel.getRangeAt(0).commonAncestorContainer.parentNode as HTMLElement;
+        if (parent && parent.id === "product-detail-rich-editor") {
+          document.execCommand("formatBlock", false, "div");
+        }
+      }
+    }
+
+    document.execCommand(command, false, value);
+    setProductDetailText(editor.innerHTML);
+
+    // Save selection again after command execution
+    setTimeout(saveSelection, 10);
+  };
+
   // Convex Hooks
   const convexPopup = useQuery(api.popups.get);
   const convexFloating = useQuery(api.floatings.get);
@@ -5152,6 +5201,12 @@ export default function AdminPage() {
                       font-style: italic;
                       display: block;
                     }
+                    .rich-content-view font[size="1"] { font-size: 10px !important; }
+                    .rich-content-view font[size="2"] { font-size: 12px !important; }
+                    .rich-content-view font[size="3"] { font-size: 14px !important; }
+                    .rich-content-view font[size="4"] { font-size: 16px !important; }
+                    .rich-content-view font[size="5"] { font-size: 18px !important; }
+                    .rich-content-view font[size="6"] { font-size: 24px !important; }
                   `}</style>
                   <div className="border border-[#f2ccd7] rounded-xl overflow-hidden bg-white shadow-sm">
                     {/* Editor Toolbar */}
@@ -5159,7 +5214,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => document.execCommand("bold", false)}
+                        onClick={() => executeEditorCommand("bold")}
                         className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] font-bold hover:bg-[#ffd3df] transition-colors cursor-pointer"
                         title="굵게"
                       >
@@ -5168,7 +5223,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => document.execCommand("italic", false)}
+                        onClick={() => executeEditorCommand("italic")}
                         className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] italic hover:bg-[#ffd3df] transition-colors cursor-pointer"
                         title="기울임"
                       >
@@ -5177,7 +5232,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => document.execCommand("underline", false)}
+                        onClick={() => executeEditorCommand("underline")}
                         className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] underline hover:bg-[#ffd3df] transition-colors cursor-pointer"
                         title="밑줄"
                       >
@@ -5189,7 +5244,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => document.execCommand("justifyLeft", false)}
+                        onClick={() => executeEditorCommand("justifyLeft")}
                         className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
                         title="왼쪽 정렬"
                       >
@@ -5198,7 +5253,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => document.execCommand("justifyCenter", false)}
+                        onClick={() => executeEditorCommand("justifyCenter")}
                         className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
                         title="가운데 정렬"
                       >
@@ -5207,7 +5262,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => document.execCommand("justifyRight", false)}
+                        onClick={() => executeEditorCommand("justifyRight")}
                         className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
                         title="오른쪽 정렬"
                       >
@@ -5218,7 +5273,7 @@ export default function AdminPage() {
 
                       <select
                         onMouseDown={(e) => e.preventDefault()}
-                        onChange={(e) => document.execCommand("fontSize", false, e.target.value)}
+                        onChange={(e) => executeEditorCommand("fontSize", e.target.value)}
                         className="bg-white border border-[#f2ccd7] rounded px-1 py-1 text-[10px] sm:text-xs focus:outline-none cursor-pointer"
                         title="글자 크기"
                         defaultValue="3"
@@ -5233,7 +5288,7 @@ export default function AdminPage() {
 
                       <select
                         onMouseDown={(e) => e.preventDefault()}
-                        onChange={(e) => document.execCommand("foreColor", false, e.target.value)}
+                        onChange={(e) => executeEditorCommand("foreColor", e.target.value)}
                         className="bg-white border border-[#f2ccd7] rounded px-1 py-1 text-[10px] sm:text-xs focus:outline-none font-bold cursor-pointer"
                         title="글자 색상"
                         defaultValue="#2d2026"
@@ -5250,7 +5305,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => document.execCommand("insertUnorderedList", false)}
+                        onClick={() => executeEditorCommand("insertUnorderedList")}
                         className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
                         title="글머리 기호"
                       >
@@ -5281,11 +5336,15 @@ export default function AdminPage() {
                       suppressContentEditableWarning
                       onInput={(e: React.FormEvent<HTMLDivElement>) => {
                         setProductDetailText(e.currentTarget.innerHTML);
+                        saveSelection();
                       }}
                       onBlur={(e: React.FocusEvent<HTMLDivElement>) => {
                         setProductDetailText(e.currentTarget.innerHTML);
                       }}
-                      className="p-4 min-h-[140px] max-h-[260px] overflow-y-auto focus:outline-none bg-white text-xs sm:text-sm text-[#2d2026] leading-relaxed"
+                      onMouseUp={saveSelection}
+                      onKeyUp={saveSelection}
+                      onSelect={saveSelection}
+                      className="p-4 min-h-[140px] max-h-[260px] overflow-y-auto focus:outline-none bg-white text-xs sm:text-sm text-[#2d2026] leading-relaxed rich-content-view"
                       data-placeholder="이곳에 제품 상세 안내 텍스트를 자유롭게 입력하고 편집하세요..."
                       style={{ minHeight: "140px" }}
                     />
