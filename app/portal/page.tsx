@@ -1979,10 +1979,10 @@ export default function PortalPage() {
                         {/* 2. Desktop Grid Card View */}
                         <div 
                           onClick={() => setSelectedProductDetail(p)}
-                          className="hidden sm:flex bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex-col justify-between shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 h-[390px]"
+                          className="hidden sm:flex bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex-col justify-between shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 pb-5"
                         >
                           {/* Thumbnail image & stock state badge */}
-                          <div className="h-44 relative bg-[#fff1f5] overflow-hidden shrink-0">
+                          <div className="aspect-square w-full relative bg-[#fff1f5] overflow-hidden shrink-0">
                             <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
                             <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[80%]">
                               {p.stock === "low_stock" && (
