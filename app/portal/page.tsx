@@ -376,6 +376,7 @@ export default function PortalPage() {
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedProductDetail, setSelectedProductDetail] = useState<any | null>(null);
 
   // Order page category tab
   const [activeCategory, setActiveCategory] = useState<string>("전체");
@@ -397,6 +398,12 @@ export default function PortalPage() {
 
   // Mobile menu control
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+
+  // Shipping and Return Policy states
+  const [shippingPolicy, setShippingPolicy] = useState<string>("");
+  const [returnPolicy, setReturnPolicy] = useState<string>("");
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState<number>(100000);
+  const [basicShippingFee, setBasicShippingFee] = useState<number>(3000);
 
   // ==========================================
   // INITIALIZATION WITH LOCAL STORAGE
@@ -475,8 +482,20 @@ export default function PortalPage() {
         desc: p.desc || "",
         orderIndex: p.orderIndex || 99,
         labels: p.labels || []
-      })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
       setProducts(mapped);
+
+      const policySettings = loadState("120_shipping_settings", {
+        shippingPolicy: "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다.",
+        returnPolicy: "식재료 특성상 단순 변심으로 인한 반품은 불가하며, 오배송 건은 수령 즉시 본사 접수 바랍니다.",
+        freeShippingThreshold: "100,000",
+        basicShippingFee: "3,000"
+      });
+      setShippingPolicy(policySettings.shippingPolicy);
+      setReturnPolicy(policySettings.returnPolicy);
+      const parsedThreshold = parseInt(policySettings.freeShippingThreshold.replace(/,/g, "")) || 100000;
+      const parsedFee = parseInt(policySettings.basicShippingFee.replace(/,/g, "")) || 3000;
+      setFreeShippingThreshold(parsedThreshold);
+      setBasicShippingFee(parsedFee);
     }
   }, []);
 
@@ -535,6 +554,21 @@ export default function PortalPage() {
             setProducts(mapped);
           } catch (e) {
             console.warn(e);
+          }
+        }
+
+        const ps = localStorage.getItem("120_shipping_settings");
+        if (ps) {
+          try {
+            const parsed = JSON.parse(ps);
+            setShippingPolicy(parsed.shippingPolicy || "");
+            setReturnPolicy(parsed.returnPolicy || "");
+            const parsedThreshold = parseInt((parsed.freeShippingThreshold || "100000").toString().replace(/,/g, "")) || 100000;
+            const parsedFee = parseInt((parsed.basicShippingFee || "3000").toString().replace(/,/g, "")) || 3000;
+            setFreeShippingThreshold(parsedThreshold);
+            setBasicShippingFee(parsedFee);
+          } catch (e) {
+            console.error(e);
           }
         }
       }
@@ -604,7 +638,7 @@ export default function PortalPage() {
     return acc + (p ? p.price * item.quantity : 0);
   }, 0);
 
-  const shippingFee = cartSubtotal >= 50000 || cartSubtotal === 0 ? 0 : 3000;
+  const shippingFee = cartSubtotal >= freeShippingThreshold || cartSubtotal === 0 ? 0 : basicShippingFee;
   const cartTotal = cartSubtotal + shippingFee;
 
   // ==========================================
@@ -1382,7 +1416,8 @@ export default function PortalPage() {
                     return (
                       <div 
                         key={p.id}
-                        className="bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex flex-col justify-between shadow-sm"
+                        onClick={() => setSelectedProductDetail(p)}
+                        className="bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex flex-col justify-between shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5"
                       >
                         {/* Thumbnail image & stock state badge */}
                         <div className="h-44 relative bg-[#fff1f5] overflow-hidden shrink-0">
@@ -1394,17 +1429,6 @@ export default function PortalPage() {
                             {p.stock === "out_of_stock" && (
                               <span className="bg-red-500 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">일시품절</span>
                             )}
-                            {p.labels && p.labels.map((l) => {
-                              let bgStyle = "bg-neutral-500/90 text-white";
-                              if (l === "BEST") bgStyle = "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm font-black";
-                              else if (l === "추천") bgStyle = "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm font-black";
-                              else if (l === "신제품") bgStyle = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-black";
-                              return (
-                                <span key={l} className={`font-bold text-[9px] px-2 py-0.5 rounded shadow-sm ${bgStyle}`}>
-                                  {l}
-                                </span>
-                              );
-                            })}
                           </div>
                           <span className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-[10px] text-[#bf3e67] font-extrabold px-2 py-1 rounded border border-[#f2ccd7]">
                             {p.category}
@@ -1412,8 +1436,23 @@ export default function PortalPage() {
                         </div>
 
                         {/* Product Info Block */}
-                        <div className="p-5 flex-1 flex flex-col justify-between">
-                          <div className="space-y-1">
+                        <div className="p-5 flex-1 flex flex-col justify-between relative">
+                          {p.labels && p.labels.length > 0 && (
+                            <div className="absolute top-5 right-5 flex flex-wrap gap-1 w-fit justify-end">
+                              {p.labels.map((l) => {
+                                let bgStyle = "bg-neutral-500/90 text-white";
+                                if (l === "BEST") bgStyle = "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm font-black";
+                                else if (l === "추천") bgStyle = "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm font-black";
+                                else if (l === "신제품") bgStyle = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-black";
+                                return (
+                                  <span key={l} className={`font-bold text-[9px] px-2 py-0.5 rounded shadow-sm ${bgStyle}`}>
+                                    {l}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                          <div className="space-y-1 pr-14">
                             <span className="text-[10px] text-[#735965] font-bold block">{p.packSize}</span>
                             <h3 className="font-bold text-base text-[#2d2026] leading-tight">{p.name}</h3>
                             <p className="text-[11px] text-[#735965] font-medium leading-relaxed mt-1.5">{p.desc}</p>
@@ -1423,7 +1462,7 @@ export default function PortalPage() {
                             <strong className="text-base text-[#2d2026] font-black">{p.price.toLocaleString()} 원</strong>
                             
                             {cartQty > 0 ? (
-                              <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-lg p-0.5">
+                              <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-lg p-0.5" onClick={(e) => e.stopPropagation()}>
                                 <button 
                                   onClick={() => updateCartQty(p.id, cartQty - 1)}
                                   className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
@@ -1440,7 +1479,10 @@ export default function PortalPage() {
                               </div>
                             ) : (
                               <button
-                                onClick={() => addToCart(p.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addToCart(p.id);
+                                }}
                                 className="px-4 py-2 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-xs font-bold text-[#bf3e67] transition-all"
                               >
                                 담기
@@ -1517,8 +1559,8 @@ export default function PortalPage() {
                           <span>{cartSubtotal.toLocaleString()} 원</span>
                         </div>
                         <div className="flex justify-between text-[#735965] font-bold">
-                          <span>배송비 (5만원 이상 무료)</span>
-                          <span>{shippingFee === 0 ? "무료" : "3,000 원"}</span>
+                          <span>배송비 ({freeShippingThreshold.toLocaleString()}원 이상 무료)</span>
+                          <span>{shippingFee === 0 ? "무료" : `${basicShippingFee.toLocaleString()} 원`}</span>
                         </div>
                         <div className="flex justify-between text-[#2d2026] font-black text-sm border-t border-[#f2ccd7] pt-3">
                           <span>최종 발주 금액</span>
@@ -2320,6 +2362,134 @@ export default function PortalPage() {
                 className="px-8 py-3 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
               >
                 상세내역 창 닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 6. Product Details Modal */}
+      {selectedProductDetail && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setSelectedProductDetail(null)}
+        >
+          <div 
+            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
+              <div className="flex-1">
+                <h3 className="text-sm sm:text-base font-black text-[#2d2026] flex items-center gap-2">
+                  <span className="bg-[#ffd3df] text-[#bf3e67] text-[10px] font-black px-2 py-0.5 rounded border border-[#f2ccd7]">
+                    {selectedProductDetail.category}
+                  </span>
+                  <span>{selectedProductDetail.name} 상세 정보</span>
+                </h3>
+              </div>
+              <button 
+                onClick={() => setSelectedProductDetail(null)} 
+                className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
+              
+              {/* Product Content Split (Image or Table Specs) */}
+              {selectedProductDetail.detailImg ? (
+                <div className="border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm bg-neutral-50 flex items-center justify-center min-h-[250px] max-h-[400px]">
+                  <img 
+                    src={selectedProductDetail.detailImg} 
+                    alt={`${selectedProductDetail.name} 상세페이지`} 
+                    className="w-full h-auto max-h-[400px] object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
+                  <div className="px-4 py-3 bg-[#fff1f5]/30 border-b border-[#f2ccd7]/50">
+                    <span className="font-extrabold text-[#2d2026]">품목 기본 명세 규격표</span>
+                  </div>
+                  <table className="w-full text-left border-collapse">
+                    <tbody className="divide-y divide-[#f2ccd7]/40 text-xs text-[#2d2026]">
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965] w-[120px]">제품명</td>
+                        <td className="px-4 py-3 font-semibold">{selectedProductDetail.name}</td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965]">카테고리</td>
+                        <td className="px-4 py-3">
+                          <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-bold px-2 py-0.5 rounded border border-[#f2ccd7]">
+                            {selectedProductDetail.category}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965]">발주 규격</td>
+                        <td className="px-4 py-3 font-semibold text-[#f25f8a]">{selectedProductDetail.packSize}</td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965]">제품 식별코드</td>
+                        <td className="px-4 py-3 font-mono font-bold text-[#735965]">{selectedProductDetail.id}</td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965]">기본 공급 단가</td>
+                        <td className="px-4 py-3 font-black text-[#bf3e67]">{selectedProductDetail.price.toLocaleString()} 원</td>
+                      </tr>
+                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
+                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965]">품목 정보 설명</td>
+                        <td className="px-4 py-3 font-medium text-[#735965] leading-relaxed">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Delivery and Return Policy Pastels Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                {/* Delivery policy card */}
+                <div className="bg-[#fff9fb] border border-[#f2ccd7] rounded-2xl p-4.5 space-y-2.5 shadow-sm">
+                  <div className="flex items-center gap-1.5 border-b border-[#f2ccd7] pb-2">
+                    <Truck size={15} className="text-[#f25f8a]" />
+                    <span className="font-extrabold text-[#2d2026] text-xs">🚚 본사 물류 배송 정책</span>
+                  </div>
+                  <div className="text-[11px] text-[#735965] font-semibold leading-relaxed space-y-1.5 whitespace-pre-line">
+                    {shippingPolicy || "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다."}
+                    <div className="pt-2 border-t border-[#f2ccd7]/40 text-[10px] text-[#bf3e67] font-black">
+                      💡 무료배송 기준: {freeShippingThreshold.toLocaleString()}원 이상 발주 시 배송비 무료 (미만 시 {basicShippingFee.toLocaleString()}원 부과)
+                    </div>
+                  </div>
+                </div>
+
+                {/* Return policy card */}
+                <div className="bg-[#fffdf9] border border-amber-200 rounded-2xl p-4.5 space-y-2.5 shadow-sm">
+                  <div className="flex items-center gap-1.5 border-b border-amber-200 pb-2">
+                    <ArrowRightLeft size={15} className="text-amber-500" />
+                    <span className="font-extrabold text-[#2d2026] text-xs">🔄 교환 및 반품 규정 안내</span>
+                  </div>
+                  <div className="text-[11px] text-[#735965] font-semibold leading-relaxed whitespace-pre-line">
+                    {returnPolicy || "식재료 특성상 단순 변심으로 인한 반품은 불가하며, 오배송 건은 수령 즉시 본사 접수 바랍니다."}
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 flex justify-between items-center gap-3">
+              <span className="text-[11px] font-bold text-[#735965]">
+                발주몰 규격을 정밀 점검 후 발주를 신중하게 진행해 주세요.
+              </span>
+              <button 
+                type="button"
+                onClick={() => setSelectedProductDetail(null)}
+                className="px-6 py-2.5 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
+              >
+                닫기
               </button>
             </div>
           </div>

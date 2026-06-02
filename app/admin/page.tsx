@@ -571,6 +571,13 @@ export default function AdminPage() {
   const [showLabelPanel, setShowLabelPanel] = useState<boolean>(false);
   const [productLabels, setProductLabels] = useState<string[]>([]);
 
+  // Shipping and Return Policy states
+  const [shippingPolicy, setShippingPolicy] = useState<string>("");
+  const [returnPolicy, setReturnPolicy] = useState<string>("");
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState<string>("100,000");
+  const [basicShippingFee, setBasicShippingFee] = useState<string>("3,000");
+  const [showPolicyPanel, setShowPolicyPanel] = useState<boolean>(false);
+
   // 3. BANNER CONTROL STATES
   const [bannerMainTag, setBannerMainTag] = useState<string>("");
   const [bannerMainTitle, setBannerMainTitle] = useState<string>("");
@@ -713,6 +720,17 @@ export default function AdminPage() {
       setBannerMainImage(bnr.mainImage || "");
       setBannerSideImage(bnr.sideImage || "");
       setBannerSideLink(bnr.sideLink || "training");
+
+      const policySettings = loadState("120_shipping_settings", {
+        shippingPolicy: "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다.",
+        returnPolicy: "식재료 특성상 단순 변심으로 인한 반품은 불가하며, 오배송 건은 수령 즉시 본사 접수 바랍니다.",
+        freeShippingThreshold: "100,000",
+        basicShippingFee: "3,000"
+      });
+      setShippingPolicy(policySettings.shippingPolicy);
+      setReturnPolicy(policySettings.returnPolicy);
+      setFreeShippingThreshold(policySettings.freeShippingThreshold);
+      setBasicShippingFee(policySettings.basicShippingFee);
     }
   }, []);
 
@@ -747,6 +765,19 @@ export default function AdminPage() {
 
         const ds = localStorage.getItem("120_delivery_statuses");
         if (ds) setDeliveryStatuses(JSON.parse(ds));
+
+        const ps = localStorage.getItem("120_shipping_settings");
+        if (ps) {
+          try {
+            const parsed = JSON.parse(ps);
+            setShippingPolicy(parsed.shippingPolicy || "");
+            setReturnPolicy(parsed.returnPolicy || "");
+            setFreeShippingThreshold(parsed.freeShippingThreshold || "100,000");
+            setBasicShippingFee(parsed.basicShippingFee || "3,000");
+          } catch (e) {
+            console.error(e);
+          }
+        }
       }
     };
 
@@ -815,6 +846,19 @@ export default function AdminPage() {
       localStorage.setItem("120_notices", JSON.stringify(updated));
       triggerToast("공지사항이 정상적으로 삭제되었습니다.");
     }
+  };
+
+  const handleSaveShippingSettings = (e: React.FormEvent) => {
+    e.preventDefault();
+    const settings = {
+      shippingPolicy,
+      returnPolicy,
+      freeShippingThreshold,
+      basicShippingFee
+    };
+    localStorage.setItem("120_shipping_settings", JSON.stringify(settings));
+    triggerToast("배송 및 반품 정책 설정이 저장되었습니다.");
+    setShowPolicyPanel(false);
   };
 
   // ==========================================
@@ -2365,6 +2409,7 @@ export default function AdminPage() {
                     onClick={() => {
                       setShowCategoryPanel(!showCategoryPanel);
                       setShowLabelPanel(false);
+                      setShowPolicyPanel(false);
                     }}
                     className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-[#bf3e67] text-xs font-bold rounded-lg transition-all shadow-sm"
                   >
@@ -2374,10 +2419,22 @@ export default function AdminPage() {
                     onClick={() => {
                       setShowLabelPanel(!showLabelPanel);
                       setShowCategoryPanel(false);
+                      setShowPolicyPanel(false);
                     }}
                     className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-[#bf3e67] text-xs font-bold rounded-lg transition-all shadow-sm"
                   >
                     라벨 관리
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowPolicyPanel(!showPolicyPanel);
+                      setShowCategoryPanel(false);
+                      setShowLabelPanel(false);
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-[#bf3e67] text-xs font-bold rounded-lg transition-all shadow-sm"
+                  >
+                    <Truck size={14} />
+                    배송/반품 설정
                   </button>
                   <button
                     onClick={() => handleOpenProductModal()}
@@ -2388,6 +2445,98 @@ export default function AdminPage() {
                   </button>
                 </div>
               </div>
+
+              {/* Shipping and Return Policy Panel */}
+              {showPolicyPanel && (
+                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 shadow-sm space-y-4 animate-fadeIn">
+                  <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-3">
+                    <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-1.5">
+                      <Truck size={16} className="text-[#f25f8a]" />
+                      <span>🚚 배송비 정책 및 반품안내 설정</span>
+                    </h3>
+                    <button 
+                      onClick={() => setShowPolicyPanel(false)}
+                      className="text-xs text-[#735965] hover:text-[#f25f8a] font-bold"
+                    >
+                      닫기
+                    </button>
+                  </div>
+                  <form onSubmit={handleSaveShippingSettings} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965] block">무료 배송 기준 금액 (원)</label>
+                        <input 
+                          type="text"
+                          placeholder="e.g. 100,000"
+                          value={freeShippingThreshold}
+                          onChange={(e) => {
+                            let val = e.target.value.replace(/[^0-9]/g, "");
+                            if (val) val = Number(val).toLocaleString();
+                            setFreeShippingThreshold(val);
+                          }}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965] block">기본 배송비 (원)</label>
+                        <input 
+                          type="text"
+                          placeholder="e.g. 3,000"
+                          value={basicShippingFee}
+                          onChange={(e) => {
+                            let val = e.target.value.replace(/[^0-9]/g, "");
+                            if (val) val = Number(val).toLocaleString();
+                            setBasicShippingFee(val);
+                          }}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965] block">배송비 정책 안내 설명 문구</label>
+                      <textarea
+                        rows={3}
+                        placeholder="가맹 발주몰에 노출될 배송비 정책을 친절하게 입력해 주세요."
+                        value={shippingPolicy}
+                        onChange={(e) => setShippingPolicy(e.target.value)}
+                        required
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] resize-none"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-[#735965] block">반품 및 교환 안내 설명 문구</label>
+                      <textarea
+                        rows={3}
+                        placeholder="반품 접수 기한, 파손 보상 등 반품 및 교환 규정을 자세히 명시해 주세요."
+                        value={returnPolicy}
+                        onChange={(e) => setReturnPolicy(e.target.value)}
+                        required
+                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] resize-none"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-[#f2ccd7]/30">
+                      <button
+                        type="button"
+                        onClick={() => setShowPolicyPanel(false)}
+                        className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-[#735965] font-bold text-xs rounded-xl transition-all"
+                      >
+                        취소
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-5 py-2 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm"
+                      >
+                        설정 저장하기
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
 
               {/* Real-time Label Panel */}
               {showLabelPanel && (
