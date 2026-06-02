@@ -42,6 +42,24 @@ export const createOrUpdate = mutation({
 
     const { ...fields } = args;
 
+    // 새로운 카테고리가 등록될 때 productCategories 테이블에 자동 추가하여 동기화
+    const categoryName = args.category.trim();
+    if (categoryName) {
+      const catList = await ctx.db.query("productCategories").collect();
+      if (catList.length > 0) {
+        const currentCats = catList[0].categories;
+        if (!currentCats.includes(categoryName)) {
+          await ctx.db.patch(catList[0]._id, {
+            categories: [...currentCats, categoryName]
+          });
+        }
+      } else {
+        await ctx.db.insert("productCategories", {
+          categories: [categoryName]
+        });
+      }
+    }
+
     if (existing) {
       await ctx.db.patch(existing._id, fields);
       return existing._id;
@@ -109,6 +127,24 @@ export const syncProducts = mutation({
         shippingType: p.shippingType,
         options: p.options,
       };
+
+      // 새로운 카테고리가 등록될 때 productCategories 테이블에 자동 추가하여 동기화
+      const categoryName = p.category.trim();
+      if (categoryName) {
+        const catList = await ctx.db.query("productCategories").collect();
+        if (catList.length > 0) {
+          const currentCats = catList[0].categories;
+          if (!currentCats.includes(categoryName)) {
+            await ctx.db.patch(catList[0]._id, {
+              categories: [...currentCats, categoryName]
+            });
+          }
+        } else {
+          await ctx.db.insert("productCategories", {
+            categories: [categoryName]
+          });
+        }
+      }
 
       if (existing) {
         await ctx.db.patch(existing._id, fields);

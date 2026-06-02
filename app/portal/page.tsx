@@ -458,18 +458,6 @@ export default function PortalPage() {
     }
   }, [convexProducts]);
 
-  // Sync Convex productCategories to React state and localStorage
-  useEffect(() => {
-    if (convexProductCategories !== undefined && convexProductCategories !== null) {
-      setCategories(convexProductCategories);
-      try {
-        localStorage.setItem("120_categories", JSON.stringify(convexProductCategories));
-      } catch (e) {
-        console.warn(e);
-      }
-    }
-  }, [convexProductCategories]);
-
   // Query actual Korean courier tracking API network in real-time
   useEffect(() => {
     if (!trackingInfo || !trackingModalOpen) {
