@@ -247,9 +247,10 @@ const DEFAULT_PRODUCTS: Product[] = [
     qty: 60,
     supplyPrice: 35000,
     price: 45000,
-    discountAmount: 0,
-    discountedPrice: 45000,
+    discountAmount: 3000,
+    discountedPrice: 42000,
     img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg",
+    detailImg: "",
     isActive: true,
     desc: "육즙 가득 미트소스와 로제 크림이 가미된 시그니처 대표 생지",
     stock: "in_stock"
@@ -267,6 +268,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     discountAmount: 0,
     discountedPrice: 42000,
     img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_yurkh5.jpg",
+    detailImg: "",
     isActive: true,
     desc: "달콤 상큼한 사과 과육과 시나몬 아로마가 어우러진 스테디셀러 디저트 생지",
     stock: "in_stock"
@@ -281,9 +283,10 @@ const DEFAULT_PRODUCTS: Product[] = [
     qty: 60,
     supplyPrice: 33000,
     price: 43000,
-    discountAmount: 0,
-    discountedPrice: 43000,
+    discountAmount: 1000,
+    discountedPrice: 42000,
     img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_qvb2u5.jpg",
+    detailImg: "",
     isActive: true,
     desc: "고소한 스위트콘 and 부드러운 치즈가 조합된 남녀노소 취향저격 생지",
     stock: "low_stock"
@@ -301,6 +304,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     discountAmount: 0,
     discountedPrice: 21000,
     img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg",
+    detailImg: "",
     isActive: true,
     desc: "에그120 전용 100% 국산 쌀가루 계란빵 전용 반죽 파우더 믹스",
     stock: "in_stock"
@@ -315,9 +319,10 @@ const DEFAULT_PRODUCTS: Product[] = [
     qty: 100,
     supplyPrice: 29000,
     price: 38000,
-    discountAmount: 0,
-    discountedPrice: 38000,
+    discountAmount: 2000,
+    discountedPrice: 36000,
     img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762878/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_koyjlk.jpg",
+    detailImg: "",
     isActive: true,
     desc: "기름 없이 오븐 조리가 가능한 바삭하고 쫀득한 츄러스 전용 냉동 생지",
     stock: "in_stock"
@@ -325,72 +330,21 @@ const DEFAULT_PRODUCTS: Product[] = [
   {
     id: "prod-6",
     orderIndex: 6,
-    name: "시그니처 테이크아웃 컵 16oz",
+    name: "[홍보물] 매장용 양면 포스터 및 스티커",
     category: "부자재/포장재",
-    modelName: "PR-CUP-01",
-    unit: "박스",
-    qty: 500,
-    supplyPrice: 22000,
-    price: 28000,
+    modelName: "PR-POSTER-01",
+    unit: "개",
+    qty: 1,
+    supplyPrice: 4000,
+    price: 5000,
     discountAmount: 0,
-    discountedPrice: 28000,
-    img: "/logo_yellow_blue.png",
+    discountedPrice: 5000,
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779718433/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_xk9fhi.jpg",
+    detailImg: "",
     isActive: true,
-    desc: "120pie & coffee 브랜드 전용 친환경 로고 인쇄 테이크아웃 컵",
-    stock: "in_stock"
-  },
-  {
-    id: "prod-7",
-    orderIndex: 7,
-    name: "에그120 캐릭터 포장 박스",
-    category: "부자재/포장재",
-    modelName: "EG-BOX-01",
-    unit: "박스",
-    qty: 200,
-    supplyPrice: 14000,
-    price: 18000,
-    discountAmount: 0,
-    discountedPrice: 18000,
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761728/%EC%8A%88%ED%81%AC%EB%A6%BC_gbhnz2.jpg",
-    isActive: true,
-    desc: "귀여운 에그군 캐릭터 일러스트가 프린팅된 고품격 시각 보강 포장 패키지",
+    desc: "120pie 브랜드 컬러의 매장 유리창 부착용 홍보 포스터 세트",
     stock: "in_stock",
-    options: ["대형 박스", "중형 박스", "소형 박스"]
-  },
-  {
-    id: "prod-8",
-    orderIndex: 8,
-    name: "에그군 캐릭터 자석 스티커",
-    category: "부자재/포장재",
-    modelName: "EG-STICKER-01",
-    unit: "개",
-    qty: 500,
-    supplyPrice: 7000,
-    price: 9000,
-    discountAmount: 0,
-    discountedPrice: 9000,
-    img: "/logo_yellow_blue.png",
-    isActive: true,
-    desc: "음료 및 파이 포장 봉투 부착용 원형 에그군 밀봉 스티커",
-    stock: "low_stock",
-    options: ["5cm 원형 스티커", "7cm 사각 스티커"]
-  },
-  {
-    id: "prod-9",
-    orderIndex: 9,
-    name: "전용 타이머 영수 가열지",
-    category: "소모품/집기",
-    modelName: "TM-PAPER-01",
-    unit: "개",
-    qty: 10,
-    supplyPrice: 9000,
-    price: 12000,
-    discountAmount: 0,
-    discountedPrice: 12000,
-    img: "/logo_yellow_blue.png",
-    isActive: true,
-    desc: "본사 제공 전용 가열 타이머 기기에 매칭되는 표준 감열 롤 용지",
-    stock: "in_stock"
+    options: ["A4 사이즈 포스터", "A3 사이즈 포스터", "카운터용 미니 스티커 5매"]
   }
 ];
 
@@ -874,7 +828,16 @@ export default function AdminPage() {
       // Seeds
       const st = loadState("120_stores", DEFAULT_STORES);
       setStores(st);
-      const pr = loadState("120_products", DEFAULT_PRODUCTS);
+      
+      let pr = loadState("120_products", DEFAULT_PRODUCTS);
+      // Self-healing: If bad seeds are detected, force rollback to default 6 products
+      const hasBadSeed = pr.some((p: any) => p.id === "prod-7" || (p.id === "prod-6" && p.name === "시그니처 테이크아웃 컵 16oz"));
+      if (hasBadSeed) {
+        console.log("[Self-healing] Bad seed detected. Restoring original customized product seed data...");
+        pr = DEFAULT_PRODUCTS;
+        localStorage.setItem("120_products", JSON.stringify(DEFAULT_PRODUCTS));
+      }
+
       // Self-healing: Merge options and ensure missing seed products are injected
       const healedPr = pr.map((p: any) => {
         const defaultMatch = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id);

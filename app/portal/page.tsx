@@ -109,7 +109,7 @@ const INITIAL_PRODUCTS: Product[] = [
     id: "prod-1",
     name: "로제미트파이 생지",
     category: "냉동생지/자재",
-    price: 45000,
+    price: 42000,
     packSize: "1박스 (60개입)",
     img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg",
     stock: "in_stock",
@@ -123,13 +123,13 @@ const INITIAL_PRODUCTS: Product[] = [
     packSize: "1박스 (60개입)",
     img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_yurkh5.jpg",
     stock: "in_stock",
-    desc: "달콤 상큼한 사과 과육과 시나몬 아로마가 어우러진 스테디셀러 디저트 생지"
+    desc: "달콤 상큼한 사과 과육 and 시나몬 아로마가 어우러진 스테디셀러 디저트 생지"
   },
   {
     id: "prod-3",
     name: "콘치즈파이 생지",
     category: "냉동생지/자재",
-    price: 43000,
+    price: 42000,
     packSize: "1박스 (60개입)",
     img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_qvb2u5.jpg",
     stock: "low_stock",
@@ -149,7 +149,7 @@ const INITIAL_PRODUCTS: Product[] = [
     id: "prod-5",
     name: "츄러스 전용 냉동생지",
     category: "냉동생지/자재",
-    price: 38000,
+    price: 36000,
     packSize: "1박스 (100개입)",
     img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762878/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_koyjlk.jpg",
     stock: "in_stock",
@@ -157,45 +157,14 @@ const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: "prod-6",
-    name: "시그니처 테이크아웃 컵 16oz",
+    name: "[홍보물] 매장용 양면 포스터 및 스티커",
     category: "부자재/포장재",
-    price: 28000,
-    packSize: "1박스 (500개입)",
-    img: "/logo_yellow_blue.png",
+    price: 5000,
+    packSize: "1개 (1개입)",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779718433/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_xk9fhi.jpg",
     stock: "in_stock",
-    desc: "120pie & coffee 브랜드 전용 친환경 로고 인쇄 테이크아웃 컵"
-  },
-  {
-    id: "prod-7",
-    name: "에그120 캐릭터 포장 박스",
-    category: "부자재/포장재",
-    price: 18000,
-    packSize: "1박스 (200개입)",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761728/%EC%8A%88%ED%81%AC%EB%A6%BC_gbhnz2.jpg",
-    stock: "in_stock",
-    desc: "귀여운 에그군 캐릭터 일러스트가 프린팅된 고품격 시각 보강 포장 패키지",
-    options: ["대형 박스", "중형 박스", "소형 박스"]
-  },
-  {
-    id: "prod-8",
-    name: "에그군 캐릭터 자석 스티커",
-    category: "부자재/포장재",
-    price: 9000,
-    packSize: "1팩 (500매)",
-    img: "/logo_yellow_blue.png",
-    stock: "low_stock",
-    desc: "음료 및 파이 포장 봉투 부착용 원형 에그군 밀봉 스티커",
-    options: ["5cm 원형 스티커", "7cm 사각 스티커"]
-  },
-  {
-    id: "prod-9",
-    name: "전용 타이머 영수 가열지",
-    category: "소모품/집기",
-    price: 12000,
-    packSize: "1팩 (10롤)",
-    img: "/logo_yellow_blue.png",
-    stock: "in_stock",
-    desc: "본사 제공 전용 가열 타이머 기기에 매칭되는 표준 감열 롤 용지"
+    desc: "120pie 브랜드 컬러의 매장 유리창 부착용 홍보 포스터 세트",
+    options: ["A4 사이즈 포스터", "A3 사이즈 포스터", "카운터용 미니 스티커 5매"]
   }
 ];
 
@@ -530,7 +499,14 @@ export default function PortalPage() {
       // Popup & Floating values are dynamically synced in real-time via Convex below.
 
 
-      const pr = loadState("120_products", INITIAL_PRODUCTS);
+      let pr = loadState("120_products", INITIAL_PRODUCTS);
+      // Self-healing: If bad seeds are detected, force rollback to default 6 products
+      const hasBadSeed = pr.some((p: any) => p.id === "prod-7" || (p.id === "prod-6" && p.name === "시그니처 테이크아웃 컵 16oz"));
+      if (hasBadSeed) {
+        console.log("[Self-healing] Bad seed detected. Restoring original customized product seed data...");
+        pr = INITIAL_PRODUCTS;
+        localStorage.setItem("120_products", JSON.stringify(INITIAL_PRODUCTS));
+      }
       // Self-healing: Merge options and ensure missing seed products are injected
       const healedPr = pr.map((p: any) => {
         const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id) as any;
@@ -643,7 +619,15 @@ export default function PortalPage() {
         const pr = localStorage.getItem("120_products");
         if (pr) {
           try {
-            const parsedProducts = JSON.parse(pr);
+            let parsedProducts = JSON.parse(pr);
+            // Self-healing: If bad seeds are detected, force rollback to default 6 products in polling loop
+            const hasBadSeed = parsedProducts.some((p: any) => p.id === "prod-7" || (p.id === "prod-6" && p.name === "시그니처 테이크아웃 컵 16oz"));
+            if (hasBadSeed) {
+              console.log("[Self-healing] Bad seed detected in storage poll. Restoring original customized product seed data...");
+              parsedProducts = INITIAL_PRODUCTS;
+              localStorage.setItem("120_products", JSON.stringify(INITIAL_PRODUCTS));
+            }
+
             const mapped = parsedProducts.map((p: any) => {
               const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id) as any;
               const healedPrice = typeof p.price === "number" ? p.price : (initialMatch?.price || 0);
