@@ -66,7 +66,7 @@ interface Product {
   name: string; // 제품명
   category: string; // 카테고리
   modelName: string; // 모델명
-  unit: "개" | "박스" | "kg"; // 단위
+  unit: "개" | "박스" | "kg" | "SET"; // 단위
   qty: number; // 수량
   supplyPrice: number; // 공급가
   price: number; // 판매가
@@ -553,7 +553,7 @@ export default function AdminPage() {
   const [productCategory, setProductCategory] = useState<string>("");
   const [productName, setProductName] = useState<string>("");
   const [productModelName, setProductModelName] = useState<string>("");
-  const [productUnit, setProductUnit] = useState<"개" | "박스" | "kg">("박스");
+  const [productUnit, setProductUnit] = useState<"개" | "박스" | "kg" | "SET">("박스");
   const [productQty, setProductQty] = useState<number>(1);
   const [productSupplyPrice, setProductSupplyPrice] = useState<string>("0");
   const [productPrice, setProductPrice] = useState<string>("0");
@@ -4924,6 +4924,7 @@ export default function AdminPage() {
                       <option value="개">개</option>
                       <option value="박스">박스</option>
                       <option value="kg">kg</option>
+                      <option value="SET">SET</option>
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
