@@ -482,6 +482,7 @@ export default function PortalPage() {
         desc: p.desc || "",
         orderIndex: p.orderIndex || 99,
         labels: p.labels || []
+      })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
       setProducts(mapped);
 
       const policySettings = loadState("120_shipping_settings", {
