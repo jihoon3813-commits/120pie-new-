@@ -1355,16 +1355,16 @@ export default function AdminPage() {
         let width = img.width;
         let height = img.height;
 
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
+        let ratio = 1;
+        if (width > maxWidth) {
+          ratio = maxWidth / width;
+        }
+        if (height * ratio > maxHeight) {
+          ratio = maxHeight / height;
+        }
+        if (ratio < 1) {
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
         }
 
         canvas.width = width;
@@ -1855,7 +1855,7 @@ export default function AdminPage() {
     reader.onloadend = async () => {
       if (typeof reader.result === "string") {
         try {
-          const compressed = await compressImage(reader.result, 1200, 1200, 0.7);
+          const compressed = await compressImage(reader.result, 1200, 8000, 0.85);
           setProductDetailImg(compressed);
         } catch (err) {
           console.error("Product detail image compression error:", err);
