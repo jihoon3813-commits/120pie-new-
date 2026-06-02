@@ -45,4 +45,19 @@ export default defineSchema({
   galleryCategories: defineTable({
     categories: v.array(v.string()),
   }),
+  stores: defineTable({
+    id: v.string(), // 로그인 ID (e.g. store1)
+    pw: v.string(), // 비밀번호
+    pwConfirm: v.string(), // 비밀번호 확인
+    name: v.string(), // 가맹점명
+    owner: v.string(), // 점주명
+    phone: v.string(), // 연락처
+    status: v.string(), // 가맹상태 ("승인" | "대기" | "보류" | "중지" | "취소")
+    roadAddress: v.string(), // 도로명주소
+    detailAddress: v.string(), // 상세주소
+    regDate: v.string(), // 가맹 등록일 (YYYY-MM-DD)
+    cancelDate: v.optional(v.string()), // 가맹 해지일
+    adoptionMenu: v.array(v.string()), // 도입 메뉴 브랜드 배열
+    monthlySales: v.number(), // 월매출
+  }),
 });

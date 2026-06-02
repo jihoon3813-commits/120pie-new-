@@ -12,6 +12,7 @@ import type * as floatings from "../floatings.js";
 import type * as gallery from "../gallery.js";
 import type * as inquiries from "../inquiries.js";
 import type * as popups from "../popups.js";
+import type * as stores from "../stores.js";
 
 import type {
   ApiFromModules,
@@ -24,6 +25,7 @@ declare const fullApi: ApiFromModules<{
   gallery: typeof gallery;
   inquiries: typeof inquiries;
   popups: typeof popups;
+  stores: typeof stores;
 }>;
 
 /**

@@ -544,6 +544,25 @@ export default function AdminPage() {
   const convexGalleryCategories = useQuery(api.gallery.getCategories);
   const updateCategoriesMutation = useMutation(api.gallery.updateCategories);
 
+  // Stores Convex Hooks
+  const convexStores = useQuery(api.stores.get);
+  const saveStoreMutation = useMutation(api.stores.createOrUpdate);
+  const deleteStoreMutation = useMutation(api.stores.deleteStore);
+  const seedStoresMutation = useMutation(api.stores.seedStores);
+
+  useEffect(() => {
+    if (convexStores) {
+      if (convexStores.length === 0) {
+        seedStoresMutation().then(() => {
+          console.log("[Convex] Seed stores completed.");
+        });
+      } else {
+        setStores(convexStores as any[]);
+        localStorage.setItem("120_stores", JSON.stringify(convexStores));
+      }
+    }
+  }, [convexStores, seedStoresMutation]);
+
   useEffect(() => {
     if (convexPopup) {
       setPopupActive(convexPopup.isActive);
@@ -1295,6 +1314,27 @@ export default function AdminPage() {
       triggerToast(`신규 가맹점 '${storeName}'이 성공적으로 등록되었습니다.`);
     }
 
+    // Save to Convex Cloud DB
+    saveStoreMutation({
+      id: storeLoginId,
+      pw: storePw,
+      pwConfirm: storePwConfirm,
+      name: storeName,
+      owner: storeOwner,
+      phone: storePhone,
+      status: storeStatus,
+      roadAddress: storeRoadAddress,
+      detailAddress: storeDetailAddress,
+      regDate: storeRegDate || new Date().toISOString().split("T")[0],
+      cancelDate: storeCancelDate || undefined,
+      adoptionMenu: storeAdoptionMenu,
+      monthlySales: selectedStore ? selectedStore.monthlySales : 0
+    }).then(() => {
+      console.log("[Convex] Store created/updated successfully.");
+    }).catch((err) => {
+      console.error("[Convex] Failed to save store:", err);
+    });
+
     setStores(updatedStores);
     localStorage.setItem("120_stores", JSON.stringify(updatedStores));
     setShowStoreModal(false);
@@ -1304,9 +1344,68 @@ export default function AdminPage() {
   const handleDeleteStore = (storeId: string) => {
     if (confirm("정말 이 가맹점 정보를 삭제하시겠습니까? 관련 데이터가 초기화됩니다.")) {
       const updated = stores.filter((s) => s.id !== storeId);
+      
+      // Delete from Convex Cloud DB
+      deleteStoreMutation({ id: storeId }).then(() => {
+        console.log("[Convex] Store deleted successfully.");
+      }).catch((err) => {
+        console.error("[Convex] Failed to delete store:", err);
+      });
+
       setStores(updated);
       localStorage.setItem("120_stores", JSON.stringify(updated));
       triggerToast("가맹점 정보가 삭제되었습니다.");
+    }
+  };
+
+  // Real Road Address Search using Daum/Kakao Postcode API
+  const openDaumPostcode = () => {
+    if (typeof window !== "undefined") {
+      const scriptId = "daum-postcode-script";
+      let script = document.getElementById(scriptId) as HTMLScriptElement | null;
+      
+      const startPostcode = () => {
+        new (window as any).daum.Postcode({
+          oncomplete: (data: any) => {
+            let fullRoadAddr = data.roadAddress; // 도로명 주소 변수
+            let extraRoadAddr = ''; // 참고항목 변수
+
+            // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+            // 법정동의 경우 마지막 문자가 "동/로/가"로 끝납니다.
+            if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+              extraRoadAddr += data.bname;
+            }
+            // 건물명이 있고, 공동주택일 경우 추가한다.
+            if (data.buildingName !== '') {
+              extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+            }
+            // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+            if (extraRoadAddr !== '') {
+              extraRoadAddr = ' (' + extraRoadAddr + ')';
+            }
+
+            // 도로명 주소 뒤에 참고항목(괄호)까지 통째로 붙여서 세팅
+            const finalAddress = fullRoadAddr + extraRoadAddr;
+            setStoreRoadAddress(finalAddress);
+            
+            setShowAddressPopup(false);
+            triggerToast("실제 도로명 주소(상사/괄호 주소 포함)가 성공적으로 자동 입력되었습니다.");
+          }
+        }).open();
+      };
+
+      if (!script) {
+        script = document.createElement("script");
+        script.id = scriptId;
+        script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+        script.async = true;
+        script.onload = () => {
+          startPostcode();
+        };
+        document.head.appendChild(script);
+      } else {
+        startPostcode();
+      }
     }
   };
 
@@ -5017,11 +5116,7 @@ export default function AdminPage() {
                   />
                   <button
                     type="button"
-                    onClick={() => {
-                      setAddressSearchKeyword("");
-                      setAddressSearchResults([]);
-                      setShowAddressPopup(true);
-                    }}
+                    onClick={openDaumPostcode}
                     className="px-4 py-3 bg-[#bf3e67] hover:bg-[#a63053] text-white text-xs font-bold rounded-xl transition-all"
                   >
                     주소 검색
@@ -5092,6 +5187,22 @@ export default function AdminPage() {
             </div>
 
             <div className="p-5 space-y-4">
+              {/* 실제 도로명 주소 검색 (우편번호 서비스) 연동 버튼 */}
+              <button
+                type="button"
+                onClick={openDaumPostcode}
+                className="w-full py-3.5 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 border border-[#f25f8a]/20 hover:scale-[1.01]"
+              >
+                <Search size={14} className="animate-pulse" />
+                실제 도로명 주소 실시간 검색 (Kakao API)
+              </button>
+
+              <div className="flex items-center gap-2 my-2">
+                <div className="flex-1 h-[1px] bg-[#f2ccd7]/40"></div>
+                <span className="text-[10px] font-bold text-[#735965]/60">또는 모의 시뮬레이터 이용</span>
+                <div className="flex-1 h-[1px] bg-[#f2ccd7]/40"></div>
+              </div>
+
               <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
                 가맹본부 제공 정식 도로명 주소를 모의 검색해 볼 수 있습니다. (예시: '군포', '역삼', '동교', '부산' 등)
               </p>

@@ -295,9 +295,10 @@ const INITIAL_PR: Material[] = [
 ];
 
 export default function PortalPage() {
-  // Convex Hooks for Popups & Floatings
+  // Convex Hooks for Popups, Floatings, and Stores
   const convexPopup = useQuery(api.popups.get);
   const convexFloating = useQuery(api.floatings.get);
+  const convexStores = useQuery(api.stores.get);
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
@@ -315,23 +316,23 @@ export default function PortalPage() {
     }
   }, []);
 
+  // Sync Convex stores to React state and localStorage
+  useEffect(() => {
+    if (convexStores) {
+      setStores(convexStores as any[]);
+      localStorage.setItem("120_stores", JSON.stringify(convexStores));
+    }
+  }, [convexStores]);
+
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(null);
 
-    // Read from localStorage to support dynamic stores
-    const storedStoresRaw = localStorage.getItem("120_stores");
-    let storedStores = [];
-    if (storedStoresRaw) {
-      try {
-        storedStores = JSON.parse(storedStoresRaw);
-      } catch (err) {
-        console.error(err);
-      }
-    }
+    // Dynamic store lookup prioritizing real-time Convex DB data
+    const activeStoresList = convexStores || stores || [];
 
     const isHardcodedOwner = loginId === "owner" && loginPw === "owner";
-    const matchedStore = storedStores.find(
+    const matchedStore = activeStoresList.find(
       (s: any) => s.id === loginId && s.pw === loginPw
     );
 
