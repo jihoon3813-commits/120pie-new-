@@ -80,6 +80,7 @@ interface Product {
   stock: "in_stock" | "low_stock" | "out_of_stock"; // 재고상태 호환용
   labels?: string[]; // 라벨 (e.g. ["BEST", "추천", "신제품"])
   shippingType?: "free" | "A" | "B" | "C"; // 배송 정책 구분 (무료, A, B, C)
+  options?: string[]; // 제품 선택 옵션 (홍보물 등)
 }
 
 interface BannerSettings {
@@ -549,6 +550,8 @@ export default function AdminPage() {
   // 2. PRODUCT MANAGEMENT STATES
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showProductModal, setShowProductModal] = useState<boolean>(false);
+  const [productOptions, setProductOptions] = useState<string[]>([]);
+  const [newProductOption, setNewProductOption] = useState<string>("");
 
   // Product form fields
   const [productCategory, setProductCategory] = useState<string>("");
@@ -1138,6 +1141,8 @@ export default function AdminPage() {
       setProductIsActive(prod.isActive);
       setProductLabels(prod.labels || []);
       setProductShippingType(prod.shippingType || "A");
+      setProductOptions(prod.options || []);
+      setNewProductOption("");
 
       // Load rich editor content on microtask
       setTimeout(() => {
@@ -1162,6 +1167,8 @@ export default function AdminPage() {
       setProductIsActive(true);
       setProductLabels([]);
       setProductShippingType("A");
+      setProductOptions([]);
+      setNewProductOption("");
 
       // Reset rich editor content on microtask
       setTimeout(() => {
@@ -1206,7 +1213,8 @@ export default function AdminPage() {
       desc: `${productModelName} - ${productCategory} 표준 규격`,
       stock: "in_stock",
       labels: productLabels,
-      shippingType: productShippingType
+      shippingType: productShippingType,
+      options: productOptions.length > 0 ? productOptions : undefined
     };
 
     let updatedProducts: Product[];
@@ -5258,6 +5266,73 @@ export default function AdminPage() {
                       );
                     })}
                   </div>
+                )}
+              </div>
+
+              {/* Product Options Management */}
+              <div className="space-y-2 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl">
+                <label className="font-bold text-[#2d2026] block">제품 옵션 설정 (홍보물 등 옵션 선택이 필요한 품목)</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="예시) A4 사이즈, A3 사이즈, 블랙, 화이트 등"
+                    value={newProductOption}
+                    onChange={(e) => setNewProductOption(e.target.value)}
+                    className="flex-1 bg-white border border-[#f2ccd7]/60 rounded-xl px-4 py-2.5 text-xs text-[#2d2026] focus:outline-none"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (newProductOption.trim()) {
+                          if (productOptions.includes(newProductOption.trim())) {
+                            alert("이미 추가된 옵션입니다.");
+                            return;
+                          }
+                          setProductOptions([...productOptions, newProductOption.trim()]);
+                          setNewProductOption("");
+                        }
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newProductOption.trim()) {
+                        if (productOptions.includes(newProductOption.trim())) {
+                          alert("이미 추가된 옵션입니다.");
+                          return;
+                        }
+                        setProductOptions([...productOptions, newProductOption.trim()]);
+                        setNewProductOption("");
+                      }
+                    }}
+                    className="px-4 py-2.5 bg-[#ffd3df] hover:bg-[#ffd3df]/80 text-[#bf3e67] font-bold text-xs rounded-xl transition-all"
+                  >
+                    추가
+                  </button>
+                </div>
+                
+                {productOptions.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 pt-2">
+                    {productOptions.map((opt, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#fff1f5] border border-[#f2ccd7] text-[10px] sm:text-xs font-bold text-[#bf3e67]"
+                      >
+                        {opt}
+                        <button
+                          type="button"
+                          onClick={() => setProductOptions(productOptions.filter((_, i) => i !== idx))}
+                          className="hover:text-red-500 font-bold focus:outline-none ml-1 text-[10px] w-3 h-3 flex items-center justify-center rounded-full bg-[#ffd3df]/50"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[10px] text-[#735965]/60 mt-1">
+                    * 등록된 옵션이 없습니다. 옵션이 필요 없는 제품은 비워두세요.
+                  </p>
                 )}
               </div>
 

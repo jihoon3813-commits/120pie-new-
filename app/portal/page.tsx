@@ -51,10 +51,12 @@ interface Product {
   desc: string;
   labels?: string[];
   shippingType?: "free" | "A" | "B" | "C";
+  options?: string[]; // 추가된 제품 선택 옵션 필드
 }
 
 interface CartItem {
   productId: string;
+  selectedOption?: string; // 선택된 옵션 필드 추가
   quantity: number;
 }
 
@@ -378,6 +380,11 @@ export default function PortalPage() {
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [selectedProductDetail, setSelectedProductDetail] = useState<any | null>(null);
+  const [selectedProductOption, setSelectedProductOption] = useState<string>("");
+
+  useEffect(() => {
+    setSelectedProductOption("");
+  }, [selectedProductDetail]);
 
   // Order page category tab
   const [activeCategory, setActiveCategory] = useState<string>("전체");
@@ -487,7 +494,8 @@ export default function PortalPage() {
         desc: p.desc || "",
         orderIndex: p.orderIndex || 99,
         labels: p.labels || [],
-        shippingType: p.shippingType || "A"
+        shippingType: p.shippingType || "A",
+        options: p.options || []
       })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
       setProducts(mapped);
 
@@ -562,7 +570,8 @@ export default function PortalPage() {
               desc: p.desc || "",
               orderIndex: p.orderIndex || 99,
               labels: p.labels || [],
-              shippingType: p.shippingType || "A"
+              shippingType: p.shippingType || "A",
+              options: p.options || []
             })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
             setProducts(mapped);
           } catch (e) {
@@ -608,37 +617,45 @@ export default function PortalPage() {
   // ==========================================
   // CART ACTIONS
   // ==========================================
-  const addToCart = (productId: string) => {
+  const addToCart = (productId: string, selectedOption?: string) => {
     setCart((prev) => {
-      const existing = prev.find((item) => item.productId === productId);
+      const existing = prev.find(
+        (item) => item.productId === productId && item.selectedOption === selectedOption
+      );
       if (existing) {
         triggerToast("장바구니 품목 수량을 1개 추가했습니다.");
         return prev.map((item) =>
-          item.productId === productId
+          item.productId === productId && item.selectedOption === selectedOption
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
       triggerToast("상품을 장바구니에 담았습니다.");
-      return [...prev, { productId, quantity: 1 }];
+      return [...prev, { productId, selectedOption, quantity: 1 }];
     });
   };
 
-  const updateCartQty = (productId: string, qty: number) => {
+  const updateCartQty = (productId: string, selectedOption: string | undefined, qty: number) => {
     if (qty <= 0) {
-      setCart((prev) => prev.filter((item) => item.productId !== productId));
+      setCart((prev) =>
+        prev.filter((item) => !(item.productId === productId && item.selectedOption === selectedOption))
+      );
       triggerToast("품목을 장바구니에서 삭제했습니다.");
       return;
     }
     setCart((prev) =>
       prev.map((item) =>
-        item.productId === productId ? { ...item, quantity: qty } : item
+        item.productId === productId && item.selectedOption === selectedOption
+          ? { ...item, quantity: qty }
+          : item
       )
     );
   };
 
-  const removeCartItem = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.productId !== productId));
+  const removeCartItem = (productId: string, selectedOption?: string) => {
+    setCart((prev) =>
+      prev.filter((item) => !(item.productId === productId && item.selectedOption === selectedOption))
+    );
     triggerToast("품목을 장바구니에서 삭제했습니다.");
   };
 
@@ -710,7 +727,9 @@ export default function PortalPage() {
     const newOrderItems = cart.map((item) => {
       const p = products.find((prod) => prod.id === item.productId);
       return {
-        productName: p ? p.name : "미지 상품",
+        productName: p 
+          ? (item.selectedOption ? `${p.name} [옵션: ${item.selectedOption}]` : p.name) 
+          : "미지 상품",
         quantity: item.quantity,
         price: p ? p.price : 0
       };
@@ -1521,17 +1540,27 @@ export default function PortalPage() {
                           <div className="flex items-center justify-between mt-5 border-t border-[#f2ccd7]/60 pt-4">
                             <strong className="text-base text-[#2d2026] font-black">{p.price.toLocaleString()} 원</strong>
                             
-                            {cartQty > 0 ? (
+                            {p.options && p.options.length > 0 ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedProductDetail(p);
+                                }}
+                                className="px-4 py-2 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold transition-all shadow-sm"
+                              >
+                                옵션 선택
+                              </button>
+                            ) : cartQty > 0 ? (
                               <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-lg p-0.5" onClick={(e) => e.stopPropagation()}>
                                 <button 
-                                  onClick={() => updateCartQty(p.id, cartQty - 1)}
+                                  onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
                                   className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
                                 >
                                   <Minus size={14} />
                                 </button>
                                 <span className="px-3 text-xs font-bold text-[#2d2026] w-6 text-center">{cartQty}</span>
                                 <button 
-                                  onClick={() => updateCartQty(p.id, cartQty + 1)}
+                                  onClick={() => updateCartQty(p.id, undefined, cartQty + 1)}
                                   className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
                                 >
                                   <Plus size={14} />
@@ -1587,22 +1616,29 @@ export default function PortalPage() {
                           const p = products.find((prod) => prod.id === item.productId);
                           if (!p) return null;
                           return (
-                            <div key={item.productId} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7] p-3 rounded-xl">
+                            <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7] p-3 rounded-xl">
                               <img src={p.img} alt="" className="w-12 h-12 rounded-lg object-cover shrink-0" />
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-xs text-[#2d2026] truncate">{p.name}</h4>
+                                <h4 className="font-bold text-xs text-[#2d2026] truncate">
+                                  {p.name}
+                                  {item.selectedOption && (
+                                    <span className="text-[9px] text-[#bf3e67] bg-[#ffd3df] px-1.5 py-0.5 rounded ml-1.5 font-black shrink-0">
+                                      {item.selectedOption}
+                                    </span>
+                                  )}
+                                </h4>
                                 <span className="text-[10px] text-[#735965] font-semibold block">{p.price.toLocaleString()} 원 · {p.packSize}</span>
                               </div>
                               <div className="flex flex-col items-end gap-1.5 shrink-0">
-                                <button onClick={() => removeCartItem(p.id)} className="text-[#735965]/60 hover:text-red-500 transition-colors p-1" aria-label="삭제">
+                                <button onClick={() => removeCartItem(p.id, item.selectedOption)} className="text-[#735965]/60 hover:text-red-500 transition-colors p-1" aria-label="삭제">
                                   <X size={13} />
                                 </button>
                                 <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
-                                  <button onClick={() => updateCartQty(p.id, item.quantity - 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors">
+                                  <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors">
                                     <Minus size={11} />
                                   </button>
                                   <span className="px-2 text-[10px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
-                                  <button onClick={() => updateCartQty(p.id, item.quantity + 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors">
+                                  <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors">
                                     <Plus size={11} />
                                   </button>
                                 </div>
@@ -2636,17 +2672,53 @@ export default function PortalPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 flex justify-between items-center gap-3">
-              <span className="text-[11px] font-bold text-[#735965]">
-                발주몰 규격을 정밀 점검 후 발주를 신중하게 진행해 주세요.
-              </span>
-              <button 
-                type="button"
-                onClick={() => setSelectedProductDetail(null)}
-                className="px-6 py-2.5 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
-              >
-                닫기
-              </button>
+            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex-1 flex flex-col gap-2">
+                {selectedProductDetail.options && selectedProductDetail.options.length > 0 ? (
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[#2d2026] text-xs shrink-0">옵션 선택 *</span>
+                    <select
+                      value={selectedProductOption}
+                      onChange={(e) => setSelectedProductOption(e.target.value)}
+                      className="w-full max-w-xs bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs font-bold text-[#2d2026] focus:outline-none cursor-pointer"
+                    >
+                      <option value="">-- 필수 옵션을 선택하세요 --</option>
+                      {selectedProductDetail.options.map((opt: string) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <span className="text-[11px] font-bold text-[#735965]">
+                    발주몰 규격을 정밀 점검 후 발주를 신중하게 진행해 주세요.
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                <button 
+                  type="button"
+                  onClick={() => {
+                    const hasOpts = selectedProductDetail.options && selectedProductDetail.options.length > 0;
+                    if (hasOpts && !selectedProductOption) {
+                      alert("필수 옵션을 선택해 주세요.");
+                      return;
+                    }
+                    addToCart(selectedProductDetail.id, hasOpts ? selectedProductOption : undefined);
+                    setSelectedProductDetail(null);
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-extrabold transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                >
+                  <ShoppingBag size={14} />
+                  장바구니 담기
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedProductDetail(null)}
+                  className="px-6 py-2.5 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
+                >
+                  닫기
+                </button>
+              </div>
             </div>
           </div>
         </div>
