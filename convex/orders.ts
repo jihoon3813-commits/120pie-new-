@@ -164,3 +164,16 @@ export const updateTracking = mutation({
   },
 });
 
+// 모든 주문 내역 삭제 (초기화용)
+export const deleteAllOrders = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const orders = await ctx.db.query("orders").collect();
+    for (const ord of orders) {
+      await ctx.db.delete(ord._id);
+    }
+    return true;
+  },
+});
+
+

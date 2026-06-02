@@ -1066,30 +1066,44 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   useEffect(() => {
     // Check if closed in current tab session or closed for today
     if (typeof window !== "undefined") {
-      const closedTitle = localStorage.getItem("120_popup_closed_title");
-      const currentTitle = convexPopup?.title || (localStorage.getItem("120_popups") ? JSON.parse(localStorage.getItem("120_popups") || "{}").title : "");
-      
-      if (currentTitle && closedTitle && currentTitle !== closedTitle) {
-        localStorage.removeItem("120_popup_closed_date");
-        localStorage.removeItem("120_popup_closed_title");
-        sessionStorage.removeItem("120_popup_closed_session");
+      const urlParams = new URLSearchParams(window.location.search);
+      const isTestPopup = urlParams.get("test_popup") === "true";
+
+      if (isTestPopup) {
+        // Bypass storage block checks
       } else {
-        const closedInSession = sessionStorage.getItem("120_popup_closed_session");
-        if (closedInSession === "true") {
-          setShowPopup(false);
-          return;
-        }
+        const closedTitle = localStorage.getItem("120_popup_closed_title");
+        const currentTitle = convexPopup?.title || (localStorage.getItem("120_popups") ? JSON.parse(localStorage.getItem("120_popups") || "{}").title : "");
         
-        const closedDate = localStorage.getItem("120_popup_closed_date");
-        const todayStr = new Date().toISOString().split("T")[0];
-        if (closedDate === todayStr) {
-          setShowPopup(false);
-          return;
+        if (currentTitle && closedTitle && currentTitle !== closedTitle) {
+          localStorage.removeItem("120_popup_closed_date");
+          localStorage.removeItem("120_popup_closed_title");
+          sessionStorage.removeItem("120_popup_closed_session");
+        } else {
+          const closedInSession = sessionStorage.getItem("120_popup_closed_session");
+          if (closedInSession === "true") {
+            setShowPopup(false);
+            return;
+          }
+          
+          const closedDate = localStorage.getItem("120_popup_closed_date");
+          const todayStr = new Date().toISOString().split("T")[0];
+          if (closedDate === todayStr) {
+            setShowPopup(false);
+            return;
+          }
         }
       }
     }
 
-    if (popupClosedInSessionRef.current) return;
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("test_popup") !== "true") {
+        if (popupClosedInSessionRef.current) return;
+      }
+    } else {
+      if (popupClosedInSessionRef.current) return;
+    }
 
     if (convexPopup) {
       setPopupSettings(convexPopup);

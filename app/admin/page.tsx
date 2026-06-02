@@ -38,7 +38,8 @@ import {
   UserCheck,
   Sparkles,
   Settings,
-  Map
+  Map,
+  Copy
 } from "lucide-react";
 
 // ==========================================
@@ -154,6 +155,9 @@ interface Order {
   items: { productName: string; quantity: number; price: number }[];
   totalPrice: number;
   status: string;
+  storeId?: string;
+  courier?: string;
+  trackingNo?: string;
 }
 
 interface Inquiry {
@@ -517,6 +521,8 @@ export default function AdminPage() {
   const convexPopupsList = useQuery(api.popups.list);
   const createOrUpdatePopupMutation = useMutation(api.popups.createOrUpdate);
   const deletePopupMutation = useMutation(api.popups.deletePopup);
+  const convexProductCategories = useQuery(api.categories.get);
+  const updateProductCategoriesMutation = useMutation(api.categories.update);
   const togglePopupActiveMutation = useMutation(api.popups.toggleActive);
   const updateFloatingMutation = useMutation(api.floatings.update);
   const addGalleryItemMutation = useMutation(api.gallery.add);
@@ -562,6 +568,13 @@ export default function AdminPage() {
       setPopupBtnTextSize(convexPopup.btnTextSize || "12px");
     }
   }, [convexPopup]);
+
+  useEffect(() => {
+    if (convexProductCategories) {
+      setCategories(convexProductCategories);
+      localStorage.setItem("120_categories", JSON.stringify(convexProductCategories));
+    }
+  }, [convexProductCategories]);
 
   useEffect(() => {
     if (convexFloating) {
@@ -749,6 +762,7 @@ export default function AdminPage() {
 
   // Road Address Search Simulation
   const [showAddressPopup, setShowAddressPopup] = useState<boolean>(false);
+  const [addressTab, setAddressTab] = useState<"kakao" | "simulated">("kakao");
   const [addressSearchKeyword, setAddressSearchKeyword] = useState<string>("");
   const [addressSearchResults, setAddressSearchResults] = useState<string[]>([]);
 
@@ -846,6 +860,142 @@ export default function AdminPage() {
   const [showOrderModal, setShowOrderModal] = useState<boolean>(false);
   const [selectedCourier, setSelectedCourier] = useState<string>("CJ대한통운");
   const [inputTrackingNo, setInputTrackingNo] = useState<string>("");
+
+  // 발주 필터링 및 통합검색, 엑셀 내보내기 헬퍼 상태
+  const [orderSearchKeyword, setOrderSearchKeyword] = useState<string>("");
+  const [orderDateFilterType, setOrderDateFilterType] = useState<string>("all"); // all, today, yesterday, week, month, prev_month, custom
+  const [orderStartDate, setOrderStartDate] = useState<string>("");
+  const [orderEndDate, setOrderEndDate] = useState<string>("");
+
+  // 클립보드 복사 헬퍼 함수
+  const handleCopyToClipboard = (text: string, label: string) => {
+    if (typeof window !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        triggerToast(`${label} 복사되었습니다!`);
+      }).catch(err => {
+        console.error("복사 실패:", err);
+      });
+    }
+  };
+
+  // 발주 필터링 연산
+  const getFilteredOrders = () => {
+    return orders.filter((order) => {
+      const storeInfo = stores.find(s => s.id === order.storeId) || {
+        name: order.storeId === "owner" ? "본사 테스트" : "강남역삼점",
+        owner: "홍길동",
+        phone: "010-1234-5678",
+        roadAddress: "서울시 강남구 테헤란로 123",
+        detailAddress: "1층",
+      };
+      const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`;
+
+      // 1. 통합검색 (주문번호, 가맹점명, 점주명, 연락처, 주소, 주문 품목)
+      if (orderSearchKeyword.trim() !== "") {
+        const query = orderSearchKeyword.toLowerCase();
+        const matchesId = order.id.toLowerCase().includes(query);
+        const matchesStoreName = storeInfo.name.toLowerCase().includes(query);
+        const matchesOwner = storeInfo.owner.toLowerCase().includes(query);
+        const matchesPhone = storeInfo.phone.toLowerCase().includes(query);
+        const matchesAddress = storeAddress.toLowerCase().includes(query);
+        const matchesItems = order.items.some(it => it.productName.toLowerCase().includes(query));
+        
+        if (!matchesId && !matchesStoreName && !matchesOwner && !matchesPhone && !matchesAddress && !matchesItems) {
+          return false;
+        }
+      }
+
+      // 2. 기간선택 필터
+      if (orderDateFilterType !== "all") {
+        const today = new Date();
+        const getFormattedDate = (d: Date) => d.toISOString().split("T")[0];
+        const orderDateStr = order.date;
+        
+        let start = "";
+        let end = "";
+        
+        if (orderDateFilterType === "today") {
+          start = getFormattedDate(today);
+          end = getFormattedDate(today);
+        } else if (orderDateFilterType === "yesterday") {
+          const yesterday = new Date();
+          yesterday.setDate(today.getDate() - 1);
+          start = getFormattedDate(yesterday);
+          end = getFormattedDate(yesterday);
+        } else if (orderDateFilterType === "week") {
+          const weekAgo = new Date();
+          weekAgo.setDate(today.getDate() - 7);
+          start = getFormattedDate(weekAgo);
+          end = getFormattedDate(today);
+        } else if (orderDateFilterType === "month") {
+          const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+          start = getFormattedDate(firstDayOfMonth);
+          end = getFormattedDate(today);
+        } else if (orderDateFilterType === "prev_month") {
+          const firstDayOfPrevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+          const lastDayOfPrevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+          start = getFormattedDate(firstDayOfPrevMonth);
+          end = getFormattedDate(lastDayOfPrevMonth);
+        } else if (orderDateFilterType === "custom") {
+          start = orderStartDate;
+          end = orderEndDate;
+        }
+
+        if (start && orderDateStr < start) return false;
+        if (end && orderDateStr > end) return false;
+      }
+
+      return true;
+    });
+  };
+
+  const filteredOrders = getFilteredOrders();
+
+  // 엑셀(CSV) 다운로드 헬퍼
+  const handleExcelDownload = () => {
+    if (filteredOrders.length === 0) {
+      alert("다운로드할 발주 내역이 존재하지 않습니다.");
+      return;
+    }
+
+    const headers = ["신청일자", "주문번호", "가맹점명", "점주명", "연락처", "주소", "주문품목", "결제대금", "진행상태"];
+    const rows = filteredOrders.map((order) => {
+      const storeInfo = stores.find(s => s.id === order.storeId) || {
+        name: order.storeId === "owner" ? "본사 테스트" : "강남역삼점",
+        owner: "홍길동",
+        phone: "010-1234-5678",
+        roadAddress: "서울시 강남구 테헤란로 123",
+        detailAddress: "1층",
+      };
+      const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`;
+      const itemDetails = order.items.map(it => `${it.productName}(${it.quantity}개)`).join(" / ");
+      
+      return [
+        order.date,
+        order.id,
+        storeInfo.name,
+        storeInfo.owner,
+        storeInfo.phone,
+        `"${storeAddress.replace(/"/g, '""')}"`,
+        `"${itemDetails.replace(/"/g, '""')}"`,
+        order.totalPrice,
+        order.status
+      ];
+    });
+
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    
+    const todayStr = new Date().toISOString().split("T")[0];
+    link.setAttribute("download", `120겹파이_발주내역_${todayStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    triggerToast("발주 내역 엑셀 다운로드가 완료되었습니다!");
+  };
   
   // Settings & Status Management States
   const [deliveryStatuses, setDeliveryStatuses] = useState<string[]>(["주문완료", "배송준비중", "배송중", "배송완료"]);
@@ -1499,6 +1649,7 @@ export default function AdminPage() {
   // Real Road Address Search using Daum/Kakao Postcode API (Iframe Embedded Layer Style)
   const openDaumPostcode = () => {
     setShowAddressPopup(true);
+    setAddressTab("kakao");
     setAddressSearchKeyword("");
     
     if (typeof window !== "undefined") {
@@ -1829,7 +1980,7 @@ export default function AdminPage() {
   // ==========================================
   // 3. CATEGORY CONTROL HANDLERS
   // ==========================================
-  const handleAddCategory = (e: React.FormEvent) => {
+  const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCategoryName.trim()) return;
     if (categories.includes(newCategoryName.trim())) {
@@ -1841,9 +1992,16 @@ export default function AdminPage() {
     localStorage.setItem("120_categories", JSON.stringify(updated));
     setNewCategoryName("");
     triggerToast("신규 카테고리가 등록되었습니다.");
+
+    // Sync to Convex
+    try {
+      await updateProductCategoriesMutation({ categories: updated });
+    } catch (err) {
+      console.error("Failed to sync category add to Convex", err);
+    }
   };
 
-  const handleDeleteCategory = (catName: string) => {
+  const handleDeleteCategory = async (catName: string) => {
     if (products.some((p) => p.category === catName)) {
       alert(`이 카테고리('${catName}')에 소속된 제품이 존재하므로 삭제할 수 없습니다. 관련 제품의 카테고리를 먼저 변경해 주십시오.`);
       return;
@@ -1853,10 +2011,17 @@ export default function AdminPage() {
       setCategories(updated);
       localStorage.setItem("120_categories", JSON.stringify(updated));
       triggerToast("카테고리가 삭제되었습니다.");
+
+      // Sync to Convex
+      try {
+        await updateProductCategoriesMutation({ categories: updated });
+      } catch (err) {
+        console.error("Failed to sync category delete to Convex", err);
+      }
     }
   };
 
-  const handleAdjustCategoryOrder = (index: number, direction: "up" | "down") => {
+  const handleAdjustCategoryOrder = async (index: number, direction: "up" | "down") => {
     if (direction === "up" && index === 0) return;
     if (direction === "down" && index === categories.length - 1) return;
 
@@ -1871,6 +2036,13 @@ export default function AdminPage() {
     setCategories(newCategories);
     localStorage.setItem("120_categories", JSON.stringify(newCategories));
     triggerToast("카테고리 노출 순서가 변경되었습니다.");
+
+    // Sync to Convex
+    try {
+      await updateProductCategoriesMutation({ categories: newCategories });
+    } catch (err) {
+      console.error("Failed to sync category move to Convex", err);
+    }
   };
 
   const handleAddLabel = (e: React.FormEvent) => {
@@ -3690,68 +3862,154 @@ export default function AdminPage() {
           {currentMenu === "order" && (
             <div className="space-y-6">
               
-              <div>
-                <h2 className="text-xl font-bold text-[#2d2026]">전체 가맹점 발주 주문 관리</h2>
-                <p className="text-xs text-[#735965] font-bold mt-1">가맹점들이 신청한 원자재 발주 요청을 실시간 승인하고 배송 단계를 신속히 제어합니다.</p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-[#2d2026]">전체 가맹점 발주 주문 관리</h2>
+                  <p className="text-xs text-[#735965] font-bold mt-1">가맹점들이 신청한 원자재 발주 요청을 실시간 승인하고 배송 단계를 신속히 제어합니다.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleExcelDownload}
+                  className="inline-flex items-center justify-center gap-1.5 px-4.5 py-3 bg-[#03C75A] hover:bg-[#02b350] text-white text-xs font-bold rounded-xl transition-all shadow-sm shrink-0 self-start sm:self-center cursor-pointer"
+                >
+                  <Download size={14} />
+                  발주내역 엑셀 다운로드
+                </button>
               </div>
 
+              {/* 검색 및 기간 필터 영역 */}
+              <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 shadow-sm space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* 통합 검색 */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-[#735965] block">통합 검색</label>
+                    <input
+                      type="text"
+                      placeholder="가맹점명, 점주명, 연락처, 품목명, 주소, 주문번호"
+                      value={orderSearchKeyword}
+                      onChange={(e) => setOrderSearchKeyword(e.target.value)}
+                      className="w-full bg-[#fff9fb]/10 border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 font-semibold focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+
+                  {/* 기간선택 셀렉트 */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-[#735965] block">발주 기간 필터</label>
+                    <select
+                      value={orderDateFilterType}
+                      onChange={(e) => setOrderDateFilterType(e.target.value)}
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] font-bold focus:outline-none focus:border-[#f25f8a] cursor-pointer"
+                    >
+                      <option value="all">전체 기간</option>
+                      <option value="today">당일 (오늘)</option>
+                      <option value="yesterday">전일 (어제)</option>
+                      <option value="week">최근 일주일</option>
+                      <option value="month">당월 (이번달)</option>
+                      <option value="prev_month">전월 (지난달)</option>
+                      <option value="custom">직접 지정</option>
+                    </select>
+                  </div>
+
+                  {/* 직접 지정 달력 폼 (custom일 때만 노출) */}
+                  {orderDateFilterType === "custom" && (
+                    <div className="space-y-1.5 animate-fadeIn">
+                      <label className="text-[10px] font-bold text-[#735965] block">직접 기간 선택</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="date"
+                          value={orderStartDate}
+                          onChange={(e) => setOrderStartDate(e.target.value)}
+                          className="flex-1 bg-white border border-[#f2ccd7] rounded-xl px-2 py-2 text-xs font-semibold focus:outline-none"
+                        />
+                        <span className="text-[#735965] font-bold text-xs">~</span>
+                        <input
+                          type="date"
+                          value={orderEndDate}
+                          onChange={(e) => setOrderEndDate(e.target.value)}
+                          className="flex-1 bg-white border border-[#f2ccd7] rounded-xl px-2 py-2 text-xs font-semibold focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 발주 목록 테이블 */}
               <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full text-left border-collapse min-w-[1000px]">
                     <thead>
                       <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
-                        <th className="p-4 sm:p-5 text-center">순서</th>
-                        <th className="p-4 sm:p-5">주문 일자</th>
-                        <th className="p-4 sm:p-5">가맹점</th>
-                        <th className="p-4 sm:p-5">품목</th>
-                        <th className="p-4 sm:p-5">결제 금액</th>
-                        <th className="p-4 sm:p-5">현재 상태</th>
-                        <th className="p-4 sm:p-5 text-center">상세보기</th>
+                        <th className="p-4 sm:p-5 text-center" style={{ width: '60px' }}>순서</th>
+                        <th className="p-4 sm:p-5" style={{ width: '100px' }}>신청일자</th>
+                        <th className="p-4 sm:p-5" style={{ width: '130px' }}>가맹점명</th>
+                        <th className="p-4 sm:p-5" style={{ width: '90px' }}>점주명</th>
+                        <th className="p-4 sm:p-5" style={{ width: '120px' }}>연락처</th>
+                        <th className="p-4 sm:p-5" style={{ width: '220px' }}>주소</th>
+                        <th className="p-4 sm:p-5" style={{ width: '180px' }}>주문 품목</th>
+                        <th className="p-4 sm:p-5 text-right" style={{ width: '110px' }}>결제대금</th>
+                        <th className="p-4 sm:p-5 text-center" style={{ width: '100px' }}>진행상태</th>
+                        <th className="p-4 sm:p-5 text-center" style={{ width: '90px' }}>상세정보</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
-                      {orders.length === 0 ? (
+                      {filteredOrders.length === 0 ? (
                         <tr>
-                          <td colSpan={7} className="p-8 text-center text-[#735965]">현재 접수된 가맹점 발주 주문이 존재하지 않습니다.</td>
+                          <td colSpan={10} className="p-8 text-center text-[#735965] font-bold">검색 조건에 맞는 가맹점 발주 주문이 존재하지 않습니다.</td>
                         </tr>
                       ) : (
-                        orders.map((order, idx) => (
-                          <tr key={order.id} className="hover:bg-[#fff9fb] transition-colors">
-                            <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{idx + 1}</td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{order.date}</td>
-                            <td className="p-4 sm:p-5 font-bold text-[#2d2026] whitespace-nowrap">강남역삼점</td>
-                            <td className="p-4 sm:p-5">
-                              <span className="font-bold text-[#2d2026] block">
-                                {order.items[0].productName} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ""}
-                              </span>
-                              <span className="text-[10px] text-[#735965] block font-semibold mt-0.5 max-w-[320px] truncate" title={order.items.map(item => `${item.productName} ${item.quantity}개`).join(", ")}>
-                                {order.items.map(item => `${item.productName} ${item.quantity}개`).join(", ")}
-                              </span>
-                            </td>
-                            <td className="p-4 sm:p-5 font-bold text-[#2d2026] whitespace-nowrap">{order.totalPrice.toLocaleString()} 원</td>
-                            <td className="p-4 sm:p-5 whitespace-nowrap">
-                              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
-                                order.status === "배송중" 
-                                  ? "bg-blue-50 text-blue-500 border border-blue-200" 
-                                  : order.status === "배송완료" 
-                                  ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
-                                  : order.status === "배송준비중"
-                                  ? "bg-orange-50 text-orange-500 border border-orange-200"
-                                  : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
-                              }`}>
-                                {order.status}
-                              </span>
-                            </td>
-                            <td className="p-4 sm:p-5 text-center whitespace-nowrap">
-                              <button
-                                onClick={() => handleOpenOrderModal(order)}
-                                className="px-3.5 py-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-[10px] font-bold transition-all shadow-sm"
-                              >
-                                상세보기
-                              </button>
-                            </td>
-                          </tr>
-                        ))
+                        filteredOrders.map((order, idx) => {
+                          const storeInfo = stores.find(s => s.id === order.storeId) || {
+                            name: order.storeId === "owner" ? "본사 테스트" : "강남역삼점",
+                            owner: "김지훈",
+                            phone: "010-3813-1200",
+                            roadAddress: "경기 군포시 엘에스로 143 (금정동, 1층 1001호)",
+                            detailAddress: "",
+                          };
+                          const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`.trim();
+                          
+                          return (
+                            <tr key={order.id} className="hover:bg-[#fff9fb] transition-colors">
+                              <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{idx + 1}</td>
+                              <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{order.date}</td>
+                              <td className="p-4 sm:p-5 font-black text-[#2d2026] whitespace-nowrap">{storeInfo.name}</td>
+                              <td className="p-4 sm:p-5 font-semibold text-[#735965] whitespace-nowrap">{storeInfo.owner}</td>
+                              <td className="p-4 sm:p-5 font-semibold text-[#735965] whitespace-nowrap">{storeInfo.phone}</td>
+                              <td className="p-4 sm:p-5 font-semibold text-[#735965] max-w-[220px] truncate" title={storeAddress}>{storeAddress}</td>
+                              <td className="p-4 sm:p-5">
+                                <span className="font-bold text-[#2d2026] block leading-tight">
+                                  {order.items[0]?.productName || "기본 품목"} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ""}
+                                </span>
+                                <span className="text-[10px] text-[#735965] block font-semibold mt-0.5 max-w-[175px] truncate" title={order.items.map(item => `${item.productName} ${item.quantity}개`).join(", ")}>
+                                  {order.items.map(item => `${item.productName} ${item.quantity}개`).join(", ")}
+                                </span>
+                              </td>
+                              <td className="p-4 sm:p-5 font-bold text-[#2d2026] text-right whitespace-nowrap">{order.totalPrice.toLocaleString()} 원</td>
+                              <td className="p-4 sm:p-5 text-center whitespace-nowrap">
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
+                                  order.status === "배송중" 
+                                    ? "bg-blue-50 text-blue-500 border border-blue-200" 
+                                    : order.status === "배송완료" 
+                                    ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
+                                    : order.status === "배송준비중"
+                                    ? "bg-orange-50 text-orange-500 border border-orange-200"
+                                    : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
+                                }`}>
+                                  {order.status}
+                                </span>
+                              </td>
+                              <td className="p-4 sm:p-5 text-center whitespace-nowrap">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenOrderModal(order)}
+                                  className="px-3.5 py-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-[10px] font-bold transition-all shadow-sm cursor-pointer"
+                                >
+                                  상세보기
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
                       )}
                     </tbody>
                   </table>
@@ -5707,11 +5965,11 @@ export default function AdminPage() {
                 <div className="flex gap-2">
                   <input 
                     type="text"
-                    placeholder="도로명 주소 (우측 '주소 검색' 버튼을 클릭해 주세요)"
+                    placeholder="도로명 주소 (우측 '주소 검색' 버튼을 사용하거나 직접 입력하세요)"
                     value={storeRoadAddress}
-                    readOnly
+                    onChange={(e) => setStoreRoadAddress(e.target.value)}
                     required
-                    className="flex-1 bg-neutral-50 border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none"
+                    className="flex-1 bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
                   />
                   <button
                     type="button"
@@ -5778,23 +6036,93 @@ export default function AdminPage() {
             className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-5 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/80">
-              <h4 className="text-sm font-bold text-[#2d2026]">실시간 도로명 주소 검색 (Kakao API)</h4>
-              <button onClick={() => setShowAddressPopup(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer">
-                <X size={13} />
-              </button>
+            <div className="p-5 border-b border-[#f2ccd7]/60 flex flex-col gap-3 bg-[#fff1f5]/80">
+              <div className="flex justify-between items-center">
+                <h4 className="text-sm font-bold text-[#2d2026]">도로명 주소 실시간 검색</h4>
+                <button onClick={() => setShowAddressPopup(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer">
+                  <X size={13} />
+                </button>
+              </div>
+              
+              {/* Dual-Mode Tabs */}
+              <div className="flex bg-[#ffd3df]/50 p-1 rounded-xl border border-[#f2ccd7]/60">
+                <button
+                  type="button"
+                  onClick={() => setAddressTab("kakao")}
+                  className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all ${
+                    addressTab === "kakao" 
+                      ? "bg-white text-[#bf3e67] shadow-sm border border-[#f2ccd7]/40" 
+                      : "text-[#735965] hover:text-[#bf3e67]"
+                  }`}
+                >
+                  카카오 우편번호 API
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAddressTab("simulated")}
+                  className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all ${
+                    addressTab === "simulated" 
+                      ? "bg-white text-[#bf3e67] shadow-sm border border-[#f2ccd7]/40" 
+                      : "text-[#735965] hover:text-[#bf3e67]"
+                  }`}
+                >
+                  모의 간편 검색 (대안)
+                </button>
+              </div>
             </div>
 
-            {/* Kakao Postcode Iframe Container */}
-            <div className="flex-1 w-full bg-[#fff9fb] overflow-hidden relative">
-              <div 
-                id="daum-postcode-container" 
-                className="w-full h-full"
-              ></div>
-            </div>
+            {/* Content Body based on active tab */}
+            {addressTab === "kakao" ? (
+              <div className="flex-1 w-full bg-[#fff9fb] overflow-hidden relative">
+                <div 
+                  id="daum-postcode-container" 
+                  className="w-full h-full"
+                ></div>
+              </div>
+            ) : (
+              <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-[#fff9fb]">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-[#735965] block">지번/도로명 검색어 입력</label>
+                  <input
+                    type="text"
+                    placeholder="예: 테헤란로, 엘에스로, 당동"
+                    value={addressSearchKeyword}
+                    onChange={(e) => handleAddressSearch(e.target.value)}
+                    className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] placeholder-[#735965]/40 font-semibold"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-[#735965] block">검색 결과 목록 ({addressSearchResults.length}건)</span>
+                  {addressSearchResults.length === 0 ? (
+                    <div className="p-8 text-center text-[11px] text-[#735965] bg-white border border-[#f2ccd7]/40 rounded-xl font-bold">
+                      {addressSearchKeyword.trim() ? "일치하는 주소 후보가 없습니다." : "검색어를 입력하시면 모의 주소 리스트가 노출됩니다."}
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                      {addressSearchResults.map((addr, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setStoreRoadAddress(addr);
+                            setShowAddressPopup(false);
+                            triggerToast("모의 주소가 성공적으로 자동 선택 및 입력되었습니다!");
+                          }}
+                          className="w-full text-left p-3.5 bg-white hover:bg-[#fff1f5] border border-[#f2ccd7]/50 hover:border-[#f25f8a]/50 rounded-xl text-xs font-semibold text-[#2d2026] transition-all cursor-pointer block hover:shadow-sm"
+                        >
+                          {addr}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             
             <div className="p-4 bg-neutral-50 text-center border-t border-[#f2ccd7]/60">
               <button 
+                type="button"
                 onClick={() => setShowAddressPopup(false)}
                 className="px-5 py-2.5 rounded-xl bg-white border border-[#f2ccd7] text-[11px] font-bold text-[#735965] hover:bg-[#fff1f5] cursor-pointer transition-colors"
               >
@@ -6475,8 +6803,9 @@ export default function AdminPage() {
                 </h3>
               </div>
               <button 
+                type="button"
                 onClick={() => setShowOrderModal(false)} 
-                className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 ml-4"
+                className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 ml-4 cursor-pointer"
               >
                 <X size={15} />
               </button>
@@ -6485,35 +6814,101 @@ export default function AdminPage() {
             {/* Body */}
             <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
               
-              {/* Delivery Recipient Info */}
-              <div className="space-y-3 bg-[#fff1f5]/50 border border-[#f2ccd7]/60 p-5 rounded-2xl">
-                <h4 className="font-extrabold text-sm text-[#bf3e67] border-b border-[#f2ccd7] pb-2 flex items-center gap-1.5">
-                  <Store size={15} />
-                  수령인 & 배송지 정보 (가맹점 정보)
-                </h4>
-                <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-[#735965]">
-                  <div>
-                    <span className="block text-[10px] text-[#735965]/60 mb-0.5">가맹점명</span>
-                    <strong className="text-[#2d2026]">강남역삼점</strong>
+              {/* Delivery Recipient Info (Dynamic Store Join with Clip Board Copy) */}
+              {(() => {
+                const storeInfo = stores.find(s => s.id === selectedOrder.storeId) || {
+                  name: selectedOrder.storeId === "owner" ? "본사 테스트" : "강남역삼점",
+                  owner: "김지훈",
+                  phone: "010-3813-1200",
+                  roadAddress: "경기 군포시 엘에스로 143 (금정동, 1층 1001호)",
+                  detailAddress: "",
+                };
+                const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`.trim();
+                
+                return (
+                  <div className="space-y-4 bg-gradient-to-br from-[#fff1f5]/70 to-white border border-[#f2ccd7]/80 p-6 rounded-2xl shadow-sm">
+                    <h4 className="font-extrabold text-sm text-[#bf3e67] border-b border-[#f2ccd7]/60 pb-2.5 flex items-center gap-1.5">
+                      <Store size={15} />
+                      수령인 & 배송지 정보 (가맹점 정보)
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold text-[#735965]">
+                      <div className="bg-white/60 p-3 rounded-xl border border-[#f2ccd7]/30 flex justify-between items-center">
+                        <div>
+                          <span className="block text-[9px] text-[#735965]/60 mb-0.5 font-bold">가맹점명</span>
+                          <strong className="text-[#2d2026] text-xs">{storeInfo.name}</strong>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyToClipboard(storeInfo.name, "가맹점명")}
+                          className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/40 rounded-lg shrink-0 cursor-pointer hover:shadow-sm"
+                          title="복사하기"
+                        >
+                          <Copy size={11} />
+                        </button>
+                      </div>
+
+                      <div className="bg-white/60 p-3 rounded-xl border border-[#f2ccd7]/30 flex justify-between items-center">
+                        <div>
+                          <span className="block text-[9px] text-[#735965]/60 mb-0.5 font-bold">점주 대표자</span>
+                          <strong className="text-[#2d2026] text-xs">{storeInfo.owner}</strong>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyToClipboard(storeInfo.owner, "대표자명")}
+                          className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/40 rounded-lg shrink-0 cursor-pointer hover:shadow-sm"
+                          title="복사하기"
+                        >
+                          <Copy size={11} />
+                        </button>
+                      </div>
+
+                      <div className="bg-white/60 p-3 rounded-xl border border-[#f2ccd7]/30 flex justify-between items-center">
+                        <div>
+                          <span className="block text-[9px] text-[#735965]/60 mb-0.5 font-bold">연락처</span>
+                          <strong className="text-[#2d2026] text-xs">{storeInfo.phone}</strong>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyToClipboard(storeInfo.phone, "연락처")}
+                          className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/40 rounded-lg shrink-0 cursor-pointer hover:shadow-sm"
+                          title="복사하기"
+                        >
+                          <Copy size={11} />
+                        </button>
+                      </div>
+
+                      <div className="bg-white/60 p-3 rounded-xl border border-[#f2ccd7]/30 flex justify-between items-center">
+                        <div>
+                          <span className="block text-[9px] text-[#735965]/60 mb-0.5 font-bold">주문 신청일</span>
+                          <strong className="text-[#2d2026] text-xs">{selectedOrder.date}</strong>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyToClipboard(selectedOrder.date, "신청일")}
+                          className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/40 rounded-lg shrink-0 cursor-pointer hover:shadow-sm"
+                          title="복사하기"
+                        >
+                          <Copy size={11} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="pt-3.5 text-xs font-semibold text-[#735965] border-t border-[#f2ccd7]/40 bg-white/60 p-4 rounded-xl border border-[#f2ccd7]/30 flex justify-between items-center gap-4">
+                      <div className="flex-1">
+                        <span className="block text-[9px] text-[#735965]/60 mb-0.5 font-bold">배송지 주소</span>
+                        <strong className="text-[#2d2026] text-xs break-words leading-tight">{storeAddress}</strong>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyToClipboard(storeAddress, "배송지 주소")}
+                        className="p-2 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7] rounded-xl shrink-0 cursor-pointer hover:shadow-md transition-all self-center"
+                        title="주소 복사"
+                      >
+                        <Copy size={13} />
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <span className="block text-[10px] text-[#735965]/60 mb-0.5">점주 대표자</span>
-                    <strong className="text-[#2d2026]">김지훈</strong>
-                  </div>
-                  <div>
-                    <span className="block text-[10px] text-[#735965]/60 mb-0.5">연락처</span>
-                    <strong className="text-[#2d2026]">010-3813-1200</strong>
-                  </div>
-                  <div>
-                    <span className="block text-[10px] text-[#735965]/60 mb-0.5">주문 신청일</span>
-                    <strong className="text-[#2d2026]">{selectedOrder.date}</strong>
-                  </div>
-                </div>
-                <div className="pt-2 text-xs font-semibold text-[#735965] border-t border-[#f2ccd7]/40">
-                  <span className="block text-[10px] text-[#735965]/60 mb-0.5">배송지 주소</span>
-                  <strong className="text-[#2d2026]">경기 군포시 엘에스로 143 (금정동, 1층 1001호)</strong>
-                </div>
-              </div>
+                );
+              })()}
 
               {/* Order Item List */}
               <div className="space-y-3">
@@ -6565,7 +6960,9 @@ export default function AdminPage() {
                 </div>
 
                 <div className="bg-[#fff1f5]/80 border border-[#f2ccd7]/60 p-4 rounded-xl flex flex-col justify-center items-end text-right">
-                  <span className="text-[10px] text-[#735965] font-bold block mb-1">총 결제 합계액 (부가세 포함)</span>
+                  <span className="text-[10px] text-[#735965] font-bold block mb-1">결제 수단 정보</span>
+                  <span className="text-xs text-[#bf3e67] font-black block mb-2">현금 입금 진행</span>
+                  <span className="text-[10px] text-[#735965]/80 font-bold block mb-1">총 결제 합계액 (부가세 포함)</span>
                   <strong className="text-xl font-black text-[#bf3e67]">
                     {selectedOrder.totalPrice.toLocaleString()} 원
                   </strong>

@@ -134,4 +134,7 @@ export default defineSchema({
     date: v.string(), // YYYY-MM-DD
     views: v.number(),
   }),
+  productCategories: defineTable({
+    categories: v.array(v.string()),
+  }),
 });

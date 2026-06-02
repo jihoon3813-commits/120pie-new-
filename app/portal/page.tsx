@@ -322,6 +322,7 @@ export default function PortalPage() {
   const convexMaterials = useQuery(api.materials.list);
   const convexStoreInquiries = useQuery(api.storeInquiries.listByStore, { storeId: activeStoreId || "owner" });
   const convexNotices = useQuery(api.notices.list);
+  const convexProductCategories = useQuery(api.categories.get);
 
   const saveOrderMutation = useMutation(api.orders.createOrUpdate);
   const syncProductsMutation = useMutation(api.products.syncProducts);
@@ -443,14 +444,31 @@ export default function PortalPage() {
         options: p.options || []
       })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
       setProducts(mapped);
+
+      // Extract unique categories from actual active products dynamically
+      const uniqueCats = Array.from(new Set(mapped.map((p: any) => p.category).filter(Boolean))) as string[];
+      setCategories(uniqueCats);
       
       try {
         localStorage.setItem("120_products", JSON.stringify(convexProducts));
+        localStorage.setItem("120_categories", JSON.stringify(uniqueCats));
       } catch (e) {
         console.warn(e);
       }
     }
   }, [convexProducts]);
+
+  // Sync Convex productCategories to React state and localStorage
+  useEffect(() => {
+    if (convexProductCategories !== undefined && convexProductCategories !== null) {
+      setCategories(convexProductCategories);
+      try {
+        localStorage.setItem("120_categories", JSON.stringify(convexProductCategories));
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  }, [convexProductCategories]);
 
   // Query actual Korean courier tracking API network in real-time
   useEffect(() => {
@@ -520,7 +538,7 @@ export default function PortalPage() {
         courier: o.courier,
         trackingNo: o.trackingNo
       }));
-      setOrders(mappedOrders.length > 0 ? mappedOrders : INITIAL_ORDERS);
+      setOrders(mappedOrders);
       localStorage.setItem("120_orders", JSON.stringify(mappedOrders));
     }
   }, [convexOrders, activeStoreId]);
@@ -577,12 +595,18 @@ export default function PortalPage() {
       }
 
       if (convexPopup && convexPopup.isActive) {
-        const closedDate = localStorage.getItem("120_popup_closed_date");
-        const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-        if (closedDate !== todayStr) {
+        // Query string bypass parameter for testing (?test_popup=true)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("test_popup") === "true") {
           setShowPopup(true);
         } else {
-          setShowPopup(false);
+          const closedDate = localStorage.getItem("120_popup_closed_date");
+          const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+          if (closedDate !== todayStr) {
+            setShowPopup(true);
+          } else {
+            setShowPopup(false);
+          }
         }
       } else {
         setShowPopup(false);
@@ -696,7 +720,7 @@ export default function PortalPage() {
 
       // Seeds
       setStores(loadState("120_stores", []));
-      setCategories(loadState("120_categories", ["냉동생지/자재", "부자재/포장재", "소모품/집기"]));
+      setCategories(loadState("120_categories", []));
       setBanner(loadState("120_banners", null));
       setActiveStoreId(localStorage.getItem("120_active_store_id") || "owner");
 
@@ -799,7 +823,7 @@ export default function PortalPage() {
         setPrs(parseSafely("120_prs", INITIAL_PR));
 
         setStores(parseSafely("120_stores", []));
-        setCategories(parseSafely("120_categories", ["냉동생지/자재", "부자재/포장재", "소모품/집기"]));
+        setCategories(parseSafely("120_categories", []));
         
         const bnr = localStorage.getItem("120_banners");
         if (bnr) {
@@ -1875,14 +1899,14 @@ export default function PortalPage() {
               <div className="lg:col-span-8 space-y-6">
                 
                 {/* Category selector */}
-                <div className="flex flex-wrap gap-2 bg-white border border-[#f2ccd7] p-2 rounded-2xl shadow-sm">
+                <div className="flex sm:flex-wrap overflow-x-auto sm:overflow-x-visible flex-nowrap whitespace-nowrap gap-1.5 sm:gap-2 bg-white border border-[#f2ccd7] p-1.5 sm:p-2 rounded-xl sm:rounded-2xl shadow-sm scrollbar-none">
                   {["전체", ...categories].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
-                      className={`px-4 py-2 rounded-xl font-bold text-xs transition-colors ${
+                      className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl font-bold text-[11px] sm:text-xs transition-all shrink-0 ${
                         activeCategory === cat
-                          ? "bg-[#f25f8a] text-white"
+                          ? "bg-[#f25f8a] text-white shadow-sm"
                           : "text-[#735965] hover:text-[#bf3e67] hover:bg-[#fff1f5]"
                       }`}
                     >
@@ -1891,98 +1915,167 @@ export default function PortalPage() {
                   ))}
                 </div>
 
-                {/* Product Box Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Product Box Grid (Responsive: Left thumbnail row for mobile, Grid card for desktop) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {filteredProducts.map((p) => {
                     const cartQty = cart.find((item) => item.productId === p.id)?.quantity || 0;
                     return (
-                      <div 
-                        key={p.id}
-                        onClick={() => setSelectedProductDetail(p)}
-                        className="bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex flex-col justify-between shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5"
-                      >
-                        {/* Thumbnail image & stock state badge */}
-                        <div className="h-44 relative bg-[#fff1f5] overflow-hidden shrink-0">
-                          <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-                          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[80%]">
-                            {p.stock === "low_stock" && (
-                              <span className="bg-orange-500 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">품절임박</span>
-                            )}
+                      <React.Fragment key={p.id}>
+                        {/* 1. Mobile Row View (Compact Left Thumbnail Layout) */}
+                        <div 
+                          onClick={() => setSelectedProductDetail(p)}
+                          className="sm:hidden bg-white border border-[#f2ccd7] hover:border-[#f25f8a] active:scale-[0.99] transition-all rounded-xl p-3 flex gap-3 items-center shadow-sm cursor-pointer relative"
+                        >
+                          {/* Left: Thumbnail & Stock State */}
+                          <div className="w-16 h-16 rounded-lg bg-[#fff1f5] overflow-hidden shrink-0 border border-[#f2ccd7]/60 relative">
+                            <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
                             {p.stock === "out_of_stock" && (
-                              <span className="bg-red-500 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">일시품절</span>
-                            )}
-                          </div>
-                          <span className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-[10px] text-[#bf3e67] font-extrabold px-2 py-1 rounded border border-[#f2ccd7]">
-                            {p.category}
-                          </span>
-                        </div>
-
-                        {/* Product Info Block */}
-                        <div className="p-5 flex-1 flex flex-col justify-between relative">
-                          {p.labels && p.labels.length > 0 && (
-                            <div className="absolute top-5 right-5 flex flex-wrap gap-1 w-fit justify-end">
-                              {p.labels.map((l) => {
-                                let bgStyle = "bg-neutral-500/90 text-white";
-                                if (l === "BEST") bgStyle = "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm font-black";
-                                else if (l === "추천") bgStyle = "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm font-black";
-                                else if (l === "신제품") bgStyle = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-black";
-                                return (
-                                  <span key={l} className={`font-bold text-[9px] px-2 py-0.5 rounded shadow-sm ${bgStyle}`}>
-                                    {l}
-                                  </span>
-                                );
-                              })}
-                            </div>
-                          )}
-                          <div className="space-y-1 pr-14">
-                            <span className="text-[10px] text-[#735965] font-bold block">{p.packSize}</span>
-                            <h3 className="font-bold text-base text-[#2d2026] leading-tight">{p.name}</h3>
-                            <p className="text-[11px] text-[#735965] font-medium leading-relaxed mt-1.5">{p.desc}</p>
-                          </div>
-
-                          <div className="flex items-center justify-between mt-5 border-t border-[#f2ccd7]/60 pt-4">
-                            <strong className="text-base text-[#2d2026] font-black">{p.price.toLocaleString()} 원</strong>
-                            
-                            {p.options && p.options.length > 0 ? (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedProductDetail(p);
-                                }}
-                                className="px-4 py-2 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold transition-all shadow-sm"
-                              >
-                                옵션 선택
-                              </button>
-                            ) : cartQty > 0 ? (
-                              <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-lg p-0.5" onClick={(e) => e.stopPropagation()}>
-                                <button 
-                                  onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
-                                  className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
-                                >
-                                  <Minus size={14} />
-                                </button>
-                                <span className="px-3 text-xs font-bold text-[#2d2026] w-6 text-center">{cartQty}</span>
-                                <button 
-                                  onClick={() => updateCartQty(p.id, undefined, cartQty + 1)}
-                                  className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
-                                >
-                                  <Plus size={14} />
-                                </button>
+                              <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
+                                <span className="text-white font-black text-[9px] px-1 py-0.5 rounded bg-red-500 shadow-sm">품절</span>
                               </div>
-                            ) : (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  addToCart(p.id);
-                                }}
-                                className="px-4 py-2 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-xs font-bold text-[#bf3e67] transition-all"
-                              >
-                                담기
-                              </button>
                             )}
                           </div>
+
+                          {/* Right: Info & Cart Actions */}
+                          <div className="flex-1 min-w-0 flex flex-col justify-between h-16">
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[9px] text-[#bf3e67] font-extrabold bg-[#ffd3df] px-1.5 py-0.5 rounded-md border border-[#f2ccd7]/60">
+                                  {p.category}
+                                </span>
+                                <span className="text-[9px] text-[#735965] font-bold">{p.packSize}</span>
+                              </div>
+                              <h4 className="font-extrabold text-xs text-[#2d2026] truncate leading-tight">{p.name}</h4>
+                            </div>
+
+                            <div className="flex items-center justify-between mt-1">
+                              <strong className="text-xs text-[#bf3e67] font-black">{p.price.toLocaleString()}원</strong>
+                              
+                              <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+                                {p.options && p.options.length > 0 ? (
+                                  <button
+                                    onClick={() => setSelectedProductDetail(p)}
+                                    className="px-2.5 py-1 rounded bg-[#f25f8a] text-white text-[10px] font-black shadow-sm"
+                                  >
+                                    옵션선택
+                                  </button>
+                                ) : cartQty > 0 ? (
+                                  <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-md p-0.5">
+                                    <button 
+                                      onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
+                                      className="p-0.5 hover:text-[#bf3e67] text-[#735965]"
+                                    >
+                                      <Minus size={11} />
+                                    </button>
+                                    <span className="px-2 text-[10px] font-bold text-[#2d2026] w-4 text-center">{cartQty}</span>
+                                    <button 
+                                      onClick={() => updateCartQty(p.id, undefined, cartQty + 1)}
+                                      className="p-0.5 hover:text-[#bf3e67] text-[#735965]"
+                                    >
+                                      <Plus size={11} />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => addToCart(p.id)}
+                                    className="px-2.5 py-1 rounded bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-[10px] font-black text-[#bf3e67]"
+                                  >
+                                    담기
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
+
+                        {/* 2. Desktop Grid Card View */}
+                        <div 
+                          onClick={() => setSelectedProductDetail(p)}
+                          className="hidden sm:flex bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex-col justify-between shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 h-[390px]"
+                        >
+                          {/* Thumbnail image & stock state badge */}
+                          <div className="h-44 relative bg-[#fff1f5] overflow-hidden shrink-0">
+                            <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
+                            <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[80%]">
+                              {p.stock === "low_stock" && (
+                                <span className="bg-orange-500 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">품절임박</span>
+                              )}
+                              {p.stock === "out_of_stock" && (
+                                <span className="bg-red-500 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">일시품절</span>
+                              )}
+                            </div>
+                            <span className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-[10px] text-[#bf3e67] font-extrabold px-2 py-1 rounded border border-[#f2ccd7]">
+                              {p.category}
+                            </span>
+                          </div>
+
+                          {/* Product Info Block */}
+                          <div className="p-5 flex-1 flex flex-col justify-between relative">
+                            {p.labels && p.labels.length > 0 && (
+                              <div className="absolute top-5 right-5 flex flex-wrap gap-1 w-fit justify-end">
+                                {p.labels.map((l) => {
+                                  let bgStyle = "bg-neutral-500/90 text-white";
+                                  if (l === "BEST") bgStyle = "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm font-black";
+                                  else if (l === "추천") bgStyle = "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm font-black";
+                                  else if (l === "신제품") bgStyle = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-black";
+                                  return (
+                                    <span key={l} className={`font-bold text-[9px] px-2 py-0.5 rounded shadow-sm ${bgStyle}`}>
+                                      {l}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            )}
+                            <div className="space-y-1 pr-14">
+                              <span className="text-[10px] text-[#735965] font-bold block">{p.packSize}</span>
+                              <h3 className="font-bold text-base text-[#2d2026] leading-tight">{p.name}</h3>
+                              <p className="text-[11px] text-[#735965] font-medium leading-relaxed mt-1.5">{p.desc}</p>
+                            </div>
+
+                            <div className="flex items-center justify-between mt-5 border-t border-[#f2ccd7]/60 pt-4">
+                              <strong className="text-base text-[#2d2026] font-black">{p.price.toLocaleString()} 원</strong>
+                              
+                              {p.options && p.options.length > 0 ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedProductDetail(p);
+                                  }}
+                                  className="px-4 py-2 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold transition-all shadow-sm"
+                                >
+                                  옵션 선택
+                                </button>
+                              ) : cartQty > 0 ? (
+                                <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-lg p-0.5" onClick={(e) => e.stopPropagation()}>
+                                  <button 
+                                    onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
+                                    className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
+                                  >
+                                    <Minus size={14} />
+                                  </button>
+                                  <span className="px-3 text-xs font-bold text-[#2d2026] w-6 text-center">{cartQty}</span>
+                                  <button 
+                                    onClick={() => updateCartQty(p.id, undefined, cartQty + 1)}
+                                    className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
+                                  >
+                                    <Plus size={14} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addToCart(p.id);
+                                  }}
+                                  className="px-4 py-2 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-xs font-bold text-[#bf3e67] transition-all"
+                                >
+                                  담기
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </React.Fragment>
                     );
                   })}
                 </div>
@@ -2802,7 +2895,7 @@ export default function PortalPage() {
               <div className="bg-[#fff1f5]/20 border border-[#f2ccd7] rounded-2xl p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] text-[#735965] font-extrabold block">결제 수단 정보</span>
-                  <strong className="text-xs text-[#2d2026] block font-bold">본사 가상계좌 예치금 차감 (실시간 정산 완료)</strong>
+                  <strong className="text-xs text-[#2d2026] block font-bold">현금 입금 진행</strong>
                 </div>
                 <div className="text-left sm:text-right border-t sm:border-t-0 border-[#f2ccd7]/60 pt-3 sm:pt-0">
                   <span className="text-[10px] text-[#735965] font-bold block">총 결제 금액 (VAT 포함)</span>
