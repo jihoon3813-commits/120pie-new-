@@ -3448,7 +3448,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
       {showPopup && popupSettings && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn text-[#2d2026]">
           <div 
-            className="w-full max-w-md bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp"
+            className="w-full max-w-md bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp text-left"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header / Background visual */}
