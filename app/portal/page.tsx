@@ -2449,29 +2449,30 @@ export default function PortalPage() {
               )}
 
               {/* Delivery and Return Policy Pastels Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-5">
                 
                 {/* Delivery policy card */}
-                <div className="bg-[#fff9fb] border border-[#f2ccd7] rounded-2xl p-4.5 space-y-2.5 shadow-sm">
-                  <div className="flex items-center gap-1.5 border-b border-[#f2ccd7] pb-2">
-                    <Truck size={15} className="text-[#f25f8a]" />
-                    <span className="font-extrabold text-[#2d2026] text-xs">🚚 본사 물류 배송 정책</span>
+                <div className="bg-[#fff9fb] border border-[#f2ccd7] rounded-3xl p-6 sm:p-7 space-y-3.5 shadow-sm">
+                  <div className="flex items-center gap-2 border-b border-[#f2ccd7]/60 pb-2.5">
+                    <Truck size={16} className="text-[#f25f8a]" />
+                    <span className="font-extrabold text-[#2d2026] text-sm">🚚 본사 물류 배송 정책</span>
                   </div>
-                  <div className="text-[11px] text-[#735965] font-semibold leading-relaxed space-y-1.5 whitespace-pre-line">
-                    {shippingPolicy || "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다."}
-                    <div className="pt-2 border-t border-[#f2ccd7]/40 text-[10px] text-[#bf3e67] font-black">
-                      💡 무료배송 기준: {freeShippingThreshold.toLocaleString()}원 이상 발주 시 배송비 무료 (미만 시 {basicShippingFee.toLocaleString()}원 부과)
+                  <div className="text-xs text-[#735965] font-semibold leading-relaxed whitespace-pre-line space-y-3">
+                    <p>{shippingPolicy || "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다."}</p>
+                    <div className="pt-3 border-t border-[#f2ccd7]/40 text-[11px] text-[#bf3e67] font-black flex items-center gap-1.5">
+                      <span>💡</span>
+                      <span>무료배송 기준: {freeShippingThreshold.toLocaleString()}원 이상 발주 시 배송비 무료 (미만 시 {basicShippingFee.toLocaleString()}원 부과)</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Return policy card */}
-                <div className="bg-[#fffdf9] border border-amber-200 rounded-2xl p-4.5 space-y-2.5 shadow-sm">
-                  <div className="flex items-center gap-1.5 border-b border-amber-200 pb-2">
-                    <ArrowRightLeft size={15} className="text-amber-500" />
-                    <span className="font-extrabold text-[#2d2026] text-xs">🔄 교환 및 반품 규정 안내</span>
+                <div className="bg-[#fffdf9] border border-amber-200 rounded-3xl p-6 sm:p-7 space-y-3.5 shadow-sm">
+                  <div className="flex items-center gap-2 border-b border-amber-200/60 pb-2.5">
+                    <ArrowRightLeft size={16} className="text-amber-500" />
+                    <span className="font-extrabold text-[#2d2026] text-sm">🔄 교환 및 반품 규정 안내</span>
                   </div>
-                  <div className="text-[11px] text-[#735965] font-semibold leading-relaxed whitespace-pre-line">
+                  <div className="text-xs text-[#735965] font-semibold leading-relaxed whitespace-pre-line">
                     {returnPolicy || "식재료 특성상 단순 변심으로 인한 반품은 불가하며, 오배송 건은 수령 즉시 본사 접수 바랍니다."}
                   </div>
                 </div>
