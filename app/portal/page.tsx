@@ -2399,52 +2399,86 @@ export default function PortalPage() {
 
             <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
               
-              {/* Product Content Split (Image or Table Specs) */}
-              {selectedProductDetail.detailImg ? (
-                <div className="border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm bg-neutral-50 flex items-center justify-center min-h-[250px] max-h-[400px]">
+              {/* Product Core Info: Thumbnail & Spec Table */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                {/* 1. Thumbnail Image */}
+                <div className="md:col-span-5 border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm bg-[#fff1f5]/30 aspect-square flex items-center justify-center relative">
                   <img 
-                    src={selectedProductDetail.detailImg} 
-                    alt={`${selectedProductDetail.name} 상세페이지`} 
-                    className="w-full h-auto max-h-[400px] object-contain"
+                    src={selectedProductDetail.img} 
+                    alt={selectedProductDetail.name} 
+                    className="w-full h-full object-cover"
                   />
+                  {selectedProductDetail.labels && selectedProductDetail.labels.length > 0 && (
+                    <div className="absolute top-4 right-4 flex flex-wrap gap-1 w-fit justify-end">
+                      {selectedProductDetail.labels.map((l: string) => {
+                        let bgStyle = "bg-neutral-500/90 text-white";
+                        if (l === "BEST") bgStyle = "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm font-black";
+                        else if (l === "추천") bgStyle = "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm font-black";
+                        else if (l === "신제품") bgStyle = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-black";
+                        return (
+                          <span key={l} className={`font-bold text-[9px] px-2 py-0.5 rounded shadow-sm ${bgStyle}`}>
+                            {l}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
+
+                {/* 2. Spec Table */}
+                <div className="md:col-span-7 bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm h-fit">
                   <div className="px-4 py-3 bg-[#fff1f5]/30 border-b border-[#f2ccd7]/50">
                     <span className="font-extrabold text-[#2d2026]">품목 기본 명세 규격표</span>
                   </div>
                   <table className="w-full text-left border-collapse">
                     <tbody className="divide-y divide-[#f2ccd7]/40 text-xs text-[#2d2026]">
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965] w-[120px]">제품명</td>
-                        <td className="px-4 py-3 font-semibold">{selectedProductDetail.name}</td>
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965] w-[110px]">제품명</td>
+                        <td className="px-4 py-3.5 font-bold text-neutral-800">{selectedProductDetail.name}</td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965]">카테고리</td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">카테고리</td>
+                        <td className="px-4 py-3.5">
                           <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-bold px-2 py-0.5 rounded border border-[#f2ccd7]">
                             {selectedProductDetail.category}
                           </span>
                         </td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965]">발주 규격</td>
-                        <td className="px-4 py-3 font-semibold text-[#f25f8a]">{selectedProductDetail.packSize}</td>
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">발주 규격</td>
+                        <td className="px-4 py-3.5 font-semibold text-[#f25f8a]">{selectedProductDetail.packSize}</td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965]">제품 식별코드</td>
-                        <td className="px-4 py-3 font-mono font-bold text-[#735965]">{selectedProductDetail.id}</td>
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">제품 식별코드</td>
+                        <td className="px-4 py-3.5 font-mono font-bold text-[#735965]">{selectedProductDetail.id}</td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965]">기본 공급 단가</td>
-                        <td className="px-4 py-3 font-black text-[#bf3e67]">{selectedProductDetail.price.toLocaleString()} 원</td>
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">공급 단가</td>
+                        <td className="px-4 py-3.5 font-black text-[#bf3e67]">{selectedProductDetail.price.toLocaleString()} 원</td>
                       </tr>
                       <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-3 bg-[#fff1f5]/20 font-bold text-[#735965]">품목 정보 설명</td>
-                        <td className="px-4 py-3 font-medium text-[#735965] leading-relaxed">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
+                        <td className="px-4 py-3.5 bg-[#fff1f5]/20 font-bold text-[#735965]">품목 정보 설명</td>
+                        <td className="px-4 py-3.5 font-medium text-[#735965] leading-relaxed whitespace-pre-line">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
                       </tr>
                     </tbody>
                   </table>
+                </div>
+              </div>
+
+              {/* 3. Detailed Page (If available) */}
+              {selectedProductDetail.detailImg && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 border-b border-[#f2ccd7]/60 pb-2">
+                    <span className="w-1.5 h-3.5 rounded-full bg-[#f25f8a]"></span>
+                    <span className="font-extrabold text-[#2d2026] text-xs sm:text-sm">🔍 제품 상세 정보 안내</span>
+                  </div>
+                  <div className="border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm bg-neutral-50 flex items-center justify-center p-2 min-h-[200px]">
+                    <img 
+                      src={selectedProductDetail.detailImg} 
+                      alt={`${selectedProductDetail.name} 상세페이지`} 
+                      className="w-full h-auto object-contain rounded-2xl"
+                    />
+                  </div>
                 </div>
               )}
 
