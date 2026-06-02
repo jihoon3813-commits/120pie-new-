@@ -767,7 +767,7 @@ export default function AdminPage() {
         if (ds) setDeliveryStatuses(JSON.parse(ds));
 
         const ps = localStorage.getItem("120_shipping_settings");
-        if (ps) {
+        if (ps && !showPolicyPanel) {
           try {
             const parsed = JSON.parse(ps);
             setShippingPolicy(parsed.shippingPolicy || "");
@@ -783,7 +783,7 @@ export default function AdminPage() {
 
     const interval = setInterval(syncStates, 1500);
     return () => clearInterval(interval);
-  }, []);
+  }, [showPolicyPanel]);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
