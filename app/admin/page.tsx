@@ -1358,40 +1358,51 @@ export default function AdminPage() {
     }
   };
 
-  // Real Road Address Search using Daum/Kakao Postcode API
+  // Real Road Address Search using Daum/Kakao Postcode API (Iframe Embedded Layer Style)
   const openDaumPostcode = () => {
+    setShowAddressPopup(true);
+    setAddressSearchKeyword("");
+    
     if (typeof window !== "undefined") {
       const scriptId = "daum-postcode-script";
       let script = document.getElementById(scriptId) as HTMLScriptElement | null;
       
-      const startPostcode = () => {
-        new (window as any).daum.Postcode({
-          oncomplete: (data: any) => {
-            let fullRoadAddr = data.roadAddress; // 도로명 주소 변수
-            let extraRoadAddr = ''; // 참고항목 변수
+      const embedPostcode = () => {
+        // Wait minor delay until modal container is fully rendered in DOM
+        setTimeout(() => {
+          const container = document.getElementById("daum-postcode-container");
+          if (!container) return;
+          
+          new (window as any).daum.Postcode({
+            oncomplete: (data: any) => {
+              let fullRoadAddr = data.roadAddress; // 도로명 주소 변수
+              let extraRoadAddr = ''; // 참고항목 변수
 
-            // 법정동명이 있을 경우 추가한다. (법정리는 제외)
-            // 법정동의 경우 마지막 문자가 "동/로/가"로 끝납니다.
-            if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-              extraRoadAddr += data.bname;
-            }
-            // 건물명이 있고, 공동주택일 경우 추가한다.
-            if (data.buildingName !== '') {
-              extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-            }
-            // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-            if (extraRoadAddr !== '') {
-              extraRoadAddr = ' (' + extraRoadAddr + ')';
-            }
+              // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+              // 법정동의 경우 마지막 문자가 "동/로/가"로 끝납니다.
+              if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                extraRoadAddr += data.bname;
+              }
+              // 건물명이 있고, 공동주택일 경우 추가한다.
+              if (data.buildingName !== '') {
+                extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+              }
+              // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+              if (extraRoadAddr !== '') {
+                extraRoadAddr = ' (' + extraRoadAddr + ')';
+              }
 
-            // 도로명 주소 뒤에 참고항목(괄호)까지 통째로 붙여서 세팅
-            const finalAddress = fullRoadAddr + extraRoadAddr;
-            setStoreRoadAddress(finalAddress);
-            
-            setShowAddressPopup(false);
-            triggerToast("실제 도로명 주소(상사/괄호 주소 포함)가 성공적으로 자동 입력되었습니다.");
-          }
-        }).open();
+              // 도로명 주소 뒤에 참고항목(괄호)까지 통째로 붙여서 세팅
+              const finalAddress = fullRoadAddr + extraRoadAddr;
+              setStoreRoadAddress(finalAddress);
+              
+              setShowAddressPopup(false);
+              triggerToast("실제 도로명 주소(상사/괄호 주소 포함)가 성공적으로 자동 입력되었습니다.");
+            },
+            width: "100%",
+            height: "100%"
+          }).embed(container);
+        }, 100);
       };
 
       if (!script) {
@@ -1400,11 +1411,11 @@ export default function AdminPage() {
         script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
         script.async = true;
         script.onload = () => {
-          startPostcode();
+          embedPostcode();
         };
         document.head.appendChild(script);
       } else {
-        startPostcode();
+        embedPostcode();
       }
     }
   };
@@ -5169,83 +5180,37 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* 4. Address Popup Simulator Modal */}
+      {/* 4. Address Popup Simulator Modal with Real Kakao API Embed */}
       {showAddressPopup && (
         <div 
           className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowAddressPopup(false)}
         >
           <div 
-            className="w-full max-w-md bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+            className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-5 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/80">
-              <h4 className="text-sm font-bold text-[#2d2026]">도로명 주소 실시간 검색 시뮬레이터</h4>
-              <button onClick={() => setShowAddressPopup(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
+              <h4 className="text-sm font-bold text-[#2d2026]">실시간 도로명 주소 검색 (Kakao API)</h4>
+              <button onClick={() => setShowAddressPopup(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer">
                 <X size={13} />
               </button>
             </div>
 
-            <div className="p-5 space-y-4">
-              {/* 실제 도로명 주소 검색 (우편번호 서비스) 연동 버튼 */}
-              <button
-                type="button"
-                onClick={openDaumPostcode}
-                className="w-full py-3.5 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 border border-[#f25f8a]/20 hover:scale-[1.01]"
-              >
-                <Search size={14} className="animate-pulse" />
-                실제 도로명 주소 실시간 검색 (Kakao API)
-              </button>
-
-              <div className="flex items-center gap-2 my-2">
-                <div className="flex-1 h-[1px] bg-[#f2ccd7]/40"></div>
-                <span className="text-[10px] font-bold text-[#735965]/60">또는 모의 시뮬레이터 이용</span>
-                <div className="flex-1 h-[1px] bg-[#f2ccd7]/40"></div>
-              </div>
-
-              <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
-                가맹본부 제공 정식 도로명 주소를 모의 검색해 볼 수 있습니다. (예시: '군포', '역삼', '동교', '부산' 등)
-              </p>
-              
-              <div className="flex gap-2">
-                <input 
-                  type="text"
-                  placeholder="도로명이나 건물명을 검색해 보세요"
-                  value={addressSearchKeyword}
-                  onChange={(e) => handleAddressSearch(e.target.value)}
-                  className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] focus:outline-none"
-                />
-              </div>
-
-              {/* Candidates list */}
-              <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                {addressSearchResults.length === 0 ? (
-                  <p className="text-[11px] text-[#735965] opacity-50 py-8 text-center font-bold">검색 결과가 존재하지 않습니다.</p>
-                ) : (
-                  addressSearchResults.map((addr) => (
-                    <button
-                      key={addr}
-                      type="button"
-                      onClick={() => {
-                        setStoreRoadAddress(addr);
-                        setShowAddressPopup(false);
-                        triggerToast("도로명 주소가 선택되어 자동 입력되었습니다.");
-                      }}
-                      className="w-full text-left p-3 rounded-xl border border-[#f2ccd7] hover:border-[#f25f8a] hover:bg-[#fff9fb] text-xs font-semibold text-[#2d2026] transition-colors leading-relaxed block"
-                    >
-                      {addr}
-                    </button>
-                  ))
-                )}
-              </div>
+            {/* Kakao Postcode Iframe Container */}
+            <div className="flex-1 w-full bg-[#fff9fb] overflow-hidden relative">
+              <div 
+                id="daum-postcode-container" 
+                className="w-full h-full"
+              ></div>
             </div>
             
             <div className="p-4 bg-neutral-50 text-center border-t border-[#f2ccd7]/60">
               <button 
                 onClick={() => setShowAddressPopup(false)}
-                className="px-5 py-2 rounded-lg bg-white border border-[#f2ccd7] text-[11px] font-bold text-[#735965]"
+                className="px-5 py-2.5 rounded-xl bg-white border border-[#f2ccd7] text-[11px] font-bold text-[#735965] hover:bg-[#fff1f5] cursor-pointer transition-colors"
               >
-                닫기
+                검색 창 닫기
               </button>
             </div>
           </div>
