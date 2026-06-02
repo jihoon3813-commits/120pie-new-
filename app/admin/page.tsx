@@ -1901,7 +1901,7 @@ export default function AdminPage() {
                 className="h-6 w-auto object-contain group-hover:scale-102 transition-transform"
               />
               <span className="font-extrabold text-xs text-[#735965] ml-1.5 hidden sm:inline uppercase tracking-wider">Head Office</span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-red-50 text-red-500 border border-red-200 font-bold ml-1">본사 어드민</span>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-bold ml-1">본사 어드민</span>
             </Link>
           </div>
 
