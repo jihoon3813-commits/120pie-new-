@@ -3464,11 +3464,8 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 backgroundPosition: "center"
               } : undefined}
             >
-              {popupSettings.image && <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>}
+              {popupSettings.image && <div className="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-black/95 via-black/60 to-transparent"></div>}
               <div className="relative z-10 space-y-1">
-                <span className="bg-[#ffd3df] text-[#bf3e67] text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-widest w-fit">
-                  HQ Announcement
-                </span>
                 <h4 
                   className="font-black leading-snug whitespace-pre-line"
                   style={{
