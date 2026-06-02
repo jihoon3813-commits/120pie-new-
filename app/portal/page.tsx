@@ -985,10 +985,7 @@ export default function PortalPage() {
             </button>
           </form>
 
-          <div className="bg-[#fff1f5] border border-[#f2ccd7] rounded-xl p-4 text-center text-[10px] space-y-1">
-            <span className="font-extrabold text-[#bf3e67] block">📢 임시 테스트 계정 안내</span>
-            <p className="text-[#735965] font-bold">아이디: <code className="bg-white border border-[#f2ccd7] px-1.5 py-0.5 rounded font-extrabold text-[#f25f8a]">owner</code> / 비밀번호: <code className="bg-white border border-[#f2ccd7] px-1.5 py-0.5 rounded font-extrabold text-[#f25f8a]">owner</code></p>
-          </div>
+
           
           <div className="text-center pt-2">
             <Link href="/" className="text-xs text-[#735965] hover:text-[#bf3e67] hover:underline font-bold transition-all flex items-center justify-center gap-1">
