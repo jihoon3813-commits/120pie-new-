@@ -563,6 +563,10 @@ export default function AdminPage() {
   const [productIsActive, setProductIsActive] = useState<boolean>(true);
   const [productShippingType, setProductShippingType] = useState<"free" | "A" | "B" | "C">("A");
 
+  // Product Search & Filter States
+  const [adminProductSearch, setAdminProductSearch] = useState<string>("");
+  const [adminProductCategoryFilter, setAdminProductCategoryFilter] = useState<string>("전체");
+
   // Category list settings
   const [showCategoryPanel, setShowCategoryPanel] = useState<boolean>(false);
   const [newCategoryName, setNewCategoryName] = useState<string>("");
@@ -1986,6 +1990,22 @@ export default function AdminPage() {
     );
   }
 
+  // Product Real-time Filtered List Calculation
+  const filteredProducts = products.filter((p) => {
+    const matchesCategory =
+      adminProductCategoryFilter === "전체" || p.category === adminProductCategoryFilter;
+
+    const searchKeyword = adminProductSearch.trim().toLowerCase();
+    const matchesSearch =
+      searchKeyword === "" ||
+      p.name.toLowerCase().includes(searchKeyword) ||
+      p.modelName.toLowerCase().includes(searchKeyword);
+
+    return matchesCategory && matchesSearch;
+  });
+
+  const isProductFiltering = adminProductSearch.trim() !== "" || adminProductCategoryFilter !== "전체";
+
   return (
     <div id="admin-portal" className="h-screen overflow-hidden bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans select-none antialiased">
       
@@ -2747,6 +2767,73 @@ export default function AdminPage() {
                 </div>
               )}
 
+              {/* Products Search & Category Filter Controls */}
+              <div className="bg-[#fff1f5]/40 border border-[#f2ccd7] rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-2 text-xs font-bold text-[#735965]">
+                  <span>
+                    총{" "}
+                    <strong className="text-[#bf3e67] font-black">
+                      {filteredProducts.length}
+                    </strong>
+                    개의 제품이 검색되었습니다.
+                  </span>
+                  {isProductFiltering && (
+                    <button
+                      onClick={() => {
+                        setAdminProductSearch("");
+                        setAdminProductCategoryFilter("전체");
+                      }}
+                      className="text-[10px] px-2.5 py-0.5 rounded-lg bg-[#ffd3df] hover:bg-[#f25f8a] hover:text-white text-[#bf3e67] border border-[#f2ccd7] transition-all font-extrabold"
+                    >
+                      필터 초기화
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
+                  {/* Category Filter Select */}
+                  <div className="relative min-w-[140px]">
+                    <select
+                      value={adminProductCategoryFilter}
+                      onChange={(e) => setAdminProductCategoryFilter(e.target.value)}
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#735965] focus:outline-none focus:border-[#f25f8a] appearance-none pr-8 cursor-pointer shadow-sm"
+                    >
+                      <option value="전체">카테고리 전체</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#735965]/60 text-[10px]">
+                      ▼
+                    </div>
+                  </div>
+
+                  {/* Text Search Input */}
+                  <div className="relative flex-1 sm:w-64">
+                    <input
+                      type="text"
+                      placeholder="제품명 또는 모델명 검색"
+                      value={adminProductSearch}
+                      onChange={(e) => setAdminProductSearch(e.target.value)}
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl pl-9 pr-8 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] shadow-sm font-semibold"
+                    />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#735965]/50">
+                      <Search size={14} />
+                    </div>
+                    {adminProductSearch && (
+                      <button
+                        onClick={() => setAdminProductSearch("")}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-[#735965]/40 hover:text-red-500 font-extrabold w-5 h-5 flex items-center justify-center rounded-full hover:bg-neutral-100 transition-colors"
+                      >
+                        &times;
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Products Table */}
               <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
@@ -2765,12 +2852,16 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
-                      {products.length === 0 ? (
+                      {filteredProducts.length === 0 ? (
                         <tr>
-                          <td colSpan={9} className="p-8 text-center text-[#735965]">등록된 자재 제품이 존재하지 않습니다.</td>
+                          <td colSpan={9} className="p-8 text-center text-[#735965] font-bold">
+                            {isProductFiltering
+                              ? "검색 및 필터 조건에 부합하는 제품이 없습니다."
+                              : "등록된 자재 제품이 존재하지 않습니다."}
+                          </td>
                         </tr>
                       ) : (
-                        products.map((p, idx) => (
+                        filteredProducts.map((p) => (
                           <tr key={p.id} className="hover:bg-[#fff9fb] transition-colors">
                             <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{p.orderIndex}</td>
                             <td className="p-4 sm:p-5">
@@ -2817,19 +2908,27 @@ export default function AdminPage() {
                               <div className="flex items-center justify-center gap-1">
                                 <button
                                   type="button"
-                                  onClick={() => handleAdjustProductOrder(idx, "up")}
-                                  disabled={idx === 0}
-                                  className="p-1 rounded bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] disabled:opacity-35 disabled:hover:bg-white text-[#735965] font-bold transition-all text-[9px]"
-                                  title="순서 위로"
+                                  onClick={() => handleAdjustProductOrder(products.findIndex((op) => op.id === p.id), "up")}
+                                  disabled={isProductFiltering || products.findIndex((op) => op.id === p.id) === 0}
+                                  className="p-1 rounded bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] disabled:opacity-35 disabled:hover:bg-white text-[#735965] font-bold transition-all text-[9px] cursor-pointer"
+                                  title={
+                                    isProductFiltering
+                                      ? "검색/필터가 적용된 상태에서는 순서 조정이 불가합니다. 필터를 초기화해 주세요."
+                                      : "순서 위로"
+                                  }
                                 >
                                   ▲
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => handleAdjustProductOrder(idx, "down")}
-                                  disabled={idx === products.length - 1}
-                                  className="p-1 rounded bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] disabled:opacity-35 disabled:hover:bg-white text-[#735965] font-bold transition-all text-[9px]"
-                                  title="순서 아래로"
+                                  onClick={() => handleAdjustProductOrder(products.findIndex((op) => op.id === p.id), "down")}
+                                  disabled={isProductFiltering || products.findIndex((op) => op.id === p.id) === products.length - 1}
+                                  className="p-1 rounded bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] disabled:opacity-35 disabled:hover:bg-white text-[#735965] font-bold transition-all text-[9px] cursor-pointer"
+                                  title={
+                                    isProductFiltering
+                                      ? "검색/필터가 적용된 상태에서는 순서 조정이 불가합니다. 필터를 초기화해 주세요."
+                                      : "순서 아래로"
+                                  }
                                 >
                                   ▼
                                 </button>
