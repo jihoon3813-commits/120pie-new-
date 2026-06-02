@@ -830,8 +830,8 @@ export default function AdminPage() {
       setStores(st);
       
       let pr = loadState("120_products", DEFAULT_PRODUCTS);
-      // Self-healing: If bad seeds are detected, force rollback to default 6 products
-      const hasBadSeed = pr.some((p: any) => p.id === "prod-7" || (p.id === "prod-6" && p.name === "시그니처 테이크아웃 컵 16oz"));
+      // Self-healing: Narrow down bad seed detection to misnamed prod-6 to protect newly registered custom products (e.g. prod-7)
+      const hasBadSeed = pr.some((p: any) => p.id === "prod-6" && p.name === "시그니처 테이크아웃 컵 16oz");
       if (hasBadSeed) {
         console.log("[Self-healing] Bad seed detected. Restoring original customized product seed data...");
         pr = DEFAULT_PRODUCTS;
