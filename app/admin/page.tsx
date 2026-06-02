@@ -1179,6 +1179,23 @@ export default function AdminPage() {
     }
   };
 
+  const handleAdjustCategoryOrder = (index: number, direction: "up" | "down") => {
+    if (direction === "up" && index === 0) return;
+    if (direction === "down" && index === categories.length - 1) return;
+
+    const newCategories = [...categories];
+    const targetIdx = direction === "up" ? index - 1 : index + 1;
+    
+    // Swap
+    const temp = newCategories[index];
+    newCategories[index] = newCategories[targetIdx];
+    newCategories[targetIdx] = temp;
+
+    setCategories(newCategories);
+    localStorage.setItem("120_categories", JSON.stringify(newCategories));
+    triggerToast("카테고리 노출 순서가 변경되었습니다.");
+  };
+
   // Browser-side image compression helper to avoid LocalStorage quota errors
   const compressImage = (base64Str: string, maxWidth = 800, maxHeight = 800, quality = 0.7): Promise<string> => {
     return new Promise((resolve) => {
@@ -1646,6 +1663,54 @@ export default function AdminPage() {
         } catch (err) {
           console.error("Gallery image compression error:", err);
           setGalleryItemUrl(reader.result);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleProductImgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 10 * 1024 * 1024) {
+      alert("이미지 크기는 10MB 이하여야 합니다.");
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      if (typeof reader.result === "string") {
+        try {
+          const compressed = await compressImage(reader.result, 800, 800, 0.7);
+          setProductImg(compressed);
+        } catch (err) {
+          console.error("Product image compression error:", err);
+          setProductImg(reader.result);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleProductDetailImgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 10 * 1024 * 1024) {
+      alert("이미지 크기는 10MB 이하여야 합니다.");
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      if (typeof reader.result === "string") {
+        try {
+          const compressed = await compressImage(reader.result, 1200, 1200, 0.7);
+          setProductDetailImg(compressed);
+        } catch (err) {
+          console.error("Product detail image compression error:", err);
+          setProductDetailImg(reader.result);
         }
       }
     };
@@ -2288,16 +2353,36 @@ export default function AdminPage() {
                     </button>
                   </form>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {categories.map((catName) => (
+                    {categories.map((catName, idx) => (
                       <span 
                         key={catName} 
                         className="inline-flex items-center gap-1.5 bg-[#fff1f5] border border-[#f2ccd7] text-[#bf3e67] px-3 py-1.5 rounded-lg text-xs font-bold"
                       >
                         {catName}
+                        <div className="flex items-center gap-0.5 ml-1">
+                          <button
+                            type="button"
+                            onClick={() => handleAdjustCategoryOrder(idx, "up")}
+                            disabled={idx === 0}
+                            className="w-4 h-4 flex items-center justify-center rounded bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[8px] transition-colors cursor-pointer"
+                            title="위로 이동"
+                          >
+                            ▲
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleAdjustCategoryOrder(idx, "down")}
+                            disabled={idx === categories.length - 1}
+                            className="w-4 h-4 flex items-center justify-center rounded bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[8px] transition-colors cursor-pointer"
+                            title="아래로 이동"
+                          >
+                            ▼
+                          </button>
+                        </div>
                         <button 
                           type="button"
                           onClick={() => handleDeleteCategory(catName)}
-                          className="hover:text-red-500 text-[#735965] transition-colors font-extrabold ml-0.5"
+                          className="hover:text-red-500 text-[#735965] transition-colors font-extrabold ml-1"
                           title="삭제"
                         >
                           &times;
@@ -4444,30 +4529,50 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Image url links with quick presets */}
-              <div className="space-y-3">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">썸네일 대표 이미지 주소 *</label>
-                  <input 
-                    type="text"
-                    placeholder="https://res.cloudinary.com/... 이미지 경로"
-                    value={productImg}
-                    onChange={(e) => setProductImg(e.target.value)}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">상세 상세페이지 이미지 주소 (옵션)</label>
-                  <input 
-                    type="text"
-                    placeholder="https://res.cloudinary.com/... 이미지 상세 경로"
-                    value={productDetailImg}
-                    onChange={(e) => setProductDetailImg(e.target.value)}
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none"
-                  />
+              {/* Image url links with file upload option */}
+              <div className="space-y-4">
+                <div className="flex flex-col gap-1.5 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl space-y-2">
+                  <label className="font-bold text-[#2d2026]">썸네일 대표 이미지 *</label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input 
+                      type="text"
+                      placeholder="https://res.cloudinary.com/... 이미지 웹 경로"
+                      value={productImg}
+                      onChange={(e) => setProductImg(e.target.value)}
+                      required
+                      className="flex-1 bg-white border border-[#f2ccd7]/60 rounded-xl px-4 py-2.5 text-xs text-[#2d2026] focus:outline-none"
+                    />
+                    <div className="flex items-center bg-white border border-[#f2ccd7]/60 rounded-xl px-3 py-2 shrink-0">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProductImgUpload}
+                        className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer w-full max-w-[180px]"
+                      />
+                    </div>
+                  </div>
                 </div>
 
+                <div className="flex flex-col gap-1.5 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl space-y-2">
+                  <label className="font-bold text-[#2d2026]">상세 상세페이지 이미지 (옵션)</label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input 
+                      type="text"
+                      placeholder="https://res.cloudinary.com/... 이미지 상세 웹 경로"
+                      value={productDetailImg}
+                      onChange={(e) => setProductDetailImg(e.target.value)}
+                      className="flex-1 bg-white border border-[#f2ccd7]/60 rounded-xl px-4 py-2.5 text-xs text-[#2d2026] focus:outline-none"
+                    />
+                    <div className="flex items-center bg-white border border-[#f2ccd7]/60 rounded-xl px-3 py-2 shrink-0">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProductDetailImgUpload}
+                        className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer w-full max-w-[180px]"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <button 

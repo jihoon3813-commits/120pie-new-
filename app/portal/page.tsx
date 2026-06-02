@@ -1357,7 +1357,7 @@ export default function PortalPage() {
                 
                 {/* Category selector */}
                 <div className="flex flex-wrap gap-2 bg-white border border-[#f2ccd7] p-2 rounded-2xl shadow-sm">
-                  {["전체", "냉동생지/자재", "부자재/포장재", "소모품/집기"].map((cat) => (
+                  {["전체", ...categories].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
