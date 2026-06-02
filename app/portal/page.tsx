@@ -34,8 +34,12 @@ import {
   Camera,
   Video,
   Phone,
-  MessageCircle
+  MessageCircle,
+  RotateCcw
 } from "lucide-react";
+
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 // ==========================================
 // TYPES DEFINITIONS
@@ -291,9 +295,10 @@ const INITIAL_PR: Material[] = [
 ];
 
 export default function PortalPage() {
-  // ==========================================
-  // AUTHENTICATION STATE & LOGIC
-  // ==========================================
+  // Convex Hooks for Popups & Floatings
+  const convexPopup = useQuery(api.popups.get);
+  const convexFloating = useQuery(api.floatings.get);
+
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
   const [loginId, setLoginId] = useState<string>("");
@@ -355,6 +360,71 @@ export default function PortalPage() {
     localStorage.removeItem("120_active_store_id");
     setIsLoggedIn(false);
     triggerToast("안전하게 로그아웃되었습니다.");
+  };
+
+  // ==========================================
+  // CONVEX REAL-TIME POPUP & FLOATING SYNC
+  // ==========================================
+  useEffect(() => {
+    if (convexPopup !== undefined) {
+      setPopupSettings(convexPopup);
+      try {
+        localStorage.setItem("120_popups", JSON.stringify(convexPopup));
+      } catch (e) {
+        console.warn(e);
+      }
+
+      if (convexPopup && convexPopup.isActive) {
+        const closedDate = localStorage.getItem("120_popup_closed_date");
+        const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+        if (closedDate !== todayStr) {
+          setShowPopup(true);
+        } else {
+          setShowPopup(false);
+        }
+      } else {
+        setShowPopup(false);
+      }
+    }
+  }, [convexPopup]);
+
+  useEffect(() => {
+    if (convexFloating !== undefined) {
+      setFloatingSettings(convexFloating);
+      try {
+        localStorage.setItem("120_floatings", JSON.stringify(convexFloating));
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  }, [convexFloating]);
+
+  // ==========================================
+  // SYSTEM DATA RESET SYNC
+  // ==========================================
+  const handleDataReset = () => {
+    if (
+      window.confirm(
+        "모든 발주 데이터 및 캐시를 공장 초기 상태로 동기화(초기화)하시겠습니까?\n이 작업은 데이터 꼬임이나 캐싱 문제를 완벽하게 해결합니다."
+      )
+    ) {
+      localStorage.removeItem("120_products");
+      localStorage.removeItem("120_categories");
+      localStorage.removeItem("120_banners");
+      localStorage.removeItem("120_popups");
+      localStorage.removeItem("120_floatings");
+      localStorage.removeItem("120_orders");
+      localStorage.removeItem("120_inquiries");
+      localStorage.removeItem("120_notices");
+      localStorage.removeItem("120_trainings");
+      localStorage.removeItem("120_prs");
+      localStorage.removeItem("120_shipping_settings");
+      localStorage.removeItem("120_owner_logged_in");
+      localStorage.removeItem("120_active_store_id");
+      localStorage.removeItem("120_popup_closed_date");
+      alert("시스템 데이터가 성공적으로 동기화 및 초기화되었습니다. 새로고침 후 다시 로그인해 주세요.");
+      window.location.reload();
+    }
   };
 
   // ==========================================
@@ -456,35 +526,8 @@ export default function PortalPage() {
       setBanner(loadState("120_banners", null));
       setActiveStoreId(localStorage.getItem("120_active_store_id") || "owner");
 
-      // Load Popup & Floating values
-      const loadedPop = loadState("120_popups", {
-        isActive: true,
-        title: "여름 스페셜 '망고파이' 물류 정식 출시!",
-        desc: "신메뉴 출시 기념 특전! 지금 물류 메뉴에서 망고파이 생지 3박스 이상 주문 시 캐릭터 홍보 포스터 패키지 및 아크릴 테이블 텐트 시안 무상 증정!",
-        image: "",
-        link: "order",
-        btnText: "지금 바로 신메뉴 생지 주문하러 가기"
-      });
-      setPopupSettings(loadedPop);
+      // Popup & Floating values are dynamically synced in real-time via Convex below.
 
-      const loadedFloat = loadState("120_floatings", {
-        isActive: true,
-        instaUrl: "https://www.instagram.com/120pie77/",
-        youtubeUrl: "https://youtube.com",
-        chatUrl: "https://kakao.com",
-        phoneNo: "1566-3594",
-        kakaoUrl: "https://kakao.com"
-      });
-      setFloatingSettings(loadedFloat);
-
-      // Check if popup should be shown today
-      if (loadedPop?.isActive) {
-        const closedDate = localStorage.getItem("120_popup_closed_date");
-        const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-        if (closedDate !== todayStr) {
-          setShowPopup(true);
-        }
-      }
 
       const pr = loadState("120_products", INITIAL_PRODUCTS);
       // Self-healing: Merge options and ensure missing seed products are injected
@@ -1102,7 +1145,14 @@ export default function PortalPage() {
             </nav>
           </div>
 
-          <div className="border-t border-[#f2ccd7] pt-6">
+          <div className="border-t border-[#f2ccd7] pt-6 space-y-2">
+            <button
+              onClick={handleDataReset}
+              className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#bf3e67] bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] transition-all text-left cursor-pointer shadow-sm"
+            >
+              <RotateCcw size={17} />
+              <span>시스템 데이터 동기화</span>
+            </button>
             <button
               onClick={handleLogout}
               className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#735965] hover:text-red-500 hover:bg-red-50 transition-colors text-left"
@@ -1180,7 +1230,14 @@ export default function PortalPage() {
                 </nav>
               </div>
 
-              <div className="border-t border-[#f2ccd7] pt-6">
+              <div className="border-t border-[#f2ccd7] pt-6 space-y-2">
+                <button
+                  onClick={handleDataReset}
+                  className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#bf3e67] bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] transition-all text-left cursor-pointer shadow-sm"
+                >
+                  <RotateCcw size={17} />
+                  <span>시스템 데이터 동기화</span>
+                </button>
                 <button
                   onClick={handleLogout}
                   className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#735965] hover:text-red-500 hover:bg-red-50 transition-colors text-left"
