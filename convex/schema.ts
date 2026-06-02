@@ -60,4 +60,41 @@ export default defineSchema({
     adoptionMenu: v.array(v.string()), // 도입 메뉴 브랜드 배열
     monthlySales: v.number(), // 월매출
   }),
+  products: defineTable({
+    id: v.string(), // e.g. "prod-1"
+    orderIndex: v.number(),
+    name: v.string(),
+    category: v.string(),
+    modelName: v.string(),
+    unit: v.string(), // "개" | "박스" | "kg" | "SET" | "EA" | "대"
+    qty: v.number(),
+    supplyPrice: v.number(),
+    price: v.number(),
+    discountAmount: v.number(),
+    discountedPrice: v.number(),
+    img: v.string(),
+    detailImg: v.optional(v.string()),
+    detailText: v.optional(v.string()),
+    isActive: v.boolean(),
+    desc: v.string(),
+    stock: v.string(), // "in_stock" | "low_stock" | "out_of_stock"
+    labels: v.optional(v.array(v.string())),
+    shippingType: v.optional(v.string()), // "free" | "A" | "B" | "C"
+    options: v.optional(v.array(v.string())),
+  }),
+  orders: defineTable({
+    id: v.string(), // e.g. "ORD-20260525-01"
+    date: v.string(), // YYYY-MM-DD
+    items: v.array(
+      v.object({
+        productName: v.string(),
+        quantity: v.number(),
+        price: v.number(),
+        selectedOption: v.optional(v.string()),
+      })
+    ),
+    totalPrice: v.number(),
+    status: v.string(), // "대기" | "배송중" | "배송완료" 등
+    storeId: v.optional(v.string()), // 발주 넣은 가맹점의 ID
+  }),
 });
