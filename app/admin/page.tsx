@@ -409,8 +409,30 @@ export default function AdminPage() {
     if (command.startsWith("justify")) {
       const sel = window.getSelection();
       if (sel && sel.rangeCount > 0) {
-        const parent = sel.getRangeAt(0).commonAncestorContainer.parentNode as HTMLElement;
-        if (parent && parent.id === "product-detail-rich-editor") {
+        let node = sel.getRangeAt(0).commonAncestorContainer;
+        if (node.nodeType === Node.TEXT_NODE) {
+          node = node.parentNode || node;
+        }
+
+        let closestBlock: HTMLElement | null = null;
+        let temp = node as HTMLElement;
+        while (temp && temp !== editor) {
+          const display = window.getComputedStyle(temp).display;
+          if (
+            display === "block" ||
+            display === "flex" ||
+            display === "grid" ||
+            temp.tagName === "DIV" ||
+            temp.tagName === "P" ||
+            temp.tagName === "CENTER"
+          ) {
+            closestBlock = temp;
+            break;
+          }
+          temp = temp.parentNode as HTMLElement;
+        }
+
+        if (!closestBlock) {
           document.execCommand("formatBlock", false, "div");
         }
       }
@@ -5392,6 +5414,9 @@ export default function AdminPage() {
                       onMouseUp={saveSelection}
                       onKeyUp={saveSelection}
                       onSelect={saveSelection}
+                      onFocus={() => {
+                        document.execCommand("defaultParagraphSeparator", false, "div");
+                      }}
                       className="p-4 min-h-[140px] max-h-[260px] overflow-y-auto focus:outline-none bg-white text-xs sm:text-sm text-[#2d2026] leading-relaxed rich-content-view"
                       data-placeholder="이곳에 제품 상세 안내 텍스트를 자유롭게 입력하고 편집하세요..."
                       style={{ minHeight: "140px" }}
