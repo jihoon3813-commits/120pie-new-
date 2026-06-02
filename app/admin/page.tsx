@@ -405,15 +405,20 @@ export default function AdminPage() {
     editor.focus();
     restoreSelection();
 
-    // justifyAlign command self-healing: ensure text block is formatted as block-level element
     if (command.startsWith("justify")) {
       const sel = window.getSelection();
       if (sel && sel.rangeCount > 0) {
-        let node = sel.getRangeAt(0).commonAncestorContainer;
+        const range = sel.getRangeAt(0);
+        let align = "left";
+        if (command === "justifyCenter") align = "center";
+        else if (command === "justifyRight") align = "right";
+
+        let node = range.commonAncestorContainer;
         if (node.nodeType === Node.TEXT_NODE) {
           node = node.parentNode || node;
         }
 
+        // Find the closest block level container inside the editor
         let closestBlock: HTMLElement | null = null;
         let temp = node as HTMLElement;
         while (temp && temp !== editor) {
@@ -432,13 +437,46 @@ export default function AdminPage() {
           temp = temp.parentNode as HTMLElement;
         }
 
-        if (!closestBlock) {
-          document.execCommand("formatBlock", false, "div");
+        if (closestBlock) {
+          // If we found a block wrapper (like an existing div or p), apply text-align directly
+          closestBlock.style.textAlign = align;
+        } else {
+          // If there is no block wrapper, manually wrap in a div and apply text-align
+          const div = document.createElement("div");
+          div.style.textAlign = align;
+          try {
+            range.surroundContents(div);
+            
+            // Re-select the wrapped contents to preserve selection
+            sel.removeAllRanges();
+            const newRange = document.createRange();
+            newRange.selectNodeContents(div);
+            sel.addRange(newRange);
+            savedRangeRef.current = newRange;
+          } catch (e) {
+            // Fallback: extract and insert if range splits elements
+            try {
+              const fragment = range.extractContents();
+              div.appendChild(fragment);
+              range.insertNode(div);
+              
+              sel.removeAllRanges();
+              const newRange = document.createRange();
+              newRange.selectNodeContents(div);
+              sel.addRange(newRange);
+              savedRangeRef.current = newRange;
+            } catch (err) {
+              console.error("Failed to apply custom align wrapping:", err);
+              document.execCommand("formatBlock", false, "div");
+              document.execCommand(command, false, value);
+            }
+          }
         }
       }
+    } else {
+      document.execCommand(command, false, value);
     }
 
-    document.execCommand(command, false, value);
     setProductDetailText(editor.innerHTML);
 
     // Save selection again after command execution
