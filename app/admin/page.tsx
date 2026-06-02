@@ -2471,7 +2471,11 @@ export default function AdminPage() {
                           value={freeShippingThreshold}
                           onChange={(e) => {
                             let val = e.target.value.replace(/[^0-9]/g, "");
-                            if (val) val = Number(val).toLocaleString();
+                            if (val) {
+                              val = Number(val).toLocaleString();
+                            } else {
+                              val = "";
+                            }
                             setFreeShippingThreshold(val);
                           }}
                           required
@@ -2486,7 +2490,11 @@ export default function AdminPage() {
                           value={basicShippingFee}
                           onChange={(e) => {
                             let val = e.target.value.replace(/[^0-9]/g, "");
-                            if (val) val = Number(val).toLocaleString();
+                            if (val) {
+                              val = Number(val).toLocaleString();
+                            } else {
+                              val = "";
+                            }
                             setBasicShippingFee(val);
                           }}
                           required
