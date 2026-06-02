@@ -49,6 +49,7 @@ interface Product {
   img: string;
   stock: "in_stock" | "low_stock" | "out_of_stock";
   desc: string;
+  labels?: string[];
 }
 
 interface CartItem {
@@ -472,7 +473,8 @@ export default function PortalPage() {
         img: p.img,
         stock: p.stock || "in_stock",
         desc: p.desc || "",
-        orderIndex: p.orderIndex || 99
+        orderIndex: p.orderIndex || 99,
+        labels: p.labels || []
       })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
       setProducts(mapped);
     }
@@ -527,7 +529,8 @@ export default function PortalPage() {
               img: p.img,
               stock: p.stock || "in_stock",
               desc: p.desc || "",
-              orderIndex: p.orderIndex || 99
+              orderIndex: p.orderIndex || 99,
+              labels: p.labels || []
             })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
             setProducts(mapped);
           } catch (e) {
@@ -1384,13 +1387,24 @@ export default function PortalPage() {
                         {/* Thumbnail image & stock state badge */}
                         <div className="h-44 relative bg-[#fff1f5] overflow-hidden shrink-0">
                           <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-                          <div className="absolute top-3 left-3 flex gap-1.5">
+                          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[80%]">
                             {p.stock === "low_stock" && (
                               <span className="bg-orange-500 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">품절임박</span>
                             )}
                             {p.stock === "out_of_stock" && (
                               <span className="bg-red-500 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow-sm">일시품절</span>
                             )}
+                            {p.labels && p.labels.map((l) => {
+                              let bgStyle = "bg-neutral-500/90 text-white";
+                              if (l === "BEST") bgStyle = "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm font-black";
+                              else if (l === "추천") bgStyle = "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm font-black";
+                              else if (l === "신제품") bgStyle = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-black";
+                              return (
+                                <span key={l} className={`font-bold text-[9px] px-2 py-0.5 rounded shadow-sm ${bgStyle}`}>
+                                  {l}
+                                </span>
+                              );
+                            })}
                           </div>
                           <span className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-[10px] text-[#bf3e67] font-extrabold px-2 py-1 rounded border border-[#f2ccd7]">
                             {p.category}

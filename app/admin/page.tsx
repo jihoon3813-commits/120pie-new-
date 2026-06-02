@@ -77,6 +77,7 @@ interface Product {
   isActive: boolean; // 판매 활성화여부
   desc: string; // 설명
   stock: "in_stock" | "low_stock" | "out_of_stock"; // 재고상태 호환용
+  labels?: string[]; // 라벨 (e.g. ["BEST", "추천", "신제품"])
 }
 
 interface BannerSettings {
@@ -564,6 +565,12 @@ export default function AdminPage() {
   const [showCategoryPanel, setShowCategoryPanel] = useState<boolean>(false);
   const [newCategoryName, setNewCategoryName] = useState<string>("");
 
+  // Label management states
+  const [labels, setLabels] = useState<string[]>([]);
+  const [newLabelName, setNewLabelName] = useState<string>("");
+  const [showLabelPanel, setShowLabelPanel] = useState<boolean>(false);
+  const [productLabels, setProductLabels] = useState<string[]>([]);
+
   // 3. BANNER CONTROL STATES
   const [bannerMainTag, setBannerMainTag] = useState<string>("");
   const [bannerMainTitle, setBannerMainTitle] = useState<string>("");
@@ -658,6 +665,8 @@ export default function AdminPage() {
       setProducts(pr);
       const cat = loadState("120_categories", ["냉동생지/자재", "부자재/포장재", "소모품/집기"]);
       setCategories(cat);
+      const lab = loadState("120_labels", ["BEST", "추천", "신제품"]);
+      setLabels(lab);
       
       const bnr = loadState("120_banners", DEFAULT_BANNER);
       setBanner(bnr);
@@ -732,6 +741,9 @@ export default function AdminPage() {
         if (pr) setProducts(JSON.parse(pr));
         if (cat) setCategories(JSON.parse(cat));
         if (bnr) setBanner(JSON.parse(bnr));
+
+        const lab = localStorage.getItem("120_labels");
+        if (lab) setLabels(JSON.parse(lab));
 
         const ds = localStorage.getItem("120_delivery_statuses");
         if (ds) setDeliveryStatuses(JSON.parse(ds));
@@ -1056,6 +1068,7 @@ export default function AdminPage() {
       setProductImg(prod.img);
       setProductDetailImg(prod.detailImg || "");
       setProductIsActive(prod.isActive);
+      setProductLabels(prod.labels || []);
     } else {
       setSelectedProduct(null);
       setProductCategory(categories[0] || "냉동생지/자재");
@@ -1069,6 +1082,7 @@ export default function AdminPage() {
       setProductImg("");
       setProductDetailImg("");
       setProductIsActive(true);
+      setProductLabels([]);
     }
     setShowProductModal(true);
   };
@@ -1102,7 +1116,8 @@ export default function AdminPage() {
       detailImg: productDetailImg || undefined,
       isActive: productIsActive,
       desc: `${productModelName} - ${productCategory} 표준 규격`,
-      stock: "in_stock"
+      stock: "in_stock",
+      labels: productLabels
     };
 
     let updatedProducts: Product[];
@@ -1194,6 +1209,46 @@ export default function AdminPage() {
     setCategories(newCategories);
     localStorage.setItem("120_categories", JSON.stringify(newCategories));
     triggerToast("카테고리 노출 순서가 변경되었습니다.");
+  };
+
+  const handleAddLabel = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newLabelName.trim()) return;
+    if (labels.includes(newLabelName.trim())) {
+      alert("이미 존재하는 라벨입니다.");
+      return;
+    }
+    const updated = [...labels, newLabelName.trim()];
+    setLabels(updated);
+    localStorage.setItem("120_labels", JSON.stringify(updated));
+    setNewLabelName("");
+    triggerToast("신규 라벨이 등록되었습니다.");
+  };
+
+  const handleDeleteLabel = (labelName: string) => {
+    if (confirm(`정말 '${labelName}' 라벨을 삭제하시겠습니까?`)) {
+      const updated = labels.filter((l) => l !== labelName);
+      setLabels(updated);
+      localStorage.setItem("120_labels", JSON.stringify(updated));
+      triggerToast("라벨이 삭제되었습니다.");
+    }
+  };
+
+  const handleAdjustLabelOrder = (index: number, direction: "up" | "down") => {
+    if (direction === "up" && index === 0) return;
+    if (direction === "down" && index === labels.length - 1) return;
+
+    const newLabels = [...labels];
+    const targetIdx = direction === "up" ? index - 1 : index + 1;
+    
+    // Swap
+    const temp = newLabels[index];
+    newLabels[index] = newLabels[targetIdx];
+    newLabels[targetIdx] = temp;
+
+    setLabels(newLabels);
+    localStorage.setItem("120_labels", JSON.stringify(newLabels));
+    triggerToast("라벨 노출 순서가 변경되었습니다.");
   };
 
   // Browser-side image compression helper to avoid LocalStorage quota errors
@@ -2307,10 +2362,22 @@ export default function AdminPage() {
                 </div>
                 <div className="flex items-center gap-2 self-start sm:self-center">
                   <button
-                    onClick={() => setShowCategoryPanel(!showCategoryPanel)}
+                    onClick={() => {
+                      setShowCategoryPanel(!showCategoryPanel);
+                      setShowLabelPanel(false);
+                    }}
                     className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-[#bf3e67] text-xs font-bold rounded-lg transition-all shadow-sm"
                   >
                     카테고리 관리
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowLabelPanel(!showLabelPanel);
+                      setShowCategoryPanel(false);
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-[#bf3e67] text-xs font-bold rounded-lg transition-all shadow-sm"
+                  >
+                    라벨 관리
                   </button>
                   <button
                     onClick={() => handleOpenProductModal()}
@@ -2321,6 +2388,80 @@ export default function AdminPage() {
                   </button>
                 </div>
               </div>
+
+              {/* Real-time Label Panel */}
+              {showLabelPanel && (
+                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-3">
+                    <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-1.5">
+                      <span>🏷 라벨 실시간 관리 대장</span>
+                    </h3>
+                    <button 
+                      onClick={() => setShowLabelPanel(false)}
+                      className="text-xs text-[#735965] hover:text-[#f25f8a] font-bold"
+                    >
+                      닫기
+                    </button>
+                  </div>
+                  <form onSubmit={handleAddLabel} className="flex gap-2">
+                    <input 
+                      type="text"
+                      placeholder="신규 라벨 입력 (e.g. BEST, 추천, 신제품 등)"
+                      value={newLabelName}
+                      onChange={(e) => setNewLabelName(e.target.value)}
+                      required
+                      className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                    />
+                    <button 
+                      type="submit"
+                      className="px-4 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all"
+                    >
+                      추가
+                    </button>
+                  </form>
+                  <div className="space-y-2.5 max-w-md pt-2">
+                    <label className="text-[11px] font-bold text-[#735965] block">등록된 라벨 목록 (순서 조정 및 삭제)</label>
+                    <div className="space-y-2 p-3.5 bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-2xl max-h-[300px] overflow-y-auto">
+                      {labels.map((labName, idx) => (
+                        <div
+                          key={labName}
+                          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#fff9fb] text-[#bf3e67] border border-[#f2ccd7] group"
+                        >
+                          <span>{labName}</span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleAdjustLabelOrder(idx, "up")}
+                              disabled={idx === 0}
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              title="위로 이동"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleAdjustLabelOrder(idx, "down")}
+                              disabled={idx === labels.length - 1}
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              title="아래로 이동"
+                            >
+                              ▼
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteLabel(labName)}
+                              className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 ml-1 font-bold text-sm leading-none transition-colors cursor-pointer"
+                              title="라벨 삭제"
+                            >
+                              &times;
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Real-time Category Panel */}
               {showCategoryPanel && (
@@ -2431,7 +2572,21 @@ export default function AdminPage() {
                               </span>
                             </td>
                             <td className="p-4 sm:p-5">
-                              <div className="font-bold text-[#2d2026] text-xs">{p.name}</div>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-bold text-[#2d2026] text-xs">{p.name}</span>
+                                {p.labels && p.labels.map((l) => {
+                                  let bgClass = "";
+                                  if (l === "BEST") bgClass = "bg-amber-50 text-amber-600 border border-amber-200";
+                                  else if (l === "추천") bgClass = "bg-indigo-50 text-indigo-600 border border-indigo-200";
+                                  else if (l === "신제품") bgClass = "bg-emerald-50 text-emerald-600 border border-emerald-200";
+                                  else bgClass = "bg-neutral-50 text-neutral-600 border border-neutral-200";
+                                  return (
+                                    <span key={l} className={`text-[9px] font-black px-1.5 py-0.5 rounded border ${bgClass}`}>
+                                      {l}
+                                    </span>
+                                  );
+                                })}
+                              </div>
                               <div className="text-[10px] text-[#735965] font-semibold mt-0.5">{p.modelName} ({p.qty}{p.unit})</div>
                             </td>
                             <td className="p-4 sm:p-5 text-[#735965] font-bold">{p.supplyPrice.toLocaleString()} 원</td>
@@ -4576,6 +4731,37 @@ export default function AdminPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Product Label Selection */}
+              <div className="space-y-2 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl">
+                <label className="font-bold text-[#2d2026] block">자재 적용 라벨 선택 (중복 체크 가능)</label>
+                {labels.length === 0 ? (
+                  <p className="text-[10px] text-[#735965] opacity-50">등록된 라벨이 없습니다. 라벨 관리에서 먼저 추가해 주세요.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-4 pt-1">
+                    {labels.map((labelName) => {
+                      const isChecked = productLabels.includes(labelName);
+                      return (
+                        <label key={labelName} className="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-[#2d2026]">
+                          <input 
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setProductLabels([...productLabels, labelName]);
+                              } else {
+                                setProductLabels(productLabels.filter((l) => l !== labelName));
+                              }
+                            }}
+                            className="w-4 h-4 rounded text-[#f25f8a] border-[#f2ccd7] focus:ring-[#f25f8a] accent-[#f25f8a] cursor-pointer"
+                          />
+                          <span>{labelName}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               <button 
