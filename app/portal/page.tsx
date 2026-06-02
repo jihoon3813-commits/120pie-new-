@@ -489,9 +489,29 @@ export default function PortalPage() {
       const pr = loadState("120_products", INITIAL_PRODUCTS);
       // Self-healing: Merge options and ensure missing seed products are injected
       const healedPr = pr.map((p: any) => {
-        const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id);
+        const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id) as any;
+        const healedPrice = typeof p.price === "number" ? p.price : (initialMatch?.price || 0);
+        const healedDisc = typeof p.discountAmount === "number" ? p.discountAmount : (initialMatch?.discountAmount || 0);
         return {
-          ...p,
+          id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
+          orderIndex: typeof p.orderIndex === "number" ? p.orderIndex : (initialMatch?.orderIndex || 99),
+          name: p.name || initialMatch?.name || "이름 없는 상품",
+          category: p.category || initialMatch?.category || "냉동생지/자재",
+          modelName: p.modelName || initialMatch?.modelName || `MODEL-${p.id || "GENERIC"}`,
+          unit: p.unit || initialMatch?.unit || "박스",
+          qty: typeof p.qty === "number" ? p.qty : (initialMatch?.qty || 1),
+          supplyPrice: typeof p.supplyPrice === "number" ? p.supplyPrice : (initialMatch?.supplyPrice || 0),
+          price: healedPrice,
+          discountAmount: healedDisc,
+          discountedPrice: typeof p.discountedPrice === "number" ? p.discountedPrice : (healedPrice - healedDisc),
+          img: p.img || initialMatch?.img || "",
+          detailImg: p.detailImg || initialMatch?.detailImg || "",
+          detailText: p.detailText || initialMatch?.detailText || "",
+          isActive: typeof p.isActive === "boolean" ? p.isActive : true,
+          desc: p.desc || initialMatch?.desc || "",
+          stock: p.stock || initialMatch?.stock || "in_stock",
+          labels: Array.isArray(p.labels) ? p.labels : (initialMatch?.labels || []),
+          shippingType: p.shippingType || initialMatch?.shippingType || "A",
           options: p.options && p.options.length > 0 ? p.options : (initialMatch?.options || undefined)
         };
       });
@@ -581,23 +601,47 @@ export default function PortalPage() {
           try {
             const parsedProducts = JSON.parse(pr);
             const mapped = parsedProducts.map((p: any) => {
-              const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id);
-              const opts = p.options && p.options.length > 0 ? p.options : (initialMatch?.options || []);
+              const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id) as any;
+              const healedPrice = typeof p.price === "number" ? p.price : (initialMatch?.price || 0);
+              const healedDisc = typeof p.discountAmount === "number" ? p.discountAmount : (initialMatch?.discountAmount || 0);
+              const healedP = {
+                id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
+                orderIndex: typeof p.orderIndex === "number" ? p.orderIndex : (initialMatch?.orderIndex || 99),
+                name: p.name || initialMatch?.name || "이름 없는 상품",
+                category: p.category || initialMatch?.category || "냉동생지/자재",
+                modelName: p.modelName || initialMatch?.modelName || `MODEL-${p.id || "GENERIC"}`,
+                unit: p.unit || initialMatch?.unit || "박스",
+                qty: typeof p.qty === "number" ? p.qty : (initialMatch?.qty || 1),
+                supplyPrice: typeof p.supplyPrice === "number" ? p.supplyPrice : (initialMatch?.supplyPrice || 0),
+                price: healedPrice,
+                discountAmount: healedDisc,
+                discountedPrice: typeof p.discountedPrice === "number" ? p.discountedPrice : (healedPrice - healedDisc),
+                img: p.img || initialMatch?.img || "",
+                detailImg: p.detailImg || initialMatch?.detailImg || "",
+                detailText: p.detailText || initialMatch?.detailText || "",
+                isActive: typeof p.isActive === "boolean" ? p.isActive : true,
+                desc: p.desc || initialMatch?.desc || "",
+                stock: p.stock || initialMatch?.stock || "in_stock",
+                labels: Array.isArray(p.labels) ? p.labels : (initialMatch?.labels || []),
+                shippingType: p.shippingType || initialMatch?.shippingType || "A",
+                options: p.options && p.options.length > 0 ? p.options : (initialMatch?.options || [])
+              };
+
               return {
-                id: p.id,
-                name: p.name,
-                category: p.category,
-                price: p.discountedPrice !== undefined ? p.discountedPrice : p.price,
-                packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
-                img: p.img,
-                detailImg: p.detailImg,
-                detailText: p.detailText,
-                stock: p.stock || "in_stock",
-                desc: p.desc || "",
-                orderIndex: p.orderIndex || 99,
-                labels: p.labels || [],
-                shippingType: p.shippingType || "A",
-                options: opts
+                id: healedP.id,
+                name: healedP.name,
+                category: healedP.category,
+                price: healedP.discountedPrice !== undefined ? healedP.discountedPrice : healedP.price,
+                packSize: `${healedP.unit || '박스'} (${healedP.qty || 1}개입)`,
+                img: healedP.img,
+                detailImg: healedP.detailImg,
+                detailText: healedP.detailText,
+                stock: healedP.stock || "in_stock",
+                desc: healedP.desc || "",
+                orderIndex: healedP.orderIndex || 99,
+                labels: healedP.labels || [],
+                shippingType: healedP.shippingType || "A",
+                options: healedP.options
               };
             }).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
             setProducts(mapped);

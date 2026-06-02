@@ -753,8 +753,28 @@ export default function AdminPage() {
       // Self-healing: Merge options and ensure missing seed products are injected
       const healedPr = pr.map((p: any) => {
         const defaultMatch = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id);
+        const healedPrice = typeof p.price === "number" ? p.price : (defaultMatch?.price || 0);
+        const healedDisc = typeof p.discountAmount === "number" ? p.discountAmount : (defaultMatch?.discountAmount || 0);
         return {
-          ...p,
+          id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
+          orderIndex: typeof p.orderIndex === "number" ? p.orderIndex : (defaultMatch?.orderIndex || 99),
+          name: p.name || defaultMatch?.name || "이름 없는 상품",
+          category: p.category || defaultMatch?.category || "냉동생지/자재",
+          modelName: p.modelName || defaultMatch?.modelName || `MODEL-${p.id || "GENERIC"}`,
+          unit: p.unit || defaultMatch?.unit || "박스",
+          qty: typeof p.qty === "number" ? p.qty : (defaultMatch?.qty || 1),
+          supplyPrice: typeof p.supplyPrice === "number" ? p.supplyPrice : (defaultMatch?.supplyPrice || 0),
+          price: healedPrice,
+          discountAmount: healedDisc,
+          discountedPrice: typeof p.discountedPrice === "number" ? p.discountedPrice : (healedPrice - healedDisc),
+          img: p.img || defaultMatch?.img || "",
+          detailImg: p.detailImg || defaultMatch?.detailImg || "",
+          detailText: p.detailText || defaultMatch?.detailText || "",
+          isActive: typeof p.isActive === "boolean" ? p.isActive : true,
+          desc: p.desc || defaultMatch?.desc || "",
+          stock: p.stock || defaultMatch?.stock || "in_stock",
+          labels: Array.isArray(p.labels) ? p.labels : (defaultMatch?.labels || []),
+          shippingType: p.shippingType || defaultMatch?.shippingType || "A",
           options: p.options && p.options.length > 0 ? p.options : (defaultMatch?.options || undefined)
         };
       });
@@ -862,8 +882,28 @@ export default function AdminPage() {
             const parsed = JSON.parse(pr);
             const healed = parsed.map((p: any) => {
               const defaultMatch = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id);
+              const healedPrice = typeof p.price === "number" ? p.price : (defaultMatch?.price || 0);
+              const healedDisc = typeof p.discountAmount === "number" ? p.discountAmount : (defaultMatch?.discountAmount || 0);
               return {
-                ...p,
+                id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
+                orderIndex: typeof p.orderIndex === "number" ? p.orderIndex : (defaultMatch?.orderIndex || 99),
+                name: p.name || defaultMatch?.name || "이름 없는 상품",
+                category: p.category || defaultMatch?.category || "냉동생지/자재",
+                modelName: p.modelName || defaultMatch?.modelName || `MODEL-${p.id || "GENERIC"}`,
+                unit: p.unit || defaultMatch?.unit || "박스",
+                qty: typeof p.qty === "number" ? p.qty : (defaultMatch?.qty || 1),
+                supplyPrice: typeof p.supplyPrice === "number" ? p.supplyPrice : (defaultMatch?.supplyPrice || 0),
+                price: healedPrice,
+                discountAmount: healedDisc,
+                discountedPrice: typeof p.discountedPrice === "number" ? p.discountedPrice : (healedPrice - healedDisc),
+                img: p.img || defaultMatch?.img || "",
+                detailImg: p.detailImg || defaultMatch?.detailImg || "",
+                detailText: p.detailText || defaultMatch?.detailText || "",
+                isActive: typeof p.isActive === "boolean" ? p.isActive : true,
+                desc: p.desc || defaultMatch?.desc || "",
+                stock: p.stock || defaultMatch?.stock || "in_stock",
+                labels: Array.isArray(p.labels) ? p.labels : (defaultMatch?.labels || []),
+                shippingType: p.shippingType || defaultMatch?.shippingType || "A",
                 options: p.options && p.options.length > 0 ? p.options : (defaultMatch?.options || undefined)
               };
             });
@@ -1226,9 +1266,9 @@ export default function AdminPage() {
       setProductModelName(prod.modelName);
       setProductUnit(prod.unit);
       setProductQty(prod.qty);
-      setProductSupplyPrice(prod.supplyPrice.toLocaleString());
-      setProductPrice(prod.price.toLocaleString());
-      setProductDiscountAmount(prod.discountAmount.toLocaleString());
+      setProductSupplyPrice((prod.supplyPrice || 0).toLocaleString());
+      setProductPrice((prod.price || 0).toLocaleString());
+      setProductDiscountAmount((prod.discountAmount || 0).toLocaleString());
       setProductImg(prod.img);
       setProductDetailImg(prod.detailImg || "");
       setProductDetailText(prod.detailText || "");
@@ -3044,10 +3084,10 @@ export default function AdminPage() {
                               </div>
                               <div className="text-[10px] text-[#735965] font-semibold mt-0.5">{p.modelName} ({p.qty}{p.unit})</div>
                             </td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-bold">{p.supplyPrice.toLocaleString()} 원</td>
+                            <td className="p-4 sm:p-5 text-[#735965] font-bold">{(p.supplyPrice || 0).toLocaleString()} 원</td>
                             <td className="p-4 sm:p-5">
-                              <div className="text-[#2d2026] font-extrabold line-through text-[10px] opacity-60">{p.price.toLocaleString()} 원</div>
-                              <div className="text-[#f25f8a] font-black text-xs">{p.discountedPrice.toLocaleString()} 원</div>
+                              <div className="text-[#2d2026] font-extrabold line-through text-[10px] opacity-60">{(p.price || 0).toLocaleString()} 원</div>
+                              <div className="text-[#f25f8a] font-black text-xs">{(p.discountedPrice || 0).toLocaleString()} 원</div>
                             </td>
                             <td className="p-4 sm:p-5">
                               <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
