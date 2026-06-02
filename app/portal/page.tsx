@@ -169,7 +169,8 @@ const INITIAL_PRODUCTS: Product[] = [
     packSize: "1박스 (200개입)",
     img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761728/%EC%8A%88%ED%81%AC%EB%A6%BC_gbhnz2.jpg",
     stock: "in_stock",
-    desc: "귀여운 에그군 캐릭터 일러스트가 프린팅된 고품격 시각 보강 포장 패키지"
+    desc: "귀여운 에그군 캐릭터 일러스트가 프린팅된 고품격 시각 보강 포장 패키지",
+    options: ["대형 박스", "중형 박스", "소형 박스"]
   },
   {
     id: "prod-8",
@@ -179,7 +180,8 @@ const INITIAL_PRODUCTS: Product[] = [
     packSize: "1팩 (500매)",
     img: "/logo_yellow_blue.png",
     stock: "low_stock",
-    desc: "음료 및 파이 포장 봉투 부착용 원형 에그군 밀봉 스티커"
+    desc: "음료 및 파이 포장 봉투 부착용 원형 에그군 밀봉 스티커",
+    options: ["5cm 원형 스티커", "7cm 사각 스티커"]
   },
   {
     id: "prod-9",
@@ -481,7 +483,22 @@ export default function PortalPage() {
       }
 
       const pr = loadState("120_products", INITIAL_PRODUCTS);
-      const mapped = pr.map((p: any) => ({
+      // Self-healing: Merge options and ensure missing seed products are injected
+      const healedPr = pr.map((p: any) => {
+        const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id);
+        return {
+          ...p,
+          options: p.options && p.options.length > 0 ? p.options : (initialMatch?.options || undefined)
+        };
+      });
+      const finalPr = [...healedPr];
+      INITIAL_PRODUCTS.forEach((ip) => {
+        if (!finalPr.some((p) => p.id === ip.id)) {
+          finalPr.push(ip);
+        }
+      });
+
+      const mapped = finalPr.map((p: any) => ({
         id: p.id,
         name: p.name,
         category: p.category,
@@ -498,6 +515,8 @@ export default function PortalPage() {
         options: p.options || []
       })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
       setProducts(mapped);
+      // Sync self-healed data back to localStorage for seamless cross-tab consistency
+      localStorage.setItem("120_products", JSON.stringify(finalPr));
 
       const policySettings = loadState("120_shipping_settings", {
         shippingPolicy: "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다.",
@@ -557,22 +576,26 @@ export default function PortalPage() {
         if (pr) {
           try {
             const parsedProducts = JSON.parse(pr);
-            const mapped = parsedProducts.map((p: any) => ({
-              id: p.id,
-              name: p.name,
-              category: p.category,
-              price: p.discountedPrice !== undefined ? p.discountedPrice : p.price,
-              packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
-              img: p.img,
-              detailImg: p.detailImg,
-              detailText: p.detailText,
-              stock: p.stock || "in_stock",
-              desc: p.desc || "",
-              orderIndex: p.orderIndex || 99,
-              labels: p.labels || [],
-              shippingType: p.shippingType || "A",
-              options: p.options || []
-            })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+            const mapped = parsedProducts.map((p: any) => {
+              const initialMatch = INITIAL_PRODUCTS.find((ip) => ip.id === p.id);
+              const opts = p.options && p.options.length > 0 ? p.options : (initialMatch?.options || []);
+              return {
+                id: p.id,
+                name: p.name,
+                category: p.category,
+                price: p.discountedPrice !== undefined ? p.discountedPrice : p.price,
+                packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
+                img: p.img,
+                detailImg: p.detailImg,
+                detailText: p.detailText,
+                stock: p.stock || "in_stock",
+                desc: p.desc || "",
+                orderIndex: p.orderIndex || 99,
+                labels: p.labels || [],
+                shippingType: p.shippingType || "A",
+                options: opts
+              };
+            }).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
             setProducts(mapped);
           } catch (e) {
             console.warn(e);

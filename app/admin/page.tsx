@@ -326,6 +326,25 @@ const DEFAULT_PRODUCTS: Product[] = [
     isActive: true,
     desc: "기름 없이 오븐 조리가 가능한 바삭하고 쫀득한 츄러스 전용 냉동 생지",
     stock: "in_stock"
+  },
+  {
+    id: "prod-6",
+    orderIndex: 6,
+    name: "[홍보물] 매장용 양면 포스터 및 스티커",
+    category: "부자재/포장재",
+    modelName: "PR-POSTER-01",
+    unit: "개",
+    qty: 1,
+    supplyPrice: 4000,
+    price: 5000,
+    discountAmount: 0,
+    discountedPrice: 5000,
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779718433/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_xk9fhi.jpg",
+    detailImg: "",
+    isActive: true,
+    desc: "120pie 브랜드 컬러의 매장 유리창 부착용 홍보 포스터 세트",
+    stock: "in_stock",
+    options: ["A4 사이즈 포스터", "A3 사이즈 포스터", "카운터용 미니 스티커 5매"]
   }
 ];
 
@@ -682,8 +701,23 @@ export default function AdminPage() {
       const st = loadState("120_stores", DEFAULT_STORES);
       setStores(st);
       const pr = loadState("120_products", DEFAULT_PRODUCTS);
-      const sortedPr = [...pr].sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+      // Self-healing: Merge options and ensure missing seed products are injected
+      const healedPr = pr.map((p: any) => {
+        const defaultMatch = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id);
+        return {
+          ...p,
+          options: p.options && p.options.length > 0 ? p.options : (defaultMatch?.options || undefined)
+        };
+      });
+      const finalPr = [...healedPr];
+      DEFAULT_PRODUCTS.forEach((dp) => {
+        if (!finalPr.some((p) => p.id === dp.id)) {
+          finalPr.push(dp);
+        }
+      });
+      const sortedPr = [...finalPr].sort((a: any, b: any) => a.orderIndex - b.orderIndex);
       setProducts(sortedPr);
+      localStorage.setItem("120_products", JSON.stringify(finalPr));
       const cat = loadState("120_categories", ["냉동생지/자재", "부자재/포장재", "소모품/집기"]);
       setCategories(cat);
       const lab = loadState("120_labels", ["BEST", "추천", "신제품"]);
@@ -775,9 +809,20 @@ export default function AdminPage() {
         
         if (st) setStores(JSON.parse(st));
         if (pr) {
-          const parsed = JSON.parse(pr);
-          const sortedPr = [...parsed].sort((a: any, b: any) => a.orderIndex - b.orderIndex);
-          setProducts(sortedPr);
+          try {
+            const parsed = JSON.parse(pr);
+            const healed = parsed.map((p: any) => {
+              const defaultMatch = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id);
+              return {
+                ...p,
+                options: p.options && p.options.length > 0 ? p.options : (defaultMatch?.options || undefined)
+              };
+            });
+            const sortedPr = [...healed].sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+            setProducts(sortedPr);
+          } catch (e) {
+            console.error(e);
+          }
         }
         if (cat) setCategories(JSON.parse(cat));
         if (bnr) setBanner(JSON.parse(bnr));
@@ -5113,6 +5158,7 @@ export default function AdminPage() {
                     <div className="bg-[#fff1f5] border-b border-[#f2ccd7] p-2 flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs">
                       <button
                         type="button"
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => document.execCommand("bold", false)}
                         className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] font-bold hover:bg-[#ffd3df] transition-colors cursor-pointer"
                         title="굵게"
@@ -5121,6 +5167,7 @@ export default function AdminPage() {
                       </button>
                       <button
                         type="button"
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => document.execCommand("italic", false)}
                         className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] italic hover:bg-[#ffd3df] transition-colors cursor-pointer"
                         title="기울임"
@@ -5129,6 +5176,7 @@ export default function AdminPage() {
                       </button>
                       <button
                         type="button"
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => document.execCommand("underline", false)}
                         className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] underline hover:bg-[#ffd3df] transition-colors cursor-pointer"
                         title="밑줄"
@@ -5140,6 +5188,7 @@ export default function AdminPage() {
 
                       <button
                         type="button"
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => document.execCommand("justifyLeft", false)}
                         className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
                         title="왼쪽 정렬"
@@ -5148,6 +5197,7 @@ export default function AdminPage() {
                       </button>
                       <button
                         type="button"
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => document.execCommand("justifyCenter", false)}
                         className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
                         title="가운데 정렬"
@@ -5156,6 +5206,7 @@ export default function AdminPage() {
                       </button>
                       <button
                         type="button"
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => document.execCommand("justifyRight", false)}
                         className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
                         title="오른쪽 정렬"
@@ -5166,6 +5217,7 @@ export default function AdminPage() {
                       <div className="h-4 w-px bg-[#f2ccd7] mx-1"></div>
 
                       <select
+                        onMouseDown={(e) => e.preventDefault()}
                         onChange={(e) => document.execCommand("fontSize", false, e.target.value)}
                         className="bg-white border border-[#f2ccd7] rounded px-1 py-1 text-[10px] sm:text-xs focus:outline-none cursor-pointer"
                         title="글자 크기"
@@ -5180,6 +5232,7 @@ export default function AdminPage() {
                       </select>
 
                       <select
+                        onMouseDown={(e) => e.preventDefault()}
                         onChange={(e) => document.execCommand("foreColor", false, e.target.value)}
                         className="bg-white border border-[#f2ccd7] rounded px-1 py-1 text-[10px] sm:text-xs focus:outline-none font-bold cursor-pointer"
                         title="글자 색상"
@@ -5196,6 +5249,7 @@ export default function AdminPage() {
 
                       <button
                         type="button"
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => document.execCommand("insertUnorderedList", false)}
                         className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
                         title="글머리 기호"
@@ -5205,6 +5259,7 @@ export default function AdminPage() {
 
                       <button
                         type="button"
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
                           if (confirm("상세페이지 텍스트 내용을 초기화하시겠습니까?")) {
                             setProductDetailText("");
