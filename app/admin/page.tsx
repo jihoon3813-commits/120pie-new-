@@ -1368,41 +1368,55 @@ export default function AdminPage() {
       let script = document.getElementById(scriptId) as HTMLScriptElement | null;
       
       const embedPostcode = () => {
-        // Wait minor delay until modal container is fully rendered in DOM
-        setTimeout(() => {
+        let attempts = 0;
+        
+        // Double-safety polling: wait for window.daum.Postcode to be fully loaded and container to be rendered
+        const tryEmbed = () => {
           const container = document.getElementById("daum-postcode-container");
-          if (!container) return;
+          const daumNamespace = (window as any).daum;
           
-          new (window as any).daum.Postcode({
-            oncomplete: (data: any) => {
-              let fullRoadAddr = data.roadAddress; // 도로명 주소 변수
-              let extraRoadAddr = ''; // 참고항목 변수
+          if (daumNamespace && daumNamespace.Postcode && container) {
+            new daumNamespace.Postcode({
+              oncomplete: (data: any) => {
+                let fullRoadAddr = data.roadAddress; // 도로명 주소 변수
+                let extraRoadAddr = ''; // 참고항목 변수
 
-              // 법정동명이 있을 경우 추가한다. (법정리는 제외)
-              // 법정동의 경우 마지막 문자가 "동/로/가"로 끝납니다.
-              if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                extraRoadAddr += data.bname;
-              }
-              // 건물명이 있고, 공동주택일 경우 추가한다.
-              if (data.buildingName !== '') {
-                extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-              }
-              // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-              if (extraRoadAddr !== '') {
-                extraRoadAddr = ' (' + extraRoadAddr + ')';
-              }
+                // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                // 법정동의 경우 마지막 문자가 "동/로/가"로 끝납니다.
+                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                  extraRoadAddr += data.bname;
+                }
+                // 건물명이 있고, 공동주택일 경우 추가한다.
+                if (data.buildingName !== '') {
+                  extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                if (extraRoadAddr !== '') {
+                  extraRoadAddr = ' (' + extraRoadAddr + ')';
+                }
 
-              // 도로명 주소 뒤에 참고항목(괄호)까지 통째로 붙여서 세팅
-              const finalAddress = fullRoadAddr + extraRoadAddr;
-              setStoreRoadAddress(finalAddress);
-              
-              setShowAddressPopup(false);
-              triggerToast("실제 도로명 주소(상사/괄호 주소 포함)가 성공적으로 자동 입력되었습니다.");
-            },
-            width: "100%",
-            height: "100%"
-          }).embed(container);
-        }, 100);
+                // 도로명 주소 뒤에 참고항목(괄호)까지 통째로 붙여서 세팅
+                const finalAddress = fullRoadAddr + extraRoadAddr;
+                setStoreRoadAddress(finalAddress);
+                
+                setShowAddressPopup(false);
+                triggerToast("실제 도로명 주소(상사/괄호 주소 포함)가 성공적으로 자동 입력되었습니다.");
+              },
+              width: "100%",
+              height: "100%"
+            }).embed(container);
+          } else {
+            if (attempts < 30) { // 3 seconds timeout (100ms * 30)
+              attempts++;
+              setTimeout(tryEmbed, 100);
+            } else {
+              console.error("[Kakao API] Failed to load Kakao Postcode library safely.");
+              triggerToast("주소 검색 라이브러리를 로드하는 데 일시적인 실패가 발생했습니다. 다시 시도해 주세요.");
+            }
+          }
+        };
+
+        setTimeout(tryEmbed, 100);
       };
 
       if (!script) {
