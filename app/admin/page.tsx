@@ -917,10 +917,10 @@ export default function AdminPage() {
       const lab = loadState("120_labels", ["BEST", "추천", "신제품"]);
       setLabels(lab);
       
-      const bnr = loadState("120_banners", DEFAULT_BANNER);
+      const bnr = loadState("120_banners", DEFAULT_BANNER) || DEFAULT_BANNER;
       setBanner(bnr);
 
-      const pop = loadState("120_popups", DEFAULT_POPUP);
+      const pop = loadState("120_popups", DEFAULT_POPUP) || DEFAULT_POPUP;
       setPopupActive(pop.isActive);
       setPopupTitle(pop.title);
       setPopupDesc(pop.desc);
@@ -935,7 +935,7 @@ export default function AdminPage() {
       setPopupBtnTextColor(pop.btnTextColor || "#ffffff");
       setPopupBtnTextSize(pop.btnTextSize || "12px");
 
-      const flt = loadState("120_floatings", DEFAULT_FLOATING);
+      const flt = loadState("120_floatings", DEFAULT_FLOATING) || DEFAULT_FLOATING;
       setFloatingActive(flt.isActive);
       setFloatingInsta(flt.instaUrl || "");
       setFloatingYoutube(flt.youtubeUrl || "");
