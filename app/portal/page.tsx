@@ -383,9 +383,13 @@ export default function PortalPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [selectedProductDetail, setSelectedProductDetail] = useState<any | null>(null);
   const [selectedProductOption, setSelectedProductOption] = useState<string>("");
+  const [localSelectedOptions, setLocalSelectedOptions] = useState<{ optionName: string; quantity: number }[]>([]);
+  const [localSingleQty, setLocalSingleQty] = useState<number>(1);
 
   useEffect(() => {
     setSelectedProductOption("");
+    setLocalSelectedOptions([]);
+    setLocalSingleQty(1);
   }, [selectedProductDetail]);
 
   // Order page category tab
@@ -640,21 +644,21 @@ export default function PortalPage() {
   // ==========================================
   // CART ACTIONS
   // ==========================================
-  const addToCart = (productId: string, selectedOption?: string) => {
+  const addToCart = (productId: string, selectedOption?: string, quantity: number = 1) => {
     setCart((prev) => {
       const existing = prev.find(
         (item) => item.productId === productId && item.selectedOption === selectedOption
       );
       if (existing) {
-        triggerToast("장바구니 품목 수량을 1개 추가했습니다.");
+        triggerToast(`장바구니 품목 수량을 ${quantity}개 추가했습니다.`);
         return prev.map((item) =>
           item.productId === productId && item.selectedOption === selectedOption
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
       triggerToast("상품을 장바구니에 담았습니다.");
-      return [...prev, { productId, selectedOption, quantity: 1 }];
+      return [...prev, { productId, selectedOption, quantity }];
     });
   };
 
@@ -1642,15 +1646,13 @@ export default function PortalPage() {
                             <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7] p-3 rounded-xl">
                               <img src={p.img} alt="" className="w-12 h-12 rounded-lg object-cover shrink-0" />
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-xs text-[#2d2026] truncate">
-                                  {p.name}
-                                  {item.selectedOption && (
-                                    <span className="text-[9px] text-[#bf3e67] bg-[#ffd3df] px-1.5 py-0.5 rounded ml-1.5 font-black shrink-0">
-                                      {item.selectedOption}
-                                    </span>
-                                  )}
-                                </h4>
-                                <span className="text-[10px] text-[#735965] font-semibold block">{p.price.toLocaleString()} 원 · {p.packSize}</span>
+                                <h4 className="font-bold text-xs text-[#2d2026] truncate">{p.name}</h4>
+                                {item.selectedOption && (
+                                  <span className="text-[10px] text-[#bf3e67] font-black block mt-0.5 select-none">
+                                    [선택 옵션: {item.selectedOption}]
+                                  </span>
+                                )}
+                                <span className="text-[10px] text-[#735965] font-semibold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
                               </div>
                               <div className="flex flex-col items-end gap-1.5 shrink-0">
                                 <button onClick={() => removeCartItem(p.id, item.selectedOption)} className="text-[#735965]/60 hover:text-red-500 transition-colors p-1" aria-label="삭제">
@@ -2695,52 +2697,171 @@ export default function PortalPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex-1 flex flex-col gap-2">
+            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 flex flex-col gap-4">
+              {/* Option / Quantity Control Area */}
+              <div className="flex flex-col gap-3">
                 {selectedProductDetail.options && selectedProductDetail.options.length > 0 ? (
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#2d2026] text-xs shrink-0">옵션 선택 *</span>
-                    <select
-                      value={selectedProductOption}
-                      onChange={(e) => setSelectedProductOption(e.target.value)}
-                      className="w-full max-w-xs bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs font-bold text-[#2d2026] focus:outline-none cursor-pointer"
-                    >
-                      <option value="">-- 필수 옵션을 선택하세요 --</option>
-                      {selectedProductDetail.options.map((opt: string) => (
-                        <option key={opt} value={opt}>{opt}</option>
-                      ))}
-                    </select>
+                  <div className="space-y-3">
+                    {/* Option Select Dropdown & Add Button */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-[#2d2026] text-xs shrink-0">옵션 선택 *</span>
+                      <select
+                        value={selectedProductOption}
+                        onChange={(e) => setSelectedProductOption(e.target.value)}
+                        className="flex-1 max-w-xs bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs font-bold text-[#2d2026] focus:outline-none cursor-pointer"
+                      >
+                        <option value="">-- 필수 옵션을 선택하세요 --</option>
+                        {selectedProductDetail.options.map((opt: string) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!selectedProductOption) {
+                            alert("옵션을 먼저 선택해 주세요.");
+                            return;
+                          }
+                          const exists = localSelectedOptions.find((o) => o.optionName === selectedProductOption);
+                          if (exists) {
+                            setLocalSelectedOptions(
+                              localSelectedOptions.map((o) =>
+                                o.optionName === selectedProductOption ? { ...o, quantity: o.quantity + 1 } : o
+                              )
+                            );
+                            triggerToast(`'${selectedProductOption}' 옵션의 수량을 1개 추가했습니다.`);
+                          } else {
+                            setLocalSelectedOptions([...localSelectedOptions, { optionName: selectedProductOption, quantity: 1 }]);
+                            triggerToast(`'${selectedProductOption}' 옵션을 추가했습니다.`);
+                          }
+                          setSelectedProductOption(""); // Reset select choice
+                        }}
+                        className="px-4 py-2.5 rounded-xl bg-[#ffd3df] hover:bg-[#ffd3df]/80 text-[#bf3e67] text-xs font-extrabold transition-all shadow-sm"
+                      >
+                        옵션 추가
+                      </button>
+                    </div>
+
+                    {/* Selected Options List */}
+                    {localSelectedOptions.length > 0 && (
+                      <div className="bg-white border border-[#f2ccd7] rounded-xl p-3 space-y-2.5 max-h-[160px] overflow-y-auto shadow-inner">
+                        <span className="text-[10px] text-[#bf3e67] font-black block">선택된 옵션 목록</span>
+                        {localSelectedOptions.map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between gap-3 bg-[#fff9fb] border border-[#f2ccd7]/60 p-2.5 rounded-lg text-xs font-bold text-[#2d2026]">
+                            <span className="truncate flex-1 pr-2">{item.optionName}</span>
+                            <div className="flex items-center gap-3 shrink-0">
+                              {/* Option Qty Controller */}
+                              <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (item.quantity <= 1) return;
+                                    setLocalSelectedOptions(
+                                      localSelectedOptions.map((o) =>
+                                        o.optionName === item.optionName ? { ...o, quantity: o.quantity - 1 } : o
+                                      )
+                                    );
+                                  }}
+                                  className="p-1 hover:text-[#bf3e67] text-[#735965]/70 transition-colors"
+                                >
+                                  <Minus size={12} />
+                                </button>
+                                <span className="px-2 text-[10px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setLocalSelectedOptions(
+                                      localSelectedOptions.map((o) =>
+                                        o.optionName === item.optionName ? { ...o, quantity: o.quantity + 1 } : o
+                                      )
+                                    );
+                                  }}
+                                  className="p-1 hover:text-[#bf3e67] text-[#735965]/70 transition-colors"
+                                >
+                                  <Plus size={12} />
+                                </button>
+                              </div>
+                              {/* Remove Option Button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setLocalSelectedOptions(localSelectedOptions.filter((o) => o.optionName !== item.optionName));
+                                  triggerToast(`'${item.optionName}' 옵션을 목록에서 제거했습니다.`);
+                                }}
+                                className="text-[#735965]/60 hover:text-red-500 transition-colors p-1"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <span className="text-[11px] font-bold text-[#735965]">
-                    발주몰 규격을 정밀 점검 후 발주를 신중하게 진행해 주세요.
-                  </span>
+                  /* Optionless Qty Controller */
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-[#2d2026] text-xs shrink-0">발주 수량 설정</span>
+                    <div className="flex items-center border border-[#f2ccd7] bg-white rounded-xl p-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (localSingleQty <= 1) return;
+                          setLocalSingleQty(localSingleQty - 1);
+                        }}
+                        className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="px-4 text-xs font-bold text-[#2d2026] w-8 text-center">{localSingleQty}</span>
+                      <button
+                        type="button"
+                        onClick={() => setLocalSingleQty(localSingleQty + 1)}
+                        className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
-              <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-                <button 
-                  type="button"
-                  onClick={() => {
-                    const hasOpts = selectedProductDetail.options && selectedProductDetail.options.length > 0;
-                    if (hasOpts && !selectedProductOption) {
-                      alert("필수 옵션을 선택해 주세요.");
-                      return;
-                    }
-                    addToCart(selectedProductDetail.id, hasOpts ? selectedProductOption : undefined);
-                    setSelectedProductDetail(null);
-                  }}
-                  className="px-6 py-2.5 rounded-xl bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-extrabold transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
-                >
-                  <ShoppingBag size={14} />
-                  장바구니 담기
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => setSelectedProductDetail(null)}
-                  className="px-6 py-2.5 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
-                >
-                  닫기
-                </button>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-[#f2ccd7]/60">
+                <span className="text-[11px] font-bold text-[#735965] hidden sm:inline">
+                  발주 규격을 다시 한 번 정밀 확인 후 신중히 진행해 주세요.
+                </span>
+                <div className="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const hasOpts = selectedProductDetail.options && selectedProductDetail.options.length > 0;
+                      if (hasOpts) {
+                        if (localSelectedOptions.length === 0) {
+                          alert("옵션을 최소 하나 이상 목록에 추가해 주세요.");
+                          return;
+                        }
+                        localSelectedOptions.forEach((item) => {
+                          addToCart(selectedProductDetail.id, item.optionName, item.quantity);
+                        });
+                      } else {
+                        addToCart(selectedProductDetail.id, undefined, localSingleQty);
+                      }
+                      setSelectedProductDetail(null);
+                    }}
+                    className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-extrabold transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                  >
+                    <ShoppingBag size={14} />
+                    장바구니 담기
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => setSelectedProductDetail(null)}
+                    className="px-6 py-3 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
+                  >
+                    닫기
+                  </button>
+                </div>
               </div>
             </div>
           </div>
