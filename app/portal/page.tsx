@@ -678,6 +678,31 @@ export default function PortalPage() {
   const [shippingFeeB, setShippingFeeB] = useState<number>(4000);
   const [shippingFeeC, setShippingFeeC] = useState<number>(5000);
 
+  // Mobile popstate / back button handling for modals
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      // 모달이 하나라도 열려있는 상황이라면 닫고 뒤로가기 기본 동작 방지
+      if (selectedOrder || selectedProductDetail || trackingModalOpen || showInquiryModal) {
+        setSelectedOrder(null);
+        setSelectedProductDetail(null);
+        setTrackingModalOpen(false);
+        setShowInquiryModal(false);
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [selectedOrder, selectedProductDetail, trackingModalOpen, showInquiryModal]);
+
+  // 각 모달이 열리는 시점에 pushState를 호출해 줍니다!
+  useEffect(() => {
+    if (selectedOrder || selectedProductDetail || trackingModalOpen || showInquiryModal) {
+      window.history.pushState({ modal: true }, "");
+    }
+  }, [selectedOrder, selectedProductDetail, trackingModalOpen, showInquiryModal]);
+
   // ==========================================
   // INITIALIZATION WITH LOCAL STORAGE
   // ==========================================
@@ -1979,10 +2004,10 @@ export default function PortalPage() {
                         {/* 2. Desktop Grid Card View */}
                         <div 
                           onClick={() => setSelectedProductDetail(p)}
-                          className="hidden sm:flex bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex-col justify-between shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 pb-5"
+                          className="hidden sm:flex bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex-col justify-between shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 aspect-square w-full"
                         >
                           {/* Thumbnail image & stock state badge */}
-                          <div className="aspect-square w-full relative bg-[#fff1f5] overflow-hidden shrink-0">
+                          <div className="h-[52%] w-full relative bg-[#fff1f5] overflow-hidden shrink-0 border-b border-[#f2ccd7]/40">
                             <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
                             <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[80%]">
                               {p.stock === "low_stock" && (
@@ -1998,30 +2023,30 @@ export default function PortalPage() {
                           </div>
 
                           {/* Product Info Block */}
-                          <div className="p-5 flex-1 flex flex-col justify-between relative">
+                          <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between min-h-0 relative">
                             {p.labels && p.labels.length > 0 && (
-                              <div className="absolute top-5 right-5 flex flex-wrap gap-1 w-fit justify-end">
+                              <div className="absolute top-4 right-4 flex flex-wrap gap-1 w-fit justify-end">
                                 {p.labels.map((l) => {
                                   let bgStyle = "bg-neutral-500/90 text-white";
                                   if (l === "BEST") bgStyle = "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm font-black";
                                   else if (l === "추천") bgStyle = "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm font-black";
                                   else if (l === "신제품") bgStyle = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-black";
                                   return (
-                                    <span key={l} className={`font-bold text-[9px] px-2 py-0.5 rounded shadow-sm ${bgStyle}`}>
+                                    <span key={l} className={`font-bold text-[8px] px-1.5 py-0.5 rounded shadow-sm ${bgStyle}`}>
                                       {l}
                                     </span>
                                   );
                                 })}
                               </div>
                             )}
-                            <div className="space-y-1 pr-14">
-                              <span className="text-[10px] text-[#735965] font-bold block">{p.packSize}</span>
-                              <h3 className="font-bold text-base text-[#2d2026] leading-tight">{p.name}</h3>
-                              <p className="text-[11px] text-[#735965] font-medium leading-relaxed mt-1.5">{p.desc}</p>
+                            <div className="space-y-0.5 pr-12 min-h-0 overflow-hidden">
+                              <span className="text-[9px] text-[#735965] font-bold block">{p.packSize}</span>
+                              <h3 className="font-bold text-sm text-[#2d2026] leading-tight truncate">{p.name}</h3>
+                              <p className="text-[10px] text-[#735965] font-medium leading-relaxed truncate mt-1">{p.desc}</p>
                             </div>
 
-                            <div className="flex items-center justify-between mt-5 border-t border-[#f2ccd7]/60 pt-4">
-                              <strong className="text-base text-[#2d2026] font-black">{p.price.toLocaleString()} 원</strong>
+                            <div className="flex items-center justify-between mt-2 border-t border-[#f2ccd7]/60 pt-2.5">
+                              <strong className="text-sm text-[#2d2026] font-black">{p.price.toLocaleString()} 원</strong>
                               
                               {p.options && p.options.length > 0 ? (
                                 <button
@@ -2029,7 +2054,7 @@ export default function PortalPage() {
                                     e.stopPropagation();
                                     setSelectedProductDetail(p);
                                   }}
-                                  className="px-4 py-2 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold transition-all shadow-sm"
+                                  className="px-3 py-1.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-[10px] font-bold transition-all shadow-sm"
                                 >
                                   옵션 선택
                                 </button>
@@ -2037,16 +2062,16 @@ export default function PortalPage() {
                                 <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-lg p-0.5" onClick={(e) => e.stopPropagation()}>
                                   <button 
                                     onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
-                                    className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
+                                    className="p-0.5 hover:text-[#bf3e67] text-[#735965] transition-colors"
                                   >
-                                    <Minus size={14} />
+                                    <Minus size={12} />
                                   </button>
-                                  <span className="px-3 text-xs font-bold text-[#2d2026] w-6 text-center">{cartQty}</span>
+                                  <span className="px-2 text-[10px] font-bold text-[#2d2026] w-5 text-center">{cartQty}</span>
                                   <button 
                                     onClick={() => updateCartQty(p.id, undefined, cartQty + 1)}
-                                    className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
+                                    className="p-0.5 hover:text-[#bf3e67] text-[#735965] transition-colors"
                                   >
-                                    <Plus size={14} />
+                                    <Plus size={12} />
                                   </button>
                                 </div>
                               ) : (
@@ -2055,7 +2080,7 @@ export default function PortalPage() {
                                     e.stopPropagation();
                                     addToCart(p.id);
                                   }}
-                                  className="px-4 py-2 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-xs font-bold text-[#bf3e67] transition-all"
+                                  className="px-3 py-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-[10px] font-bold text-[#bf3e67] transition-all"
                                 >
                                   담기
                                 </button>
@@ -2184,9 +2209,9 @@ export default function PortalPage() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
-                        <th className="p-4 sm:p-5">신청 일자</th>
+                        <th className="p-4 sm:p-5 whitespace-nowrap">신청 일자</th>
                         <th className="p-4 sm:p-5">주문 품목 요약</th>
-                        <th className="p-4 sm:p-5">총 결제 대금</th>
+                        <th className="p-4 sm:p-5 whitespace-nowrap">총 결제 대금</th>
                         <th className="p-4 sm:p-5">배송 상태</th>
                         <th className="p-4 sm:p-5 text-center">상세 정보</th>
                       </tr>
@@ -2203,7 +2228,7 @@ export default function PortalPage() {
                             onClick={() => setSelectedOrder(order)}
                             className="hover:bg-[#fff9fb] transition-colors cursor-pointer group"
                           >
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold">{order.date}</td>
+                            <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{order.date}</td>
                             <td className="p-4 sm:p-5">
                               <span className="font-bold text-[#2d2026]">
                                 {order.items[0].productName} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ""}
@@ -2212,7 +2237,7 @@ export default function PortalPage() {
                                 {order.items.map(item => `${item.productName} ${item.quantity}개`).join(", ")}
                               </span>
                             </td>
-                            <td className="p-4 sm:p-5 font-black text-[#bf3e67]">{order.totalPrice.toLocaleString()} 원</td>
+                            <td className="p-4 sm:p-5 font-black text-[#bf3e67] whitespace-nowrap">{order.totalPrice.toLocaleString()} 원</td>
                             <td className="p-4 sm:p-5">
                               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
                                 order.status === "배송중" 
@@ -3782,6 +3807,26 @@ export default function PortalPage() {
             }`}
           >
             {floatingOpen ? <X size={20} className="text-white" /> : <Plus size={20} className="text-white animate-pulse" />}
+          </button>
+        </div>
+      )}
+
+      {/* MOBILE BOTTOM FLOATING CART BAR (Always visible when items are added in order menu) */}
+      {cart.length > 0 && currentMenu === "order" && (
+        <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-[#f2ccd7] px-4 py-3.5 pb-safe shadow-[0_-8px_30px_rgba(242,204,215,0.3)] flex items-center justify-between animate-slideUp">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold text-[#735965] select-none">총 {cart.reduce((sum, item) => sum + item.quantity, 0)}개 상품 담김</span>
+            <span className="text-sm font-black text-[#bf3e67] select-none">{cartTotal.toLocaleString()} 원</span>
+          </div>
+          <button
+            onClick={() => {
+              // Smooth scroll to shopping cart at the bottom
+              window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+            }}
+            className="px-5 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-black rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border-0"
+          >
+            <ShoppingBag size={14} className="text-white" />
+            발주 장바구니 확인
           </button>
         </div>
       )}
