@@ -677,7 +677,8 @@ export default function AdminPage() {
       const st = loadState("120_stores", DEFAULT_STORES);
       setStores(st);
       const pr = loadState("120_products", DEFAULT_PRODUCTS);
-      setProducts(pr);
+      const sortedPr = [...pr].sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+      setProducts(sortedPr);
       const cat = loadState("120_categories", ["냉동생지/자재", "부자재/포장재", "소모품/집기"]);
       setCategories(cat);
       const lab = loadState("120_labels", ["BEST", "추천", "신제품"]);
@@ -768,7 +769,11 @@ export default function AdminPage() {
         if (p) setPrs(JSON.parse(p));
         
         if (st) setStores(JSON.parse(st));
-        if (pr) setProducts(JSON.parse(pr));
+        if (pr) {
+          const parsed = JSON.parse(pr);
+          const sortedPr = [...parsed].sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+          setProducts(sortedPr);
+        }
         if (cat) setCategories(JSON.parse(cat));
         if (bnr) setBanner(JSON.parse(bnr));
 
@@ -1192,8 +1197,9 @@ export default function AdminPage() {
       triggerToast(`신규 제품 '${productName}'이 성공적으로 등록되었습니다.`);
     }
 
-    setProducts(updatedProducts);
-    localStorage.setItem("120_products", JSON.stringify(updatedProducts));
+    const sortedProducts = [...updatedProducts].sort((a, b) => a.orderIndex - b.orderIndex);
+    setProducts(sortedProducts);
+    localStorage.setItem("120_products", JSON.stringify(sortedProducts));
     setShowProductModal(false);
   };
 
@@ -1210,10 +1216,12 @@ export default function AdminPage() {
   };
 
   // Adjust product order (swap ▲ / ▼)
-  const handleAdjustProductOrder = (currentIndex: number, direction: "up" | "down") => {
+  const handleAdjustProductOrder = (productId: string, direction: "up" | "down") => {
     const sorted = [...products].sort((a, b) => a.orderIndex - b.orderIndex);
-    const targetIdx = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    const currentIndex = sorted.findIndex((op) => op.id === productId);
+    if (currentIndex === -1) return;
 
+    const targetIdx = direction === "up" ? currentIndex - 1 : currentIndex + 1;
     if (targetIdx < 0 || targetIdx >= sorted.length) return; // Out of bounds
 
     // Swap indexes
@@ -2908,7 +2916,7 @@ export default function AdminPage() {
                               <div className="flex items-center justify-center gap-1">
                                 <button
                                   type="button"
-                                  onClick={() => handleAdjustProductOrder(products.findIndex((op) => op.id === p.id), "up")}
+                                  onClick={() => handleAdjustProductOrder(p.id, "up")}
                                   disabled={isProductFiltering || products.findIndex((op) => op.id === p.id) === 0}
                                   className="p-1 rounded bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] disabled:opacity-35 disabled:hover:bg-white text-[#735965] font-bold transition-all text-[9px] cursor-pointer"
                                   title={
@@ -2921,7 +2929,7 @@ export default function AdminPage() {
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => handleAdjustProductOrder(products.findIndex((op) => op.id === p.id), "down")}
+                                  onClick={() => handleAdjustProductOrder(p.id, "down")}
                                   disabled={isProductFiltering || products.findIndex((op) => op.id === p.id) === products.length - 1}
                                   className="p-1 rounded bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] disabled:opacity-35 disabled:hover:bg-white text-[#735965] font-bold transition-all text-[9px] cursor-pointer"
                                   title={
