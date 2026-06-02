@@ -3781,6 +3781,110 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         </>
       )}
 
+      {/* ==========================================
+          REAL-TIME POPUP MODAL (ON-ENTRY)
+         ========================================== */}
+      {showPopup && popupSettings && (
+        <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn text-[#2d2026]">
+          <div 
+            className="w-full max-w-md bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp text-left"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header / Background visual */}
+            <div 
+              className={`w-full relative flex flex-col justify-end p-6 text-white ${
+                popupSettings.image ? "aspect-[4/3]" : "min-h-[160px]"
+              } ${
+                popupSettings.image ? "" : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a]"
+              }`}
+              style={popupSettings.image ? {
+                backgroundImage: `url(${popupSettings.image})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center"
+              } : undefined}
+            >
+              {popupSettings.image && <div className="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-black/95 via-black/60 to-transparent"></div>}
+              <div className="relative z-10 space-y-1">
+                <h4 
+                  className="font-black leading-snug whitespace-pre-line"
+                  style={{
+                    color: popupSettings.titleColor || "#ffffff",
+                    fontSize: popupSettings.titleSize || "18px"
+                  }}
+                >
+                  {popupSettings.title}
+                </h4>
+              </div>
+            </div>
+
+            {/* Body Description */}
+            <div 
+              className="p-6 overflow-y-auto font-semibold leading-relaxed whitespace-pre-line"
+              style={{
+                color: popupSettings.descColor || "#735965",
+                fontSize: popupSettings.descSize || "12px"
+              }}
+            >
+              {popupSettings.desc}
+            </div>
+
+            {/* Action buttons & 'Today close' bar */}
+            <div className="border-t border-[#f2ccd7]/60">
+              {popupSettings.link && (
+                <div className="p-4 border-b border-[#f2ccd7]/40 bg-[#fff1f5]/20 text-center">
+                  <button
+                    onClick={() => {
+                      const link = popupSettings.link;
+                      if (link.startsWith("http")) {
+                        window.open(link, "_blank");
+                      } else {
+                        if (link === "menu") {
+                          document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" });
+                        } else if (link === "order") {
+                          window.open("/portal", "_blank");
+                        } else {
+                          setInquiryModalOpen(true);
+                        }
+                        setShowPopup(false);
+                      }
+                    }}
+                    className="w-full py-3 font-extrabold rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
+                    style={{
+                      backgroundColor: popupSettings.btnBgColor || "#f25f8a",
+                      color: popupSettings.btnTextColor || "#ffffff",
+                      fontSize: popupSettings.btnTextSize || "12px"
+                    }}
+                  >
+                    {popupSettings.btnText || "자세히 보기"}
+                  </button>
+                </div>
+              )}
+
+              {/* Close Footer bar */}
+              <div className="bg-[#fff9fb] p-3 flex justify-between items-center px-5 text-[11px] font-bold text-[#735965]">
+                <button
+                  onClick={() => {
+                    const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+                    localStorage.setItem("120_popup_closed_date", todayStr);
+                    localStorage.setItem("120_popup_closed_title", popupSettings.title);
+                    setShowPopup(false);
+                  }}
+                  className="hover:text-[#bf3e67] transition-colors flex items-center gap-1 cursor-pointer border-0 bg-transparent text-[11px] font-bold"
+                >
+                  오늘 하루 안보기
+                </button>
+                <button
+                  onClick={() => setShowPopup(false)}
+                  className="hover:text-red-500 font-extrabold transition-colors cursor-pointer border-0 bg-transparent text-[11px]"
+                >
+                  닫기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
