@@ -4467,28 +4467,7 @@ export default function AdminPage() {
                     className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none"
                   />
                 </div>
-                
-                {/* Quick Presets */}
-                <div className="space-y-1.5 bg-[#fff1f5]/50 border border-[#f2ccd7] p-4 rounded-xl">
-                  <span className="text-[10px] text-[#735965] font-extrabold block">✨ 이미지 주소 퀵 프리셋 버튼 (클릭 시 자동 입력)</span>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {[
-                      { name: "로제미트", url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg" },
-                      { name: "콘치즈", url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_qvb2u5.jpg" },
-                      { name: "계란빵믹스", url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg" },
-                      { name: "츄러스생지", url: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762878/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_koyjlk.jpg" }
-                    ].map((preset) => (
-                      <button
-                        type="button"
-                        key={preset.name}
-                        onClick={() => setProductImg(preset.url)}
-                        className="px-2 py-1 bg-white hover:bg-[#ffd3df] border border-[#f2ccd7] rounded text-[10px] font-bold text-[#bf3e67] transition-all"
-                      >
-                        {preset.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+
               </div>
 
               <button 
