@@ -1068,6 +1068,14 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
       const isTestPopup = urlParams.get("test_popup") === "true";
+      const isResetPopup = urlParams.get("reset_popup") === "true";
+
+      if (isResetPopup) {
+        localStorage.removeItem("120_popup_closed_date");
+        localStorage.removeItem("120_popup_closed_title");
+        sessionStorage.removeItem("120_popup_closed_session");
+        popupClosedInSessionRef.current = false;
+      }
 
       if (isTestPopup) {
         // Bypass storage block checks
