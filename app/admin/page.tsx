@@ -1217,21 +1217,44 @@ export default function AdminPage() {
 
   // Adjust product order (swap ▲ / ▼)
   const handleAdjustProductOrder = (productId: string, direction: "up" | "down") => {
-    const sorted = [...products].sort((a, b) => a.orderIndex - b.orderIndex);
-    const currentIndex = sorted.findIndex((op) => op.id === productId);
+    // We compute the current filtered products to find the target to swap with
+    const currentList = products.filter((p) => {
+      const matchesCategory =
+        adminProductCategoryFilter === "전체" || p.category === adminProductCategoryFilter;
+
+      const searchKeyword = adminProductSearch.trim().toLowerCase();
+      const matchesSearch =
+        searchKeyword === "" ||
+        p.name.toLowerCase().includes(searchKeyword) ||
+        p.modelName.toLowerCase().includes(searchKeyword);
+
+      return matchesCategory && matchesSearch;
+    }).sort((a, b) => a.orderIndex - b.orderIndex);
+
+    const currentIndex = currentList.findIndex((op) => op.id === productId);
     if (currentIndex === -1) return;
 
     const targetIdx = direction === "up" ? currentIndex - 1 : currentIndex + 1;
-    if (targetIdx < 0 || targetIdx >= sorted.length) return; // Out of bounds
+    if (targetIdx < 0 || targetIdx >= currentList.length) return; // Out of bounds
 
-    // Swap indexes
-    const tempIndex = sorted[currentIndex].orderIndex;
-    sorted[currentIndex].orderIndex = sorted[targetIdx].orderIndex;
-    sorted[targetIdx].orderIndex = tempIndex;
+    const currentProduct = currentList[currentIndex];
+    const targetProduct = currentList[targetIdx];
 
-    const updated = sorted.sort((a, b) => a.orderIndex - b.orderIndex);
-    setProducts(updated);
-    localStorage.setItem("120_products", JSON.stringify(updated));
+    // Find their indices in the original products array
+    const originalCurrentIdx = products.findIndex((op) => op.id === currentProduct.id);
+    const originalTargetIdx = products.findIndex((op) => op.id === targetProduct.id);
+
+    if (originalCurrentIdx === -1 || originalTargetIdx === -1) return;
+
+    // Swap indexes in products array
+    const updated = [...products];
+    const tempIndex = updated[originalCurrentIdx].orderIndex;
+    updated[originalCurrentIdx].orderIndex = updated[originalTargetIdx].orderIndex;
+    updated[originalTargetIdx].orderIndex = tempIndex;
+
+    const sortedUpdated = updated.sort((a, b) => a.orderIndex - b.orderIndex);
+    setProducts(sortedUpdated);
+    localStorage.setItem("120_products", JSON.stringify(sortedUpdated));
     triggerToast("제품 전시 순서가 실시간으로 재정렬되었습니다.");
   };
 
@@ -2917,26 +2940,18 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleAdjustProductOrder(p.id, "up")}
-                                  disabled={isProductFiltering || products.findIndex((op) => op.id === p.id) === 0}
+                                  disabled={filteredProducts.findIndex((op) => op.id === p.id) === 0}
                                   className="p-1 rounded bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] disabled:opacity-35 disabled:hover:bg-white text-[#735965] font-bold transition-all text-[9px] cursor-pointer"
-                                  title={
-                                    isProductFiltering
-                                      ? "검색/필터가 적용된 상태에서는 순서 조정이 불가합니다. 필터를 초기화해 주세요."
-                                      : "순서 위로"
-                                  }
+                                  title="순서 위로"
                                 >
                                   ▲
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleAdjustProductOrder(p.id, "down")}
-                                  disabled={isProductFiltering || products.findIndex((op) => op.id === p.id) === products.length - 1}
+                                  disabled={filteredProducts.findIndex((op) => op.id === p.id) === filteredProducts.length - 1}
                                   className="p-1 rounded bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] disabled:opacity-35 disabled:hover:bg-white text-[#735965] font-bold transition-all text-[9px] cursor-pointer"
-                                  title={
-                                    isProductFiltering
-                                      ? "검색/필터가 적용된 상태에서는 순서 조정이 불가합니다. 필터를 초기화해 주세요."
-                                      : "순서 아래로"
-                                  }
+                                  title="순서 아래로"
                                 >
                                   ▼
                                 </button>
