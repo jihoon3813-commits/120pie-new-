@@ -56,6 +56,7 @@ export const metadata = {
 };
 
 import ConvexClientProvider from "./ConvexClientProvider";
+import TrackPageView from "@/app/components/TrackPageView";
 
 export default function RootLayout({
   children
@@ -158,6 +159,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
         <ConvexClientProvider>
+          <TrackPageView />
           {children}
         </ConvexClientProvider>
       </body>

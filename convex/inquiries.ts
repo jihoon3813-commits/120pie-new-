@@ -21,3 +21,12 @@ export const add = mutation({
     return await ctx.db.insert("inquiries", args);
   },
 });
+
+export const deleteInquiry = mutation({
+  args: { _id: v.id("inquiries") },
+  handler: async (ctx: any, args: any) => {
+    await ctx.db.delete(args._id);
+    return true;
+  },
+});
+

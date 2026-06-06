@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as analytics from "../analytics.js";
 import type * as categories from "../categories.js";
 import type * as floatings from "../floatings.js";
 import type * as gallery from "../gallery.js";
@@ -27,6 +28,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  analytics: typeof analytics;
   categories: typeof categories;
   floatings: typeof floatings;
   gallery: typeof gallery;

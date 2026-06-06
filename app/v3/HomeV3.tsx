@@ -1051,6 +1051,25 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
     };
   }, [selectedMenu, selectedAdoptionStep, inquiryModalOpen]);
 
+  // Track menu views when selectedMenu is set
+  useEffect(() => {
+    if (selectedMenu) {
+      const referrer = typeof document !== "undefined" ? document.referrer : "";
+      fetch("/api/track", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "menu_view",
+          path: window.location.pathname,
+          menuName: selectedMenu,
+          referrer: referrer || "direct",
+        }),
+      }).catch((err) => console.error("MenuView tracking failed:", err));
+    }
+  }, [selectedMenu]);
+
   useEffect(() => {
     const video = mobileHeroVideoRef.current;
     if (!video) return;

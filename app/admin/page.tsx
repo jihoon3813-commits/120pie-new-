@@ -39,7 +39,8 @@ import {
   Sparkles,
   Settings,
   Map,
-  Copy
+  Copy,
+  BarChart3
 } from "lucide-react";
 
 // ==========================================
@@ -379,7 +380,56 @@ interface GalleryItem {
 
 const DEFAULT_GALLERY: GalleryItem[] = [];
 
+const parseReferrer = (ref: string) => {
+  if (!ref || ref.toLowerCase() === "direct" || ref === "") return "Direct (직접입력/즐겨찾기)";
+  
+  const lowerRef = ref.toLowerCase();
+  
+  if (typeof window !== "undefined" && lowerRef.includes(window.location.host)) {
+    return "Direct (직접입력/즐겨찾기)";
+  }
+  if (lowerRef.includes("120pie") || lowerRef.includes("localhost")) {
+    return "Direct (직접입력/즐겨찾기)";
+  }
+
+  if (lowerRef.includes("naver.com")) return "네이버 (Naver)";
+  if (lowerRef.includes("google.")) return "구글 (Google)";
+  if (lowerRef.includes("daum.net") || lowerRef.includes("kakao.com")) return "다음/카카오 (Daum/Kakao)";
+  if (lowerRef.includes("instagram.com")) return "인스타그램 (Instagram)";
+  if (lowerRef.includes("youtube.com") || lowerRef.includes("youtu.be")) return "유튜브 (YouTube)";
+  if (lowerRef.includes("facebook.com")) return "페이스북 (Facebook)";
+  
+  try {
+    const url = new URL(ref);
+    return url.hostname;
+  } catch (e) {
+    return ref;
+  }
+};
+
+const getDatesInRange = (startStr: string, endStr: string) => {
+  const dates: string[] = [];
+  if (!startStr || !endStr) return dates;
+  let current = new Date(startStr + "T00:00:00");
+  const end = new Date(endStr + "T23:59:59");
+  while (current <= end) {
+    const yyyy = current.getFullYear();
+    const mm = String(current.getMonth() + 1).padStart(2, '0');
+    const dd = String(current.getDate()).padStart(2, '0');
+    dates.push(`${yyyy}-${mm}-${dd}`);
+    current.setDate(current.getDate() + 1);
+  }
+  return dates.reverse();
+};
+
 export default function AdminPage() {
+  // Analytics State
+  const [analyticsDateFilter, setAnalyticsDateFilter] = useState<string>("week");
+  const [analyticsStartDate, setAnalyticsStartDate] = useState<string>("");
+  const [analyticsEndDate, setAnalyticsEndDate] = useState<string>("");
+  const [ipSearchQuery, setIpSearchQuery] = useState<string>("");
+  const [ipListPage, setIpListPage] = useState<number>(1);
+
   // Rich Text Editor Selection Preservation & Command Execution
   const savedRangeRef = React.useRef<Range | null>(null);
 
@@ -513,6 +563,7 @@ export default function AdminPage() {
   const convexStoreInquiries = useQuery(api.storeInquiries.list);
   const answerInquiryMutation = useMutation(api.storeInquiries.answerInquiry);
   const deleteInquiryMutation = useMutation(api.storeInquiries.deleteInquiry);
+  const deleteConsultationMutation = useMutation(api.inquiries.deleteInquiry);
 
   const convexNotices = useQuery(api.notices.list);
   const saveNoticeMutation = useMutation(api.notices.createOrUpdate);
@@ -596,6 +647,12 @@ export default function AdminPage() {
   }, [convexStoreInquiries]);
 
   useEffect(() => {
+    if (convexInquiries) {
+      setConsultations(convexInquiries as any[]);
+    }
+  }, [convexInquiries]);
+
+  useEffect(() => {
     if (convexGallery) {
       const mapped = convexGallery.map((item: any) => ({
         ...item,
@@ -642,6 +699,50 @@ export default function AdminPage() {
       localStorage.setItem("120_notices", JSON.stringify(mapped));
     }
   }, [convexNotices]);
+
+  // Analytics Date Range Calculation useEffect
+  useEffect(() => {
+    const getFormattedDate = (date: Date) => {
+      return date.toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
+    };
+    const today = new Date();
+    if (analyticsDateFilter === "today") {
+      const dStr = getFormattedDate(today);
+      setAnalyticsStartDate(dStr);
+      setAnalyticsEndDate(dStr);
+    } else if (analyticsDateFilter === "yesterday") {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const dStr = getFormattedDate(yesterday);
+      setAnalyticsStartDate(dStr);
+      setAnalyticsEndDate(dStr);
+    } else if (analyticsDateFilter === "week") {
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 6);
+      setAnalyticsStartDate(getFormattedDate(weekAgo));
+      setAnalyticsEndDate(getFormattedDate(today));
+    } else if (analyticsDateFilter === "month") {
+      const firstDay = new Date();
+      firstDay.setDate(1);
+      setAnalyticsStartDate(getFormattedDate(firstDay));
+      setAnalyticsEndDate(getFormattedDate(today));
+    } else if (analyticsDateFilter === "prev_month") {
+      const firstDayPrev = new Date();
+      firstDayPrev.setMonth(firstDayPrev.getMonth() - 1);
+      firstDayPrev.setDate(1);
+      const lastDayPrev = new Date();
+      lastDayPrev.setDate(0);
+      setAnalyticsStartDate(getFormattedDate(firstDayPrev));
+      setAnalyticsEndDate(getFormattedDate(lastDayPrev));
+    }
+  }, [analyticsDateFilter]);
+
+  const convexAnalytics = useQuery(
+    api.analytics.listEvents,
+    analyticsStartDate && analyticsEndDate ? { startDate: analyticsStartDate, endDate: analyticsEndDate } : {}
+  );
+  const analyticsEvents = convexAnalytics || [];
+
   // ==========================================
   // HQ ADMIN AUTHENTICATION STATE & LOGIC
   // ==========================================
@@ -690,6 +791,8 @@ export default function AdminPage() {
   const [categories, setCategories] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [consultations, setConsultations] = useState<any[]>([]);
+  const [selectedConsultation, setSelectedConsultation] = useState<any | null>(null);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [trainings, setTrainings] = useState<Material[]>([]);
   const [prs, setPrs] = useState<Material[]>([]);
@@ -1338,6 +1441,17 @@ export default function AdminPage() {
       }
 
       triggerToast("공지사항이 정상적으로 삭제되었습니다.");
+    }
+  };
+
+  const handleDeleteConsultation = (_id: any) => {
+    if (confirm("정말 이 창업 상담문의 내역을 삭제하시겠습니까?")) {
+      deleteConsultationMutation({ _id }).then(() => {
+        triggerToast("상담문의 내역이 정상적으로 삭제되었습니다.");
+      }).catch(err => {
+        console.error("Failed to delete consultation:", err);
+        alert("상담문의 삭제 중 오류가 발생했습니다.");
+      });
     }
   };
 
@@ -2909,6 +3023,95 @@ export default function AdminPage() {
 
   const isProductFiltering = adminProductSearch.trim() !== "" || adminProductCategoryFilter !== "전체";
 
+  // ==========================================
+  // ANALYTICS DATA PROCESSING & COMPUTATION
+  // ==========================================
+  // 1. Filter consultations (inquiries) for the selected period
+  const filteredConsultations = consultations.filter((inq) => {
+    if (!inq.regDate) return false;
+    let ok = true;
+    if (analyticsStartDate) ok = ok && inq.regDate >= analyticsStartDate;
+    if (analyticsEndDate) ok = ok && inq.regDate <= analyticsEndDate;
+    return ok;
+  });
+
+  // 2. Count metrics
+  const totalVisits = analyticsEvents.filter(e => e.type === "visit").length;
+  const totalInquiries = filteredConsultations.length;
+  const totalMenuViews = analyticsEvents.filter(e => e.type === "menu_view").length;
+
+  // 3. Generate daily trend data
+  const dateList = getDatesInRange(analyticsStartDate, analyticsEndDate);
+  const dailyData = dateList.map(date => {
+    const visits = analyticsEvents.filter(e => e.type === "visit" && e.date === date).length;
+    const inquiries = filteredConsultations.filter(inq => inq.regDate === date).length;
+    const menuViews = analyticsEvents.filter(e => e.type === "menu_view" && e.date === date).length;
+    return { date, visits, inquiries, menuViews };
+  });
+
+  // 4. Referrer Ranking
+  const referrerCounts: Record<string, number> = {};
+  analyticsEvents.forEach(e => {
+    const category = parseReferrer(e.referrer || "direct");
+    referrerCounts[category] = (referrerCounts[category] || 0) + 1;
+  });
+  const sortedReferrers = Object.entries(referrerCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+  const totalReferrerCount = sortedReferrers.reduce((acc, curr) => acc + curr.count, 0) || 1;
+
+  // 5. Menu View Ranking
+  const menuCounts: Record<string, number> = {};
+  analyticsEvents.filter(e => e.type === "menu_view" && e.menuName).forEach(e => {
+    const name = e.menuName!;
+    menuCounts[name] = (menuCounts[name] || 0) + 1;
+  });
+  const sortedMenus = Object.entries(menuCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+  const totalMenuViewCount = sortedMenus.reduce((acc, curr) => acc + curr.count, 0) || 1;
+
+  // 6. IP Analytics
+  const ipMap: Record<string, {
+    ip: string;
+    visitCount: number;
+    menuViewCount: number;
+    referrers: Set<string>;
+    paths: Set<string>;
+    lastTime: number;
+  }> = {};
+  analyticsEvents.forEach(e => {
+    const ip = e.ip || "127.0.0.1";
+    if (!ipMap[ip]) {
+      ipMap[ip] = {
+        ip,
+        visitCount: 0,
+        menuViewCount: 0,
+        referrers: new Set<string>(),
+        paths: new Set<string>(),
+        lastTime: 0,
+      };
+    }
+    const item = ipMap[ip];
+    if (e.type === "visit") item.visitCount += 1;
+    if (e.type === "menu_view") item.menuViewCount += 1;
+    if (e.referrer) item.referrers.add(parseReferrer(e.referrer));
+    if (e.path) item.paths.add(e.path);
+    if (e._creationTime && e._creationTime > item.lastTime) {
+      item.lastTime = e._creationTime;
+    }
+  });
+
+  const rawIpsList = Object.values(ipMap);
+  const filteredIpsList = rawIpsList.filter(item => {
+    if (!ipSearchQuery) return true;
+    return item.ip.toLowerCase().includes(ipSearchQuery.toLowerCase());
+  }).sort((a, b) => b.lastTime - a.lastTime);
+
+  const ipItemsPerPage = 10;
+  const totalIpPages = Math.ceil(filteredIpsList.length / ipItemsPerPage) || 1;
+  const paginatedIps = filteredIpsList.slice((ipListPage - 1) * ipItemsPerPage, ipListPage * ipItemsPerPage);
+
   return (
     <div id="admin-portal" className="h-screen overflow-hidden bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans select-none antialiased">
       
@@ -2984,7 +3187,9 @@ export default function AdminPage() {
                 { key: "product", label: "제품 관리", icon: Package },
                 { key: "order", label: "주문/배송 관리", icon: ShoppingBag, badge: incomingOrdersCount > 0 ? incomingOrdersCount : undefined },
                 { key: "notice", label: "공지사항 관리", icon: Megaphone },
-                { key: "inquiry", label: "1:1 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
+                { key: "inquiry", label: "1:1 AS 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
+                { key: "consultation", label: "창업 상담문의 관리", icon: Headphones },
+                { key: "analytics", label: "통계관리", icon: BarChart3 },
                 { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
                 { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
                 { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
@@ -3065,7 +3270,9 @@ export default function AdminPage() {
                     { key: "product", label: "제품 관리", icon: Package },
                     { key: "order", label: "주문/배송 관리", icon: ShoppingBag, badge: incomingOrdersCount > 0 ? incomingOrdersCount : undefined },
                     { key: "notice", label: "공지사항 관리", icon: Megaphone },
-                    { key: "inquiry", label: "1:1 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
+                    { key: "inquiry", label: "1:1 AS 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
+                    { key: "consultation", label: "창업 상담문의 관리", icon: Headphones },
+                    { key: "analytics", label: "통계관리", icon: BarChart3 },
                     { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
                     { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
                     { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
@@ -3122,7 +3329,7 @@ export default function AdminPage() {
             <div className="space-y-6">
               
               {/* Summary Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <button 
                   onClick={() => setCurrentMenu("store")}
                   className="bg-white border border-[#f2ccd7] hover:border-[#f25f8a] hover:bg-[#fff9fb] transition-all rounded-2xl p-5 flex items-center justify-between shadow-sm text-left group cursor-pointer"
@@ -3159,6 +3366,19 @@ export default function AdminPage() {
                   </div>
                   <div className="bg-[#ffd3df] text-[#bf3e67] group-hover:bg-[#f25f8a] group-hover:text-white p-3 rounded-xl transition-all">
                     <MessageSquare size={22} />
+                  </div>
+                </button>
+
+                <button 
+                  onClick={() => setCurrentMenu("consultation")}
+                  className="bg-white border border-[#f2ccd7] hover:border-[#f25f8a] hover:bg-[#fff9fb] transition-all rounded-2xl p-5 flex items-center justify-between shadow-sm text-left group cursor-pointer"
+                >
+                  <div>
+                    <span className="text-xs text-[#735965] font-bold block mb-1">창업 상담문의</span>
+                    <strong className="text-2xl font-black text-[#2d2026]">{consultations.length} <span className="text-xs text-[#735965] font-normal">건</span></strong>
+                  </div>
+                  <div className="bg-[#ffd3df] text-[#bf3e67] group-hover:bg-[#f25f8a] group-hover:text-white p-3 rounded-xl transition-all">
+                    <Headphones size={22} />
                   </div>
                 </button>
               </div>
@@ -4163,6 +4383,435 @@ export default function AdminPage() {
                 )}
               </div>
 
+            </div>
+          )}
+
+          {/* ==========================================
+              MENU: 6.5. CONSULTATION INQUIRIES MANAGEMENT
+             ========================================== */}
+          {currentMenu === "consultation" && (
+            <div className="space-y-6">
+              
+              <div>
+                <h2 className="text-xl font-bold text-[#2d2026]">홈페이지 창업 상담문의 관리</h2>
+                <p className="text-xs text-[#735965] font-bold mt-1">홈페이지 랜딩페이지를 통해 접수된 예비 창업자들의 상담 신청 내역을 조회하고 관리합니다.</p>
+              </div>
+
+              {/* Consultation Inquiries list */}
+              <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
+                        <th className="p-4 sm:p-5 w-24">신청일</th>
+                        <th className="p-4 sm:p-5 w-24">고객명</th>
+                        <th className="p-4 sm:p-5 w-44">연락처</th>
+                        <th className="p-4 sm:p-5 w-40">도입 희망 유형</th>
+                        <th className="p-4 sm:p-5">상세 문의 내용</th>
+                        <th className="p-4 sm:p-5 w-28 text-center">액션</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                      {consultations.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="p-8 text-center text-[#735965]">접수된 창업 상담문의가 존재하지 않습니다.</td>
+                        </tr>
+                      ) : (
+                        [...consultations]
+                          .sort((a, b) => b.regDate.localeCompare(a.regDate) || (b._creationTime || 0) - (a._creationTime || 0))
+                          .map((inq) => (
+                            <tr key={inq._id} className="hover:bg-[#fff9fb] transition-colors">
+                              <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{inq.regDate}</td>
+                              <td className="p-4 sm:p-5 font-bold text-[#2d2026] whitespace-nowrap">{inq.name}</td>
+                              <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">
+                                <div className="flex items-center gap-1.5">
+                                  <span>{inq.phone}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopyToClipboard(inq.phone, "연락처")}
+                                    className="p-1 hover:text-[#f25f8a] text-[#735965] bg-[#fff9fb] border border-[#f2ccd7] rounded cursor-pointer transition-colors"
+                                    title="복사하기"
+                                  >
+                                    <Copy size={11} />
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5">
+                                <span className="bg-[#ffd3df] text-[#bf3e67] font-bold px-2 py-0.5 rounded text-[10px] border border-[#f2ccd7] whitespace-nowrap">
+                                  {inq.storeType}
+                                </span>
+                              </td>
+                              <td className="p-4 sm:p-5 text-[#2d2026] max-w-xs sm:max-w-sm truncate" title={inq.message}>
+                                <div className="flex items-center gap-2">
+                                  <span className="truncate">{inq.message || "-"}</span>
+                                  {inq.message && inq.message.length > 20 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setSelectedConsultation(inq)}
+                                      className="px-2 py-0.5 rounded bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-[10px] font-bold transition-all whitespace-nowrap"
+                                    >
+                                      더보기
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteConsultation(inq._id)}
+                                  className="p-1.5 rounded-lg border border-[#f2ccd7] bg-white hover:bg-[#fff1f5] text-red-500 hover:border-red-300 transition-all text-xs cursor-pointer"
+                                  title="삭제"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* ==========================================
+              MENU: 6.8. HOMEPAGE ANALYTICS MANAGEMENT
+             ========================================== */}
+          {currentMenu === "analytics" && (
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-[#2d2026]">홈페이지 방문 및 통계 관리</h2>
+                  <p className="text-xs text-[#735965] font-bold mt-1">
+                    인입 건수, 창업 상담문의 접수, 브랜드 메뉴 조회수 통계를 분석하고 유입 경로와 방문자 IP를 확인합니다.
+                  </p>
+                </div>
+
+                {/* Period selection */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="bg-[#fff1f5] border border-[#f2ccd7] rounded-xl p-1 flex gap-1">
+                    {[
+                      { key: "today", label: "당일" },
+                      { key: "yesterday", label: "전일" },
+                      { key: "week", label: "일주일" },
+                      { key: "month", label: "당월" },
+                      { key: "prev_month", label: "전월" },
+                      { key: "custom", label: "기간선택" }
+                    ].map((item) => (
+                      <button
+                        key={item.key}
+                        onClick={() => {
+                          setAnalyticsDateFilter(item.key);
+                          setIpListPage(1);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          analyticsDateFilter === item.key
+                            ? "bg-[#f25f8a] text-white shadow-sm font-black"
+                            : "text-[#735965] hover:text-[#bf3e67]"
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {analyticsDateFilter === "custom" && (
+                    <div className="flex items-center gap-1.5 bg-white border border-[#f2ccd7] rounded-xl p-1">
+                      <input
+                        type="date"
+                        value={analyticsStartDate}
+                        onChange={(e) => {
+                          setAnalyticsStartDate(e.target.value);
+                          setIpListPage(1);
+                        }}
+                        className="bg-transparent border-0 text-xs font-bold text-[#2d2026] focus:ring-0 p-1"
+                      />
+                      <span className="text-xs text-[#735965] font-bold">~</span>
+                      <input
+                        type="date"
+                        value={analyticsEndDate}
+                        onChange={(e) => {
+                          setAnalyticsEndDate(e.target.value);
+                          setIpListPage(1);
+                        }}
+                        className="bg-transparent border-0 text-xs font-bold text-[#2d2026] focus:ring-0 p-1"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Date display helper */}
+              <div className="bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-xl px-4 py-2 text-xs text-[#bf3e67] font-extrabold flex items-center gap-1.5">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#f25f8a]"></span>
+                분석 대상 기간: {analyticsStartDate || "-"} ~ {analyticsEndDate || "-"} (총 {dateList.length}일)
+              </div>
+
+              {/* Metric cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 flex items-center justify-between shadow-sm">
+                  <div>
+                    <span className="text-xs text-[#735965] font-bold block mb-1">방문자수 (인입건수)</span>
+                    <strong className="text-2xl font-black text-[#2d2026]">
+                      {totalVisits.toLocaleString()} <span className="text-xs text-[#735965] font-normal">회</span>
+                    </strong>
+                  </div>
+                  <div className="bg-[#fff1f5] text-[#f25f8a] p-3 rounded-xl border border-[#f2ccd7]/40">
+                    <Monitor size={22} />
+                  </div>
+                </div>
+
+                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 flex items-center justify-between shadow-sm">
+                  <div>
+                    <span className="text-xs text-[#735965] font-bold block mb-1">창업 상담문의</span>
+                    <strong className="text-2xl font-black text-[#f25f8a]">
+                      {totalInquiries.toLocaleString()} <span className="text-xs text-[#735965] font-normal">건</span>
+                    </strong>
+                  </div>
+                  <div className="bg-[#fff1f5] text-[#f25f8a] p-3 rounded-xl border border-[#f2ccd7]/40">
+                    <Headphones size={22} />
+                  </div>
+                </div>
+
+                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 flex items-center justify-between shadow-sm">
+                  <div>
+                    <span className="text-xs text-[#735965] font-bold block mb-1">메뉴 상세 뷰수</span>
+                    <strong className="text-2xl font-black text-[#2d2026]">
+                      {totalMenuViews.toLocaleString()} <span className="text-xs text-[#735965] font-normal">회</span>
+                    </strong>
+                  </div>
+                  <div className="bg-[#fff1f5] text-[#f25f8a] p-3 rounded-xl border border-[#f2ccd7]/40">
+                    <BarChart3 size={22} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Daily trend and referrer */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* Daily Table (7 columns) */}
+                <div className="lg:col-span-7 bg-white border border-[#f2ccd7] rounded-2xl shadow-sm flex flex-col overflow-hidden">
+                  <div className="p-4 sm:p-5 border-b border-[#f2ccd7] bg-[#fff9fb]">
+                    <h3 className="text-sm font-bold text-[#2d2026]">일자별 상세 지표</h3>
+                  </div>
+                  <div className="overflow-x-auto flex-1 max-h-[350px]">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[10px] font-bold text-[#735965] uppercase tracking-wider sticky top-0 z-10">
+                          <th className="p-3">일자</th>
+                          <th className="p-3 text-right">방문자수 (인입)</th>
+                          <th className="p-3 text-right">창업 상담문의</th>
+                          <th className="p-3 text-right">메뉴 상세 뷰수</th>
+                          <th className="p-3 text-right">합계</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                        {dailyData.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="p-8 text-center text-[#735965] font-bold">기간 내 조회된 통계가 없습니다.</td>
+                          </tr>
+                        ) : (
+                          dailyData.map((row) => (
+                            <tr key={row.date} className="hover:bg-[#fff9fb] transition-colors">
+                              <td className="p-3 text-[#2d2026] font-extrabold">{row.date}</td>
+                              <td className="p-3 text-right text-[#735965] font-semibold">{row.visits.toLocaleString()}</td>
+                              <td className="p-3 text-right text-[#f25f8a] font-bold">{row.inquiries.toLocaleString()}</td>
+                              <td className="p-3 text-right text-[#735965] font-semibold">{row.menuViews.toLocaleString()}</td>
+                              <td className="p-3 text-right text-[#bf3e67] font-extrabold bg-[#fff9fb]/40">
+                                {(row.visits + row.inquiries + row.menuViews).toLocaleString()}
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Referrers Rank (5 columns) */}
+                <div className="lg:col-span-5 bg-white border border-[#f2ccd7] rounded-2xl shadow-sm flex flex-col overflow-hidden">
+                  <div className="p-4 sm:p-5 border-b border-[#f2ccd7] bg-[#fff9fb]">
+                    <h3 className="text-sm font-bold text-[#2d2026]">유입경로(Referrer) 분석</h3>
+                  </div>
+                  <div className="p-5 overflow-y-auto max-h-[350px] flex-1 space-y-4">
+                    {sortedReferrers.length === 0 ? (
+                      <div className="text-center text-[#735965] font-bold py-12">조회된 유입경로 데이터가 없습니다.</div>
+                    ) : (
+                      sortedReferrers.map((ref, idx) => {
+                        const percent = Math.round((ref.count / totalReferrerCount) * 100);
+                        return (
+                          <div key={ref.name} className="space-y-1">
+                            <div className="flex justify-between items-center text-xs">
+                              <span className="font-extrabold text-[#2d2026] flex items-center gap-1.5">
+                                <span className="inline-block w-4 h-4 rounded-full bg-[#ffd3df] text-[#bf3e67] text-[10px] font-black flex items-center justify-center">
+                                  {idx + 1}
+                                </span>
+                                {ref.name}
+                              </span>
+                              <span className="font-bold text-[#735965]">
+                                {ref.count.toLocaleString()}건 ({percent}%)
+                              </span>
+                            </div>
+                            <div className="w-full bg-[#f2ccd7]/30 h-2 rounded-full overflow-hidden">
+                              <div
+                                  className="bg-[#f25f8a] h-full rounded-full transition-all"
+                                  style={{ width: `${percent}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Brand Menu View Ranking */}
+              <div className="bg-white border border-[#f2ccd7] rounded-2xl shadow-sm overflow-hidden">
+                <div className="p-4 sm:p-5 border-b border-[#f2ccd7] bg-[#fff9fb] flex justify-between items-center">
+                  <h3 className="text-sm font-bold text-[#2d2026]">브랜드 / 메뉴별 상세 조회수 순위</h3>
+                  <span className="text-[10px] bg-[#ffd3df] text-[#bf3e67] px-2.5 py-0.5 rounded-full font-bold border border-[#f2ccd7]">
+                    총 뷰수: {totalMenuViews.toLocaleString()}회
+                  </span>
+                </div>
+                <div className="p-5 space-y-4 max-h-[300px] overflow-y-auto">
+                  {sortedMenus.length === 0 ? (
+                    <div className="text-center text-[#735965] font-bold py-8">조회된 메뉴 상세 뷰 데이터가 없습니다.</div>
+                  ) : (
+                    sortedMenus.map((menu, idx) => {
+                      const percent = Math.round((menu.count / totalMenuViewCount) * 100);
+                      return (
+                        <div key={menu.name} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-6">
+                          <span className="font-extrabold text-[#2d2026] text-xs sm:w-1/4 flex items-center gap-2">
+                            <span className="inline-block w-5 h-5 rounded-lg bg-[#fff1f5] border border-[#f2ccd7] text-[#bf3e67] text-[10px] font-black flex items-center justify-center shrink-0">
+                              {idx + 1}
+                            </span>
+                            {menu.name}
+                          </span>
+                          <div className="flex-1 flex items-center gap-3">
+                            <div className="flex-1 bg-[#f2ccd7]/20 h-2.5 rounded-full overflow-hidden">
+                              <div
+                                className="bg-gradient-to-r from-[#f25f8a] to-[#bf3e67] h-full rounded-full transition-all"
+                                style={{ width: `${percent}%` }}
+                              ></div>
+                            </div>
+                            <span className="font-bold text-[#735965] text-xs w-20 text-right shrink-0">
+                              {menu.count.toLocaleString()}회 ({percent}%)
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* IP Access Logs */}
+              <div className="bg-white border border-[#f2ccd7] rounded-2xl shadow-sm overflow-hidden">
+                <div className="p-4 sm:p-5 border-b border-[#f2ccd7] bg-[#fff9fb] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-bold text-[#2d2026]">유입 IP 주소별 방문 분석 로그</h3>
+                    <p className="text-[10px] text-[#735965] font-bold mt-0.5">접속 IP별 누적 방문 횟수 및 유입 경로, 최근 방문한 페이지를 요약 조회합니다.</p>
+                  </div>
+
+                  {/* Search */}
+                  <div className="relative w-full sm:w-64">
+                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#735965]">
+                      <Search size={14} />
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="IP 주소 검색..."
+                      value={ipSearchQuery}
+                      onChange={(e) => {
+                        setIpSearchQuery(e.target.value);
+                        setIpListPage(1);
+                      }}
+                      className="pl-9 pr-4 py-1.5 w-full bg-white border border-[#f2ccd7] rounded-xl text-xs font-bold text-[#2d2026] placeholder-[#735965]/50 focus:border-[#f25f8a] focus:ring-1 focus:ring-[#f25f8a] transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[10px] font-bold text-[#735965] uppercase tracking-wider">
+                        <th className="p-4 w-44">IP 주소</th>
+                        <th className="p-4 text-center w-24">누적 방문수</th>
+                        <th className="p-4 text-center w-24">메뉴 상세뷰</th>
+                        <th className="p-4">유입 경로 (Referrer)</th>
+                        <th className="p-4 w-44">최종 방문 경로</th>
+                        <th className="p-4 w-44">최종 접속 일시</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                      {paginatedIps.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="p-8 text-center text-[#735965]">검색 필터에 부합하는 IP 기록이 없습니다.</td>
+                        </tr>
+                      ) : (
+                        paginatedIps.map((row) => (
+                          <tr key={row.ip} className="hover:bg-[#fff9fb] transition-colors">
+                            <td className="p-4 font-extrabold text-[#2d2026]">{row.ip}</td>
+                            <td className="p-4 text-center font-bold text-[#735965]">{row.visitCount.toLocaleString()}회</td>
+                            <td className="p-4 text-center font-bold text-[#bf3e67]">{row.menuViewCount.toLocaleString()}회</td>
+                            <td className="p-4 text-[#735965] font-semibold max-w-xs truncate">
+                              <div className="flex flex-wrap gap-1">
+                                {Array.from(row.referrers).map((ref, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="bg-[#fff1f5] border border-[#f2ccd7]/60 text-[#bf3e67] text-[9px] font-black px-1.5 py-0.5 rounded"
+                                  >
+                                    {ref}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="p-4 text-[#735965] font-semibold max-w-xs truncate" title={Array.from(row.paths).join(", ")}>
+                              <span className="bg-[#fff9fb] border border-[#f2ccd7]/40 text-[#735965] text-[10px] px-2 py-0.5 rounded">
+                                {Array.from(row.paths).pop() || "/"}
+                              </span>
+                            </td>
+                            <td className="p-4 text-[#735965] font-bold whitespace-nowrap">
+                              {new Date(row.lastTime).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Footer */}
+                {totalIpPages > 1 && (
+                  <div className="p-4 sm:p-5 border-t border-[#f2ccd7] bg-[#fff9fb] flex items-center justify-between">
+                    <span className="text-[10px] text-[#735965] font-bold">
+                      총 {filteredIpsList.length}개 IP 중 {(ipListPage - 1) * ipItemsPerPage + 1}~{Math.min(ipListPage * ipItemsPerPage, filteredIpsList.length)} 표시
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        disabled={ipListPage === 1}
+                        onClick={() => setIpListPage(p => Math.max(p - 1, 1))}
+                        className="px-2.5 py-1 text-xs font-bold border border-[#f2ccd7] rounded-lg bg-white text-[#735965] disabled:opacity-50 hover:bg-[#fff9fb] transition-all cursor-pointer"
+                      >
+                        이전
+                      </button>
+                      <span className="text-xs text-[#2d2026] font-bold px-3">
+                        {ipListPage} / {totalIpPages}
+                      </span>
+                      <button
+                        disabled={ipListPage === totalIpPages}
+                        onClick={() => setIpListPage(p => Math.min(p + 1, totalIpPages))}
+                        className="px-2.5 py-1 text-xs font-bold border border-[#f2ccd7] rounded-lg bg-white text-[#735965] disabled:opacity-50 hover:bg-[#fff9fb] transition-all cursor-pointer"
+                      >
+                        다음
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -5704,6 +6353,83 @@ export default function AdminPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 1.5. Consultation Inquiry Detail Modal */}
+      {selectedConsultation && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setSelectedConsultation(null)}
+        >
+          <div 
+            className="w-full max-w-xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
+              <h3 className="text-base font-bold text-[#2d2026]">창업 상담문의 상세 내역</h3>
+              <button onClick={() => setSelectedConsultation(null)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
+                <X size={15} />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
+              <div className="bg-[#fff1f5] border border-[#f2ccd7]/60 p-5 rounded-2xl space-y-3 font-semibold text-[#735965]">
+                <div className="flex justify-between border-b border-[#f2ccd7]/40 pb-2">
+                  <span>신청인</span>
+                  <span className="text-[#2d2026] font-bold">{selectedConsultation.name}</span>
+                </div>
+                <div className="flex justify-between border-b border-[#f2ccd7]/40 pb-2">
+                  <span>연락처</span>
+                  <span className="text-[#2d2026] font-bold flex items-center gap-1.5">
+                    {selectedConsultation.phone}
+                    <button
+                      type="button"
+                      onClick={() => handleCopyToClipboard(selectedConsultation.phone, "연락처")}
+                      className="p-1 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7] rounded cursor-pointer transition-colors"
+                      title="복사하기"
+                    >
+                      <Copy size={11} />
+                    </button>
+                  </span>
+                </div>
+                <div className="flex justify-between border-b border-[#f2ccd7]/40 pb-2">
+                  <span>도입 희망 유형</span>
+                  <span className="bg-[#ffd3df] text-[#bf3e67] font-bold px-2 py-0.5 rounded text-[10px] border border-[#f2ccd7]">
+                    {selectedConsultation.storeType}
+                  </span>
+                </div>
+                {selectedConsultation.existingStoreName && (
+                  <div className="flex justify-between border-b border-[#f2ccd7]/40 pb-2">
+                    <span>기존 매장명</span>
+                    <span className="text-[#2d2026] font-bold">{selectedConsultation.existingStoreName}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span>신청일</span>
+                  <span className="text-[#2d2026] font-bold">{selectedConsultation.regDate}</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="font-bold text-[#2d2026]">상세 문의 내용</label>
+                <div className="bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl min-h-[120px] max-h-[240px] overflow-y-auto">
+                  <p className="text-xs sm:text-sm text-[#2d2026] leading-relaxed whitespace-pre-wrap font-medium">
+                    {selectedConsultation.message || "입력된 문의 내용이 없습니다."}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-5 bg-neutral-50 text-right border-t border-[#f2ccd7]/60">
+              <button 
+                onClick={() => setSelectedConsultation(null)}
+                className="px-6 py-2.5 rounded-xl bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-xs font-bold text-[#735965] transition-colors"
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </div>
       )}

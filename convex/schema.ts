@@ -137,4 +137,12 @@ export default defineSchema({
   productCategories: defineTable({
     categories: v.array(v.string()),
   }),
+  analytics: defineTable({
+    type: v.string(), // "visit" | "menu_view"
+    path: v.string(), // 웹 경로, e.g. "/landing-v4", "/portal"
+    menuName: v.optional(v.string()), // 브랜드 메뉴 명칭 (e.g. "120겹파이", "에그120", "츄러스120")
+    referrer: v.optional(v.string()), // 유입경로
+    ip: v.string(), // 접속 IP 주소
+    date: v.string(), // YYYY-MM-DD
+  }).index("by_date", ["date"]),
 });
