@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 
 export const list = query({
   args: {},
@@ -18,7 +19,16 @@ export const add = mutation({
     regDate: v.string(),
   },
   handler: async (ctx: any, args: any) => {
-    return await ctx.db.insert("inquiries", args);
+    const id = await ctx.db.insert("inquiries", args);
+    await ctx.scheduler.runAfter(0, internal.discord.notifyConsultation, {
+      name: args.name,
+      phone: args.phone,
+      storeType: args.storeType,
+      existingStoreName: args.existingStoreName,
+      message: args.message,
+      regDate: args.regDate,
+    });
+    return id;
   },
 });
 

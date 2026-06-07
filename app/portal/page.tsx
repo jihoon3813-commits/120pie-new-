@@ -328,6 +328,7 @@ export default function PortalPage() {
   const syncOrdersMutation = useMutation(api.orders.syncOrders);
   const createInquiryMutation = useMutation(api.storeInquiries.createOrUpdate);
   const incrementNoticeViewsMutation = useMutation(api.notices.incrementViews);
+  const updateOrderStatusMutation = useMutation(api.orders.updateStatus);
 
 
 
@@ -979,6 +980,9 @@ export default function PortalPage() {
   const placeOrder = () => {
     if (cart.length === 0) return;
 
+    const confirmOrder = window.confirm("정말로 자재 발주를 신청하시겠습니까?");
+    if (!confirmOrder) return;
+
     const newOrderItems = cart.map((item) => {
       const p = products.find((prod) => prod.id === item.productId);
       return {
@@ -1029,6 +1033,32 @@ export default function PortalPage() {
     clearCart();
     triggerToast("발주 주문이 정상적으로 완료되었습니다!");
     setCurrentMenu("history");
+  };
+
+  // ==========================================
+  // CANCEL ORDER
+  // ==========================================
+  const cancelOrder = (orderId: string) => {
+    const confirmCancel = window.confirm("정말로 이 주문을 취소하시겠습니까?");
+    if (!confirmCancel) return;
+
+    // Update locally first for optimistic response
+    const updatedOrders = orders.map((o) =>
+      o.id === orderId ? { ...o, status: "주문취소" } : o
+    );
+    setOrders(updatedOrders);
+    localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
+
+    // Update in Convex Cloud DB
+    updateOrderStatusMutation({ id: orderId, status: "주문취소" })
+      .then(() => {
+        triggerToast("주문이 취소되었습니다.");
+        setSelectedOrder(null);
+      })
+      .catch((err) => {
+        console.error("[Convex] Failed to cancel order:", err);
+        triggerToast("주문 취소 처리에 실패했습니다.");
+      });
   };
 
   // ==========================================
@@ -2938,7 +2968,19 @@ export default function PortalPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 text-center">
+            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 flex justify-between items-center gap-4">
+              {["주문완료", "배송준비중", "대기"].includes(selectedOrder.status) ? (
+                <button 
+                  type="button"
+                  onClick={() => cancelOrder(selectedOrder.id)}
+                  className="px-5 py-3 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-xs font-extrabold text-red-500 transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                >
+                  <Trash2 size={13} />
+                  주문 취소
+                </button>
+              ) : (
+                <div />
+              )}
               <button 
                 type="button"
                 onClick={() => closeModal(() => setSelectedOrder(null))}

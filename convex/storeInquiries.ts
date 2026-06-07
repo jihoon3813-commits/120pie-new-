@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 
 // 1. 본사용 전체 문의 조회 (최근일 순)
 export const list = query({
@@ -42,6 +43,15 @@ export const createOrUpdate = mutation({
       return _id;
     } else {
       const newId = await ctx.db.insert("storeInquiries", fields);
+      await ctx.scheduler.runAfter(0, internal.discord.notifyInquiry, {
+        id: args.id,
+        storeId: args.storeId,
+        storeName: args.storeName,
+        category: args.category,
+        title: args.title,
+        content: args.content,
+        date: args.date,
+      });
       return newId;
     }
   },

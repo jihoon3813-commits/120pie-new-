@@ -10,6 +10,7 @@
 
 import type * as analytics from "../analytics.js";
 import type * as categories from "../categories.js";
+import type * as discord from "../discord.js";
 import type * as floatings from "../floatings.js";
 import type * as gallery from "../gallery.js";
 import type * as inquiries from "../inquiries.js";
@@ -30,6 +31,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   analytics: typeof analytics;
   categories: typeof categories;
+  discord: typeof discord;
   floatings: typeof floatings;
   gallery: typeof gallery;
   inquiries: typeof inquiries;

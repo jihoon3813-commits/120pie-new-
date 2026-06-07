@@ -151,6 +151,7 @@ const DEFAULT_FLOATING: FloatingSettings = {
 };
 
 interface Order {
+  _id?: any;
   id: string;
   date: string;
   items: { productName: string; quantity: number; price: number }[];
@@ -162,14 +163,16 @@ interface Order {
 }
 
 interface Inquiry {
+  _id?: any;
   id: string;
+  storeId?: string;
+  storeName?: string;
   category: string;
   title: string;
   date: string;
   status: "답변대기" | "답변완료";
   content: string;
   answer?: string;
-  _id?: any;
 }
 
 interface Notice {
@@ -555,6 +558,7 @@ export default function AdminPage() {
   const syncOrdersMutation = useMutation(api.orders.syncOrders);
   const updateOrderStatusMutation = useMutation(api.orders.updateStatus);
   const updateTrackingMutation = useMutation(api.orders.updateTracking);
+  const deleteOrderMutation = useMutation(api.orders.deleteOrder);
 
   const convexMaterials = useQuery(api.materials.list);
   const saveMaterialMutation = useMutation(api.materials.createOrUpdate);
@@ -582,6 +586,8 @@ export default function AdminPage() {
   const toggleFeaturedMutation = useMutation(api.gallery.toggleFeatured);
   const convexGalleryCategories = useQuery(api.gallery.getCategories);
   const updateCategoriesMutation = useMutation(api.gallery.updateCategories);
+  const syncGalleryMutation = useMutation(api.gallery.syncGallery);
+  const seedGalleryMutation = useMutation(api.gallery.seedGallery);
 
   // Stores Convex Hooks
   const convexStores = useQuery(api.stores.get);
@@ -1188,6 +1194,40 @@ export default function AdminPage() {
         }
       }
 
+      if (convexGallery !== undefined && convexGallery.length === 0) {
+        const storedGalRaw = localStorage.getItem("120_gallery_items");
+        let migrated = false;
+        if (storedGalRaw) {
+          try {
+            const parsedGal = JSON.parse(storedGalRaw);
+            if (parsedGal && parsedGal.length > 0) {
+              console.log("[Migration] Moving local gallery items to Convex cloud DB...");
+              const itemsToSync = parsedGal.map((item: any) => ({
+                name: item.name,
+                category: item.category,
+                url: item.url,
+                regDate: item.regDate || new Date().toISOString().split("T")[0],
+                orderIndex: item.orderIndex,
+                isFeatured: item.isFeatured
+              }));
+              syncGalleryMutation({ items: itemsToSync }).then(() => {
+                console.log("[Migration] Gallery migration completed!");
+              });
+              migrated = true;
+            }
+          } catch (e) {
+            console.error("[Migration] Failed to migrate gallery items:", e);
+          }
+        }
+
+        if (!migrated) {
+          console.log("[Migration] Seeding default gallery items...");
+          seedGalleryMutation().then(() => {
+            console.log("[Migration] Default gallery seeding completed!");
+          });
+        }
+      }
+
       const healedPr = pr.map((p: any) => ({
         id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
         orderIndex: typeof p.orderIndex === "number" ? p.orderIndex : 99,
@@ -1280,7 +1320,7 @@ export default function AdminPage() {
       setShippingFeeB(policySettings.shippingFeeB || "4,000");
       setShippingFeeC(policySettings.shippingFeeC || "5,000");
     }
-  }, [convexProducts, convexOrders]);
+  }, [convexProducts, convexOrders, convexGallery]);
 
   // Sync real-time Convex products and backup to localStorage
   useEffect(() => {
@@ -1452,6 +1492,32 @@ export default function AdminPage() {
         console.error("Failed to delete consultation:", err);
         alert("상담문의 삭제 중 오류가 발생했습니다.");
       });
+    }
+  };
+
+  const handleDeleteOrder = (_id: any) => {
+    if (confirm("정말로 이 가맹점 발주 주문 내역을 삭제하시겠습니까?")) {
+      deleteOrderMutation({ _id })
+        .then(() => {
+          triggerToast("발주 주문 내역이 삭제되었습니다.");
+        })
+        .catch((err) => {
+          console.error("Failed to delete order:", err);
+          alert("주문 삭제 중 오류가 발생했습니다.");
+        });
+    }
+  };
+
+  const handleDeleteStoreInquiry = (_id: any) => {
+    if (confirm("정말로 이 1:1 AS 문의 내역을 삭제하시겠습니까?")) {
+      deleteInquiryMutation({ _id })
+        .then(() => {
+          triggerToast("1:1 문의 내역이 삭제되었습니다.");
+        })
+        .catch((err) => {
+          console.error("Failed to delete inquiry:", err);
+          alert("문의 삭제 중 오류가 발생했습니다.");
+        });
     }
   };
 
@@ -4219,13 +4285,23 @@ export default function AdminPage() {
                                 </span>
                               </td>
                               <td className="p-4 sm:p-5 text-center whitespace-nowrap">
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenOrderModal(order)}
-                                  className="px-3.5 py-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-[10px] font-bold transition-all shadow-sm cursor-pointer"
-                                >
-                                  상세보기
-                                </button>
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenOrderModal(order)}
+                                    className="px-3.5 py-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-[10px] font-bold transition-all shadow-sm cursor-pointer"
+                                  >
+                                    상세보기
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteOrder(order._id)}
+                                    className="p-1.5 rounded-lg bg-white hover:bg-red-50 text-red-500 border border-[#f2ccd7] hover:border-red-200 transition-all cursor-pointer"
+                                    title="삭제"
+                                  >
+                                    <Trash2 size={13} />
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           );
@@ -4338,15 +4414,25 @@ export default function AdminPage() {
                           <span className="text-[10px] font-bold text-[#bf3e67] tracking-wider uppercase bg-[#ffd3df] px-2 py-0.5 rounded border border-[#f2ccd7]">
                             {inq.category}
                           </span>
-                          <span className="text-xs font-semibold text-[#735965]">접수번호: {inq.id} · 신청점포: 강남역삼점 ({inq.date})</span>
+                          <span className="text-xs font-semibold text-[#735965]">접수번호: {inq.id} · 신청점포: {inq.storeName || "강남역삼점"} ({inq.date})</span>
                         </div>
-                        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
-                          inq.status === "답변완료" 
-                            ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
-                            : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
-                        }`}>
-                          {inq.status}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                            inq.status === "답변완료" 
+                              ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
+                              : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
+                          }`}>
+                            {inq.status}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteStoreInquiry(inq._id)}
+                            className="p-1.5 rounded-lg bg-white hover:bg-red-50 text-red-500 border border-[#f2ccd7] hover:border-red-200 transition-all cursor-pointer"
+                            title="삭제"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
                       </div>
 
                       <div className="space-y-2">

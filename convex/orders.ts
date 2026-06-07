@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 
 // 모든 발주 주문 리스트 조회 (최근 주문이 위로 정렬)
 export const list = query({
@@ -42,6 +43,28 @@ export const createOrUpdate = mutation({
       return existing._id;
     } else {
       const newId = await ctx.db.insert("orders", fields);
+      
+      // Look up store name
+      let storeName = "";
+      if (args.storeId) {
+        const store = await ctx.db
+          .query("stores")
+          .filter((q) => q.eq(q.field("id"), args.storeId))
+          .first();
+        if (store) {
+          storeName = store.name;
+        }
+      }
+
+      await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
+        id: args.id,
+        date: args.date,
+        storeId: args.storeId,
+        storeName: storeName || undefined,
+        totalPrice: args.totalPrice,
+        items: args.items,
+      });
+
       return newId;
     }
   },
@@ -172,6 +195,15 @@ export const deleteAllOrders = mutation({
     for (const ord of orders) {
       await ctx.db.delete(ord._id);
     }
+    return true;
+  },
+});
+
+// 개별 주문 삭제 mutation
+export const deleteOrder = mutation({
+  args: { _id: v.id("orders") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args._id);
     return true;
   },
 });
