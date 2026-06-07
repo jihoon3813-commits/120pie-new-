@@ -1121,6 +1121,9 @@ export default function AdminPage() {
   // ==========================================
   // INITIALIZATION & DYNAMIC STORAGE PULLING
   // ==========================================
+  // ==========================================
+  // INITIALIZATION & DYNAMIC STORAGE PULLING
+  // ==========================================
   useEffect(() => {
     if (typeof window !== "undefined") {
       const loadState = (key: string, defaultData: any) => {
@@ -1157,76 +1160,6 @@ export default function AdminPage() {
       let pr = loadState("120_products", []);
       // Filter out legacy mock seed products (prod-1 to prod-6) to ensure they are completely deleted
       pr = pr.filter((p: any) => p && !["prod-1", "prod-2", "prod-3", "prod-4", "prod-5", "prod-6"].includes(p.id));
-
-      // [Migration] Automatic migration from LocalStorage to Convex Cloud DB
-      if (convexProducts !== undefined && convexProducts.length === 0) {
-        const storedPrRaw = localStorage.getItem("120_products");
-        if (storedPrRaw) {
-          try {
-            const parsedPr = JSON.parse(storedPrRaw);
-            const filteredMigration = parsedPr.filter((p: any) => p && !["prod-1", "prod-2", "prod-3", "prod-4", "prod-5", "prod-6"].includes(p.id));
-            if (filteredMigration && filteredMigration.length > 0) {
-              console.log("[Migration] Moving local products to Convex cloud DB...");
-              syncProductsMutation({ products: filteredMigration }).then(() => {
-                console.log("[Migration] Products migration completed!");
-              });
-            }
-          } catch (e) {
-            console.error("[Migration] Failed to migrate products:", e);
-          }
-        }
-      }
-
-      if (convexOrders !== undefined && convexOrders.length === 0) {
-        const storedOrdRaw = localStorage.getItem("120_orders");
-        if (storedOrdRaw) {
-          try {
-            const parsedOrd = JSON.parse(storedOrdRaw);
-            if (parsedOrd && parsedOrd.length > 0) {
-              console.log("[Migration] Moving local orders to Convex cloud DB...");
-              syncOrdersMutation({ orders: parsedOrd }).then(() => {
-                console.log("[Migration] Orders migration completed!");
-              });
-            }
-          } catch (e) {
-            console.error("[Migration] Failed to migrate orders:", e);
-          }
-        }
-      }
-
-      if (convexGallery !== undefined && convexGallery.length === 0) {
-        const storedGalRaw = localStorage.getItem("120_gallery_items");
-        let migrated = false;
-        if (storedGalRaw) {
-          try {
-            const parsedGal = JSON.parse(storedGalRaw);
-            if (parsedGal && parsedGal.length > 0) {
-              console.log("[Migration] Moving local gallery items to Convex cloud DB...");
-              const itemsToSync = parsedGal.map((item: any) => ({
-                name: item.name,
-                category: item.category,
-                url: item.url,
-                regDate: item.regDate || new Date().toISOString().split("T")[0],
-                orderIndex: item.orderIndex,
-                isFeatured: item.isFeatured
-              }));
-              syncGalleryMutation({ items: itemsToSync }).then(() => {
-                console.log("[Migration] Gallery migration completed!");
-              });
-              migrated = true;
-            }
-          } catch (e) {
-            console.error("[Migration] Failed to migrate gallery items:", e);
-          }
-        }
-
-        if (!migrated) {
-          console.log("[Migration] Seeding default gallery items...");
-          seedGalleryMutation().then(() => {
-            console.log("[Migration] Default gallery seeding completed!");
-          });
-        }
-      }
 
       const healedPr = pr.map((p: any) => ({
         id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
@@ -1320,7 +1253,83 @@ export default function AdminPage() {
       setShippingFeeB(policySettings.shippingFeeB || "4,000");
       setShippingFeeC(policySettings.shippingFeeC || "5,000");
     }
-  }, [convexProducts, convexOrders, convexGallery]);
+  }, []);
+
+  // [Migration] Automatic migration from LocalStorage to Convex Cloud DB
+  useEffect(() => {
+    if (convexProducts !== undefined && convexProducts.length === 0) {
+      const storedPrRaw = localStorage.getItem("120_products");
+      if (storedPrRaw) {
+        try {
+          const parsedPr = JSON.parse(storedPrRaw);
+          const filteredMigration = parsedPr.filter((p: any) => p && !["prod-1", "prod-2", "prod-3", "prod-4", "prod-5", "prod-6"].includes(p.id));
+          if (filteredMigration && filteredMigration.length > 0) {
+            console.log("[Migration] Moving local products to Convex cloud DB...");
+            syncProductsMutation({ products: filteredMigration }).then(() => {
+              console.log("[Migration] Products migration completed!");
+            });
+          }
+        } catch (e) {
+          console.error("[Migration] Failed to migrate products:", e);
+        }
+      }
+    }
+  }, [convexProducts, syncProductsMutation]);
+
+  useEffect(() => {
+    if (convexOrders !== undefined && convexOrders.length === 0) {
+      const storedOrdRaw = localStorage.getItem("120_orders");
+      if (storedOrdRaw) {
+        try {
+          const parsedOrd = JSON.parse(storedOrdRaw);
+          if (parsedOrd && parsedOrd.length > 0) {
+            console.log("[Migration] Moving local orders to Convex cloud DB...");
+            syncOrdersMutation({ orders: parsedOrd }).then(() => {
+              console.log("[Migration] Orders migration completed!");
+            });
+          }
+        } catch (e) {
+          console.error("[Migration] Failed to migrate orders:", e);
+        }
+      }
+    }
+  }, [convexOrders, syncOrdersMutation]);
+
+  useEffect(() => {
+    if (convexGallery !== undefined && convexGallery.length === 0) {
+      const storedGalRaw = localStorage.getItem("120_gallery_items");
+      let migrated = false;
+      if (storedGalRaw) {
+        try {
+          const parsedGal = JSON.parse(storedGalRaw);
+          if (parsedGal && parsedGal.length > 0) {
+            console.log("[Migration] Moving local gallery items to Convex cloud DB...");
+            const itemsToSync = parsedGal.map((item: any) => ({
+              name: item.name,
+              category: item.category,
+              url: item.url,
+              regDate: item.regDate || new Date().toISOString().split("T")[0],
+              orderIndex: item.orderIndex,
+              isFeatured: item.isFeatured
+            }));
+            syncGalleryMutation({ items: itemsToSync }).then(() => {
+              console.log("[Migration] Gallery migration completed!");
+            });
+            migrated = true;
+          }
+        } catch (e) {
+          console.error("[Migration] Failed to migrate gallery items:", e);
+        }
+      }
+
+      if (!migrated) {
+        console.log("[Migration] Seeding default gallery items...");
+        seedGalleryMutation().then(() => {
+          console.log("[Migration] Default gallery seeding completed!");
+        });
+      }
+    }
+  }, [convexGallery, syncGalleryMutation, seedGalleryMutation]);
 
   // Sync real-time Convex products and backup to localStorage
   useEffect(() => {
