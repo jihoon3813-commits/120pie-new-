@@ -35,7 +35,8 @@ import {
   Phone,
   MessageCircle,
   Plus,
-  MessageSquare
+  MessageSquare,
+  FileText
 } from "lucide-react";
 
 // 뷰포트 감지 카운팅 애니메이션 컴포넌트 (V3 다크 옐로우 맞춤 에디션)
@@ -3709,6 +3710,16 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>빠른 실시간 상담</span>
               </button>
             )}
+
+            {/* View Proposal Link */}
+            <Link
+              href="/proposal"
+              className="p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
+              style={{ backgroundColor: isPinkVariant ? "#f25f8a" : "#ffd500" }}
+            >
+              <FileText size={16} style={{ color: isPinkVariant ? "#ffffff" : "#0d233a" }} className={`w-[16px] h-[16px] ${isPinkVariant ? "text-white" : "text-[#0d233a]"}`} />
+              <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>제안서보기</span>
+            </Link>
           </div>
 
           {/* Mobile View: Collapsible list under "+" Button */}
@@ -3805,6 +3816,16 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>빠른 실시간 상담</span>
                   </button>
                 )}
+
+                {/* View Proposal Link */}
+                <Link
+                  href="/proposal"
+                  className="p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-115 active:scale-90 cursor-pointer relative group border-0"
+                  style={{ backgroundColor: isPinkVariant ? "#f25f8a" : "#ffd500" }}
+                >
+                  <FileText size={16} style={{ color: isPinkVariant ? "#ffffff" : "#0d233a" }} className={`w-[16px] h-[16px] ${isPinkVariant ? "text-white" : "text-[#0d233a]"}`} />
+                  <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>제안서보기</span>
+                </Link>
               </div>
             )}
 
