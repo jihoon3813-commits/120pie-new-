@@ -160,7 +160,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
         <ConvexClientProvider>
-          <Script src="https://cdn.iamport.kr/v1/iamport.js" strategy="lazyOnload" />
+          <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="lazyOnload" />
           <TrackPageView />
           {children}
         </ConvexClientProvider>
