@@ -43,33 +43,12 @@ export const verifyAndSaveOrder = action({
     }
 
     try {
-      // 1. Get access token from PortOne V1 API
-      const tokenResponse = await fetch("https://api.iamport.kr/users/getToken", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imp_key: impKey,
-          imp_secret: impSecret,
-        }),
-      });
-
-      if (!tokenResponse.ok) {
-        const errText = await tokenResponse.text();
-        return { success: false, message: `포트원 토큰 발급 실패: ${errText}` };
-      }
-
-      const tokenData = await tokenResponse.json();
-      const accessToken = tokenData.response?.access_token;
-      if (!accessToken) {
-        return { success: false, message: "포트원 토큰 데이터가 유효하지 않습니다." };
-      }
-
-      // 2. Get payment info from PortOne V1 API
-      const paymentResponse = await fetch(`https://api.iamport.kr/payments/${args.impUid}`, {
+      // 1. Get payment info from PortOne V2 API
+      const paymentResponse = await fetch(`https://api.portone.io/payments/${args.impUid}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": accessToken,
+          "Authorization": `PortOne ${impSecret}`,
         },
       });
 
@@ -78,32 +57,30 @@ export const verifyAndSaveOrder = action({
         return { success: false, message: `포트원 결제내역 조회 실패: ${errText}` };
       }
 
-      const paymentData = await paymentResponse.json();
-      const paymentInfo = paymentData.response;
+      const paymentInfo = await paymentResponse.json();
 
-      if (!paymentInfo) {
-        return { success: false, message: "포트원 서버에 해당 결제 내역이 존재하지 않습니다." };
+      if (!paymentInfo || !paymentInfo.status) {
+        return { success: false, message: "포트원 서버에 해당 결제 내역이 존재하지 않거나 응답이 올바르지 않습니다." };
       }
 
-      // 3. Compare amounts and status
-      const actualAmount = paymentInfo.amount;
-      const paymentStatus = paymentInfo.status; // V1 결제 완료 상태는 "paid"
+      // 2. Compare amounts and status
+      const actualAmount = paymentInfo.amount?.total;
+      const paymentStatus = paymentInfo.status; // V2 결제 완료 상태는 "PAID"
 
-      if (paymentStatus !== "paid") {
+      if (paymentStatus !== "PAID") {
         return { success: false, message: `결제가 완료되지 않은 상태입니다 (상태: ${paymentStatus})` };
       }
 
       // Check if amount matches expected amount
       if (typeof actualAmount !== "number" || Math.abs(actualAmount - args.amount) > 1) {
-        // Amount mismatch - possible forgery! Cancel the payment.
-        await fetch("https://api.iamport.kr/payments/cancel", {
+        // Amount mismatch - possible forgery! Cancel the payment using V2 Cancel API.
+        await fetch(`https://api.portone.io/payments/${args.impUid}/cancel`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": accessToken,
+            "Authorization": `PortOne ${impSecret}`,
           },
           body: JSON.stringify({
-            imp_uid: args.impUid,
             reason: "결제 금액 위변조 의심으로 인한 자동 환불",
           }),
         });
