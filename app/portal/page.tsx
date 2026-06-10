@@ -1026,8 +1026,8 @@ export default function PortalPage() {
   const placeOrder = () => {
     if (cart.length === 0) return;
 
-    const PortOne = (window as any).PortOne;
-    if (!PortOne) {
+    const IMP = (window as any).IMP;
+    if (!IMP) {
       showCustomAlert("결제 오류", "결제 모듈을 로드하는 중입니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
@@ -1059,23 +1059,21 @@ export default function PortalPage() {
       // 토스페이먼츠(UPLUS) 특수문자 제한 방지를 위해 상품명 정제
       const sanitizedOrderTitle = cart.length > 1 ? `${firstItemName} 외 ${cart.length - 1}건` : firstItemName;
 
-      PortOne.requestPayment({
-        storeId: storeId,
+      IMP.init(storeId);
+
+      IMP.request_pay({
         channelKey: channelKey,
-        paymentId: newOrderId,
-        orderName: sanitizedOrderTitle.replace(/[\[\]]/g, ""), // 특수문자 대괄호 제거
-        totalAmount: cartTotal,
-        currency: "KRW",
-        payMethod: "CARD",
-        customer: {
-          fullName: "가맹점주",
-          phoneNumber: "010-0000-0000",
-        },
-      }).then((response: any) => {
-        if (response.code === undefined) {
-          // 결제 성공 시 (code 필드가 없는 경우 성공)
+        merchant_uid: newOrderId,
+        name: sanitizedOrderTitle.replace(/[\[\]]/g, ""), // 특수문자 대괄호 제거
+        amount: cartTotal,
+        buyer_name: "가맹점주",
+        buyer_tel: "010-0000-0000",
+        pay_method: "card",
+      }, (response: any) => {
+        if (response.success) {
+          // 결제 성공 시
           verifyAndSaveOrderAction({
-            impUid: response.paymentId,
+            impUid: response.imp_uid,
             merchantUid: newOrderId,
             amount: cartTotal,
             storeId: activeStoreId || "owner",
@@ -1109,12 +1107,9 @@ export default function PortalPage() {
               showCustomAlert("주문 등록 오류", "결제는 승인되었으나 주문 등록 중 오류가 발생했습니다. 고객센터에 문의바랍니다.");
             });
         } else {
-          // 결제 실패 (code 필드가 있는 경우 에러)
-          showCustomAlert("결제 실패", `결제에 실패하였습니다. 사유: ${response.message || "알 수 없는 에러"}`);
+          // 결제 실패
+          showCustomAlert("결제 실패", `결제에 실패하였습니다. 사유: ${response.error_msg || "알 수 없는 에러"}`);
         }
-      }).catch((err: any) => {
-        console.error("결제 요청 중 오류 발생:", err);
-        showCustomAlert("결제 오류", `결제창을 여는 중 에러가 발생했습니다: ${err.message || err}`);
       });
     });
   };
