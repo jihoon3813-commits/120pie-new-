@@ -57,6 +57,7 @@ export const metadata = {
 
 import ConvexClientProvider from "./ConvexClientProvider";
 import TrackPageView from "@/app/components/TrackPageView";
+import Script from "next/script";
 
 export default function RootLayout({
   children
@@ -159,6 +160,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
         <ConvexClientProvider>
+          <Script src="https://cdn.iamport.kr/v1/iamport.js" strategy="lazyOnload" />
           <TrackPageView />
           {children}
         </ConvexClientProvider>

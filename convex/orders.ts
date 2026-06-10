@@ -29,6 +29,8 @@ export const createOrUpdate = mutation({
     storeId: v.optional(v.string()),
     courier: v.optional(v.string()),
     trackingNo: v.optional(v.string()),
+    impUid: v.optional(v.string()),
+    payMethod: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -90,6 +92,8 @@ export const syncOrders = mutation({
         storeId: v.optional(v.string()),
         courier: v.optional(v.string()),
         trackingNo: v.optional(v.string()),
+        impUid: v.optional(v.string()),
+        payMethod: v.optional(v.string()),
       })
     ),
   },
@@ -109,6 +113,8 @@ export const syncOrders = mutation({
         storeId: ord.storeId,
         courier: ord.courier,
         trackingNo: ord.trackingNo,
+        impUid: ord.impUid,
+        payMethod: ord.payMethod,
       };
 
       if (existing) {

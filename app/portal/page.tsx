@@ -39,7 +39,7 @@ import {
   ExternalLink
 } from "lucide-react";
 
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 // ==========================================
@@ -329,6 +329,7 @@ export default function PortalPage() {
   const createInquiryMutation = useMutation(api.storeInquiries.createOrUpdate);
   const incrementNoticeViewsMutation = useMutation(api.notices.incrementViews);
   const updateOrderStatusMutation = useMutation(api.orders.updateStatus);
+  const verifyAndSaveOrderAction = useAction(api.payments.verifyAndSaveOrder);
 
 
 
@@ -980,7 +981,13 @@ export default function PortalPage() {
   const placeOrder = () => {
     if (cart.length === 0) return;
 
-    const confirmOrder = window.confirm("정말로 자재 발주를 신청하시겠습니까?");
+    const IMP = (window as any).IMP;
+    if (!IMP) {
+      alert("결제 모듈을 로드하는 중입니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
+
+    const confirmOrder = window.confirm("선택한 자재의 결제 및 발주를 신청하시겠습니까?");
     if (!confirmOrder) return;
 
     const newOrderItems = cart.map((item) => {
@@ -990,7 +997,8 @@ export default function PortalPage() {
           ? (item.selectedOption ? `${p.name} [옵션: ${item.selectedOption}]` : p.name) 
           : "미지 상품",
         quantity: item.quantity,
-        price: p ? p.price : 0
+        price: p ? p.price : 0,
+        selectedOption: item.selectedOption,
       };
     });
 
@@ -1000,39 +1008,64 @@ export default function PortalPage() {
       Math.floor(100 + Math.random() * 900)
     )}`;
 
-    const newOrder: Order = {
-      id: newOrderId,
-      date: new Date().toISOString().split("T")[0],
-      items: newOrderItems,
-      totalPrice: cartTotal,
-      status: "주문완료"
+    const firstItemName = products.find((prod) => prod.id === cart[0].productId)?.name || "자재 주문";
+    const orderTitle = cart.length > 1 ? `${firstItemName} 외 ${cart.length - 1}건` : firstItemName;
+
+    // 포트원 가맹점 식별코드 (환경변수가 없으면 기본 테스트 식별코드 imp31378378 사용)
+    const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "imp31378378";
+    IMP.init(storeId);
+
+    const paymentData = {
+      pg: "html5_inicis",           // 이니시스 테스트 PG
+      pay_method: "card",           // 카드결제
+      merchant_uid: newOrderId,     // 가맹점 주문번호
+      name: orderTitle,             // 주문명
+      amount: cartTotal,            // 결제 금액
+      buyer_name: activeStoreId || "owner",
+      buyer_tel: "010-0000-0000",
     };
 
-    const updatedOrders = [newOrder, ...orders];
-    setOrders(updatedOrders);
-    localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
+    IMP.request_pay(paymentData, (response: any) => {
+      if (response.success) {
+        // 결제 성공 시 서버 검증 Action 호출
+        verifyAndSaveOrderAction({
+          impUid: response.imp_uid,
+          merchantUid: response.merchant_uid,
+          amount: cartTotal,
+          storeId: activeStoreId || "owner",
+          items: newOrderItems,
+        })
+          .then((result: any) => {
+            if (result.success) {
+              const newOrder: Order = {
+                id: newOrderId,
+                date: new Date().toISOString().split("T")[0],
+                items: newOrderItems,
+                totalPrice: cartTotal,
+                status: "결제완료",
+                courier: "",
+                trackingNo: "",
+              };
 
-    // Save to Convex Cloud DB
-    saveOrderMutation({
-      id: newOrder.id,
-      date: newOrder.date,
-      items: newOrder.items.map((it: any) => ({
-        productName: it.productName,
-        quantity: it.quantity,
-        price: it.price
-      })),
-      totalPrice: newOrder.totalPrice,
-      status: newOrder.status,
-      storeId: activeStoreId || "owner"
-    }).then(() => {
-      console.log("[Convex] Order submitted successfully.");
-    }).catch(err => {
-      console.error("[Convex] Failed to submit order to cloud DB:", err);
+              const updatedOrders = [newOrder, ...orders];
+              setOrders(updatedOrders);
+              localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
+
+              clearCart();
+              triggerToast("발주 주문 및 결제가 완료되었습니다!");
+              setCurrentMenu("history");
+            } else {
+              alert(`결제 검증 실패: ${result.message}`);
+            }
+          })
+          .catch((err) => {
+            console.error("결제 검증 중 오류 발생:", err);
+            alert("결제는 승인되었으나 주문 등록 중 오류가 발생했습니다. 고객센터에 문의바랍니다.");
+          });
+      } else {
+        alert(`결제에 실패하였습니다. 사유: ${response.error_msg}`);
+      }
     });
-
-    clearCart();
-    triggerToast("발주 주문이 정상적으로 완료되었습니다!");
-    setCurrentMenu("history");
   };
 
   // ==========================================
