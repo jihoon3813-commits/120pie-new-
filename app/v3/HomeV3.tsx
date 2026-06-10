@@ -944,7 +944,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
     ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png"
     : isYellowVariant
       ? "/logo_yellow_blue.png"
-      : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png";
+      : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png";
 
   const logoTargetUrl = isPinkVariant ? "/pink" : isYellowVariant ? "/" : "/v3";
 
