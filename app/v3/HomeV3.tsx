@@ -1102,12 +1102,24 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         // Bypass storage block checks
       } else {
         const closedTitle = localStorage.getItem("120_popup_closed_title");
-        const currentTitle = convexPopup?.title || (localStorage.getItem("120_popups") ? JSON.parse(localStorage.getItem("120_popups") || "{}").title : "");
+        let activeTitle = "";
+        if (convexPopup !== undefined) {
+          activeTitle = convexPopup?.title || "";
+        } else {
+          const stored = localStorage.getItem("120_popups");
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored);
+              activeTitle = parsed?.title || "";
+            } catch (e) {}
+          }
+        }
         
-        if (currentTitle && closedTitle && currentTitle !== closedTitle) {
+        if (activeTitle && closedTitle && activeTitle !== closedTitle) {
           localStorage.removeItem("120_popup_closed_until");
           localStorage.removeItem("120_popup_closed_title");
           sessionStorage.removeItem("120_popup_closed_session");
+          popupClosedInSessionRef.current = false;
         } else {
           const closedInSession = sessionStorage.getItem("120_popup_closed_session");
           if (closedInSession === "true") {
@@ -1134,9 +1146,14 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
       if (popupClosedInSessionRef.current) return;
     }
 
-    if (convexPopup) {
+    if (convexPopup !== undefined) {
       setPopupSettings(convexPopup);
-      if (convexPopup.isActive) {
+      try {
+        localStorage.setItem("120_popups", JSON.stringify(convexPopup));
+      } catch (e) {
+        console.warn(e);
+      }
+      if (convexPopup && convexPopup.isActive) {
         setShowPopup(true);
       } else {
         setShowPopup(false);
@@ -1148,7 +1165,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
           try {
             const parsed = JSON.parse(storedPop);
             setPopupSettings(parsed);
-            if (parsed.isActive) {
+            if (parsed && parsed.isActive) {
               setShowPopup(true);
             } else {
               setShowPopup(false);
@@ -3713,12 +3730,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
             {/* View Proposal Link */}
             <Link
-              href="/proposal"
+              href="/proposal2"
+              target="_blank"
               className="p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
               style={{ backgroundColor: isPinkVariant ? "#f25f8a" : "#ffd500" }}
             >
               <FileText size={16} style={{ color: isPinkVariant ? "#ffffff" : "#0d233a" }} className={`w-[16px] h-[16px] ${isPinkVariant ? "text-white" : "text-[#0d233a]"}`} />
-              <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>제안서보기</span>
+              <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>제안서</span>
             </Link>
           </div>
 
@@ -3819,12 +3837,13 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
                 {/* View Proposal Link */}
                 <Link
-                  href="/proposal"
+                  href="/proposal2"
+                  target="_blank"
                   className="p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-115 active:scale-90 cursor-pointer relative group border-0"
                   style={{ backgroundColor: isPinkVariant ? "#f25f8a" : "#ffd500" }}
                 >
                   <FileText size={16} style={{ color: isPinkVariant ? "#ffffff" : "#0d233a" }} className={`w-[16px] h-[16px] ${isPinkVariant ? "text-white" : "text-[#0d233a]"}`} />
-                  <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>제안서보기</span>
+                  <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>제안서</span>
                 </Link>
               </div>
             )}
