@@ -1015,8 +1015,10 @@ export default function PortalPage() {
     const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "imp31378378";
     IMP.init(storeId);
 
+    const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY || "channel-key-7712b8cf-c5f1-424b-8047-8fc35c0bd793";
+
     const paymentData = {
-      pg: "html5_inicis",           // 이니시스 테스트 PG
+      channelKey: channelKey,       // 포트원 V2 채널 키
       pay_method: "card",           // 카드결제
       merchant_uid: newOrderId,     // 가맹점 주문번호
       name: orderTitle,             // 주문명
