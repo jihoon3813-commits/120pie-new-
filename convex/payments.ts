@@ -43,7 +43,7 @@ export const verifyAndSaveOrder = action({
     }
 
     try {
-      // 1. Get access token from PortOne
+      // 1. Get access token from PortOne V1 API
       const tokenResponse = await fetch("https://api.iamport.kr/users/getToken", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -64,7 +64,7 @@ export const verifyAndSaveOrder = action({
         return { success: false, message: "포트원 토큰 데이터가 유효하지 않습니다." };
       }
 
-      // 2. Get payment info from PortOne
+      // 2. Get payment info from PortOne V1 API
       const paymentResponse = await fetch(`https://api.iamport.kr/payments/${args.impUid}`, {
         method: "GET",
         headers: {
@@ -87,14 +87,14 @@ export const verifyAndSaveOrder = action({
 
       // 3. Compare amounts and status
       const actualAmount = paymentInfo.amount;
-      const paymentStatus = paymentInfo.status; // "paid"
+      const paymentStatus = paymentInfo.status; // V1 결제 완료 상태는 "paid"
 
       if (paymentStatus !== "paid") {
         return { success: false, message: `결제가 완료되지 않은 상태입니다 (상태: ${paymentStatus})` };
       }
 
       // Check if amount matches expected amount
-      if (Math.abs(actualAmount - args.amount) > 1) {
+      if (typeof actualAmount !== "number" || Math.abs(actualAmount - args.amount) > 1) {
         // Amount mismatch - possible forgery! Cancel the payment.
         await fetch("https://api.iamport.kr/payments/cancel", {
           method: "POST",
