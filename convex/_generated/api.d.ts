@@ -17,6 +17,7 @@ import type * as inquiries from "../inquiries.js";
 import type * as materials from "../materials.js";
 import type * as notices from "../notices.js";
 import type * as orders from "../orders.js";
+import type * as payments from "../payments.js";
 import type * as popups from "../popups.js";
 import type * as products from "../products.js";
 import type * as storeInquiries from "../storeInquiries.js";
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   materials: typeof materials;
   notices: typeof notices;
   orders: typeof orders;
+  payments: typeof payments;
   popups: typeof popups;
   products: typeof products;
   storeInquiries: typeof storeInquiries;
