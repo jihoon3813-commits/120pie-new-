@@ -967,7 +967,7 @@ export default function PortalPage() {
 
   // Cart math
   const cartSubtotal = cart.reduce((acc, item) => {
-    const p = products.find((prod) => prod.id === item.productId);
+    const p = (products || []).find((prod) => prod.id === item.productId);
     return acc + (p ? p.price * item.quantity : 0);
   }, 0);
 
@@ -977,7 +977,7 @@ export default function PortalPage() {
     
     let maxFee = 0;
     cart.forEach((item) => {
-      const p = products.find((prod) => prod.id === item.productId);
+      const p = (products || []).find((prod) => prod.id === item.productId);
       const type = p?.shippingType || "A";
       let fee = 0;
       if (type === "A") fee = shippingFeeA;
@@ -998,7 +998,7 @@ export default function PortalPage() {
     let maxFee = -1;
     let maxType = "free";
     cart.forEach((item) => {
-      const p = products.find((prod) => prod.id === item.productId);
+      const p = (products || []).find((prod) => prod.id === item.productId);
       const type = p?.shippingType || "A";
       let fee = 0;
       if (type === "A") fee = shippingFeeA;
@@ -1034,7 +1034,7 @@ export default function PortalPage() {
 
     showCustomConfirm("발주 신청", "선택한 자재의 결제 및 발주를 신청하시겠습니까?", () => {
       const newOrderItems = cart.map((item) => {
-        const p = products.find((prod) => prod.id === item.productId);
+        const p = (products || []).find((prod) => prod.id === item.productId);
         return {
           productName: p 
             ? (item.selectedOption ? `${p.name} [옵션: ${item.selectedOption}]` : p.name) 
@@ -1051,7 +1051,7 @@ export default function PortalPage() {
         Math.floor(100 + Math.random() * 900)
       )}`;
 
-      const firstItemName = products.find((prod) => prod.id === cart[0].productId)?.name || "자재 주문";
+      const firstItemName = (products || []).find((prod) => prod.id === cart[0].productId)?.name || "자재 주문";
       const orderTitle = cart.length > 1 ? `${firstItemName} 외 ${cart.length - 1}건` : firstItemName;
 
       // 포트원 가맹점 식별코드 (환경변수가 없으면 기본 테스트 식별코드 imp31378378 사용)
@@ -2201,7 +2201,7 @@ export default function PortalPage() {
                       {/* Cart Items list */}
                       <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
                         {cart.map((item) => {
-                          const p = products.find((prod) => prod.id === item.productId);
+                          const p = (products || []).find((prod) => prod.id === item.productId);
                           if (!p) return null;
                           return (
                             <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7] p-3 rounded-xl">
