@@ -656,6 +656,51 @@ export default function PortalPage() {
   const [shippingFeeB, setShippingFeeB] = useState<number>(4000);
   const [shippingFeeC, setShippingFeeC] = useState<number>(5000);
 
+  // 커스텀 알럿/컨펌 모달 상태
+  const [customDialog, setCustomDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: "alert" | "confirm";
+    onConfirm?: () => void;
+    onCancel?: () => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "alert"
+  });
+
+  const showCustomAlert = (title: string, message: string, onConfirm?: () => void) => {
+    setCustomDialog({
+      isOpen: true,
+      title,
+      message,
+      type: "alert",
+      onConfirm: () => {
+        setCustomDialog(prev => ({ ...prev, isOpen: false }));
+        if (onConfirm) onConfirm();
+      }
+    });
+  };
+
+  const showCustomConfirm = (title: string, message: string, onConfirm: () => void, onCancel?: () => void) => {
+    setCustomDialog({
+      isOpen: true,
+      title,
+      message,
+      type: "confirm",
+      onConfirm: () => {
+        setCustomDialog(prev => ({ ...prev, isOpen: false }));
+        onConfirm();
+      },
+      onCancel: () => {
+        setCustomDialog(prev => ({ ...prev, isOpen: false }));
+        if (onCancel) onCancel();
+      }
+    });
+  };
+
   // Mobile popstate / back button handling for modals
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -983,90 +1028,89 @@ export default function PortalPage() {
 
     const IMP = (window as any).IMP;
     if (!IMP) {
-      alert("결제 모듈을 로드하는 중입니다. 잠시 후 다시 시도해 주세요.");
+      showCustomAlert("결제 오류", "결제 모듈을 로드하는 중입니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
 
-    const confirmOrder = window.confirm("선택한 자재의 결제 및 발주를 신청하시겠습니까?");
-    if (!confirmOrder) return;
+    showCustomConfirm("발주 신청", "선택한 자재의 결제 및 발주를 신청하시겠습니까?", () => {
+      const newOrderItems = cart.map((item) => {
+        const p = products.find((prod) => prod.id === item.productId);
+        return {
+          productName: p 
+            ? (item.selectedOption ? `${p.name} [옵션: ${item.selectedOption}]` : p.name) 
+            : "미지 상품",
+          quantity: item.quantity,
+          price: p ? p.price : 0,
+          selectedOption: item.selectedOption,
+        };
+      });
 
-    const newOrderItems = cart.map((item) => {
-      const p = products.find((prod) => prod.id === item.productId);
-      return {
-        productName: p 
-          ? (item.selectedOption ? `${p.name} [옵션: ${item.selectedOption}]` : p.name) 
-          : "미지 상품",
-        quantity: item.quantity,
-        price: p ? p.price : 0,
-        selectedOption: item.selectedOption,
+      const newOrderId = `ORD-${new Date().getFullYear()}${String(
+        new Date().getMonth() + 1
+      ).padStart(2, "0")}${String(new Date().getDate()).padStart(2, "0")}-${String(
+        Math.floor(100 + Math.random() * 900)
+      )}`;
+
+      const firstItemName = products.find((prod) => prod.id === cart[0].productId)?.name || "자재 주문";
+      const orderTitle = cart.length > 1 ? `${firstItemName} 외 ${cart.length - 1}건` : firstItemName;
+
+      // 포트원 가맹점 식별코드 (환경변수가 없으면 기본 테스트 식별코드 imp31378378 사용)
+      const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "imp31378378";
+      IMP.init(storeId);
+
+      const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY || "channel-key-7712b8cf-c5f1-424b-8047-8fc35c0bd793";
+
+      const paymentData = {
+        channelKey: channelKey,       // 포트원 V2 채널 키
+        pay_method: "card",           // 카드결제
+        merchant_uid: newOrderId,     // 가맹점 주문번호
+        name: orderTitle,             // 주문명
+        amount: cartTotal,            // 결제 금액
+        buyer_name: activeStoreId || "owner",
+        buyer_tel: "010-0000-0000",
       };
-    });
 
-    const newOrderId = `ORD-${new Date().getFullYear()}${String(
-      new Date().getMonth() + 1
-    ).padStart(2, "0")}${String(new Date().getDate()).padStart(2, "0")}-${String(
-      Math.floor(100 + Math.random() * 900)
-    )}`;
-
-    const firstItemName = products.find((prod) => prod.id === cart[0].productId)?.name || "자재 주문";
-    const orderTitle = cart.length > 1 ? `${firstItemName} 외 ${cart.length - 1}건` : firstItemName;
-
-    // 포트원 가맹점 식별코드 (환경변수가 없으면 기본 테스트 식별코드 imp31378378 사용)
-    const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "imp31378378";
-    IMP.init(storeId);
-
-    const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY || "channel-key-7712b8cf-c5f1-424b-8047-8fc35c0bd793";
-
-    const paymentData = {
-      channelKey: channelKey,       // 포트원 V2 채널 키
-      pay_method: "card",           // 카드결제
-      merchant_uid: newOrderId,     // 가맹점 주문번호
-      name: orderTitle,             // 주문명
-      amount: cartTotal,            // 결제 금액
-      buyer_name: activeStoreId || "owner",
-      buyer_tel: "010-0000-0000",
-    };
-
-    IMP.request_pay(paymentData, (response: any) => {
-      if (response.success) {
-        // 결제 성공 시 서버 검증 Action 호출
-        verifyAndSaveOrderAction({
-          impUid: response.imp_uid,
-          merchantUid: response.merchant_uid,
-          amount: cartTotal,
-          storeId: activeStoreId || "owner",
-          items: newOrderItems,
-        })
-          .then((result: any) => {
-            if (result.success) {
-              const newOrder: Order = {
-                id: newOrderId,
-                date: new Date().toISOString().split("T")[0],
-                items: newOrderItems,
-                totalPrice: cartTotal,
-                status: "결제완료",
-                courier: "",
-                trackingNo: "",
-              };
-
-              const updatedOrders = [newOrder, ...orders];
-              setOrders(updatedOrders);
-              localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
-
-              clearCart();
-              triggerToast("발주 주문 및 결제가 완료되었습니다!");
-              setCurrentMenu("history");
-            } else {
-              alert(`결제 검증 실패: ${result.message}`);
-            }
+      IMP.request_pay(paymentData, (response: any) => {
+        if (response.success) {
+          // 결제 성공 시 서버 검증 Action 호출
+          verifyAndSaveOrderAction({
+            impUid: response.imp_uid,
+            merchantUid: response.merchant_uid,
+            amount: cartTotal,
+            storeId: activeStoreId || "owner",
+            items: newOrderItems,
           })
-          .catch((err) => {
-            console.error("결제 검증 중 오류 발생:", err);
-            alert("결제는 승인되었으나 주문 등록 중 오류가 발생했습니다. 고객센터에 문의바랍니다.");
-          });
-      } else {
-        alert(`결제에 실패하였습니다. 사유: ${response.error_msg}`);
-      }
+            .then((result: any) => {
+              if (result.success) {
+                const newOrder: Order = {
+                  id: newOrderId,
+                  date: new Date().toISOString().split("T")[0],
+                  items: newOrderItems,
+                  totalPrice: cartTotal,
+                  status: "결제완료",
+                  courier: "",
+                  trackingNo: "",
+                };
+
+                const updatedOrders = [newOrder, ...orders];
+                setOrders(updatedOrders);
+                localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
+
+                clearCart();
+                triggerToast("발주 주문 및 결제가 완료되었습니다!");
+                setCurrentMenu("history");
+              } else {
+                showCustomAlert("결제 검증 오류", `결제 검증 실패: ${result.message}`);
+              }
+            })
+            .catch((err) => {
+              console.error("결제 검증 중 오류 발생:", err);
+              showCustomAlert("주문 등록 오류", "결제는 승인되었으나 주문 등록 중 오류가 발생했습니다. 고객센터에 문의바랍니다.");
+            });
+        } else {
+          showCustomAlert("결제 실패", `결제에 실패하였습니다. 사유: ${response.error_msg}`);
+        }
+      });
     });
   };
 
@@ -1074,26 +1118,25 @@ export default function PortalPage() {
   // CANCEL ORDER
   // ==========================================
   const cancelOrder = (orderId: string) => {
-    const confirmCancel = window.confirm("정말로 이 주문을 취소하시겠습니까?");
-    if (!confirmCancel) return;
+    showCustomConfirm("주문 취소", "정말로 이 주문을 취소하시겠습니까?", () => {
+      // Update locally first for optimistic response
+      const updatedOrders = orders.map((o) =>
+        o.id === orderId ? { ...o, status: "주문취소" } : o
+      );
+      setOrders(updatedOrders);
+      localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
 
-    // Update locally first for optimistic response
-    const updatedOrders = orders.map((o) =>
-      o.id === orderId ? { ...o, status: "주문취소" } : o
-    );
-    setOrders(updatedOrders);
-    localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
-
-    // Update in Convex Cloud DB
-    updateOrderStatusMutation({ id: orderId, status: "주문취소" })
-      .then(() => {
-        triggerToast("주문이 취소되었습니다.");
-        setSelectedOrder(null);
-      })
-      .catch((err) => {
-        console.error("[Convex] Failed to cancel order:", err);
-        triggerToast("주문 취소 처리에 실패했습니다.");
-      });
+      // Update in Convex Cloud DB
+      updateOrderStatusMutation({ id: orderId, status: "주문취소" })
+        .then(() => {
+          triggerToast("주문이 취소되었습니다.");
+          setSelectedOrder(null);
+        })
+        .catch((err) => {
+          console.error("[Convex] Failed to cancel order:", err);
+          triggerToast("주문 취소 처리에 실패했습니다.");
+        });
+    });
   };
 
   // ==========================================
@@ -1102,7 +1145,7 @@ export default function PortalPage() {
   const submitInquiry = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inquiryTitle || !inquiryContent) {
-      alert("제목과 내용을 입력해 주세요.");
+      showCustomAlert("입력 오류", "제목과 내용을 입력해 주세요.");
       return;
     }
 
@@ -3506,7 +3549,7 @@ export default function PortalPage() {
                         type="button"
                         onClick={() => {
                           if (!selectedProductOption) {
-                            alert("옵션을 먼저 선택해 주세요.");
+                            showCustomAlert("옵션 선택", "옵션을 먼저 선택해 주세요.");
                             return;
                           }
                           const exists = localSelectedOptions.find((o) => o.optionName === selectedProductOption);
@@ -3625,7 +3668,7 @@ export default function PortalPage() {
                       const hasOpts = selectedProductDetail.options && selectedProductDetail.options.length > 0;
                       if (hasOpts) {
                         if (localSelectedOptions.length === 0) {
-                          alert("옵션을 최소 하나 이상 목록에 추가해 주세요.");
+                          showCustomAlert("옵션 선택", "옵션을 최소 하나 이상 목록에 추가해 주세요.");
                           return;
                         }
                         localSelectedOptions.forEach((item) => {
@@ -3880,6 +3923,69 @@ export default function PortalPage() {
             <ShoppingBag size={12} className="text-white" />
             장바구니 확인
           </button>
+        </div>
+      )}
+
+      {/* Premium Custom Alert / Confirm Modal */}
+      {customDialog.isOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-sm animate-custom-fade select-none">
+          <div className="bg-white border border-neutral-100 rounded-3xl w-full max-w-[340px] overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.12)] relative my-auto flex flex-col p-6 animate-custom-scale">
+            
+            {/* Top decorative color bar */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 to-[#f25f8a]"></div>
+            
+            {/* Icon / Title */}
+            <div className="flex items-center gap-2.5 mb-3 mt-1 text-left">
+              <div className="p-2 rounded-full bg-amber-50 text-amber-500 shrink-0">
+                <AlertCircle size={18} />
+              </div>
+              <h3 className="text-sm sm:text-base font-black text-neutral-800 leading-snug">
+                {customDialog.title || "알림"}
+              </h3>
+            </div>
+            
+            {/* Message */}
+            <p className="text-xs sm:text-sm font-bold text-neutral-500 leading-relaxed mb-6 text-left whitespace-pre-line">
+              {customDialog.message}
+            </p>
+            
+            {/* Buttons */}
+            <div className="flex items-center justify-end gap-2">
+              {customDialog.type === "confirm" && (
+                <button
+                  type="button"
+                  onClick={customDialog.onCancel}
+                  className="px-4 py-2 bg-neutral-50 hover:bg-neutral-100 text-neutral-500 font-extrabold text-xs rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer border border-neutral-200"
+                >
+                  취소
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={customDialog.onConfirm}
+                className="px-5 py-2.5 bg-amber-400 hover:bg-amber-350 text-neutral-950 font-black text-xs rounded-xl transition-all shadow-md active:scale-95 cursor-pointer border-0"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+          
+          <style dangerouslySetInnerHTML={{ __html: `
+            @keyframes customFadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes customScaleUp {
+              from { transform: scale(0.95); opacity: 0; }
+              to { transform: scale(1); opacity: 1; }
+            }
+            .animate-custom-fade {
+              animation: customFadeIn 0.2s ease-out forwards;
+            }
+            .animate-custom-scale {
+              animation: customScaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            }
+          `}} />
         </div>
       )}
 
