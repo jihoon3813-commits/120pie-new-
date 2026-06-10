@@ -1045,9 +1045,9 @@ export default function PortalPage() {
         };
       });
 
-      const newOrderId = `ORD-${new Date().getFullYear()}${String(
+      const newOrderId = `ORD${new Date().getFullYear()}${String(
         new Date().getMonth() + 1
-      ).padStart(2, "0")}${String(new Date().getDate()).padStart(2, "0")}-${String(
+      ).padStart(2, "0")}${String(new Date().getDate()).padStart(2, "0")}${String(
         Math.floor(100 + Math.random() * 900)
       )}`;
 
