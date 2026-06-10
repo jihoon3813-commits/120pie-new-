@@ -1026,8 +1026,8 @@ export default function PortalPage() {
   const placeOrder = () => {
     if (cart.length === 0) return;
 
-    const IMP = (window as any).IMP;
-    if (!IMP) {
+    const PortOne = (window as any).PortOne;
+    if (!PortOne) {
       showCustomAlert("결제 오류", "결제 모듈을 로드하는 중입니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
@@ -1054,28 +1054,27 @@ export default function PortalPage() {
       const firstItemName = (products || []).find((prod) => prod.id === cart[0].productId)?.name || "자재 주문";
       const orderTitle = cart.length > 1 ? `${firstItemName} 외 ${cart.length - 1}건` : firstItemName;
 
-      // 포트원 가맹점 식별코드 (환경변수가 없으면 기본 테스트 식별코드 imp31378378 사용)
-      const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "imp31378378";
-      IMP.init(storeId);
-
+      const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "store-1ba40e9a-5edf-4497-b8dc-ae82194fcf42";
       const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY || "channel-key-7712b8cf-c5f1-424b-8047-8fc35c0bd793";
 
-      const paymentData = {
-        channelKey: channelKey,       // 포트원 V2 채널 키
-        pay_method: "card",           // 카드결제
-        merchant_uid: newOrderId,     // 가맹점 주문번호
-        name: orderTitle,             // 주문명
-        amount: cartTotal,            // 결제 금액
-        buyer_name: activeStoreId || "owner",
-        buyer_tel: "010-0000-0000",
-      };
-
-      IMP.request_pay(paymentData, (response: any) => {
-        if (response.success) {
-          // 결제 성공 시 서버 검증 Action 호출
+      PortOne.requestPayment({
+        storeId: storeId,
+        channelKey: channelKey,
+        paymentId: newOrderId,
+        orderName: orderTitle,
+        totalAmount: cartTotal,
+        currency: "CURRENCY_KRW",
+        payMethod: "CARD",
+        customer: {
+          fullName: activeStoreId || "owner",
+          phoneNumber: "010-0000-0000",
+        },
+      }).then((response: any) => {
+        if (response.code === undefined) {
+          // 결제 성공 시 (code 필드가 없는 경우 성공)
           verifyAndSaveOrderAction({
-            impUid: response.imp_uid,
-            merchantUid: response.merchant_uid,
+            impUid: response.paymentId,
+            merchantUid: newOrderId,
             amount: cartTotal,
             storeId: activeStoreId || "owner",
             items: newOrderItems,
@@ -1108,8 +1107,12 @@ export default function PortalPage() {
               showCustomAlert("주문 등록 오류", "결제는 승인되었으나 주문 등록 중 오류가 발생했습니다. 고객센터에 문의바랍니다.");
             });
         } else {
-          showCustomAlert("결제 실패", `결제에 실패하였습니다. 사유: ${response.error_msg}`);
+          // 결제 실패 (code 필드가 있는 경우 에러)
+          showCustomAlert("결제 실패", `결제에 실패하였습니다. 사유: ${response.message || "알 수 없는 에러"}`);
         }
+      }).catch((err: any) => {
+        console.error("결제 요청 중 오류 발생:", err);
+        showCustomAlert("결제 오류", `결제창을 여는 중 에러가 발생했습니다: ${err.message || err}`);
       });
     });
   };
