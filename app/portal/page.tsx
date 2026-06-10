@@ -2266,7 +2266,7 @@ export default function PortalPage() {
                         className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-0"
                       >
                         <CheckCircle2 size={16} />
-                        자재 발주 신청하기
+                        결제 진행하기
                       </button>
                     </>
                   )}
