@@ -563,7 +563,7 @@ export default function FranchisePageClient() {
               <div className="lg:col-span-5 relative group">
                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
                   <img 
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186403/IMG_8185_jpquaf_z9ikmf.jpg" 
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590223/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_01_24_05_etbfvd.png" 
                     alt="6WAY packaging box" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                   />
