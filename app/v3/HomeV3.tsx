@@ -74,19 +74,19 @@ function MenuModal({ menuId, onClose, onInquiry, isPink = false }: { menuId: str
       title: "커피와 함께 즐기기 좋은 대표 메뉴, 120파이",
       desc: "고소한 크림 파이부터 든든한 미트와 피자 파이까지, 손님의 취향과 시간대에 맞춰 폭넓게 제안할 수 있는 120파이 메뉴입니다.",
       items: [
-        { name: "로제미트파이", desc: "부드러운 로제 소스와 든든한 미트가 어우러진 식사형 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg" },
-        { name: "블루베리파이", desc: "상큼한 블루베리 풍미가 바삭한 파이와 어울리는 달콤한 디저트입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_tnfg8c.jpg" },
-        { name: "콘치즈파이", desc: "고소한 옥수수와 치즈의 조합으로 누구나 편하게 즐기기 좋은 메뉴입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_qvb2u5.jpg" },
+        { name: "로제미트파이", desc: "부드러운 로제 소스와 든든한 미트가 어우러진 식사형 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184221/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s3svi2.jpg" },
+        { name: "블루베리파이", desc: "상큼한 블루베리 풍미가 바삭한 파이와 어울리는 달콤한 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184610/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_zfmatx.jpg" },
+        { name: "콘치즈파이", desc: "고소한 옥수수와 치즈의 조합으로 누구나 편하게 즐기기 좋은 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184643/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_lio2tj.jpg" },
         { name: "흑임자파이", desc: "진한 흑임자 크림의 고소함을 담아 커피와 잘 어울리는 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%ED%9D%91%EC%9E%84%EC%9E%90%ED%81%AC%EB%A6%BC_g0p6sk.jpg" },
-        { name: "커스터드파이", desc: "부드럽고 달콤한 커스터드 크림을 채운 클래식 디저트 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_b0flce.jpg" },
-        { name: "불고기파이", desc: "달큰한 불고기 풍미를 담아 간단한 한 끼로도 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B41_ezthee.jpg" },
+        { name: "커스터드파이", desc: "부드럽고 달콤한 커스터드 크림을 채운 클래식 디저트 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184658/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_dule6z.jpg" },
+        { name: "불고기파이", desc: "달큰한 불고기 풍미를 담아 간단한 한 끼로도 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184700/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ss1t8y.jpg" },
         { name: "두바이쫀득파이", desc: "고소하고 쫀득한 식감이 매력적인 특별한 디저트 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EB%91%90%EB%B0%94%EC%9D%B4%EC%AA%BD%EB%93%9D%ED%8C%8C%EC%9D%B4_vjl5zb.jpg" },
-        { name: "애플파이", desc: "달콤한 사과 풍미로 따뜻한 커피와 편안하게 곁들이기 좋습니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_yurkh5.jpg" },
-        { name: "팥치즈파이", desc: "달콤한 팥과 담백한 치즈가 만나 익숙하면서도 새로운 맛을 전합니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%ED%8C%A5%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_wa1gif.jpg" },
-        { name: "크림치즈파이", desc: "산뜻한 크림치즈의 부드러움을 바삭한 결 사이에 담았습니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_oryqml.jpg" },
-        { name: "망고파이", desc: "달콤하고 향긋한 망고의 풍미가 돋보이는 산뜻한 디저트입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EB%A7%9D%EA%B3%A0%ED%8C%8C%EC%9D%B4_x97swe.jpg" },
-        { name: "페퍼로니피자파이", desc: "페퍼로니와 치즈의 익숙한 풍미로 간식과 식사 모두 잘 어울립니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760052/%ED%8E%98%ED%8D%BC%EB%A1%9C%EB%8B%88%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_naduul.jpg" },
-        { name: "고구마파이", desc: "달콤하고 포근한 고구마 맛으로 남녀노소 편하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760052/%EA%B3%A0%EA%B5%AC%EB%A7%88%ED%8C%8C%EC%9D%B4_gms5db.jpg" },
+        { name: "애플파이", desc: "달콤한 사과 풍미로 따뜻한 커피와 편안하게 곁들이기 좋습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184723/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_kxykcu.jpg" },
+        { name: "팥치즈파이", desc: "달콤한 팥과 담백한 치즈가 만나 익숙하면서도 새로운 맛을 전합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184738/%ED%8C%A5%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_cvme5l.jpg" },
+        { name: "크림치즈파이", desc: "산뜻한 크림치즈의 부드러움을 바삭한 결 사이에 담았습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184763/%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_nvzwvc.jpg" },
+        { name: "망고파이", desc: "달콤하고 향긋한 망고의 풍미가 돋보이는 산뜻한 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184783/%EB%A7%9D%EA%B3%A0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_yynprf.jpg" },
+        { name: "페퍼로니피자파이", desc: "페퍼로니와 치즈의 익숙한 풍미로 간식과 식사 모두 잘 어울립니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184808/%ED%8E%98%ED%8E%98%EB%A1%9C%EB%8B%88%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_izlrfv.jpg" },
+        { name: "고구마파이", desc: "달콤하고 포근한 고구마 맛으로 남녀노소 편하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184829/%EA%B3%A0%EA%B5%AC%EB%A7%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_qojchr.jpg" },
         { name: "함박치즈파이", desc: "육즙 가득한 함박과 치즈를 담아 든든함을 더한 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760052/%ED%95%A8%EB%B0%95%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_fgxgld.jpg" },
         { name: "포테이토베이컨피자파이", desc: "포테이토와 베이컨, 치즈를 풍성하게 담은 인기 피자 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760054/%ED%8F%AC%ED%85%8C%EC%9D%B4%ED%86%A0%EB%B2%A0%EC%9D%B4%EC%BB%A8%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_ccdena.jpg" },
         { name: "불고기피자파이", desc: "달콤짭조름한 불고기와 치즈가 어우러진 든든한 피자 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760054/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_aadfep.jpg" },
@@ -97,28 +97,28 @@ function MenuModal({ menuId, onClose, onInquiry, isPink = false }: { menuId: str
       title: "폭신하고 부드러운 간식, 에그120 계란빵",
       desc: "폭신한 계란빵에 고소한 계란과 다채로운 토핑을 더했습니다. 커피와 함께 가볍게 즐기기 좋은, 따뜻하고 친근한 간식 메뉴입니다.",
       items: [
-        { name: "오리지널 계란빵", desc: "추억 속 계란빵의 따뜻한 맛을 요즘 감성으로 담아낸 시그니처 메뉴입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg" },
-        { name: "베이컨 계란빵", desc: "짭짤하고 고소한 베이컨과 담백한 계란이 잘 어우러지는 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761728/%EB%B2%A0%EC%9D%B4%EC%BB%A8%EA%B3%84%EB%9E%80%EB%B9%B52_ar10w0.jpg" },
-        { name: "커스터드 계란빵", desc: "달콤하고 부드러운 크림이 담백한 계란빵과 만나 사르르 녹는 디저트입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%EA%B3%84%EB%9E%80%EB%B9%B52_xbfcpj.jpg" },
-        { name: "콘버터 계란빵", desc: "달콤한 옥수수와 고소한 버터가 더해져 풍성하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761730/%EC%BD%98%EB%B2%84%ED%84%B0%EA%B3%84%EB%9E%80%EB%B9%B52_pichzu.jpg" },
-        { name: "로제미트 계란빵", desc: "부드러운 로제소스와 계란의 조합으로 진하고 크리미한 풍미를 전합니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761728/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8_na0cok.jpg" },
-        { name: "통모짜 계란빵", desc: "쭉 늘어나는 모짜렐라 치즈가 더해져 고소하고 짭짤하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%ED%86%B5%EB%AA%A8%EC%A7%9C_sqieu3.jpg" },
-        { name: "슈크림 계란빵", desc: "달콤하고 부드러운 슈크림이 계란의 고소함과 어우러지는 간식입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761728/%EC%8A%88%ED%81%AC%EB%A6%BC_gbhnz2.jpg" },
-        { name: "팥 계란빵", desc: "달콤한 팥앙금과 고소한 계란이 만나 포근한 단맛을 느낄 수 있습니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761728/%ED%8C%A5_pezeff.jpg" },
+        { name: "오리지널 계란빵", desc: "추억 속 계란빵의 따뜻한 맛을 요즘 감성으로 담아낸 시그니처 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184985/edited-photo_4_y98ytv.jpg" },
+        { name: "베이컨 계란빵", desc: "짭짤하고 고소한 베이컨과 담백한 계란이 잘 어우러지는 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184987/edited-photo_2_rplfpn.jpg" },
+        { name: "커스터드 계란빵", desc: "달콤하고 부드러운 크림이 담백한 계란빵과 만나 사르르 녹는 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184988/edited-photo_5_shiudy.jpg" },
+        { name: "콘버터 계란빵", desc: "달콤한 옥수수와 고소한 버터가 더해져 풍성하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184986/edited-photo_6_mkz6ey.jpg" },
+        { name: "로제미트 계란빵", desc: "부드러운 로제소스와 계란의 조합으로 진하고 크리미한 풍미를 전합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184991/edited-photo_1_euib8f.jpg" },
+        { name: "통모짜 계란빵", desc: "쭉 늘어나는 모짜렐라 치즈가 더해져 고소하고 짭짤하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184989/edited-photo_7_usuk8g.jpg" },
+        { name: "슈크림 계란빵", desc: "달콤하고 부드러운 슈크림이 계란의 고소함과 어우러지는 간식입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184989/edited-photo_3_syalvo.jpg" },
+        { name: "팥 계란빵", desc: "달콤한 팥앙금과 고소한 계란이 만나 포근한 단맛을 느낄 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184990/edited-photo_8_h7k4xt.jpg" },
       ]
     },
     "기타": {
       title: "달콤한 간식부터 든든한 한 입까지, 사이드 메뉴",
       desc: "스페인 정통 찹쌀 츄러스와 떡볶이 삼총사, 직화불고기 핫도그까지. 매장의 시간대와 손님 취향에 맞춰 다채롭게 제안할 수 있습니다.",
       items: [
-        { name: "오리지널 츄러스", desc: "쫀득한 찹쌀 식감과 바삭한 겉결을 살린, 커피와 잘 어울리는 기본 츄러스입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762878/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_koyjlk.jpg" },
-        { name: "녹차 츄러스", desc: "은은한 녹차 향과 담백한 단맛으로 깔끔하게 즐기기 좋은 츄러스입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762877/%EB%85%B9%EC%B0%A8_yucndq.jpg" },
-        { name: "슈가 츄러스", desc: "달콤한 슈가 코팅을 더해 한입마다 기분 좋은 바삭함을 전합니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762877/%EC%8A%88%EA%B0%80_tf4jni.jpg" },
-        { name: "오레오 츄러스", desc: "달콤한 쿠키 풍미를 더해 디저트로 더욱 즐겁게 맛볼 수 있습니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762878/%EC%98%A4%EB%A0%88%EC%98%A4_k9ea73.jpg" },
-        { name: "국물 떡볶이", desc: "달콤하면서도 매콤한 국물 한입에 자꾸 생각나는 중독적인 떡볶이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762984/%EA%B5%AD%EB%AC%BC%EB%96%A1%EB%B3%B6%EC%9D%B4_ue9q3m.jpg" },
-        { name: "로제짜장 떡볶이", desc: "짜장에 로제를 더해 부드럽고 진한 맛을 즐길 수 있는 색다른 떡볶이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762983/%EB%A1%9C%EC%A0%9C%EC%A7%9C%EC%9E%A5%EB%96%A1%EB%B3%B6%EC%9D%B4_t3zxcd.jpg" },
-        { name: "로제 떡볶이", desc: "고소한 크림에 달달매콤한 풍미가 더해져 부드럽게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762983/%EB%A1%9C%EC%A0%9C%EB%96%A1%EB%B3%B6%EC%9D%B4_zl0ran.jpg" },
-        { name: "직화불고기 핫도그", desc: "불향 가득한 직화불고기와 육즙 있는 소시지가 어우러진 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762930/%EC%A7%81%ED%99%94%EB%B6%88%EA%B3%A0%EA%B8%B0_khx8qf.jpg" }
+        { name: "오리지널 츄러스", desc: "쫀득한 찹쌀 식감과 바삭한 겉결을 살린, 커피와 잘 어울리는 기본 츄러스입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185404/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_izqnfl.jpg" },
+        { name: "녹차 츄러스", desc: "은은한 녹차 향과 담백한 단맛으로 깔끔하게 즐기기 좋은 츄러스입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185408/%EB%85%B9%EC%B0%A8_jmac8h.jpg" },
+        { name: "슈가 츄러스", desc: "달콤한 슈가 코팅을 더해 한입마다 기분 좋은 바삭함을 전합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185405/%EC%8A%88%EA%B0%80_tzns46.jpg" },
+        { name: "오레오 츄러스", desc: "달콤한 쿠키 풍미를 더해 디저트로 더욱 즐겁게 맛볼 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185408/%EC%98%A4%EB%A0%88%EC%98%A4_bssm74.jpg" },
+        { name: "국물 떡볶이", desc: "달콤하면서도 매콤한 국물 한입에 자꾸 생각나는 중독적인 떡볶이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185350/%EA%B5%AD%EB%AC%BC1_amnxed.png" },
+        { name: "로제짜장 떡볶이", desc: "짜장에 로제를 더해 부드럽고 진한 맛을 즐길 수 있는 색다른 떡볶이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185349/%EC%A7%9C%EC%9E%A51_zktcnn.png" },
+        { name: "로제 떡볶이", desc: "고소한 크림에 달달매콤한 풍미가 더해져 부드럽게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185348/%EB%A1%9C%EC%A0%9C1_lwn2j7.png" },
+        { name: "직화불고기 핫도그", desc: "불향 가득한 직화불고기와 육즙 있는 소시지가 어우러진 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185539/A4_07054_2_er4md2.jpg" }
       ]
     }
   };
@@ -368,24 +368,24 @@ function AdoptionModal({ exampleId, onClose }: { exampleId: string | null, onClo
 }
 
 const MARQUEE_IMAGES = [
-  { name: "로제미트파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg" },
-  { name: "블루베리파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_tnfg8c.jpg" },
-  { name: "콘치즈파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_qvb2u5.jpg" },
+  { name: "로제미트파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184221/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s3svi2.jpg" },
+  { name: "블루베리파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184610/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_zfmatx.jpg" },
+  { name: "콘치즈파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184643/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_lio2tj.jpg" },
   { name: "흑임자크림파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%ED%9D%91%EC%9E%84%EC%9E%90%ED%81%AC%EB%A6%BC_g0p6sk.jpg" },
-  { name: "커스터드파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_b0flce.jpg" },
-  { name: "불고기파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B41_ezthee.jpg" },
+  { name: "커스터드파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184658/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_dule6z.jpg" },
+  { name: "불고기파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184700/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ss1t8y.jpg" },
   { name: "두바이쫀득파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EB%91%90%EB%B0%94%EC%9D%B4%EC%AA%BD%EB%93%9D%ED%8C%8C%EC%9D%B4_vjl5zb.jpg" },
-  { name: "애플시나몬파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_yurkh5.jpg" },
-  { name: "오리지널 계란빵", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg" },
-  { name: "오리지널 츄러스", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762878/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_koyjlk.jpg" }
+  { name: "애플시나몬파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184723/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_kxykcu.jpg" },
+  { name: "오리지널 계란빵", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184985/edited-photo_4_y98ytv.jpg" },
+  { name: "오리지널 츄러스", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185404/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_izqnfl.jpg" }
 ];
 
 // V3 StoresPreviewSection
 function StoresPreviewSection({ isPink = false, isYellow = false }: { isPink?: boolean, isYellow?: boolean }) {
   const previewStores = [
-    { name: "120겹파이 AK플라자 금정점", region: "경기 군포시 엘에스로 143 1층 1001호", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs.jpg" },
-    { name: "120겹파이 본점", region: "서울 성북구 돌곶이로14길 35 1층", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg" },
-    { name: "120겹파이 삼산점", region: "인천 부평구 장제로228번길 24", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772272/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy.jpg" },
+    { name: "120겹파이 AK플라자 금정점", region: "경기 군포시 엘에스로 143 1층 1001호", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186013/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs_bmrkku.jpg" },
+    { name: "120겹파이 본점", region: "서울 성북구 돌곶이로14길 35 1층", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185938/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon_z90vyq.jpg" },
+    { name: "120겹파이 삼산점", region: "인천 부평구 장제로228번길 24", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186018/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy_m3wmdr.jpg" },
   ];
 
   return (
@@ -524,7 +524,7 @@ function OwnerSystemSection({ isPink = false, isYellow = false }: { isPink?: boo
               isPink ? "bg-white border border-[#f2ccd7]" : isYellow ? "bg-white border border-[#e6dfc3]" : "bg-neutral-900"
             }`}>
               <video
-                src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779775703/120pie_%EC%8B%9C%EC%8A%A4%ED%85%9C_vda0xm.mp4"
+                src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183441/120pie_%EC%8B%9C%EC%8A%A4%ED%85%9C_bpwa5d.mp4"
                 autoPlay
                 muted
                 loop
@@ -944,7 +944,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
     ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png"
     : isYellowVariant
       ? "/logo_yellow_blue.png"
-      : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png";
+      : "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
 
   const logoTargetUrl = isPinkVariant ? "/pink" : isYellowVariant ? "/" : "/v3";
 
@@ -1405,11 +1405,11 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   <video
                     ref={mobileHeroVideoRef}
                     src={isPinkVariant
-                      ? "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779806053/120pie_%EC%98%81%EC%83%81_6_qlxvav.mp4"
-                      : "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779779154/120pie_%EC%98%81%EC%83%81_7_xoo7il.mp4"}
+                      ? "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"
+                      : "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"}
                     poster={isPinkVariant
-                      ? "https://res.cloudinary.com/dx7l09wwu/video/upload/so_0,f_jpg,q_auto/v1779806053/120pie_%EC%98%81%EC%83%81_6_qlxvav.jpg"
-                      : "https://res.cloudinary.com/dx7l09wwu/video/upload/so_0,f_jpg,q_auto/v1779779154/120pie_%EC%98%81%EC%83%81_7_xoo7il.jpg"}
+                      ? "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"
+                      : "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"}
                     autoPlay
                     muted
                     loop
@@ -1469,8 +1469,8 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               >
                 <video
                   src={isPinkVariant
-                    ? "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779806053/120pie_%EC%98%81%EC%83%81_6_qlxvav.mp4"
-                    : "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779779154/120pie_%EC%98%81%EC%83%81_7_xoo7il.mp4"}
+                    ? "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"
+                    : "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"}
                   autoPlay
                   muted
                   loop
@@ -1565,7 +1565,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <video
-                  src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779805753/120pie_%EC%98%81%EC%83%81_3_exaslh.mp4"
+                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183394/120pie_%EC%98%81%EC%83%81_3_xqmdny.mp4"
                   autoPlay
                   muted
                   loop
@@ -1597,7 +1597,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <img
-                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779808274/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A0%ED%94%8C_%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%97%B0%EC%B6%9C_rrdtor.jpg"
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183595/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A0%ED%94%8C_%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%97%B0%EC%B6%9C_bzyzzs.jpg"
                   alt="120겹 파이 크림치즈 애플 블루베리 연출"
                   className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
                 />
@@ -1687,7 +1687,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <img
-                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779721204/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_du1czf.jpg"
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183720/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_yszrts.jpg"
                   alt="120겹 파이 초간편 3분 조리 연출"
                   className="w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
                 />
@@ -1715,7 +1715,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <img
-                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779847988/7c2cce19-579e-4810-9b4d-692bf40cae03.png"
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186392/7c2cce19-579e-4810-9b4d-692bf40cae03_xmarwy.png"
                   alt="에그120 계란빵 조리 및 폐기율 제로 연출"
                   className="w-full h-full object-cover hover:scale-[1.05] transition-all duration-550 opacity-100"
                 />
@@ -1822,7 +1822,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                       : "bg-white border-neutral-200 hover:border-amber-400/60"
                 }`}>
                   <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
-                    <video src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779758245/120pie_%EC%98%81%EC%83%81_4_bt9dyp.mp4" autoPlay muted loop playsInline aria-label="120겹파이 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
+                    <video src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183410/120pie_%EC%98%81%EC%83%81_4_tylqqc.mp4" autoPlay muted loop playsInline aria-label="120겹파이 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
                     <div className={`text-[10px] font-bold mb-1.5 tracking-widest uppercase ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-500"}`}>Signature Pie</div>
@@ -1840,7 +1840,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                       : "bg-white border-neutral-200 hover:border-amber-400/60"
                 }`}>
                   <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
-                    <video src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779806130/egg120_%EC%98%81%EC%83%81_1_jwv7fe.mp4" autoPlay muted loop playsInline aria-label="에그120 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
+                    <video src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183413/egg120_%EC%98%81%EC%83%81_1_nyph02.mp4" autoPlay muted loop playsInline aria-label="에그120 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
                     <div className={`text-[10px] font-bold mb-1.5 tracking-widest uppercase ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-emerald-600" : "text-emerald-500"}`}>Sweet Choice</div>
@@ -1858,7 +1858,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                       : "bg-white border-neutral-200 hover:border-amber-400/60"
                 }`}>
                   <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
-                    <video src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779805882/%EC%B8%84%EB%9F%AC%EC%8A%A4120_%EC%98%81%EC%83%81_1_qpxlyo.mp4" autoPlay muted loop playsInline aria-label="츄러스 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
+                    <video src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183414/%EC%B8%84%EB%9F%AC%EC%8A%A4120_%EC%98%81%EC%83%81_1_ybpdnm.mp4" autoPlay muted loop playsInline aria-label="츄러스 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
                     <div className={`text-[10px] font-bold mb-1.5 tracking-widest uppercase ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-blue-600" : "text-blue-500"}`}>More Favorites</div>
@@ -1905,7 +1905,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   eyebrow: "Signature",
                   title: "120파이 시리즈",
                   desc: "고기파이부터 애플파이, 피자 파이까지. 커피와 자연스럽게 어울리는 브랜드의 대표 메뉴입니다.",
-                  image: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779718433/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_xk9fhi.jpg",
+                  image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg",
                   alt: "120겹파이"
                 },
                 {
@@ -1913,7 +1913,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   eyebrow: "Dessert",
                   title: "에그120 계란빵",
                   desc: "폭신하고 부드러운 식감에 다양한 토핑을 더해, 커피와 함께 즐기기 좋은 디저트 메뉴입니다.",
-                  image: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779722602/120egg_45_y2al4f.jpg",
+                  image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184083/120egg_45_dqgrir.jpg",
                   alt: "에그120 계란빵"
                 },
                 {
@@ -1921,7 +1921,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   eyebrow: "Side Menu",
                   title: "츄러스 · 핫도그 · 떡볶이",
                   desc: "간단한 조리로 선택 폭을 넓히고, 파이와 함께 추가 주문을 이끄는 사이드 메뉴입니다.",
-                  image: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779759362/IMG_0015_6_3_au1ykg.jpg",
+                  image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184099/IMG_0015_6_3_bxmolh.jpg",
                   alt: "사이드 메뉴"
                 }
               ].map((menu) => (
@@ -1993,21 +1993,21 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     title: "떡볶이 + 120파이",
                     desc: "든든한 간식과 식사 대용 메뉴를 찾는 오피스·학원가 매장에 어울리는 구성입니다.",
                     location: "오피스 · 대학가",
-                    image: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779849846/%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%9C%84%EC%97%90_%EC%9C%84_202605271143_npntmg.jpg"
+                    image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185663/%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%9C%84%EC%97%90_%EC%9C%84_202605271143_npntmg_cbmmh0.jpg"
                   },
                   {
                     label: "TREND",
                     title: "에그120 + 시그니처 음료",
                     desc: "사진 찍기 좋은 디저트 메뉴로 젊은 고객의 방문과 공유를 기대하는 매장에 적합합니다.",
                     location: "로드샵 · 번화가",
-                    image: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850141/%EB%91%90_%EB%A9%94%EB%89%B4_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271147_1_rkb6ns.jpg"
+                    image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185661/%EB%91%90_%EB%A9%94%EB%89%B4_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271147_1_rkb6ns_wr8gno.jpg"
                   },
                   {
                     label: "DELIVERY",
                     title: "츄러스 + 핫도그 + 파이",
                     desc: "함께 나눠 먹기 좋은 구성을 통해 포장과 배달 주문을 넓히기 좋은 조합입니다.",
                     location: "주거 · 배달 상권",
-                    image: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850228/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm.jpg"
+                    image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185662/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm_nxk2mq.jpg"
                   }
                 ].map((set) => (
                   <article key={set.label} className={`group text-left border-t pt-6 transition-colors flex flex-col ${
@@ -2138,7 +2138,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.6 }}
               >
                 <video
-                  src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779807895/120pie_%EC%98%81%EC%83%81_2_2_qz3xdx.mp4"
+                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781185778/120pie_%EC%98%81%EC%83%81_2_2_j4zc5s.mp4"
                   autoPlay
                   muted
                   loop
@@ -2321,7 +2321,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     aria-label="영상 크게보기"
                   >
                     <video
-                      src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4"
+                      src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4"
                       autoPlay
                       muted
                       loop
@@ -2372,7 +2372,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             >
               <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl bg-black shadow-2xl" onClick={(e) => e.stopPropagation()}>
                 <video
-                  src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4"
+                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4"
                   autoPlay
                   muted={false}
                   loop
@@ -2449,7 +2449,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
                 <div className="aspect-[4/3] rounded-xl overflow-hidden relative border border-neutral-200 bg-neutral-100">
                   <img
-                    src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779765483/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_26%EC%9D%BC_%EC%98%A4%ED%9B%84_12_13_48_asivm6.png"
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185881/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_26%EC%9D%BC_%EC%98%A4%ED%9B%84_12_13_48_asivm6_cvxjzp.png"
                     alt="커피 한 잔만으로 아쉬운 매출을 표현한 이미지"
                     className="w-full h-full object-cover"
                   />
@@ -2515,7 +2515,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
                 <div className="aspect-[4/3] rounded-xl overflow-hidden relative border border-neutral-800">
                   <img
-                    src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779765478/230515_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%95%A0%ED%94%8C%EC%B9%98%EC%A6%88_2_sddz7b.jpg"
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185897/230515_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%95%A0%ED%94%8C%EC%B9%98%EC%A6%88_2_sddz7b_ctaarg.jpg"
                     alt="커피와 파이를 함께 찾는 카페 이미지"
                     className="w-full h-full object-cover"
                   />
@@ -2556,10 +2556,10 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7 mb-20">
               {[
-                { num: "01", title: "메뉴부터 가볍게 시작", desc: "작은 판매 공간에 파이 메뉴를 더해 손님의 반응을 먼저 살펴봅니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772299/KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp.jpg" },
-                { num: "02", title: "매장 안에서 알리기", desc: "메뉴보드와 안내물을 활용해 파이를 판매하는 카페임을 자연스럽게 알립니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772301/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd.jpg" },
-                { num: "03", title: "필요하면 외부 표기 추가", desc: "원하는 매장에 한해 기존 간판 옆에 브랜드 표기를 더할 수 있습니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772298/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm.jpg" },
-                { num: "04", title: "검증 후 확장 선택", desc: "매출과 고객 반응을 확인한 뒤, 매장 전환 여부를 차분히 결정합니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg" }
+                { num: "01", title: "메뉴부터 가볍게 시작", desc: "작은 판매 공간에 파이 메뉴를 더해 손님의 반응을 먼저 살펴봅니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185929/KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp_xoc0oc.jpg" },
+                { num: "02", title: "매장 안에서 알리기", desc: "메뉴보드와 안내물을 활용해 파이를 판매하는 카페임을 자연스럽게 알립니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185933/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd_ddvcvz.jpg" },
+                { num: "03", title: "필요하면 외부 표기 추가", desc: "원하는 매장에 한해 기존 간판 옆에 브랜드 표기를 더할 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185936/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm_zbuqaq.jpg" },
+                { num: "04", title: "검증 후 확장 선택", desc: "매출과 고객 반응을 확인한 뒤, 매장 전환 여부를 차분히 결정합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185938/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon_z90vyq.jpg" }
               ].map((step) => (
                 <article key={step.num} className={`group border-t pt-5 flex flex-col h-full transition-colors ${
                   isPinkVariant ? "border-[#f2ccd7]/60" : isYellowVariant ? "border-[#e6dfc3]/60" : "border-neutral-700"
@@ -2922,7 +2922,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.6 }}
               >
                 <video
-                  src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779774298/Video_Project_15-2_kfgydn.mp4"
+                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781186151/Video_Project_15-2_sypvht.mp4"
                   autoPlay
                   muted
                   loop
@@ -3006,7 +3006,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                         }`}>
                           <div className="w-9 h-9 shrink-0 flex items-center justify-center">
                             <img
-                              src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png"}
+                              src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png"}
                               alt="120pie 로고"
                               className="w-full h-full object-contain"
                             />
@@ -3071,7 +3071,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                         }`}>
                           <div className="w-9 h-9 shrink-0 flex items-center justify-center">
                             <img
-                              src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png"}
+                              src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png"}
                               alt="120pie 로고"
                               className="w-full h-full object-contain"
                             />
@@ -3407,7 +3407,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             <div className="lg:col-span-7">
               <div className="mb-7">
                 <img
-                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779845741/logo_120pie_coffee_nu_woul37.png"
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png"
                   alt="120pie 로고"
                   className="h-7 sm:h-8 w-auto object-contain opacity-40 hover:opacity-75 transition-opacity duration-200 grayscale"
                 />

@@ -61,8 +61,8 @@ function MenuModal({ menuId, onClose }: { menuId: string | null, onClose: () => 
        title: "시그니처 핵심 엔진: 120파이",
        desc: "독보적인 120겹 페이스트리 기술력을 바탕으로 겉바속촉 식감을 극한으로 올렸습니다. 디저트부터 든든한 식사 대용까지 폭넓은 시간대 수요를 흡수합니다.",
        items: [
-         { name: "수제 고기파이", desc: "육즙이 풍부한 다진 고기와 특제 소스로 속을 꽉 채워 든든한 한 끼 식사가 되는 시그니처 파이", img: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=600&auto=format&fit=crop" },
-         { name: "달콤 애플파이", desc: "달콤한 시나몬과 사과 과육의 조화로 커피와 완벽한 페어링을 자랑하는 스테디셀러 디저트 파이", img: "https://images.unsplash.com/photo-1519869325930-281384150729?q=80&w=600&auto=format&fit=crop" },
+         { name: "수제 고기파이", desc: "육즙이 풍부한 다진 고기와 특제 소스로 속을 꽉 채워 든든한 한 끼 식사가 되는 시그니처 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184221/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s3svi2.jpg" },
+         { name: "달콤 애플파이", desc: "달콤한 시나몬과 사과 과육의 조화로 커피와 완벽한 페어링을 자랑하는 스테디셀러 디저트 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184723/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_kxykcu.jpg" },
          { name: "식사/피자 파이류", desc: "치즈와 토마토 베이스의 조합으로 점심 및 저녁 식사 배달 수요까지 끌어들이는 하이브리드 파이", img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=600&auto=format&fit=crop" }
        ]
     },
@@ -70,16 +70,16 @@ function MenuModal({ menuId, onClose }: { menuId: string | null, onClose: () => 
        title: "성장/바이럴 엔진: 에그120 계란빵",
        desc: "밀가루가 아닌 100% 쌀반죽을 사용하여 쫄깃함과 소화 편의성을 더하고, 귀여운 위트 캐릭터 브랜딩으로 인스타 바이럴을 이끄는 프리미엄 에그빵입니다.",
        items: [
-         { name: "쌀반죽 오리지널 에그빵", desc: "100% 국내산 쌀가루 반죽에 계란 하나가 통째로 들어가 겉바속촉 고소함이 일품인 대표 웰빙 영양빵", img: "https://images.unsplash.com/photo-1587314168485-3236d6710814?q=80&w=600&auto=format&fit=crop" },
-         { name: "베이컨치즈 에그빵", desc: "짭조름한 고급 베이컨과 멜팅 치즈, 계란의 풍미가 어우러져 단짠 매력을 선사하는 업그레이드 에그빵", img: "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?q=80&w=600&auto=format&fit=crop" },
+         { name: "쌀반죽 오리지널 에그빵", desc: "100% 국내산 쌀가루 반죽에 계란 하나가 통째로 들어가 겉바속촉 고소함이 일품인 대표 웰빙 영양빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184985/edited-photo_4_y98ytv.jpg" },
+         { name: "베이컨치즈 에그빵", desc: "짭조름한 고급 베이컨과 멜팅 치즈, 계란의 풍미가 어우러져 단짠 매력을 선사하는 업그레이드 에그빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184987/edited-photo_2_rplfpn.jpg" },
        ]
     },
     "기타": {
        title: "확장 패밀리: 스낵 & 브런치 수프",
        desc: "에어프라이어 5분 가열만으로 갓 튀긴 듯 바삭한 츄러스, 특제 소시지를 적용한 핫도그, 그리고 매장의 품격을 높여줄 수프까지 강력한 객단가 보강 라인업입니다.",
        items: [
-         { name: "에어프라이 고품질 츄러스", desc: "번거로운 기름 조리 과정 없이 구워내어 시나몬 향 가득 겉은 바삭하고 속은 부드러운 스낵 츄러스", img: "https://images.unsplash.com/photo-1561571994-3c61c554181a?q=80&w=600&auto=format&fit=crop" },
-         { name: "직화 불고기 핫도그", desc: "저가형 소시지가 아닌 깊은 직화 불고기 풍미와 쫄깃한 소시지가 들어간 프리미엄 아메리칸 스타일 핫도그", img: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?q=80&w=600&auto=format&fit=crop" },
+         { name: "에어프라이 고품질 츄러스", desc: "번거로운 기름 조리 과정 없이 구워내어 시나몬 향 가득 겉은 바삭하고 속은 부드러운 스낵 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185404/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_izqnfl.jpg" },
+         { name: "직화 불고기 핫도그", desc: "저가형 소시지가 아닌 깊은 직화 불고기 풍미와 쫄깃한 소시지가 들어간 프리미엄 아메리칸 스타일 핫도그", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185539/A4_07054_2_er4md2.jpg" },
          { name: "프리미엄 브런치 수프", desc: "빵과 최적의 궁합을 가지는 본사 특제 레시피 완제품 수프로, 개인 카페를 단숨에 브런치 매장으로 격상", img: "https://images.unsplash.com/photo-1547592180-85f173990554?q=80&w=600&auto=format&fit=crop" }
        ]
     }
@@ -636,7 +636,7 @@ export default function HomeV3() {
                 transition={{ duration: 0.6 }}
               >
                 <video
-                  src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779757782/120pie_%EC%98%81%EC%83%81_2_lnnpbh.mp4"
+                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"
                   autoPlay
                   muted
                   loop
@@ -709,7 +709,7 @@ export default function HomeV3() {
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <video
-                  src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779757960/120pie_%EC%98%81%EC%83%81_3_ylbwog.mp4"
+                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183394/120pie_%EC%98%81%EC%83%81_3_xqmdny.mp4"
                   autoPlay
                   muted
                   loop
@@ -809,7 +809,7 @@ export default function HomeV3() {
                   {/* Module Card 1 */}
                   <div className="bg-neutral-950 rounded-2xl border border-neutral-850 relative z-10 flex flex-col items-center overflow-hidden hover:border-amber-400/40 transition-colors">
                     <div className="h-28 w-full overflow-hidden bg-neutral-900 relative">
-                      <video src="https://res.cloudinary.com/dx7l09wwu/video/upload/v1779758245/120pie_%EC%98%81%EC%83%81_4_bt9dyp.mp4" autoPlay muted loop playsInline aria-label="120겹파이 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24] opacity-60" />
+                      <video src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183410/120pie_%EC%98%81%EC%83%81_4_tylqqc.mp4" autoPlay muted loop playsInline aria-label="120겹파이 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24] opacity-60" />
                     </div>
                     <div className="p-5 flex flex-col items-center">
                       <div className="text-[10px] font-bold text-amber-400 mb-1.5 tracking-widest uppercase">Signature Pie</div>

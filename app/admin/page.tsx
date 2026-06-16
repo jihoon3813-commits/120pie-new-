@@ -349,7 +349,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 5000,
     discountAmount: 0,
     discountedPrice: 5000,
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779718433/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_xk9fhi.jpg",
+    img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg",
     detailImg: "",
     isActive: true,
     desc: "120pie 브랜드 컬러의 매장 유리창 부착용 홍보 포스터 세트",
@@ -3317,7 +3317,7 @@ export default function AdminPage() {
                 <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
                   <div className="flex items-center gap-2">
                     <img
-                      src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png"
+                      src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png"
                       alt="로고"
                       className="w-7 h-7"
                     />

@@ -12,7 +12,7 @@ const getCloudinaryResizedUrl = (url: string, width = 300, height = 300) => {
   return url;
 };
 
-const logoUrlBlack = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png";
+const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
 const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png";
 
 // Inline Item Detail Interface with Qty
@@ -44,66 +44,66 @@ const PACKAGES: PackageInfo[] = [
     price: "4,400,000원",
     normalPrice: "5,500,000원",
     desc: "120겹의 극대화된 바삭함과 풍미를 선사하는 120겹파이를 매장에 즉시 도입하는 기기 및 브랜딩 올인원 세트입니다.",
-    videoUrl: "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4",
+    videoUrl: "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4",
     items: [
       {
         title: "자체 금형 오리지널 파이 머신",
         desc: "독자 설계 자체 금형 기술로 가장 극대화된 120겹의 파이 결을 살려내는 전용 베이킹 머신",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779847988/7c2cce19-579e-4810-9b4d-692bf40cae03.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186392/7c2cce19-579e-4810-9b4d-692bf40cae03_xmarwy.png",
         qty: "1ea"
       },
       {
         title: "시그니처 패스트리 생지",
         desc: "본사 콜드체인 물류망을 통해 신선하게 급송되는 120겹 레이어드 특제 생지 (완성 파이 200개 분량)",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/4b7d41db63592_wyo4r0.webp",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186395/4b7d41db63592_wyo4r0_m7yx1q.webp",
         qty: "1box"
       },
       {
         title: "엄선 프리미엄 필링 초도 자재 지원",
         desc: "120pie 대표 9대 맛(애플, 커스터드, 블루베리, 망고, cream치즈, 앙고구마, 불닭, 불고기, 함박) 고품질 필링팩 무상 공급",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C1_ueicna.jpg",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186398/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C1_ueicna_qxbo3b.jpg",
         qty: "각 1kg"
       },
       {
         title: "브랜드 공식 엑스배너 2종 세트",
         desc: "실내용 및 실외 전천후 외부용 고선명 엑스배너 거치대 포함 제공 (규격: 가로 60cm × 세로 180cm)",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/2026-05-28_13_37_40_sbppa6.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186400/2026-05-28_13_37_40_sbppa6_z2w4mg.png",
         qty: "각 1ea"
       },
       {
         title: "매장 전용 카운터/테이블 POP 5종",
         desc: "고객 시선을 사로잡는 입체적 메뉴 거치용 프리미엄 아크릴 POP 스탠드 (규격: 가로 22cm × 세로 30cm)",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/2026-05-28_13_41_46_xec3ws.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186407/2026-05-28_13_41_46_xec3ws_hrigku.png",
         qty: "각 1ea"
       },
       {
         title: "메뉴 홍보 포스터 8종 세트",
         desc: "파이 비주얼과 질감이 살아있는 내외부 유리벽 부착용 고급 홍보 포스터 (규격: 가로 48cm × 세로 69cm)",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/2026-05-28_13_42_18_f7abqv.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186409/2026-05-28_13_42_18_f7abqv_grhghb.png",
         qty: "각 1ea"
       },
       {
         title: "초정밀 푸드 스타일링 파이 모형 4종",
         desc: "고객의 주문 충동을 자극하는 초정밀 실물 원형 모형 1종 및 애플/블루베리/직화류 단면 모형 3종 세트",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/KakaoTalk_20220113_105520905_01_gpdfsy.jpg",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186412/KakaoTalk_20220113_105520905_01_gpdfsy_rqkk62.jpg",
         qty: "각 1ea"
       },
       {
         title: "배달 플랫폼 전용 고해상도 실사 라이센스 이미지",
         desc: "배달의민족, 쿠팡이츠 등 즉시 등록 가능한 스튜디오 촬영 전용 파이 메뉴 대표/옵션 컷 원본 제공",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_r90tky.jpg",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781187164/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_r90tky_lqzsb6.jpg",
         qty: "지원"
       },
       {
         title: "시그니처 테이크아웃 포장 부자재 세트",
         desc: "120pie 전용 크라프트 캐리어, 특수 기능성 포장 속지 등 초도 포장 자재 세트 무상 지원",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945187/IMG_8185_jpquaf.jpg",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186403/IMG_8185_jpquaf_z9ikmf.jpg",
         qty: "지원"
       },
       {
         title: "프로페셔널 오븐 설치 및 1:1 조리 교육",
         desc: "본사 엔지니어 기기 셋팅 출장 지원 및 비숙련자도 3분 내 완벽 조리가 가능한 1:1 현장 교육 및 가이드",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186418/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns_myousq.png",
         qty: "지원"
       }
     ]
@@ -115,78 +115,78 @@ const PACKAGES: PackageInfo[] = [
     price: "3,300,000원",
     normalPrice: "4,400,000원",
     desc: "100% 국산 쌀가루로 만들어 겉은 바삭하고 속은 부드러운 커스터드로 가득 찬 egg120을 도입하기 위한 최적의 패키지입니다.",
-    videoUrl: "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779806130/egg120_%EC%98%81%EC%83%81_1_jwv7fe.mp4",
+    videoUrl: "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183413/egg120_%EC%98%81%EC%83%81_1_nyph02.mp4",
     items: [
       {
         title: "에그120 계란빵 전용 머신",
         desc: "진짜 계란빵의 완벽한 형상과 결을 제대로 살려내는 독점 기기 (온도센서/타이머 탑재, 1.3kw 초절전 저전력 설계, 10구 동시 생산)",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945817/10d36a7d-b8d5-4903-9d24-fbedfcbf98cd.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186600/10d36a7d-b8d5-4903-9d24-fbedfcbf98cd_yatwnr.png",
         qty: "1대"
       },
       {
         title: "시그니처 전용 반죽",
         desc: "겉바속촉 식감을 극대화하는 에그120 특제 반죽 (5kg 벌크 6봉 제공, 완성 계란빵 약 720개 조리 가능 대용량)",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945603/2026-05-28_13_49_08_j9unkq.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186614/2026-05-28_13_49_08_j9unkq_jxssyk.png",
         qty: "30kg"
       },
       {
         title: "프리미엄 토핑 속재료 4종",
         desc: "에그120만의 다채로운 맛을 내기 위한 핵심 속재료 초도 세트 (스팸 1kg, 커스터드 믹스 1kg, 콘버터 1kg, 베이컨 1kg)",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945603/A4_08297_2_kkxovy.jpg",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186604/A4_08297_2_kkxovy_i7xlf1.jpg",
         qty: "각 1ea"
       },
       {
         title: "동물복지 친환경 유황란",
         desc: "건강함과 최고의 신선한 고소함을 전하는 동물복지 인증 유황 먹인 명품 유정란",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945602/2026-05-28_14_00_35_wg4qfj.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186617/2026-05-28_14_00_35_wg4qfj_bxx2cc.png",
         qty: "120ea"
       },
       {
         title: "브랜드 공식 홍보용 X배너",
         desc: "실내외 공간 어디에나 배치할 수 있는 프리미엄 홍보용 X배너 (사이즈: 60cm × 180cm, 주문 제작용)",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_51_40_ahiniz.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186607/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_51_40_ahiniz_e6b27f.png",
         qty: "1ea"
       },
       {
         title: "공식 테이블/카운터 메뉴판 POP",
         desc: "매장 내부에 깔끔하고 정갈하게 메뉴 비주얼을 노출하는 카운터 전용 아크릴 POP 메뉴판 (사이즈: 22cm × 30cm, 주문 제작용)",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_52_47_k3qg27.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186619/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_52_47_k3qg27_ainij4.png",
         qty: "1ea"
       },
       {
         title: "에그120 공식 홍보용 포스터 3종",
         desc: "매장 내외부 유리벽 부착을 통해 시각적 식욕을 최고조로 유도하는 고선명 포스터 세트 (사이즈: 48cm × 69cm, 주문 제작용)",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945605/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_54_44_ihkz2y.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186622/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_54_44_ihkz2y_cupghd.png",
         qty: "각 1ea"
       },
       {
         title: "초정밀 푸드 디자인 계란빵 모형 4종 & 전용 미니 쇼케이스",
         desc: "실물 제품과 똑같이 제작되어 카운터 시선 중앙에서 주문율을 올리는 계란빵 원형 모형 2종 및 단면 모형 2종 세트, 그리고 모형을 먼지 없이 위생적으로 전시할 수 있는 투명 쇼케이스 일체",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_00_48_qomspv.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186611/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_00_48_qomspv_hcopmg.png",
         qty: "1set"
       },
       {
         title: "배달 플랫폼 프로페셔널 셋업 대행",
         desc: "배달의민족, 쿠팡이츠, 요기요 등 배달앱 즉시 등록을 위한 본사 담당자 1:1 파견 대행 셋업 및 고해상도 제품 실사 이미지 패키지 지원",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_01_00_y1gkyp.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186626/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_01_00_y1gkyp_ql9xij.png",
         qty: "지원"
       },
       {
         title: "테이크아웃 포장 및 부재료 패키지",
         desc: "에그120 시그니처 종이봉투(소), 브랜드 로고 패킹 비닐봉투(소), 배달 전용 용기 및 에그120 엠블럼 스티커 초도 제공",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945602/KakaoTalk_20250819_162905131_zkmre3.jpg",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186628/KakaoTalk_20250819_162905131_zkmre3_x6drp8.jpg",
         qty: "지원"
       },
       {
         title: "동물복지 공식 인증 명품 매장 판넬",
         desc: "친환경 동물복지란 사용을 선명히 고지하여 고객의 안전 먹거리 신뢰감을 높이는 명품 판넬",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945603/EGG120_%EB%8F%99%EB%AC%BC%EB%B3%B5%EC%A7%80_%ED%8C%9D%EC%97%85POPUP__240613_jqil66.jpg",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186632/EGG120_%EB%8F%99%EB%AC%BC%EB%B3%B5%EC%A7%80_%ED%8C%9D%EC%97%85POPUP__240613_jqil66_dl8hjh.jpg",
         qty: "1ea"
       },
       {
         title: "전문 기술 엔지니어 기기 설치 & 1:1 교육",
         desc: "본사 전문 테크니컬 마스터 파견을 통한 기기 최적 정밀 설치 셋팅, 1:1 현장 교육 및 조리 운영 가이드 서비스 일체 지원",
-        imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_07_46_evwssk.png",
+        imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186635/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_07_46_evwssk_tpflrk.png",
         qty: "지원"
       }
     ]
@@ -210,7 +210,7 @@ const FRIENDS_MENUS: FriendsMenuInfo[] = [
     sub: "정통 스패니시 디저트",
     desc: "겉은 바삭하고 속은 쫄깃한 정통 스패니시 스타일의 츄러스입니다. 오븐에 굽거나 가볍게 튀겨 3분 안에 간편하게 제공 가능합니다.",
     highlight: "정통 냉동 츄러스 생지 & 120 전용 시나몬 파우더 직배송",
-    imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779759362/IMG_0015_6_3_au1ykg.jpg",
+    imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184099/IMG_0015_6_3_bxmolh.jpg",
     badgeColor: "bg-orange-500/10 text-orange-600 border border-orange-500/20",
     supplyType: "완제품"
   },
@@ -219,7 +219,7 @@ const FRIENDS_MENUS: FriendsMenuInfo[] = [
     sub: "숍인숍 최고의 매출 치트키",
     desc: "남녀노소 누구나 매일 찾는 120 특제 국물 떡볶이입니다. 주방 공간 차지 없이 물만 붓고 끓이면 바로 조리가 끝납니다.",
     highlight: "중독성 넘치는 120 마약 떡볶이 소스 분말 & 쫄깃 밀떡 그대로 공급",
-    imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762984/%EA%B5%AD%EB%AC%BC%EB%96%A1%EB%B3%B6%EC%9D%B4_ue9q3m.jpg",
+    imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781187221/%EA%B5%AD%EB%AC%BC%EB%96%A1%EB%B3%B6%EC%9D%B4_ue9q3m_iycoo5.jpg",
     badgeColor: "bg-rose-500/10 text-rose-500 border border-rose-500/20",
     supplyType: "완제품"
   },
@@ -228,7 +228,7 @@ const FRIENDS_MENUS: FriendsMenuInfo[] = [
     sub: "바삭함 and 풍성한 육즙의 조화",
     desc: "카페 음료 및 가벼운 든든한 식사 대용으로 아주 훌륭한 핫도그입니다. 주문 즉시 오븐에 굽거나 데워 설탕만 솔솔 뿌려 건넵니다.",
     highlight: "육즙 팡팡 터지는 소시지가 들어간 120 전용 프리미엄 반제품 핫도그 공급",
-    imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762930/%EC%A7%81%ED%99%94%EB%B6%88%EA%B3%A0%EA%B8%B0_khx8qf.jpg",
+    imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185539/A4_07054_2_er4md2.jpg",
     badgeColor: "bg-red-500/10 text-red-600 border border-red-500/20",
     supplyType: "완제품"
   },
@@ -237,7 +237,7 @@ const FRIENDS_MENUS: FriendsMenuInfo[] = [
     sub: "파이와 완벽한 페어링",
     desc: "120시리즈 디저트의 부드러운 맛을 가장 기품 있게 살려주는 본사 하우스 아라비카 원두입니다. 커피 매출을 비약적으로 보충합니다.",
     highlight: "프리미엄 100% 아라비카 하우스 블렌딩 고품질 원두 원자재 직배송",
-    imageUrl: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779947666/A4_01133_lzjp9l.jpg",
+    imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781187208/A4_01133_lzjp9l_j4lfgk.jpg",
     badgeColor: "bg-cyan-500/10 text-cyan-600 border border-cyan-500/20",
     supplyType: "원재료"
   }
@@ -636,7 +636,7 @@ export default function CostsPageClient() {
                     isPink ? "bg-neutral-950/90 border-neutral-900" : "bg-white border-[#ffd500]/25 shadow-sm"
                   }`}>
                     <img 
-                      src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_r90tky.jpg" 
+                      src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781187164/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_r90tky_lqzsb6.jpg" 
                       alt="120겹파이" 
                       className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-neutral-200/40 dark:border-neutral-800 shrink-0 shadow-sm"
                     />
@@ -663,7 +663,7 @@ export default function CostsPageClient() {
                     isPink ? "bg-neutral-950/90 border-neutral-900" : "bg-white border-[#ffd500]/25 shadow-sm"
                   }`}>
                     <img 
-                      src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779722364/egg120_%EB%A9%94%EC%9D%B8_%EB%B0%B0%EB%84%88_owuycx.jpg" 
+                      src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781187166/egg120_%EB%A9%94%EC%9D%B8_%EB%B0%B0%EB%84%88_owuycx_l2nggx.jpg" 
                       alt="egg120" 
                       className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-neutral-200/40 dark:border-neutral-800 shrink-0 shadow-sm"
                     />
