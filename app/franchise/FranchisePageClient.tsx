@@ -761,7 +761,7 @@ export default function FranchisePageClient() {
                 <img 
                   src={selectedPlanTab === "8py" 
                     ? "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590217/edited-photo_68_t9lc94.png"
-                    : "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186611/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_00_48_qomspv_hcopmg.png"
+                    : "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590217/edited-photo_67_uqjalx.png"
                   } 
                   alt="Floor plan spatial layout" 
                   className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-550"
