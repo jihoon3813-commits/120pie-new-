@@ -668,7 +668,7 @@ export default function FranchisePageClient() {
               </div>
               <div className="rounded-xl overflow-hidden aspect-[16/10] bg-neutral-900 border border-neutral-800 relative group">
                 <img 
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186628/KakaoTalk_20250819_162905131_zkmre3_x6drp8.jpg" 
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590222/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_05_08_gylw9o.png" 
                   alt="Dough and baking process" 
                   className="w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-300"
                 />
