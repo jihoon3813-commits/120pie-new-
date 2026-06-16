@@ -417,7 +417,7 @@ export default function FranchisePageClient() {
             <div className="lg:col-span-5 relative group">
               <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
                 <img 
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186398/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C1_ueicna_qxbo3b.jpg" 
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185662/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm_nxk2mq.jpg" 
                   alt="120pie signature dessert" 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
