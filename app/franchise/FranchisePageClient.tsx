@@ -1097,14 +1097,20 @@ export default function FranchisePageClient() {
               {activeMenuTab === "side" && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-2xl mx-auto">
                   {[
-                    "국물 떡볶이", "로제 떡볶이", "짜장 떡볶이", "직화불고기 핫도그"
-                  ].map((name, idx) => (
+                    { name: "국물 떡볶이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185350/%EA%B5%AD%EB%AC%BC1_amnxed.png" },
+                    { name: "로제 떡볶이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185348/%EB%A1%9C%EC%A0%9C1_lwn2j7.png" },
+                    { name: "짜장 떡볶이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185349/%EC%A7%9C%EC%9E%A51_zktcnn.png" },
+                    { name: "직화불고기 핫도그", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185539/A4_07054_2_er4md2.jpg" }
+                  ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className={`w-full aspect-[4/3] rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
-                        <span className="text-2xl opacity-60">🌭</span>
-                        <span className="text-[8px] font-black uppercase tracking-wider mt-1.5 opacity-50">IMAGE AREA</span>
+                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
+                        <img 
+                          src={item.img} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
+                        />
                       </div>
-                      <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{name}</span>
+                      <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{item.name}</span>
                     </div>
                   ))}
                 </div>
