@@ -1119,16 +1119,56 @@ export default function FranchisePageClient() {
               {activeMenuTab === "drink" && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 sm:gap-6">
                   {[
-                    "아메리카노", "카페라떼", "바닐라라떼", "콜드브루", "흑당라떼", "딸기라떼", "녹차라떼",
-                    "요거트스무디", "캐모마일티", "히비스커스티", "페퍼민트티", "밀크티", "아이스티", "뱅쇼",
-                    "밀크쉐이크", "딸기쉐이크", "쿠앤크쉐이크", "초코쉐이크", "딸기주스", "망고주스", "블루베리주스"
-                  ].map((name, idx) => (
+                    { name: "아메리카노", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594614/%EC%95%84%EB%A9%94%EB%A6%AC%EC%B9%B4%EB%85%B8_qn2vhm.png" },
+                    { name: "카페라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594617/%EC%B9%B4%ED%8E%98%EB%9D%BC%EB%96%BC_hxx4gl.png" },
+                    { name: "카푸치노", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594625/%EC%B9%B4%ED%91%B8%EC%B9%98%EB%85%B82_lzqz34.png" },
+                    { name: "바닐라라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594630/%EB%B0%94%EB%8B%90%EB%9D%BC%EB%9D%BC%EB%96%BC_egaeff.png" },
+                    { name: "카라멜마끼아또", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594637/%EC%B9%B4%EB%9D%BC%EB%A9%9C%EB%A7%88%EB%81%BC%EC%95%84%EB%98%902_lelmg4.png" },
+                    { name: "카페모카", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594639/%EC%B9%B4%ED%8E%98%EB%AA%A8%EC%B9%B42_vpcsd0.png" },
+                    { name: "연유카페라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594648/%EC%97%B0%EC%9C%A0%EC%B9%B4%ED%8E%98%EB%9D%BC%EB%96%BC2_qsvl7v.png" },
+                    { name: "콜드브루", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594651/%EC%BD%9C%EB%93%9C%EB%B8%8C%EB%A3%A8_mshias.png" },
+                    { name: "콜드브루라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594654/%EC%BD%9C%EB%93%9C%EB%B8%8C%EB%A3%A8%EB%9D%BC%EB%96%BC2_fgyrox.png" },
+                    { name: "연유 콜드브루", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594659/%EC%97%B0%EC%9C%A0_%EC%BD%9C%EB%93%9C%EB%B8%8C%EB%A3%A82_vozqcs.png" },
+                    { name: "흑당라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594662/%ED%9D%91%EB%8B%B9%EB%9D%BC%EB%96%BC_zg0rsf.png" },
+                    { name: "곡물라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594667/%EA%B3%A1%EB%AC%BC%EB%9D%BC%EB%96%BC2_xmudz1.png" },
+                    { name: "고구마라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594670/%EA%B3%A0%EA%B5%AC%EB%A7%88%EB%9D%BC%EB%96%BC2_ya5oyd.png" },
+                    { name: "딸기라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594673/%EB%94%B8%EA%B8%B0%EB%9D%BC%EB%96%BC_mefpyg.png" },
+                    { name: "토피넛라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594679/%ED%86%A0%ED%94%BC%EB%84%9B%EB%9D%BC%EB%96%BC2_fxx4la.png" },
+                    { name: "녹차라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594683/%EB%85%B9%EC%B0%A8%EB%9D%BC%EB%96%BC_c9q9wu.png" },
+                    { name: "달고나라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594687/%EB%8B%AC%EA%B3%A0%EB%82%98%EB%9D%BC%EB%96%BC2_rh97dz.png" },
+                    { name: "피스타치오라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594692/%ED%94%BC%EC%8A%A4%ED%83%80%EC%B9%98%EC%98%A4%EB%9D%BC%EB%96%BC2_qhmttf.png" },
+                    { name: "미숫가루", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594697/%EB%AF%B8%EC%88%AB%EA%B0%80%EB%A3%A82_h8gehs.png" },
+                    { name: "초당옥수수라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594702/%EC%B4%88%EB%8B%B9%EC%98%A5%EC%88%98%EC%88%98%EB%9D%BC%EB%96%BC2_etf8dq.png" },
+                    { name: "딸기 요거트스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594708/%EB%94%B8%EA%B8%B0_%EC%9A%94%EA%B1%B0%ED%8A%B8%EC%8A%A4%EB%AC%B4%EB%94%942_nbnyqp.png" },
+                    { name: "망고 요거트스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594714/%EB%A7%9D%EA%B3%A0_%EC%9A%94%EA%B1%B0%ED%8A%B8%EC%8A%A4%EB%AC%B4%EB%94%942_cwywih.png" },
+                    { name: "딸기망고블루베리 스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594718/%EB%94%B8%EA%B8%B0%EB%A7%9D%EA%B3%A0%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%8A%A4%EB%AC%B4%EB%94%94_af48jr.png" },
+                    { name: "딸기바나나 스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594721/%EB%94%B8%EA%B8%B0%EB%B0%94%EB%82%98%EB%82%98_%EC%8A%A4%EB%AC%B4%EB%94%94_k98pno.png" },
+                    { name: "수박 스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594724/%EC%88%98%EB%B0%95_%EC%8A%A4%EB%AC%B4%EB%94%94_xizimi.png" },
+                    { name: "복숭아 아이스티", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594750/%EB%B3%B5%EC%88%AD%EC%95%84_%EC%95%84%EC%9D%B4%EC%8A%A4%ED%8B%B02_zy1xrm.png" },
+                    { name: "자몽 에이드", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594779/%EC%9E%90%EB%AA%BD_%EC%97%90%EC%9D%B4%EB%93%9C2_dmdi0k.png" },
+                    { name: "레몬 에이드", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594783/%EB%A0%88%EB%AA%AC_%EC%97%90%EC%9D%B4%EB%93%9C2_z4g3g3.png" },
+                    { name: "청포도 에이드", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594786/%EC%B2%AD%ED%8F%AC%EB%8F%84_%EC%97%90%EC%9D%B4%EB%93%9C2_rbww0m.png" },
+                    { name: "제주한라봉", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594790/%EC%A0%9C%EC%A3%BC%ED%95%9C%EB%9D%BC%EB%B4%89_%EC%97%90%EC%9D%B4%EB%93%9C2_hwrd2x.png" },
+                    { name: "밀크 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594794/%EB%B0%80%ED%81%AC%EC%89%90%EC%9D%B4%ED%81%AC_olhchd.png" },
+                    { name: "딸기 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594797/%EB%94%B8%EA%B8%B0%EC%89%90%EC%9D%B4%ED%81%AC_luxgk0.png" },
+                    { name: "쿠앤크 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594800/%EC%BF%A0%EC%95%A4%ED%81%AC%EC%89%90%EC%9D%B4%ED%81%AC_mddmzw.png" },
+                    { name: "초코 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594803/%EC%B4%88%EC%BD%94%EC%89%90%EC%9D%B4%ED%81%AC_k13wi2.png" },
+                    { name: "커피 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594807/%EC%BB%A4%ED%94%BC_%EC%89%90%EC%9D%B4%ED%81%AC2_ypr12t.png" },
+                    { name: "딸기 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594811/%EB%94%B8%EA%B8%B0%EC%A3%BC%EC%8A%A4_uo7vkh.png" },
+                    { name: "망고 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594814/%EB%A7%9D%EA%B3%A0%EC%A3%BC%EC%8A%A4_stoklt.png" },
+                    { name: "블루베리 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594817/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%EC%A3%BC%EC%8A%A4_drjxl0.png" },
+                    { name: "애플망고 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594821/%EC%95%A0%ED%94%8C%EB%A7%9D%EA%B3%A0_%EC%A3%BC%EC%8A%A42_acsy4h.png" },
+                    { name: "오렌지 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594824/%EC%98%A4%EB%A0%8C%EC%A7%80_%EC%A3%BC%EC%8A%A42_uhicvy.png" }
+                  ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className={`w-full aspect-square rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
-                        <span className="text-2xl opacity-60">☕</span>
-                        <span className="text-[8px] font-black uppercase tracking-wider mt-1.5 opacity-50">IMAGE AREA</span>
+                      <div className="w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
+                        <img 
+                          src={item.img} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
+                        />
                       </div>
-                      <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{name}</span>
+                      <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{item.name}</span>
                     </div>
                   ))}
                 </div>
