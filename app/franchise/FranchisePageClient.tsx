@@ -834,7 +834,7 @@ export default function FranchisePageClient() {
               <div className="lg:col-span-5 relative group flex flex-col justify-center">
                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[350px]">
                   <img 
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186400/2026-05-28_13_37_40_sbppa6_z2w4mg.png" 
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590221/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_24_39_a38n7c.png" 
                     alt="Success advertising banner mockup" 
                     className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 opacity-90"
                   />
