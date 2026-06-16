@@ -1552,7 +1552,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
               {/* PAIR 1 (Set Menu): Video Card (5 cols) */}
               <motion.div
-                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg min-h-[280px] ${
+                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg aspect-[4/3] w-full self-center ${
                   isPinkVariant 
                     ? "bg-[#fff5f7] border-[#f2ccd7]/80" 
                     : isYellowVariant 
@@ -1584,7 +1584,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
               {/* PAIR 2 (Shop in Shop): Image Card (5 cols) */}
               <motion.div
-                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg min-h-[280px] ${
+                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg aspect-[4/3] w-full self-center ${
                   isPinkVariant 
                     ? "bg-[#fff5f7] border-[#f2ccd7]/80" 
                     : isYellowVariant 
@@ -1674,7 +1674,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
               {/* PAIR 3 (Easy Cooking): Video Card (5 cols) */}
               <motion.div
-                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg min-h-[280px] ${
+                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg aspect-[4/3] w-full self-center ${
                   isPinkVariant 
                     ? "bg-[#fff5f7] border-[#f2ccd7]/80" 
                     : isYellowVariant 
@@ -1689,7 +1689,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 <img
                   src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183720/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_yszrts.jpg"
                   alt="120겹 파이 초간편 3분 조리 연출"
-                  className="w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
+                  className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
                 />
                 <div className={`absolute inset-0 bg-gradient-to-t ${
                   isPinkVariant 
@@ -1702,7 +1702,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
               {/* PAIR 4 (Zero Waste): Video Card (5 cols) */}
               <motion.div
-                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg min-h-[280px] ${
+                className={`md:col-span-5 border rounded-2xl overflow-hidden relative shadow-lg aspect-[4/3] w-full self-center ${
                   isPinkVariant 
                     ? "bg-[#fff5f7] border-[#f2ccd7]/80" 
                     : isYellowVariant 
@@ -1717,7 +1717,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 <img
                   src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186392/7c2cce19-579e-4810-9b4d-692bf40cae03_xmarwy.png"
                   alt="에그120 계란빵 조리 및 폐기율 제로 연출"
-                  className="w-full h-full object-cover hover:scale-[1.05] transition-all duration-550 opacity-100"
+                  className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-550 opacity-100"
                 />
                 <div className={`absolute inset-0 bg-gradient-to-t ${
                   isPinkVariant 
