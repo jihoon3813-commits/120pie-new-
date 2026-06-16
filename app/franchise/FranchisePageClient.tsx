@@ -1112,11 +1112,11 @@ export default function FranchisePageClient() {
                     { name: "직화불고기 핫도그", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185539/A4_07054_2_er4md2.jpg" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className="w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
+                      <div className={`w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md ${isPink ? "bg-neutral-900" : "bg-[#fffdf4]"} relative group-hover:border-amber-400 transition-all duration-300`}>
                         <img 
                           src={getOptimizedImg(item.img, 350)} 
                           alt={item.name} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 opacity-95"
                         />
                       </div>
                       <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{item.name}</span>
@@ -1170,11 +1170,11 @@ export default function FranchisePageClient() {
                     { name: "오렌지 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594824/%EC%98%A4%EB%A0%8C%EC%A7%80_%EC%A3%BC%EC%8A%A42_uhicvy.png" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className="w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
+                      <div className={`w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md ${isPink ? "bg-neutral-900" : "bg-[#fffdf4]"} relative group-hover:border-amber-400 transition-all duration-300`}>
                         <img 
                           src={getOptimizedImg(item.img, 200)} 
                           alt={item.name} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 opacity-95"
                         />
                       </div>
                       <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{item.name}</span>
