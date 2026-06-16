@@ -430,9 +430,7 @@ export default function FranchisePageClient() {
                   alt="120pie signature dessert" 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
-                  <span className="text-xs font-bold text-white/95">대표 메뉴: 120겹 오리지널 애플파이</span>
-                </div>
+                
               </div>
             </div>
           </div>
@@ -493,9 +491,7 @@ export default function FranchisePageClient() {
                     alt="Artisan rolling pastry dough" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
-                    <span className="text-xs font-bold text-white/95">40년 제과 장인의 120겹 정밀 도우 성형 공정</span>
-                  </div>
+                  
                 </div>
               </div>
             </div>
@@ -576,9 +572,7 @@ export default function FranchisePageClient() {
                     alt="6WAY packaging box" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
-                    <span className="text-xs font-bold text-white/95">포장 및 배달 경쟁력을 높이는 브랜드 전용 패키징 박스</span>
-                  </div>
+                  
                 </div>
               </div>
             </div>
@@ -681,9 +675,7 @@ export default function FranchisePageClient() {
                   alt="Dough and baking process" 
                   className="w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
-                  <span className="text-xs font-bold text-white/95">가맹점 실제 주방 조리 공간 및 에그빵 제조 모습</span>
-                </div>
+                
               </div>
             </div>
           </div>
@@ -775,12 +767,7 @@ export default function FranchisePageClient() {
                   alt="Floor plan spatial layout" 
                   className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-550"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent flex flex-col justify-end p-4">
-                  <span className="text-[10px] font-black text-amber-400 block uppercase tracking-wider">Interior Concept Mockup</span>
-                  <span className="text-xs font-bold text-white/95 mt-0.5">
-                    {selectedPlanTab === "8py" ? "8평 매장 내부 인테리어 레이아웃" : "10평 매장 전경 및 아일랜드 동선 배치"}
-                  </span>
-                </div>
+                
               </div>
             </div>
           </div>
@@ -847,10 +834,7 @@ export default function FranchisePageClient() {
                     alt="Success advertising banner mockup" 
                     className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 opacity-90"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent flex flex-col justify-end p-4">
-                    <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider">Marketing Assets</span>
-                    <span className="text-xs font-bold text-white/95 mt-0.5">매출 부스팅 전단 및 모바일 광고 홍보 시각 시안</span>
-                  </div>
+                  
                 </div>
               </div>
             </div>
@@ -1245,13 +1229,11 @@ export default function FranchisePageClient() {
               <div className="lg:col-span-4 flex flex-col justify-between space-y-4">
                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950 w-full">
                   <img 
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781187164/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_r90tky_lqzsb6.jpg" 
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590218/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_44_25_dmwlfs.png" 
                     alt="Arabica specialty coffee beans" 
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 opacity-90"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
-                    <span className="text-[10px] font-bold text-white/95">커피 판매 마진을 극대화하는 아라비카 원두 및 매장 비주얼</span>
-                  </div>
+                  
                 </div>
 
                 <div className={`p-5 rounded-2xl border ${isPink ? "border-rose-500/20 bg-rose-500/5 text-rose-455" : "border-amber-400/20 bg-amber-400/5 text-amber-600"} flex flex-col items-center justify-center text-center space-y-1.5`}>
@@ -1313,9 +1295,7 @@ export default function FranchisePageClient() {
                   alt="Model A Counter POP advertising" 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
-                  <span className="text-[10px] font-bold text-white/95">카운터 샵인샵 전용 비주얼 포스터</span>
-                </div>
+                
               </div>
             </div>
 
@@ -1392,9 +1372,7 @@ export default function FranchisePageClient() {
                   alt="Model B Packaging box design" 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-550 opacity-90"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
-                  <span className="text-[10px] font-bold text-white/95">테이크아웃 및 선물 상자 박스</span>
-                </div>
+                
               </div>
             </div>
 
@@ -1471,9 +1449,7 @@ export default function FranchisePageClient() {
                   alt="Model C premium kitchen cafe interior mockup" 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
-                  <span className="text-[10px] font-bold text-white/95">프리미엄 세련된 주방 및 홀 구성</span>
-                </div>
+                
               </div>
             </div>
 
@@ -1562,9 +1538,6 @@ export default function FranchisePageClient() {
                     alt="Process marketing material" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
-                    <span className="text-xs font-bold text-white/95">오픈 준비 전속 지원 패키징 및 POP 세트</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -1620,9 +1593,6 @@ export default function FranchisePageClient() {
                     alt="Egg120 animal welfare pop-up" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
-                    <span className="text-xs font-bold text-white/95">가맹 공급 재료 차별화: 친환경 동물복지 인증 계란</span>
-                  </div>
                 </div>
               </div>
             </div>
