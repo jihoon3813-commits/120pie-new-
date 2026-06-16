@@ -1033,7 +1033,7 @@ export default function FranchisePageClient() {
                     { name: "블루베리 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184610/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_zfmatx.jpg" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className="w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
+                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
                         <img 
                           src={item.img} 
                           alt={item.name} 
@@ -1053,7 +1053,7 @@ export default function FranchisePageClient() {
                     "로제미트 계란빵", "통모짜 계란빵", "슈크림 계란빵", "팥 계란빵"
                   ].map((name, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className={`w-full aspect-square rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
+                      <div className={`w-full aspect-[4/3] rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
                         <span className="text-2xl opacity-60">🥚</span>
                         <span className="text-[8px] font-black uppercase tracking-wider mt-1.5 opacity-50">IMAGE AREA</span>
                       </div>
@@ -1069,7 +1069,7 @@ export default function FranchisePageClient() {
                     "오리지널 츄러스", "슈가 츄러스", "오레오 츄러스", "녹차 츄러스"
                   ].map((name, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className={`w-full aspect-square rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
+                      <div className={`w-full aspect-[4/3] rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
                         <span className="text-2xl opacity-60">🥨</span>
                         <span className="text-[8px] font-black uppercase tracking-wider mt-1.5 opacity-50">IMAGE AREA</span>
                       </div>
@@ -1085,7 +1085,7 @@ export default function FranchisePageClient() {
                     "국물 떡볶이", "로제 떡볶이", "짜장 떡볶이", "직화불고기 핫도그"
                   ].map((name, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className={`w-full aspect-square rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
+                      <div className={`w-full aspect-[4/3] rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
                         <span className="text-2xl opacity-60">🌭</span>
                         <span className="text-[8px] font-black uppercase tracking-wider mt-1.5 opacity-50">IMAGE AREA</span>
                       </div>
@@ -1103,7 +1103,7 @@ export default function FranchisePageClient() {
                     "밀크쉐이크", "딸기쉐이크", "쿠앤크쉐이크", "초코쉐이크", "딸기주스", "망고주스", "블루베리주스"
                   ].map((name, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className={`w-full aspect-square rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
+                      <div className={`w-full aspect-[4/3] rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
                         <span className="text-2xl opacity-60">☕</span>
                         <span className="text-[8px] font-black uppercase tracking-wider mt-1.5 opacity-50">IMAGE AREA</span>
                       </div>
