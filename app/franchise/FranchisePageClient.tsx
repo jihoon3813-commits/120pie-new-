@@ -480,7 +480,7 @@ export default function FranchisePageClient() {
               <div className="lg:col-span-5 relative group">
                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
                   <img 
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186395/4b7d41db63592_wyo4r0_m7yx1q.webp" 
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590329/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C3_ibhumn.jpg" 
                     alt="Artisan rolling pastry dough" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                   />
