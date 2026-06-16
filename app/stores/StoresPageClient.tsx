@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, MapPin, Store, ExternalLink, Menu, X } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, MapPin, Store, ExternalLink, Menu, X, ArrowRight } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
+import Footer from "@/app/components/Footer";
 
 const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
 const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png";
@@ -280,6 +281,17 @@ export default function StoresPageClient() {
             </Link>
             <button
               type="button"
+              onClick={() => setInquiryForcedOpen(true)}
+              className={`pink-primary-button hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-xs sm:text-sm font-black hover:scale-[1.02] transition-all border-0 cursor-pointer ${
+                isPink 
+                  ? "bg-rose-500 hover:bg-rose-600 text-white shadow-[0_4px_16px_rgba(244,63,94,0.2)]" 
+                  : "bg-amber-400 hover:bg-amber-300 text-neutral-950 shadow-[0_4px_16px_rgba(251,191,36,0.2)]"
+              }`}
+            >
+              상담 신청 <ArrowRight size={14} className="ml-1.5 shrink-0" />
+            </button>
+            <button
+              type="button"
               className={`pink-primary-button lg:hidden inline-flex items-center justify-center rounded-lg p-2.5 text-xs font-black border-0 cursor-pointer ${
                 isPink 
                   ? "bg-rose-500 text-white hover:bg-rose-600" 
@@ -543,6 +555,7 @@ export default function StoresPageClient() {
           />
         </div>
       </main>
+      <Footer theme={isPink ? "black" : "yellow"} />
     </div>
   );
 }

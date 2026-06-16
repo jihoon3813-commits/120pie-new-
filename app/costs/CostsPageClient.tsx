@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, CheckCircle2, Sparkles, Truck, Flame, Layers, Menu, X } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CheckCircle2, Sparkles, Truck, Flame, Layers, Menu, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
+import Footer from "@/app/components/Footer";
 
 const getCloudinaryResizedUrl = (url: string, width = 300, height = 300) => {
   if (url && url.includes("cloudinary.com") && url.includes("/upload/")) {
@@ -357,6 +358,17 @@ export default function CostsPageClient() {
             }`} href="/portal" target="_blank" rel="noopener noreferrer">
               점주전용
             </Link>
+            <button
+              type="button"
+              onClick={() => setInquiryForcedOpen(true)}
+              className={`pink-primary-button hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-xs sm:text-sm font-black hover:scale-[1.02] transition-all border-0 cursor-pointer ${
+                isPink 
+                  ? "bg-rose-500 hover:bg-rose-600 text-white shadow-[0_4px_16px_rgba(244,63,94,0.2)]" 
+                  : "bg-amber-400 hover:bg-amber-300 text-neutral-950 shadow-[0_4px_16px_rgba(251,191,36,0.2)]"
+              }`}
+            >
+              상담 신청 <ArrowRight size={14} className="ml-1.5 shrink-0" />
+            </button>
             <button
               type="button"
               className={`pink-primary-button lg:hidden inline-flex items-center justify-center rounded-lg p-2.5 text-xs font-black border-0 cursor-pointer ${
@@ -932,6 +944,7 @@ export default function CostsPageClient() {
           />
         </div>
       </main>
+      <Footer theme={isPink ? "black" : "yellow"} />
     </div>
   );
 }

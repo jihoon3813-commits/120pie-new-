@@ -36,6 +36,8 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useMutation } from "convex/react";
+import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
+import Footer from "@/app/components/Footer";
 import { api } from "@/convex/_generated/api";
 
 const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
@@ -1722,14 +1724,8 @@ export default function FranchisePageClient() {
 
       </main>
 
-      {/* Footer */}
-      <footer className="py-12 border-t border-neutral-200/20 text-center text-xs font-semibold text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 space-y-4">
-          <p>㈜일이공에프앤비 | 대표이사: 홍길동 | 서울특별시 강남구 역삼로 120, 5층</p>
-          <p>가맹문의: 1566-0000 | 이메일: support@120pie.com | 사업자등록번호: 000-00-00000</p>
-          <p className="text-[10px] text-slate-650">© 2026 120pie & coffee Corp. All rights reserved.</p>
-        </div>
-      </footer>
+      <FloatingAndInquiry isPink={isPink} />
+      <Footer theme={isPink ? "black" : "yellow"} />
     </div>
   );
 }
