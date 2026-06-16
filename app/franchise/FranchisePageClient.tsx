@@ -1103,7 +1103,7 @@ export default function FranchisePageClient() {
                     { name: "직화불고기 핫도그", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185539/A4_07054_2_er4md2.jpg" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
+                      <div className="w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
                         <img 
                           src={item.img} 
                           alt={item.name} 
@@ -1124,7 +1124,7 @@ export default function FranchisePageClient() {
                     "밀크쉐이크", "딸기쉐이크", "쿠앤크쉐이크", "초코쉐이크", "딸기주스", "망고주스", "블루베리주스"
                   ].map((name, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className={`w-full aspect-[4/3] rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
+                      <div className={`w-full aspect-square rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
                         <span className="text-2xl opacity-60">☕</span>
                         <span className="text-[8px] font-black uppercase tracking-wider mt-1.5 opacity-50">IMAGE AREA</span>
                       </div>
