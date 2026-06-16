@@ -903,7 +903,7 @@ export default function FranchisePageClient() {
                     "함박치즈 / 망고 / 애플",
                     "흑임자크림 / 직화불고기 / 직화불닭"
                   ],
-                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186398/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C1_ueicna_qxbo3b.jpg"
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183595/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A0%ED%94%8C_%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%97%B0%EC%B6%9C_bzyzzs.jpg"
                 },
                 {
                   title: "에그 120",
@@ -913,7 +913,7 @@ export default function FranchisePageClient() {
                     "통팥 / 통모짜",
                     "로제미트 / 슈크림"
                   ],
-                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186614/2026-05-28_13_49_08_j9unkq_jxssyk.png"
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184083/120egg_45_dqgrir.jpg"
                 },
                 {
                   title: "츄러스 120",
@@ -930,7 +930,7 @@ export default function FranchisePageClient() {
                     "직화 불고기 핫도그",
                     "커피 / 에이드 / 스무디 / 뱅쇼 등"
                   ],
-                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185539/A4_07054_2_er4md2.jpg"
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590222/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_36_29_dgybn5.png"
                 }
               ].map((card, idx) => (
                 <div key={idx} className={`p-6 rounded-2xl ${innerCardBgAccent} ${innerCardHover} border ${isPink ? "border-neutral-850" : "border-amber-200/60"} flex flex-col justify-between h-[450px] group`}>
