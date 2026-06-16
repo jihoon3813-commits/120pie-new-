@@ -78,20 +78,14 @@ function MenuModal({ menuId, onClose, onInquiry, isPink = false }: { menuId: str
         { name: "로제미트파이", desc: "부드러운 로제 소스와 든든한 미트가 어우러진 식사형 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184221/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s3svi2.jpg" },
         { name: "블루베리파이", desc: "상큼한 블루베리 풍미가 바삭한 파이와 어울리는 달콤한 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184610/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_zfmatx.jpg" },
         { name: "콘치즈파이", desc: "고소한 옥수수와 치즈의 조합으로 누구나 편하게 즐기기 좋은 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184643/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_lio2tj.jpg" },
-        { name: "흑임자파이", desc: "진한 흑임자 크림의 고소함을 담아 커피와 잘 어울리는 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%ED%9D%91%EC%9E%84%EC%9E%90%ED%81%AC%EB%A6%BC_g0p6sk.jpg" },
         { name: "커스터드파이", desc: "부드럽고 달콤한 커스터드 크림을 채운 클래식 디저트 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184658/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_dule6z.jpg" },
         { name: "불고기파이", desc: "달큰한 불고기 풍미를 담아 간단한 한 끼로도 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184700/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ss1t8y.jpg" },
-        { name: "두바이쫀득파이", desc: "고소하고 쫀득한 식감이 매력적인 특별한 디저트 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EB%91%90%EB%B0%94%EC%9D%B4%EC%AA%BD%EB%93%9D%ED%8C%8C%EC%9D%B4_vjl5zb.jpg" },
         { name: "애플파이", desc: "달콤한 사과 풍미로 따뜻한 커피와 편안하게 곁들이기 좋습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184723/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_kxykcu.jpg" },
         { name: "팥치즈파이", desc: "달콤한 팥과 담백한 치즈가 만나 익숙하면서도 새로운 맛을 전합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184738/%ED%8C%A5%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_cvme5l.jpg" },
         { name: "크림치즈파이", desc: "산뜻한 크림치즈의 부드러움을 바삭한 결 사이에 담았습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184763/%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_nvzwvc.jpg" },
         { name: "망고파이", desc: "달콤하고 향긋한 망고의 풍미가 돋보이는 산뜻한 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184783/%EB%A7%9D%EA%B3%A0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_yynprf.jpg" },
         { name: "페퍼로니피자파이", desc: "페퍼로니와 치즈의 익숙한 풍미로 간식과 식사 모두 잘 어울립니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184808/%ED%8E%98%ED%8E%98%EB%A1%9C%EB%8B%88%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_izlrfv.jpg" },
-        { name: "고구마파이", desc: "달콤하고 포근한 고구마 맛으로 남녀노소 편하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184829/%EA%B3%A0%EA%B5%AC%EB%A7%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_qojchr.jpg" },
-        { name: "함박치즈파이", desc: "육즙 가득한 함박과 치즈를 담아 든든함을 더한 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760052/%ED%95%A8%EB%B0%95%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_fgxgld.jpg" },
-        { name: "포테이토베이컨피자파이", desc: "포테이토와 베이컨, 치즈를 풍성하게 담은 인기 피자 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760054/%ED%8F%AC%ED%85%8C%EC%9D%B4%ED%86%A0%EB%B2%A0%EC%9D%B4%EC%BB%A8%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_ccdena.jpg" },
-        { name: "불고기피자파이", desc: "달콤짭조름한 불고기와 치즈가 어우러진 든든한 피자 파이입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760054/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_aadfep.jpg" },
-        { name: "고구마베이컨피자파이", desc: "달콤한 고구마와 짭조름한 베이컨으로 풍성하게 즐기는 메뉴입니다.", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760129/%EA%B3%A0%EA%B5%AC%EB%A7%88%EB%B2%A0%EC%9D%B4%EC%BB%A8%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_tnz2js.jpg" }
+        { name: "고구마파이", desc: "달콤하고 포근한 고구마 맛으로 남녀노소 편하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184829/%EA%B3%A0%EA%B5%AC%EB%A7%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_qojchr.jpg" }
       ]
     },
     "에그120": {
