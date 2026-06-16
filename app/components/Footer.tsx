@@ -1,7 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { X } from "lucide-react";
+import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
 
 interface FooterProps {
   theme: "yellow" | "black" | "pink";
@@ -10,6 +12,46 @@ interface FooterProps {
 export default function Footer({ theme }: FooterProps) {
   const isPinkVariant = theme === "pink";
   const isYellowVariant = theme === "yellow";
+
+  const [terms, setTerms] = useState("");
+  const [privacy, setPrivacy] = useState("");
+  const [refund, setRefund] = useState("");
+  const [activeModal, setActiveModal] = useState<"terms" | "privacy" | "refund" | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setTerms(localStorage.getItem("120_terms_of_use") || DEFAULT_TERMS);
+      setPrivacy(localStorage.getItem("120_privacy_policy") || DEFAULT_PRIVACY);
+      setRefund(localStorage.getItem("120_refund_policy") || DEFAULT_REFUND);
+    }
+  }, []);
+
+  const openPolicyModal = (type: "terms" | "privacy" | "refund") => {
+    if (typeof window !== "undefined") {
+      if (type === "terms") {
+        setTerms(localStorage.getItem("120_terms_of_use") || DEFAULT_TERMS);
+      } else if (type === "privacy") {
+        setPrivacy(localStorage.getItem("120_privacy_policy") || DEFAULT_PRIVACY);
+      } else if (type === "refund") {
+        setRefund(localStorage.getItem("120_refund_policy") || DEFAULT_REFUND);
+      }
+    }
+    setActiveModal(type);
+  };
+
+  const getModalTitle = () => {
+    if (activeModal === "terms") return "이용약관";
+    if (activeModal === "privacy") return "개인정보처리방침";
+    if (activeModal === "refund") return "환불정책";
+    return "";
+  };
+
+  const getModalContent = () => {
+    if (activeModal === "terms") return terms;
+    if (activeModal === "privacy") return privacy;
+    if (activeModal === "refund") return refund;
+    return "";
+  };
 
   return (
     <footer className={`border-t transition-all duration-300 ${
@@ -71,11 +113,12 @@ export default function Footer({ theme }: FooterProps) {
               </p>
             </div>
 
-            <div className={`flex gap-6 text-sm font-bold ${
-              isPinkVariant ? "text-[#7c5d6c] hover:text-[#4c2d3a]" : isYellowVariant ? "text-[#576575] hover:text-[#0d233a]" : "text-neutral-400 hover:text-white"
+            <div className={`flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold ${
+              isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
             }`}>
-              <span className="transition-colors cursor-pointer">이용약관</span>
-              <span className="transition-colors cursor-pointer">개인정보처리방침</span>
+              <span onClick={() => openPolicyModal("terms")} className="transition-colors cursor-pointer hover:text-[#f25f8a] hover:underline">이용약관</span>
+              <span onClick={() => openPolicyModal("privacy")} className="transition-colors cursor-pointer hover:text-[#f25f8a] hover:underline font-black">개인정보처리방침</span>
+              <span onClick={() => openPolicyModal("refund")} className="transition-colors cursor-pointer hover:text-[#f25f8a] hover:underline">환불정책</span>
             </div>
           </div>
         </div>
@@ -108,6 +151,57 @@ export default function Footer({ theme }: FooterProps) {
           </div>
         </div>
       </div>
+
+      {activeModal && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-sm policy-modal-fade select-none">
+          <div className="bg-white border border-[#f2ccd7]/60 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl relative my-auto flex flex-col max-h-[85vh] policy-modal-scale">
+            
+            {/* Header */}
+            <div className="p-6 border-b border-[#f2ccd7]/40 flex items-center justify-between">
+              <h3 className="text-base sm:text-lg font-black text-neutral-800">
+                {getModalTitle()}
+              </h3>
+              <button
+                onClick={() => setActiveModal(null)}
+                className="p-1 rounded-full text-neutral-400 hover:text-[#f25f8a] hover:bg-[#fff1f5] transition-all cursor-pointer border-0 bg-transparent"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Content */}
+            <div className="p-6 overflow-y-auto flex-1 text-xs sm:text-sm text-neutral-600 leading-relaxed font-medium whitespace-pre-wrap max-h-[60vh] text-left">
+              {getModalContent()}
+            </div>
+            
+            {/* Footer */}
+            <div className="p-4 bg-neutral-50 border-t border-[#f2ccd7]/20 flex justify-end">
+              <button
+                onClick={() => setActiveModal(null)}
+                className="px-5 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-black text-xs rounded-xl transition-all shadow-md active:scale-95 cursor-pointer border-0"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+          <style dangerouslySetInnerHTML={{ __html: `
+            @keyframes policyFadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes policyScaleUp {
+              from { transform: scale(0.95); opacity: 0; }
+              to { transform: scale(1); opacity: 1; }
+            }
+            .policy-modal-fade {
+              animation: policyFadeIn 0.2s ease-out forwards;
+            }
+            .policy-modal-scale {
+              animation: policyScaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            }
+          `}} />
+        </div>
+      )}
     </footer>
   );
 }

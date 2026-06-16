@@ -42,6 +42,8 @@ import {
   Copy,
   BarChart3
 } from "lucide-react";
+import Footer from "@/app/components/Footer";
+import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
 
 // ==========================================
 // TYPES DEFINITIONS
@@ -1113,6 +1115,9 @@ export default function AdminPage() {
   const [adminPwSetting, setAdminPwSetting] = useState<string>("");
   const [adminPwSettingConfirm, setAdminPwSettingConfirm] = useState<string>("");
   const [kakaoMapKeySetting, setKakaoMapKeySetting] = useState<string>("");
+  const [termsOfUseSetting, setTermsOfUseSetting] = useState<string>("");
+  const [privacyPolicySetting, setPrivacyPolicySetting] = useState<string>("");
+  const [refundPolicySetting, setRefundPolicySetting] = useState<string>("");
 
   // Toast and navigation
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -1152,6 +1157,12 @@ export default function AdminPage() {
       setAdminIdSetting(storedAdminId);
       const storedKakaoKey = localStorage.getItem("120_kakao_api_key") || "";
       setKakaoMapKeySetting(storedKakaoKey);
+      const storedTerms = localStorage.getItem("120_terms_of_use") || DEFAULT_TERMS;
+      setTermsOfUseSetting(storedTerms);
+      const storedPrivacy = localStorage.getItem("120_privacy_policy") || DEFAULT_PRIVACY;
+      setPrivacyPolicySetting(storedPrivacy);
+      const storedRefund = localStorage.getItem("120_refund_policy") || DEFAULT_REFUND;
+      setRefundPolicySetting(storedRefund);
 
       // Seeds
       const st = loadState("120_stores", DEFAULT_STORES);
@@ -2558,6 +2569,14 @@ export default function AdminPage() {
     e.preventDefault();
     localStorage.setItem("120_kakao_api_key", kakaoMapKeySetting.trim());
     triggerToast("카카오맵 API 설정이 성공적으로 저장되었습니다!");
+  };
+
+  const handleSavePolicies = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem("120_terms_of_use", termsOfUseSetting);
+    localStorage.setItem("120_privacy_policy", privacyPolicySetting);
+    localStorage.setItem("120_refund_policy", refundPolicySetting);
+    triggerToast("이용약관, 개인정보처리방침 및 환불정책이 성공적으로 저장되었습니다!");
   };
 
   // ==========================================
@@ -6053,6 +6072,67 @@ export default function AdminPage() {
                   </form>
                 </div>
 
+                {/* 4. 약관 및 정책 설정 */}
+                <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 lg:col-span-2">
+                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
+                    <FileText size={18} className="text-[#f25f8a]" />
+                    이용약관, 개인정보처리방침 및 환불정책 설정
+                  </h3>
+                  
+                  <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
+                    홈페이지 하단 푸터 및 주요 안내에 사용되는 서비스 이용약관, 개인정보처리방침, 환불정책 내용을 관리합니다.<br />
+                    작성된 내용은 사이트 전반의 푸터 메뉴를 통해 연동되어 노출됩니다.
+                  </p>
+
+                  <form onSubmit={handleSavePolicies} className="space-y-5">
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965] block">이용약관</label>
+                        <textarea 
+                          value={termsOfUseSetting}
+                          onChange={(e) => setTermsOfUseSetting(e.target.value)}
+                          rows={12}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] font-mono leading-relaxed resize-y"
+                          placeholder="이용약관 내용을 입력해 주세요"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965] block">개인정보처리방침</label>
+                        <textarea 
+                          value={privacyPolicySetting}
+                          onChange={(e) => setPrivacyPolicySetting(e.target.value)}
+                          rows={12}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] font-mono leading-relaxed resize-y"
+                          placeholder="개인정보처리방침 내용을 입력해 주세요"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965] block">환불정책</label>
+                        <textarea 
+                          value={refundPolicySetting}
+                          onChange={(e) => setRefundPolicySetting(e.target.value)}
+                          rows={12}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] font-mono leading-relaxed resize-y"
+                          placeholder="환불정책 내용을 입력해 주세요"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="py-3 px-6 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+                    >
+                      <Check size={14} />
+                      약관 및 정책 설정 저장
+                    </button>
+                  </form>
+                </div>
+
               </div>
 
             </div>
@@ -6277,6 +6357,10 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* Footer */}
+          <div className="mt-12 -mx-4 sm:-mx-6 lg:-mx-8">
+            <Footer theme="pink" />
+          </div>
         </main>
       </div>
 

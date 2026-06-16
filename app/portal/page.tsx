@@ -41,6 +41,7 @@ import {
 
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import Footer from "@/app/components/Footer";
 
 // ==========================================
 // TYPES DEFINITIONS
@@ -2606,6 +2607,10 @@ export default function PortalPage() {
             </div>
           )}
 
+          {/* Footer */}
+          <div className="mt-12 -mx-4 sm:-mx-6 lg:-mx-8">
+            <Footer theme="pink" />
+          </div>
         </main>
       </div>
 
