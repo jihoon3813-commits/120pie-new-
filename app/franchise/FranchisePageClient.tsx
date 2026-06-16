@@ -93,6 +93,15 @@ export default function FranchisePageClient() {
   const [selectedPlanTab, setSelectedPlanTab] = useState<"8py" | "10py">("8py");
   const [activeMenuTab, setActiveMenuTab] = useState<"pie" | "egg" | "churros" | "side" | "drink">("pie");
   
+  // Helper to optimize Cloudinary images (downscales large images to look crisp and clean)
+  const getOptimizedImg = (url: string, width = 300) => {
+    if (url && url.includes("res.cloudinary.com")) {
+      if (url.includes("image/upload/w_")) return url;
+      return url.replace("image/upload/", `image/upload/w_${width},q_auto,f_auto/`);
+    }
+    return url;
+  };
+
   // Inquiry Form States
   const [formData, setFormData] = useState({
     name: "",
@@ -1035,7 +1044,7 @@ export default function FranchisePageClient() {
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
                         <img 
-                          src={item.img} 
+                          src={getOptimizedImg(item.img, 300)} 
                           alt={item.name} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
                         />
@@ -1061,7 +1070,7 @@ export default function FranchisePageClient() {
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
                         <img 
-                          src={item.img} 
+                          src={getOptimizedImg(item.img, 300)} 
                           alt={item.name} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
                         />
@@ -1083,7 +1092,7 @@ export default function FranchisePageClient() {
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
                         <img 
-                          src={item.img} 
+                          src={getOptimizedImg(item.img, 350)} 
                           alt={item.name} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
                         />
@@ -1105,7 +1114,7 @@ export default function FranchisePageClient() {
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
                         <img 
-                          src={item.img} 
+                          src={getOptimizedImg(item.img, 350)} 
                           alt={item.name} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
                         />
@@ -1163,7 +1172,7 @@ export default function FranchisePageClient() {
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
                         <img 
-                          src={item.img} 
+                          src={getOptimizedImg(item.img, 200)} 
                           alt={item.name} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
                         />
