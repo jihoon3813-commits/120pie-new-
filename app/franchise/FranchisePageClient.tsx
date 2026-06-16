@@ -404,8 +404,8 @@ export default function FranchisePageClient() {
               
               <div className="flex flex-wrap gap-3 pt-2">
                 <a 
-                  href="/120pie_franchise_proposal.pdf" 
-                  download="120pie_가맹창업제안서.pdf"
+                  href="/120pie-가맹-제안서.pdf" 
+                  download="120pie-가맹-제안서.pdf"
                   className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-amber-400 text-[#0d233a] hover:bg-amber-300 font-extrabold text-sm transition-all shadow-md shadow-[#ffd500]/10"
                 >
                   <Download size={16} className="mr-2" /> 제안서 PDF 다운로드
@@ -2082,13 +2082,13 @@ export default function FranchisePageClient() {
               </div>
 
               <div className="flex flex-wrap gap-3 pt-6">
-                <button 
-                  type="button"
-                  onClick={handlePrintPage}
+                <a 
+                  href="/120pie-가맹-제안서.pdf" 
+                  download="120pie-가맹-제안서.pdf"
                   className={`inline-flex items-center justify-center px-5 py-3 rounded-xl border font-extrabold text-sm cursor-pointer transition-all shadow-md ${isPink ? "bg-neutral-900 border-neutral-800 text-white hover:bg-neutral-800" : "bg-white border-amber-250/70 text-slate-755 hover:bg-amber-50/50"}`}
                 >
                   <FileText size={16} className={`mr-2 ${isPink ? "text-rose-500" : "text-amber-500"}`} /> 제안서 PDF 저장/인쇄
-                </button>
+                </a>
                 <a 
                   href="#inquiry-form-section"
                   className={`inline-flex items-center justify-center px-6 py-3 rounded-xl font-extrabold text-sm transition-all shadow-md hover:scale-[1.02] cursor-pointer ${isPink ? "bg-rose-500 text-white hover:bg-rose-600 shadow-rose-500/10" : "bg-amber-400 text-neutral-900 hover:bg-amber-300 shadow-amber-400/10"}`}
