@@ -1338,66 +1338,205 @@ export default function FranchisePageClient() {
             <span className="text-xs font-black text-slate-400">SHOP-IN-SHOP / DELIVERY</span>
           </div>
 
-          <div className="my-auto py-2 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            <div className="lg:col-span-5 space-y-4 text-left flex flex-col justify-between">
-              <div>
-                <span className={`text-xs font-black px-2.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455 border-rose-500/20" : "bg-amber-400/10 text-amber-600 border-amber-400/20"} border rounded-full`}>
-                  모델 A: 샵인샵 / 배달 전문형
+          {/* Top Title, Subtitle, Wreath Badge, Hashtags */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10 pb-6 border-b border-neutral-200/10">
+            <div className="text-left space-y-3">
+              <span className={`text-xs font-black px-2.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455 border-rose-500/20" : "bg-amber-400/10 text-amber-600 border-amber-400/20"} border rounded-full`}>
+                창업 모델 A
+              </span>
+              <h2 className={`text-2xl sm:text-3xl md:text-4xl font-black leading-tight ${textTitle}`}>
+                샵인샵<span className="text-sm sm:text-base font-semibold text-slate-400 ml-1.5 font-mono">(shop in shop)</span><br />
+                <span className={textHighlight}>매출 두배</span> 창업
+              </h2>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <span className={`text-[11px] font-extrabold px-2.5 py-1 rounded bg-[#ffd500]/10 text-[#ffd500] border border-[#ffd500]/20`}>
+                  #거품 없는 도입 비용
                 </span>
-                <h2 className={`text-xl sm:text-2xl md:text-3xl font-black leading-tight ${textTitle} mt-3`}>
-                  기존 매장 그대로,<br />
-                  <span className={textHighlight}>440만 원</span> 소자본 즉시 결합
-                </h2>
-                <p className={`text-xs sm:text-sm leading-relaxed ${textDesc} mt-2`}>
-                  기존 카페, 핫도그, 떡볶이집 매장에 기기 세팅과 사인물 교체만으로 디저트 판매를 시작하는 초간편 하이브리드 가입 프로그램입니다.
-                </p>
-              </div>
-              
-              <div className={`grid grid-cols-2 gap-3 text-xs font-bold ${textDesc}`}>
-                {[
-                  "가맹비/교육비 파격 환급",
-                  "주방 설비 공사 불필요",
-                  "초도 생지 200개 지원",
-                  "배달 플랫폼 즉시 연동"
-                ].map((txt, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5">
-                    <CheckCircle2 size={12} className={isPink ? "text-rose-500" : "text-amber-500"} />
-                    <span>{txt}</span>
-                  </div>
-                ))}
+                <span className={`text-[11px] font-extrabold px-2.5 py-1 rounded bg-[#ffd500]/10 text-[#ffd500] border border-[#ffd500]/20`}>
+                  #가맹비/교육비/로열티 3無
+                </span>
               </div>
             </div>
 
-            <div className="lg:col-span-3 relative group">
-              <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
-                <img 
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186407/2026-05-28_13_41_46_xec3ws_hrigku.png" 
-                  alt="Model A Counter POP advertising" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+            {/* Laurel Wreath Badge */}
+            <div className="relative flex items-center justify-center w-36 h-32 shrink-0 mx-auto lg:mx-0">
+              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-amber-500/80">
+                {/* Left Laurel Branch */}
+                <path 
+                  d="M 45,85 C 25,80 15,60 20,40 C 23,28 32,18 45,15" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2.2" 
+                  strokeLinecap="round"
                 />
-                
+                {/* Left Leaves */}
+                <path d="M 20,65 Q 12,62 17,55 Q 23,58 21,65 Z" fill="currentColor" />
+                <path d="M 17,50 Q 8,46 14,40 Q 20,43 18,50 Z" fill="currentColor" />
+                <path d="M 22,33 Q 15,25 23,21 Q 28,27 24,33 Z" fill="currentColor" />
+                <path d="M 33,20 Q 28,10 36,8 Q 39,17 34,20 Z" fill="currentColor" />
+
+                {/* Right Laurel Branch */}
+                <path 
+                  d="M 55,85 C 75,80 85,60 80,40 C 77,28 68,18 55,15" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2.2" 
+                  strokeLinecap="round"
+                />
+                {/* Right Leaves */}
+                <path d="M 80,65 Q 88,62 83,55 Q 77,58 79,65 Z" fill="currentColor" />
+                <path d="M 83,50 Q 92,46 86,40 Q 80,43 82,50 Z" fill="currentColor" />
+                <path d="M 78,33 Q 85,25 77,21 Q 72,27 76,33 Z" fill="currentColor" />
+                <path d="M 67,20 Q 72,10 64,8 Q 61,17 66,20 Z" fill="currentColor" />
+              </svg>
+              
+              <div className="z-10 flex flex-col items-center text-center">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-amber-500 mb-0.5">
+                  <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7z" />
+                  <path d="M3 20h18" />
+                </svg>
+                <span className="text-[7px] text-amber-500 tracking-wider -mt-0.5 mb-0.5">★★★★★</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span className="text-3xl font-black text-rose-500 tracking-tight">330</span>
+                  <span className="text-xs font-black text-rose-500">만원부터</span>
+                </div>
+                <span className="text-[9px] font-bold text-slate-450 -mt-0.5">VAT 별도</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Vertical list of packages */}
+          <div className="space-y-8 text-left">
+            {/* Package 1: 120겹파이 올인원 패키지 */}
+            <div className={`p-5 sm:p-7 rounded-2xl border ${isPink ? "border-neutral-805 bg-neutral-900/40" : "border-amber-200/50 bg-white"} shadow-sm`}>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-neutral-200/10">
+                <span className={`text-sm sm:text-base font-black px-3.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455" : "bg-orange-500/10 text-orange-600"} rounded-full`}>
+                  120겹파이 올인원 패키지
+                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-400 font-bold line-through">5,500,000원</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-lg sm:text-xl font-black text-rose-500">4,400,000</span>
+                    <span className="text-xs font-bold text-rose-500">원</span>
+                    <span className="text-[10px] text-slate-400 font-bold ml-1">VAT별도</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto rounded-xl border border-neutral-200/15 bg-neutral-950/5">
+                <table className="w-full text-left border-collapse text-[11px] sm:text-xs min-w-[650px] lg:min-w-0">
+                  <thead>
+                    <tr className={`border-b ${isPink ? "border-neutral-805 bg-neutral-900/40 text-rose-455" : "border-amber-200/40 bg-amber-500/5 text-amber-600"} font-bold`}>
+                      <th className="py-2.5 px-4 font-black w-[20%]">구분</th>
+                      <th className="py-2.5 px-4 font-black w-[45%]">세부 내용</th>
+                      <th className="py-2.5 px-4 font-black w-[35%]">비고</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { cat: "전용 베이킹 인프라", detail: "자체 금형 오리지널 파이 머신 1ea", note: "120겹 파이 결을 살리는 전용 베이킹 머신" },
+                      { cat: "초도 원재료 패키지", detail: "시그니처 패스트리 생지 1box + 프리미엄 필링 9종 각 1kg", note: "파이 약 200개 분량 생지와 대표 맛 필링 초도 지원" },
+                      { cat: "매장 홍보물 세트", detail: "공식 X배너 2종 + POP 5종 + 메뉴 홍보 포스터 8종", note: "매장 내외부 고객 시선을 끌기 위한 홍보물 구성" },
+                      { cat: "판매 촉진 비주얼 세트", detail: "파이 모형 4종 + 배달 플랫폼용 실사 이미지", note: "오프라인 진열과 배달앱 등록에 활용 가능한 비주얼 자료" },
+                      { cat: "운영 정착 지원", detail: "포장 부자재 세트 + 오븐 설치 및 1:1 조리 교육", note: "포장 운영, 장비 세팅, 현장 조리 교육까지 지원" }
+                    ].map((row, idx) => (
+                      <tr key={idx} className={`border-b last:border-0 ${isPink ? "border-neutral-805/50" : "border-amber-200/20"} ${textTitle} font-bold`}>
+                        <td className={`py-3 px-4 ${isPink ? "text-rose-400/80" : "text-amber-700"} font-black`}>{row.cat}</td>
+                        <td className="py-3 px-4 font-medium">{row.detail}</td>
+                        <td className={`py-3 px-4 text-[10px] sm:text-[11px] ${textDesc} font-semibold`}>{row.note}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            <div className={`lg:col-span-4 p-6 rounded-2xl text-left flex flex-col justify-between ${innerCardBgAccent} ${innerCardHover}`}>
-              <span className={`text-[10px] font-black ${textDesc} uppercase tracking-wider block`}>MODEL A DETAILS</span>
-              <div className={`space-y-3 border-b ${isPink ? "border-neutral-805" : "border-amber-200/35"} pb-4 my-3`}>
-                <div className="flex justify-between items-center text-xs font-bold">
-                  <span className={textDesc}>가맹비 (한시 혜택)</span>
-                  <span className={`${textTitle} font-extrabold line-through`}>100만 원</span>
-                </div>
-                <div className="flex justify-between items-center text-xs font-bold">
-                  <span className={textDesc}>장비 공급 비용</span>
-                  <span className={`${isPink ? "text-rose-455" : "text-amber-600"} font-extrabold text-sm`}>290만 원</span>
-                </div>
-                <div className="flex justify-between items-center text-xs font-bold">
-                  <span className={textDesc}>초도 자재 지원</span>
-                  <span className={`${textTitle} font-extrabold`}>150만 원</span>
+            {/* Package 2: 에그120 프리미엄 패키지 */}
+            <div className={`p-5 sm:p-7 rounded-2xl border ${isPink ? "border-neutral-805 bg-neutral-900/40" : "border-amber-200/50 bg-white"} shadow-sm`}>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-neutral-200/10">
+                <span className={`text-sm sm:text-base font-black px-3.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455" : "bg-orange-500/10 text-orange-600"} rounded-full`}>
+                  에그120 프리미엄 패키지
+                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-400 font-bold line-through">4,400,000원</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-lg sm:text-xl font-black text-rose-500">3,300,000</span>
+                    <span className="text-xs font-bold text-rose-500">원</span>
+                    <span className="text-[10px] text-slate-400 font-bold ml-1">VAT별도</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-between items-center font-black">
-                <span className={`text-xs ${textTitle}`}>최종 도입 금액</span>
-                <span className={`text-base ${isPink ? "text-rose-500" : "text-amber-500"}`}>440만 원</span>
+
+              {/* Table */}
+              <div className="overflow-x-auto rounded-xl border border-neutral-200/15 bg-neutral-950/5">
+                <table className="w-full text-left border-collapse text-[11px] sm:text-xs min-w-[650px] lg:min-w-0">
+                  <thead>
+                    <tr className={`border-b ${isPink ? "border-neutral-805 bg-neutral-900/40 text-rose-455" : "border-amber-200/40 bg-amber-500/5 text-amber-600"} font-bold`}>
+                      <th className="py-2.5 px-4 font-black w-[20%]">구분</th>
+                      <th className="py-2.5 px-4 font-black w-[45%]">세부 내용</th>
+                      <th className="py-2.5 px-4 font-black w-[35%]">비고</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { cat: "전용 조리 인프라", detail: "에그120 계란빵 전용 머신 1대", note: "10구 동시 생산이 가능한 에그120 전용 기기" },
+                      { cat: "초도 원재료 패키지", detail: "시그니처 전용 반죽 30kg + 토핑 식재료 4종 + 동물복지 유정란 120ea", note: "계란빵 약 720개 조리 가능한 반죽과 핵심 식재료 초도 지원" },
+                      { cat: "매장 홍보물 세트", detail: "공식 X배너 1ea + 테이블/카운티 POP 1ea + 홍보 포스터 3종", note: "매장 내외부에서 egg120 메뉴를 노출하기 위한 홍보물 구성" },
+                      { cat: "판매 촉진 비주얼 세트", detail: "계란빵 모형 4종 + 전용 미니 쇼케이스 + 동물복지 인증 매장 판넬", note: "카운터 진열, 신뢰도 강화, 주문 유도를 위한 시각 자료" },
+                      { cat: "운영 정착 지원", detail: "배달 플랫폼 셋업 대행 + 포장/부재료 패키지 + 기기 설치 및 1:1 교육", note: "배달앱 등록, 포장 운영, 장비 설치, 현장 교육까지 지원" }
+                    ].map((row, idx) => (
+                      <tr key={idx} className={`border-b last:border-0 ${isPink ? "border-neutral-805/50" : "border-amber-200/20"} ${textTitle} font-bold`}>
+                        <td className={`py-3 px-4 ${isPink ? "text-rose-400/80" : "text-amber-700"} font-black`}>{row.cat}</td>
+                        <td className="py-3 px-4 font-medium">{row.detail}</td>
+                        <td className={`py-3 px-4 text-[10px] sm:text-[11px] ${textDesc} font-semibold`}>{row.note}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Package 3: 120 시리즈 결합 패키지 */}
+            <div className={`p-5 sm:p-7 rounded-2xl border ${isPink ? "border-neutral-805 bg-neutral-900/40" : "border-amber-200/50 bg-white"} shadow-sm`}>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="space-y-3">
+                  <span className={`text-sm sm:text-base font-black px-3.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455" : "bg-orange-500/10 text-orange-600"} rounded-full inline-block`}>
+                    120 시리즈 결합 패키지 (120겹 파이 + 에그120)
+                  </span>
+                  
+                  {/* Two small product thumbnail images side by side */}
+                  <div className="flex gap-4 pt-1 items-center">
+                    <div className="flex -space-x-4">
+                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white shadow-md bg-neutral-900 shrink-0">
+                        <img 
+                          src="https://res.cloudinary.com/dfarfqx7e/image/upload/w_100,q_auto,f_auto/v1781183595/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A0%ED%94%8C_%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%97%B0%EC%B6%9C_bzyzzs.jpg" 
+                          alt="120겹 파이" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white shadow-md bg-neutral-900 shrink-0">
+                        <img 
+                          src="https://res.cloudinary.com/dfarfqx7e/image/upload/w_100,q_auto,f_auto/v1781184083/120egg_45_dqgrir.jpg" 
+                          alt="에그120 계란빵" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                    <span className={`text-xs ${textDesc} font-bold leading-normal`}>
+                      120겹 파이와 에그120 계란빵 두 가지 시그니처 메뉴를<br className="hidden sm:inline" /> 하나의 매장에 완벽하게 결합
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-end shrink-0 w-full md:w-auto border-t md:border-t-0 border-neutral-200/10 pt-3 md:pt-0">
+                  <span className="text-xs text-slate-400 font-bold line-through">9,900,000원</span>
+                  <div className="flex items-baseline gap-1 mt-0.5">
+                    <span className="text-xl sm:text-2xl font-black text-rose-500">6,900,000</span>
+                    <span className="text-xs font-bold text-rose-500">원</span>
+                    <span className="text-[11px] text-slate-400 font-bold ml-1.5">VAT별도</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1412,70 +1551,169 @@ export default function FranchisePageClient() {
         <section className={`rounded-3xl p-6 sm:p-12 ${cardBg} relative`}>
           <div className="flex items-center justify-between border-b border-neutral-200/20 pb-4 mb-8">
             <span className="text-xs font-black tracking-widest text-[#ffd500]">12 / FRANCHISE MODEL B</span>
-            <span className="text-xs font-black text-slate-400">COMPACT TAKE-OUT CAFE</span>
+            <span className="text-xs font-black text-slate-400">HYBRID TAKE-OUT CAFE</span>
           </div>
 
-          <div className="my-auto py-2 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            <div className="lg:col-span-5 space-y-4 text-left flex flex-col justify-between">
-              <div>
-                <span className={`text-xs font-black px-2.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455 border-rose-500/20" : "bg-amber-400/10 text-amber-600 border-amber-400/20"} border rounded-full`}>
-                  모델 B: 8~10평 컴팩트 매장
+          {/* Top Title, Subtitle, Wreath Badge, Hashtags */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 pb-6 border-b border-neutral-200/10">
+            <div className="text-left space-y-3">
+              <span className={`text-xs font-black px-2.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455 border-rose-500/20" : "bg-amber-400/10 text-amber-600 border-amber-400/20"} border rounded-full`}>
+                창업 모델 B
+              </span>
+              <h2 className={`text-2xl sm:text-3xl md:text-4xl font-black leading-tight ${textTitle}`}>
+                소자본<br />
+                <span className={textHighlight}>하이브리드</span> 창업
+              </h2>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <span className={`text-[11px] font-extrabold px-2.5 py-1 rounded bg-[#ffd500]/10 text-[#ffd500] border border-[#ffd500]/20`}>
+                  #기존 카페 운영하시는 사장님
                 </span>
-                <h2 className={`text-xl sm:text-2xl md:text-3xl font-black leading-tight ${textTitle} mt-3`}>
-                  포장과 홀의 황금 비율,<br />
-                  <span className={textHighlight}>1인 운영 최적화</span> 실속형 카페
-                </h2>
-                <p className={`text-xs sm:text-sm leading-relaxed ${textDesc} mt-2`}>
-                  8평~10평의 콤팩트한 매장에서 포장และ 배달, 테이블 매출을 극대화하는 정석 가맹 프로그램입니다.
-                </p>
-              </div>
-              
-              <div className={`grid grid-cols-2 gap-3 text-xs font-bold ${textDesc}`}>
-                {[
-                  "1인 운영 가능 동선 배치",
-                  "초소형 주방 특화 레이아웃",
-                  "아웃도어 주문 창구 설계",
-                  "고급 인테리어 마감 지원"
-                ].map((txt, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5">
-                    <CheckCircle2 size={12} className={isPink ? "text-rose-500" : "text-amber-500"} />
-                    <span>{txt}</span>
-                  </div>
-                ))}
+                <span className={`text-[11px] font-extrabold px-2.5 py-1 rounded bg-[#ffd500]/10 text-[#ffd500] border border-[#ffd500]/20`}>
+                  #업종 전환 최적화
+                </span>
               </div>
             </div>
 
-            <div className="lg:col-span-3 relative group">
-              <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
-                <img 
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186403/IMG_8185_jpquaf_z9ikmf.jpg" 
-                  alt="Model B Packaging box design" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-550 opacity-90"
+            {/* Laurel Wreath Badge */}
+            <div className="relative flex items-center justify-center w-36 h-32 shrink-0 mx-auto lg:mx-0">
+              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-amber-500/80">
+                {/* Left Laurel Branch */}
+                <path 
+                  d="M 45,85 C 25,80 15,60 20,40 C 23,28 32,18 45,15" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2.2" 
+                  strokeLinecap="round"
                 />
-                
+                {/* Left Leaves */}
+                <path d="M 20,65 Q 12,62 17,55 Q 23,58 21,65 Z" fill="currentColor" />
+                <path d="M 17,50 Q 8,46 14,40 Q 20,43 18,50 Z" fill="currentColor" />
+                <path d="M 22,33 Q 15,25 23,21 Q 28,27 24,33 Z" fill="currentColor" />
+                <path d="M 33,20 Q 28,10 36,8 Q 39,17 34,20 Z" fill="currentColor" />
+
+                {/* Right Laurel Branch */}
+                <path 
+                  d="M 55,85 C 75,80 85,60 80,40 C 77,28 68,18 55,15" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2.2" 
+                  strokeLinecap="round"
+                />
+                {/* Right Leaves */}
+                <path d="M 80,65 Q 88,62 83,55 Q 77,58 79,65 Z" fill="currentColor" />
+                <path d="M 83,50 Q 92,46 86,40 Q 80,43 82,50 Z" fill="currentColor" />
+                <path d="M 78,33 Q 85,25 77,21 Q 72,27 76,33 Z" fill="currentColor" />
+                <path d="M 67,20 Q 72,10 64,8 Q 61,17 66,20 Z" fill="currentColor" />
+              </svg>
+              
+              <div className="z-10 flex flex-col items-center text-center">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-amber-500 mb-0.5">
+                  <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7z" />
+                  <path d="M3 20h18" />
+                </svg>
+                <span className="text-[7px] text-amber-500 tracking-wider -mt-0.5 mb-0.5">★★★★★</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span className="text-3xl font-black text-rose-500 tracking-tight">980</span>
+                  <span className="text-xs font-black text-rose-500">만원</span>
+                </div>
+                <span className="text-[9px] font-bold text-slate-450 -mt-0.5">VAT 별도</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch text-left">
+            {/* Left Info: 하이브리드 창업이란? */}
+            <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
+              <div className={`p-5 rounded-2xl border ${isPink ? "bg-neutral-900/30 border-rose-500/20" : "bg-amber-400/5 border-amber-300"} h-full flex flex-col justify-center`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`text-xs font-black px-2.5 py-1 rounded ${isPink ? "bg-rose-500/20 text-rose-455" : "bg-amber-400 text-neutral-900"} font-bold`}>
+                    하이브리드 창업이란?
+                  </span>
+                </div>
+                <ul className={`space-y-2.5 text-xs font-bold ${textDesc}`}>
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-500 mt-0.5 shrink-0">✔</span>
+                    <span>인테리어 장비의 부담을 없애고 간판과 사인물 교체만으로 창업</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-500 mt-0.5 shrink-0">✔</span>
+                    <span>메뉴와 홍보를 중심으로 실질적인 매출 중점 관리</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-500 mt-0.5 shrink-0">✔</span>
+                    <span>로열티 등 추가 비용 면제</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            <div className={`lg:col-span-4 p-6 rounded-2xl text-left flex flex-col justify-between ${innerCardBgAccent} ${innerCardHover}`}>
-              <span className={`text-[10px] font-black ${textDesc} uppercase tracking-wider block`}>MODEL B BUDGET</span>
-              <div className={`space-y-3 border-b ${isPink ? "border-neutral-805" : "border-amber-200/35"} pb-4 my-3`}>
-                <div className="flex justify-between items-center text-xs font-bold">
-                  <span className={textDesc}>가맹 계약비</span>
-                  <span className={`${textTitle} font-extrabold`}>200만 원</span>
+            {/* Right: Pricing Table details */}
+            <div className="lg:col-span-7 flex flex-col justify-between">
+              <div className={`p-5 sm:p-6 rounded-2xl border ${isPink ? "border-neutral-805 bg-neutral-900/40" : "border-amber-200/50 bg-white"} shadow-sm h-full`}>
+                <div className="flex justify-between items-center mb-3">
+                  <span className={`text-xs font-black ${isPink ? "text-rose-455" : "text-amber-600"} uppercase tracking-wider block`}>
+                    10평대 창업비 <span className="text-[10px] text-slate-455 ml-1 font-mono">HYBRID START UP COST</span>
+                  </span>
+                  <span className="text-[10px] text-slate-450 font-bold">VAT별도</span>
                 </div>
-                <div className="flex justify-between items-center text-xs font-bold">
-                  <span className={textDesc}>인테리어 (10평 기준)</span>
-                  <span className={`${textTitle} font-extrabold`}>1,500만 원</span>
-                </div>
-                <div className="flex justify-between items-center text-xs font-bold">
-                  <span className={textDesc}>간판 및 기기 세팅</span>
-                  <span className={`${textTitle} font-extrabold`}>800만 원</span>
+
+                <div className="overflow-x-auto rounded-xl border border-neutral-200/15 bg-neutral-950/5">
+                  <table className="w-full text-left border-collapse text-[11px] sm:text-xs min-w-[500px] lg:min-w-0">
+                    <thead>
+                      <tr className={`border-b ${isPink ? "border-neutral-805 bg-neutral-900/40 text-rose-455" : "border-amber-200/40 bg-amber-500/5 text-amber-600"} font-bold`}>
+                        <th className="py-2 px-3 font-black w-[18%]">구분</th>
+                        <th className="py-2 px-3 font-black w-[50%]">세부 내용</th>
+                        <th className="py-2 px-3 font-black text-right w-[17%]">금액</th>
+                        <th className="py-2 px-3 font-black w-[15%]">비고</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { cat: "가맹비", detail: "120겹파이 브랜드에 대한 상권 내 독점 사용권, 교육 및 개점 지원 등", price: "100만원", note: "소멸성" },
+                        { cat: "장비", detail: "파이 머신, 계란빵 머신 외", price: "150만원", note: "기본 품목 외 별도" },
+                        { cat: "간판", detail: "전면 돌출 실사 어닝 외", price: "300만원", note: "현장 상황에 따라 상이함" },
+                        { cat: "물품(초도)", detail: "식재료, 원부자재, 유니폼, 메뉴판, 배너, 현수막, 시트지 및 각종 홍보물", price: "300만원", note: "-" },
+                        { cat: "홍보비", detail: "사전 이벤트, 스마트 플레이스 등록 세팅, 배민, 쿠팡잇츠, 요기요 등록 세팅, 인스타/당근 타깃 마케팅, 네이버 블로그 마케팅, 그랜드 오픈 현수막/배너", price: "130만원", note: "-" }
+                      ].map((row, idx) => (
+                        <tr key={idx} className={`border-b last:border-0 ${isPink ? "border-neutral-850/50" : "border-amber-200/20"} ${textTitle} font-bold`}>
+                          <td className={`py-2 px-3 ${isPink ? "text-rose-400/80" : "text-amber-700"} font-black`}>{row.cat}</td>
+                          <td className="py-2 px-3 font-medium text-[10.5px] leading-relaxed">{row.detail}</td>
+                          <td className="py-2 px-3 text-right font-black text-rose-500 whitespace-nowrap">{row.price}</td>
+                          <td className={`py-2 px-3 text-[10px] ${textDesc} font-semibold`}>{row.note}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-              <div className="flex justify-between items-center font-black">
-                <span className={`text-xs ${textTitle}`}>예상 창업 비용</span>
-                <span className={`text-base ${isPink ? "text-rose-500" : "text-amber-500"}`}>2,500만 원 대</span>
-              </div>
+            </div>
+          </div>
+
+          {/* Bullet notes below */}
+          <div className={`mt-6 p-4 rounded-xl border ${isPink ? "bg-neutral-950/40 border-neutral-850 text-slate-400" : "bg-amber-500/5 border-amber-200/30 text-slate-500"} text-[10.5px] sm:text-xs font-bold text-left space-y-1`}>
+            <p className="flex items-start gap-1.5">
+              <span>•</span>
+              <span>점주가 직접 시공 가능 (단, 감리는 본사 진행)</span>
+            </p>
+            <p className="flex items-start gap-1.5">
+              <span>•</span>
+              <span>상기 비용은 본사 매뉴얼에 따른 창업 비용이며, 점포의 면적, 상권, 가맹점 형태에 따라 금액은 변동될 수 있습니다.</span>
+            </p>
+            <p className="flex items-start gap-1.5">
+              <span>•</span>
+              <span>인테리어 개별 시공 및 부분 시공이 가능하며 도면, 설계, 감리는 무료입니다.</span>
+            </p>
+          </div>
+
+          {/* Bottom Storefront Image */}
+          <div className="mt-8 rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[21/9] sm:aspect-[32/10] bg-neutral-950 w-full relative group">
+            <img 
+              src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590223/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_02_58_dhg5yy.png" 
+              alt="120PIE COFFEE store storefront exterior" 
+              className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700 opacity-90"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-4">
+              <span className="text-white text-xs sm:text-sm font-black drop-shadow">120PIE COFFEE 대표 가맹점 전경</span>
             </div>
           </div>
 
@@ -1492,67 +1730,189 @@ export default function FranchisePageClient() {
             <span className="text-xs font-black text-slate-400">PREMIUM CAFE & BRUNCH</span>
           </div>
 
-          <div className="my-auto py-2 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            <div className="lg:col-span-5 space-y-4 text-left flex flex-col justify-between">
-              <div>
-                <span className={`text-xs font-black px-2.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455 border-rose-500/20" : "bg-amber-400/10 text-amber-600 border-amber-400/20"} border rounded-full`}>
-                  모델 C: 15평 이상 프리미엄 카페
+          {/* Top Title, Subtitle, Wreath Badge, Hashtags */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 pb-6 border-b border-neutral-200/10">
+            <div className="text-left space-y-3">
+              <span className={`text-xs font-black px-2.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455 border-rose-500/20" : "bg-amber-400/10 text-amber-600 border-amber-400/20"} border rounded-full`}>
+                창업 모델 C
+              </span>
+              <h2 className={`text-2xl sm:text-3xl md:text-4xl font-black leading-tight ${textTitle}`}>
+                신규 가맹<br />
+                <span className={textHighlight}>정식 창업</span>
+              </h2>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <span className={`text-[11px] font-extrabold px-2.5 py-1 rounded bg-[#ffd500]/10 text-[#ffd500] border border-[#ffd500]/20`}>
+                  #신규 창업을 준비하는 예비 점주님
                 </span>
-                <h2 className={`text-xl sm:text-2xl md:text-3xl font-black leading-tight ${textTitle} mt-3`}>
-                  브런치 라인업 강화,<br />
-                  <span className={textHighlight}>고객 체류 시간</span>을 늘리는 프리미엄형
-                </h2>
-                <p className={`text-xs sm:text-sm leading-relaxed ${textDesc} mt-2`}>
-                  넓은 홀 테이블을 통해 디저트뿐만 아니라 음료, 브런치 매출의 동반 성장을 이끄는 고수익 플래그십 매장입니다.
-                </p>
-              </div>
-              
-              <div className={`grid grid-cols-2 gap-3 text-xs font-bold ${textDesc}`}>
-                {[
-                  "단독 테이블 홀 좌석 확보",
-                  "플레이팅 디저트 세트 공급",
-                  "단체 세미나 및 주부 고객 유치",
-                  "매장 랜드마크화 디자인"
-                ].map((txt, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5">
-                    <CheckCircle2 size={12} className={isPink ? "text-rose-500" : "text-amber-500"} />
-                    <span>{txt}</span>
-                  </div>
-                ))}
+                <span className={`text-[11px] font-extrabold px-2.5 py-1 rounded bg-[#ffd500]/10 text-[#ffd500] border border-[#ffd500]/20`}>
+                  #홀&배달 동시 운영을 희망하는 점주님
+                </span>
               </div>
             </div>
 
-            <div className="lg:col-span-3 relative group">
-              <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
-                <img 
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186418/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns_myousq.png" 
-                  alt="Model C premium kitchen cafe interior mockup" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+            {/* Laurel Wreath Badge */}
+            <div className="relative flex items-center justify-center w-36 h-32 shrink-0 mx-auto lg:mx-0">
+              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-amber-500/80">
+                {/* Left Laurel Branch */}
+                <path 
+                  d="M 45,85 C 25,80 15,60 20,40 C 23,28 32,18 45,15" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2.2" 
+                  strokeLinecap="round"
                 />
-                
+                {/* Left Leaves */}
+                <path d="M 20,65 Q 12,62 17,55 Q 23,58 21,65 Z" fill="currentColor" />
+                <path d="M 17,50 Q 8,46 14,40 Q 20,43 18,50 Z" fill="currentColor" />
+                <path d="M 22,33 Q 15,25 23,21 Q 28,27 24,33 Z" fill="currentColor" />
+                <path d="M 33,20 Q 28,10 36,8 Q 39,17 34,20 Z" fill="currentColor" />
+
+                {/* Right Laurel Branch */}
+                <path 
+                  d="M 55,85 C 75,80 85,60 80,40 C 77,28 68,18 55,15" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2.2" 
+                  strokeLinecap="round"
+                />
+                {/* Right Leaves */}
+                <path d="M 80,65 Q 88,62 83,55 Q 77,58 79,65 Z" fill="currentColor" />
+                <path d="M 83,50 Q 92,46 86,40 Q 80,43 82,50 Z" fill="currentColor" />
+                <path d="M 78,33 Q 85,25 77,21 Q 72,27 76,33 Z" fill="currentColor" />
+                <path d="M 67,20 Q 72,10 64,8 Q 61,17 66,20 Z" fill="currentColor" />
+              </svg>
+              
+              <div className="z-10 flex flex-col items-center text-center">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-amber-500 mb-0.5">
+                  <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7z" />
+                  <path d="M3 20h18" />
+                </svg>
+                <span className="text-[7px] text-amber-500 tracking-wider -mt-0.5 mb-0.5">★★★★★</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span className="text-3xl font-black text-rose-500 tracking-tight">6,518</span>
+                  <span className="text-xs font-black text-rose-500">만원</span>
+                </div>
+                <span className="text-[9px] font-bold text-slate-450 -mt-0.5">VAT 별도</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Pricing Tables Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-left items-stretch">
+            {/* Table 1: 기본 비용 */}
+            <div className={`p-5 sm:p-6 rounded-2xl border ${isPink ? "border-neutral-805 bg-neutral-900/40" : "border-amber-200/50 bg-white"} shadow-sm flex flex-col justify-between`}>
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <span className={`text-xs font-black ${isPink ? "text-rose-455" : "text-amber-600"} uppercase tracking-wider block`}>
+                    ■ 기본 비용 - 1,040만원
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-bold">VAT별도</span>
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-neutral-200/15 bg-neutral-950/5">
+                  <table className="w-full text-left border-collapse text-[11px] sm:text-xs min-w-[480px] lg:min-w-0">
+                    <thead>
+                      <tr className={`border-b ${isPink ? "border-neutral-805 bg-neutral-900/40 text-rose-455" : "border-amber-200/40 bg-amber-500/5 text-amber-600"} font-bold`}>
+                        <th className="py-2 px-3 font-black w-[20%]">구분</th>
+                        <th className="py-2 px-3 font-black w-[50%]">세부 내용</th>
+                        <th className="py-2 px-3 font-black text-right w-[17%]">금액</th>
+                        <th className="py-2 px-3 font-black w-[13%]">비고</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { cat: "가맹비", detail: "120겹파이 브랜드에 대한 상권 내 독점 사용권, 교육 및 개점 지원 등", price: "500만원", note: "소멸성" },
+                        { cat: "초도 물품비", detail: "원부자재, 유니폼, 메뉴판, 배너, 현수막, 시트지 및 각종 홍보물", price: "440만원", note: "-" },
+                        { cat: "계약 이행 보증금", detail: "보증금", price: "100만원", note: "만기 상환" },
+                        { cat: "로열티", detail: "시즌 마케팅 각종 스팟성 홍보물", price: "11만원", note: "월납" }
+                      ].map((row, idx) => (
+                        <tr key={idx} className={`border-b last:border-0 ${isPink ? "border-neutral-850/50" : "border-amber-200/20"} ${textTitle} font-bold`}>
+                          <td className={`py-2.5 px-3 ${isPink ? "text-rose-400/80" : "text-amber-700"} font-black`}>{row.cat}</td>
+                          <td className="py-2.5 px-3 font-medium text-[10.5px] leading-relaxed">{row.detail}</td>
+                          <td className="py-2.5 px-3 text-right font-black text-rose-500 whitespace-nowrap">{row.price}</td>
+                          <td className={`py-2.5 px-3 text-[10px] ${textDesc} font-semibold`}>{row.note}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
-            <div className={`lg:col-span-4 p-6 rounded-2xl text-left flex flex-col justify-between ${innerCardBgAccent} ${innerCardHover}`}>
-              <span className={`text-[10px] font-black ${textDesc} uppercase tracking-wider block`}>MODEL C BUDGET</span>
-              <div className={`space-y-3 border-b ${isPink ? "border-neutral-805" : "border-amber-200/35"} pb-4 my-3`}>
-                <div className="flex justify-between items-center text-xs font-bold">
-                  <span className={textDesc}>가맹 계약 및 교육</span>
-                  <span className={`${textTitle} font-extrabold`}>300만 원</span>
+            {/* Table 2: 기타 비용 */}
+            <div className={`p-5 sm:p-6 rounded-2xl border ${isPink ? "border-neutral-805 bg-neutral-900/40" : "border-amber-200/50 bg-white"} shadow-sm flex flex-col justify-between`}>
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <span className={`text-xs font-black ${isPink ? "text-rose-455" : "text-amber-600"} uppercase tracking-wider block`}>
+                    ■ 기타 비용 - 5,478만원
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-bold">VAT별도</span>
                 </div>
-                <div className="flex justify-between items-center text-xs font-bold">
-                  <span className={textDesc}>인테리어 (15평 기준)</span>
-                  <span className={`${textTitle} font-extrabold`}>2,200만 원</span>
-                </div>
-                <div className="flex justify-between items-center text-xs font-bold">
-                  <span className={textDesc}>기기 설비 및 집기</span>
-                  <span className={`${textTitle} font-extrabold`}>1,100만 원</span>
+
+                <div className="overflow-x-auto rounded-xl border border-neutral-200/15 bg-neutral-950/5">
+                  <table className="w-full text-left border-collapse text-[11px] sm:text-xs min-w-[480px] lg:min-w-0">
+                    <thead>
+                      <tr className={`border-b ${isPink ? "border-neutral-805 bg-neutral-900/40 text-rose-455" : "border-amber-200/40 bg-amber-500/5 text-amber-600"} font-bold`}>
+                        <th className="py-2 px-3 font-black w-[22%]">구분</th>
+                        <th className="py-2 px-3 font-black w-[48%]">세부 내용</th>
+                        <th className="py-2 px-3 font-black text-right w-[17%]">금액</th>
+                        <th className="py-2 px-3 font-black w-[13%]">비고</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { cat: "인테리어 / 시설", detail: "목공, 전기, 도장, 조명, 타일, 미장, 설계 및 감리", price: "2,850만원", note: "평당 190만원" },
+                        { cat: "주방 / 주방 집기류", detail: "싱크대, 디스펜서, 제빙기, 서랍식 냉장고, 커피머신", price: "2,200만원", note: "기본 품목 외 별도" },
+                        { cat: "간판", detail: "전면 돌출 실사 등", price: "330만원", note: "현장 상황에 따라 상이함" },
+                        { cat: "기타", detail: "키오스크, 포스 주방 관련, 의탁자", price: "440만원", note: "-" }
+                      ].map((row, idx) => (
+                        <tr key={idx} className={`border-b last:border-0 ${isPink ? "border-neutral-850/50" : "border-amber-200/20"} ${textTitle} font-bold`}>
+                          <td className={`py-2.5 px-3 ${isPink ? "text-rose-400/80" : "text-amber-700"} font-black`}>{row.cat}</td>
+                          <td className="py-2.5 px-3 font-medium text-[10.5px] leading-relaxed">{row.detail}</td>
+                          <td className="py-2.5 px-3 text-right font-black text-rose-500 whitespace-nowrap">{row.price}</td>
+                          <td className={`py-2.5 px-3 text-[10px] ${textDesc} font-semibold`}>{row.note}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-              <div className="flex justify-between items-center font-black">
-                <span className={`text-xs ${textTitle}`}>예상 창업 비용</span>
-                <span className={`text-base ${isPink ? "text-rose-500" : "text-amber-500"}`}>3,600만 원 대</span>
-              </div>
+            </div>
+          </div>
+
+          {/* Bullet notes below */}
+          <div className={`mt-6 p-4 rounded-xl border ${isPink ? "bg-neutral-950/40 border-neutral-850 text-slate-400" : "bg-amber-500/5 border-amber-200/30 text-slate-500"} text-[10.5px] sm:text-xs font-bold text-left space-y-1`}>
+            <p className="flex items-start gap-1.5">
+              <span>•</span>
+              <span>점주가 직접 시공 가능 (단, 감리는 본사 진행)</span>
+            </p>
+            <p className="flex items-start gap-1.5">
+              <span>•</span>
+              <span>점포 투자 비용은 규모의 특성에 따라 달라질 수 있으며 부가세는 별도입니다.</span>
+            </p>
+            <p className="flex items-start gap-1.5">
+              <span>•</span>
+              <span>의탁자, 메뉴보드는 옵션입니다.</span>
+            </p>
+            <p className="flex items-start gap-1.5">
+              <span>•</span>
+              <span>간판 및 모든 조명은 효율성이 높은 LED 전구를 기본으로 채택, 사용합니다.</span>
+            </p>
+            <p className="flex items-start gap-1.5">
+              <span>•</span>
+              <span>철거, 전기 증설, 소방 경비 외 계약서에 명시된 별도 공사 내역, 간판, 가구, 아웃테리어는 현장 견적으로 별도입니다.</span>
+            </p>
+          </div>
+
+          {/* Bottom Store Interior Mockup Image */}
+          <div className="mt-8 rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[21/9] sm:aspect-[32/10] bg-neutral-950 w-full relative group">
+            <img 
+              src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590220/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_12_23_dqjfic.png" 
+              alt="120PIE COFFEE store interior setup mockup" 
+              className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700 opacity-90"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-4">
+              <span className="text-white text-xs sm:text-sm font-black drop-shadow">120PIE COFFEE 가맹점 내부 인프라</span>
             </div>
           </div>
 
@@ -1566,161 +1926,204 @@ export default function FranchisePageClient() {
         <section className={`rounded-3xl p-6 sm:p-12 ${cardBg} relative`}>
           <div className="flex items-center justify-between border-b border-neutral-200/20 pb-4 mb-8">
             <span className="text-xs font-black tracking-widest text-[#ffd500]">14 / FRANCHISE PROCESS</span>
-            <span className="text-xs font-black text-slate-400">7-STEP LAUNCH ROADMAP</span>
+            <span className="text-xs font-black text-slate-400">5-STEP LAUNCH ROADMAP</span>
           </div>
 
           <div className="space-y-10">
-            <div className="text-center md:text-left space-y-3">
-              <h2 className="text-2xl sm:text-3xl font-black">
-                체계적인 <span className={textHighlight}>7단계 개점 프로세스</span>
-              </h2>
-              <p className={`text-sm sm:text-base leading-relaxed ${textDesc}`}>
-                상담 신청부터 최종 그랜드 오픈까지 본사 개점 전담팀이 밀착하여 케어합니다.
-              </p>
-            </div>
+            {/* Top row: Left Title, Right Support points */}
+            <div className="flex flex-col lg:flex-row justify-between items-stretch gap-6 text-left">
+              {/* Left Title & Subtitle */}
+              <div className="flex flex-col justify-center space-y-3 lg:w-[45%]">
+                <span className="text-xs font-bold text-amber-500 tracking-wider uppercase font-mono">
+                  Franchise Process
+                </span>
+                <h2 className={`text-3xl sm:text-4xl font-black leading-tight ${textTitle}`}>
+                  체계적인 <br />
+                  <span className={textHighlight}>창업 절차</span>
+                </h2>
+                <p className={`text-sm sm:text-base leading-relaxed ${textDesc} font-bold pt-1`}>
+                  계약부터 오픈 이후 사후관리까지, 본사의 밀착 케어 시스템으로 안정적인 창업을 지원합니다.
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left">
-              <div className="lg:col-span-8 relative">
-                {/* Connecting Line */}
-                <div className={`absolute left-6 top-4 bottom-4 w-0.5 ${isPink ? "bg-neutral-805" : "bg-amber-200/50"} z-0`}></div>
-                <div className="space-y-4 relative z-10">
+              {/* Right Support Points Card */}
+              <div className={`p-5 sm:p-6 rounded-2xl border ${isPink ? "bg-neutral-900/30 border-rose-500/20" : "bg-amber-400/5 border-amber-200/40"} lg:w-[50%] flex flex-col justify-center`}>
+                <h3 className={`text-xs font-black tracking-wider ${isPink ? "text-rose-455" : "text-amber-600"} mb-4 text-center lg:text-left`}>
+                  본사 지원 포인트
+                </h3>
+                <div className="grid grid-cols-2 gap-3.5">
                   {[
-                    { step: "01", name: "상담 신청", desc: "도입 형태 및 평수 진단", icon: <Info size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
-                    { step: "02", name: "상권 분석", desc: "배달 및 타깃 분석", icon: <Search size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
-                    { step: "03", name: "가맹 계약", desc: "세부 혜택 및 체결", icon: <FileText size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
-                    { step: "04", name: "도면 설계", desc: "1인 동선 배치도 확정", icon: <Building2 size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
-                    { step: "05", name: "기기 교육", desc: "1:1 레시피/조리 마스터", icon: <ChefHat size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
-                    { step: "06", name: "오픈 리허설", desc: "최종 가동 테스트", icon: <Sliders size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
-                    { step: "07", name: "그랜드 오픈", desc: "매출 활성화 마케팅", icon: <Sparkles size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> }
-                  ].map((row, idx) => (
-                    <div key={idx} className="flex items-center gap-4 hover:scale-[1.01] transition-transform duration-200">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black shrink-0 border transition-all duration-300 shadow-md ${isPink ? "bg-neutral-950 border-neutral-800 text-rose-500" : "bg-white border-amber-200/60 text-amber-600"}`}>
-                        {row.step}
-                      </div>
-                      <div className={`flex-1 p-3.5 rounded-xl ${innerCardBg} ${innerCardHover} border ${isPink ? "border-neutral-850/60" : "border-amber-250/20"} flex items-center justify-between`}>
-                        <div>
-                          <h4 className={`text-xs sm:text-sm font-black ${textTitle}`}>{row.name}</h4>
-                          <p className={`text-[10px] ${textDesc} leading-relaxed font-semibold mt-0.5`}>{row.desc}</p>
-                        </div>
-                        <div className={`p-1.5 rounded-lg ${isPink ? "bg-neutral-950/60" : "bg-amber-100/40"}`}>
-                          {row.icon}
-                        </div>
-                      </div>
+                    { label: "상권 분석", icon: <MapPin className="w-4 h-4 shrink-0" /> },
+                    { label: "메뉴 교육", icon: <ChefHat className="w-4 h-4 shrink-0" /> },
+                    { label: "오픈 세팅", icon: <Store className="w-4 h-4 shrink-0" /> },
+                    { label: "사후 관리", icon: <Users className="w-4 h-4 shrink-0" /> }
+                  ].map((item, idx) => (
+                    <div 
+                      key={idx} 
+                      className={`flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-sm justify-center font-black transition-all duration-300 hover:scale-[1.02] ${
+                        isPink 
+                          ? "bg-rose-500/10 hover:bg-rose-500/20 text-rose-200 border border-rose-500/20" 
+                          : "bg-[#ffd500] hover:bg-[#ffe14d] text-neutral-900"
+                      }`}
+                    >
+                      {item.icon}
+                      <span className="text-xs sm:text-sm tracking-wide">{item.label}</span>
                     </div>
                   ))}
                 </div>
               </div>
-
-              <div className="lg:col-span-4 relative group">
-                <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/6] bg-neutral-950 w-full h-full min-h-[350px]">
-                  <img 
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186607/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_51_40_ahiniz_e6b27f.png" 
-                    alt="Process marketing material" 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500">
-            <span>* 상담부터 평균 개점 소요 기간: 샵인샵 7일, 신규창업 21일</span>
-            <span>Slide 14 / 16</span>
-          </div>
-        </section>
-
-        {/* SECTION 15. 도입 이유 (WHY PARTNER WITH US) */}
-        <section className={`rounded-3xl p-6 sm:p-12 ${cardBg} relative`}>
-          <div className="flex items-center justify-between border-b border-neutral-200/20 pb-4 mb-8">
-            <span className="text-xs font-black tracking-widest text-[#ffd500]">15 / FRANCHISE VALUE</span>
-            <span className="text-xs font-black text-slate-400">PARTNER BENEFITS SUMMARY</span>
-          </div>
-
-          <div className="space-y-10">
-            <div className="text-center md:text-left space-y-3">
-              <h2 className="text-2xl sm:text-3xl font-black">
-                점주님들이 120pie를 <span className={textHighlight}>선택한 결정적인 이유</span>
-              </h2>
-              <p className={`text-sm sm:text-base leading-relaxed ${textDesc}`}>
-                본사 수익보다 가맹점주님의 마진을 최우선으로 생각하는 브랜드 정책입니다.
-              </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left">
-              <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Bottom row: Steps list on left, Photos stack on right */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch text-left">
+              {/* Left Column: Steps (01 to 05) */}
+              <div className="lg:col-span-7 flex flex-col justify-between gap-4">
                 {[
-                  { title: "로열티 0% 선언", desc: "매월 발생하는 매출 비례 가맹금이나 광고 분담금 일절 청구 없음", icon: <Percent size={16} /> },
-                  { title: "가맹비 전액 환급 프로그램", desc: "일정 물량 소화 또는 매출 기준 달성 시 보증금처럼 환원", icon: <Award size={16} /> },
-                  { title: "100% 완제품 생지 공급", desc: "반죽, 재료 손질 없이 오븐기 하나로 전문 베이커리 퀄리티 구현", icon: <ChefHat size={16} /> },
-                  { title: "강력한 시즌 메뉴 호환", desc: "파이 머신 외에 계란빵 머신 무상 대여로 겨울철 추가 매출 확보", icon: <Sparkles size={16} /> }
-                ].map((item, idx) => (
-                  <div key={idx} className={`p-5 rounded-2xl ${innerCardBgAccent} border ${isPink ? "border-neutral-850" : "border-amber-250/20"} flex items-start gap-4 text-left h-[130px] ${innerCardHover}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isPink ? "bg-rose-500/10 text-rose-500" : "bg-amber-400/10 text-amber-600"}`}>
-                      {item.icon}
+                  { num: "01", title: "창업 상담 및 매장 상황/상권 분석" },
+                  { num: "02", title: "아이템 선정 및 맞춤형 가맹 계약" },
+                  { num: "03", title: "본사 전문가의 메뉴 교육 및 파이 레시피 제공" },
+                  { num: "04", title: "본사 패키지 세팅 및 매장 그랜드 오픈" },
+                  { num: "05", title: "지속적인 신메뉴 개발 및 철저한 사후 매출 관리" }
+                ].map((step, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`flex items-stretch rounded-2xl border transition-all duration-300 hover:scale-[1.01] overflow-hidden ${
+                      isPink 
+                        ? "bg-neutral-900/40 border-neutral-805/70 hover:border-rose-500/30" 
+                        : "bg-[#fffdeb] border-amber-250/40 hover:border-amber-400"
+                    }`}
+                  >
+                    {/* Step Number Badge */}
+                    <div className={`w-14 flex items-center justify-center font-black shrink-0 text-white ${
+                      isPink 
+                        ? "bg-gradient-to-br from-rose-600 to-pink-500" 
+                        : "bg-gradient-to-br from-[#ff6600] to-[#e64c00]"
+                    }`}>
+                      {step.num}
                     </div>
-                    <div>
-                      <h4 className={`text-sm font-black ${textTitle}`}>{item.title}</h4>
-                      <p className={`text-[11px] ${textDesc} leading-relaxed font-semibold mt-1`}>{item.desc}</p>
+                    <div className="flex-1 py-3 px-5 flex items-center">
+                      <h4 className={`text-xs sm:text-sm font-black leading-snug ${textTitle}`}>
+                        {step.title}
+                      </h4>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="lg:col-span-4 relative group">
-                <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950">
-                  <img 
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186632/EGG120_%EB%8F%99%EB%AC%BC%EB%B3%B5%EC%A7%80_%ED%8C%9D%EC%97%85POPUP__240613_jqil66_dl8hjh.jpg" 
-                    alt="Egg120 animal welfare pop-up" 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
-                  />
+              {/* Right Column: 3 Photos Stack */}
+              <div className="lg:col-span-5 flex flex-col justify-between gap-4">
+                {[
+                  { src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590221/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_44_02_dvfuq7.png", alt: "창업 상담 및 매장 상황 분석" },
+                  { src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590220/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_25_41_psjtvg.png", alt: "본사 전문가의 메뉴 조리 교육" },
+                  { src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590223/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_25_48_ab8bal.png", alt: "매장 매출 관리 및 사후 지원" }
+                ].map((photo, idx) => (
+                  <div 
+                    key={idx} 
+                    className="relative rounded-2xl overflow-hidden border border-neutral-200/10 shadow-lg aspect-[21/9] sm:aspect-[24/8] bg-neutral-950 w-full group flex-1 min-h-[100px]"
+                  >
+                    <img 
+                      src={photo.src} 
+                      alt={photo.alt} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent flex items-end p-3">
+                      <span className="text-white text-[11px] sm:text-xs font-bold drop-shadow">
+                        {photo.alt}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500">
+            <span>* 가맹 형태 및 매장 여건에 따라 일정은 변동될 수 있습니다.</span>
+            <span>Slide 14 / 16</span>
+          </div>
+        </section>
+
+        {/* SECTION 15. 뒷면 (Back Cover) / CTA */}
+        <section className={`rounded-3xl p-6 sm:p-12 md:p-16 ${cardBg} relative overflow-hidden`}>
+          <div className="absolute inset-0 bg-gradient-to-tr from-amber-400/5 via-transparent to-transparent pointer-events-none"></div>
+
+          <div className="flex items-center justify-between border-b border-neutral-200/20 pb-6 mb-8">
+            <span className="text-xs font-black tracking-widest text-[#ffd500]">15 / BACK COVER</span>
+            <span className={`text-xs font-bold ${isPink ? "text-rose-500" : "text-amber-600"} font-mono`}>120PIE & COFFEE</span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left my-auto py-6">
+            {/* Left persuasive details column */}
+            <div className="lg:col-span-7 space-y-6">
+              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black leading-tight ${textTitle}`}>
+                성공적인 창업의 시작,<br />
+                <span className={textHighlight}>120pie & coffee</span>가 확실한 해답입니다.
+              </h2>
+              
+              <p className={`text-sm sm:text-base leading-relaxed ${textDesc} font-bold`}>
+                창업은 무모한 모험이 아닌 철저히 계산된 비즈니스여야 합니다. 120pie만의 독자적인 베이킹 기술과 1인 운영 특화 시스템으로 리스크 없는 성공 가도를 함께 걷겠습니다. 망설이지 마시고 기회를 잡으세요.
+              </p>
+
+              {/* Value checklists */}
+              <div className="space-y-3 pt-2">
+                {[
+                  { title: "초기 밀착 마케팅 케어", desc: "스마트플레이스 최적화, 타깃형 SNS 마케팅, 네이버 블로그 전폭 지원", icon: "🚀" },
+                  { title: "동종 업계 최고 수준 마진율", desc: "원재료 직배송 콜드체인 공급망 혁신을 통한 점주 마진 극대화", icon: "📈" },
+                  { title: "로열티 / 광고 분담금 / 재계약비 3無", desc: "가맹점의 성공이 본사의 성공이라는 철저한 상생 파트너십 구축", icon: "🤝" }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
+                    <div>
+                      <h4 className={`text-xs sm:text-sm font-black ${textTitle}`}>{item.title}</h4>
+                      <p className={`text-[11px] sm:text-xs ${textDesc} font-semibold leading-relaxed mt-0.5`}>{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-3 pt-6">
+                <button 
+                  type="button"
+                  onClick={handlePrintPage}
+                  className={`inline-flex items-center justify-center px-5 py-3 rounded-xl border font-extrabold text-sm cursor-pointer transition-all shadow-md ${isPink ? "bg-neutral-900 border-neutral-800 text-white hover:bg-neutral-800" : "bg-white border-amber-250/70 text-slate-755 hover:bg-amber-50/50"}`}
+                >
+                  <FileText size={16} className={`mr-2 ${isPink ? "text-rose-500" : "text-amber-500"}`} /> 제안서 PDF 저장/인쇄
+                </button>
+                <a 
+                  href="#inquiry-form-section"
+                  className={`inline-flex items-center justify-center px-6 py-3 rounded-xl font-extrabold text-sm transition-all shadow-md hover:scale-[1.02] cursor-pointer ${isPink ? "bg-rose-500 text-white hover:bg-rose-600 shadow-rose-500/10" : "bg-amber-400 text-neutral-900 hover:bg-amber-300 shadow-amber-400/10"}`}
+                >
+                  가맹 상담 신청서 작성하기
+                </a>
+              </div>
+            </div>
+
+            {/* Right large hero image column */}
+            <div className="lg:col-span-5 relative group">
+              <div className="relative rounded-3xl overflow-hidden border border-neutral-200/20 shadow-2xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[350px]">
+                <img 
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590221/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_24_39_a38n7c.png" 
+                  alt="120PIE COFFEE premium success storefront and menu" 
+                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 opacity-90"
+                />
+                
+                {/* Floating Social Proof Badge */}
+                <div className="absolute top-4 left-4 right-4 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl py-3 px-4 text-center">
+                  <span className="text-[#ffd500] text-xs sm:text-sm font-black tracking-wide drop-shadow">
+                    ★ 누적 가맹 및 샵인샵 도입 150호점 돌파 ★
+                  </span>
+                </div>
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
+                  <span className="text-white text-xs font-bold opacity-80">120PIE & COFFEE 프리미엄 매장 전경</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500">
-            <span>* 가맹 공정거래위원회 표준 약관 및 가맹 계약 내용 준수</span>
-            <span>Slide 15 / 16</span>
-          </div>
-        </section>
-
-        {/* SECTION 16. 뒷면 (Back Cover) */}
-        <section className={`rounded-3xl p-6 sm:p-12 md:p-16 ${cardBg} flex flex-col justify-between min-h-[460px] relative overflow-hidden text-center`}>
-          <div className="absolute inset-0 bg-gradient-to-tr from-amber-400/5 to-transparent pointer-events-none"></div>
-
-          <div className="flex items-center justify-between border-b border-neutral-200/20 pb-6 mb-6">
-            <span className="text-xs font-black tracking-widest text-slate-500">16 / BACK COVER</span>
-            <span className={`text-xs font-bold ${isPink ? "text-rose-500" : "text-amber-600"} font-mono`}>120PIE & COFFEE</span>
-          </div>
-
-          <div className="my-auto py-10 space-y-6 max-w-2xl mx-auto">
-            <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black leading-tight ${textTitle}`}>
-              성공적인 창업의 시작,<br />
-              <span className={textHighlight}>120pie & coffee</span>가 함께합니다.
-            </h2>
-            <p className={`text-xs sm:text-sm md:text-base leading-relaxed ${textDesc}`}>
-              예비 가맹점주님의 기존 여건을 적극 존중하여 최저 비용으로 최대 효율을 뽑아내는 가이드를 약속드립니다. 지금 하단 상담 신청 폼에 연락처를 남겨주세요.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3 pt-4">
-              <button 
-                type="button"
-                onClick={handlePrintPage}
-                className={`inline-flex items-center justify-center px-5 py-3 rounded-xl border font-extrabold text-sm cursor-pointer transition-all shadow-md ${isPink ? "bg-neutral-900 border-neutral-800 text-white hover:bg-neutral-800" : "bg-white border-amber-250/70 text-slate-700 hover:bg-amber-50/50"}`}
-              >
-                <FileText size={16} className={`mr-2 ${isPink ? "text-rose-500" : "text-amber-500"}`} /> 현재 제안서 PDF로 인쇄/저장
-              </button>
-              <a 
-                href="#inquiry-form-section"
-                className={`inline-flex items-center justify-center px-6 py-3 rounded-xl font-extrabold text-sm transition-all shadow-md ${isPink ? "bg-rose-500 text-white hover:bg-rose-600 shadow-rose-500/10" : "bg-amber-400 text-neutral-900 hover:bg-amber-300 shadow-amber-400/10"}`}
-              >
-                가맹 상담 신청서 작성하기
-              </a>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-6 text-[11px] sm:text-xs font-bold text-slate-500">
             <span>© 2026 120pie & coffee Corp. All rights reserved.</span>
-            <span>Slide 16 / 16</span>
+            <span>Slide 15 / 15</span>
           </div>
         </section>
 
