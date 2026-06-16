@@ -760,7 +760,7 @@ export default function FranchisePageClient() {
               <div className="md:col-span-5 rounded-xl overflow-hidden bg-neutral-955 aspect-square border border-neutral-850/20 relative group">
                 <img 
                   src={selectedPlanTab === "8py" 
-                    ? "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186418/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns_myousq.png"
+                    ? "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590217/edited-photo_68_t9lc94.png"
                     : "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186611/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_00_48_qomspv_hcopmg.png"
                   } 
                   alt="Floor plan spatial layout" 
