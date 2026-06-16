@@ -1182,64 +1182,144 @@ export default function FranchisePageClient() {
           </div>
 
           <div className="space-y-10">
-            <div className="text-center md:text-left space-y-3">
-              <h2 className="text-2xl sm:text-3xl font-black">
-                체계적인 <span className={textHighlight}>가맹점 수익 시뮬레이션</span>
-              </h2>
-              <p className={`text-sm sm:text-base leading-relaxed ${textDesc}`}>
-                높은 마진율과 무상 가맹 지원으로 빠른 초기 비용 회수가 가능합니다. (월 매출 3,000만 원 예시)
-              </p>
+            {/* Header with Predictor Summary Box */}
+            <div className="text-center md:text-left space-y-4">
+              <div className="space-y-1">
+                <span className="text-xs font-extrabold text-amber-500 uppercase tracking-wider block">Financial Predict</span>
+                <h2 className="text-2xl sm:text-3xl font-black">
+                  검증된 <span className={textHighlight}>가맹점 수익 시뮬레이션</span>
+                </h2>
+              </div>
+              
+              <div className={`p-4 rounded-xl border max-w-xl text-center md:text-left ${
+                isPink 
+                  ? "bg-neutral-900/40 border-neutral-800" 
+                  : "bg-amber-400/5 border-amber-300"
+              }`}>
+                <div className="text-base sm:text-lg font-bold">
+                  월매출 <span className="underline">3,000만원</span> 기준, 가맹점주 순수익 <span className="text-rose-500 dark:text-rose-400 font-extrabold text-xl sm:text-2xl">1,050만원</span> 예상
+                </div>
+                <p className="text-xs text-slate-400 font-semibold mt-1">테이크아웃 전문점(7평~12평) 기준 예측 가이드</p>
+              </div>
             </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch text-left">
               <div className={`lg:col-span-8 p-6 rounded-2xl border ${isPink ? "border-neutral-850" : "border-amber-200/40"} overflow-x-auto ${innerCardBg} ${innerCardHover}`}>
                 <table className="w-full text-left border-collapse text-xs sm:text-sm">
                   <thead>
                     <tr className={`border-b ${isPink ? "border-neutral-805" : "border-amber-200/40"} ${isPink ? "text-rose-455" : "text-amber-600"}`}>
-                      <th className="py-3 px-4 font-black">구분</th>
-                      <th className="py-3 px-4 font-black text-right">금액</th>
-                      <th className="py-3 px-4 font-black text-right">비율</th>
-                      <th className="py-3 px-4 font-black">비고</th>
+                      <th className="py-3 px-4 font-black">항목</th>
+                      <th className="py-3 px-4 text-right font-black">금액(원)</th>
+                      <th className="py-3 px-4 text-right font-black">비율(%)</th>
+                      <th className="py-3 px-4 font-black">설명</th>
                     </tr>
                   </thead>
                   <tbody>
                     {[
-                      { cat: "월 매출액", price: "3,000만 원", ratio: "100%", desc: "평균 가맹점 월 판매 기준 매출 예시" },
-                      { cat: "식자재비", price: "1,050만 원", ratio: "35%", desc: "본사 완제품 생지 및 부자재 공급 단가" },
-                      { cat: "임차료", price: "250만 원", ratio: "8.3%", desc: "10평형 매장 평균 월세" },
-                      { cat: "인건비", price: "180만 원", ratio: "6.0%", desc: "점주 1인 + 파트타임 1인 운영" },
-                      { cat: "관리비 및 수수료", price: "120만 원", ratio: "4.0%", desc: "수도, 광열비 및 배달앱 수수료 등" }
+                      { cat: "월 총매출", price: "30,000,000원", ratio: "100%", desc: "테이크아웃 및 배달 포함 평균 매출" },
+                      { cat: "재료비/부재료", price: "9,000,000원", ratio: "30%", desc: "원두, 일회용품, 원부자재 일체" },
+                      { cat: "인건비", price: "6,000,000원", ratio: "20%", desc: "직원 및 파트 타이머 고용 비용" },
+                      { cat: "기타 비용", price: "4,500,000원", ratio: "15%", desc: "매장 임대료 및 기본 관리비 등" }
                     ].map((row, idx) => (
                       <tr key={idx} className={`border-b ${isPink ? "border-neutral-805/50" : "border-amber-200/20"} ${textTitle} font-bold`}>
                         <td className="py-3 px-4 font-black">{row.cat}</td>
                         <td className="py-3 px-4 text-right">{row.price}</td>
                         <td className="py-3 px-4 text-right font-mono">{row.ratio}</td>
-                        <td className={`py-3 px-4 text-[10px] ${textDesc}`}>{row.desc}</td>
+                        <td className={`py-3 px-4 text-[11px] ${textDesc} font-semibold`}>{row.desc}</td>
                       </tr>
                     ))}
-                    <tr className={`${isPink ? "bg-rose-500/10 text-rose-500" : "bg-amber-400/10 text-amber-600"} font-black`}>
-                      <td className="py-4 px-4 rounded-l-xl">월 순수익</td>
-                      <td className="py-4 px-4 text-right">1,400만 원</td>
-                      <td className="py-4 px-4 text-right font-mono">46.7%</td>
-                      <td className="py-4 px-4 rounded-r-xl text-[10px]">로열티 0% 적용 및 높은 마진 보장</td>
+                    <tr className={`${isPink ? "bg-rose-500/20 text-rose-400" : "bg-orange-500/10 text-orange-600"} font-black`}>
+                      <td className="py-4 px-4 rounded-l-xl">가맹점주 순수익</td>
+                      <td className="py-4 px-4 text-right text-sm sm:text-base">10,500,000원</td>
+                      <td className="py-4 px-4 text-right font-mono">35%</td>
+                      <td className="py-4 px-4 rounded-r-xl text-[11px]">매출 대비 높은 마진율 확보</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              <div className="lg:col-span-4 flex flex-col justify-between space-y-4">
-                <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950 w-full">
+              <div className="lg:col-span-4 relative group">
+                <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950 w-full h-full">
                   <img 
                     src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590218/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_44_25_dmwlfs.png" 
                     alt="Arabica specialty coffee beans" 
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 opacity-90"
                   />
-                  
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Row: Pie Chart & Point Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center pt-6 border-t border-neutral-200/10 text-left">
+              {/* Donut Pie Chart Container */}
+              <div className="md:col-span-5 flex flex-col sm:flex-row items-center justify-center gap-6">
+                <div className="relative w-32 h-32 shrink-0">
+                  <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
+                    {/* Background Circle */}
+                    <circle cx="18" cy="18" r="12.5" fill="transparent" stroke={isPink ? "#262626" : "#f3f4f6"} strokeWidth="5" pathLength={100}></circle>
+                    {/* 30% 재료비 (grey) - offset 0 */}
+                    <circle cx="18" cy="18" r="12.5" fill="transparent" stroke="#94a3b8" strokeWidth="5" strokeDasharray="30 70" strokeDashoffset="0" pathLength={100}></circle>
+                    {/* 20% 인건비 (blue-grey) - offset -30 */}
+                    <circle cx="18" cy="18" r="12.5" fill="transparent" stroke="#64748b" strokeWidth="5" strokeDasharray="20 80" strokeDashoffset="-30" pathLength={100}></circle>
+                    {/* 15% 기타비용 (orange) - offset -50 */}
+                    <circle cx="18" cy="18" r="12.5" fill="transparent" stroke="#f97316" strokeWidth="5" strokeDasharray="15 85" strokeDashoffset="-50" pathLength={100}></circle>
+                    {/* 35% 순수익 (yellow) - offset -65 */}
+                    <circle cx="18" cy="18" r="12.5" fill="transparent" stroke="#fbbf24" strokeWidth="5" strokeDasharray="35 65" strokeDashoffset="-65" pathLength={100}></circle>
+                  </svg>
+                  {/* Inside Center Text */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <span className="text-[10px] font-black text-slate-400 leading-none">순수익</span>
+                    <span className={`text-sm font-black mt-0.5 ${isPink ? "text-rose-400" : "text-amber-500"}`}>35%</span>
+                  </div>
+                </div>
+                
+                {/* Chart Legends */}
+                <div className="grid grid-cols-2 sm:grid-cols-1 gap-1.5 text-[11px] font-extrabold shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#fbbf24] shrink-0"></span>
+                    <span>35% 순수익</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#94a3b8] shrink-0"></span>
+                    <span>30% 재료비/부재료</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#64748b] shrink-0"></span>
+                    <span>20% 인건비</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#f97316] shrink-0"></span>
+                    <span>15% 기타 비용</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Point Cards */}
+              <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Point Card 1 */}
+                <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
+                  isPink ? "bg-neutral-900/50 border-neutral-800" : "bg-white border-amber-100 shadow-sm"
+                }`}>
+                  <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+                    <span className="text-base">🎯</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-blue-500">핵심 포인트</h4>
+                    <p className={`text-[11px] font-semibold mt-1 leading-normal ${textDesc}`}>작은 평수에서도 높은 수익률을 기대할 수 있는 구조</p>
+                  </div>
                 </div>
 
-                <div className={`p-5 rounded-2xl border ${isPink ? "border-rose-500/20 bg-rose-500/5 text-rose-455" : "border-amber-400/20 bg-amber-400/5 text-amber-600"} flex flex-col items-center justify-center text-center space-y-1.5`}>
-                  <TrendingUp size={24} />
-                  <span className="text-xs font-black">디저트 업계 최고 수준 마진율</span>
-                  <span className="text-base font-extrabold">월 순수익 약 1,400만 원 (46.7%)</span>
+                {/* Point Card 2 */}
+                <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
+                  isPink ? "bg-neutral-900/50 border-neutral-800" : "bg-white border-amber-100 shadow-sm"
+                }`}>
+                  <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                    <span className="text-base">📈</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-green-500">수익 구조</h4>
+                    <p className={`text-[11px] font-semibold mt-1 leading-normal ${textDesc}`}>배달과 테이크아웃 결합 시 매출 안정성 강화</p>
+                  </div>
                 </div>
               </div>
             </div>
