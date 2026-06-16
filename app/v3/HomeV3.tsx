@@ -1267,25 +1267,16 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
           </div>
 
           <nav className={`hidden lg:flex items-center gap-2.5 xl:gap-4 text-[10px] xl:text-[13px] font-bold shrink-0 ${navLinkTextClass}`}>
-            <a href="#why" className="hover:text-amber-400 transition-colors">도입 가치</a>
-            <a href="#structure" className="hover:text-amber-400 transition-colors">브랜드 구조</a>
-            <a href="#menu" className="hover:text-amber-400 transition-colors">메뉴 카탈로그</a>
-            <a href="#adoption" className="hover:text-amber-400 transition-colors">도입 방식 &amp; 성공사례</a>
-            <Link href={isYellowVariant ? "/stores?theme=yellow" : isPinkVariant ? "/stores?theme=pink" : "/stores?theme=yellow"} className={`hover:scale-105 transition-transform shrink-0 ${
-              isPinkVariant 
-                ? "text-rose-500 hover:text-rose-600 font-extrabold" 
-                : "text-amber-400 hover:text-amber-300 font-extrabold"
-            }`}>
+            <a href="#menu" className="hover:text-amber-400 transition-colors">메뉴</a>
+            <Link href={isYellowVariant ? "/stores?theme=yellow" : "/stores?theme=pink"} className="hover:text-amber-400 transition-colors shrink-0">
               가맹점 현황
             </Link>
-            <Link href={isYellowVariant ? "/costs?theme=yellow" : isPinkVariant ? "/costs?theme=pink" : "/costs?theme=yellow"} className={`hover:scale-105 transition-transform shrink-0 ${
-              isPinkVariant 
-                ? "text-rose-500 hover:text-rose-600 font-extrabold" 
-                : "text-amber-400 hover:text-amber-300 font-extrabold"
-            }`}>
+            <Link href={isYellowVariant ? "/costs?theme=yellow" : "/costs?theme=pink"} className="hover:text-amber-400 transition-colors shrink-0">
               비용 안내
             </Link>
-            <span className="w-px h-3 bg-neutral-800 mx-1 hidden lg:block" />
+            <Link href={isYellowVariant ? "/franchise?theme=yellow" : "/franchise?theme=pink"} className="hover:text-amber-400 transition-colors shrink-0">
+              창업 안내
+            </Link>
             <a href="#faq" className="hover:text-amber-400 transition-colors">FAQ</a>
           </nav>
 
@@ -1326,24 +1317,21 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {mobileNavOpen && (
           <nav id="mobile-landing-nav" className={`lg:hidden border-t px-4 pb-5 pt-3.5 transition-all duration-300 ${mobileNavDrawerBgClass}`}>
             <div className="grid grid-cols-2 gap-2 text-sm font-bold">
-              {[
-                { label: "도입 가치", href: "#why" },
-                { label: "브랜드 구조", href: "#structure" },
-                { label: "메뉴 카탈로그", href: "#menu" },
-                { label: "수익 시뮬레이터", href: "#simulator" },
-                { label: "도입 방식", href: "#adoption" },
-                { label: "FAQ", href: "#faq" }
-              ].map(item => (
-                <a key={item.href} href={item.href} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
-                  {item.label}
-                </a>
-              ))}
-              <Link href={isPinkVariant ? "/stores?theme=pink" : "/stores?theme=yellow"} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
+              <a href="#menu" onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
+                메뉴
+              </a>
+              <Link href={isYellowVariant ? "/stores?theme=yellow" : "/stores?theme=pink"} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
                 가맹점 현황
               </Link>
-              <Link href="/portal" target="_blank" rel="noopener noreferrer" onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
-                점주전용
+              <Link href={isYellowVariant ? "/costs?theme=yellow" : "/costs?theme=pink"} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
+                비용 안내
               </Link>
+              <Link href={isYellowVariant ? "/franchise?theme=yellow" : "/franchise?theme=pink"} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
+                창업 안내
+              </Link>
+              <a href="#faq" onClick={() => setMobileNavOpen(false)} className={`col-span-2 rounded-xl px-4 py-3 transition-colors text-center ${mobileNavLinkClass}`}>
+                FAQ
+              </a>
             </div>
             <button type="button" onClick={() => { setMobileNavOpen(false); setInquiryModalOpen(true); }} className={`pink-primary-button mt-3 flex w-full items-center justify-center rounded-xl px-4 py-3.5 text-sm font-black border-0 cursor-pointer ${
               isPinkVariant 
