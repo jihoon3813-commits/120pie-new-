@@ -1075,14 +1075,20 @@ export default function FranchisePageClient() {
               {activeMenuTab === "churros" && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-2xl mx-auto">
                   {[
-                    "오리지널 츄러스", "슈가 츄러스", "오레오 츄러스", "녹차 츄러스"
-                  ].map((name, idx) => (
+                    { name: "오리지널 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185404/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_izqnfl.jpg" },
+                    { name: "슈가 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185405/%EC%8A%88%EA%B0%80_tzns46.jpg" },
+                    { name: "오레오 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185408/%EC%98%A4%EB%A0%88%EC%98%A4_bssm74.jpg" },
+                    { name: "녹차 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185408/%EB%85%B9%EC%B0%A8_jmac8h.jpg" }
+                  ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className={`w-full aspect-[4/3] rounded-2xl border-2 border-dashed ${isPink ? "border-neutral-800 bg-neutral-900/30 text-rose-500/20" : "border-amber-200/60 bg-amber-50/20 text-amber-500/30"} flex flex-col items-center justify-center relative group-hover:border-amber-400 transition-all duration-300`}>
-                        <span className="text-2xl opacity-60">🥨</span>
-                        <span className="text-[8px] font-black uppercase tracking-wider mt-1.5 opacity-50">IMAGE AREA</span>
+                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
+                        <img 
+                          src={item.img} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
+                        />
                       </div>
-                      <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{name}</span>
+                      <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{item.name}</span>
                     </div>
                   ))}
                 </div>
