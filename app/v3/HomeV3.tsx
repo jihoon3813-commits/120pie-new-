@@ -1328,13 +1328,28 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 FAQ
               </a>
             </div>
-            <button type="button" onClick={() => { setMobileNavOpen(false); setInquiryModalOpen(true); }} className={`pink-primary-button mt-3 flex w-full items-center justify-center rounded-xl px-4 py-3.5 text-sm font-black border-0 cursor-pointer ${
-              isPinkVariant 
-                ? "bg-rose-500 text-white hover:bg-rose-600 shadow-[0_4px_16px_rgba(244,63,94,0.25)]" 
-                : "bg-amber-400 text-neutral-950 hover:bg-amber-300 shadow-[0_4px_16px_rgba(251,191,36,0.25)]"
-            }`}>
-              상담 신청 <ArrowRight size={15} className="ml-1.5" />
-            </button>
+            <div className="flex gap-2 mt-3 w-full">
+              <Link
+                href="/portal"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileNavOpen(false)}
+                className={`flex-1 flex items-center justify-center rounded-xl px-4 py-3.5 text-xs sm:text-sm font-black border transition-all ${portalBtnClass}`}
+              >
+                점주전용
+              </Link>
+              <button
+                type="button"
+                onClick={() => { setMobileNavOpen(false); setInquiryModalOpen(true); }}
+                className={`pink-primary-button flex-1 flex items-center justify-center rounded-xl px-4 py-3.5 text-xs sm:text-sm font-black border-0 cursor-pointer ${
+                  isPinkVariant 
+                    ? "bg-rose-500 text-white hover:bg-rose-600 shadow-[0_4px_16px_rgba(244,63,94,0.25)]" 
+                    : "bg-amber-400 text-neutral-950 hover:bg-amber-300 shadow-[0_4px_16px_rgba(251,191,36,0.25)]"
+                }`}
+              >
+                상담 신청 <ArrowRight size={14} className="ml-1.5 shrink-0" />
+              </button>
+            </div>
           </nav>
         )}
       </header>
