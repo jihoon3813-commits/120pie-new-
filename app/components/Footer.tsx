@@ -56,14 +56,14 @@ export default function Footer({ theme }: FooterProps) {
   return (
     <footer className={`border-t transition-all duration-300 ${
       isPinkVariant 
-        ? "bg-[#fff1f4] border-rose-100 text-[#7c5d6c]" 
+        ? "bg-[#f4f3f4] border-neutral-200 text-[#7c5d6c]" 
         : isYellowVariant 
-          ? "bg-[#fff9e6] border-[#e6dfc3] text-[#576575]" 
-          : "bg-[#090909] border-neutral-900 text-neutral-400"
+          ? "bg-[#f5f5f4] border-neutral-200 text-[#576575]" 
+          : "bg-[#1f1f21] border-neutral-800 text-neutral-400"
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
         <div className={`grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 pb-12 border-b ${
-          isPinkVariant ? "border-rose-200/50" : isYellowVariant ? "border-[#e6dfc3]" : "border-neutral-800/80"
+          isPinkVariant ? "border-neutral-200" : isYellowVariant ? "border-neutral-200" : "border-neutral-800"
         }`}>
           <div className="lg:col-span-7">
             <div className="mb-7">
@@ -137,7 +137,7 @@ export default function Footer({ theme }: FooterProps) {
             >
               점주포털
             </Link>
-            <span className={isPinkVariant ? "text-rose-200/50" : isYellowVariant ? "text-[#e6dfc3]" : "text-neutral-800"}>|</span>
+            <span className={isPinkVariant ? "text-neutral-300" : isYellowVariant ? "text-neutral-300" : "text-neutral-850"}>|</span>
             <Link
               href="/admin"
               target="_blank"
