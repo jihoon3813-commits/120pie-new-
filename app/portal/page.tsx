@@ -1066,6 +1066,8 @@ export default function PortalPage() {
       // 토스페이먼츠(UPLUS) 특수문자 제한 방지를 위해 상품명 정제
       const sanitizedOrderTitle = cart.length > 1 ? `${firstItemName} 외 ${cart.length - 1}건` : firstItemName;
 
+      const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+
       PortOne.requestPayment({
         storeId: storeId,
         channelKey: channelKey,
@@ -1075,8 +1077,9 @@ export default function PortalPage() {
         currency: "KRW",
         payMethod: "CARD",
         customer: {
-          fullName: "가맹점주",
-          phoneNumber: "010-0000-0000",
+          fullName: activeStore?.owner || "가맹점주",
+          phoneNumber: activeStore?.phone || "010-0000-0000",
+          email: "120piecoffee@gmail.com", // KG이니시스 필수 입력값 설정
         },
       }).then((response: any) => {
         if (response.code === undefined) {
