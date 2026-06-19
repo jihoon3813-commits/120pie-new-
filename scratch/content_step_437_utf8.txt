@@ -1,0 +1,1 @@
+﻿"          <div className=\"flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500\">\n            <span>* 15?됲삎 ?쒖? ?뚮옒洹몄떗 留ㅼ옣 媛쒖꽕 寃ъ쟻 媛?대뱶 湲곗?</span>\n            <span>Slide 13 / 16</span>\n          </div>\n        </section>"

@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Add dynamic cursor style to root div.\"",
+  "EndLine": "411",
+  "Instruction": "\"Inject dynamic cursor hide styling on desktop screen.\"",
+  "ReplacementContent": "\"    <div id={isPink ? \\\"landing-v3\\\" : \\\"landing-v5\\\"} className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg} ${isHovering && !isInteractive ? \\\"lg:cursor-none\\\" : \\\"\\\"}`}>\"",
+  "StartLine": "411",
+  "TargetContent": "\"    <div id={isPink ? \\\"landing-v3\\\" : \\\"landing-v5\\\"} className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg}`}>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Adding cursor-none style to root div\"",
+  "toolSummary": "\"Replace file content\""
+}

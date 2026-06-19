@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Wrap Slide 02 bottom cards grid in ScrollTriggered.\"",
+  "EndLine": "645",
+  "Instruction": "\"Wrap bottom cards grid in ScrollTriggered.\"",
+  "ReplacementContent": "\"            <ScrollTriggered>\\n              {(isVisible) => (\\n                <div className=\\\"grid grid-cols-1 md:grid-cols-3 gap-6\\\">\"",
+  "StartLine": "645",
+  "TargetContent": "\"            <div className=\\\"grid grid-cols-1 md:grid-cols-3 gap-6\\\">\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Wrapping bottom cards in ScrollTriggered\"",
+  "toolSummary": "\"Replace file content\""
+}

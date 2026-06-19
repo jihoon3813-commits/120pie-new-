@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Remove legacy duplicate 결합 패키지 code block inside Section 11.\"",
+  "EndLine": "1337",
+  "Instruction": "\"Remove the duplicate, legacy 결합 패키지 card layout to fix duplicate rendering.\"",
+  "ReplacementContent": "\"\"",
+  "StartLine": "1315",
+  "TargetContent": "\"            {/* 결합 패키지 */}\\n            <div className={`p-6 rounded-2xl border ${isPink ? \\\"border-neutral-800\\\" : \\\"border-amber-200/40\\\"} ${innerCardBgAccent} ${innerCardHover} text-left flex flex-col md:flex-row justify-between items-center gap-6`}>\\n              <div className=\\\"flex items-center gap-4\\\">\\n                <div className=\\\"flex gap-2 shrink-0\\\">\\n                  <div className=\\\"w-14 h-14 rounded-xl overflow-hidden border border-neutral-200/20 bg-neutral-950\\\">\\n                    <img src=\\\"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/2026-05-28_13_41_46_xec3ws.png\\\" alt=\\\"120pie thumbnail\\\" className=\\\"w-full h-full object-cover\\\" />\\n                  </div>\\n                  <div className=\\\"w-14 h-14 rounded-xl overflow-hidden border border-neutral-200/20 bg-neutral-950\\\">\\n                    <img src=\\\"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945187/IMG_8185_jpquaf.jpg\\\" alt=\\\"egg120 thumbnail\\\" className=\\\"w-full h-full object-cover\\\" />\\n                  </div>\\n                </div>\\n                <div>\\n                  <h4 className={`text-base font-black ${textTitle}`}>120 시리즈 결합 패키지 (120겹 파이 + 에그120)</h4>\\n                  <p className={`text-xs ${textDesc} mt-1`}>파이와 계란빵 두 가지 시그니처 디저트를 완벽 결합하여 매출 극대화</p>\\n                </div>\\n              </div>\\n              <div className=\\\"text-right shrink-0\\\">\\n                <span className=\\\"text-xs font-bold line-through text-neutral-450 mr-2\\\">9,900,000원</span>\\n                <span className={`text-lg sm:text-xl font-black ${isPink ? \\\"text-rose-300 font-extrabold\\\" : \\\"text-[#f05c40]\\\"}`}>6,900,000원 <span className=\\\"text-xs font-bold text-neutral-400\\\">VAT별도</span></span>\\n              </div>\\n            </div>\"",
+  "TargetFile": "\"d:/anti-gv/25. 120pie(new)_2/app/franchise/FranchisePageClient.tsx\"",
+  "toolAction": "\"Removing legacy duplicate code in Section 11\"",
+  "toolSummary": "\"Remove duplicate code\""
+}

@@ -1,0 +1,9 @@
+{
+  "CodeContent": "\"import re\\n\\nfilepath = r\\\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\\\"\\n\\nwith open(filepath, \\\"r\\\", encoding=\\\"utf-8\\\") as f:\\n    content = f.read()\\n\\n# 패턴을 좀 더 유연하게 만듭니다.\\n# 1,050만 원이 들어간 라인 뒤에 나오는 </div>와 {/* Tables Area */} 그리고 올인원 패키지 부분을 찾습니다.\\npattern = r'(1,050만\\\\s*원.*?</div>\\\\s*)\\\\{\\\\/\\\\*\\\\s*Tables\\\\s*Area\\\\s*\\\\*\\\\}\\\\s*<div\\\\s*className=\\\"grid\\\\s*grid-cols-1\\\\s*lg:grid-cols-2\\\\s*gap-8\\\\s*text-left\\\">\\\\s*\\\\{\\\\/\\\\*\\\\s*올인원\\\\s*패키지\\\\s*\\\\*\\\\}'\\n\\nmatch = re.search(pattern, content, re.DOTALL)\\nif match:\\n    print(\\\"Matched!\\\")\\n    print(\\\"Match group 1:\\\")\\n    print(repr(match.group(1)))\\nelse:\\n    print(\\\"Not matched.\\\")\\n    # 파일 내 1,050만 원 근처 200글자 출력\\n    idx = content.find(\\\"1,050만 원\\\")\\n    if idx != -1:\\n        print(\\\"Context around '1,050만 원':\\\")\\n        print(repr(content[idx-200:idx+300]))\\n    else:\\n        print(\\\"'1,050만 원' not found at all. Try '1,050만'\\\")\\n        idx2 = content.find(\\\"1,050만\\\")\\n        if idx2 != -1:\\n            print(\\\"Context around '1,050만':\\\")\\n            print(repr(content[idx2-200:idx2+300]))\\n\"",
+  "Description": "\"Create a python script to test regex matching on FranchisePageClient.tsx\"",
+  "IsArtifact": "false",
+  "Overwrite": "true",
+  "TargetFile": "\"C:\\\\Users\\\\FORYOUCOM\\\\.gemini\\\\antigravity-ide\\\\brain\\\\fcfe2e54-0c4e-4167-8fd6-d0d791b028ba\\\\scratch\\\\test_match.py\"",
+  "toolAction": "\"Writing test script to find regex patterns in codebase\"",
+  "toolSummary": "\"Writing match test script\""
+}

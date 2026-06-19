@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Close ScrollTriggered wrapper for Slide 02 bottom cards.\"",
+  "EndLine": "672",
+  "Instruction": "\"Inject closing braces for ScrollTriggered.\"",
+  "ReplacementContent": "\"            </div>\\n          )}\\n        </ScrollTriggered>\"",
+  "StartLine": "672",
+  "TargetContent": "\"            </div>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Closing ScrollTriggered tag\"",
+  "toolSummary": "\"Replace file content\""
+}

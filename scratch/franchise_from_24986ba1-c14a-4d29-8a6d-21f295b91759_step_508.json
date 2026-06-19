@@ -1,0 +1,10 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Make Section 15 cards, typography, and icon circles fully theme-aware and responsive in light mode\"",
+  "EndLine": "1449",
+  "Instruction": "\"Update cards wrapper, icon wrapper, title, and description typography to use theme variables.\"",
+  "ReplacementContent": "\"                ].map((item, idx) => (\\n                  <div key={idx} className={`p-5 rounded-2xl ${innerCardBgAccent} border ${isPink ? \\\"border-neutral-850\\\" : \\\"border-amber-250/20\\\"} flex items-start gap-4 text-left h-[130px] ${innerCardHover}`}>\\n                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isPink ? \\\"bg-rose-500/10 text-rose-500\\\" : \\\"bg-amber-400/10 text-amber-600\\\"}`}>\\n                      {item.icon}\\n                    </div>\\n                    <div>\\n                      <h4 className={`text-sm font-black ${textTitle}`}>{item.title}</h4>\\n                      <p className={`text-[11px] ${textDesc} leading-relaxed font-semibold mt-1`}>{item.desc}</p>\\n                    </div>\\n                  </div>\\n                ))}\"",
+  "StartLine": "1438",
+  "TargetContent": "\"                ].map((item, idx) => (\\n                  <div key={idx} className={`p-5 rounded-2xl ${innerCardBg} border border-neutral-200/10 flex items-start gap-4 text-left h-[130px] hover:scale-102 transition-transform duration-200`}>\\n                    <div className=\\\"w-8 h-8 rounded-full bg-amber-400/10 flex items-center justify-center text-amber-400 shrink-0\\\">\\n                      {item.icon}\\n                    </div>\\n                    <div>\\n                      <h4 className=\\\"text-sm font-black text-white\\\">{item.title}</h4>\\n                      <p className=\\\"text-[11px] text-slate-450 leading-relaxed font-semibold mt-1\\\">{item.desc}</p>\\n                    </div>\\n                  </div>\\n                ))}\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\""
+}

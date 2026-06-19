@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Mark all tasks as completed in task.md.\"",
+  "EndLine": "11",
+  "Instruction": "\"Mark all tasks as completed.\"",
+  "ReplacementContent": "\"- [x] Create wrapper container `#magnifiable-page` in `FranchisePageClient.tsx`\\n- [x] Add state variables (`isMagnifierActive`, `isHoveringClose`, `lensPos`, `pageHtml`, `pageSize`)\\n- [x] Implement coordinates updates and page HTML cloning logic in `useEffect` and `mousemove` handler\\n- [x] Implement freeze-on-hover physics logic for the lens positioning\\n- [x] Rebuild and enlarge the magnifier lens overlay with a close button and remove the \\\"ZOOM\\\" text\\n- [x] Create the activation floating button on the page when the magnifier is closed\\n- [x] Modify `ImageMagnifier` so that it doesn't double-zoom when global magnifier is active\\n- [x] Verify functionality (checking hover behavior, close button clicking, re-activation, styling)\"",
+  "StartLine": "3",
+  "TargetContent": "\"- [/] Create wrapper container `#magnifiable-page` in `FranchisePageClient.tsx`\\n- [/] Add state variables (`isMagnifierActive`, `isHoveringClose`, `lensPos`, `pageHtml`, `pageSize`)\\n- [/] Implement coordinates updates and page HTML cloning logic in `useEffect` and `mousemove` handler\\n- [/] Implement freeze-on-hover physics logic for the lens positioning\\n- [/] Rebuild and enlarge the magnifier lens overlay with a close button and remove the \\\"ZOOM\\\" text\\n- [/] Create the activation floating button on the page when the magnifier is closed\\n- [/] Modify `ImageMagnifier` so that it doesn't double-zoom when global magnifier is active\\n- [ ] Verify functionality (checking hover behavior, close button clicking, re-activation, styling)\"",
+  "TargetFile": "\"C:\\\\Users\\\\FORYOUCOM\\\\.gemini\\\\antigravity-ide\\\\brain\\\\a7d16e60-6a64-43a8-9037-063c51e7a7cf\\\\task.md\"",
+  "toolAction": "\"Completing all items in task.md\"",
+  "toolSummary": "\"Complete tasks in task.md\""
+}

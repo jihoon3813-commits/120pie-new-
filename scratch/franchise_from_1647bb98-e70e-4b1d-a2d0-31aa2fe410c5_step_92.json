@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Inject closing tags of ScrollTriggered at line 674.\"",
+  "EndLine": "674",
+  "Instruction": "\"Close the child function and ScrollTriggered element.\"",
+  "ReplacementContent": "\"            </div>\\n          )}\\n        </ScrollTriggered>\"",
+  "StartLine": "674",
+  "TargetContent": "\"            </div>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Closing ScrollTriggered tag\"",
+  "toolSummary": "\"Replace file content\""
+}

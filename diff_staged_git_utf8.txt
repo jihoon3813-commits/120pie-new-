@@ -1,0 +1,969 @@
+﻿diff --git a/scratch/franchise_staged_git.tsx b/app/franchise/FranchisePageClient.tsx
+index ad64602..c1ec750 100644
+--- a/scratch/franchise_staged_git.tsx
++++ b/app/franchise/FranchisePageClient.tsx
+@@ -32,9 +32,10 @@ import {
+   Users,
+   Warehouse,
+   Sliders,
+-  Percent
++  Percent,
++  Headphones
+ } from "lucide-react";
+-import { useState, useEffect } from "react";
++import { useState, useEffect, useRef } from "react";
+ import { useMutation } from "convex/react";
+ import { api } from "@/convex/_generated/api";
+ 
+@@ -85,6 +86,112 @@ const SUCCESS_CASES: SuccessCase[] = [
+   }
+ ];
+ 
++// Scroll-triggered wrapper component using IntersectionObserver
++function ScrollTriggered({ children, className = "" }: { children: (isVisible: boolean) => React.ReactNode, className?: string }) {
++  const ref = useRef<HTMLDivElement>(null);
++  const [isVisible, setIsVisible] = useState(false);
++
++  useEffect(() => {
++    if (typeof window === "undefined") return;
++    const observer = new IntersectionObserver(
++      ([entry]) => {
++        if (entry.isIntersecting) {
++          setIsVisible(true);
++          observer.disconnect();
++        }
++      },
++      { threshold: 0.05 }
++    );
++    if (ref.current) {
++      observer.observe(ref.current);
++    }
++    return () => observer.disconnect();
++  }, []);
++
++  return <div ref={ref} className={className}>{children(isVisible)}</div>;
++}
++
++// Image Magnifier component on hover
++function ImageMagnifier({
++  src,
++  alt,
++  className = "",
++  magnifierHeight = 150,
++  magnifierWidth = 150,
++  zoomLevel = 1.8,
++  disabled = false
++}: {
++  src: string;
++  alt: string;
++  className?: string;
++  magnifierHeight?: number;
++  magnifierWidth?: number;
++  zoomLevel?: number;
++  disabled?: boolean;
++}) {
++  const [[x, y], setXY] = useState([0, 0]);
++  const [showMagnifier, setShowMagnifier] = useState(false);
++  const [[imgWidth, imgHeight], setSize] = useState([0, 0]);
++
++  return (
++    <div
++      className={`relative overflow-hidden cursor-crosshair select-none ${className}`}
++      onMouseEnter={(e) => {
++        if (disabled) return;
++        const elem = e.currentTarget;
++        const { width, height } = elem.getBoundingClientRect();
++        setSize([width, height]);
++        setShowMagnifier(true);
++      }}
++      onMouseMove={(e) => {
++        if (disabled) return;
++        const elem = e.currentTarget;
++        const { top, left } = elem.getBoundingClientRect();
++        const xCoord = e.clientX - left;
++        const yCoord = e.clientY - top;
++        setXY([xCoord, yCoord]);
++      }}
++      onMouseLeave={() => {
++        setShowMagnifier(false);
++      }}
++    >
++      <img
++        src={src}
++        alt={alt}
++        className="w-full h-full object-cover transition-all duration-300"
++        style={{
++          filter: showMagnifier && !disabled ? "brightness(0.85)" : "none"
++        }}
++      />
++
++      {showMagnifier && !disabled && (
++        <div
++          className="absolute border-2 border-amber-400 rounded-full shadow-2xl pointer-events-none z-30"
++          style={{
++            height: `${magnifierHeight}px`,
++            width: `${magnifierWidth}px`,
++            top: `${y - magnifierHeight / 2}px`,
++            left: `${x - magnifierWidth / 2}px`,
++            backgroundImage: `url('${src}')`,
++            backgroundRepeat: "no-repeat",
++            backgroundSize: `${imgWidth * zoomLevel}px ${imgHeight * zoomLevel}px`,
++            backgroundPositionX: `${-x * zoomLevel + magnifierWidth / 2}px`,
++            backgroundPositionY: `${-y * zoomLevel + magnifierHeight / 2}px`
++          }}
++        >
++          {/* Spotlight reflection glare */}
++          <div className="absolute top-1 left-1 w-8 h-8 bg-white/20 rounded-full blur-[2px]"></div>
++          {/* Subtle crosshair in the center of lens */}
++          <div className="absolute inset-0 flex items-center justify-center opacity-30">
++            <div className="w-4 h-[1px] bg-white"></div>
++            <div className="h-4 w-[1px] bg-white absolute"></div>
++          </div>
++        </div>
++      )}
++    </div>
++  );
++}
++
+ export default function FranchisePageClient() {
+   const [theme, setTheme] = useState<"pink" | "yellow">("yellow");
+   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+@@ -104,6 +211,121 @@ export default function FranchisePageClient() {
+ 
+   const addInquiry = useMutation(api.inquiries.add);
+ 
++  // Custom cursor state
++  const [mousePos, setMousePos] = useState({ x: -200, y: -200 });
++  const [isHovering, setIsHovering] = useState(false);
++  const [isInteractive, setIsInteractive] = useState(false);
++
++  // Global page magnifier states
++  const [isMagnifierActive, setIsMagnifierActive] = useState(true);
++  const [lensPos, setLensPos] = useState({ x: -260, y: -260 });
++  const [pageHtml, setPageHtml] = useState("");
++  const [pageSize, setPageSize] = useState({ width: 1200, height: 10000 });
++  const [mounted, setMounted] = useState(false);
++
++  useEffect(() => {
++    setMounted(true);
++  }, []);
++
++  const lensSize = 260; // Magnifying glass diameter (larger size)
++  const zoomLevel = 1.6; // Scale factor for general page magnification
++
++  useEffect(() => {
++    if (typeof window === "undefined") return;
++
++    const handleMouseMove = (e: MouseEvent) => {
++      setMousePos({ x: e.clientX, y: e.clientY });
++      setIsHovering(true);
++      
++      setLensPos({ x: e.clientX, y: e.clientY });
++      
++      const target = e.target as HTMLElement;
++      if (!target) return;
++      
++      const isInteractiveElement = 
++        target.tagName === "BUTTON" ||
++        target.tagName === "A" ||
++        target.tagName === "INPUT" ||
++        target.tagName === "SELECT" ||
++        target.tagName === "TEXTAREA" ||
++        target.closest("button") ||
++        target.closest("a") ||
++        target.closest("input") ||
++        target.closest("select") ||
++        target.closest("textarea") ||
++        target.closest(".interactive") ||
++        target.closest("label");
++      
++      setIsInteractive(!!isInteractiveElement);
++    };
++
++    const handleMouseLeave = () => {
++      setIsHovering(false);
++    };
++
++    window.addEventListener("mousemove", handleMouseMove);
++    document.addEventListener("mouseleave", handleMouseLeave);
++    return () => {
++      window.removeEventListener("mousemove", handleMouseMove);
++      document.removeEventListener("mouseleave", handleMouseLeave);
++    };
++  }, []);
++
++  // Sync page HTML and size when states change, and on scroll (debounced)
++  useEffect(() => {
++    if (typeof window === "undefined") return;
++
++    const syncPage = () => {
++      const element = document.getElementById("magnifiable-page");
++      if (element) {
++        setPageHtml(element.innerHTML);
++        setPageSize({
++          width: element.offsetWidth,
++          height: element.offsetHeight
++        });
++      }
++    };
++
++    // Sync on tab/theme change or magnifier activation
++    const timer = setTimeout(syncPage, 200);
++
++    if (!isMagnifierActive) {
++      return () => clearTimeout(timer);
++    }
++
++    let scrollTimeout: NodeJS.Timeout;
++    const handleScroll = () => {
++      clearTimeout(scrollTimeout);
++      scrollTimeout = setTimeout(syncPage, 150);
++    };
++
++    window.addEventListener("scroll", handleScroll, { passive: true });
++
++    return () => {
++      clearTimeout(timer);
++      clearTimeout(scrollTimeout);
++      window.removeEventListener("scroll", handleScroll);
++    };
++  }, [theme, selectedPlanTab, activeMenuTab, isMagnifierActive]);
++
++  // Sync size on window resize
++  useEffect(() => {
++    if (typeof window === "undefined") return;
++
++    const handleResize = () => {
++      const element = document.getElementById("magnifiable-page");
++      if (element) {
++        setPageSize({
++          width: element.offsetWidth,
++          height: element.offsetHeight
++        });
++      }
++    };
++
++    window.addEventListener("resize", handleResize);
++    return () => window.removeEventListener("resize", handleResize);
++  }, []);
++
+   // Load theme dynamically from browser environment
+   useEffect(() => {
+     if (typeof window !== "undefined") {
+@@ -262,7 +484,8 @@ export default function FranchisePageClient() {
+     : "bg-[#181114] border border-[#f2ccd7]/10 text-neutral-400 hover:text-rose-400";
+ 
+   return (
+-    <div id={isPink ? "landing-v3" : "landing-v5"} className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg}`}>
++    <div id={isPink ? "landing-v3" : "landing-v5"} className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg} ${isHovering && !isInteractive && isMagnifierActive ? "lg:cursor-none" : ""}`}>
++      <div id="magnifiable-page" className="w-full relative">
+       {/* Header */}
+       <header className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 ${headerBg}`}>
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between min-h-[60px] sm:min-h-[80px] lg:min-h-[94px] gap-2.5 sm:gap-4">
+@@ -414,12 +637,12 @@ export default function FranchisePageClient() {
+ 
+             <div className="lg:col-span-5 relative group">
+               <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C1_ueicna.jpg" 
+                   alt="120pie signature dessert" 
+-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
++                  className="w-full h-full opacity-90"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                   <span className="text-xs font-bold text-white/95">???硫붾돱: 120寃??ㅻ━吏???좏뵆?뚯씠</span>
+                 </div>
+               </div>
+@@ -452,20 +675,25 @@ export default function FranchisePageClient() {
+                 </div>
+ 
+                 {/* Growth Graph */}
+-                <div className={`p-5 rounded-2xl ${innerCardBg} space-y-4`}>
++                <ScrollTriggered>
++                  {(isVisible) => (
++                    <div className={`p-5 rounded-2xl ${innerCardBg} space-y-4`}>
+                   <h4 className={`text-xs sm:text-sm font-black text-center md:text-left flex items-center gap-1.5 ${textTitle}`}>
+                     <TrendingUp size={16} className={isPink ? "text-rose-500" : "text-amber-500"} /> 3???곗냽 媛留??깆옣 吏??(?꾩쟻 怨꾩빟 湲곗?)
+                   </h4>
+                   <div className="space-y-3 pt-2">
+                     {[
+-                      { year: "1?꾩감 (?곗묶湲?", count: "10?몄젏", width: "w-[15%]", bg: "bg-slate-400" },
+-                      { year: "2?꾩감 (?깆옣湲?", count: "70?몄젏", width: "w-[40%]", bg: isPink ? "bg-rose-500/70" : "bg-amber-400/70" },
+-                      { year: "3?꾩감 (?꾩옱)", count: "300?몄젏 ?뚰뙆", width: "w-full", bg: isPink ? "bg-rose-500" : "bg-amber-400" }
++                      { year: "1?꾩감 (?곗묶湲?", count: "10?몄젏", width: "15%", bg: "bg-slate-400" },
++                      { year: "2?꾩감 (?깆옣湲?", count: "70?몄젏", width: "40%", bg: isPink ? "bg-rose-500/70" : "bg-amber-400/70" },
++                      { year: "3?꾩감 (?꾩옱)", count: "300?몄젏 ?뚰뙆", width: "100%", bg: isPink ? "bg-rose-500" : "bg-amber-400" }
+                     ].map((row, idx) => (
+                       <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs font-bold">
+                         <span className={`w-28 ${textDesc}`}>{row.year}</span>
+                         <div className="flex-1 h-8 bg-neutral-950/40 rounded-lg overflow-hidden flex items-center">
+-                          <div className={`h-full ${row.width} ${row.bg} flex items-center px-3 transition-all duration-1000`}>
++                          <div 
++                            className={`h-full ${row.bg} flex items-center px-3 transition-all duration-[1200ms] ease-out`}
++                            style={{ width: isVisible ? row.width : "0%" }}
++                          >
+                             <span className="text-[#0d233a] font-extrabold text-[10px] sm:text-xs">{row.count}</span>
+                           </div>
+                         </div>
+@@ -473,29 +701,41 @@ export default function FranchisePageClient() {
+                     ))}
+                   </div>
+                 </div>
+-              </div>
++              )}
++            </ScrollTriggered>
++                </div>
+ 
+               <div className="lg:col-span-5 relative group">
+                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
+-                  <img 
++                  <ImageMagnifier disabled={isMagnifierActive} 
+                     src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/4b7d41db63592_wyo4r0.webp" 
+                     alt="Artisan rolling pastry dough" 
+-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
++                    className="w-full h-full opacity-90"
+                   />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                     <span className="text-xs font-bold text-white/95">40???쒓낵 ?μ씤??120寃??뺣? ?꾩슦 ?깊삎 怨듭젙</span>
+                   </div>
+                 </div>
+               </div>
+             </div>
+ 
+-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
++            <ScrollTriggered>
++              {(isVisible) => (
++                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+               {[
+                 { title: "?ㅼ씠踰?寃?됰웾", val: "??61,500??", desc: "?ㅼ썙??荑쇰━ 寃?됰웾 ?뺣룄??1??, icon: <Search size={22} className={isPink ? "text-rose-500" : "text-amber-400"} /> },
+                 { title: "SNS ?댁떆?쒓렇", val: "?꾩쟻 19.3留뚭컻+", desc: "#120寃뱁뙆???먮컻???낆냼臾??뺤궛", icon: <Hash size={22} className={isPink ? "text-rose-500" : "text-amber-400"} /> },
+                 { title: "釉뚮옖???몄???, val: "?뚰삎 ?붿???1??, desc: "怨좉컼 ?좏샇??議곗궗 寃곌낵 寃利?, icon: <Award size={22} className={isPink ? "text-rose-500" : "text-amber-400"} /> }
+               ].map((item, idx) => (
+-                <div key={idx} className={`p-6 rounded-2xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between text-left h-40 relative group`}>
++                <div 
++                  key={idx} 
++                  className={`p-6 rounded-2xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between text-left h-40 relative group`}
++                  style={{
++                    opacity: isVisible ? 1 : 0,
++                    transform: isVisible ? "translateY(0)" : "translateY(20px)",
++                    transition: `opacity 0.6s ease-out ${idx * 120}ms, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 120}ms`
++                  }}
++                >
+                   <div className="flex justify-between items-start">
+                     <span className={`text-xs font-bold ${textDesc}`}>{item.title}</span>
+                     <div className={`p-2 rounded-xl ${isPink ? "bg-rose-500/10" : "bg-amber-400/10"}`}>
+@@ -507,6 +747,8 @@ export default function FranchisePageClient() {
+                 </div>
+               ))}
+             </div>
++          )}
++        </ScrollTriggered>
+           </div>
+ 
+           <div className="flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500">
+@@ -535,7 +777,9 @@ export default function FranchisePageClient() {
+                 </div>
+ 
+                 {/* Channels Grid */}
+-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
++                <ScrollTriggered>
++                  {(isVisible) => (
++                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                   {[
+                     { title: "01. 留ㅼ옣 ???", desc: "而ㅽ뵾? ?명듃 留ㅼ텧 洹밸???, icon: <Store size={16} className="text-amber-400" /> },
+                     { title: "02. ?ъ옣 (?뚯씠?ъ븘??", desc: "1???? ?⑤?由???媛꾪렪 ?좊룄", icon: <ShoppingBag size={16} className="text-amber-400" /> },
+@@ -544,7 +788,15 @@ export default function FranchisePageClient() {
+                     { title: "05. ?⑥껜 二쇰Ц ?좎튂", desc: "?숆탳쨌?뚯궗쨌?숉샇?????媛꾩떇", icon: <Users size={16} className="text-amber-400" /> },
+                     { title: "06. ?먯껜 ?쒖쫵 硫붾돱", desc: "怨꾨?鍮돠룹툌?ъ뒪 怨꾩젅蹂??쇱씤??, icon: <Sparkles size={16} className="text-amber-400" /> }
+                   ].map((channel, idx) => (
+-                    <div key={idx} className={`p-4 rounded-xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between h-28`}>
++                    <div 
++                      key={idx} 
++                      className={`p-4 rounded-xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between h-28`}
++                      style={{
++                        opacity: isVisible ? 1 : 0,
++                        transform: isVisible ? "translateY(0)" : "translateY(15px)",
++                        transition: `opacity 0.5s ease-out ${idx * 80}ms, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 80}ms`
++                      }}
++                    >
+                       <div className="flex justify-between items-center">
+                         <span className={`text-[10px] font-black ${textDesc} uppercase`}>Channel {idx + 1}</span>
+                         {channel.icon}
+@@ -556,16 +808,18 @@ export default function FranchisePageClient() {
+                     </div>
+                   ))}
+                 </div>
++                  )}
++                </ScrollTriggered>
+               </div>
+ 
+               <div className="lg:col-span-5 relative group">
+                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
+-                  <img 
++                  <ImageMagnifier disabled={isMagnifierActive} 
+                     src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945187/IMG_8185_jpquaf.jpg" 
+                     alt="6WAY packaging box" 
+-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
++                    className="w-full h-full opacity-90"
+                   />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                     <span className="text-xs font-bold text-white/95">?ъ옣 諛?諛곕떖 寃쎌웳?μ쓣 ?믪씠??釉뚮옖???꾩슜 ?⑦궎吏?諛뺤뒪</span>
+                   </div>
+                 </div>
+@@ -577,14 +831,24 @@ export default function FranchisePageClient() {
+               <h4 className={`text-sm font-bold text-center md:text-left flex items-center gap-2 ${textTitle}`}>
+                 <Clock size={16} className={isPink ? "text-rose-500" : "text-amber-500"} /> 怨듬갚 ?녿뒗 24?쒓컙 ??꾨씪?몃퀎 理쒖쟻 ?섏슂
+               </h4>
+-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-left">
++              <ScrollTriggered>
++                {(isVisible) => (
++                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-left">
+                 {[
+                   { time: "08:00 - 11:00", label: "?꾩묠 ?깃탳/異쒓렐湲?, menu: "?곕걟??? 怨꾨?鍮?& 而ㅽ뵾", icon: <Sun size={14} className="text-amber-400" /> },
+                   { time: "11:30 - 14:00", label: "?먯떖 ?앺썑 ?붿???, menu: "120寃??좏뵆?뚯씠 & ?꾨찓由ъ뭅??, icon: <Coffee size={14} className="text-amber-400" /> },
+                   { time: "14:30 - 17:00", label: "?ㅽ썑 媛꾩떇 ???, menu: "?ㅻ젅??痢꾨윭??& ?대┛??媛꾩떇", icon: <Sparkles size={14} className="text-amber-400" /> },
+                   { time: "17:30 - 21:00", label: "????닿렐 諛??쇱떇", menu: "留ㅼ숴??遺덈떗?뚯씠 ?⑤?由???, icon: <Moon size={14} className="text-amber-400" /> }
+                 ].map((t, idx) => (
+-                  <div key={idx} className={`p-4 ${innerCardBgAccent} ${innerCardHover} rounded-xl text-left relative overflow-hidden`}>
++                  <div 
++                    key={idx} 
++                    className={`p-4 ${innerCardBgAccent} ${innerCardHover} rounded-xl text-left relative overflow-hidden`}
++                    style={{
++                      opacity: isVisible ? 1 : 0,
++                      transform: isVisible ? "translateY(0)" : "translateY(15px)",
++                      transition: `opacity 0.5s ease-out ${idx * 120}ms, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 120}ms`
++                    }}
++                  >
+                     <div className="absolute top-3 right-3 opacity-20">
+                       {t.icon}
+                     </div>
+@@ -594,6 +858,8 @@ export default function FranchisePageClient() {
+                   </div>
+                 ))}
+               </div>
++                )}
++              </ScrollTriggered>
+             </div>
+           </div>
+ 
+@@ -623,14 +889,24 @@ export default function FranchisePageClient() {
+             {/* Steps Flowchart */}
+             <div className="relative">
+               <div className={`hidden sm:block absolute top-1/2 left-4 right-4 h-0.5 ${isPink ? "bg-neutral-800/80" : "bg-[#e6dfc3]"} -translate-y-1/2 z-0`}></div>
+-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 text-center relative z-10">
++              <ScrollTriggered>
++                {(isVisible) => (
++                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 text-center relative z-10">
+                 {[
+                   { step: "STEP 01", title: "?앹? 怨듦툒", desc: "蹂몄궗 二?3???좎꽑 ?됰룞 臾쇰쪟 吏곷같??, icon: <Truck size={20} className="text-amber-400" /> },
+                   { step: "STEP 02", title: "?됰룞 蹂닿?", desc: "?대룞 怨쇱젙 ?놁씠 利됱떆 蹂닿? 媛??, icon: <Warehouse size={20} className="text-amber-400" /> },
+                   { step: "STEP 03", title: "3遺?踰좎씠??, desc: "?ㅻ툙湲곗뿉 ?ｊ퀬 ??대㉧ ?명똿 ?꾨즺", icon: <ChefHat size={20} className="text-amber-400" /> },
+                   { step: "STEP 04", title: "利됱떆 ?쒓났", desc: "諛붿궘?⑥씠 ?댁븘?덈뒗 120寃??뚯씠 ?꾩꽦", icon: <ShoppingBag size={20} className="text-amber-400" /> }
+                 ].map((row, idx) => (
+-                  <div key={idx} className={`p-5 rounded-xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between h-40 text-left`}>
++                  <div 
++                    key={idx} 
++                    className={`p-5 rounded-xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between h-40 text-left`}
++                    style={{
++                      opacity: isVisible ? 1 : 0,
++                      transform: isVisible ? "translateX(0)" : "translateX(-20px)",
++                      transition: `opacity 0.6s ease-out ${idx * 150}ms, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 150}ms`
++                    }}
++                  >
+                     <div className="flex justify-between items-center">
+                       <span className={`text-[10px] font-black ${textDesc}`}>{row.step}</span>
+                       {row.icon}
+@@ -642,6 +918,8 @@ export default function FranchisePageClient() {
+                   </div>
+                 ))}
+               </div>
++                )}
++              </ScrollTriggered>
+             </div>
+ 
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-left">
+@@ -665,12 +943,12 @@ export default function FranchisePageClient() {
+                 </ul>
+               </div>
+               <div className="rounded-xl overflow-hidden aspect-[16/10] bg-neutral-900 border border-neutral-800 relative group">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945602/KakaoTalk_20250819_162905131_zkmre3.jpg" 
+                   alt="Dough and baking process" 
+-                  className="w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-300"
++                  className="w-full h-full opacity-80"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                   <span className="text-xs font-bold text-white/95">媛留뱀젏 ?ㅼ젣 二쇰갑 議곕━ 怨듦컙 諛??먭렇鍮??쒖“ 紐⑥뒿</span>
+                 </div>
+               </div>
+@@ -756,15 +1034,15 @@ export default function FranchisePageClient() {
+                 </div>
+               </div>
+               <div className="md:col-span-5 rounded-xl overflow-hidden bg-neutral-955 aspect-square border border-neutral-850/20 relative group">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src={selectedPlanTab === "8py" 
+                     ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns.png"
+                     : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_00_48_qomspv.png"
+                   } 
+                   alt="Floor plan spatial layout" 
+-                  className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-550"
++                  className="w-full h-full opacity-90"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent flex flex-col justify-end p-4">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent flex flex-col justify-end p-4 pointer-events-none">
+                   <span className="text-[10px] font-black text-amber-400 block uppercase tracking-wider">Interior Concept Mockup</span>
+                   <span className="text-xs font-bold text-white/95 mt-0.5">
+                     {selectedPlanTab === "8py" ? "8??留ㅼ옣 ?대? ?명뀒由ъ뼱 ?덉씠?꾩썐" : "10??留ㅼ옣 ?꾧꼍 諛??꾩씪?쒕뱶 ?숈꽑 諛곗튂"}
+@@ -781,7 +1059,7 @@ export default function FranchisePageClient() {
+         </section>
+ 
+         {/* SECTION 6. ?대? ?명뀒由ъ뼱 */}
+-        /* SECTION 7. ?깃났?щ? */
++        {/* SECTION 7. ?깃났?щ? */}
+         <section className={`rounded-3xl p-6 sm:p-12 ${cardBg} relative`}>
+           <div className="flex items-center justify-between border-b border-neutral-200/20 pb-4 mb-8">
+             <span className="text-xs font-black tracking-widest text-[#ffd500]">07 / SUCCESS CASES</span>
+@@ -831,12 +1109,12 @@ export default function FranchisePageClient() {
+ 
+               <div className="lg:col-span-5 relative group flex flex-col justify-center">
+                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[350px]">
+-                  <img 
++                  <ImageMagnifier disabled={isMagnifierActive} 
+                     src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/2026-05-28_13_37_40_sbppa6.png" 
+                     alt="Success advertising banner mockup" 
+-                    className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 opacity-90"
++                    className="w-full h-full opacity-90"
+                   />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent flex flex-col justify-end p-4">
++                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent flex flex-col justify-end p-4 pointer-events-none">
+                     <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider">Marketing Assets</span>
+                     <span className="text-xs font-bold text-white/95 mt-0.5">留ㅼ텧 遺?ㅽ똿 ?꾨떒 諛?紐⑤컮??愿묎퀬 ?띾낫 ?쒓컖 ?쒖븞</span>
+                   </div>
+@@ -947,10 +1225,10 @@ export default function FranchisePageClient() {
+                     </ul>
+                   </div>
+                   <div className="mt-4 rounded-xl overflow-hidden border border-neutral-250/10 aspect-[16/9] bg-neutral-950 relative">
+-                    <img 
++                    <ImageMagnifier disabled={isMagnifierActive} 
+                       src={card.img} 
+                       alt={card.title} 
+-                      className="w-full h-full object-cover opacity-90 group-hover:scale-[1.03] transition-transform duration-500" 
++                      className="w-full h-full opacity-90"
+                     />
+                   </div>
+                 </div>
+@@ -1149,107 +1427,6 @@ export default function FranchisePageClient() {
+                       </tr>
+                     ))}
+                     <tr className={`${isPink ? "bg-rose-500/10 text-rose-500" : "bg-amber-400/10 text-amber-600"} font-black`}>
+-                      <td className="py-4 px-4 rounded-l-xl">???쒖닔??/td>
+-                      <td className="py-4 px-4 text-right">1,400留???/td>
+-                      <td className="py-4 px-4 text-right font-mono">46.7%</td>
+-                      <td className="py-4 px-4 rounded-r-xl text-[10px]">濡쒖뿴??0% ?곸슜 諛??믪? 留덉쭊 蹂댁옣</td>
+-                    </tr>
+-                  </tbody>
+-                </table>
+-              </div>
+-
+-              <div className="lg:col-span-4 flex flex-col justify-between space-y-4">
+-                <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950 w-full">
+-                  <img 
+-                    src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_r90tky.jpg" 
+-                    alt="Arabica specialty coffee beans" 
+-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 opacity-90"
+-                  />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
+-                    <span className="text-[10px] font-bold text-white/95">而ㅽ뵾 ?먮ℓ 留덉쭊??洹밸??뷀븯???꾨씪鍮꾩뭅 ?먮몢 諛?留ㅼ옣 鍮꾩＜??/span>
+-                  </div>
+-                </div>
+-
+-                <div className={`p-5 rounded-2xl border ${isPink ? "border-rose-500/20 bg-rose-500/5 text-rose-455" : "border-amber-400/20 bg-amber-400/5 text-amber-600"} flex flex-col items-center justify-center text-center space-y-1.5`}>
+-                  <TrendingUp size={24} />
+-                  <span className="text-xs font-black">?붿????낃퀎 理쒓퀬 ?섏? 留덉쭊??/span>
+-                  <span className="text-base font-extrabold">???쒖닔????1,400留???(46.7%)</span>
+-                </div>
+-              </div>
+-            </div>
+-          </div>
+-
+-          <div className="flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500">
+-            <span>* ?곴린 湲덉븸? ?먰룷 ?낆? 諛?媛留뱀젏 ?댁쁺 諛⑹떇???곕씪 ?ㅻ? ???덉뒿?덈떎.</span>
+-            <span>Slide 10 / 16</span>
+-          </div>
+-        </section>
+-
+-        {/* SECTION 11. 李쎌뾽紐⑤뜽 A */}
+-        <section className={`rounded-3xl p-6 sm:p-12 ${cardBg} relative`}>
+-          <div className="flex items-center justify-between border-b border-neutral-200/20 pb-4 mb-8">
+-            <span className="text-xs font-black tracking-widest text-[#ffd500]">11 / FRANCHISE MODEL A</span>
+-            <span className="text-xs font-black text-slate-400">SHOP-IN-SHOP / DELIVERY</span>
+-          </div>
+-
+-          <div className="my-auto py-2 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+-            <div className="lg:col-span-5 space-y-4 text-left flex flex-col justify-between">
+-              <div>
+-                <span className={`text-xs font-black px-2.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455 border-rose-500/20" : "bg-amber-400/10 text-amber-600 border-amber-400/20"} border rounded-full`}>
+-                  紐⑤뜽 A: ?듭씤??/ 諛곕떖 ?꾨Ц??-                </span>
+-                <h2 className={`text-xl sm:text-2xl md:text-3xl font-black leading-tight ${textTitle} mt-3`}>
+-                  湲곗〈 留ㅼ옣 洹몃?濡?<br />
+-                  <span className={textHighlight}>440留???/span> ?뚯옄蹂?利됱떆 寃고빀
+-                </h2>
+-                <p className={`text-xs sm:text-sm leading-relaxed ${textDesc} mt-2`}>
+-                  湲곗〈 移댄럹, ?ル룄洹? ?〓낭?댁쭛 留ㅼ옣??湲곌린 ?명똿怨??ъ씤臾?援먯껜留뚯쑝濡??붿????먮ℓ瑜??쒖옉?섎뒗 珥덇컙???섏씠釉뚮━??媛???꾨줈洹몃옩?낅땲??
+-                </p>
+-              </div>
+-              
+-              <div className={`grid grid-cols-2 gap-3 text-xs font-bold ${textDesc}`}>
+-                {[
+-                  "媛留밸퉬/援먯쑁鍮??뚭꺽 ?섍툒",
+-                  "二쇰갑 ?ㅻ퉬 怨듭궗 遺덊븘??,
+-                  "珥덈룄 ?앹? 200媛?吏??,
+-                  "諛곕떖 ?뚮옯??利됱떆 ?곕룞"
+-                ].map((txt, idx) => (
+-                  <div key={idx} className="flex items-center gap-1.5">
+-                    <CheckCircle2 size={12} className={isPink ? "text-rose-500" : "text-amber-500"} />
+-                    <span>{txt}</span>
+-                  </div>
+-                ))}
+-              </div>
+-            </div>
+-
+-            <div className="lg:col-span-3 relative group">
+-              <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
+-                <img 
+-                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/2026-05-28_13_41_46_xec3ws.png" 
+-                  alt="Model A Counter POP advertising" 
+-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+-                />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
+-                  <span className="text-[10px] font-bold text-white/95">移댁슫???듭씤???꾩슜 鍮꾩＜???ъ뒪??/span>
+-                </div>
+-              </div>
+-            </div>
+-
+-            <div className={`lg:col-span-4 p-6 rounded-2xl text-left flex flex-col justify-between ${innerCardBgAccent} ${innerCardHover}`}>
+-              <span className={`text-[10px] font-black ${textDesc} uppercase tracking-wider block`}>MODEL A DETAILS</span>
+-              <div className={`space-y-3 border-b ${isPink ? "border-neutral-805" : "border-amber-200/35"} pb-4 my-3`}>
+-                <div className="flex justify-between items-center text-xs font-bold">
+-                  <span className={textDesc}>媛留밸퉬 (?쒖떆 ?쒗깮)</span>
+-                  <span className={`${textTitle} font-extrabold line-through`}>100留???/span>
+-                </div>
+-                <div className="flex justify-between items-center text-xs font-bold">
+-                  <span className={textDesc}>?λ퉬 怨듦툒 鍮꾩슜</span>
+-                  <span className={`${isPink ? "text-rose-455" : "text-amber-600"} font-extrabold text-sm`}>290留???/span>
+-                </div>
+-                <div className="flex justify-between items-center text-xs font-bold">
+-                  <span className={textDesc}>珥덈룄 ?먯옱 吏??/span>
+-                  <span className={`${textTitle} font-extrabold`}>150留???/span>
+-                </div>
+               </div>
+               <div className="flex justify-between items-center font-black">
+                 <span className={`text-xs ${textTitle}`}>理쒖쥌 ?꾩엯 湲덉븸</span>
+@@ -1303,12 +1480,12 @@ export default function FranchisePageClient() {
+ 
+             <div className="lg:col-span-3 relative group">
+               <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945187/IMG_8185_jpquaf.jpg" 
+                   alt="Model B Packaging box design" 
+-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-550 opacity-90"
++                  className="w-full h-full opacity-90"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3 pointer-events-none">
+                   <span className="text-[10px] font-bold text-white/95">?뚯씠?ъ븘??諛??좊Ъ ?곸옄 諛뺤뒪</span>
+                 </div>
+               </div>
+@@ -1382,12 +1559,12 @@ export default function FranchisePageClient() {
+ 
+             <div className="lg:col-span-3 relative group">
+               <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns.png" 
+                   alt="Model C premium kitchen cafe interior mockup" 
+-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
++                  className="w-full h-full opacity-90"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3 pointer-events-none">
+                   <span className="text-[10px] font-bold text-white/95">?꾨━誘몄뾼 ?몃젴??二쇰갑 諛?? 援ъ꽦</span>
+                 </div>
+               </div>
+@@ -1426,72 +1603,110 @@ export default function FranchisePageClient() {
+         <section className={`rounded-3xl p-6 sm:p-12 ${cardBg} relative`}>
+           <div className="flex items-center justify-between border-b border-neutral-200/20 pb-4 mb-8">
+             <span className="text-xs font-black tracking-widest text-[#ffd500]">14 / FRANCHISE PROCESS</span>
+-            <span className="text-xs font-black text-slate-400">7-STEP LAUNCH ROADMAP</span>
++            <span className="text-xs font-black text-slate-400">5-STEP LAUNCH ROADMAP</span>
+           </div>
+ 
+           <div className="space-y-10">
+-            <div className="text-center md:text-left space-y-3">
+-              <h2 className="text-2xl sm:text-3xl font-black">
+-                泥닿퀎?곸씤 <span className={textHighlight}>7?④퀎 媛쒖젏 ?꾨줈?몄뒪</span>
+-              </h2>
+-              <p className={`text-sm sm:text-base leading-relaxed ${textDesc}`}>
+-                ?곷떞 ?좎껌遺??理쒖쥌 洹몃옖???ㅽ뵂源뚯? 蹂몄궗 媛쒖젏 ?꾨떞???諛李⑺븯??耳?댄빀?덈떎.
+-              </p>
+-            </div>
++            {/* Top Grid: Title and Support Points */}
++            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
++              {/* Left Title */}
++              <div className="text-center md:text-left space-y-3">
++                <span className={`text-xs font-black tracking-widest ${isPink ? "text-rose-450" : "text-amber-500"} uppercase block font-mono`}>Franchise Process</span>
++                <h2 className="text-3xl sm:text-4xl font-black">
++                  泥닿퀎?곸씤 <span className={textHighlight}>李쎌뾽 ?덉감</span>
++                </h2>
++                <p className={`text-sm sm:text-base leading-relaxed ${textDesc}`}>
++                  怨꾩빟遺???ㅽ뵂 ?댄썑 ?ы썑愿由ш퉴吏, 蹂몄궗??諛李?耳???쒖뒪?쒖쑝濡??덉젙?곸씤 李쎌뾽??吏?먰빀?덈떎.
++                </p>
++              </div>
+ 
+-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left">
+-              <div className="lg:col-span-8 relative">
+-                {/* Connecting Line */}
+-                <div className={`absolute left-6 top-4 bottom-4 w-0.5 ${isPink ? "bg-neutral-805" : "bg-amber-200/50"} z-0`}></div>
+-                <div className="space-y-4 relative z-10">
++              {/* Right Support Points Card */}
++              <div className={`p-6 rounded-3xl border ${isPink ? "bg-neutral-900/60 border-neutral-800 shadow-rose-950/5" : "bg-[#fffbf0] border-amber-200/50 shadow-amber-100/10"} shadow-lg text-left`}>
++                <h3 className={`text-sm sm:text-base font-black text-center mb-5 ${textTitle}`}>蹂몄궗 吏???ъ씤??/h3>
++                <div className="grid grid-cols-2 gap-3">
+                   {[
+-                    { step: "01", name: "?곷떞 ?좎껌", desc: "?꾩엯 ?뺥깭 諛??됱닔 吏꾨떒", icon: <Info size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "02", name: "?곴텒 遺꾩꽍", desc: "諛곕떖 諛??源?遺꾩꽍", icon: <Search size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "03", name: "媛留?怨꾩빟", desc: "?몃? ?쒗깮 諛?泥닿껐", icon: <FileText size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "04", name: "?꾨㈃ ?ㅺ퀎", desc: "1???숈꽑 諛곗튂???뺤젙", icon: <Building2 size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "05", name: "湲곌린 援먯쑁", desc: "1:1 ?덉떆??議곕━ 留덉뒪??, icon: <ChefHat size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "06", name: "?ㅽ뵂 由ы뿀??, desc: "理쒖쥌 媛???뚯뒪??, icon: <Sliders size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "07", name: "洹몃옖???ㅽ뵂", desc: "留ㅼ텧 ?쒖꽦??留덉???, icon: <Sparkles size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> }
+-                  ].map((row, idx) => (
+-                    <div key={idx} className="flex items-center gap-4 hover:scale-[1.01] transition-transform duration-200">
+-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black shrink-0 border transition-all duration-300 shadow-md ${isPink ? "bg-neutral-950 border-neutral-800 text-rose-500" : "bg-white border-amber-200/60 text-amber-600"}`}>
+-                        {row.step}
+-                      </div>
+-                      <div className={`flex-1 p-3.5 rounded-xl ${innerCardBg} ${innerCardHover} border ${isPink ? "border-neutral-850/60" : "border-amber-250/20"} flex items-center justify-between`}>
+-                        <div>
+-                          <h4 className={`text-xs sm:text-sm font-black ${textTitle}`}>{row.name}</h4>
+-                          <p className={`text-[10px] ${textDesc} leading-relaxed font-semibold mt-0.5`}>{row.desc}</p>
+-                        </div>
+-                        <div className={`p-1.5 rounded-lg ${isPink ? "bg-neutral-950/60" : "bg-amber-100/40"}`}>
+-                          {row.icon}
+-                        </div>
++                    { title: "?곴텒 遺꾩꽍", icon: <MapPin size={20} className={isPink ? "text-rose-400" : "text-amber-600"} />, bgClass: isPink ? "bg-neutral-950 border border-neutral-850" : "bg-white border border-amber-200/50" },
++                    { title: "硫붾돱 援먯쑁", icon: <ChefHat size={20} className={isPink ? "text-rose-400" : "text-amber-600"} />, bgClass: isPink ? "bg-neutral-950 border border-neutral-850" : "bg-white border border-amber-200/50" },
++                    { title: "?ㅽ뵂 ?명똿", icon: <Store size={20} className={isPink ? "text-rose-400" : "text-amber-600"} />, bgClass: isPink ? "bg-neutral-950 border border-neutral-850" : "bg-white border border-amber-200/50" },
++                    { title: "?ы썑 愿由?, icon: <Headphones size={20} className={isPink ? "text-rose-400" : "text-amber-600"} />, bgClass: isPink ? "bg-neutral-950 border border-neutral-850" : "bg-white border border-amber-200/50" },
++                  ].map((pt, idx) => (
++                    <div key={idx} className={`p-3.5 rounded-2xl ${pt.bgClass} flex flex-col items-center text-center justify-center gap-1.5 transition-transform hover:scale-[1.03] duration-300`}>
++                      <div className={`p-2 rounded-xl ${isPink ? "bg-rose-500/10" : "bg-amber-100/50"} shadow-sm`}>
++                        {pt.icon}
+                       </div>
++                      <span className={`text-xs sm:text-sm font-black ${textTitle}`}>{pt.title}</span>
+                     </div>
+                   ))}
+                 </div>
+               </div>
++            </div>
+ 
+-              <div className="lg:col-span-4 relative group">
+-                <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/6] bg-neutral-950 w-full h-full min-h-[350px]">
+-                  <img 
+-                    src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_51_40_ahiniz.png" 
+-                    alt="Process marketing material" 
+-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+-                  />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
+-                    <span className="text-xs font-bold text-white/95">?ㅽ뵂 以鍮??꾩냽 吏???⑦궎吏?諛?POP ?명듃</span>
++            {/* Bottom Grid: 5-step cards and images */}
++            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-8">
++              {/* Left Column (5 steps): 7 columns */}
++              <div className="lg:col-span-7 space-y-5">
++                {[
++                  { step: "01", text: "李쎌뾽 ?곷떞 諛?留ㅼ옣 ?곹솴/?곴텒 遺꾩꽍" },
++                  { step: "02", text: "?꾩씠???좎젙 諛?留욎땄??媛留?怨꾩빟" },
++                  { step: "03", text: "蹂몄궗 ?꾨Ц媛??硫붾돱 援먯쑁 諛??뚯씠 ?덉떆???쒓났" },
++                  { step: "04", text: "蹂몄궗 ?⑦궎吏 ?명똿 諛?留ㅼ옣 洹몃옖???ㅽ뵂" },
++                  { step: "05", text: "吏?띿쟻???좊찓??媛쒕컻 諛?泥좎????ы썑 留ㅼ텧 愿由? }
++                ].map((item, idx) => (
++                  <div key={idx} className="relative pl-3 select-none">
++                    {/* Ribbon folding shadow trick */}
++                    <div className={`absolute -left-1.5 top-[calc(50%+8px)] w-0 h-0 border-t-[5px] ${isPink ? "border-t-rose-950" : "border-t-amber-950"} border-l-[5px] border-l-transparent z-0`}></div>
++                    
++                    {/* Step Card Body */}
++                    <div className={`p-4 pl-12 pr-6 rounded-2xl border ${isPink ? "bg-neutral-900/60 border-neutral-800 text-white" : "bg-gradient-to-r from-amber-400 to-amber-300 text-neutral-900 border-amber-400 shadow-md"} relative z-10 flex items-center justify-between text-left hover:scale-[1.01] transition-transform duration-200`}>
++                      {/* Ribbon Number Badge */}
++                      <div className={`w-10 h-10 flex items-center justify-center font-black rounded-r-xl rounded-l-md absolute -left-2 top-1/2 -translate-y-1/2 shadow-md ${isPink ? "bg-rose-600 text-white" : "bg-[#f05c40] text-white"}`}>
++                        {item.step}
++                      </div>
++                      <span className="text-xs sm:text-sm md:text-base font-black leading-snug">
++                        {item.text}
++                      </span>
++                    </div>
+                   </div>
+-                </div>
++                ))}
++              </div>
++
++              {/* Right Column (3 images): 5 columns */}
++              <div className="lg:col-span-5 space-y-4">
++                {[
++                  {
++                    url: "https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&w=600&q=80",
++                    cap: "李쎌뾽 ?곷떞 諛??몃? ?곴텒 而⑥꽕??
++                  },
++                  {
++                    url: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&q=80",
++                    cap: "蹂몄궗 議곕━??1:1 湲곌린 諛??덉떆??吏묒쨷 援먯쑁"
++                  },
++                  {
++                    url: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=600&q=80",
++                    cap: "?ㅽ뵂 ?댄썑 泥좎???諛李??ы썑 愿由?
++                  }
++                ].map((imgItem, idx) => (
++                  <div key={idx} className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-lg aspect-[16/7] bg-neutral-950 group hover:scale-[1.02] transition-all duration-300">
++                    <img 
++                      src={imgItem.url} 
++                      alt={imgItem.cap} 
++                      className="w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500" 
++                    />
++                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/75 via-transparent to-transparent flex items-end p-3">
++                      <span className="text-[10px] sm:text-xs font-bold text-white/95">{imgItem.cap}</span>
++                    </div>
++                  </div>
++                ))}
+               </div>
+             </div>
+           </div>
+ 
+           <div className="flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500">
+-            <span>* ?곷떞遺???됯퇏 媛쒖젏 ?뚯슂 湲곌컙: ?듭씤??7?? ?좉퇋李쎌뾽 21??/span>
++            <span>* 媛留??곷떞 ?꾨즺 ???곸꽭 媛쒖젏 ?ㅼ?以꾨윭瑜?臾댁긽 ?쒓났???쒕┰?덈떎.</span>
+             <span>Slide 14 / 16</span>
+           </div>
+         </section>
+-
++        
+         {/* SECTION 15. ?꾩엯 ?댁쑀 (WHY PARTNER WITH US) */}
+         <section className={`rounded-3xl p-6 sm:p-12 ${cardBg} relative`}>
+           <div className="flex items-center justify-between border-b border-neutral-200/20 pb-4 mb-8">
+@@ -1531,12 +1746,12 @@ export default function FranchisePageClient() {
+ 
+               <div className="lg:col-span-4 relative group">
+                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950">
+-                  <img 
++                  <ImageMagnifier disabled={isMagnifierActive} 
+                     src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945603/EGG120_%EB%8F%99%EB%AC%BC%EB%B3%B5%EC%A7%80_%ED%8C%9D%EC%97%85POPUP__240613_jqil66.jpg" 
+                     alt="Egg120 animal welfare pop-up" 
+-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
++                    className="w-full h-full opacity-95"
+                   />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                     <span className="text-xs font-bold text-white/95">媛留?怨듦툒 ?щ즺 李⑤퀎?? 移쒗솚寃??숇Ъ蹂듭? ?몄쬆 怨꾨?</span>
+                   </div>
+                 </div>
+@@ -1730,6 +1945,95 @@ export default function FranchisePageClient() {
+           <p className="text-[10px] text-slate-650">짤 2026 120pie & coffee Corp. All rights reserved.</p>
+         </div>
+       </footer>
++      </div>
++
++      {/* Global Magnifying Glass Overlay */}
++      {mounted && isMagnifierActive && (
++        <div 
++          className="fixed z-[9999] hidden lg:block"
++          style={{
++            left: `${lensPos.x}px`,
++            top: `${lensPos.y}px`,
++            transform: "translate(-50%, -50%)",
++            width: `${lensSize}px`,
++            height: `${lensSize}px`,
++            pointerEvents: "none",
++            transition: "none",
++          }}
++        >
++          {/* Circular Lens */}
++          <div 
++            className={`relative w-full h-full rounded-full border-4 ${isPink ? 'border-rose-500 bg-neutral-950' : 'border-amber-400 bg-[#fffdf4]'} shadow-2xl overflow-hidden`}
++          >
++            {/* Spotlight reflection glare */}
++            <div className="absolute top-2 left-2 w-16 h-16 bg-white/20 rounded-full blur-[2px] z-40"></div>
++            
++            {/* Mirror cloned page */}
++            <div
++              className="magnifier-lens-content"
++              style={{
++                position: "absolute",
++                width: "100vw",
++                minWidth: "100vw",
++                maxWidth: "none", // Prevent global max-width CSS resets from squishing layout
++                height: `${pageSize.height}px`,
++                maxHeight: "none", // Prevent global max-height constraints
++                transform: `scale(${zoomLevel})`,
++                transformOrigin: "top left",
++                left: `${-(lensPos.x + (typeof window !== "undefined" ? window.scrollX : 0)) * zoomLevel + lensSize / 2}px`,
++                top: `${-(lensPos.y + (typeof window !== "undefined" ? window.scrollY : 0)) * zoomLevel + lensSize / 2}px`,
++                pointerEvents: "none",
++              }}
++              dangerouslySetInnerHTML={{ __html: pageHtml }}
++            />
++          </div>
++        </div>
++      )}
++
++      {/* CSS Overrides for Mirrored Content in Magnifier Lens */}
++      <style dangerouslySetInnerHTML={{ __html: `
++        .magnifier-lens-content [style*="opacity: 0"], 
++        .magnifier-lens-content [style*="opacity:0"] {
++          opacity: 1 !important;
++          transform: none !important;
++        }
++      `}} />
++
++      {/* Persistent Magnifier Toggle Sidebar Button */}
++      {mounted && (
++        <button
++          type="button"
++          onClick={() => {
++            if (isMagnifierActive) {
++              setIsMagnifierActive(false);
++            } else {
++              setIsMagnifierActive(true);
++              const element = document.getElementById("magnifiable-page");
++              if (element) {
++                setPageHtml(element.innerHTML);
++                setPageSize({
++                  width: element.offsetWidth,
++                  height: element.offsetHeight
++                });
++              }
++            }
++          }}
++          className={`fixed top-1/2 left-6 -translate-y-1/2 z-[9999] hidden lg:flex flex-col items-center justify-center gap-1.5 w-14 h-24 rounded-full shadow-2xl font-black text-[10px] cursor-pointer hover:scale-105 active:scale-95 transition-all border ${
++            isMagnifierActive
++              ? isPink 
++                ? "bg-rose-500 text-white border-rose-400 shadow-rose-500/20" 
++                : "bg-amber-400 text-neutral-950 border-amber-500 shadow-amber-400/20"
++              : isPink
++                ? "bg-neutral-900 text-neutral-350 border-neutral-800"
++                : "bg-white text-slate-700 border-neutral-200"
++          }`}
++        >
++          <Search size={16} className={isMagnifierActive ? "animate-pulse" : ""} />
++          <span className="text-center leading-tight">
++            ?뗫낫湲?br />{isMagnifierActive ? "?꾧린" : "耳쒓린"}
++          </span>
++        </button>
++      )}
+     </div>
+   );
+ }

@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Wrap Slide 04 flowchart grid in ScrollTriggered.\"",
+  "EndLine": "817",
+  "Instruction": "\"Wrap flowchart grid in ScrollTriggered.\"",
+  "ReplacementContent": "\"              <ScrollTriggered>\\n                {(isVisible) => (\\n                  <div className=\\\"grid grid-cols-1 sm:grid-cols-4 gap-6 text-center relative z-10\\\">\"",
+  "StartLine": "817",
+  "TargetContent": "\"              <div className=\\\"grid grid-cols-1 sm:grid-cols-4 gap-6 text-center relative z-10\\\">\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Wrapping flowchart in ScrollTriggered\"",
+  "toolSummary": "\"Replace file content\""
+}

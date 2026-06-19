@@ -1,0 +1,12 @@
+{
+  "name": "grep_search",
+  "args": {
+    "CaseInsensitive": "false",
+    "IsRegex": "false",
+    "MatchPerLine": "true",
+    "Query": "\"120겹파이 올인원 패키지\"",
+    "SearchPath": "\"d:/anti-gv/25. 120pie(new)_2/app/franchise/FranchisePageClient.tsx\"",
+    "toolAction": "\"Searching for a Korean string in file\"",
+    "toolSummary": "\"Grep search for Korean string\""
+  }
+}

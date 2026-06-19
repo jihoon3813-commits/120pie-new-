@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Wrap Slide 10 Donut Chart in ScrollTriggered.\"",
+  "EndLine": "1383",
+  "Instruction": "\"Wrap the donut chart div in ScrollTriggered.\"",
+  "ReplacementContent": "\"                <ScrollTriggered>\\n                  {(isVisible) => (\\n                    <div className={`relative flex items-center justify-center w-72 h-72 sm:w-80 sm:h-80 rounded-full border ${isPink ? \\\"bg-neutral-900/40 border-neutral-800 shadow-rose-950/20\\\" : \\\"bg-white border-amber-200/40 shadow-amber-100/50\\\"} shadow-xl`}>\"",
+  "StartLine": "1383",
+  "TargetContent": "\"                <div className={`relative flex items-center justify-center w-72 h-72 sm:w-80 sm:h-80 rounded-full border ${isPink ? \\\"bg-neutral-900/40 border-neutral-800 shadow-rose-950/20\\\" : \\\"bg-white border-amber-200/40 shadow-amber-100/50\\\"} shadow-xl`}>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Wrapping donut chart in ScrollTriggered\"",
+  "toolSummary": "\"Replace file content\""
+}

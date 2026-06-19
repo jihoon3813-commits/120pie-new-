@@ -1,0 +1,10 @@
+{
+  "ArtifactMetadata": "{\"ArtifactType\":\"task\",\"Summary\":\"Task list for upgrading the magnifying glass on the franchise page. Tracks progress of adding global magnifier states, mirroring the DOM inside the lens, resolving cursor physics for the close button, styling modifications, adding the reactivation toggle, and replacing localized ImageMagnifiers.\"}",
+  "CodeContent": "\"# Upgrading Franchise Page Magnifying Glass Task List\\n\\n- [ ] Create wrapper container `#magnifiable-page` in `FranchisePageClient.tsx`\\n- [ ] Add state variables (`isMagnifierActive`, `isHoveringClose`, `lensPos`, `pageHtml`, `pageSize`)\\n- [ ] Implement coordinates updates and page HTML cloning logic in `useEffect` and `mousemove` handler\\n- [ ] Implement freeze-on-hover physics logic for the lens positioning\\n- [ ] Rebuild and enlarge the magnifier lens overlay with a close button and remove the \\\"ZOOM\\\" text\\n- [ ] Create the activation floating button on the page when the magnifier is closed\\n- [ ] Modify `ImageMagnifier` so that it doesn't double-zoom when global magnifier is active\\n- [ ] Verify functionality (checking hover behavior, close button clicking, re-activation, styling)\\n\"",
+  "Description": "\"Create task.md to track implementation progress.\"",
+  "IsArtifact": "true",
+  "Overwrite": "true",
+  "TargetFile": "\"C:\\\\Users\\\\FORYOUCOM\\\\.gemini\\\\antigravity-ide\\\\brain\\\\a7d16e60-6a64-43a8-9037-063c51e7a7cf\\\\task.md\"",
+  "toolAction": "\"Writing task list to task.md\"",
+  "toolSummary": "\"Write task.md\""
+}

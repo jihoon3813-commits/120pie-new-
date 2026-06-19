@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation } from "convex/react";
 import Footer from "@/app/components/Footer";
+import { MENU_DATA } from "@/app/constants/menu";
 import { api } from "../../convex/_generated/api";
 import {
   ArrowRight,
@@ -70,55 +71,8 @@ function AnimatedNumber({ value, suffix = "" }: { value: number, suffix?: string
 function MenuModal({ menuId, onClose, onInquiry, isPink = false }: { menuId: string | null, onClose: () => void, onInquiry: () => void, isPink?: boolean }) {
   if (!menuId) return null;
 
-  const details: Record<string, { title: string, desc: string, items: { name: string, desc: string, img: string }[] }> = {
-    "120겹파이": {
-      title: "커피와 함께 즐기기 좋은 대표 메뉴, 120파이",
-      desc: "고소한 크림 파이부터 든든한 미트와 피자 파이까지, 손님의 취향과 시간대에 맞춰 폭넓게 제안할 수 있는 120파이 메뉴입니다.",
-      items: [
-        { name: "로제미트파이", desc: "부드러운 로제 소스와 든든한 미트가 어우러진 식사형 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184221/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s3svi2.jpg" },
-        { name: "블루베리파이", desc: "상큼한 블루베리 풍미가 바삭한 파이와 어울리는 달콤한 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184610/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_zfmatx.jpg" },
-        { name: "콘치즈파이", desc: "고소한 옥수수와 치즈의 조합으로 누구나 편하게 즐기기 좋은 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184643/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_lio2tj.jpg" },
-        { name: "커스터드파이", desc: "부드럽고 달콤한 커스터드 크림을 채운 클래식 디저트 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184658/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_dule6z.jpg" },
-        { name: "불고기파이", desc: "달큰한 불고기 풍미를 담아 간단한 한 끼로도 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184700/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ss1t8y.jpg" },
-        { name: "애플파이", desc: "달콤한 사과 풍미로 따뜻한 커피와 편안하게 곁들이기 좋습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184723/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_kxykcu.jpg" },
-        { name: "팥치즈파이", desc: "달콤한 팥과 담백한 치즈가 만나 익숙하면서도 새로운 맛을 전합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184738/%ED%8C%A5%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_cvme5l.jpg" },
-        { name: "크림치즈파이", desc: "산뜻한 크림치즈의 부드러움을 바삭한 결 사이에 담았습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184763/%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_nvzwvc.jpg" },
-        { name: "망고파이", desc: "달콤하고 향긋한 망고의 풍미가 돋보이는 산뜻한 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184783/%EB%A7%9D%EA%B3%A0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_yynprf.jpg" },
-        { name: "페퍼로니피자파이", desc: "페퍼로니와 치즈의 익숙한 풍미로 간식과 식사 모두 잘 어울립니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184808/%ED%8E%98%ED%8E%98%EB%A1%9C%EB%8B%88%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_izlrfv.jpg" },
-        { name: "고구마파이", desc: "달콤하고 포근한 고구마 맛으로 남녀노소 편하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184829/%EA%B3%A0%EA%B5%AC%EB%A7%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_qojchr.jpg" }
-      ]
-    },
-    "에그120": {
-      title: "폭신하고 부드러운 간식, 에그120 계란빵",
-      desc: "폭신한 계란빵에 고소한 계란과 다채로운 토핑을 더했습니다. 커피와 함께 가볍게 즐기기 좋은, 따뜻하고 친근한 간식 메뉴입니다.",
-      items: [
-        { name: "오리지널 계란빵", desc: "추억 속 계란빵의 따뜻한 맛을 요즘 감성으로 담아낸 시그니처 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184985/edited-photo_4_y98ytv.jpg" },
-        { name: "베이컨 계란빵", desc: "짭짤하고 고소한 베이컨과 담백한 계란이 잘 어우러지는 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184987/edited-photo_2_rplfpn.jpg" },
-        { name: "커스터드 계란빵", desc: "달콤하고 부드러운 크림이 담백한 계란빵과 만나 사르르 녹는 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184988/edited-photo_5_shiudy.jpg" },
-        { name: "콘버터 계란빵", desc: "달콤한 옥수수와 고소한 버터가 더해져 풍성하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184986/edited-photo_6_mkz6ey.jpg" },
-        { name: "로제미트 계란빵", desc: "부드러운 로제소스와 계란의 조합으로 진하고 크리미한 풍미를 전합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184991/edited-photo_1_euib8f.jpg" },
-        { name: "통모짜 계란빵", desc: "쭉 늘어나는 모짜렐라 치즈가 더해져 고소하고 짭짤하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184989/edited-photo_7_usuk8g.jpg" },
-        { name: "슈크림 계란빵", desc: "달콤하고 부드러운 슈크림이 계란의 고소함과 어우러지는 간식입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184989/edited-photo_3_syalvo.jpg" },
-        { name: "팥 계란빵", desc: "달콤한 팥앙금과 고소한 계란이 만나 포근한 단맛을 느낄 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184990/edited-photo_8_h7k4xt.jpg" },
-      ]
-    },
-    "기타": {
-      title: "달콤한 간식부터 든든한 한 입까지, 사이드 메뉴",
-      desc: "스페인 정통 찹쌀 츄러스와 떡볶이 삼총사, 직화불고기 핫도그까지. 매장의 시간대와 손님 취향에 맞춰 다채롭게 제안할 수 있습니다.",
-      items: [
-        { name: "오리지널 츄러스", desc: "쫀득한 찹쌀 식감과 바삭한 겉결을 살린, 커피와 잘 어울리는 기본 츄러스입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185404/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_izqnfl.jpg" },
-        { name: "녹차 츄러스", desc: "은은한 녹차 향과 담백한 단맛으로 깔끔하게 즐기기 좋은 츄러스입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185408/%EB%85%B9%EC%B0%A8_jmac8h.jpg" },
-        { name: "슈가 츄러스", desc: "달콤한 슈가 코팅을 더해 한입마다 기분 좋은 바삭함을 전합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185405/%EC%8A%88%EA%B0%80_tzns46.jpg" },
-        { name: "오레오 츄러스", desc: "달콤한 쿠키 풍미를 더해 디저트로 더욱 즐겁게 맛볼 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185408/%EC%98%A4%EB%A0%88%EC%98%A4_bssm74.jpg" },
-        { name: "국물 떡볶이", desc: "달콤하면서도 매콤한 국물 한입에 자꾸 생각나는 중독적인 떡볶이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185350/%EA%B5%AD%EB%AC%BC1_amnxed.png" },
-        { name: "로제짜장 떡볶이", desc: "짜장에 로제를 더해 부드럽고 진한 맛을 즐길 수 있는 색다른 떡볶이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185349/%EC%A7%9C%EC%9E%A51_zktcnn.png" },
-        { name: "로제 떡볶이", desc: "고소한 크림에 달달매콤한 풍미가 더해져 부드럽게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185348/%EB%A1%9C%EC%A0%9C1_lwn2j7.png" },
-        { name: "직화불고기 핫도그", desc: "불향 가득한 직화불고기와 육즙 있는 소시지가 어우러진 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185539/A4_07054_2_er4md2.jpg" }
-      ]
-    }
-  };
-
-  const data = details[menuId];
+  const data = MENU_DATA[menuId];
+  if (!data) return null;
 
   return (
     <AnimatePresence>
@@ -153,9 +107,8 @@ function MenuModal({ menuId, onClose, onInquiry, isPink = false }: { menuId: str
             <div className="p-5 sm:p-8 grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 bg-neutral-950">
               {data.items.map((item, i) => (
                 <div key={i} className="bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-850 shadow-lg hover:border-amber-400/40 transition-all group">
-                  <div className="h-44 overflow-hidden relative bg-neutral-950">
-                    <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent"></div>
+                  <div className="h-44 overflow-hidden relative bg-white flex items-center justify-center p-3">
+                    <img src={item.img} alt={item.name} className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <div className="p-5">
                     <h4 className="font-extrabold text-white text-base mb-1.5">{item.name}</h4>
@@ -1933,10 +1886,11 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               ].map((menu) => {
                 const tabParam = menu.id === "120겹파이" ? "pie" : menu.id === "에그120" ? "egg" : menu.id === "coffee120" ? "coffee" : "side";
                 return (
-                  <Link
+                  <button
                     key={menu.id}
-                    href={isYellowVariant ? `/menu?theme=yellow&tab=${tabParam}` : `/menu?theme=pink&tab=${tabParam}`}
-                    className={`group text-left border-t pt-5 transition-colors flex flex-col ${
+                    type="button"
+                    onClick={() => setSelectedMenu(menu.id)}
+                    className={`group text-left border-t border-x-0 border-b-0 bg-transparent pt-5 transition-colors flex flex-col w-full cursor-pointer focus:outline-none ${
                       isPinkVariant 
                         ? "border-[#f2ccd7] hover:border-rose-400 text-[#735965]" 
                         : isYellowVariant 
@@ -1971,7 +1925,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     }`}>
                       메뉴 자세히 보기 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
                     </span>
-                  </Link>
+                  </button>
                 );
               })}
             </div>

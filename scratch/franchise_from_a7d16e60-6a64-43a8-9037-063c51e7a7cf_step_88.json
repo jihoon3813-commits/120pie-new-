@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Wrap the page content in #magnifiable-page and update cursor-hidden class application based on isMagnifierActive.\"",
+  "EndLine": "477",
+  "Instruction": "\"Wrap the header, main, and footer elements inside a magnifiable-page container, and modify cursor-none condition to depend on isMagnifierActive.\"",
+  "ReplacementContent": "\"  return (\\n    <div id={isPink ? \\\"landing-v3\\\" : \\\"landing-v5\\\"} className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg} ${isHovering && !isInteractive && isMagnifierActive ? \\\"lg:cursor-none\\\" : \\\"\\\"}`}>\\n      <div id=\\\"magnifiable-page\\\" className=\\\"w-full relative\\\">\"",
+  "StartLine": "472",
+  "TargetContent": "\"  return (\\n    <div id={isPink ? \\\"landing-v3\\\" : \\\"landing-v5\\\"} className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg} ${isHovering && !isInteractive ? \\\"lg:cursor-none\\\" : \\\"\\\"}`}>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Adding magnifiable-page wrapper tag and updating root div class\"",
+  "toolSummary": "\"Modify page wrapper in FranchisePageClient\""
+}

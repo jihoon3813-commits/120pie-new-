@@ -1,0 +1,8 @@
+{
+  "Description": "\"Import useRef and fix unclosed div tag in Slide 02 of FranchisePageClient.tsx\"",
+  "Instruction": "\"Add useRef to the React imports at the top of the file, and insert the missing closing </div> tag in the Slide 02 scroll wrapper.\"",
+  "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":38,\"ReplacementContent\":\"import { useState, useEffect, useRef } from \\\"react\\\";\",\"StartLine\":36,\"TargetContent\":\"import { useState, useEffect } from \\\"react\\\";\"},{\"AllowMultiple\":false,\"EndLine\":628,\"ReplacementContent\":\"                    ))}\\n                  </div>\\n                </div>\\n              )}\\n            </ScrollTriggered>\",\"StartLine\":623,\"TargetContent\":\"                    ))}\\n                  </div>\\n                    )}\\n                  </ScrollTriggered>\"}]",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Fixing imports and Slide 02 syntax error in FranchisePageClient.tsx\"",
+  "toolSummary": "\"Fixing compilation errors in client component\""
+}

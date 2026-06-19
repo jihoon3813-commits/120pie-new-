@@ -1,0 +1,10 @@
+{
+  "ArtifactMetadata": "{\"ArtifactType\":\"implementation_plan\",\"RequestFeedback\":true,\"Summary\":\"FranchisePageClient.tsx 파일의 Section 11, 12, 13 슬라이드 UI 개편을 위한 구현 계획서입니다. 시안 이미지 내 표 내용 및 디자인 요소를 완벽하게 반영하여 프리미엄하고 깔끔한 화면을 제공합니다.\"}",
+  "CodeContent": "\"# 가맹 안내 페이지 (Slide 11~13) UI 개편 계획\\n\\n가맹 안내 페이지(`app/franchise/FranchisePageClient.tsx`) 내의 11, 12, 13번 슬라이드 영역을 사용자가 전달한 첨부 파일(창업 모델 A, B, C 상세 시안)에 맞추어 디자인을 현대적이고 프리미엄하게 개편합니다.\\n\\n## User Review Required\\n\\n> [!IMPORTANT]\\n> - **3無 및 혜택 배지 강조**: 각 슬라이드 상단에는 시안과 동일하게 월계관형 골드/로즈 엠블럼과 가격 정보(`330만원부터`, `980만원`, `6,518만원`)를 눈에 띄게 배치합니다.\\n> - **취소선 가격 적용**: 기존 가격 대비 할인된 최종 창업 비용을 시각적 고대비로 명확하게 노출합니다.\\n> - **테마 호환성**: `isPink` 조건에 따라 블랙/로즈 골드 테마 및 옐로우/네이비 테마가 완벽하게 교차 반영되도록 텍스트 및 배경 색상 클래스를 정밀하게 설정합니다.\\n\\n## Proposed Changes\\n\\n### 가맹 안내 컴포넌트\\n\\n#### [MODIFY] [FranchisePageClient.tsx](file:///d:/anti-gv/25.%20120pie(new)_2/app/franchise/FranchisePageClient.tsx)\\n\\n##### 1. Section 11 (창업모델 A. 샵인샵 매출 두배 창업)\\n- **헤더 & 배지**: \\\"창업 모델 A. 샵인샵(shop in shop) 매출 두배 창업\\\" 타이틀 및 \\\"#거품 없는 도입 비용\\\", \\\"#가맹비/교육비/로열티 3無\\\" 태그 추가. 우측에 \\\"330만원부터 VAT별도\\\" 월계관 골드 크라운 배지 이식.\\n- **테이블 1**: `120겹파이 올인원 패키지` (5,500,000원 -> **4,400,000원 VAT별도**). 전용 베이킹 인프라, 초도 원재료 패키지, 매장 홍보물 세트, 판매 촉진 비주얼 세트, 운영 정착 지원의 5개 행 구현.\\n- **테이블 2**: `에그120 프리미엄 패키지` (4,400,000원 -> **3,300,000원 VAT별도**). 전용 조리 인프라, 초도 원재료 패키지, 매장 홍보물 세트, 판매 촉진 비주얼 세트, 운영 정착 지원의 5개 행 구현.\\n- **결합 패키지**: `120 시리즈 결합 패키지 \n<truncated 2179 bytes>",
+  "Description": "\"가맹 안내 페이지 11~13번 슬라이드 UI 개편을 위한 구현 계획서 생성\"",
+  "IsArtifact": "true",
+  "Overwrite": "true",
+  "TargetFile": "\"C:\\\\Users\\\\FORYOUCOM\\\\.gemini\\\\antigravity-ide\\\\brain\\\\fcfe2e54-0c4e-4167-8fd6-d0d791b028ba\\\\implementation_plan.md\"",
+  "toolAction": "\"Creating implementation plan for franchise page edits\"",
+  "toolSummary": "\"Implementation plan creation\""
+}

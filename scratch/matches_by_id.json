@@ -1,0 +1,446 @@
+[
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 118,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762984/%EA%B5%AD%EB%AC%BC%EB%96%A1%EB%B3%B6%EC%9D%B4_ue9q3m.jpg",
+      "context": "        { name: \"슈가 츄러스\", desc: \"달콤한 슈가 코팅을 더해 한입마다 기분 좋은 바삭함을 전합니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762877/%EC%8A%88%EA%B0%80_tf4jni.jpg\" },\r\n        { name: \"오레오 츄러스\", desc: \"달콤한 쿠키 풍미를 더해 디저트로 더욱 즐겁게 맛볼 수 있습니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762878/%EC%98%A4%EB%A0%88%EC%98%A4_k9ea73.jpg\" },\r\n        { name: \"국물 떡볶이\", desc: \"달콤하면서도 매콤한 국물 한입에 자꾸 생각나는 중독적인 떡볶이입니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762984/%EA%B5%AD%EB%AC%BC%EB%96%A1%EB%B3%B6%EC%9D%B4_ue9q3m.jpg\" },\r\n        { name: \"로제짜장 떡볶이\", desc: \"짜장에 로제를 더해 부드럽고 진한 맛을 즐길 수 있는 색다른 떡볶이입니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762983/%EB%A1%9C%EC%A0%9C%EC%A7%9C%EC%9E%A5%EB%96%A1%EB%B3%B6%EC%9D%B4_t3zxcd.jpg\" },\r\n        { name: \"로제 떡볶이\", desc: \"고소한 크림에 달달매콤한 풍미가 더해져 부드럽게 즐길 수 있습니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762983/%EB%A1%9C%EC%A0%9C%EB%96%A1%EB%B3%B6%EC%9D%B4_zl0ran.jpg\" },\r"
+    },
+    "codePublicId": "%EA%B5%AD%EB%AC%BC%EB%96%A1%EB%B3%B6%EC%9D%B4_ue9q3m",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/w_400,h_250,c_fill/v1779762984/%EA%B5%AD%EB%AC%BC%EB%96%A1%EB%B3%B6%EC%9D%B4_ue9q3m.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781187221/%EA%B5%AD%EB%AC%BC%EB%96%A1%EB%B3%B6%EC%9D%B4_ue9q3m_iycoo5.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 121,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762930/%EC%A7%81%ED%99%94%EB%B6%88%EA%B3%A0%EA%B8%B0_khx8qf.jpg",
+      "context": "        { name: \"로제짜장 떡볶이\", desc: \"짜장에 로제를 더해 부드럽고 진한 맛을 즐길 수 있는 색다른 떡볶이입니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762983/%EB%A1%9C%EC%A0%9C%EC%A7%9C%EC%9E%A5%EB%96%A1%EB%B3%B6%EC%9D%B4_t3zxcd.jpg\" },\r\n        { name: \"로제 떡볶이\", desc: \"고소한 크림에 달달매콤한 풍미가 더해져 부드럽게 즐길 수 있습니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762983/%EB%A1%9C%EC%A0%9C%EB%96%A1%EB%B3%B6%EC%9D%B4_zl0ran.jpg\" },\r\n        { name: \"직화불고기 핫도그\", desc: \"불향 가득한 직화불고기와 육즙 있는 소시지가 어우러진 든든한 메뉴입니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762930/%EC%A7%81%ED%99%94%EB%B6%88%EA%B3%A0%EA%B8%B0_khx8qf.jpg\" }\r\n      ]\r\n    }\r"
+    },
+    "codePublicId": "%EC%A7%81%ED%99%94%EB%B6%88%EA%B3%A0%EA%B8%B0_khx8qf",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/w_400,h_250,c_fill/v1779762930/%EC%A7%81%ED%99%94%EB%B6%88%EA%B3%A0%EA%B8%B0_khx8qf.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185539/A4_07054_2_er4md2.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 386,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs.jpg",
+      "context": "function StoresPreviewSection({ isPink = false, isYellow = false }: { isPink?: boolean, isYellow?: boolean }) {\r\n  const previewStores = [\r\n    { name: \"120겹파이 AK플라자 금정점\", region: \"경기 군포시 엘에스로 143 1층 1001호\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs.jpg\" },\r\n    { name: \"120겹파이 본점\", region: \"서울 성북구 돌곶이로14길 35 1층\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg\" },\r\n    { name: \"120겹파이 삼산점\", region: \"인천 부평구 장제로228번길 24\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772272/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy.jpg\" },\r"
+    },
+    "codePublicId": "120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186013/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs_bmrkku.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 387,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg",
+      "context": "  const previewStores = [\r\n    { name: \"120겹파이 AK플라자 금정점\", region: \"경기 군포시 엘에스로 143 1층 1001호\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs.jpg\" },\r\n    { name: \"120겹파이 본점\", region: \"서울 성북구 돌곶이로14길 35 1층\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg\" },\r\n    { name: \"120겹파이 삼산점\", region: \"인천 부평구 장제로228번길 24\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772272/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy.jpg\" },\r\n  ];\r"
+    },
+    "codePublicId": "120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185938/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon_z90vyq.jpg"
+      },
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186016/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon_r06p1m.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 388,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772272/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy.jpg",
+      "context": "    { name: \"120겹파이 AK플라자 금정점\", region: \"경기 군포시 엘에스로 143 1층 1001호\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs.jpg\" },\r\n    { name: \"120겹파이 본점\", region: \"서울 성북구 돌곶이로14길 35 1층\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg\" },\r\n    { name: \"120겹파이 삼산점\", region: \"인천 부평구 장제로228번길 24\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772272/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy.jpg\" },\r\n  ];\r\n\r"
+    },
+    "codePublicId": "120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772272/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186018/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy_m3wmdr.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 527,
+      "url": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779775703/120pie_%EC%8B%9C%EC%8A%A4%ED%85%9C_vda0xm.mp4",
+      "context": "            }`}>\r\n              <video\r\n                src=\"https://res.cloudinary.com/dx7l09wwu/video/upload/v1779775703/120pie_%EC%8B%9C%EC%8A%A4%ED%85%9C_vda0xm.mp4\"\r\n                autoPlay\r\n                muted\r"
+    },
+    "codePublicId": "120pie_%EC%8B%9C%EC%8A%A4%ED%85%9C_vda0xm",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779775703/120pie_%EC%8B%9C%EC%8A%A4%ED%85%9C_vda0xm.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183441/120pie_%EC%8B%9C%EC%8A%A4%ED%85%9C_bpwa5d.mp4"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 1707,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779847988/7c2cce19-579e-4810-9b4d-692bf40cae03.png",
+      "context": "              >\r\n                <img\r\n                  src=\"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779847988/7c2cce19-579e-4810-9b4d-692bf40cae03.png\"\r\n                  alt=\"에그120 계란빵 조리 및 폐기율 제로 연출\"\r\n                  className=\"w-full h-full object-cover hover:scale-[1.05] transition-all duration-550 opacity-100\"\r"
+    },
+    "codePublicId": "7c2cce19-579e-4810-9b4d-692bf40cae03",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/w_150,h_150,c_fill/v1779847988/7c2cce19-579e-4810-9b4d-692bf40cae03.png",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186392/7c2cce19-579e-4810-9b4d-692bf40cae03_xmarwy.png"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 1814,
+      "url": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779758245/120pie_%EC%98%81%EC%83%81_4_bt9dyp.mp4",
+      "context": "                }`}>\r\n                  <div className=\"aspect-video w-full overflow-hidden bg-neutral-100 relative\">\r\n                    <video src=\"https://res.cloudinary.com/dx7l09wwu/video/upload/v1779758245/120pie_%EC%98%81%EC%83%81_4_bt9dyp.mp4\" autoPlay muted loop playsInline aria-label=\"120겹파이 메뉴 영상\" className=\"absolute inset-0 block w-full h-full object-cover scale-[1.24]\" />\r\n                  </div>\r\n                  <div className=\"p-6 flex flex-col items-center\">\r"
+    },
+    "codePublicId": "120pie_%EC%98%81%EC%83%81_4_bt9dyp",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779758245/120pie_%EC%98%81%EC%83%81_4_bt9dyp.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183410/120pie_%EC%98%81%EC%83%81_4_tylqqc.mp4"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 1832,
+      "url": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779806130/egg120_%EC%98%81%EC%83%81_1_jwv7fe.mp4",
+      "context": "                }`}>\r\n                  <div className=\"aspect-video w-full overflow-hidden bg-neutral-100 relative\">\r\n                    <video src=\"https://res.cloudinary.com/dx7l09wwu/video/upload/v1779806130/egg120_%EC%98%81%EC%83%81_1_jwv7fe.mp4\" autoPlay muted loop playsInline aria-label=\"에그120 메뉴 영상\" className=\"absolute inset-0 block w-full h-full object-cover scale-[1.24]\" />\r\n                  </div>\r\n                  <div className=\"p-6 flex flex-col items-center\">\r"
+    },
+    "codePublicId": "egg120_%EC%98%81%EC%83%81_1_jwv7fe",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779806130/egg120_%EC%98%81%EC%83%81_1_jwv7fe.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183413/egg120_%EC%98%81%EC%83%81_1_nyph02.mp4"
+      },
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779806130/egg120_%EC%98%81%EC%83%81_1_jwv7fe.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183413/egg120_%EC%98%81%EC%83%81_1_nyph02.mp4"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 1850,
+      "url": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779805882/%EC%B8%84%EB%9F%AC%EC%8A%A4120_%EC%98%81%EC%83%81_1_qpxlyo.mp4",
+      "context": "                }`}>\r\n                  <div className=\"aspect-video w-full overflow-hidden bg-neutral-100 relative\">\r\n                    <video src=\"https://res.cloudinary.com/dx7l09wwu/video/upload/v1779805882/%EC%B8%84%EB%9F%AC%EC%8A%A4120_%EC%98%81%EC%83%81_1_qpxlyo.mp4\" autoPlay muted loop playsInline aria-label=\"츄러스 메뉴 영상\" className=\"absolute inset-0 block w-full h-full object-cover scale-[1.24]\" />\r\n                  </div>\r\n                  <div className=\"p-6 flex flex-col items-center\">\r"
+    },
+    "codePublicId": "%EC%B8%84%EB%9F%AC%EC%8A%A4120_%EC%98%81%EC%83%81_1_qpxlyo",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779805882/%EC%B8%84%EB%9F%AC%EC%8A%A4120_%EC%98%81%EC%83%81_1_qpxlyo.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183414/%EC%B8%84%EB%9F%AC%EC%8A%A4120_%EC%98%81%EC%83%81_1_ybpdnm.mp4"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 1897,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779718433/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_xk9fhi.jpg",
+      "context": "                  title: \"120파이 시리즈\",\r\n                  desc: \"고기파이부터 애플파이, 피자 파이까지. 커피와 자연스럽게 어울리는 브랜드의 대표 메뉴입니다.\",\r\n                  image: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779718433/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_xk9fhi.jpg\",\r\n                  alt: \"120겹파이\"\r\n                },\r"
+    },
+    "codePublicId": "120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_xk9fhi",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779718433/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_xk9fhi.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 1905,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779722602/120egg_45_y2al4f.jpg",
+      "context": "                  title: \"에그120 계란빵\",\r\n                  desc: \"폭신하고 부드러운 식감에 다양한 토핑을 더해, 커피와 함께 즐기기 좋은 디저트 메뉴입니다.\",\r\n                  image: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779722602/120egg_45_y2al4f.jpg\",\r\n                  alt: \"에그120 계란빵\"\r\n                },\r"
+    },
+    "codePublicId": "120egg_45_y2al4f",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779722602/120egg_45_y2al4f.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184083/120egg_45_dqgrir.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 1913,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779759362/IMG_0015_6_3_au1ykg.jpg",
+      "context": "                  title: \"츄러스 · 핫도그 · 떡볶이\",\r\n                  desc: \"간단한 조리로 선택 폭을 넓히고, 파이와 함께 추가 주문을 이끄는 사이드 메뉴입니다.\",\r\n                  image: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779759362/IMG_0015_6_3_au1ykg.jpg\",\r\n                  alt: \"사이드 메뉴\"\r\n                }\r"
+    },
+    "codePublicId": "IMG_0015_6_3_au1ykg",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779759362/IMG_0015_6_3_au1ykg.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184099/IMG_0015_6_3_bxmolh.jpg"
+      },
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/w_400,h_250,c_fill/v1779759362/IMG_0015_6_3_au1ykg.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184099/IMG_0015_6_3_bxmolh.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 1985,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779849846/%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%9C%84%EC%97%90_%EC%9C%84_202605271143_npntmg.jpg",
+      "context": "                    desc: \"든든한 간식과 식사 대용 메뉴를 찾는 오피스·학원가 매장에 어울리는 구성입니다.\",\r\n                    location: \"오피스 · 대학가\",\r\n                    image: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779849846/%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%9C%84%EC%97%90_%EC%9C%84_202605271143_npntmg.jpg\"\r\n                  },\r\n                  {\r"
+    },
+    "codePublicId": "%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%9C%84%EC%97%90_%EC%9C%84_202605271143_npntmg",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779849846/%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%9C%84%EC%97%90_%EC%9C%84_202605271143_npntmg.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185663/%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%9C%84%EC%97%90_%EC%9C%84_202605271143_npntmg_cbmmh0.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 1992,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850141/%EB%91%90_%EB%A9%94%EB%89%B4_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271147_1_rkb6ns.jpg",
+      "context": "                    desc: \"사진 찍기 좋은 디저트 메뉴로 젊은 고객의 방문과 공유를 기대하는 매장에 적합합니다.\",\r\n                    location: \"로드샵 · 번화가\",\r\n                    image: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850141/%EB%91%90_%EB%A9%94%EB%89%B4_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271147_1_rkb6ns.jpg\"\r\n                  },\r\n                  {\r"
+    },
+    "codePublicId": "%EB%91%90_%EB%A9%94%EB%89%B4_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271147_1_rkb6ns",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850141/%EB%91%90_%EB%A9%94%EB%89%B4_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271147_1_rkb6ns.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185661/%EB%91%90_%EB%A9%94%EB%89%B4_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271147_1_rkb6ns_wr8gno.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 1999,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850228/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm.jpg",
+      "context": "                    desc: \"함께 나눠 먹기 좋은 구성을 통해 포장과 배달 주문을 넓히기 좋은 조합입니다.\",\r\n                    location: \"주거 · 배달 상권\",\r\n                    image: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850228/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm.jpg\"\r\n                  }\r\n                ].map((set) => (\r"
+    },
+    "codePublicId": "%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779850228/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185662/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm_nxk2mq.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 2313,
+      "url": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4",
+      "context": "                  >\r\n                    <video\r\n                      src=\"https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4\"\r\n                      autoPlay\r\n                      muted\r"
+    },
+    "codePublicId": "120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4"
+      },
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781186312/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_c3tebe.mp4"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 2364,
+      "url": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4",
+      "context": "              <div className=\"relative w-full max-w-4xl overflow-hidden rounded-3xl bg-black shadow-2xl\" onClick={(e) => e.stopPropagation()}>\r\n                <video\r\n                  src=\"https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4\"\r\n                  autoPlay\r\n                  muted={false}\r"
+    },
+    "codePublicId": "120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4"
+      },
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779764563/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_posntw.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781186312/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_c3tebe.mp4"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 2441,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779765483/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_26%EC%9D%BC_%EC%98%A4%ED%9B%84_12_13_48_asivm6.png",
+      "context": "                <div className=\"aspect-[4/3] rounded-xl overflow-hidden relative border border-neutral-200 bg-neutral-100\">\r\n                  <img\r\n                    src=\"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779765483/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_26%EC%9D%BC_%EC%98%A4%ED%9B%84_12_13_48_asivm6.png\"\r\n                    alt=\"커피 한 잔만으로 아쉬운 매출을 표현한 이미지\"\r\n                    className=\"w-full h-full object-cover\"\r"
+    },
+    "codePublicId": "ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_26%EC%9D%BC_%EC%98%A4%ED%9B%84_12_13_48_asivm6",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779765483/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_26%EC%9D%BC_%EC%98%A4%ED%9B%84_12_13_48_asivm6.png",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185881/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_26%EC%9D%BC_%EC%98%A4%ED%9B%84_12_13_48_asivm6_cvxjzp.png"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 2507,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779765478/230515_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%95%A0%ED%94%8C%EC%B9%98%EC%A6%88_2_sddz7b.jpg",
+      "context": "                <div className=\"aspect-[4/3] rounded-xl overflow-hidden relative border border-neutral-800\">\r\n                  <img\r\n                    src=\"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779765478/230515_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%95%A0%ED%94%8C%EC%B9%98%EC%A6%88_2_sddz7b.jpg\"\r\n                    alt=\"커피와 파이를 함께 찾는 카페 이미지\"\r\n                    className=\"w-full h-full object-cover\"\r"
+    },
+    "codePublicId": "230515_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%95%A0%ED%94%8C%EC%B9%98%EC%A6%88_2_sddz7b",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779765478/230515_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%95%A0%ED%94%8C%EC%B9%98%EC%A6%88_2_sddz7b.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185897/230515_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%95%A0%ED%94%8C%EC%B9%98%EC%A6%88_2_sddz7b_ctaarg.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 2548,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772299/KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp.jpg",
+      "context": "            <div className=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7 mb-20\">\r\n              {[\r\n                { num: \"01\", title: \"메뉴부터 가볍게 시작\", desc: \"작은 판매 공간에 파이 메뉴를 더해 손님의 반응을 먼저 살펴봅니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772299/KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp.jpg\" },\r\n                { num: \"02\", title: \"매장 안에서 알리기\", desc: \"메뉴보드와 안내물을 활용해 파이를 판매하는 카페임을 자연스럽게 알립니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772301/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd.jpg\" },\r\n                { num: \"03\", title: \"필요하면 외부 표기 추가\", desc: \"원하는 매장에 한해 기존 간판 옆에 브랜드 표기를 더할 수 있습니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772298/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm.jpg\" },\r"
+    },
+    "codePublicId": "KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772299/KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185929/KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp_xoc0oc.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 2549,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772301/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd.jpg",
+      "context": "              {[\r\n                { num: \"01\", title: \"메뉴부터 가볍게 시작\", desc: \"작은 판매 공간에 파이 메뉴를 더해 손님의 반응을 먼저 살펴봅니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772299/KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp.jpg\" },\r\n                { num: \"02\", title: \"매장 안에서 알리기\", desc: \"메뉴보드와 안내물을 활용해 파이를 판매하는 카페임을 자연스럽게 알립니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772301/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd.jpg\" },\r\n                { num: \"03\", title: \"필요하면 외부 표기 추가\", desc: \"원하는 매장에 한해 기존 간판 옆에 브랜드 표기를 더할 수 있습니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772298/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm.jpg\" },\r\n                { num: \"04\", title: \"검증 후 확장 선택\", desc: \"매출과 고객 반응을 확인한 뒤, 매장 전환 여부를 차분히 결정합니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg\" }\r"
+    },
+    "codePublicId": "KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772301/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185933/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd_ddvcvz.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 2550,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772298/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm.jpg",
+      "context": "                { num: \"01\", title: \"메뉴부터 가볍게 시작\", desc: \"작은 판매 공간에 파이 메뉴를 더해 손님의 반응을 먼저 살펴봅니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772299/KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp.jpg\" },\r\n                { num: \"02\", title: \"매장 안에서 알리기\", desc: \"메뉴보드와 안내물을 활용해 파이를 판매하는 카페임을 자연스럽게 알립니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772301/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd.jpg\" },\r\n                { num: \"03\", title: \"필요하면 외부 표기 추가\", desc: \"원하는 매장에 한해 기존 간판 옆에 브랜드 표기를 더할 수 있습니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772298/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm.jpg\" },\r\n                { num: \"04\", title: \"검증 후 확장 선택\", desc: \"매출과 고객 반응을 확인한 뒤, 매장 전환 여부를 차분히 결정합니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg\" }\r\n              ].map((step) => (\r"
+    },
+    "codePublicId": "KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772298/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185936/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm_zbuqaq.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 2551,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg",
+      "context": "                { num: \"02\", title: \"매장 안에서 알리기\", desc: \"메뉴보드와 안내물을 활용해 파이를 판매하는 카페임을 자연스럽게 알립니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772301/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd.jpg\" },\r\n                { num: \"03\", title: \"필요하면 외부 표기 추가\", desc: \"원하는 매장에 한해 기존 간판 옆에 브랜드 표기를 더할 수 있습니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772298/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm.jpg\" },\r\n                { num: \"04\", title: \"검증 후 확장 선택\", desc: \"매출과 고객 반응을 확인한 뒤, 매장 전환 여부를 차분히 결정합니다.\", img: \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg\" }\r\n              ].map((step) => (\r\n                <article key={step.num} className={`group border-t pt-5 flex flex-col h-full transition-colors ${\r"
+    },
+    "codePublicId": "120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185938/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon_z90vyq.jpg"
+      },
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779772271/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon.jpg",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186016/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon_r06p1m.jpg"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 2914,
+      "url": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779774298/Video_Project_15-2_kfgydn.mp4",
+      "context": "              >\r\n                <video\r\n                  src=\"https://res.cloudinary.com/dx7l09wwu/video/upload/v1779774298/Video_Project_15-2_kfgydn.mp4\"\r\n                  autoPlay\r\n                  muted\r"
+    },
+    "codePublicId": "Video_Project_15-2_kfgydn",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779774298/Video_Project_15-2_kfgydn.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781186151/Video_Project_15-2_sypvht.mp4"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 2998,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png",
+      "context": "                          <div className=\"w-9 h-9 shrink-0 flex items-center justify-center\">\r\n                            <img\r\n                              src={isPinkVariant ? \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png\" : \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png\"}\r\n                              alt=\"120pie 로고\"\r\n                              className=\"w-full h-full object-contain\"\r"
+    },
+    "codePublicId": "logo_120pie_coffee_nu2_c7tiiy",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 3063,
+      "url": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png",
+      "context": "                          <div className=\"w-9 h-9 shrink-0 flex items-center justify-center\">\r\n                            <img\r\n                              src={isPinkVariant ? \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png\" : \"https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png\"}\r\n                              alt=\"120pie 로고\"\r\n                              className=\"w-full h-full object-contain\"\r"
+    },
+    "codePublicId": "logo_120pie_coffee_nu2_c7tiiy",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1780326442/logo_120pie_coffee_nu2_c7tiiy.png",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png"
+      }
+    ]
+  },
+  {
+    "code": {
+      "file": "HomeV3.tsx",
+      "line": 812,
+      "url": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779758245/120pie_%EC%98%81%EC%83%81_4_bt9dyp.mp4",
+      "context": "                  <div className=\"bg-neutral-950 rounded-2xl border border-neutral-850 relative z-10 flex flex-col items-center overflow-hidden hover:border-amber-400/40 transition-colors\">\n                    <div className=\"h-28 w-full overflow-hidden bg-neutral-900 relative\">\n                      <video src=\"https://res.cloudinary.com/dx7l09wwu/video/upload/v1779758245/120pie_%EC%98%81%EC%83%81_4_bt9dyp.mp4\" autoPlay muted loop playsInline aria-label=\"120겹파이 메뉴 영상\" className=\"absolute inset-0 block w-full h-full object-cover scale-[1.24] opacity-60\" />\n                    </div>\n                    <div className=\"p-5 flex flex-col items-center\">"
+    },
+    "codePublicId": "120pie_%EC%98%81%EC%83%81_4_bt9dyp",
+    "mappings": [
+      {
+        "기존": "https://res.cloudinary.com/dx7l09wwu/video/upload/v1779758245/120pie_%EC%98%81%EC%83%81_4_bt9dyp.mp4",
+        "변경": "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183410/120pie_%EC%98%81%EC%83%81_4_tylqqc.mp4"
+      }
+    ]
+  }
+]

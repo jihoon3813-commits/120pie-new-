@@ -1,0 +1,9 @@
+{
+  "CodeContent": "\"const fs = require('fs');\\nconst readline = require('readline');\\n\\nasync function run() {\\n  const jsonlPath = 'C:\\\\\\\\Users\\\\\\\\FORYOUCOM\\\\\\\\.gemini\\\\\\\\antigravity-ide\\\\\\\\brain\\\\\\\\fcfe2e54-0c4e-4167-8fd6-d0d791b028ba\\\\\\\\.system_generated\\\\\\\\logs\\\\\\\\transcript.jsonl';\\n  const fileStream = fs.createReadStream(jsonlPath);\\n  const rl = readline.createInterface({\\n    input: fileStream,\\n    crlfDelay: Infinity\\n  });\\n\\n  let stepCount = 0;\\n  for await (const line of rl) {\\n    stepCount++;\\n    try {\\n      const step = JSON.parse(line);\\n      if (step.tool_calls) {\\n        step.tool_calls.forEach((tc, tcIdx) => {\\n          const args = tc.args || {};\\n          const target = args.TargetFile || args.AbsolutePath || '';\\n          if (target.includes('FranchisePageClient.tsx')) {\\n            console.log(`Step ${step.step_index || stepCount}: tool call: ${tc.name}, method: ${tc.name}`);\\n            let code = args.ReplacementContent || args.CodeContent || '';\\n            if (args.ReplacementChunks && args.ReplacementChunks[0]) {\\n              code = args.ReplacementChunks.map(chunk => chunk.ReplacementContent).join('\\\\n');\\n            }\\n            console.log(`  Length: ${code.length}`);\\n            if (code) {\\n              console.log(`  Preview: ${JSON.stringify(code.substring(0, 150))}`);\\n            }\\n          }\\n        });\\n      }\\n    } catch(e){}\\n  }\\n}\\n\\nrun().catch(console.error);\\n\"",
+  "Description": "\"Writing a script to extract all tool calls on FranchisePageClient.tsx from previous brain logs.\"",
+  "IsArtifact": "false",
+  "Overwrite": "true",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\scratch\\\\extract_franchise_history.js\"",
+  "toolAction": "\"Creating franchise history extractor script.\"",
+  "toolSummary": "\"File edit\""
+}

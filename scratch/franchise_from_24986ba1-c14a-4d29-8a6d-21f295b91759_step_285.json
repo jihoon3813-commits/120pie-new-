@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Update card tokens in FranchisePageClient to support premium gradients and hover highlights.\"",
+  "EndLine": "219",
+  "Instruction": "\"Replace the flat innerCardBg definition with innerCardBg, innerCardBgAccent, and innerCardHover tokens.\"",
+  "ReplacementContent": "\"  const innerCardBg = isPink \\n    ? \\\"bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 shadow-md shadow-black/20\\\" \\n    : \\\"bg-gradient-to-br from-white via-[#fffdf5] to-[#fffcf0] border border-amber-200/60 shadow-[0_4px_16px_rgba(251,191,36,0.03)]\\\";\\n\\n  const innerCardBgAccent = isPink \\n    ? \\\"bg-gradient-to-br from-neutral-900 to-neutral-950 border border-t-4 border-neutral-800 border-t-rose-500 shadow-md shadow-black/20\\\" \\n    : \\\"bg-gradient-to-br from-white via-[#fffdf5] to-[#fffcf0] border border-t-4 border-amber-200/60 border-t-amber-400 shadow-[0_4px_16px_rgba(251,191,36,0.03)]\\\";\\n\\n  const innerCardHover = isPink\\n    ? \\\"hover:from-neutral-850 hover:to-neutral-900 hover:border-rose-500/30 hover:shadow-[0_8px_30px_rgba(244,63,94,0.06)] hover:scale-[1.03] transition-all duration-300\\\"\\n    : \\\"hover:from-white hover:to-[#fff9e6] hover:border-amber-400 hover:shadow-[0_8px_30px_rgba(251,191,36,0.12)] hover:scale-[1.03] transition-all duration-300\\\";\\n\"",
+  "StartLine": "216",
+  "TargetContent": "\"  const innerCardBg = isPink \\n    ? \\\"bg-neutral-950/70 border border-neutral-850\\\" \\n    : \\\"bg-[#fff9e6] border border-[#ffd500]/10\\\";\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Updating styling tokens\"",
+  "toolSummary": "\"FranchisePageClient tokens update\""
+}

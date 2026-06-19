@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Make Growth Graph bars animate width when scrolled into view.\"",
+  "EndLine": "618",
+  "Instruction": "\"Replace hardcoded width classes with inline style width based on isVisible state.\"",
+  "ReplacementContent": "\"                      { year: \\\"1년차 (런칭기)\\\", count: \\\"10호점\\\", width: \\\"15%\\\", bg: \\\"bg-slate-400\\\" },\\n                      { year: \\\"2년차 (성장기)\\\", count: \\\"70호점\\\", width: \\\"40%\\\", bg: isPink ? \\\"bg-rose-500/70\\\" : \\\"bg-amber-400/70\\\" },\\n                      { year: \\\"3년차 (현재)\\\", count: \\\"300호점 돌파\\\", width: \\\"100%\\\", bg: isPink ? \\\"bg-rose-500\\\" : \\\"bg-amber-400\\\" }\\n                    ].map((row, idx) => (\\n                      <div key={idx} className=\\\"flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs font-bold\\\">\\n                        <span className={`w-28 ${textDesc}`}>{row.year}</span>\\n                        <div className=\\\"flex-1 h-8 bg-neutral-950/40 rounded-lg overflow-hidden flex items-center\\\">\\n                          <div \\n                            className={`h-full ${row.bg} flex items-center px-3 transition-all duration-[1200ms] ease-out`}\\n                            style={{ width: isVisible ? row.width : \\\"0%\\\" }}\\n                          >\"",
+  "StartLine": "609",
+  "TargetContent": "\"                      { year: \\\"1년차 (런칭기)\\\", count: \\\"10호점\\\", width: \\\"w-[15%]\\\", bg: \\\"bg-slate-400\\\" },\\n                      { year: \\\"2년차 (성장기)\\\", count: \\\"70호점\\\", width: \\\"w-[40%]\\\", bg: isPink ? \\\"bg-rose-500/70\\\" : \\\"bg-amber-400/70\\\" },\\n                      { year: \\\"3년차 (현재)\\\", count: \\\"300호점 돌파\\\", width: \\\"w-full\\\", bg: isPink ? \\\"bg-rose-500\\\" : \\\"bg-amber-400\\\" }\\n                    ].map((row, idx) => (\\n                      <div key={idx} className=\\\"flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs font-bold\\\">\\n                        <span className={`w-28 ${textDesc}`}>{row.year}</span>\\n                        <div className=\\\"flex-1 h-8 bg-neutral-950/40 rounded-lg overflow-hidden flex items-center\\\">\\n                          <div className={`h-full ${row.width} ${row.bg} flex items-center px-3 transition-all duration-1000`}>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Animating growth graph bars\"",
+  "toolSummary": "\"Replace file content\""
+}

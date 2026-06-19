@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Add staggered horizontal slide-in transition to Slide 04 flowchart steps.\"",
+  "EndLine": "826",
+  "Instruction": "\"Replace the div tag inside the flowchart map function to include staggered styles.\"",
+  "ReplacementContent": "\"                  <div \\n                    key={idx} \\n                    className={`p-5 rounded-xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between h-40 text-left`}\\n                    style={{\\n                      opacity: isVisible ? 1 : 0,\\n                      transform: isVisible ? \\\"translateX(0)\\\" : \\\"translateX(-20px)\\\",\\n                      transition: `opacity 0.6s ease-out ${idx * 150}ms, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 150}ms`\\n                    }}\\n                  >\"",
+  "StartLine": "826",
+  "TargetContent": "\"                  <div key={idx} className={`p-5 rounded-xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between h-40 text-left`}>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Adding step transition styles\"",
+  "toolSummary": "\"Replace file content\""
+}

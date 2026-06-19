@@ -1,0 +1,891 @@
+﻿diff --git a/app/franchise/FranchisePageClient.tsx b/app/franchise/FranchisePageClient.tsx
+index ad64602..b079a99 100644
+--- a/app/franchise/FranchisePageClient.tsx
++++ b/app/franchise/FranchisePageClient.tsx
+@@ -34,7 +34,7 @@ import {
+   Sliders,
+   Percent
+ } from "lucide-react";
+-import { useState, useEffect } from "react";
++import { useState, useEffect, useRef } from "react";
+ import { useMutation } from "convex/react";
+ import { api } from "@/convex/_generated/api";
+ 
+@@ -85,6 +85,112 @@ const SUCCESS_CASES: SuccessCase[] = [
+   }
+ ];
+ 
++// Scroll-triggered wrapper component using IntersectionObserver
++function ScrollTriggered({ children, className = "" }: { children: (isVisible: boolean) => React.ReactNode, className?: string }) {
++  const ref = useRef<HTMLDivElement>(null);
++  const [isVisible, setIsVisible] = useState(false);
++
++  useEffect(() => {
++    if (typeof window === "undefined") return;
++    const observer = new IntersectionObserver(
++      ([entry]) => {
++        if (entry.isIntersecting) {
++          setIsVisible(true);
++          observer.disconnect();
++        }
++      },
++      { threshold: 0.05 }
++    );
++    if (ref.current) {
++      observer.observe(ref.current);
++    }
++    return () => observer.disconnect();
++  }, []);
++
++  return <div ref={ref} className={className}>{children(isVisible)}</div>;
++}
++
++// Image Magnifier component on hover
++function ImageMagnifier({
++  src,
++  alt,
++  className = "",
++  magnifierHeight = 150,
++  magnifierWidth = 150,
++  zoomLevel = 1.8,
++  disabled = false
++}: {
++  src: string;
++  alt: string;
++  className?: string;
++  magnifierHeight?: number;
++  magnifierWidth?: number;
++  zoomLevel?: number;
++  disabled?: boolean;
++}) {
++  const [[x, y], setXY] = useState([0, 0]);
++  const [showMagnifier, setShowMagnifier] = useState(false);
++  const [[imgWidth, imgHeight], setSize] = useState([0, 0]);
++
++  return (
++    <div
++      className={`relative overflow-hidden cursor-crosshair select-none ${className}`}
++      onMouseEnter={(e) => {
++        if (disabled) return;
++        const elem = e.currentTarget;
++        const { width, height } = elem.getBoundingClientRect();
++        setSize([width, height]);
++        setShowMagnifier(true);
++      }}
++      onMouseMove={(e) => {
++        if (disabled) return;
++        const elem = e.currentTarget;
++        const { top, left } = elem.getBoundingClientRect();
++        const xCoord = e.clientX - left;
++        const yCoord = e.clientY - top;
++        setXY([xCoord, yCoord]);
++      }}
++      onMouseLeave={() => {
++        setShowMagnifier(false);
++      }}
++    >
++      <img
++        src={src}
++        alt={alt}
++        className="w-full h-full object-cover transition-all duration-300"
++        style={{
++          filter: showMagnifier && !disabled ? "brightness(0.85)" : "none"
++        }}
++      />
++
++      {showMagnifier && !disabled && (
++        <div
++          className="absolute border-2 border-amber-400 rounded-full shadow-2xl pointer-events-none z-30"
++          style={{
++            height: `${magnifierHeight}px`,
++            width: `${magnifierWidth}px`,
++            top: `${y - magnifierHeight / 2}px`,
++            left: `${x - magnifierWidth / 2}px`,
++            backgroundImage: `url('${src}')`,
++            backgroundRepeat: "no-repeat",
++            backgroundSize: `${imgWidth * zoomLevel}px ${imgHeight * zoomLevel}px`,
++            backgroundPositionX: `${-x * zoomLevel + magnifierWidth / 2}px`,
++            backgroundPositionY: `${-y * zoomLevel + magnifierHeight / 2}px`
++          }}
++        >
++          {/* Spotlight reflection glare */}
++          <div className="absolute top-1 left-1 w-8 h-8 bg-white/20 rounded-full blur-[2px]"></div>
++          {/* Subtle crosshair in the center of lens */}
++          <div className="absolute inset-0 flex items-center justify-center opacity-30">
++            <div className="w-4 h-[1px] bg-white"></div>
++            <div className="h-4 w-[1px] bg-white absolute"></div>
++          </div>
++        </div>
++      )}
++    </div>
++  );
++}
++
+ export default function FranchisePageClient() {
+   const [theme, setTheme] = useState<"pink" | "yellow">("yellow");
+   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+@@ -104,6 +210,121 @@ export default function FranchisePageClient() {
+ 
+   const addInquiry = useMutation(api.inquiries.add);
+ 
++  // Custom cursor state
++  const [mousePos, setMousePos] = useState({ x: -200, y: -200 });
++  const [isHovering, setIsHovering] = useState(false);
++  const [isInteractive, setIsInteractive] = useState(false);
++
++  // Global page magnifier states
++  const [isMagnifierActive, setIsMagnifierActive] = useState(true);
++  const [lensPos, setLensPos] = useState({ x: -260, y: -260 });
++  const [pageHtml, setPageHtml] = useState("");
++  const [pageSize, setPageSize] = useState({ width: 1200, height: 10000 });
++  const [mounted, setMounted] = useState(false);
++
++  useEffect(() => {
++    setMounted(true);
++  }, []);
++
++  const lensSize = 260; // Magnifying glass diameter (larger size)
++  const zoomLevel = 1.6; // Scale factor for general page magnification
++
++  useEffect(() => {
++    if (typeof window === "undefined") return;
++
++    const handleMouseMove = (e: MouseEvent) => {
++      setMousePos({ x: e.clientX, y: e.clientY });
++      setIsHovering(true);
++      
++      setLensPos({ x: e.clientX, y: e.clientY });
++      
++      const target = e.target as HTMLElement;
++      if (!target) return;
++      
++      const isInteractiveElement = 
++        target.tagName === "BUTTON" ||
++        target.tagName === "A" ||
++        target.tagName === "INPUT" ||
++        target.tagName === "SELECT" ||
++        target.tagName === "TEXTAREA" ||
++        target.closest("button") ||
++        target.closest("a") ||
++        target.closest("input") ||
++        target.closest("select") ||
++        target.closest("textarea") ||
++        target.closest(".interactive") ||
++        target.closest("label");
++      
++      setIsInteractive(!!isInteractiveElement);
++    };
++
++    const handleMouseLeave = () => {
++      setIsHovering(false);
++    };
++
++    window.addEventListener("mousemove", handleMouseMove);
++    document.addEventListener("mouseleave", handleMouseLeave);
++    return () => {
++      window.removeEventListener("mousemove", handleMouseMove);
++      document.removeEventListener("mouseleave", handleMouseLeave);
++    };
++  }, []);
++
++  // Sync page HTML and size when states change, and on scroll (debounced)
++  useEffect(() => {
++    if (typeof window === "undefined") return;
++
++    const syncPage = () => {
++      const element = document.getElementById("magnifiable-page");
++      if (element) {
++        setPageHtml(element.innerHTML);
++        setPageSize({
++          width: element.offsetWidth,
++          height: element.offsetHeight
++        });
++      }
++    };
++
++    // Sync on tab/theme change or magnifier activation
++    const timer = setTimeout(syncPage, 200);
++
++    if (!isMagnifierActive) {
++      return () => clearTimeout(timer);
++    }
++
++    let scrollTimeout: NodeJS.Timeout;
++    const handleScroll = () => {
++      clearTimeout(scrollTimeout);
++      scrollTimeout = setTimeout(syncPage, 150);
++    };
++
++    window.addEventListener("scroll", handleScroll, { passive: true });
++
++    return () => {
++      clearTimeout(timer);
++      clearTimeout(scrollTimeout);
++      window.removeEventListener("scroll", handleScroll);
++    };
++  }, [theme, selectedPlanTab, activeMenuTab, isMagnifierActive]);
++
++  // Sync size on window resize
++  useEffect(() => {
++    if (typeof window === "undefined") return;
++
++    const handleResize = () => {
++      const element = document.getElementById("magnifiable-page");
++      if (element) {
++        setPageSize({
++          width: element.offsetWidth,
++          height: element.offsetHeight
++        });
++      }
++    };
++
++    window.addEventListener("resize", handleResize);
++    return () => window.removeEventListener("resize", handleResize);
++  }, []);
++
+   // Load theme dynamically from browser environment
+   useEffect(() => {
+     if (typeof window !== "undefined") {
+@@ -262,7 +483,8 @@ export default function FranchisePageClient() {
+     : "bg-[#181114] border border-[#f2ccd7]/10 text-neutral-400 hover:text-rose-400";
+ 
+   return (
+-    <div id={isPink ? "landing-v3" : "landing-v5"} className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg}`}>
++    <div id={isPink ? "landing-v3" : "landing-v5"} className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg} ${isHovering && !isInteractive && isMagnifierActive ? "lg:cursor-none" : ""}`}>
++      <div id="magnifiable-page" className="w-full relative">
+       {/* Header */}
+       <header className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 ${headerBg}`}>
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between min-h-[60px] sm:min-h-[80px] lg:min-h-[94px] gap-2.5 sm:gap-4">
+@@ -414,12 +636,12 @@ export default function FranchisePageClient() {
+ 
+             <div className="lg:col-span-5 relative group">
+               <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C1_ueicna.jpg" 
+                   alt="120pie signature dessert" 
+-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
++                  className="w-full h-full opacity-90"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                   <span className="text-xs font-bold text-white/95">???硫붾돱: 120寃??ㅻ━吏???좏뵆?뚯씠</span>
+                 </div>
+               </div>
+@@ -452,20 +674,25 @@ export default function FranchisePageClient() {
+                 </div>
+ 
+                 {/* Growth Graph */}
+-                <div className={`p-5 rounded-2xl ${innerCardBg} space-y-4`}>
++                <ScrollTriggered>
++                  {(isVisible) => (
++                    <div className={`p-5 rounded-2xl ${innerCardBg} space-y-4`}>
+                   <h4 className={`text-xs sm:text-sm font-black text-center md:text-left flex items-center gap-1.5 ${textTitle}`}>
+                     <TrendingUp size={16} className={isPink ? "text-rose-500" : "text-amber-500"} /> 3???곗냽 媛留??깆옣 吏??(?꾩쟻 怨꾩빟 湲곗?)
+                   </h4>
+                   <div className="space-y-3 pt-2">
+                     {[
+-                      { year: "1?꾩감 (?곗묶湲?", count: "10?몄젏", width: "w-[15%]", bg: "bg-slate-400" },
+-                      { year: "2?꾩감 (?깆옣湲?", count: "70?몄젏", width: "w-[40%]", bg: isPink ? "bg-rose-500/70" : "bg-amber-400/70" },
+-                      { year: "3?꾩감 (?꾩옱)", count: "300?몄젏 ?뚰뙆", width: "w-full", bg: isPink ? "bg-rose-500" : "bg-amber-400" }
++                      { year: "1?꾩감 (?곗묶湲?", count: "10?몄젏", width: "15%", bg: "bg-slate-400" },
++                      { year: "2?꾩감 (?깆옣湲?", count: "70?몄젏", width: "40%", bg: isPink ? "bg-rose-500/70" : "bg-amber-400/70" },
++                      { year: "3?꾩감 (?꾩옱)", count: "300?몄젏 ?뚰뙆", width: "100%", bg: isPink ? "bg-rose-500" : "bg-amber-400" }
+                     ].map((row, idx) => (
+                       <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs font-bold">
+                         <span className={`w-28 ${textDesc}`}>{row.year}</span>
+                         <div className="flex-1 h-8 bg-neutral-950/40 rounded-lg overflow-hidden flex items-center">
+-                          <div className={`h-full ${row.width} ${row.bg} flex items-center px-3 transition-all duration-1000`}>
++                          <div 
++                            className={`h-full ${row.bg} flex items-center px-3 transition-all duration-[1200ms] ease-out`}
++                            style={{ width: isVisible ? row.width : "0%" }}
++                          >
+                             <span className="text-[#0d233a] font-extrabold text-[10px] sm:text-xs">{row.count}</span>
+                           </div>
+                         </div>
+@@ -473,29 +700,41 @@ export default function FranchisePageClient() {
+                     ))}
+                   </div>
+                 </div>
+-              </div>
++              )}
++            </ScrollTriggered>
++                </div>
+ 
+               <div className="lg:col-span-5 relative group">
+                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
+-                  <img 
++                  <ImageMagnifier disabled={isMagnifierActive} 
+                     src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/4b7d41db63592_wyo4r0.webp" 
+                     alt="Artisan rolling pastry dough" 
+-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
++                    className="w-full h-full opacity-90"
+                   />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                     <span className="text-xs font-bold text-white/95">40???쒓낵 ?μ씤??120寃??뺣? ?꾩슦 ?깊삎 怨듭젙</span>
+                   </div>
+                 </div>
+               </div>
+             </div>
+ 
+-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
++            <ScrollTriggered>
++              {(isVisible) => (
++                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+               {[
+                 { title: "?ㅼ씠踰?寃?됰웾", val: "??61,500??", desc: "?ㅼ썙??荑쇰━ 寃?됰웾 ?뺣룄??1??, icon: <Search size={22} className={isPink ? "text-rose-500" : "text-amber-400"} /> },
+                 { title: "SNS ?댁떆?쒓렇", val: "?꾩쟻 19.3留뚭컻+", desc: "#120寃뱁뙆???먮컻???낆냼臾??뺤궛", icon: <Hash size={22} className={isPink ? "text-rose-500" : "text-amber-400"} /> },
+                 { title: "釉뚮옖???몄???, val: "?뚰삎 ?붿???1??, desc: "怨좉컼 ?좏샇??議곗궗 寃곌낵 寃利?, icon: <Award size={22} className={isPink ? "text-rose-500" : "text-amber-400"} /> }
+               ].map((item, idx) => (
+-                <div key={idx} className={`p-6 rounded-2xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between text-left h-40 relative group`}>
++                <div 
++                  key={idx} 
++                  className={`p-6 rounded-2xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between text-left h-40 relative group`}
++                  style={{
++                    opacity: isVisible ? 1 : 0,
++                    transform: isVisible ? "translateY(0)" : "translateY(20px)",
++                    transition: `opacity 0.6s ease-out ${idx * 120}ms, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 120}ms`
++                  }}
++                >
+                   <div className="flex justify-between items-start">
+                     <span className={`text-xs font-bold ${textDesc}`}>{item.title}</span>
+                     <div className={`p-2 rounded-xl ${isPink ? "bg-rose-500/10" : "bg-amber-400/10"}`}>
+@@ -507,6 +746,8 @@ export default function FranchisePageClient() {
+                 </div>
+               ))}
+             </div>
++          )}
++        </ScrollTriggered>
+           </div>
+ 
+           <div className="flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500">
+@@ -535,7 +776,9 @@ export default function FranchisePageClient() {
+                 </div>
+ 
+                 {/* Channels Grid */}
+-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
++                <ScrollTriggered>
++                  {(isVisible) => (
++                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                   {[
+                     { title: "01. 留ㅼ옣 ???", desc: "而ㅽ뵾? ?명듃 留ㅼ텧 洹밸???, icon: <Store size={16} className="text-amber-400" /> },
+                     { title: "02. ?ъ옣 (?뚯씠?ъ븘??", desc: "1???? ?⑤?由???媛꾪렪 ?좊룄", icon: <ShoppingBag size={16} className="text-amber-400" /> },
+@@ -544,7 +787,15 @@ export default function FranchisePageClient() {
+                     { title: "05. ?⑥껜 二쇰Ц ?좎튂", desc: "?숆탳쨌?뚯궗쨌?숉샇?????媛꾩떇", icon: <Users size={16} className="text-amber-400" /> },
+                     { title: "06. ?먯껜 ?쒖쫵 硫붾돱", desc: "怨꾨?鍮돠룹툌?ъ뒪 怨꾩젅蹂??쇱씤??, icon: <Sparkles size={16} className="text-amber-400" /> }
+                   ].map((channel, idx) => (
+-                    <div key={idx} className={`p-4 rounded-xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between h-28`}>
++                    <div 
++                      key={idx} 
++                      className={`p-4 rounded-xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between h-28`}
++                      style={{
++                        opacity: isVisible ? 1 : 0,
++                        transform: isVisible ? "translateY(0)" : "translateY(15px)",
++                        transition: `opacity 0.5s ease-out ${idx * 80}ms, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 80}ms`
++                      }}
++                    >
+                       <div className="flex justify-between items-center">
+                         <span className={`text-[10px] font-black ${textDesc} uppercase`}>Channel {idx + 1}</span>
+                         {channel.icon}
+@@ -556,16 +807,18 @@ export default function FranchisePageClient() {
+                     </div>
+                   ))}
+                 </div>
++                  )}
++                </ScrollTriggered>
+               </div>
+ 
+               <div className="lg:col-span-5 relative group">
+                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
+-                  <img 
++                  <ImageMagnifier disabled={isMagnifierActive} 
+                     src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945187/IMG_8185_jpquaf.jpg" 
+                     alt="6WAY packaging box" 
+-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
++                    className="w-full h-full opacity-90"
+                   />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                     <span className="text-xs font-bold text-white/95">?ъ옣 諛?諛곕떖 寃쎌웳?μ쓣 ?믪씠??釉뚮옖???꾩슜 ?⑦궎吏?諛뺤뒪</span>
+                   </div>
+                 </div>
+@@ -577,14 +830,24 @@ export default function FranchisePageClient() {
+               <h4 className={`text-sm font-bold text-center md:text-left flex items-center gap-2 ${textTitle}`}>
+                 <Clock size={16} className={isPink ? "text-rose-500" : "text-amber-500"} /> 怨듬갚 ?녿뒗 24?쒓컙 ??꾨씪?몃퀎 理쒖쟻 ?섏슂
+               </h4>
+-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-left">
++              <ScrollTriggered>
++                {(isVisible) => (
++                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-left">
+                 {[
+                   { time: "08:00 - 11:00", label: "?꾩묠 ?깃탳/異쒓렐湲?, menu: "?곕걟??? 怨꾨?鍮?& 而ㅽ뵾", icon: <Sun size={14} className="text-amber-400" /> },
+                   { time: "11:30 - 14:00", label: "?먯떖 ?앺썑 ?붿???, menu: "120寃??좏뵆?뚯씠 & ?꾨찓由ъ뭅??, icon: <Coffee size={14} className="text-amber-400" /> },
+                   { time: "14:30 - 17:00", label: "?ㅽ썑 媛꾩떇 ???, menu: "?ㅻ젅??痢꾨윭??& ?대┛??媛꾩떇", icon: <Sparkles size={14} className="text-amber-400" /> },
+                   { time: "17:30 - 21:00", label: "????닿렐 諛??쇱떇", menu: "留ㅼ숴??遺덈떗?뚯씠 ?⑤?由???, icon: <Moon size={14} className="text-amber-400" /> }
+                 ].map((t, idx) => (
+-                  <div key={idx} className={`p-4 ${innerCardBgAccent} ${innerCardHover} rounded-xl text-left relative overflow-hidden`}>
++                  <div 
++                    key={idx} 
++                    className={`p-4 ${innerCardBgAccent} ${innerCardHover} rounded-xl text-left relative overflow-hidden`}
++                    style={{
++                      opacity: isVisible ? 1 : 0,
++                      transform: isVisible ? "translateY(0)" : "translateY(15px)",
++                      transition: `opacity 0.5s ease-out ${idx * 120}ms, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 120}ms`
++                    }}
++                  >
+                     <div className="absolute top-3 right-3 opacity-20">
+                       {t.icon}
+                     </div>
+@@ -594,6 +857,8 @@ export default function FranchisePageClient() {
+                   </div>
+                 ))}
+               </div>
++                )}
++              </ScrollTriggered>
+             </div>
+           </div>
+ 
+@@ -623,14 +888,24 @@ export default function FranchisePageClient() {
+             {/* Steps Flowchart */}
+             <div className="relative">
+               <div className={`hidden sm:block absolute top-1/2 left-4 right-4 h-0.5 ${isPink ? "bg-neutral-800/80" : "bg-[#e6dfc3]"} -translate-y-1/2 z-0`}></div>
+-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 text-center relative z-10">
++              <ScrollTriggered>
++                {(isVisible) => (
++                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 text-center relative z-10">
+                 {[
+                   { step: "STEP 01", title: "?앹? 怨듦툒", desc: "蹂몄궗 二?3???좎꽑 ?됰룞 臾쇰쪟 吏곷같??, icon: <Truck size={20} className="text-amber-400" /> },
+                   { step: "STEP 02", title: "?됰룞 蹂닿?", desc: "?대룞 怨쇱젙 ?놁씠 利됱떆 蹂닿? 媛??, icon: <Warehouse size={20} className="text-amber-400" /> },
+                   { step: "STEP 03", title: "3遺?踰좎씠??, desc: "?ㅻ툙湲곗뿉 ?ｊ퀬 ??대㉧ ?명똿 ?꾨즺", icon: <ChefHat size={20} className="text-amber-400" /> },
+                   { step: "STEP 04", title: "利됱떆 ?쒓났", desc: "諛붿궘?⑥씠 ?댁븘?덈뒗 120寃??뚯씠 ?꾩꽦", icon: <ShoppingBag size={20} className="text-amber-400" /> }
+                 ].map((row, idx) => (
+-                  <div key={idx} className={`p-5 rounded-xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between h-40 text-left`}>
++                  <div 
++                    key={idx} 
++                    className={`p-5 rounded-xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between h-40 text-left`}
++                    style={{
++                      opacity: isVisible ? 1 : 0,
++                      transform: isVisible ? "translateX(0)" : "translateX(-20px)",
++                      transition: `opacity 0.6s ease-out ${idx * 150}ms, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 150}ms`
++                    }}
++                  >
+                     <div className="flex justify-between items-center">
+                       <span className={`text-[10px] font-black ${textDesc}`}>{row.step}</span>
+                       {row.icon}
+@@ -642,6 +917,8 @@ export default function FranchisePageClient() {
+                   </div>
+                 ))}
+               </div>
++                )}
++              </ScrollTriggered>
+             </div>
+ 
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-left">
+@@ -665,12 +942,12 @@ export default function FranchisePageClient() {
+                 </ul>
+               </div>
+               <div className="rounded-xl overflow-hidden aspect-[16/10] bg-neutral-900 border border-neutral-800 relative group">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945602/KakaoTalk_20250819_162905131_zkmre3.jpg" 
+                   alt="Dough and baking process" 
+-                  className="w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-300"
++                  className="w-full h-full opacity-80"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                   <span className="text-xs font-bold text-white/95">媛留뱀젏 ?ㅼ젣 二쇰갑 議곕━ 怨듦컙 諛??먭렇鍮??쒖“ 紐⑥뒿</span>
+                 </div>
+               </div>
+@@ -756,15 +1033,15 @@ export default function FranchisePageClient() {
+                 </div>
+               </div>
+               <div className="md:col-span-5 rounded-xl overflow-hidden bg-neutral-955 aspect-square border border-neutral-850/20 relative group">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src={selectedPlanTab === "8py" 
+                     ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns.png"
+                     : "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_00_48_qomspv.png"
+                   } 
+                   alt="Floor plan spatial layout" 
+-                  className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-550"
++                  className="w-full h-full opacity-90"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent flex flex-col justify-end p-4">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent flex flex-col justify-end p-4 pointer-events-none">
+                   <span className="text-[10px] font-black text-amber-400 block uppercase tracking-wider">Interior Concept Mockup</span>
+                   <span className="text-xs font-bold text-white/95 mt-0.5">
+                     {selectedPlanTab === "8py" ? "8??留ㅼ옣 ?대? ?명뀒由ъ뼱 ?덉씠?꾩썐" : "10??留ㅼ옣 ?꾧꼍 諛??꾩씪?쒕뱶 ?숈꽑 諛곗튂"}
+@@ -781,7 +1058,7 @@ export default function FranchisePageClient() {
+         </section>
+ 
+         {/* SECTION 6. ?대? ?명뀒由ъ뼱 */}
+-        /* SECTION 7. ?깃났?щ? */
++        {/* SECTION 7. ?깃났?щ? */}
+         <section className={`rounded-3xl p-6 sm:p-12 ${cardBg} relative`}>
+           <div className="flex items-center justify-between border-b border-neutral-200/20 pb-4 mb-8">
+             <span className="text-xs font-black tracking-widest text-[#ffd500]">07 / SUCCESS CASES</span>
+@@ -831,12 +1108,12 @@ export default function FranchisePageClient() {
+ 
+               <div className="lg:col-span-5 relative group flex flex-col justify-center">
+                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[350px]">
+-                  <img 
++                  <ImageMagnifier disabled={isMagnifierActive} 
+                     src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/2026-05-28_13_37_40_sbppa6.png" 
+                     alt="Success advertising banner mockup" 
+-                    className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 opacity-90"
++                    className="w-full h-full opacity-90"
+                   />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent flex flex-col justify-end p-4">
++                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent flex flex-col justify-end p-4 pointer-events-none">
+                     <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider">Marketing Assets</span>
+                     <span className="text-xs font-bold text-white/95 mt-0.5">留ㅼ텧 遺?ㅽ똿 ?꾨떒 諛?紐⑤컮??愿묎퀬 ?띾낫 ?쒓컖 ?쒖븞</span>
+                   </div>
+@@ -947,10 +1224,10 @@ export default function FranchisePageClient() {
+                     </ul>
+                   </div>
+                   <div className="mt-4 rounded-xl overflow-hidden border border-neutral-250/10 aspect-[16/9] bg-neutral-950 relative">
+-                    <img 
++                    <ImageMagnifier disabled={isMagnifierActive} 
+                       src={card.img} 
+                       alt={card.title} 
+-                      className="w-full h-full object-cover opacity-90 group-hover:scale-[1.03] transition-transform duration-500" 
++                      className="w-full h-full opacity-90"
+                     />
+                   </div>
+                 </div>
+@@ -1159,21 +1436,70 @@ export default function FranchisePageClient() {
+               </div>
+ 
+               <div className="lg:col-span-4 flex flex-col justify-between space-y-4">
+-                <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950 w-full">
+-                  <img 
+-                    src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_r90tky.jpg" 
+-                    alt="Arabica specialty coffee beans" 
+-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 opacity-90"
+-                  />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
+-                    <span className="text-[10px] font-bold text-white/95">而ㅽ뵾 ?먮ℓ 留덉쭊??洹밸??뷀븯???꾨씪鍮꾩뭅 ?먮몢 諛?留ㅼ옣 鍮꾩＜??/span>
+-                  </div>
+-                </div>
++                <ScrollTriggered>
++                  {(isVisible) => {
++                    const circumference = 188.5;
++                    // Segment lengths: 46.7% (88.0), 35.0% (66.0), 8.3% (15.6), 6.0% (11.3), 4.0% (7.5)
++                    const segments = [
++                      { percentage: 46.7, label: "?쒖닔??, color: isPink ? "#f43f5e" : "#fbbf24", length: 88.0, offset: 0 },
++                      { percentage: 35.0, label: "?앹옄?щ퉬", color: "#38bdf8", length: 66.0, offset: -88.0 },
++                      { percentage: 8.3, label: "?꾩감猷?, color: "#a78bfa", length: 15.6, offset: -154.0 },
++                      { percentage: 6.0, label: "?멸굔鍮?, color: "#fb923c", length: 11.3, offset: -169.6 },
++                      { percentage: 4.0, label: "愿由щ퉬", color: "#94a3b8", length: 7.5, offset: -180.9 }
++                    ];
++
++                    return (
++                      <div className={`p-5 rounded-2xl ${innerCardBg} border ${isPink ? "border-neutral-800" : "border-amber-200/50"} flex flex-col items-center justify-center text-center relative overflow-hidden group`}>
++                        <h4 className={`text-xs sm:text-sm font-black mb-4 flex items-center gap-1.5 ${textTitle}`}>
++                          <TrendingUp size={16} className={isPink ? "text-rose-500" : "text-amber-500"} /> ??吏異?諛??쒖닔??鍮꾩쨷 (ROI)
++                        </h4>
++                        <div className="relative w-40 h-40 sm:w-44 sm:h-44">
++                          <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
++                            {segments.map((seg, sIdx) => (
++                              <circle
++                                key={sIdx}
++                                cx="50"
++                                cy="50"
++                                r="30"
++                                fill="transparent"
++                                stroke={seg.color}
++                                strokeWidth="12"
++                                strokeDasharray={`${isVisible ? seg.length : 0} ${circumference}`}
++                                strokeDashoffset={seg.offset}
++                                strokeLinecap="round"
++                                className="transition-all ease-out"
++                                style={{
++                                  transitionDuration: "1200ms",
++                                  transitionDelay: `${sIdx * 100}ms`
++                                }}
++                              />
++                            ))}
++                            <circle cx="50" cy="50" r="24" fill={isPink ? "#161616" : "#ffffff"} className="transition-colors duration-350" />
++                          </svg>
++                          <div className="absolute inset-0 flex flex-col items-center justify-center leading-tight pointer-events-none">
++                            <span className={`text-[10px] font-bold ${textDesc}`}>?쒖닔?듬쪧</span>
++                            <span className={`text-lg sm:text-xl font-black ${isPink ? "text-rose-500" : "text-amber-500"}`}>46.7%</span>
++                          </div>
++                        </div>
+ 
+-                <div className={`p-5 rounded-2xl border ${isPink ? "border-rose-500/20 bg-rose-500/5 text-rose-455" : "border-amber-400/20 bg-amber-400/5 text-amber-600"} flex flex-col items-center justify-center text-center space-y-1.5`}>
+-                  <TrendingUp size={24} />
+-                  <span className="text-xs font-black">?붿????낃퀎 理쒓퀬 ?섏? 留덉쭊??/span>
+-                  <span className="text-base font-extrabold">???쒖닔????1,400留???(46.7%)</span>
++                        {/* Legend */}
++                        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-5 w-full text-[10px] font-bold">
++                          {segments.map((seg, sIdx) => (
++                            <div key={sIdx} className="flex items-center gap-1.5">
++                              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: seg.color }}></span>
++                              <span className={`${textDesc}`}>{seg.label}</span>
++                              <span className={`${textTitle} font-extrabold ml-auto`}>{seg.percentage}%</span>
++                            </div>
++                          ))}
++                        </div>
++                      </div>
++                    );
++                  }}
++                </ScrollTriggered>
++
++                <div className={`p-4 rounded-2xl border ${isPink ? "border-rose-500/20 bg-rose-500/5 text-rose-455" : "border-amber-400/20 bg-amber-400/5 text-amber-600"} flex flex-col items-center justify-center text-center space-y-1`}>
++                  <span className="text-[10px] font-black">?붿????낃퀎 理쒓퀬 ?섏? 留덉쭊??/span>
++                  <span className="text-sm font-extrabold">???쒖닔????1,400留???(46.7%)</span>
+                 </div>
+               </div>
+             </div>
+@@ -1224,12 +1550,12 @@ export default function FranchisePageClient() {
+ 
+             <div className="lg:col-span-3 relative group">
+               <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/2026-05-28_13_41_46_xec3ws.png" 
+                   alt="Model A Counter POP advertising" 
+-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
++                  className="w-full h-full opacity-90"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3 pointer-events-none">
+                   <span className="text-[10px] font-bold text-white/95">移댁슫???듭씤???꾩슜 鍮꾩＜???ъ뒪??/span>
+                 </div>
+               </div>
+@@ -1303,12 +1629,12 @@ export default function FranchisePageClient() {
+ 
+             <div className="lg:col-span-3 relative group">
+               <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945187/IMG_8185_jpquaf.jpg" 
+                   alt="Model B Packaging box design" 
+-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-550 opacity-90"
++                  className="w-full h-full opacity-90"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3 pointer-events-none">
+                   <span className="text-[10px] font-bold text-white/95">?뚯씠?ъ븘??諛??좊Ъ ?곸옄 諛뺤뒪</span>
+                 </div>
+               </div>
+@@ -1382,12 +1708,12 @@ export default function FranchisePageClient() {
+ 
+             <div className="lg:col-span-3 relative group">
+               <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
+-                <img 
++                <ImageMagnifier disabled={isMagnifierActive} 
+                   src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns.png" 
+                   alt="Model C premium kitchen cafe interior mockup" 
+-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
++                  className="w-full h-full opacity-90"
+                 />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
++                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3 pointer-events-none">
+                   <span className="text-[10px] font-bold text-white/95">?꾨━誘몄뾼 ?몃젴??二쇰갑 諛?? 援ъ꽦</span>
+                 </div>
+               </div>
+@@ -1440,45 +1766,57 @@ export default function FranchisePageClient() {
+             </div>
+ 
+             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left">
+-              <div className="lg:col-span-8 relative">
+-                {/* Connecting Line */}
+-                <div className={`absolute left-6 top-4 bottom-4 w-0.5 ${isPink ? "bg-neutral-805" : "bg-amber-200/50"} z-0`}></div>
+-                <div className="space-y-4 relative z-10">
+-                  {[
+-                    { step: "01", name: "?곷떞 ?좎껌", desc: "?꾩엯 ?뺥깭 諛??됱닔 吏꾨떒", icon: <Info size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "02", name: "?곴텒 遺꾩꽍", desc: "諛곕떖 諛??源?遺꾩꽍", icon: <Search size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "03", name: "媛留?怨꾩빟", desc: "?몃? ?쒗깮 諛?泥닿껐", icon: <FileText size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "04", name: "?꾨㈃ ?ㅺ퀎", desc: "1???숈꽑 諛곗튂???뺤젙", icon: <Building2 size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "05", name: "湲곌린 援먯쑁", desc: "1:1 ?덉떆??議곕━ 留덉뒪??, icon: <ChefHat size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "06", name: "?ㅽ뵂 由ы뿀??, desc: "理쒖쥌 媛???뚯뒪??, icon: <Sliders size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
+-                    { step: "07", name: "洹몃옖???ㅽ뵂", desc: "留ㅼ텧 ?쒖꽦??留덉???, icon: <Sparkles size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> }
+-                  ].map((row, idx) => (
+-                    <div key={idx} className="flex items-center gap-4 hover:scale-[1.01] transition-transform duration-200">
+-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black shrink-0 border transition-all duration-300 shadow-md ${isPink ? "bg-neutral-950 border-neutral-800 text-rose-500" : "bg-white border-amber-200/60 text-amber-600"}`}>
+-                        {row.step}
+-                      </div>
+-                      <div className={`flex-1 p-3.5 rounded-xl ${innerCardBg} ${innerCardHover} border ${isPink ? "border-neutral-850/60" : "border-amber-250/20"} flex items-center justify-between`}>
+-                        <div>
+-                          <h4 className={`text-xs sm:text-sm font-black ${textTitle}`}>{row.name}</h4>
+-                          <p className={`text-[10px] ${textDesc} leading-relaxed font-semibold mt-0.5`}>{row.desc}</p>
+-                        </div>
+-                        <div className={`p-1.5 rounded-lg ${isPink ? "bg-neutral-950/60" : "bg-amber-100/40"}`}>
+-                          {row.icon}
++              <ScrollTriggered className="lg:col-span-8 relative">
++                {(isVisible) => (
++                  <>
++                    {/* Connecting Line */}
++                    <div className={`absolute left-6 top-4 bottom-4 w-0.5 ${isPink ? "bg-neutral-850" : "bg-amber-200/50"} z-0`}></div>
++                    <div className="space-y-4 relative z-10">
++                      {[
++                        { step: "01", name: "?곷떞 ?좎껌", desc: "?꾩엯 ?뺥깭 諛??됱닔 吏꾨떒", icon: <Info size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
++                        { step: "02", name: "?곴텒 遺꾩꽍", desc: "諛곕떖 諛??源?遺꾩꽍", icon: <Search size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
++                        { step: "03", name: "媛留?怨꾩빟", desc: "?몃? ?쒗깮 諛?泥닿껐", icon: <FileText size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
++                        { step: "04", name: "?꾨㈃ ?ㅺ퀎", desc: "1???숈꽑 諛곗튂???뺤젙", icon: <Building2 size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
++                        { step: "05", name: "湲곌린 援먯쑁", desc: "1:1 ?덉떆??議곕━ 留덉뒪??, icon: <ChefHat size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
++                        { step: "06", name: "?ㅽ뵂 由ы뿀??, desc: "理쒖쥌 媛???뚯뒪??, icon: <Sliders size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> },
++                        { step: "07", name: "洹몃옖???ㅽ뵂", desc: "留ㅼ텧 ?쒖꽦??留덉???, icon: <Sparkles size={12} className={isPink ? "text-rose-500" : "text-amber-500"} /> }
++                      ].map((row, idx) => (
++                        <div 
++                          key={idx} 
++                          className="flex items-center gap-4 hover:scale-[1.01] transition-transform duration-200"
++                          style={{
++                            opacity: isVisible ? 1 : 0,
++                            transform: isVisible ? "translateX(0)" : "translateX(-20px)",
++                            transition: `opacity 0.5s ease-out ${idx * 100}ms, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 100}ms`
++                          }}
++                        >
++                          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black shrink-0 border transition-all duration-300 shadow-md ${isPink ? "bg-neutral-950 border-neutral-800 text-rose-500" : "bg-white border-amber-200/60 text-amber-600"}`}>
++                            {row.step}
++                          </div>
++                          <div className={`flex-1 p-3.5 rounded-xl ${innerCardBg} ${innerCardHover} border ${isPink ? "border-neutral-850/60" : "border-amber-250/20"} flex items-center justify-between`}>
++                            <div>
++                              <h4 className={`text-xs sm:text-sm font-black ${textTitle}`}>{row.name}</h4>
++                              <p className={`text-[10px] ${textDesc} leading-relaxed font-semibold mt-0.5`}>{row.desc}</p>
++                            </div>
++                            <div className={`p-1.5 rounded-lg ${isPink ? "bg-neutral-950/60" : "bg-amber-100/40"}`}>
++                              {row.icon}
++                            </div>
++                          </div>
+                         </div>
+-                      </div>
++                      ))}
+                     </div>
+-                  ))}
+-                </div>
+-              </div>
++                  </>
++                )}
++              </ScrollTriggered>
+ 
+               <div className="lg:col-span-4 relative group">
+                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/6] bg-neutral-950 w-full h-full min-h-[350px]">
+-                  <img 
++                  <ImageMagnifier disabled={isMagnifierActive} 
+                     src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_51_40_ahiniz.png" 
+                     alt="Process marketing material" 
+-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
++                    className="w-full h-full opacity-90"
+                   />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                     <span className="text-xs font-bold text-white/95">?ㅽ뵂 以鍮??꾩냽 吏???⑦궎吏?諛?POP ?명듃</span>
+                   </div>
+                 </div>
+@@ -1531,12 +1869,12 @@ export default function FranchisePageClient() {
+ 
+               <div className="lg:col-span-4 relative group">
+                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950">
+-                  <img 
++                  <ImageMagnifier disabled={isMagnifierActive} 
+                     src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945603/EGG120_%EB%8F%99%EB%AC%BC%EB%B3%B5%EC%A7%80_%ED%8C%9D%EC%97%85POPUP__240613_jqil66.jpg" 
+                     alt="Egg120 animal welfare pop-up" 
+-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
++                    className="w-full h-full opacity-95"
+                   />
+-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4">
++                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-4 pointer-events-none">
+                     <span className="text-xs font-bold text-white/95">媛留?怨듦툒 ?щ즺 李⑤퀎?? 移쒗솚寃??숇Ъ蹂듭? ?몄쬆 怨꾨?</span>
+                   </div>
+                 </div>
+@@ -1730,6 +2068,95 @@ export default function FranchisePageClient() {
+           <p className="text-[10px] text-slate-650">짤 2026 120pie & coffee Corp. All rights reserved.</p>
+         </div>
+       </footer>
++      </div>
++
++      {/* Global Magnifying Glass Overlay */}
++      {mounted && isMagnifierActive && (
++        <div 
++          className="fixed z-[9999] hidden lg:block"
++          style={{
++            left: `${lensPos.x}px`,
++            top: `${lensPos.y}px`,
++            transform: "translate(-50%, -50%)",
++            width: `${lensSize}px`,
++            height: `${lensSize}px`,
++            pointerEvents: "none",
++            transition: "none",
++          }}
++        >
++          {/* Circular Lens */}
++          <div 
++            className={`relative w-full h-full rounded-full border-4 ${isPink ? 'border-rose-500 bg-neutral-950' : 'border-amber-400 bg-[#fffdf4]'} shadow-2xl overflow-hidden`}
++          >
++            {/* Spotlight reflection glare */}
++            <div className="absolute top-2 left-2 w-16 h-16 bg-white/20 rounded-full blur-[2px] z-40"></div>
++            
++            {/* Mirror cloned page */}
++            <div
++              className="magnifier-lens-content"
++              style={{
++                position: "absolute",
++                width: "100vw",
++                minWidth: "100vw",
++                maxWidth: "none", // Prevent global max-width CSS resets from squishing layout
++                height: `${pageSize.height}px`,
++                maxHeight: "none", // Prevent global max-height constraints
++                transform: `scale(${zoomLevel})`,
++                transformOrigin: "top left",
++                left: `${-(lensPos.x + (typeof window !== "undefined" ? window.scrollX : 0)) * zoomLevel + lensSize / 2}px`,
++                top: `${-(lensPos.y + (typeof window !== "undefined" ? window.scrollY : 0)) * zoomLevel + lensSize / 2}px`,
++                pointerEvents: "none",
++              }}
++              dangerouslySetInnerHTML={{ __html: pageHtml }}
++            />
++          </div>
++        </div>
++      )}
++
++      {/* CSS Overrides for Mirrored Content in Magnifier Lens */}
++      <style dangerouslySetInnerHTML={{ __html: `
++        .magnifier-lens-content [style*="opacity: 0"], 
++        .magnifier-lens-content [style*="opacity:0"] {
++          opacity: 1 !important;
++          transform: none !important;
++        }
++      `}} />
++
++      {/* Persistent Magnifier Toggle Sidebar Button */}
++      {mounted && (
++        <button
++          type="button"
++          onClick={() => {
++            if (isMagnifierActive) {
++              setIsMagnifierActive(false);
++            } else {
++              setIsMagnifierActive(true);
++              const element = document.getElementById("magnifiable-page");
++              if (element) {
++                setPageHtml(element.innerHTML);
++                setPageSize({
++                  width: element.offsetWidth,
++                  height: element.offsetHeight
++                });
++              }
++            }
++          }}
++          className={`fixed top-1/2 left-6 -translate-y-1/2 z-[9999] hidden lg:flex flex-col items-center justify-center gap-1.5 w-14 h-24 rounded-full shadow-2xl font-black text-[10px] cursor-pointer hover:scale-105 active:scale-95 transition-all border ${
++            isMagnifierActive
++              ? isPink 
++                ? "bg-rose-500 text-white border-rose-400 shadow-rose-500/20" 
++                : "bg-amber-400 text-neutral-950 border-amber-500 shadow-amber-400/20"
++              : isPink
++                ? "bg-neutral-900 text-neutral-350 border-neutral-800"
++                : "bg-white text-slate-700 border-neutral-200"
++          }`}
++        >
++          <Search size={16} className={isMagnifierActive ? "animate-pulse" : ""} />
++          <span className="text-center leading-tight">
++            ?뗫낫湲?br />{isMagnifierActive ? "?꾧린" : "耳쒓린"}
++          </span>
++        </button>
++      )}
+     </div>
+   );
+ }

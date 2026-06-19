@@ -1,0 +1,10 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Add missing grid container div in Section 10 to fix JSX tag nesting error\"",
+  "EndLine": "1046",
+  "Instruction": "\"Insert the grid container opening tag right before the lg:col-span-8 table card.\"",
+  "ReplacementContent": "\"            <div className=\\\"grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch text-left\\\">\\n              <div className={`lg:col-span-8 p-6 rounded-2xl border ${isPink ? \\\"border-neutral-850\\\" : \\\"border-amber-200/40\\\"} overflow-x-auto ${innerCardBg} ${innerCardHover}`}>\"",
+  "StartLine": "1044",
+  "TargetContent": "\"\\n              <div className={`lg:col-span-8 p-6 rounded-2xl border ${isPink ? \\\"border-neutral-850\\\" : \\\"border-amber-200/40\\\"} overflow-x-auto ${innerCardBg} ${innerCardHover}`}>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\""
+}

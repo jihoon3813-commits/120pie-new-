@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Set custom cursor to none when custom magnifying glass is active.\"",
+  "EndLine": "414",
+  "Instruction": "\"Add cursor hide classes dynamically to the outer container when mouse is active and not on interactive element.\"",
+  "ReplacementContent": "\"    <div id={isPink ? \\\"landing-v3\\\" : \\\"landing-v5\\\"} className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg} ${isHovering && !isInteractive ? \\\"lg:cursor-none\\\" : \\\"\\\"}`}>\"",
+  "StartLine": "412",
+  "TargetContent": "\"    <div id={isPink ? \\\"landing-v3\\\" : \\\"landing-v5\\\"} className={`min-h-screen font-sans antialiased transition-colors duration-300 ${pageBg}`}>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Adding dynamic cursor style to root div\"",
+  "toolSummary": "\"Replace file content\""
+}

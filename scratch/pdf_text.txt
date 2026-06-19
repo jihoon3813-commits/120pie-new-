@@ -1,0 +1,21 @@
+﻿node : D:\anti-gv\25. 120pie(new)_2\scratch\extract_pdf.js:4
+위치 줄:1 문자:1
++ node scratch/extract_pdf.js 2>&1 | Out-File -FilePath scratch/pdf_tex ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (D:\anti-gv\25. ...xtract_pdf.js:4:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+pdf(buf).then(d => {
+^
+
+TypeError: pdf is not a function
+    at Object.<anonymous> (D:\anti-gv\25. 120pie(new)_2\scratch\extract_pdf.js:4:1)
+    at Module._compile (node:internal/modules/cjs/loader:1812:14)
+    at Object..js (node:internal/modules/cjs/loader:1943:10)
+    at Module.load (node:internal/modules/cjs/loader:1533:32)
+    at Module._load (node:internal/modules/cjs/loader:1335:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.14.0

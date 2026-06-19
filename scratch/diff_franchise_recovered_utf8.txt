@@ -1,0 +1,194 @@
+﻿癤풼iff --git a/app/franchise/FranchisePageClient.tsx b/app/franchise/FranchisePageClient.tsx
+index ad64602..8201a32 100644
+--- a/app/franchise/FranchisePageClient.tsx
++++ b/app/franchise/FranchisePageClient.tsx
+@@ -1347,77 +1347,138 @@ export default function FranchisePageClient() {
+         <section className={`rounded-3xl p-6 sm:p-12 ${cardBg} relative`}>
+           <div className="flex items-center justify-between border-b border-neutral-200/20 pb-4 mb-8">
+             <span className="text-xs font-black tracking-widest text-[#ffd500]">13 / FRANCHISE MODEL C</span>
+-            <span className="text-xs font-black text-slate-400">PREMIUM CAFE & BRUNCH</span>
++            <span className="text-xs font-black text-slate-400">Start-up Costs</span>
+           </div>
+ 
+-          <div className="my-auto py-2 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+-            <div className="lg:col-span-5 space-y-4 text-left flex flex-col justify-between">
+-              <div>
+-                <span className={`text-xs font-black px-2.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455 border-rose-500/20" : "bg-amber-400/10 text-amber-600 border-amber-400/20"} border rounded-full`}>
+-                  紐⑤뜽 C: 15???占쎌긽 ?占쎈━誘몄뾼 移댄럹
+-                </span>
+-                <h2 className={`text-xl sm:text-2xl md:text-3xl font-black leading-tight ${textTitle} mt-3`}>
+-                  釉뚮윴占??占쎌씤??媛뺥솕,<br />
+-                  <span className={textHighlight}>怨좉컼 泥대쪟 ?占쎄컙</span>???占쎈━???占쎈━誘몄뾼??+          <div className="space-y-8">
++            {/* Top Row: Title & Badge */}
++            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
++              <div className="text-center md:text-left space-y-4">
++                <h2 className={`text-2xl sm:text-3xl md:text-4xl font-black leading-tight ${textTitle}`}>
++                  李쎌뾽 紐⑤뜽 C.<br />
++                  ?占쎄퇋 媛占??占쎌떇 李쎌뾽
+                 </h2>
+-                <p className={`text-xs sm:text-sm leading-relaxed ${textDesc} mt-2`}>
+-                  ?占쏙옙? ?占??占쎌씠釉붿쓣 ?占쏀빐 ?占쏙옙??占쎈퓧占??占쎈땲???占쎈즺, 釉뚮윴占?留ㅼ텧???占쎈컲 ?占쎌옣???占쎈걚??怨좎닔???占쎈옒洹몄떗 留ㅼ옣?占쎈땲??
+-                </p>
+-              </div>
+-              
+-              <div className={`grid grid-cols-2 gap-3 text-xs font-bold ${textDesc}`}>
+-                {[
+-                  "?占쎈룆 ?占쎌씠占??占?醫뚯꽍 ?占쎈낫",
+-                  "?占쎈젅?占쏀똿 ?占쏙옙????占쏀듃 怨듦툒",
+-                  "?占쎌껜 ?占쏙옙???占?二쇽옙? 怨좉컼 ?占쎌튂",
+-                  "留ㅼ옣 ?占쎈뱶留덊겕???占쎌옄??
+-                ].map((txt, idx) => (
+-                  <div key={idx} className="flex items-center gap-1.5">
+-                    <CheckCircle2 size={12} className={isPink ? "text-rose-500" : "text-amber-500"} />
+-                    <span>{txt}</span>
+-                  </div>
+-                ))}
++                <div className="flex flex-wrap gap-2 justify-center md:justify-start">
++                  <span className={`text-[10px] sm:text-xs font-extrabold px-3 py-1.5 rounded-full ${
++                    isPink ? "bg-rose-500/10 text-rose-455 border border-rose-500/20" : "bg-[#f2a813]/10 text-[#f2a813] border border-[#f2a813]/20"
++                  }`}>
++                    #?占쎄퇋 李쎌뾽??以鍮꾪븯???占쎈퉬 ?占쎌＜??+                  </span>
++                  <span className={`text-[10px] sm:text-xs font-extrabold px-3 py-1.5 rounded-full ${
++                    isPink ? "bg-rose-500/10 text-rose-455 border border-rose-500/20" : "bg-[#f2a813]/10 text-[#f2a813] border border-[#f2a813]/20"
++                  }`}>
++                    #?占?諛곕떖 ?占쎌떆 ?占쎌쁺???占쎈쭩?占쎈뒗 ?占쎌＜??+                  </span>
++                </div>
+               </div>
+-            </div>
+ 
+-            <div className="lg:col-span-3 relative group">
+-              <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
+-                <img 
+-                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns.png" 
+-                  alt="Model C premium kitchen cafe interior mockup" 
+-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+-                />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
+-                  <span className="text-[10px] font-bold text-white/95">?占쎈━誘몄뾼 ?占쎈젴??二쇰갑 占??占?援ъ꽦</span>
++              {/* Gold Badge */}
++              <div className={`flex flex-col items-center justify-center border p-5 rounded-2xl shadow-sm min-w-[170px] sm:min-w-[190px] shrink-0 text-center ${
++                isPink ? "border-rose-500/30 bg-rose-500/5 text-rose-500" : "border-amber-400/30 bg-amber-400/5 text-[#f05c40]"
++              }`}>
++                <span className="text-xl">?占쏙옙</span>
++                <span className="text-[9px] tracking-widest font-black opacity-80">?占썩쁾?占썩쁾??/span>
++                <div className="flex items-baseline gap-0.5 mt-1 font-black">
++                  <span className="text-3xl sm:text-4xl text-[#f05c40] !text-[#f05c40]">6,518</span>
++                  <span className="text-sm font-bold text-slate-500">留뚯썝</span>
+                 </div>
++                <span className="text-[9px] text-slate-400 font-bold mt-1">VAT蹂꾨룄</span>
+               </div>
+             </div>
+ 
+-            <div className={`lg:col-span-4 p-6 rounded-2xl text-left flex flex-col justify-between ${innerCardBgAccent} ${innerCardHover}`}>
+-              <span className={`text-[10px] font-black ${textDesc} uppercase tracking-wider block`}>MODEL C BUDGET</span>
+-              <div className={`space-y-3 border-b ${isPink ? "border-neutral-805" : "border-amber-200/35"} pb-4 my-3`}>
+-                <div className="flex justify-between items-center text-xs font-bold">
+-                  <span className={textDesc}>媛占?怨꾩빟 占?援먯쑁</span>
+-                  <span className={`${textTitle} font-extrabold`}>300占???/span>
+-                </div>
+-                <div className="flex justify-between items-center text-xs font-bold">
+-                  <span className={textDesc}>?占쏀뀒由ъ뼱 (15??湲곤옙?)</span>
+-                  <span className={`${textTitle} font-extrabold`}>2,200占???/span>
++            {/* Two Budget Tables */}
++            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 text-left">
++              {/* Table 1: 湲곕낯 鍮꾩슜 */}
++              <div className="space-y-4">
++                <div className="flex items-center justify-between border-b pb-2">
++                  <h3 className={`text-base sm:text-lg font-black ${textTitle} flex items-center gap-2`}>
++                    <span className={`w-2 h-4 ${isPink ? "bg-rose-500" : "bg-amber-400"} rounded-sm`}></span>
++                    湲곕낯 鍮꾩슜
++                  </h3>
++                  <span className={`text-sm sm:text-base font-black ${isPink ? "text-rose-500" : "text-[#f05c40]"}`}>1,040留뚯썝 <span className="text-[10px] font-bold text-slate-400">VAT蹂꾨룄</span></span>
+                 </div>
+-                <div className="flex justify-between items-center text-xs font-bold">
+-                  <span className={textDesc}>湲곌린 ?占쎈퉬 占?吏묎린</span>
+-                  <span className={`${textTitle} font-extrabold`}>1,100占???/span>
++                <div className={`w-full overflow-hidden border ${isPink ? "border-neutral-850" : "border-[#e6dfc3]"} rounded-xl shadow-sm overflow-x-auto`}>
++                  <table className="w-full border-collapse text-xs">
++                    <thead>
++                      <tr className={`${isPink ? "bg-neutral-900 text-rose-455" : "bg-[#fecb43]/20 text-[#0d233a]"} font-black text-left`}>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5">援щ텇</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-2/5">?占쏙옙? ?占쎌슜</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5 text-right">湲덉븸</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5">鍮꾧퀬</th>
++                      </tr>
++                    </thead>
++                    <tbody className={`divide-y ${isPink ? "divide-neutral-805 bg-neutral-950/40" : "divide-amber-100/30 bg-white"} font-semibold ${textDesc}`}>
++                      {[
++                        { cat: "媛留밸퉬", desc: "120寃뱁뙆??釉뚮옖?占쎌뿉 ?占???占쎄텒 ???占쎌젏 ?占쎌슜占? 援먯쑁 占?媛쒖젏 吏????, price: "500留뚯썝", note: "?占쎈㈇?? },
++                        { cat: "珥덈룄 臾쇳뭹占?, desc: "?占쏙옙??占쎌옱, ?占쎈땲?? 硫붾돱?? 諛곕꼫, ?占쎌닔占? ?占쏀듃吏 占?媛곸쥌 ?占쎈낫占?, price: "440留뚯썝", note: "-" },
++                        { cat: "怨꾩빟 ?占쏀뻾 蹂댁쬆占?, desc: "蹂댁쬆占?, price: "100留뚯썝", note: "留뚭린 諛섑솚" },
++                        { cat: "濡쒖뿴??, desc: "?占쎌쫵 留덌옙???媛곸쥌 ?占쏀뙚???占쎈낫占?, price: "11留뚯썝", note: "?占쎈궔" }
++                      ].map((row, idx) => (
++                        <tr key={idx} className="hover:bg-slate-50/10 transition-colors">
++                          <td className={`py-2 px-3 font-black ${textTitle}`}>{row.cat}</td>
++                          <td className="py-2 px-3 leading-relaxed">{row.desc}</td>
++                          <td className={`py-2 px-3 text-right font-black ${isPink ? "text-rose-500" : "text-[#f05c40]"}`}>{row.price}</td>
++                          <td className="py-2 px-3 text-slate-450">{row.note}</td>
++                        </tr>
++                      ))}
++                    </tbody>
++                  </table>
+                 </div>
+               </div>
+-              <div className="flex justify-between items-center font-black">
+-                <span className={`text-xs ${textTitle}`}>?占쎌긽 李쎌뾽 鍮꾩슜</span>
+-                <span className={`text-base ${isPink ? "text-rose-500" : "text-amber-500"}`}>3,600占????占?/span>
++
++              {/* Table 2: 湲곤옙? 鍮꾩슜 */}
++              <div className="space-y-4">
++                <div className="flex items-center justify-between border-b pb-2">
++                  <h3 className={`text-base sm:text-lg font-black ${textTitle} flex items-center gap-2`}>
++                    <span className={`w-2 h-4 ${isPink ? "bg-rose-500" : "bg-amber-400"} rounded-sm`}></span>
++                    湲곤옙? 鍮꾩슜
++                  </h3>
++                  <span className={`text-sm sm:text-base font-black ${isPink ? "text-rose-500" : "text-[#f05c40]"}`}>5,478留뚯썝 <span className="text-[10px] font-bold text-slate-400">VAT蹂꾨룄</span></span>
++                </div>
++                <div className={`w-full overflow-hidden border ${isPink ? "border-neutral-850" : "border-[#e6dfc3]"} rounded-xl shadow-sm overflow-x-auto`}>
++                  <table className="w-full border-collapse text-xs">
++                    <thead>
++                      <tr className={`${isPink ? "bg-neutral-900 text-rose-455" : "bg-[#fecb43]/20 text-[#0d233a]"} font-black text-left`}>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5">援щ텇</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-2/5">?占쏙옙? ?占쎌슜</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5 text-right">湲덉븸</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5">鍮꾧퀬</th>
++                      </tr>
++                    </thead>
++                    <tbody className={`divide-y ${isPink ? "divide-neutral-805 bg-neutral-950/40" : "divide-amber-100/30 bg-white"} font-semibold ${textDesc}`}>
++                      {[
++                        { cat: "?占쏀뀒由ъ뼱 / ?占쎌꽕", desc: "紐⑷났, ?占쎄린, ?占쎌옣, 議곕챸, ?占?? 誘몄옣, ?占쎄퀎 占?媛먮━", price: "2,850留뚯썝", note: "?占쎈떦 190留뚯썝" },
++                        { cat: "二쇰갑 / 二쇰갑 吏묎린占?, desc: "?占쏀겕?占? ?占쎌뒪?占쎌꽌, ?占쎈튃占? ?占쎈엻???占쎌옣占? 而ㅽ뵾癒몄떊", price: "2,200留뚯썝", note: "湲곕낯 ?占쎈ぉ ??蹂꾨룄" },
++                        { cat: "媛꾪뙋", desc: "?占쎈㈃ ?占쎌텧 ?占쎌궗 ??, price: "330留뚯썝", note: "?占쎌옣 ?占쏀솴???占쎈씪 ?占쎌씠?? },
++                        { cat: "湲곤옙?", desc: "?占쎌삤?占쏀겕, ?占쎌뒪 二쇰갑 愿?? ?占쏀긽??, price: "440留뚯썝", note: "-" }
++                      ].map((row, idx) => (
++                        <tr key={idx} className="hover:bg-slate-50/10 transition-colors">
++                          <td className={`py-2 px-3 font-black ${textTitle}`}>{row.cat}</td>
++                          <td className="py-2 px-3 leading-relaxed">{row.desc}</td>
++                          <td className={`py-2 px-3 text-right font-black ${isPink ? "text-rose-500" : "text-[#f05c40]"}`}>{row.price}</td>
++                          <td className="py-2 px-3 text-slate-450">{row.note}</td>
++                        </tr>
++                      ))}
++                    </tbody>
++                  </table>
++                </div>
+               </div>
+             </div>
++
++            {/* Detailed Cautions */}
++            <div className="p-4 rounded-xl border border-slate-200/10 text-left">
++              <ul className="space-y-1.5 text-[10px] sm:text-xs text-slate-455 font-bold list-disc pl-4 leading-relaxed">
++                <li>?占쎌＜媛 吏곸젒 ?占쎄났 媛??(?? 媛먮━??蹂몄궗 吏꾪뻾)</li>
++                <li>?占쏀룷 ?占쎌옄 鍮꾩슜?占?洹쒕え???占쎌꽦???占쎈씪 ?占쎈씪占????占쎌쑝占?遺媛?占쎈뒗 蹂꾨룄?占쎈땲??</li>
++                <li>?占쏀긽?? 硫붾돱蹂대뱶???占쎌뀡?占쎈땲??</li>
++                <li>媛꾪뙋 占?紐⑤뱺 議곕챸?占??占쎌쑉?占쎌씠 ?占쏙옙? LED ?占쎄뎄占?湲곕낯?占쎈줈 梨꾪깮, ?占쎌슜?占쎈땲??</li>
++                <li>泥좉굅, ?占쎄린 利앹꽕, 吏占?寃쎈퉬 ??怨꾩빟?占쎌뿉 紐낆떆??蹂꾨룄 怨듭궗 ?占쎌뿭, 媛꾪뙋, 媛占? ?占쎌썐?占쎈━?占쎈뒗 ?占쎌옣 寃ъ쟻?占쎈줈 蹂꾨룄?占쎈땲??</li>
++              </ul>
++            </div>
+           </div>
+ 
+           <div className="flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500">
+-            <span>* 15?占쏀삎 ?占쏙옙? ?占쎈옒洹몄떗 留ㅼ옣 媛쒖꽕 寃ъ쟻 媛?占쎈뱶 湲곤옙?</span>
++            <span>120pie & coffee 媛占?李쎌뾽 ?占쎌븞??/span>
+             <span>Slide 13 / 16</span>
+           </div>
+         </section>

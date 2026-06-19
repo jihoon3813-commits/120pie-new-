@@ -1,0 +1,9 @@
+{
+  "CodeContent": "\"const { execSync } = require('child_process');\\nconst fs = require('fs');\\n\\ntry {\\n  console.log(\\\"Extracting staged file from git index...\\\");\\n  const content = execSync('git show :app/franchise/FranchisePageClient.tsx', { encoding: 'utf8' });\\n  fs.writeFileSync('d:\\\\\\\\anti-gv\\\\\\\\25. 120pie(new)_2\\\\\\\\scratch\\\\\\\\franchise_staged_git.tsx', content, 'utf8');\\n  console.log(\\\"Saved staged file to franchise_staged_git.tsx. Size:\\\", content.length);\\n} catch (err) {\\n  console.error(\\\"Error running git show:\\\", err);\\n}\\n\"",
+  "Description": "\"Write script to extract staged FranchisePageClient.tsx from git index\"",
+  "IsArtifact": "false",
+  "Overwrite": "true",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\scratch\\\\check_staged.js\"",
+  "toolAction": "\"Writing check staged script\"",
+  "toolSummary": "\"Create new file\""
+}

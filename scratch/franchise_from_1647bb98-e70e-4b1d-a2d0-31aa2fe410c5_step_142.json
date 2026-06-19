@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Wrap Slide 07 Success Cases in ScrollTriggered.\"",
+  "EndLine": "1005",
+  "Instruction": "\"Replace div tag with ScrollTriggered container.\"",
+  "ReplacementContent": "\"              <ScrollTriggered className=\\\"lg:col-span-7\\\">\\n                {(isVisible) => (\\n                  <div className=\\\"space-y-4\\\">\"",
+  "StartLine": "1005",
+  "TargetContent": "\"              <div className=\\\"lg:col-span-7 space-y-4\\\">\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Wrapping success cases in ScrollTriggered\"",
+  "toolSummary": "\"Replace file content\""
+}

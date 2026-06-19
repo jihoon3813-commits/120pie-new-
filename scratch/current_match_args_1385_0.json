@@ -1,0 +1,9 @@
+{
+  "CodeContent": "\"const { execSync } = require('child_process');\\nconst fs = require('fs');\\nconst path = require('path');\\n\\nconst cwd = 'd:\\\\\\\\anti-gv\\\\\\\\25. 120pie(new)_2';\\ntry {\\n  // Let's run git diff on the unstaged changes of FranchisePageClient.tsx\\n  const diffUnstaged = execSync('git diff app/franchise/FranchisePageClient.tsx', { cwd, encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });\\n  fs.writeFileSync('d:\\\\\\\\anti-gv\\\\\\\\25. 120pie(new)_2\\\\\\\\scratch\\\\\\\\franchise_unstaged_diff.txt', diffUnstaged, 'utf8');\\n  console.log(\\\"Wrote unstaged diff to franchise_unstaged_diff.txt. Length:\\\", diffUnstaged.length);\\n  \\n  // Let's also run git diff --cached on the staged changes\\n  const diffStaged = execSync('git diff --cached app/franchise/FranchisePageClient.tsx', { cwd, encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });\\n  fs.writeFileSync('d:\\\\\\\\anti-gv\\\\\\\\25. 120pie(new)_2\\\\\\\\scratch\\\\\\\\franchise_staged_diff.txt', diffStaged, 'utf8');\\n  console.log(\\\"Wrote staged diff to franchise_staged_diff.txt. Length:\\\", diffStaged.length);\\n} catch (e) {\\n  console.error(\\\"Error:\\\", e.message);\\n}\\n\"",
+  "Description": "\"Write view_git_diff.js to dump git diffs to text files for complete inspection\"",
+  "IsArtifact": "false",
+  "Overwrite": "true",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\scratch\\\\view_git_diff.js\"",
+  "toolAction": "\"Writing view_git_diff.js\"",
+  "toolSummary": "\"Writing view_git_diff.js\""
+}

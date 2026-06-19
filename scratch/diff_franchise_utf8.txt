@@ -1,0 +1,194 @@
+﻿diff --git a/app/franchise/FranchisePageClient.tsx b/app/franchise/FranchisePageClient.tsx
+index ad64602..8201a32 100644
+--- a/app/franchise/FranchisePageClient.tsx
++++ b/app/franchise/FranchisePageClient.tsx
+@@ -1347,77 +1347,138 @@ export default function FranchisePageClient() {
+         <section className={`rounded-3xl p-6 sm:p-12 ${cardBg} relative`}>
+           <div className="flex items-center justify-between border-b border-neutral-200/20 pb-4 mb-8">
+             <span className="text-xs font-black tracking-widest text-[#ffd500]">13 / FRANCHISE MODEL C</span>
+-            <span className="text-xs font-black text-slate-400">PREMIUM CAFE & BRUNCH</span>
++            <span className="text-xs font-black text-slate-400">Start-up Costs</span>
+           </div>
+ 
+-          <div className="my-auto py-2 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+-            <div className="lg:col-span-5 space-y-4 text-left flex flex-col justify-between">
+-              <div>
+-                <span className={`text-xs font-black px-2.5 py-1 ${isPink ? "bg-rose-500/10 text-rose-455 border-rose-500/20" : "bg-amber-400/10 text-amber-600 border-amber-400/20"} border rounded-full`}>
+-                  모델 C: 15???�상 ?�리미엄 카페
+-                </span>
+-                <h2 className={`text-xl sm:text-2xl md:text-3xl font-black leading-tight ${textTitle} mt-3`}>
+-                  브런�??�인??강화,<br />
+-                  <span className={textHighlight}>고객 체류 ?�간</span>???�리???�리미엄??+          <div className="space-y-8">
++            {/* Top Row: Title & Badge */}
++            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
++              <div className="text-center md:text-left space-y-4">
++                <h2 className={`text-2xl sm:text-3xl md:text-4xl font-black leading-tight ${textTitle}`}>
++                  창업 모델 C.<br />
++                  ?�규 가�??�식 창업
+                 </h2>
+-                <p className={`text-xs sm:text-sm leading-relaxed ${textDesc} mt-2`}>
+-                  ?��? ?� ?�이블을 ?�해 ?��??�뿐�??�니???�료, 브런�?매출???�반 ?�장???�끄??고수???�래그십 매장?�니??
+-                </p>
+-              </div>
+-              
+-              <div className={`grid grid-cols-2 gap-3 text-xs font-bold ${textDesc}`}>
+-                {[
+-                  "?�독 ?�이�??� 좌석 ?�보",
+-                  "?�레?�팅 ?��????�트 공급",
+-                  "?�체 ?��???�?주�? 고객 ?�치",
+-                  "매장 ?�드마크???�자??
+-                ].map((txt, idx) => (
+-                  <div key={idx} className="flex items-center gap-1.5">
+-                    <CheckCircle2 size={12} className={isPink ? "text-rose-500" : "text-amber-500"} />
+-                    <span>{txt}</span>
+-                  </div>
+-                ))}
++                <div className="flex flex-wrap gap-2 justify-center md:justify-start">
++                  <span className={`text-[10px] sm:text-xs font-extrabold px-3 py-1.5 rounded-full ${
++                    isPink ? "bg-rose-500/10 text-rose-455 border border-rose-500/20" : "bg-[#f2a813]/10 text-[#f2a813] border border-[#f2a813]/20"
++                  }`}>
++                    #?�규 창업??준비하???�비 ?�주??+                  </span>
++                  <span className={`text-[10px] sm:text-xs font-extrabold px-3 py-1.5 rounded-full ${
++                    isPink ? "bg-rose-500/10 text-rose-455 border border-rose-500/20" : "bg-[#f2a813]/10 text-[#f2a813] border border-[#f2a813]/20"
++                  }`}>
++                    #?�&배달 ?�시 ?�영???�망?�는 ?�주??+                  </span>
++                </div>
+               </div>
+-            </div>
+ 
+-            <div className="lg:col-span-3 relative group">
+-              <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[220px]">
+-                <img 
+-                  src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945186/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns.png" 
+-                  alt="Model C premium kitchen cafe interior mockup" 
+-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+-                />
+-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent flex items-end p-3">
+-                  <span className="text-[10px] font-bold text-white/95">?�리미엄 ?�련??주방 �??� 구성</span>
++              {/* Gold Badge */}
++              <div className={`flex flex-col items-center justify-center border p-5 rounded-2xl shadow-sm min-w-[170px] sm:min-w-[190px] shrink-0 text-center ${
++                isPink ? "border-rose-500/30 bg-rose-500/5 text-rose-500" : "border-amber-400/30 bg-amber-400/5 text-[#f05c40]"
++              }`}>
++                <span className="text-xl">?��</span>
++                <span className="text-[9px] tracking-widest font-black opacity-80">?�★?�★??/span>
++                <div className="flex items-baseline gap-0.5 mt-1 font-black">
++                  <span className="text-3xl sm:text-4xl text-[#f05c40] !text-[#f05c40]">6,518</span>
++                  <span className="text-sm font-bold text-slate-500">만원</span>
+                 </div>
++                <span className="text-[9px] text-slate-400 font-bold mt-1">VAT별도</span>
+               </div>
+             </div>
+ 
+-            <div className={`lg:col-span-4 p-6 rounded-2xl text-left flex flex-col justify-between ${innerCardBgAccent} ${innerCardHover}`}>
+-              <span className={`text-[10px] font-black ${textDesc} uppercase tracking-wider block`}>MODEL C BUDGET</span>
+-              <div className={`space-y-3 border-b ${isPink ? "border-neutral-805" : "border-amber-200/35"} pb-4 my-3`}>
+-                <div className="flex justify-between items-center text-xs font-bold">
+-                  <span className={textDesc}>가�?계약 �?교육</span>
+-                  <span className={`${textTitle} font-extrabold`}>300�???/span>
+-                </div>
+-                <div className="flex justify-between items-center text-xs font-bold">
+-                  <span className={textDesc}>?�테리어 (15??기�?)</span>
+-                  <span className={`${textTitle} font-extrabold`}>2,200�???/span>
++            {/* Two Budget Tables */}
++            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 text-left">
++              {/* Table 1: 기본 비용 */}
++              <div className="space-y-4">
++                <div className="flex items-center justify-between border-b pb-2">
++                  <h3 className={`text-base sm:text-lg font-black ${textTitle} flex items-center gap-2`}>
++                    <span className={`w-2 h-4 ${isPink ? "bg-rose-500" : "bg-amber-400"} rounded-sm`}></span>
++                    기본 비용
++                  </h3>
++                  <span className={`text-sm sm:text-base font-black ${isPink ? "text-rose-500" : "text-[#f05c40]"}`}>1,040만원 <span className="text-[10px] font-bold text-slate-400">VAT별도</span></span>
+                 </div>
+-                <div className="flex justify-between items-center text-xs font-bold">
+-                  <span className={textDesc}>기기 ?�비 �?집기</span>
+-                  <span className={`${textTitle} font-extrabold`}>1,100�???/span>
++                <div className={`w-full overflow-hidden border ${isPink ? "border-neutral-850" : "border-[#e6dfc3]"} rounded-xl shadow-sm overflow-x-auto`}>
++                  <table className="w-full border-collapse text-xs">
++                    <thead>
++                      <tr className={`${isPink ? "bg-neutral-900 text-rose-455" : "bg-[#fecb43]/20 text-[#0d233a]"} font-black text-left`}>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5">구분</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-2/5">?��? ?�용</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5 text-right">금액</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5">비고</th>
++                      </tr>
++                    </thead>
++                    <tbody className={`divide-y ${isPink ? "divide-neutral-805 bg-neutral-950/40" : "divide-amber-100/30 bg-white"} font-semibold ${textDesc}`}>
++                      {[
++                        { cat: "가맹비", desc: "120겹파??브랜?�에 ?�???�권 ???�점 ?�용�? 교육 �?개점 지????, price: "500만원", note: "?�멸?? },
++                        { cat: "초도 물품�?, desc: "?��??�재, ?�니?? 메뉴?? 배너, ?�수�? ?�트지 �?각종 ?�보�?, price: "440만원", note: "-" },
++                        { cat: "계약 ?�행 보증�?, desc: "보증�?, price: "100만원", note: "만기 반환" },
++                        { cat: "로열??, desc: "?�즌 마�???각종 ?�팟???�보�?, price: "11만원", note: "?�납" }
++                      ].map((row, idx) => (
++                        <tr key={idx} className="hover:bg-slate-50/10 transition-colors">
++                          <td className={`py-2 px-3 font-black ${textTitle}`}>{row.cat}</td>
++                          <td className="py-2 px-3 leading-relaxed">{row.desc}</td>
++                          <td className={`py-2 px-3 text-right font-black ${isPink ? "text-rose-500" : "text-[#f05c40]"}`}>{row.price}</td>
++                          <td className="py-2 px-3 text-slate-450">{row.note}</td>
++                        </tr>
++                      ))}
++                    </tbody>
++                  </table>
+                 </div>
+               </div>
+-              <div className="flex justify-between items-center font-black">
+-                <span className={`text-xs ${textTitle}`}>?�상 창업 비용</span>
+-                <span className={`text-base ${isPink ? "text-rose-500" : "text-amber-500"}`}>3,600�????�</span>
++
++              {/* Table 2: 기�? 비용 */}
++              <div className="space-y-4">
++                <div className="flex items-center justify-between border-b pb-2">
++                  <h3 className={`text-base sm:text-lg font-black ${textTitle} flex items-center gap-2`}>
++                    <span className={`w-2 h-4 ${isPink ? "bg-rose-500" : "bg-amber-400"} rounded-sm`}></span>
++                    기�? 비용
++                  </h3>
++                  <span className={`text-sm sm:text-base font-black ${isPink ? "text-rose-500" : "text-[#f05c40]"}`}>5,478만원 <span className="text-[10px] font-bold text-slate-400">VAT별도</span></span>
++                </div>
++                <div className={`w-full overflow-hidden border ${isPink ? "border-neutral-850" : "border-[#e6dfc3]"} rounded-xl shadow-sm overflow-x-auto`}>
++                  <table className="w-full border-collapse text-xs">
++                    <thead>
++                      <tr className={`${isPink ? "bg-neutral-900 text-rose-455" : "bg-[#fecb43]/20 text-[#0d233a]"} font-black text-left`}>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5">구분</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-2/5">?��? ?�용</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5 text-right">금액</th>
++                        <th className="py-2.5 px-3 border-b border-[#e6dfc3]/40 w-1/5">비고</th>
++                      </tr>
++                    </thead>
++                    <tbody className={`divide-y ${isPink ? "divide-neutral-805 bg-neutral-950/40" : "divide-amber-100/30 bg-white"} font-semibold ${textDesc}`}>
++                      {[
++                        { cat: "?�테리어 / ?�설", desc: "목공, ?�기, ?�장, 조명, ?�?? 미장, ?�계 �?감리", price: "2,850만원", note: "?�당 190만원" },
++                        { cat: "주방 / 주방 집기�?, desc: "?�크?�, ?�스?�서, ?�빙�? ?�랍???�장�? 커피머신", price: "2,200만원", note: "기본 ?�목 ??별도" },
++                        { cat: "간판", desc: "?�면 ?�출 ?�사 ??, price: "330만원", note: "?�장 ?�황???�라 ?�이?? },
++                        { cat: "기�?", desc: "?�오?�크, ?�스 주방 관?? ?�탁??, price: "440만원", note: "-" }
++                      ].map((row, idx) => (
++                        <tr key={idx} className="hover:bg-slate-50/10 transition-colors">
++                          <td className={`py-2 px-3 font-black ${textTitle}`}>{row.cat}</td>
++                          <td className="py-2 px-3 leading-relaxed">{row.desc}</td>
++                          <td className={`py-2 px-3 text-right font-black ${isPink ? "text-rose-500" : "text-[#f05c40]"}`}>{row.price}</td>
++                          <td className="py-2 px-3 text-slate-450">{row.note}</td>
++                        </tr>
++                      ))}
++                    </tbody>
++                  </table>
++                </div>
+               </div>
+             </div>
++
++            {/* Detailed Cautions */}
++            <div className="p-4 rounded-xl border border-slate-200/10 text-left">
++              <ul className="space-y-1.5 text-[10px] sm:text-xs text-slate-455 font-bold list-disc pl-4 leading-relaxed">
++                <li>?�주가 직접 ?�공 가??(?? 감리??본사 진행)</li>
++                <li>?�포 ?�자 비용?� 규모???�성???�라 ?�라�????�으�?부가?�는 별도?�니??</li>
++                <li>?�탁?? 메뉴보드???�션?�니??</li>
++                <li>간판 �?모든 조명?� ?�율?�이 ?��? LED ?�구�?기본?�로 채택, ?�용?�니??</li>
++                <li>철거, ?�기 증설, 지�?경비 ??계약?�에 명시??별도 공사 ?�역, 간판, 가�? ?�웃?�리?�는 ?�장 견적?�로 별도?�니??</li>
++              </ul>
++            </div>
+           </div>
+ 
+           <div className="flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500">
+-            <span>* 15?�형 ?��? ?�래그십 매장 개설 견적 가?�드 기�?</span>
++            <span>120pie & coffee 가�?창업 ?�안??/span>
+             <span>Slide 13 / 16</span>
+           </div>
+         </section>

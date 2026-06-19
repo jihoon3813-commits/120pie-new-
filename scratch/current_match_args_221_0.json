@@ -1,0 +1,10 @@
+{
+  "ArtifactMetadata": "{\"ArtifactType\":\"task\",\"RequestFeedback\":false,\"Summary\":\"Updated task checklist for the current turn.\"}",
+  "CodeContent": "\"# Upgrading Franchise Page Magnifying Glass Task List\\n\\n- [x] Create wrapper container `#magnifiable-page` in `FranchisePageClient.tsx`\\n- [x] Add state variables (`isMagnifierActive`, `isHoveringClose`, `lensPos`, `pageHtml`, `pageSize`)\\n- [x] Implement coordinates updates and page HTML cloning logic in `useEffect` and `mousemove` handler\\n- [x] Implement freeze-on-hover physics logic for the lens positioning\\n- [x] Rebuild and enlarge the magnifier lens overlay with a close button and remove the \\\"ZOOM\\\" text\\n- [x] Create the activation floating button on the page when the magnifier is closed\\n- [x] Modify `ImageMagnifier` so that it doesn't double-zoom when global magnifier is active\\n- [x] Verify functionality (checking hover behavior, close button clicking, re-activation, styling)\\n- [x] Fix blank/white lens by setting width: 100vw, minWidth: 100vw, maxWidth: none, maxHeight: none on mirror wrapper\\n- [x] Fix close button kinematics trap by adding CSS transition lag on the lens overlay container\\n- [/] Fix card-box and dynamic content visibility inside the lens using debounced scroll HTML syncing\\n- [/] Remove close (X) button from the magnifier lens and make tracking instant (remove transition lag)\\n- [/] Refine the persistent sidebar ON/OFF toggle button on the side of the screen\\n- [ ] Verify final functionality and build correctness\\n\"",
+  "Description": "\"Update task.md checklist.\"",
+  "IsArtifact": "true",
+  "Overwrite": "true",
+  "TargetFile": "\"C:\\\\Users\\\\FORYOUCOM\\\\.gemini\\\\antigravity-ide\\\\brain\\\\a7d16e60-6a64-43a8-9037-063c51e7a7cf\\\\task.md\"",
+  "toolAction": "\"Update task list\"",
+  "toolSummary": "\"Update task list\""
+}

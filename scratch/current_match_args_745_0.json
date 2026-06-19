@@ -1,0 +1,9 @@
+{
+  "CodeContent": "\"const { execSync } = require('child_process');\\nconst fs = require('fs');\\n\\ntry {\\n  const diff = execSync('git diff app/franchise/FranchisePageClient.tsx', { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });\\n  fs.writeFileSync('d:\\\\\\\\anti-gv\\\\\\\\25. 120pie(new)_2\\\\\\\\scratch\\\\\\\\diff_workdir.txt', diff, 'utf8');\\n  console.log(\\\"Saved git diff to diff_workdir.txt. Size:\\\", diff.length);\\n} catch (err) {\\n  console.error(\\\"Error running git diff:\\\", err);\\n}\\n\"",
+  "Description": "\"Write script to run git diff on FranchisePageClient.tsx\"",
+  "IsArtifact": "false",
+  "Overwrite": "true",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\scratch\\\\run_git_diff.js\"",
+  "toolAction": "\"Writing run git diff script\"",
+  "toolSummary": "\"Create new file\""
+}

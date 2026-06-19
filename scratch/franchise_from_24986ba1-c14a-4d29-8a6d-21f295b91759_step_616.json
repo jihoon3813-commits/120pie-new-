@@ -1,0 +1,10 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Add activeMenuTab state for tabbed detailed menu display in FranchisePageClient.tsx\"",
+  "EndLine": "88",
+  "Instruction": "\"Add activeMenuTab state variable initialized to \\\"pie\\\" right after selectedPlanTab state.\"",
+  "ReplacementContent": "\"  const [theme, setTheme] = useState<\\\"pink\\\" | \\\"yellow\\\">(\\\"yellow\\\");\\n  const [mobileNavOpen, setMobileNavOpen] = useState(false);\\n  const [selectedPlanTab, setSelectedPlanTab] = useState<\\\"8py\\\" | \\\"10py\\\">(\\\"8py\\\");\\n  const [activeMenuTab, setActiveMenuTab] = useState<\\\"pie\\\" | \\\"egg\\\" | \\\"churros\\\" | \\\"side\\\" | \\\"drink\\\">(\\\"pie\\\");\"",
+  "StartLine": "83",
+  "TargetContent": "\"  const [theme, setTheme] = useState<\\\"pink\\\" | \\\"yellow\\\">(\\\"yellow\\\");\\n  const [mobileNavOpen, setMobileNavOpen] = useState(false);\\n  const [selectedPlanTab, setSelectedPlanTab] = useState<\\\"8py\\\" | \\\"10py\\\">(\\\"8py\\\");\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\""
+}

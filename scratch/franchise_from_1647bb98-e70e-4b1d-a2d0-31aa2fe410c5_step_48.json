@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Add custom cursor state and coordinates tracking useEffect to FranchisePageClient component.\"",
+  "EndLine": "210",
+  "Instruction": "\"Inject custom cursor state and mouse move tracking useEffect.\"",
+  "ReplacementContent": "\"  const addInquiry = useMutation(api.inquiries.add);\\n\\n  // Custom cursor state\\n  const [mousePos, setMousePos] = useState({ x: -200, y: -200 });\\n  const [isHovering, setIsHovering] = useState(false);\\n  const [isInteractive, setIsInteractive] = useState(false);\\n\\n  useEffect(() => {\\n    if (typeof window === \\\"undefined\\\") return;\\n\\n    const handleMouseMove = (e: MouseEvent) => {\\n      setMousePos({ x: e.clientX, y: e.clientY });\\n      setIsHovering(true);\\n      \\n      const target = e.target as HTMLElement;\\n      if (!target) return;\\n      \\n      const isInteractiveElement = \\n        target.tagName === \\\"BUTTON\\\" ||\\n        target.tagName === \\\"A\\\" ||\\n        target.tagName === \\\"INPUT\\\" ||\\n        target.tagName === \\\"SELECT\\\" ||\\n        target.tagName === \\\"TEXTAREA\\\" ||\\n        target.closest(\\\"button\\\") ||\\n        target.closest(\\\"a\\\") ||\\n        target.closest(\\\"input\\\") ||\\n        target.closest(\\\"select\\\") ||\\n        target.closest(\\\"textarea\\\") ||\\n        target.closest(\\\".interactive\\\") ||\\n        target.closest(\\\"label\\\");\\n      \\n      setIsInteractive(!!isInteractiveElement);\\n    };\\n\\n    const handleMouseLeave = () => {\\n      setIsHovering(false);\\n    };\\n\\n    window.addEventListener(\\\"mousemove\\\", handleMouseMove);\\n    document.addEventListener(\\\"mouseleave\\\", handleMouseLeave);\\n    return () => {\\n      window.removeEventListener(\\\"mousemove\\\", handleMouseMove);\\n      document.removeEventListener(\\\"mouseleave\\\", handleMouseLeave);\\n    };\\n  }, []);\"",
+  "StartLine": "208",
+  "TargetContent": "\"  const addInquiry = useMutation(api.inquiries.add);\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Adding custom cursor coordinates tracking\"",
+  "toolSummary": "\"Replace file content\""
+}

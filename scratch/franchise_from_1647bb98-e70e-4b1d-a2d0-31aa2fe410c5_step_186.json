@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Append custom magnifying glass cursor to end of FranchisePageClient.tsx.\"",
+  "EndLine": "1881",
+  "Instruction": "\"Inject custom cursor JSX before closing braces of FranchisePageClient return statement.\"",
+  "ReplacementContent": "\"      </footer>\\n\\n      {/* Custom Magnifying Glass Cursor */}\\n      <div \\n        className=\\\"fixed pointer-events-none z-[9999] hidden lg:block\\\"\\n        style={{\\n          left: `${mousePos.x}px`,\\n          top: `${mousePos.y}px`,\\n          transform: \\\"translate(-50%, -50%)\\\",\\n          opacity: isHovering && !isInteractive ? 1 : 0,\\n          transition: \\\"opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.08s cubic-bezier(0.16, 1, 0.3, 1)\\\",\\n        }}\\n      >\\n        <div className={`relative rounded-full border-2 ${isPink ? 'border-rose-500 bg-rose-500/10' : 'border-amber-400 bg-amber-400/10'} w-14 h-14 shadow-lg backdrop-blur-[1px] flex flex-col items-center justify-center`}>\\n          {/* Glass glare */}\\n          <div className=\\\"absolute top-1 left-1 w-4 h-4 bg-white/20 rounded-full blur-[1px]\\\"></div>\\n          {/* Magnifying Glass Text */}\\n          <span className={`text-[9px] font-black tracking-wider ${isPink ? 'text-rose-500' : 'text-amber-500'}`}>ZOOM</span>\\n          {/* Handle */}\\n          <div className={`absolute bottom-[-8px] right-[-8px] w-2.5 h-6 ${isPink ? 'bg-rose-500' : 'bg-amber-400'} rounded-full rotate-45 origin-top-left shadow-sm`}></div>\\n        </div>\\n      </div>\\n    </div>\\n  );\\n}\"",
+  "StartLine": "1878",
+  "TargetContent": "\"      </footer>\\n    </div>\\n  );\\n}\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Appending custom cursor JSX\"",
+  "toolSummary": "\"Replace file content\""
+}

@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Add mounted state and useEffect to check for client-side mounting before rendering client-only DOM.\"",
+  "EndLine": "233",
+  "Instruction": "\"Add mounted state and effect right below pageSize state.\"",
+  "ReplacementContent": "\"  const [pageHtml, setPageHtml] = useState(\\\"\\\");\\n  const [pageSize, setPageSize] = useState({ width: 1200, height: 10000 });\\n  const [mounted, setMounted] = useState(false);\\n\\n  useEffect(() => {\\n    setMounted(true);\\n  }, []);\"",
+  "StartLine": "227",
+  "TargetContent": "\"  const [pageHtml, setPageHtml] = useState(\\\"\\\");\\n  const [pageSize, setPageSize] = useState({ width: 1200, height: 10000 });\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Adding mounted state and effect\"",
+  "toolSummary": "\"Add mounted state and effect\""
+}

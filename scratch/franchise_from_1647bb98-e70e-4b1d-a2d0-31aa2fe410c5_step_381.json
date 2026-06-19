@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Remove premature closing div tag in Slide 02 to fix global JSX nesting\"",
+  "EndLine": "632",
+  "Instruction": "\"Remove the extra closing </div> tag on line 630.\"",
+  "ReplacementContent": "\"            </ScrollTriggered>\\n                </div>\"",
+  "StartLine": "628",
+  "TargetContent": "\"            </ScrollTriggered>\\n                </div>\\n              </div>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Removing extra closing div in FranchisePageClient.tsx\"",
+  "toolSummary": "\"Fixing JSX layout nesting\""
+}

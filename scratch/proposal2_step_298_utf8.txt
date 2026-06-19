@@ -1,0 +1,1 @@
+﻿"          {/* 4PAGE ~ 11PAGE. [?湲곗쨷] ?щ씪?대뱶 ?뚮젅?댁뒪???- Bright Yellow ?ㅽ???*/}\n          {currentSlide > 2 && currentSlide < 11 && ("

@@ -1,0 +1,1 @@
+"          {/* 4PAGE ~ 11PAGE. [대기중] 슬라이드 플레이스홀더 - Bright Yellow 스타일 */}\n          {currentSlide > 2 && currentSlide < 11 && ("

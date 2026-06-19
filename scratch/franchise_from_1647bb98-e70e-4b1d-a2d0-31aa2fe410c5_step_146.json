@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Add staggered transition style to Slide 07 success case cards.\"",
+  "EndLine": "1009",
+  "Instruction": "\"Replace the div tag inside the success cases map function to include staggered styles.\"",
+  "ReplacementContent": "\"                  <div \\n                    key={idx} \\n                    className={`p-5 rounded-2xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between text-left`}\\n                    style={{\\n                      opacity: isVisible ? 1 : 0,\\n                      transform: isVisible ? \\\"translateY(0)\\\" : \\\"translateY(25px)\\\",\\n                      transition: `opacity 0.7s ease-out ${idx * 200}ms, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 200}ms`\\n                    }}\\n                  >\"",
+  "StartLine": "1009",
+  "TargetContent": "\"                  <div key={idx} className={`p-5 rounded-2xl ${innerCardBgAccent} ${innerCardHover} flex flex-col justify-between text-left`}>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Adding success case card transition styles\"",
+  "toolSummary": "\"Replace file content\""
+}

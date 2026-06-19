@@ -1,0 +1,72 @@
+""use client";
+
+import React, { useState, useEffect } from "react";
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Play, 
+  Pause, 
+  ArrowLeft, 
+  Info,
+  MapPin,
+  TrendingUp,
+  Store,
+  Camera,
+  CheckCircle2
+} from "lucide-react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+
+export default function ProposalDeck2() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    storeType: "기존 카페 샵인샵 도입",
+    existingStoreName: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const addInquiryMutation = useMutation(api.inquiries.add);
+
+  const totalSlides = 12;
+
+  // Autoplay function
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % totalSlides);
+      }, 6000);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") {
+        setCurrentSlide((prev) => (prev + 1) % totalSlides);
+        setIsPlaying(false);
+      } else if (e.key === "ArrowLeft") {
+        setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+        setIsPlaying(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleNext = () => {
+    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    setIsPlaying(false);
+  };
+
+  const handlePrev = () => {
+    setCurrentSlide((prev) => (prev - 1 + totalSlide
+<truncated 35405 bytes>

@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Wrap Growth Graph in ScrollTriggered container.\"",
+  "EndLine": "601",
+  "Instruction": "\"Replace div tag with ScrollTriggered wrapper.\"",
+  "ReplacementContent": "\"                <ScrollTriggered>\\n                  {(isVisible) => (\\n                    <div className={`p-5 rounded-2xl ${innerCardBg} space-y-4`}>\"",
+  "StartLine": "601",
+  "TargetContent": "\"                <div className={`p-5 rounded-2xl ${innerCardBg} space-y-4`}>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Wrapping growth graph in ScrollTriggered\"",
+  "toolSummary": "\"Replace file content\""
+}

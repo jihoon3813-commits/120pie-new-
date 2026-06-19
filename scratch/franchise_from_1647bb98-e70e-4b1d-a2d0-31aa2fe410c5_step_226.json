@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Wrap Slide 03 timeline in ScrollTriggered.\"",
+  "EndLine": "757",
+  "Instruction": "\"Wrap timeline grid in ScrollTriggered.\"",
+  "ReplacementContent": "\"              <ScrollTriggered>\\n                {(isVisible) => (\\n                  <div className=\\\"grid grid-cols-1 sm:grid-cols-4 gap-4 text-left\\\">\"",
+  "StartLine": "757",
+  "TargetContent": "\"              <div className=\\\"grid grid-cols-1 sm:grid-cols-4 gap-4 text-left\\\">\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Wrapping timeline in ScrollTriggered\"",
+  "toolSummary": "\"Replace file content\""
+}

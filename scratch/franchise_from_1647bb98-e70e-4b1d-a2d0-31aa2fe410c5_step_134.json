@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Close ScrollTriggered wrapper for Slide 04 flowchart.\"",
+  "EndLine": "845",
+  "Instruction": "\"Inject closing braces and element for ScrollTriggered.\"",
+  "ReplacementContent": "\"              </div>\\n                )}\\n              </ScrollTriggered>\"",
+  "StartLine": "845",
+  "TargetContent": "\"              </div>\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Closing ScrollTriggered tag\"",
+  "toolSummary": "\"Replace file content\""
+}

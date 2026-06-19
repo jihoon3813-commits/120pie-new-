@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Wrap Slide 07 comment in JSX curly braces to fix compile error\"",
+  "EndLine": "990",
+  "Instruction": "\"Change the comment on line 986 to JSX comment format.\"",
+  "ReplacementContent": "\"        {/* SECTION 7. 성공사례 */}\"",
+  "StartLine": "984",
+  "TargetContent": "\"        /* SECTION 7. 성공사례 */\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Fixing Slide 07 comment syntax\"",
+  "toolSummary": "\"Fixing slide comment syntax\""
+}

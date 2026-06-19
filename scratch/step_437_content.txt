@@ -1,0 +1,1 @@
+"          <div className=\"flex justify-between items-center border-t border-neutral-200/20 pt-6 mt-8 text-[11px] sm:text-xs font-bold text-slate-500\">\n            <span>* 15평형 표준 플래그십 매장 개설 견적 가이드 기준</span>\n            <span>Slide 13 / 16</span>\n          </div>\n        </section>"

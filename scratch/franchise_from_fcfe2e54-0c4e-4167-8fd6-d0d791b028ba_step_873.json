@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Update Slide 14 images to use official brand assets mapped to local public paths\"",
+  "EndLine": "1690",
+  "Instruction": "\"Replace Cloudinary image URLs in Slide 14 right column with local official brand asset paths (/franchise_consulting.png, /franchise_education.png, /franchise_management.png)\"",
+  "ReplacementContent": "\"              {/* Right Column (3 images): 5 columns */}\\n              <div className=\\\"lg:col-span-5 space-y-4\\\">\\n                {[\\n                  {\\n                    url: \\\"/franchise_consulting.png\\\",\\n                    cap: \\\"창업 상담 및 세부 상권 컨설팅\\\"\\n                  },\\n                  {\\n                    url: \\\"/franchise_education.png\\\",\\n                    cap: \\\"본사 조리실 1:1 기기 및 레시피 집중 교육\\\"\\n                  },\\n                  {\\n                    url: \\\"/franchise_management.png\\\",\\n                    cap: \\\"오픈 이후 철저한 밀착 사후 관리\\\"\\n                  }\\n                ].map((imgItem, idx) => (\"",
+  "StartLine": "1674",
+  "TargetContent": "\"              {/* Right Column (3 images): 5 columns */}\\n              <div className=\\\"lg:col-span-5 space-y-4\\\">\\n                {[\\n                  {\\n                    url: \\\"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_01_00_y1gkyp.png\\\",\\n                    cap: \\\"창업 상담 및 세부 상권 컨설팅\\\"\\n                  },\\n                  {\\n                    url: \\\"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945604/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_02_07_46_evwssk.png\\\",\\n                    cap: \\\"본사 조리실 1:1 기기 및 레시피 집중 교육\\\"\\n                  },\\n                  {\\n                    url: \\\"https://res.cloudinary.com/dx7l09wwu/image/upload/v1779945185/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_01_47_46_fyk4ns.png\\\",\\n                    cap: \\\"오픈 이후 철저한 밀착 사후 관리\\\"\\n                  }\\n                ].map((imgItem, idx) => (\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Updating images in FranchisePageClient.tsx\"",
+  "toolSummary": "\"Replace image URLs\""
+}

@@ -1,0 +1,12 @@
+{
+  "AllowMultiple": "false",
+  "Description": "\"Define inputBgClass theme token for inquiry inputs\"",
+  "EndLine": "230",
+  "Instruction": "\"Define inputBgClass based on whether theme is Pink or Yellow\"",
+  "ReplacementContent": "\"  const innerCardHover = isPink\\n    ? \\\"hover:from-neutral-850 hover:to-neutral-900 hover:border-rose-500/30 hover:shadow-[0_8px_30px_rgba(244,63,94,0.06)] hover:scale-[1.03] transition-all duration-300\\\"\\n    : \\\"hover:from-white hover:to-[#fff9e6] hover:border-amber-400 hover:shadow-[0_8px_30px_rgba(251,191,36,0.12)] hover:scale-[1.03] transition-all duration-300\\\";\\n\\n  const inputBgClass = isPink \\n    ? \\\"bg-neutral-950/60 border-neutral-850 text-white focus:border-rose-500\\\" \\n    : \\\"bg-white border-[#e6dfc3] text-[#0d233a] focus:border-amber-400\\\";\\n  \\n  const textHighlight = isPink ? \\\"text-[#ffd500]\\\" : \\\"text-amber-500\\\";\"",
+  "StartLine": "224",
+  "TargetContent": "\"  const innerCardHover = isPink\\n    ? \\\"hover:from-neutral-850 hover:to-neutral-900 hover:border-rose-500/30 hover:shadow-[0_8px_30px_rgba(244,63,94,0.06)] hover:scale-[1.03] transition-all duration-300\\\"\\n    : \\\"hover:from-white hover:to-[#fff9e6] hover:border-amber-400 hover:shadow-[0_8px_30px_rgba(251,191,36,0.12)] hover:scale-[1.03] transition-all duration-300\\\";\\n\\n  \\n  const textHighlight = isPink ? \\\"text-[#ffd500]\\\" : \\\"text-amber-500\\\";\"",
+  "TargetFile": "\"d:\\\\anti-gv\\\\25. 120pie(new)_2\\\\app\\\\franchise\\\\FranchisePageClient.tsx\"",
+  "toolAction": "\"Adding inputBgClass token definition\"",
+  "toolSummary": "\"File edit\""
+}
