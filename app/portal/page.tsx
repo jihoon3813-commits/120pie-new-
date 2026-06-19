@@ -1055,7 +1055,13 @@ export default function PortalPage() {
       const firstItemName = (products || []).find((prod) => prod.id === cart[0].productId)?.name || "자재 주문";
       
       const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "store-1ba40e9a-5edf-4497-b8dc-ae82194fcf42";
-      const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY || "channel-key-7712b8cf-c5f1-424b-8047-8fc35c0bd793";
+      // KG이니시스 채널 키 로드 (포트원 V2 연동용 채널 키)
+      const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY;
+
+      if (!channelKey) {
+        showCustomAlert("결제 설정 오류", "KG이니시스 결제 채널 키(NEXT_PUBLIC_PORTONE_CHANNEL_KEY) 환경변수가 누락되었습니다. 포트원 콘솔에서 발급받은 채널 키를 환경변수에 등록해 주세요.");
+        return;
+      }
 
       // 토스페이먼츠(UPLUS) 특수문자 제한 방지를 위해 상품명 정제
       const sanitizedOrderTitle = cart.length > 1 ? `${firstItemName} 외 ${cart.length - 1}건` : firstItemName;
