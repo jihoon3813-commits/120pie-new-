@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
+import RecipeBookContent from "./RecipeBookContent";
 
 // ==========================================
 // TYPES DEFINITIONS
@@ -3284,6 +3285,7 @@ export default function AdminPage() {
                 { key: "inquiry", label: "1:1 AS 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
                 { key: "consultation", label: "창업 상담문의 관리", icon: Headphones },
                 { key: "analytics", label: "통계관리", icon: BarChart3 },
+                { key: "recipe", label: "레시피 관리", icon: FileText },
                 { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
                 { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
                 { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
@@ -3367,6 +3369,7 @@ export default function AdminPage() {
                     { key: "inquiry", label: "1:1 AS 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
                     { key: "consultation", label: "창업 상담문의 관리", icon: Headphones },
                     { key: "analytics", label: "통계관리", icon: BarChart3 },
+                    { key: "recipe", label: "레시피 관리", icon: FileText },
                     { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
                     { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
                     { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
@@ -4927,6 +4930,10 @@ export default function AdminPage() {
                 )}
               </div>
             </div>
+          )}
+
+          {currentMenu === "recipe" && (
+            <RecipeBookContent />
           )}
 
           {/* ==========================================
