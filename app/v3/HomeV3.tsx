@@ -1872,7 +1872,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   eyebrow: "Beverage",
                   title: "120커피 & 음료",
                   desc: "아메리카노부터 시그니처 쉐이크, 에이드까지. 파이와 완벽히 페어링되는 프리미엄 음료입니다.",
-                  image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594614/%EC%95%A0%EB%A9%94%EB%A6%AC%EC%B9%B4%EB%85%B8_qn2vhm.png",
+                  image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781187208/A4_01133_lzjp9l_j4lfgk.jpg",
                   alt: "120커피 & 음료"
                 },
                 {
