@@ -234,7 +234,7 @@ export default function StoresPageClient() {
           </div>
 
           <nav className={`hidden lg:flex items-center justify-center gap-2.5 xl:gap-4 text-[10px] xl:text-[13px] font-bold shrink-0 ${isPink ? "text-neutral-400 hover:text-rose-400" : "text-[#576575] hover:text-[#0d233a]"}`}>
-            <Link href={`${backUrl}#menu`} className="hover:text-amber-400 transition-colors">메뉴</Link>
+            <Link href={`/menu?theme=${theme}`} className="hover:text-amber-400 transition-colors">메뉴</Link>
             <Link href={`/stores?theme=${theme}`} className={`hover:scale-105 transition-transform shrink-0 ${
               isPink 
                 ? "text-rose-500 hover:text-rose-600 font-extrabold" 
@@ -308,7 +308,7 @@ export default function StoresPageClient() {
         {mobileNavOpen && (
           <nav id="mobile-landing-nav" className={`lg:hidden border-t px-4 pb-5 pt-3.5 transition-all duration-300 ${isYellow ? "bg-[#fffdf2]/98 border-t border-[#e6dfc3]/60" : "bg-[#0f0a0c]/98 border-t border-[#f2ccd7]/15"}`}>
             <div className="grid grid-cols-2 gap-2 text-sm font-bold">
-              <Link href={`${backUrl}#menu`} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${isYellow ? "bg-white border border-[#e6dfc3]/60 text-[#576575]" : "bg-[#181114] border border-[#f2ccd7]/10 text-neutral-400"}`}>
+              <Link href={`/menu?theme=${theme}`} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${isYellow ? "bg-white border border-[#e6dfc3]/60 text-[#576575]" : "bg-[#181114] border border-[#f2ccd7]/10 text-neutral-400"}`}>
                 메뉴
               </Link>
               <Link href={`/stores?theme=${theme}`} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors font-extrabold ${

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion, useInView, AnimatePresence } from "motion/react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation } from "convex/react";
 import Footer from "@/app/components/Footer";
 import { api } from "../../convex/_generated/api";
@@ -1262,7 +1262,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
           </div>
 
           <nav className={`hidden lg:flex items-center gap-2.5 xl:gap-4 text-[10px] xl:text-[13px] font-bold shrink-0 ${navLinkTextClass}`}>
-            <a href="#menu" className="hover:text-amber-400 transition-colors">메뉴</a>
+            <Link href={isYellowVariant ? "/menu?theme=yellow" : "/menu?theme=pink"} className="hover:text-amber-400 transition-colors">메뉴</Link>
             <Link href={isYellowVariant ? "/stores?theme=yellow" : "/stores?theme=pink"} className="hover:text-amber-400 transition-colors shrink-0">
               가맹점 현황
             </Link>
@@ -1312,9 +1312,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         {mobileNavOpen && (
           <nav id="mobile-landing-nav" className={`lg:hidden border-t px-4 pb-5 pt-3.5 transition-all duration-300 ${mobileNavDrawerBgClass}`}>
             <div className="grid grid-cols-2 gap-2 text-sm font-bold">
-              <a href="#menu" onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
+              <Link href={isYellowVariant ? "/menu?theme=yellow" : "/menu?theme=pink"} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
                 메뉴
-              </a>
+              </Link>
               <Link href={isYellowVariant ? "/stores?theme=yellow" : "/stores?theme=pink"} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
                 가맹점 현황
               </Link>
@@ -1896,7 +1896,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             </motion.div>
 
             {/* Editorial product grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
                   id: "120겹파이",
@@ -1915,6 +1915,14 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   alt: "에그120 계란빵"
                 },
                 {
+                  id: "coffee120",
+                  eyebrow: "Beverage",
+                  title: "120커피 & 음료",
+                  desc: "아메리카노부터 시그니처 쉐이크, 에이드까지. 파이와 완벽히 페어링되는 프리미엄 음료입니다.",
+                  image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594614/%EC%95%A0%EB%A9%94%EB%A6%AC%EC%B9%B4%EB%85%B8_qn2vhm.png",
+                  alt: "120커피 & 음료"
+                },
+                {
                   id: "기타",
                   eyebrow: "Side Menu",
                   title: "츄러스 · 핫도그 · 떡볶이",
@@ -1922,48 +1930,50 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184099/IMG_0015_6_3_bxmolh.jpg",
                   alt: "사이드 메뉴"
                 }
-              ].map((menu) => (
-                <button
-                  type="button"
-                  key={menu.id}
-                  onClick={() => setSelectedMenu(menu.id)}
-                  className={`group text-left border-t pt-5 transition-colors flex flex-col ${
-                    isPinkVariant 
-                      ? "border-[#f2ccd7] hover:border-rose-400 text-[#735965]" 
-                      : isYellowVariant 
-                        ? "border-[#e6dfc3] hover:border-[#0d233a] text-[#576575]" 
-                        : "border-neutral-700 hover:border-amber-400 text-neutral-400"
-                  }`}
-                >
-                  <div className={`aspect-[4/3] overflow-hidden rounded-xl mb-6 w-full ${
-                    isPinkVariant ? "bg-rose-50/50" : isYellowVariant ? "bg-[#fffdf2]/80" : "bg-neutral-900"
-                  }`}>
-                    <img
-                      src={menu.image}
-                      alt={menu.alt}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
-                    />
-                  </div>
-                  <span className={`text-[10px] font-bold tracking-[0.22em] uppercase block mb-3 ${
-                    isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
-                  }`}>{menu.eyebrow}</span>
-                  <h3 className={`text-xl font-black mb-3 ${
-                    isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
-                  }`}>{menu.title}</h3>
-                  <p className={`text-xs sm:text-sm font-medium leading-relaxed flex-1 ${
-                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
-                  }`}>{menu.desc}</p>
-                  <span className={`catalog-detail-button text-xs font-bold mt-7 inline-flex items-center gap-2 rounded-full border px-4 py-2.5 transition-colors ${
-                    isPinkVariant 
-                      ? "border-rose-500 text-rose-500 group-hover:bg-rose-500 group-hover:text-white" 
-                      : isYellowVariant 
-                        ? "border-[#0d233a] text-[#0d233a] group-hover:bg-[#0d233a] group-hover:text-white" 
-                        : "border-amber-400 text-amber-400 group-hover:bg-amber-400 group-hover:text-white"
-                  }`}>
-                    메뉴 자세히 보기 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                </button>
-              ))}
+              ].map((menu) => {
+                const tabParam = menu.id === "120겹파이" ? "pie" : menu.id === "에그120" ? "egg" : menu.id === "coffee120" ? "coffee" : "side";
+                return (
+                  <Link
+                    key={menu.id}
+                    href={isYellowVariant ? `/menu?theme=yellow&tab=${tabParam}` : `/menu?theme=pink&tab=${tabParam}`}
+                    className={`group text-left border-t pt-5 transition-colors flex flex-col ${
+                      isPinkVariant 
+                        ? "border-[#f2ccd7] hover:border-rose-400 text-[#735965]" 
+                        : isYellowVariant 
+                          ? "border-[#e6dfc3] hover:border-[#0d233a] text-[#576575]" 
+                          : "border-neutral-700 hover:border-amber-400 text-neutral-400"
+                    }`}
+                  >
+                    <div className={`aspect-[4/3] overflow-hidden rounded-xl mb-6 w-full ${
+                      isPinkVariant ? "bg-rose-50/50" : isYellowVariant ? "bg-[#fffdf2]/80" : "bg-neutral-900"
+                    }`}>
+                      <img
+                        src={menu.image}
+                        alt={menu.alt}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
+                      />
+                    </div>
+                    <span className={`text-[10px] font-bold tracking-[0.22em] uppercase block mb-3 ${
+                      isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
+                    }`}>{menu.eyebrow}</span>
+                    <h3 className={`text-xl font-black mb-3 ${
+                      isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
+                    }`}>{menu.title}</h3>
+                    <p className={`text-xs sm:text-sm font-medium leading-relaxed flex-1 ${
+                      isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
+                    }`}>{menu.desc}</p>
+                    <span className={`catalog-detail-button text-xs font-bold mt-7 inline-flex items-center gap-2 rounded-full border px-4 py-2.5 transition-colors ${
+                      isPinkVariant 
+                        ? "border-rose-500 text-rose-500 group-hover:bg-rose-500 group-hover:text-white" 
+                        : isYellowVariant 
+                          ? "border-[#0d233a] text-[#0d233a] group-hover:bg-[#0d233a] group-hover:text-white" 
+                          : "border-amber-400 text-amber-400 group-hover:bg-amber-400 group-hover:text-white"
+                    }`}>
+                      메뉴 자세히 보기 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
 
             {/* Recommended combinations */}
