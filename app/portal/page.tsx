@@ -1452,7 +1452,10 @@ export default function PortalPage() {
 
 
           
-          <div className="text-center pt-2">
+          <div className="text-center pt-2 space-y-3">
+            <p className="text-[11px] text-[#735965]/80 font-bold bg-[#fff1f5] border border-[#f2ccd7]/60 py-2 rounded-xl">
+              게스트 계정 : <span className="text-[#bf3e67]">owner</span> / <span className="text-[#bf3e67]">owner</span>
+            </p>
             <Link href="/" className="text-xs text-[#735965] hover:text-[#bf3e67] hover:underline font-bold transition-all flex items-center justify-center gap-1">
               ← 메인 랜딩 페이지로 돌아가기
             </Link>
