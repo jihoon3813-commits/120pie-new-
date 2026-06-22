@@ -1051,6 +1051,63 @@ export default function PortalPage() {
   const shippingTypeLabel = getAppliedShippingType();
   const cartTotal = cartSubtotal + shippingFee;
 
+  const groupedCartItems = (() => {
+    const groups: Record<string, { items: typeof cart; title: string; feeLabel: string }> = {
+      BOX: { items: [], title: "BOX타입 배송 품목", feeLabel: "" },
+      A: { items: [], title: "A타입 배송 품목", feeLabel: "" },
+      B: { items: [], title: "B타입 배송 품목", feeLabel: "" },
+      C: { items: [], title: "C타입 배송 품목", feeLabel: "" },
+      free: { items: [], title: "무료 배송 품목", feeLabel: "무료" }
+    };
+    
+    cart.forEach((item) => {
+      const p = (products || []).find((prod) => prod.id === item.productId);
+      const type = p?.shippingType || "A";
+      if (groups[type]) {
+        groups[type].items.push(item);
+      } else {
+        groups["A"].items.push(item);
+      }
+    });
+
+    const boxQty = groups["BOX"].items.reduce((sum, item) => sum + item.quantity, 0);
+    const calculatedBoxFee = boxQty > 0 ? (Math.floor(boxQty / 10) + 1) * shippingFeeBox : 0;
+    groups["BOX"].feeLabel = boxQty > 0 ? `${calculatedBoxFee.toLocaleString()}원` : "";
+
+    let maxStandardType = "";
+    let maxStandardFee = -1;
+    ["A", "B", "C"].forEach((type) => {
+      if (groups[type].items.length > 0) {
+        let fee = 0;
+        if (type === "A") fee = shippingFeeA;
+        else if (type === "B") fee = shippingFeeB;
+        else if (type === "C") fee = shippingFeeC;
+        
+        if (fee > maxStandardFee) {
+          maxStandardFee = fee;
+          maxStandardType = type;
+        }
+      }
+    });
+    
+    ["A", "B", "C"].forEach((type) => {
+      if (groups[type].items.length > 0) {
+        let baseFee = 0;
+        if (type === "A") baseFee = shippingFeeA;
+        else if (type === "B") baseFee = shippingFeeB;
+        else if (type === "C") baseFee = shippingFeeC;
+
+        if (type === maxStandardType) {
+          groups[type].feeLabel = `${baseFee.toLocaleString()}원`;
+        } else {
+          groups[type].feeLabel = `0원 (상위 배송비 적용)`;
+        }
+      }
+    });
+
+    return Object.entries(groups).filter(([key, group]) => group.items.length > 0);
+  })();
+
   // ==========================================
   // PLACE ORDER
   // ==========================================
@@ -2246,40 +2303,55 @@ export default function PortalPage() {
                     </div>
                   ) : (
                     <>
-                      {/* Cart Items list */}
+                      {/* Cart Items list (Grouped by Shipping Type) */}
                       <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
-                        {cart.map((item) => {
-                          const p = (products || []).find((prod) => prod.id === item.productId);
-                          if (!p) return null;
-                          return (
-                            <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7] p-3 rounded-xl">
-                              <img src={p.img} alt="" className="w-12 h-12 rounded-lg object-cover shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-xs text-[#2d2026] truncate">{p.name}</h4>
-                                {item.selectedOption && (
-                                  <span className="text-[10px] text-[#bf3e67] font-black block mt-0.5 select-none">
-                                    [선택 옵션: {item.selectedOption}]
-                                  </span>
-                                )}
-                                <span className="text-[10px] text-[#735965] font-semibold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
-                              </div>
-                              <div className="flex flex-col items-end gap-1.5 shrink-0">
-                                <button onClick={() => removeCartItem(p.id, item.selectedOption)} className="text-[#735965]/60 hover:text-red-500 transition-colors p-1 cursor-pointer" aria-label="삭제">
-                                  <X size={13} />
-                                </button>
-                                <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
-                                  <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
-                                    <Minus size={11} />
-                                  </button>
-                                  <span className="px-2 text-[10px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
-                                  <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
-                                    <Plus size={11} />
-                                  </button>
-                                </div>
-                              </div>
+                        {groupedCartItems.map(([typeKey, group]) => (
+                          <div key={typeKey} className="space-y-2">
+                            <div className="flex justify-between items-center border-b border-[#f2ccd7]/60 pb-1.5 px-1 select-none">
+                              <span className="font-extrabold text-[10px] text-[#bf3e67]">{group.title}</span>
+                              {group.feeLabel && (
+                                <span className="text-[9px] text-[#735965] font-black bg-[#fff1f5] border border-[#f2ccd7] px-2 py-0.5 rounded-full">
+                                  배송비: {group.feeLabel}
+                                </span>
+                              )}
                             </div>
-                          );
-                        })}
+                            
+                            <div className="space-y-2">
+                              {group.items.map((item) => {
+                                const p = (products || []).find((prod) => prod.id === item.productId);
+                                if (!p) return null;
+                                return (
+                                  <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7]/60 p-2.5 rounded-xl">
+                                    <img src={p.img} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="font-bold text-[11px] text-[#2d2026] truncate">{p.name}</h4>
+                                      {item.selectedOption && (
+                                        <span className="text-[9px] text-[#bf3e67] font-black block mt-0.5 select-none">
+                                          [옵션: {item.selectedOption}]
+                                        </span>
+                                      )}
+                                      <span className="text-[9px] text-[#735965] font-semibold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                      <button onClick={() => removeCartItem(p.id, item.selectedOption)} className="text-[#735965]/60 hover:text-red-500 transition-colors p-0.5 cursor-pointer" aria-label="삭제">
+                                        <X size={12} />
+                                      </button>
+                                      <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
+                                        <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
+                                          <Minus size={9} />
+                                        </button>
+                                        <span className="px-1.5 text-[9px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
+                                        <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
+                                          <Plus size={9} />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
                       </div>
 
                       {/* Cart Bill Details */}
