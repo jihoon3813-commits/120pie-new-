@@ -56,7 +56,7 @@ interface Product {
   stock: "in_stock" | "low_stock" | "out_of_stock";
   desc: string;
   labels?: string[];
-  shippingType?: "free" | "A" | "B" | "C";
+  shippingType?: "free" | "A" | "B" | "C" | "BOX";
   options?: string[]; // 추가된 제품 선택 옵션 필드
 }
 
@@ -652,10 +652,10 @@ export default function PortalPage() {
   // Shipping and Return Policy states
   const [shippingPolicy, setShippingPolicy] = useState<string>("");
   const [returnPolicy, setReturnPolicy] = useState<string>("");
-  const [freeShippingThreshold, setFreeShippingThreshold] = useState<number>(100000);
   const [shippingFeeA, setShippingFeeA] = useState<number>(3000);
   const [shippingFeeB, setShippingFeeB] = useState<number>(4000);
   const [shippingFeeC, setShippingFeeC] = useState<number>(5000);
+  const [shippingFeeBox, setShippingFeeBox] = useState<number>(6000);
 
   // 커스텀 알럿/컨펌 모달 상태
   const [customDialog, setCustomDialog] = useState<{
@@ -832,18 +832,17 @@ export default function PortalPage() {
       const policySettings = loadState("120_shipping_settings", {
         shippingPolicy: "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다.",
         returnPolicy: "식재료 특성상 단순 변심으로 인한 반품은 불가하며, 오배송 건은 수령 즉시 본사 접수 바랍니다.",
-        freeShippingThreshold: "100,000",
         shippingFeeA: "3,000",
         shippingFeeB: "4,000",
-        shippingFeeC: "5,000"
+        shippingFeeC: "5,000",
+        shippingFeeBox: "6,000"
       });
       setShippingPolicy(policySettings.shippingPolicy);
       setReturnPolicy(policySettings.returnPolicy);
-      const parsedThreshold = parseInt(policySettings.freeShippingThreshold.replace(/,/g, "")) || 100000;
-      setFreeShippingThreshold(parsedThreshold);
       setShippingFeeA(parseInt((policySettings.shippingFeeA || "3,000").replace(/,/g, "")) || 3000);
       setShippingFeeB(parseInt((policySettings.shippingFeeB || "4,000").replace(/,/g, "")) || 4000);
       setShippingFeeC(parseInt((policySettings.shippingFeeC || "5,000").replace(/,/g, "")) || 5000);
+      setShippingFeeBox(parseInt((policySettings.shippingFeeBox || "6,000").replace(/,/g, "")) || 6000);
     }
   }, []);
 
@@ -888,11 +887,10 @@ export default function PortalPage() {
             const parsed = JSON.parse(ps);
             setShippingPolicy(parsed.shippingPolicy || "");
             setReturnPolicy(parsed.returnPolicy || "");
-            const parsedThreshold = parseInt((parsed.freeShippingThreshold || "100000").toString().replace(/,/g, "")) || 100000;
-            setFreeShippingThreshold(parsedThreshold);
             setShippingFeeA(parseInt((parsed.shippingFeeA || "3,000").toString().replace(/,/g, "")) || 3000);
             setShippingFeeB(parseInt((parsed.shippingFeeB || "4,000").toString().replace(/,/g, "")) || 4000);
             setShippingFeeC(parseInt((parsed.shippingFeeC || "5,000").toString().replace(/,/g, "")) || 5000);
+            setShippingFeeBox(parseInt((parsed.shippingFeeBox || "6,000").toString().replace(/,/g, "")) || 6000);
           } catch (e) {
             console.error(e);
           }
@@ -972,49 +970,73 @@ export default function PortalPage() {
     return acc + (p ? p.price * item.quantity : 0);
   }, 0);
 
-  // Get dynamic shipping fee based on selected type: free, A, B, C (Choose maximum)
+  // Get dynamic shipping fee based on selected type: A, B, C (Choose maximum) + BOX (combined quantity based)
   const getAppliedShippingFee = () => {
-    if (cartSubtotal >= freeShippingThreshold || cart.length === 0) return 0;
+    if (cart.length === 0) return 0;
     
-    let maxFee = 0;
+    let maxStandardFee = 0;
+    let totalBoxQty = 0;
+    
     cart.forEach((item) => {
       const p = (products || []).find((prod) => prod.id === item.productId);
       const type = p?.shippingType || "A";
-      let fee = 0;
-      if (type === "A") fee = shippingFeeA;
-      else if (type === "B") fee = shippingFeeB;
-      else if (type === "C") fee = shippingFeeC;
-      else if (type === "free") fee = 0;
       
-      if (fee > maxFee) {
-        maxFee = fee;
+      if (type === "BOX") {
+        totalBoxQty += item.quantity;
+      } else {
+        let fee = 0;
+        if (type === "A") fee = shippingFeeA;
+        else if (type === "B") fee = shippingFeeB;
+        else if (type === "C") fee = shippingFeeC;
+        else if (type === "free") fee = 0;
+        
+        if (fee > maxStandardFee) {
+          maxStandardFee = fee;
+        }
       }
     });
-    return maxFee;
+    
+    const boxFee = totalBoxQty > 0 ? (Math.floor(totalBoxQty / 10) + 1) * shippingFeeBox : 0;
+    
+    return maxStandardFee + boxFee;
   };
 
   const getAppliedShippingType = () => {
-    if (cartSubtotal >= freeShippingThreshold || cart.length === 0) return "무료배송";
+    if (cart.length === 0) return "무료배송";
     
-    let maxFee = -1;
-    let maxType = "free";
+    let maxStandardFee = -1;
+    let maxStandardType = "";
+    let hasBox = false;
+    
     cart.forEach((item) => {
       const p = (products || []).find((prod) => prod.id === item.productId);
       const type = p?.shippingType || "A";
-      let fee = 0;
-      if (type === "A") fee = shippingFeeA;
-      else if (type === "B") fee = shippingFeeB;
-      else if (type === "C") fee = shippingFeeC;
-      else if (type === "free") fee = 0;
       
-      if (fee > maxFee) {
-        maxFee = fee;
-        maxType = type;
+      if (type === "BOX") {
+        hasBox = true;
+      } else {
+        let fee = 0;
+        if (type === "A") fee = shippingFeeA;
+        else if (type === "B") fee = shippingFeeB;
+        else if (type === "C") fee = shippingFeeC;
+        else if (type === "free") fee = 0;
+        
+        if (fee > maxStandardFee) {
+          maxStandardFee = fee;
+          maxStandardType = type;
+        }
       }
     });
     
-    if (maxType === "free") return "무료배송";
-    return `${maxType}타입`;
+    if (hasBox) {
+      if (maxStandardType && maxStandardType !== "free") {
+        return `BOX+${maxStandardType}타입`;
+      }
+      return "BOX타입";
+    }
+    
+    if (maxStandardType === "free" || !maxStandardType) return "무료배송";
+    return `${maxStandardType}타입`;
   };
 
   const shippingFee = getAppliedShippingFee();
@@ -2260,7 +2282,7 @@ export default function PortalPage() {
                         </div>
                         <div className="flex justify-between text-[#735965] font-bold">
                           <div className="flex flex-col">
-                            <span>배송비 ({freeShippingThreshold.toLocaleString()}원 이상 무료)</span>
+                            <span>배송비</span>
                             {shippingFee > 0 && (
                               <span className="text-[10px] text-[#bf3e67] font-bold">({shippingTypeLabel} 적용)</span>
                             )}
@@ -3445,10 +3467,17 @@ export default function PortalPage() {
                                 </span>
                               );
                             }
+                            if (type === "BOX") {
+                              return (
+                                <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-black px-2.5 py-1 rounded-full border border-[#f2ccd7]">
+                                  BOX타입 (10개당 {shippingFeeBox?.toLocaleString()}원)
+                                </span>
+                              );
+                            }
                             const feeMap: Record<string, number> = { A: shippingFeeA, B: shippingFeeB, C: shippingFeeC };
                             return (
                               <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-black px-2.5 py-1 rounded-full border border-[#f2ccd7]">
-                                {feeMap[type]?.toLocaleString()}원
+                                {type}타입 ({feeMap[type]?.toLocaleString()}원)
                               </span>
                             );
                           })()}
@@ -3527,7 +3556,7 @@ export default function PortalPage() {
                     <div className="pt-3 border-t border-[#f2ccd7]/40">
                       <div className="text-[11px] text-[#bf3e67] font-black flex items-center gap-1.5">
                         <span>💡</span>
-                        <span>무료배송 기준: {freeShippingThreshold.toLocaleString()}원 이상 발주 시 전액 무료 (미만 시 본사 규정 배송비 적용)</span>
+                        <span>배송비 안내: 일반 품목(A/B/C)은 품목별 최고가가 1회 부과되며, BOX 품목은 10개당 설정된 요금이 합산 부과됩니다.</span>
                       </div>
                     </div>
                   </div>

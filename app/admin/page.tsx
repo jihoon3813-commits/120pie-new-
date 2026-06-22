@@ -44,7 +44,6 @@ import {
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
-import RecipeBookContent from "./RecipeBookContent";
 
 // ==========================================
 // TYPES DEFINITIONS
@@ -84,7 +83,7 @@ interface Product {
   desc: string; // 설명
   stock: "in_stock" | "low_stock" | "out_of_stock"; // 재고상태 호환용
   labels?: string[]; // 라벨 (e.g. ["BEST", "추천", "신제품"])
-  shippingType?: "free" | "A" | "B" | "C"; // 배송 정책 구분 (무료, A, B, C)
+  shippingType?: "free" | "A" | "B" | "C" | "BOX"; // 배송 정책 구분 (무료, A, B, C, BOX)
   options?: string[]; // 제품 선택 옵션 (홍보물 등)
 }
 
@@ -897,7 +896,7 @@ export default function AdminPage() {
   const [productDetailImg, setProductDetailImg] = useState<string>("");
   const [productDetailText, setProductDetailText] = useState<string>("");
   const [productIsActive, setProductIsActive] = useState<boolean>(true);
-  const [productShippingType, setProductShippingType] = useState<"free" | "A" | "B" | "C">("A");
+  const [productShippingType, setProductShippingType] = useState<"free" | "A" | "B" | "C" | "BOX">("A");
 
   // Product Search & Filter States
   const [adminProductSearch, setAdminProductSearch] = useState<string>("");
@@ -916,10 +915,10 @@ export default function AdminPage() {
   // Shipping and Return Policy states
   const [shippingPolicy, setShippingPolicy] = useState<string>("");
   const [returnPolicy, setReturnPolicy] = useState<string>("");
-  const [freeShippingThreshold, setFreeShippingThreshold] = useState<string>("100,000");
   const [shippingFeeA, setShippingFeeA] = useState<string>("3,000");
   const [shippingFeeB, setShippingFeeB] = useState<string>("4,000");
   const [shippingFeeC, setShippingFeeC] = useState<string>("5,000");
+  const [shippingFeeBox, setShippingFeeBox] = useState<string>("6,000");
   const [showPolicyPanel, setShowPolicyPanel] = useState<boolean>(false);
 
   // 3. BANNER CONTROL STATES
@@ -1253,17 +1252,17 @@ export default function AdminPage() {
       const policySettings = loadState("120_shipping_settings", {
         shippingPolicy: "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다.",
         returnPolicy: "식재료 특성상 단순 변심으로 인한 반품은 불가하며, 오배송 건은 수령 즉시 본사 접수 바랍니다.",
-        freeShippingThreshold: "100,000",
         shippingFeeA: "3,000",
         shippingFeeB: "4,000",
-        shippingFeeC: "5,000"
+        shippingFeeC: "5,000",
+        shippingFeeBox: "6,000"
       });
       setShippingPolicy(policySettings.shippingPolicy);
       setReturnPolicy(policySettings.returnPolicy);
-      setFreeShippingThreshold(policySettings.freeShippingThreshold);
       setShippingFeeA(policySettings.shippingFeeA || "3,000");
       setShippingFeeB(policySettings.shippingFeeB || "4,000");
       setShippingFeeC(policySettings.shippingFeeC || "5,000");
+      setShippingFeeBox(policySettings.shippingFeeBox || "6,000");
     }
   }, []);
 
@@ -1394,10 +1393,10 @@ export default function AdminPage() {
             const parsed = JSON.parse(ps);
             setShippingPolicy(parsed.shippingPolicy || "");
             setReturnPolicy(parsed.returnPolicy || "");
-            setFreeShippingThreshold(parsed.freeShippingThreshold || "100,000");
             setShippingFeeA(parsed.shippingFeeA || "3,000");
             setShippingFeeB(parsed.shippingFeeB || "4,000");
             setShippingFeeC(parsed.shippingFeeC || "5,000");
+            setShippingFeeBox(parsed.shippingFeeBox || "6,000");
           } catch (e) {
             console.error(e);
           }
@@ -1547,10 +1546,10 @@ export default function AdminPage() {
     const settings = {
       shippingPolicy,
       returnPolicy,
-      freeShippingThreshold,
       shippingFeeA,
       shippingFeeB,
-      shippingFeeC
+      shippingFeeC,
+      shippingFeeBox
     };
     localStorage.setItem("120_shipping_settings", JSON.stringify(settings));
     triggerToast("배송 및 반품 정책 설정이 저장되었습니다.");
@@ -3285,7 +3284,6 @@ export default function AdminPage() {
                 { key: "inquiry", label: "1:1 AS 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
                 { key: "consultation", label: "창업 상담문의 관리", icon: Headphones },
                 { key: "analytics", label: "통계관리", icon: BarChart3 },
-                { key: "recipe", label: "레시피 관리", icon: FileText },
                 { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
                 { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
                 { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
@@ -3369,7 +3367,6 @@ export default function AdminPage() {
                     { key: "inquiry", label: "1:1 AS 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
                     { key: "consultation", label: "창업 상담문의 관리", icon: Headphones },
                     { key: "analytics", label: "통계관리", icon: BarChart3 },
-                    { key: "recipe", label: "레시피 관리", icon: FileText },
                     { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
                     { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
                     { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
@@ -3719,25 +3716,6 @@ export default function AdminPage() {
                   <form onSubmit={handleSaveShippingSettings} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965] block">무료 배송 기준 금액 (원)</label>
-                        <input 
-                          type="text"
-                          placeholder="e.g. 100,000"
-                          value={freeShippingThreshold}
-                          onChange={(e) => {
-                            let val = e.target.value.replace(/[^0-9]/g, "");
-                            if (val) {
-                              val = Number(val).toLocaleString();
-                            } else {
-                              val = "";
-                            }
-                            setFreeShippingThreshold(val);
-                          }}
-                          required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
-                        />
-                      </div>
-                      <div className="space-y-2">
                         <label className="text-xs font-bold text-[#735965] block">A타입 기본 배송비 (원)</label>
                         <input 
                           type="text"
@@ -3789,6 +3767,25 @@ export default function AdminPage() {
                               val = "";
                             }
                             setShippingFeeC(val);
+                          }}
+                          required
+                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#735965] block">BOX타입 기본 배송비 (10개당) (원)</label>
+                        <input 
+                          type="text"
+                          placeholder="e.g. 6,000"
+                          value={shippingFeeBox}
+                          onChange={(e) => {
+                            let val = e.target.value.replace(/[^0-9]/g, "");
+                            if (val) {
+                              val = Number(val).toLocaleString();
+                            } else {
+                              val = "";
+                            }
+                            setShippingFeeBox(val);
                           }}
                           required
                           className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
@@ -4930,10 +4927,6 @@ export default function AdminPage() {
                 )}
               </div>
             </div>
-          )}
-
-          {currentMenu === "recipe" && (
-            <RecipeBookContent />
           )}
 
           {/* ==========================================
@@ -7522,6 +7515,7 @@ export default function AdminPage() {
                     <option value="A">A타입 배송비 ({shippingFeeA}원)</option>
                     <option value="B">B타입 배송비 ({shippingFeeB}원)</option>
                     <option value="C">C타입 배송비 ({shippingFeeC}원)</option>
+                    <option value="BOX">BOX타입 배송비 (10개당 {shippingFeeBox}원)</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#735965]">
                     <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -7530,7 +7524,7 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <p className="text-[10px] text-[#735965]/80 mt-1">
-                  * 가맹점 장바구니 결제 금액이 무료배송 기준액 미만일 경우, 가장 높은 배송비 단가(A/B/C) 1회만 청구됩니다.
+                  * 일반 품목(A/B/C)은 장바구니 중 가장 높은 배송비 1회만 청구되며, BOX 품목은 10개당 설정된 요금이 합산 부과됩니다.
                 </p>
               </div>
 
