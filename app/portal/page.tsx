@@ -758,6 +758,7 @@ export default function PortalPage() {
         return initialData;
       };
 
+      setCart(loadState("120_cart", []));
       setInquiries(loadState("120_inquiries", INITIAL_INQUIRIES));
       setNotices(loadState("120_notices", INITIAL_NOTICES));
       setTrainings(loadState("120_trainings", INITIAL_TRAINING));
@@ -845,6 +846,13 @@ export default function PortalPage() {
       setShippingFeeBox(parseInt((policySettings.shippingFeeBox || "6,000").replace(/,/g, "")) || 6000);
     }
   }, []);
+
+  // Persist cart to LocalStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("120_cart", JSON.stringify(cart));
+    }
+  }, [cart]);
 
   // Poll LocalStorage to simulate real-time updates when switching tabs or active
   useEffect(() => {
