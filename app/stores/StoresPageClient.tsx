@@ -169,7 +169,6 @@ export default function StoresPageClient() {
   const rowBorder = isPink ? "border-neutral-850" : "border-[#e6dfc3]/80";
   const textStoreName = isPink ? "text-white" : "text-[#0d233a]";
   const textStoreAddr = isPink ? "text-neutral-400" : "text-[#576575]";
-  const textStorePhone = isPink ? "text-neutral-450" : "text-[#0d233a]";
   const activeDotClass = isPink ? "bg-amber-400" : "bg-[#ffd500]";
   const backUrl = isPink ? "/v3" : "/";
 
@@ -413,10 +412,9 @@ export default function StoresPageClient() {
                   <table className="w-full text-left border-collapse min-w-[550px] table-fixed">
                     <thead>
                       <tr className={`border-b text-xs font-bold font-mono ${isPink ? "border-neutral-200 text-neutral-500" : "border-neutral-900 text-neutral-400"}`}>
-                        <th className="px-6 py-4.5 w-[25%]">지점명</th>
-                        <th className="px-6 py-4.5 w-[42%]">주소</th>
-                        <th className="px-6 py-4.5 w-[18%]">연락처</th>
-                        <th className="px-6 py-4.5 w-[15%]">도입 메뉴</th>
+                        <th className="px-6 py-4.5 w-[30%]">지점명</th>
+                        <th className="px-6 py-4.5 w-[50%]">주소</th>
+                        <th className="px-6 py-4.5 w-[20%]">도입 메뉴</th>
                       </tr>
                     </thead>
                     <tbody className={`divide-y text-sm ${isPink ? "divide-neutral-100" : "divide-neutral-900/80"}`}>
@@ -450,9 +448,6 @@ export default function StoresPageClient() {
                               {store.detailAddress && (
                                 <span className="block text-[10px] text-neutral-400 mt-0.5">{store.detailAddress}</span>
                               )}
-                            </td>
-                            <td className={`px-6 py-5 text-xs font-mono font-bold align-middle whitespace-nowrap ${textStorePhone}`}>
-                              {store.phone}
                             </td>
                             <td className="px-6 py-5 align-middle">
                               <div className="flex flex-wrap gap-1">
