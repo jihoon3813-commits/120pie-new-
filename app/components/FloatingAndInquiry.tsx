@@ -198,6 +198,31 @@ export default function FloatingAndInquiry({
         regDate: new Date().toISOString().split("T")[0]
       });
       setFormSubmitted(true);
+      
+      // Track successful inquiry submission
+      fetch("/api/track", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "inquiry_submit",
+          path: window.location.pathname,
+          referrer: document.referrer || "direct"
+        })
+      }).catch(err => console.error("InquirySubmit tracking failed", err));
+
+      if (typeof window !== "undefined" && (window as any).wcs) {
+        try {
+          if (!(window as any).wcs_add) (window as any).wcs_add = {};
+          (window as any).wcs_add["wa"] = process.env.NEXT_PUBLIC_NAVER_AD_ACCOUNT_ID || "s_15663594120p";
+          const _nasa = {} as any;
+          _nasa["cnv"] = (window as any).wcs.cnv("4", "10");
+          (window as any).wcs_do(_nasa);
+        } catch (err) {
+          console.error("Naver inquiry conversion tracking failed:", err);
+        }
+      }
     } catch (err) {
       console.error("Failed to submit inquiry to Convex", err);
       // fallback
@@ -212,6 +237,31 @@ export default function FloatingAndInquiry({
         localStorage.setItem("120_inquiries", JSON.stringify([...list, newInq]));
       }
       setFormSubmitted(true);
+      
+      // Track fallback successful inquiry submission
+      fetch("/api/track", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "inquiry_submit_fallback",
+          path: window.location.pathname,
+          referrer: document.referrer || "direct"
+        })
+      }).catch(err => console.error("InquirySubmit fallback tracking failed", err));
+
+      if (typeof window !== "undefined" && (window as any).wcs) {
+        try {
+          if (!(window as any).wcs_add) (window as any).wcs_add = {};
+          (window as any).wcs_add["wa"] = process.env.NEXT_PUBLIC_NAVER_AD_ACCOUNT_ID || "s_15663594120p";
+          const _nasa = {} as any;
+          _nasa["cnv"] = (window as any).wcs.cnv("4", "10");
+          (window as any).wcs_do(_nasa);
+        } catch (err) {
+          console.error("Naver inquiry conversion tracking failed:", err);
+        }
+      }
     }
   };
 

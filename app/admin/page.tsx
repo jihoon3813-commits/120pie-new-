@@ -3583,7 +3583,7 @@ export default function AdminPage() {
                           <tr key={store.id} className="hover:bg-[#fff9fb] transition-colors">
                             <td className="p-4 sm:p-5 font-bold text-[#bf3e67] whitespace-nowrap">{store.id}</td>
                             <td className="p-4 sm:p-5 font-bold text-[#2d2026] whitespace-nowrap">
-                              {store.name.replace("120겹파이 ", "").replace("120겹 파이 ", "")}
+                              {store.name}
                             </td>
                             <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{store.owner}</td>
                             <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{store.phone}</td>

@@ -298,7 +298,7 @@ export default function FranchisePageClient() {
             }`}>
               창업 안내
             </Link>
-            <Link href={`${backUrl}#faq`} className="hover:text-amber-400 transition-colors">FAQ</Link>
+            <Link href={`/faq?theme=${theme}`} className="hover:text-amber-400 transition-colors">FAQ</Link>
           </nav>
 
           <div className="flex items-center gap-2.5">
@@ -360,7 +360,7 @@ export default function FranchisePageClient() {
               }`}>
                 창업 안내
               </Link>
-              <Link href={`${backUrl}#faq`} onClick={() => setMobileNavOpen(false)} className={`col-span-2 rounded-xl px-4 py-3 transition-colors text-center ${mobileNavLinkClass}`}>
+              <Link href={`/faq?theme=${theme}`} onClick={() => setMobileNavOpen(false)} className={`col-span-2 rounded-xl px-4 py-3 transition-colors text-center ${mobileNavLinkClass}`}>
                 FAQ
               </Link>
             </div>

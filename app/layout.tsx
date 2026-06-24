@@ -9,9 +9,9 @@ export const metadata = {
   alternates: {
     canonical: "/"
   },
-  title: "120pie&coffee | 카페 사장님을 위한 디저트 매출 솔루션",
+  title: "120겹파이 & 에그120 | 카페 디저트 샵인샵 창업 솔루션",
   description:
-    "120겹 파이와 에그120을 기존 카페에 샵인샵으로 도입해 객단가 상승, 디저트 매출 강화, 낮은 폐기 부담을 기대할 수 있는 프랜차이즈 상담 페이지입니다.",
+    "기존 카페에 바로 도입 가능한 120겹 파이와 에그120 샵인샵 디저트 솔루션. 소자본 샵인샵 도입으로 객단가 상승 및 디저트 매출 극대화!",
   icons: {
     icon: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
   },
@@ -88,6 +88,25 @@ export default function RootLayout({
     "url": "https://120piecoffee.com"
   };
 
+  const localBusinessSchema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "120pie & coffee",
+    "image": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
+    "telephone": "1566-3594",
+    "email": "120piecoffee@gmail.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "엘에스로 143 1층 1001호",
+      "addressLocality": "군포시",
+      "addressRegion": "경기도",
+      "postalCode": "15807",
+      "addressCountry": "KR"
+    },
+    "url": "https://120piecoffee.com",
+    "priceRange": "$$"
+  };
+
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -157,10 +176,15 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        />
+        <script
+          type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
         <ConvexClientProvider>
           <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="lazyOnload" />
+          <Script src="//wcs.naver.net/wcslog.js" strategy="afterInteractive" />
           <TrackPageView />
           {children}
         </ConvexClientProvider>

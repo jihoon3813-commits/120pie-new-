@@ -301,7 +301,7 @@ function AdoptionModal({ exampleId, onClose }: { exampleId: string | null, onClo
             <X size={18} />
           </button>
           <div className="w-full md:w-1/2 h-64 md:h-auto bg-neutral-950 relative">
-            <img src={data.img} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="" />
+            <img src={data.img} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt={data.title} />
             <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-neutral-900 via-transparent to-transparent"></div>
           </div>
           <div className="w-full md:w-1/2 p-8 flex flex-col justify-center bg-neutral-900 relative">
@@ -386,7 +386,7 @@ function StoresPreviewSection({ isPink = false, isYellow = false }: { isPink?: b
               }`}
             >
               <div className="h-56 overflow-hidden rounded-xl bg-neutral-100 mb-5">
-                <img src={store.img} alt={store.name} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
+                <img src={store.img} alt={store.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
               </div>
               <h3 className={`font-black text-xl mb-2 ${
                 isPink ? "text-[#4c2d3a]" : isYellow ? "text-[#0d233a]" : "text-neutral-950"
@@ -646,7 +646,7 @@ function GallerySection({ filter, setFilter, isPink = false, isYellow = false }:
                 <div className={`aspect-[4/3] rounded-xl overflow-hidden mb-4 relative shadow-sm hover:shadow transition-all group-hover:shadow-md ${
                   isPink ? "bg-rose-50/10 border border-[#f2ccd7]/30" : isYellow ? "bg-amber-50/10 border border-[#e6dfc3]/30" : "bg-neutral-100"
                 }`}>
-                  <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
+                  <img src={img.url} alt={img.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
                 </div>
                 <span className={`${
                   isPink ? "text-rose-500" : isYellow ? "text-amber-600" : "text-amber-600"
@@ -774,7 +774,7 @@ function GallerySection({ filter, setFilter, isPink = false, isYellow = false }:
                       }`}
                     >
                       <div className={`aspect-[4/3] overflow-hidden relative ${isPink ? "bg-[#fffbfb]" : isYellow ? "bg-[#fffdf2]" : "bg-neutral-950"}`}>
-                        <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-550" />
+                        <img src={img.url} alt={img.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-550" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent"></div>
                       </div>
                       <div className={`p-4 ${isPink || isYellow ? "bg-white" : "bg-neutral-800"}`}>
@@ -1225,7 +1225,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             <Link href={isYellowVariant ? "/franchise?theme=yellow" : "/franchise?theme=pink"} className="hover:text-amber-400 transition-colors shrink-0">
               창업 안내
             </Link>
-            <a href="#faq" className="hover:text-amber-400 transition-colors">FAQ</a>
+            <Link href={isYellowVariant ? "/faq?theme=yellow" : "/faq?theme=pink"} className="hover:text-amber-400 transition-colors">FAQ</Link>
           </nav>
 
           <div className="flex items-center gap-2.5">
@@ -1277,9 +1277,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               <Link href={isYellowVariant ? "/franchise?theme=yellow" : "/franchise?theme=pink"} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${mobileNavLinkClass}`}>
                 창업 안내
               </Link>
-              <a href="#faq" onClick={() => setMobileNavOpen(false)} className={`col-span-2 rounded-xl px-4 py-3 transition-colors text-center ${mobileNavLinkClass}`}>
+              <Link href={isYellowVariant ? "/faq?theme=yellow" : "/faq?theme=pink"} onClick={() => setMobileNavOpen(false)} className={`col-span-2 rounded-xl px-4 py-3 transition-colors text-center ${mobileNavLinkClass}`}>
                 FAQ
-              </a>
+              </Link>
             </div>
             <div className="flex gap-2 mt-3 w-full">
               <Link
@@ -2529,7 +2529,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   <div className={`h-40 overflow-hidden rounded-xl mb-6 ${
                     isPinkVariant ? "bg-rose-50/50" : isYellowVariant ? "bg-[#fffdf2]/85" : "bg-neutral-900"
                   }`}>
-                    <img src={step.img} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" />
+                    <img src={step.img} alt={step.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" />
                   </div>
                   <span className={`text-[10px] font-bold tracking-[0.24em] mb-3 ${
                     isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
