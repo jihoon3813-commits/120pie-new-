@@ -545,6 +545,8 @@ export default function AdminPage() {
   };
 
   // Convex Hooks
+  const convexBanners = useQuery(api.banners.get);
+  const updateBannersMutation = useMutation(api.banners.update);
   const convexPopup = useQuery(api.popups.get);
   const convexFloating = useQuery(api.floatings.get);
   const convexInquiries = useQuery(api.inquiries.list);
@@ -1265,6 +1267,52 @@ export default function AdminPage() {
       setShippingFeeBox(policySettings.shippingFeeBox || "6,000");
     }
   }, []);
+
+  // Sync Convex banners to React state
+  useEffect(() => {
+    if (convexBanners) {
+      setBanner(convexBanners);
+      setBannerMainTag(convexBanners.mainTag);
+      setBannerMainTitle(convexBanners.mainTitle);
+      setBannerMainDesc(convexBanners.mainDesc);
+      setBannerSideTag(convexBanners.sideTag);
+      setBannerSideTitle(convexBanners.sideTitle);
+      setBannerSideDesc(convexBanners.sideDesc);
+      setBannerSideBtnText(convexBanners.sideBtnText);
+      setBannerMainImage(convexBanners.mainImage || "");
+      setBannerSideImage(convexBanners.sideImage || "");
+      setBannerSideLink(convexBanners.sideLink || "training");
+    }
+  }, [convexBanners]);
+
+  // [Migration] Automatic migration of banner from LocalStorage to Convex Cloud DB
+  useEffect(() => {
+    if (convexBanners === null) {
+      const storedBannerRaw = localStorage.getItem("120_banners");
+      if (storedBannerRaw) {
+        try {
+          const parsedBanner = JSON.parse(storedBannerRaw);
+          if (parsedBanner) {
+            console.log("[Migration] Moving local banner to Convex cloud DB...");
+            updateBannersMutation({
+              mainTag: parsedBanner.mainTag || DEFAULT_BANNER.mainTag,
+              mainTitle: parsedBanner.mainTitle || DEFAULT_BANNER.mainTitle,
+              mainDesc: parsedBanner.mainDesc || DEFAULT_BANNER.mainDesc,
+              sideTag: parsedBanner.sideTag || DEFAULT_BANNER.sideTag,
+              sideTitle: parsedBanner.sideTitle || DEFAULT_BANNER.sideTitle,
+              sideDesc: parsedBanner.sideDesc || DEFAULT_BANNER.sideDesc,
+              sideBtnText: parsedBanner.sideBtnText || DEFAULT_BANNER.sideBtnText,
+              mainImage: parsedBanner.mainImage || undefined,
+              sideImage: parsedBanner.sideImage || undefined,
+              sideLink: parsedBanner.sideLink || undefined
+            });
+          }
+        } catch (e) {
+          console.error("[Migration] Failed to migrate banner:", e);
+        }
+      }
+    }
+  }, [convexBanners, updateBannersMutation]);
 
   // [Migration] Automatic migration from LocalStorage to Convex Cloud DB
   useEffect(() => {
@@ -2369,19 +2417,36 @@ export default function AdminPage() {
       sideTitle: bannerSideTitle,
       sideDesc: bannerSideDesc,
       sideBtnText: bannerSideBtnText,
-      mainImage: bannerMainImage,
-      sideImage: bannerSideImage,
-      sideLink: bannerSideLink
+      mainImage: bannerMainImage || undefined,
+      sideImage: bannerSideImage || undefined,
+      sideLink: bannerSideLink || undefined
     };
     
-    setBanner(updatedBanner);
-    try {
-      localStorage.setItem("120_banners", JSON.stringify(updatedBanner));
-      triggerToast("본사 대시보드 배너 설정이 실시간으로 동기화 저장되었습니다!");
-    } catch (err) {
-      console.error(err);
-      alert("배너 설정 저장 중 오류가 발생했습니다. 이미지 용량을 줄이거나 다른 이미지를 사용해 주세요.");
-    }
+    updateBannersMutation({
+      mainTag: updatedBanner.mainTag,
+      mainTitle: updatedBanner.mainTitle,
+      mainDesc: updatedBanner.mainDesc,
+      sideTag: updatedBanner.sideTag,
+      sideTitle: updatedBanner.sideTitle,
+      sideDesc: updatedBanner.sideDesc,
+      sideBtnText: updatedBanner.sideBtnText,
+      mainImage: updatedBanner.mainImage,
+      sideImage: updatedBanner.sideImage,
+      sideLink: updatedBanner.sideLink
+    })
+      .then(() => {
+        setBanner(updatedBanner);
+        try {
+          localStorage.setItem("120_banners", JSON.stringify(updatedBanner));
+          triggerToast("본사 대시보드 배너 설정이 실시간으로 동기화 저장되었습니다!");
+        } catch (err) {
+          console.error(err);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("배너 설정 저장 중 오류가 발생했습니다. 이미지 용량을 줄이거나 다른 이미지를 사용해 주세요.");
+      });
   };
 
   const handlePopupImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

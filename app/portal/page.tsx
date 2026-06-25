@@ -314,6 +314,7 @@ export default function PortalPage() {
   // ==========================================
   // CONVEX REAL-TIME SYNC HOOKS
   // ==========================================
+  const convexBanners = useQuery(api.banners.get);
   const convexPopup = useQuery(api.popups.get, { targetPage: "portal" });
   const convexFloating = useQuery(api.floatings.get);
   const convexStores = useQuery(api.stores.get);
@@ -364,10 +365,8 @@ export default function PortalPage() {
         views: n.views,
         content: n.content
       }));
-      if (mappedNotices.length > 0) {
-        setNotices(mappedNotices);
-        localStorage.setItem("120_notices", JSON.stringify(mappedNotices));
-      }
+      setNotices(mappedNotices);
+      localStorage.setItem("120_notices", JSON.stringify(mappedNotices));
     }
   }, [convexNotices]);
 
@@ -377,35 +376,33 @@ export default function PortalPage() {
       const trainList = convexMaterials.filter((m: any) => m.type === "training");
       const prList = convexMaterials.filter((m: any) => m.type === "pr");
       
-      if (trainList.length > 0) {
-        setTrainings(trainList.map((m: any) => ({
-          id: m._id,
-          title: m.title,
-          date: m.date,
-          size: m.size,
-          format: m.format,
-          desc: m.desc,
-          img: m.img,
-          fileUrl: m.fileUrl,
-          fileName: m.fileName
-        })));
-        localStorage.setItem("120_trainings", JSON.stringify(trainList));
-      }
+      const mappedTrainings = trainList.map((m: any) => ({
+        id: m._id,
+        title: m.title,
+        date: m.date,
+        size: m.size,
+        format: m.format,
+        desc: m.desc,
+        img: m.img,
+        fileUrl: m.fileUrl,
+        fileName: m.fileName
+      }));
+      setTrainings(mappedTrainings);
+      localStorage.setItem("120_trainings", JSON.stringify(trainList));
       
-      if (prList.length > 0) {
-        setPrs(prList.map((m: any) => ({
-          id: m._id,
-          title: m.title,
-          date: m.date,
-          size: m.size,
-          format: m.format,
-          desc: m.desc,
-          img: m.img,
-          fileUrl: m.fileUrl,
-          fileName: m.fileName
-        })));
-        localStorage.setItem("120_prs", JSON.stringify(prList));
-      }
+      const mappedPrs = prList.map((m: any) => ({
+        id: m._id,
+        title: m.title,
+        date: m.date,
+        size: m.size,
+        format: m.format,
+        desc: m.desc,
+        img: m.img,
+        fileUrl: m.fileUrl,
+        fileName: m.fileName
+      }));
+      setPrs(mappedPrs);
+      localStorage.setItem("120_prs", JSON.stringify(prList));
     }
   }, [convexMaterials]);
 
@@ -615,6 +612,30 @@ export default function PortalPage() {
     }
   }, [convexFloating]);
 
+  // Sync Convex banners to React state
+  useEffect(() => {
+    if (convexBanners !== undefined) {
+      if (convexBanners === null) {
+        // Fallback to localStorage if DB has no banners
+        const localBnr = localStorage.getItem("120_banners");
+        if (localBnr) {
+          try {
+            setBanner(JSON.parse(localBnr));
+          } catch (e) {
+            setBanner(null);
+          }
+        }
+      } else {
+        setBanner(convexBanners);
+        try {
+          localStorage.setItem("120_banners", JSON.stringify(convexBanners));
+        } catch (e) {
+          console.warn(e);
+        }
+      }
+    }
+  }, [convexBanners]);
+
   // ==========================================
   // SYSTEM DATA RESET SYNC
   // ==========================================
@@ -648,6 +669,7 @@ export default function PortalPage() {
 
   // Mobile menu control
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [mobileCartOpen, setMobileCartOpen] = useState<boolean>(false);
 
   // Shipping and Return Policy states
   const [shippingPolicy, setShippingPolicy] = useState<string>("");
@@ -706,11 +728,12 @@ export default function PortalPage() {
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       // 모달이 하나라도 열려있는 상황이라면 닫고 뒤로가기 기본 동작 방지
-      if (selectedOrder || selectedProductDetail || trackingModalOpen || showInquiryModal) {
+      if (selectedOrder || selectedProductDetail || trackingModalOpen || showInquiryModal || mobileCartOpen) {
         setSelectedOrder(null);
         setSelectedProductDetail(null);
         setTrackingModalOpen(false);
         setShowInquiryModal(false);
+        setMobileCartOpen(false);
       }
     };
 
@@ -718,14 +741,14 @@ export default function PortalPage() {
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [selectedOrder, selectedProductDetail, trackingModalOpen, showInquiryModal]);
+  }, [selectedOrder, selectedProductDetail, trackingModalOpen, showInquiryModal, mobileCartOpen]);
 
   // 각 모달이 열리는 시점에 pushState를 호출해 줍니다!
   useEffect(() => {
-    if (selectedOrder || selectedProductDetail || trackingModalOpen || showInquiryModal) {
+    if (selectedOrder || selectedProductDetail || trackingModalOpen || showInquiryModal || mobileCartOpen) {
       window.history.pushState({ modal: true }, "");
     }
-  }, [selectedOrder, selectedProductDetail, trackingModalOpen, showInquiryModal]);
+  }, [selectedOrder, selectedProductDetail, trackingModalOpen, showInquiryModal, mobileCartOpen]);
 
   // 모달 닫기 시 가상 history 스택을 동기화하기 위한 헬퍼 함수
   const closeModal = (closeFn: () => void) => {
@@ -734,6 +757,118 @@ export default function PortalPage() {
       window.history.back();
     }
   };
+
+  // ==========================================
+  // MOBILE REDIRECT PAYMENT VERIFICATION
+  // ==========================================
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentId = urlParams.get("paymentId") || urlParams.get("payment_id");
+    const code = urlParams.get("code");
+    const message = urlParams.get("message");
+
+    if (paymentId) {
+      // 1. Check if we have a pending order matching this paymentId
+      const pendingOrderId = localStorage.getItem("120_pending_order_id");
+      
+      if (pendingOrderId && pendingOrderId === paymentId) {
+        // Clear pending ID immediately to prevent duplicate runs
+        localStorage.removeItem("120_pending_order_id");
+
+        if (code) {
+          // Failure case (if code parameter is present in redirect URL)
+          showCustomAlert("결제 실패", `결제에 실패하였습니다. 사유: ${message || "알 수 없는 에러"}`);
+          // Clear other pending order data
+          localStorage.removeItem("120_pending_order_items");
+          localStorage.removeItem("120_pending_order_amount");
+          localStorage.removeItem("120_pending_order_store_id");
+          
+          // Remove query params from URL
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, newUrl);
+          return;
+        }
+
+        // Success case (verify and save)
+        const pendingItemsRaw = localStorage.getItem("120_pending_order_items");
+        const pendingAmountRaw = localStorage.getItem("120_pending_order_amount");
+        const pendingStoreId = localStorage.getItem("120_pending_order_store_id") || "owner";
+
+        if (pendingItemsRaw && pendingAmountRaw) {
+          try {
+            const pendingItems = JSON.parse(pendingItemsRaw);
+            const pendingAmount = Number(pendingAmountRaw);
+
+            // Trigger verification action
+            verifyAndSaveOrderAction({
+              impUid: paymentId, // V2 uses paymentId as impUid
+              merchantUid: paymentId,
+              amount: pendingAmount,
+              storeId: pendingStoreId,
+              items: pendingItems,
+            })
+              .then((result: any) => {
+                if (result.success) {
+                  const newOrder: Order = {
+                    id: paymentId,
+                    date: new Date().toISOString().split("T")[0],
+                    items: pendingItems,
+                    totalPrice: pendingAmount,
+                    status: "결제완료",
+                    courier: "",
+                    trackingNo: "",
+                  };
+
+                  // Retrieve existing orders from localStorage
+                  let existingOrders: Order[] = [];
+                  const storedOrders = localStorage.getItem("120_orders");
+                  if (storedOrders) {
+                    try {
+                      existingOrders = JSON.parse(storedOrders);
+                    } catch (e) {
+                      console.error("Failed to parse stored orders:", e);
+                    }
+                  }
+
+                  const updatedOrders = [newOrder, ...existingOrders];
+                  setOrders(updatedOrders);
+                  localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
+
+                  // Clear cart and triggers
+                  clearCart();
+                  triggerToast("발주 주문 및 결제가 완료되었습니다!");
+                  setCurrentMenu("history");
+                } else {
+                  showCustomAlert("결제 검증 오류", `결제 검증 실패: ${result.message}`);
+                }
+              })
+              .catch((err) => {
+                console.error("결제 검증 중 오류 발생:", err);
+                showCustomAlert("주문 등록 오류", "결제는 승인되었으나 주문 등록 중 오류가 발생했습니다. 고객센터에 문의바랍니다.");
+              })
+              .finally(() => {
+                // Clear remaining pending order data
+                localStorage.removeItem("120_pending_order_items");
+                localStorage.removeItem("120_pending_order_amount");
+                localStorage.removeItem("120_pending_order_store_id");
+                
+                // Clean URL query parameters
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+              });
+          } catch (e) {
+            console.error("Failed to process pending order data:", e);
+          }
+        }
+      } else {
+        // If there's no matching pending order ID, just clean URL
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+      }
+    }
+  }, []);
 
   // ==========================================
   // INITIALIZATION WITH LOCAL STORAGE
@@ -760,9 +895,9 @@ export default function PortalPage() {
 
       setCart(loadState("120_cart", []));
       setInquiries(loadState("120_inquiries", INITIAL_INQUIRIES));
-      setNotices(loadState("120_notices", INITIAL_NOTICES));
-      setTrainings(loadState("120_trainings", INITIAL_TRAINING));
-      setPrs(loadState("120_prs", INITIAL_PR));
+      setNotices(loadState("120_notices", []));
+      setTrainings(loadState("120_trainings", []));
+      setPrs(loadState("120_prs", []));
 
       // Seeds
       setStores(loadState("120_stores", []));
@@ -1155,6 +1290,12 @@ export default function PortalPage() {
 
       const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
 
+      // Save pending order details to LocalStorage for mobile redirection support
+      localStorage.setItem("120_pending_order_id", newOrderId);
+      localStorage.setItem("120_pending_order_items", JSON.stringify(newOrderItems));
+      localStorage.setItem("120_pending_order_amount", String(cartTotal));
+      localStorage.setItem("120_pending_order_store_id", activeStoreId || "owner");
+
       PortOne.requestPayment({
         storeId: storeId,
         channelKey: channelKey,
@@ -1163,6 +1304,7 @@ export default function PortalPage() {
         totalAmount: cartTotal,
         currency: "KRW",
         payMethod: "CARD",
+        redirectUrl: `${window.location.origin}/portal`,
         customer: {
           fullName: activeStore?.owner || "가맹점주",
           phoneNumber: activeStore?.phone || "010-0000-0000",
@@ -4046,14 +4188,178 @@ export default function PortalPage() {
           </div>
           <button
             onClick={() => {
-              // Smooth scroll to shopping cart at the bottom
-              window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+              setMobileCartOpen(true);
             }}
-            className="px-4 py-2 bg-[#f25f8a] hover:bg-[#df4977] text-white text-[10px] font-black rounded-xl shadow-sm flex items-center gap-1 transition-all cursor-pointer border-0"
+            className="px-4 py-2 bg-[#fae100] hover:bg-[#e6cf00] text-[#2d2026] text-[10px] font-black rounded-xl shadow-sm flex items-center gap-1 transition-all cursor-pointer border-0"
           >
-            <ShoppingBag size={12} className="text-white" />
+            <ShoppingBag size={12} className="text-[#2d2026]" />
             장바구니 확인
           </button>
+        </div>
+      )}
+
+      {/* 7. Mobile Cart Modal */}
+      {mobileCartOpen && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none animate-custom-fade"
+          onClick={() => closeModal(() => setMobileCartOpen(false))}
+        >
+          <div 
+            className="w-full sm:max-w-md bg-white border-t sm:border border-[#f2ccd7] rounded-t-3xl sm:rounded-2xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-5 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50 shrink-0">
+              <div className="flex items-center gap-2">
+                <ShoppingBag size={18} className="text-[#f25f8a]" />
+                <h3 className="font-extrabold text-base text-[#2d2026]">발주 장바구니 ({cart.reduce((sum, item) => sum + item.quantity, 0)}개)</h3>
+              </div>
+              <div className="flex items-center gap-3">
+                {cart.length > 0 && (
+                  <button 
+                    onClick={() => {
+                      showCustomConfirm("장바구니 비우기", "장바구니의 모든 품목을 삭제하시겠습니까?", () => {
+                        clearCart();
+                        setMobileCartOpen(false);
+                      });
+                    }} 
+                    className="text-[10px] font-bold text-[#735965] hover:text-red-500 transition-colors flex items-center gap-1 cursor-pointer border-0 bg-transparent"
+                  >
+                    <Trash2 size={12} /> 비우기
+                  </button>
+                )}
+                <button 
+                  onClick={() => closeModal(() => setMobileCartOpen(false))} 
+                  className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-5 overflow-y-auto space-y-6 flex-1 max-h-[50vh]">
+              {cart.length === 0 ? (
+                <div className="py-16 text-center space-y-3">
+                  <ShoppingBag size={36} className="text-[#f2ccd7] mx-auto" />
+                  <p className="text-xs text-[#735965] font-bold leading-relaxed max-w-[180px] mx-auto">
+                    발주할 물품의 '담기' 버튼을 클릭해 장바구니를 채워주세요.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Cart Items list (Grouped by Shipping Type) */}
+                  <div className="space-y-4 pr-1">
+                    {groupedCartItems.map(([typeKey, group]) => (
+                      <div key={typeKey} className="space-y-2 text-left">
+                        <div className="flex justify-between items-center border-b border-[#f2ccd7]/60 pb-1.5 px-1 select-none">
+                          <span className="font-extrabold text-[10px] text-[#bf3e67]">{group.title}</span>
+                          {group.feeLabel && (
+                            <span className="text-[9px] text-[#735965] font-black bg-[#fff1f5] border border-[#f2ccd7] px-2 py-0.5 rounded-full">
+                              배송비: {group.feeLabel}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {group.items.map((item) => {
+                            const p = (products || []).find((prod) => prod.id === item.productId);
+                            if (!p) return null;
+                            return (
+                              <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7]/60 p-2.5 rounded-xl">
+                                <img src={p.img} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                                <div className="flex-1 min-w-0 text-left">
+                                  <h4 className="font-bold text-[11px] text-[#2d2026] truncate">{p.name}</h4>
+                                  {item.selectedOption && (
+                                    <span className="text-[9px] text-[#bf3e67] font-black block mt-0.5 select-none">
+                                      [옵션: {item.selectedOption}]
+                                    </span>
+                                  )}
+                                  <span className="text-[9px] text-[#735965] font-semibold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
+                                </div>
+                                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                  <button 
+                                    onClick={() => {
+                                      removeCartItem(p.id, item.selectedOption);
+                                      if (cart.length <= 1) {
+                                        setMobileCartOpen(false);
+                                      }
+                                    }} 
+                                    className="text-[#735965]/60 hover:text-red-500 transition-colors p-0.5 cursor-pointer bg-transparent border-0" 
+                                    aria-label="삭제"
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                  <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
+                                    <button 
+                                      onClick={() => {
+                                        updateCartQty(p.id, item.selectedOption, item.quantity - 1);
+                                        if (item.quantity === 1 && cart.length <= 1) {
+                                          setMobileCartOpen(false);
+                                        }
+                                      }} 
+                                      className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer bg-transparent border-0"
+                                    >
+                                      <Minus size={9} />
+                                    </button>
+                                    <span className="px-1.5 text-[9px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
+                                    <button 
+                                      onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} 
+                                      className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer bg-transparent border-0"
+                                    >
+                                      <Plus size={9} />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            {cart.length > 0 && (
+              <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 shrink-0 space-y-4">
+                {/* Cart Bill Details */}
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex justify-between text-[#735965] font-bold">
+                    <span>상품 합계</span>
+                    <span>{cartSubtotal.toLocaleString()} 원</span>
+                  </div>
+                  <div className="flex justify-between text-[#735965] font-bold">
+                    <div className="flex flex-col text-left">
+                      <span>배송비</span>
+                      {shippingFee > 0 && (
+                        <span className="text-[10px] text-[#bf3e67] font-bold">({shippingTypeLabel} 적용)</span>
+                      )}
+                    </div>
+                    <span>{shippingFee === 0 ? "무료" : `${shippingFee.toLocaleString()} 원`}</span>
+                  </div>
+                  <div className="flex justify-between text-[#2d2026] font-black text-sm border-t border-[#f2ccd7] pt-3">
+                    <span>최종 결제 금액</span>
+                    <span className="text-[#f25f8a]">{cartTotal.toLocaleString()} 원</span>
+                  </div>
+                </div>
+
+                {/* Order action button */}
+                <button 
+                  onClick={() => {
+                    closeModal(() => setMobileCartOpen(false));
+                    placeOrder();
+                  }}
+                  className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-0"
+                >
+                  <CheckCircle2 size={16} />
+                  결제 진행하기
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

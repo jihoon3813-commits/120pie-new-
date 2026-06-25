@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation } from "convex/react";
 import Footer from "@/app/components/Footer";
-import { MENU_DATA } from "@/app/constants/menu";
+import { MENU_DATA, MenuItem } from "@/app/constants/menu";
 import { api } from "../../convex/_generated/api";
 import {
   ArrowRight,
@@ -28,6 +28,7 @@ import {
   MapPin,
   Headphones,
   Monitor,
+  Search,
   X,
   Check,
   ArrowUpRight,
@@ -957,6 +958,11 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   // 갤러리 필터 상태
   const [galleryFilter, setGalleryFilter] = useState<string>("대표");
 
+  // 대표메뉴 카달로그 필터/검색 상태
+  const [activeTab, setActiveTab] = useState<string>("120겹파이");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [subFilter, setSubFilter] = useState<string>("all");
+
   // Popup & Floating states for premium integration
   const [popupSettings, setPopupSettings] = useState<any>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
@@ -1113,14 +1119,10 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
           try {
             const parsed = JSON.parse(storedPop);
             setPopupSettings(parsed);
-            if (parsed && parsed.isActive) {
-              setShowPopup(true);
-            } else {
-              setShowPopup(false);
-            }
           } catch (e) {}
         }
       }
+      setShowPopup(false);
     }
   }, [convexPopup]);
 
@@ -1189,6 +1191,133 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
     viewport: { once: true, margin: "-60px" },
     transition: { duration: 0.6 }
   };
+
+  // Sub-filters lists
+  const subFilters: Record<string, { label: string; id: string }[]> = {
+    "120겹파이": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "식사 대용 (든든함)", id: "meal" },
+      { label: "디저트 & 스윗", id: "sweet" }
+    ],
+    "에그120": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "짭짤 & 고소", id: "savory" },
+      { label: "달콤 & 디저트", id: "sweet" }
+    ],
+    "기타": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "찹쌀 츄러스", id: "churros" },
+      { label: "매콤 떡볶이", id: "tteokbokki" },
+      { label: "핫도그", id: "hotdog" }
+    ],
+    "coffee120": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "커피 & 콜드브루", id: "coffee" },
+      { label: "라떼 (Non-Coffee)", id: "latte" },
+      { label: "스무디 & 쉐이크", id: "smoothie" },
+      { label: "에이드 & 주스", id: "juice" }
+    ],
+    "스콘/머핀/쿠키": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "수제 스콘", id: "scone" },
+      { label: "촉촉 머핀", id: "muffin" },
+      { label: "바삭 쿠키", id: "cookie" }
+    ],
+    "크로플/마카롱": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "크로플", id: "croffle" },
+      { label: "마카롱", id: "macaron" }
+    ]
+  };
+
+  const getFilteredItems = (): MenuItem[] => {
+    const currentCategory = MENU_DATA[activeTab];
+    let items = currentCategory?.items || [];
+    
+    // Search filter
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase();
+      items = items.filter(item => 
+        item.name.toLowerCase().includes(query) || 
+        item.desc.toLowerCase().includes(query)
+      );
+    }
+    
+    // Sub-category filter
+    if (subFilter !== "all") {
+      if (activeTab === "120겹파이") {
+        if (subFilter === "meal") {
+          items = items.filter(item => ["로제미트파이", "불고기파이", "페퍼로니피자파이"].includes(item.name));
+        } else if (subFilter === "sweet") {
+          items = items.filter(item => ["애플파이", "블루베리파이", "콘치즈파이", "커스터드파이", "팥치즈파이", "크림치즈파이", "망고파이", "고구마파이"].includes(item.name));
+        }
+      } else if (activeTab === "에그120") {
+        if (subFilter === "savory") {
+          items = items.filter(item => ["오리지널 계란빵", "베이컨 계란빵", "통모짜 계란빵", "로제미트 계란빵"].includes(item.name));
+        } else if (subFilter === "sweet") {
+          items = items.filter(item => ["커스터드 계란빵", "콘버터 계란빵", "슈크림 계란빵", "팥 계란빵"].includes(item.name));
+        }
+      } else if (activeTab === "기타") {
+        if (subFilter === "churros") {
+          items = items.filter(item => item.name.includes("츄러스"));
+        } else if (subFilter === "tteokbokki") {
+          items = items.filter(item => item.name.includes("떡볶이"));
+        } else if (subFilter === "hotdog") {
+          items = items.filter(item => item.name.includes("핫도그"));
+        }
+      } else if (activeTab === "coffee120") {
+        if (subFilter === "coffee") {
+          items = items.filter(item => 
+            ["아메리카노", "카페라떼", "카푸치노", "바닐라라떼", "카라멜마끼아또", "카페모카", "연유카페라떼", "콜드브루", "콜드브루라떼", "연유 콜드브루"].includes(item.name)
+          );
+        } else if (subFilter === "latte") {
+          items = items.filter(item => 
+            ["흑당라떼", "곡물라떼", "고구마라떼", "딸기라떼", "토피넛라떼", "녹차라떼", "달고나라떼", "피스타치오라떼", "미숫가루", "초당옥수수라떼"].includes(item.name)
+          );
+        } else if (subFilter === "smoothie") {
+          items = items.filter(item => 
+            item.name.includes("스무디") || item.name.includes("쉐이크")
+          );
+        } else if (subFilter === "juice") {
+          items = items.filter(item => 
+            item.name.includes("에이드") || item.name.includes("주스") || item.name === "복숭아 아이스티" || item.name === "제주한라봉"
+          );
+        }
+      } else if (activeTab === "스콘/머핀/쿠키") {
+        if (subFilter === "scone") {
+          items = items.filter(item => item.name.includes("스콘"));
+        } else if (subFilter === "muffin") {
+          items = items.filter(item => item.name.includes("머핀"));
+        } else if (subFilter === "cookie") {
+          items = items.filter(item => item.name.includes("쿠키"));
+        }
+      } else if (activeTab === "크로플/마카롱") {
+        if (subFilter === "croffle") {
+          items = items.filter(item => item.name.includes("크로플"));
+        } else if (subFilter === "macaron") {
+          items = items.filter(item => item.name.includes("마카롱"));
+        }
+      }
+    }
+    
+    return items;
+  };
+
+  const filteredItems = getFilteredItems();
+
+  // Theme Classes Map for Representative Menu Catalog
+  const tabWrapperClass = isPinkVariant ? "border-[#f2ccd7]/20 bg-[#4c2d3a]/5" : isYellowVariant ? "border-[#e6dfc3] bg-[#0d233a]/5" : "border-neutral-800 bg-neutral-900/50";
+  const activeTabClass = isPinkVariant ? "bg-rose-500 text-white shadow-[0_4px_20px_rgba(244,63,94,0.3)]" : isYellowVariant ? "bg-amber-400 text-neutral-950 font-black shadow-sm" : "bg-amber-400 text-neutral-950 font-black shadow-sm";
+  const inactiveTabClass = isPinkVariant ? "text-[#7c5d6c] hover:text-[#4c2d3a]" : isYellowVariant ? "text-[#576575] hover:text-[#0d233a]" : "text-neutral-450 hover:text-white";
+  
+  const inputClass = isPinkVariant ? "bg-white border-[#f2ccd7] focus:border-rose-500 text-[#4c2d3a] placeholder-[#7c5d6c]/60" : isYellowVariant ? "bg-white border-[#e6dfc3] focus:border-amber-500 text-[#0d233a] placeholder-neutral-450" : "bg-[#140e11] border-neutral-800 focus:border-amber-500 text-white placeholder-neutral-600";
+  const tagClass = isPinkVariant ? "bg-white border-[#f2ccd7]/50 text-[#7c5d6c] hover:text-[#4c2d3a] hover:border-[#f2ccd7]" : isYellowVariant ? "bg-white border-[#e6dfc3] text-neutral-500 hover:text-[#0d233a] hover:border-[#0d233a]" : "bg-neutral-900 border-neutral-800 text-neutral-450 hover:text-white hover:border-neutral-700";
+  const activeTagClass = isPinkVariant ? "bg-rose-500/10 border-rose-500/60 text-rose-600 font-extrabold" : isYellowVariant ? "bg-amber-400/10 border-amber-400 text-amber-800 font-extrabold" : "bg-amber-400/10 border-amber-400 text-amber-400 font-extrabold";
+  
+  const cardClass = isPinkVariant ? "bg-white border-[#f2ccd7]/60 hover:border-rose-500 shadow-[0_4px_16px_rgba(115,89,101,0.03)]" : isYellowVariant ? "bg-white border-[#e6dfc3] hover:border-amber-400 shadow-[0_4px_16px_rgba(13,35,58,0.03)]" : "bg-[#140e11] border-neutral-800 hover:border-amber-400/60 shadow-[0_4px_16px_rgba(0,0,0,0.2)]";
+  const cardTitleClass = isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white";
+  const cardDescClass = isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400";
+  const imgContainerBg = isPinkVariant ? "bg-white" : isYellowVariant ? "bg-white" : "bg-neutral-900";
 
   return (
     <div id={isPinkVariant ? "landing-v4" : isYellowVariant ? "landing-v5" : "landing-v3"} className={`flex flex-col w-full scroll-smooth overflow-x-hidden font-sans antialiased transition-colors duration-300 ${
@@ -1714,113 +1843,6 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
           </div>
         </section>
 
-        {/* ------------------------------------------------------------- */}
-        {/* BRAND PORTFOLIO STRUCTURE SECTION */}
-        {/* ------------------------------------------------------------- */}
-        <section id="structure" className={`py-24 overflow-hidden relative border-b transition-colors duration-300 ${
-          isPinkVariant 
-            ? "bg-[#fff9fb] border-[#f2ccd7]/40 text-[#735965]" 
-            : isYellowVariant 
-              ? "bg-[#fffdf2] border-[#e6dfc3]/40 text-[#0d233a]" 
-              : "bg-white text-neutral-900 border-neutral-100"
-        }`}>
-
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <motion.div className="max-w-3xl mb-16" {...fadeIn}>
-              <span className="text-neutral-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Brand Architecture</span>
-              <h2 className={`text-3xl sm:text-4xl font-black tracking-tight mb-4 leading-tight ${
-                isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-950"
-              }`}>하나의 브랜드 안에서, 메뉴 선택은 더 다채롭게</h2>
-              <p className={`text-xs sm:text-sm font-bold leading-relaxed max-w-xl ${
-                isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
-              }`}>
-                120pie&coffee는 120겹파이와 에그120을 중심으로, 매장의 분위기와 손님 취향에 잘 어울리는 메뉴 구성을 함께 제안합니다.
-              </p>
-            </motion.div>
-
-            <div className={`w-full border rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm relative text-center transition-colors ${
-              isPinkVariant 
-                ? "bg-[#fff5f7] border-[#f2ccd7]" 
-                : isYellowVariant 
-                  ? "bg-[#fffdf2]/40 border-[#e6dfc3]" 
-                  : "bg-neutral-50 border-neutral-100"
-            }`}>
-              <div className={`brand-master-title font-black text-xl sm:text-2xl py-3 px-8 rounded-xl inline-block mb-12 shadow-sm text-center ${
-                isPinkVariant 
-                  ? "bg-rose-500 text-white" 
-                  : isYellowVariant 
-                    ? "bg-[#0d233a] text-white" 
-                    : "bg-amber-400 text-white"
-              }`}>
-                120pie &amp; coffee <span className="block sm:inline-block font-extrabold text-[10px] sm:text-xs sm:ml-2 text-white/80 mt-1 sm:mt-0">Master Brand</span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-                {/* Connect Line Graphic (Hidden on mobile) */}
-                <div className={`hidden md:block absolute top-[-48px] left-[16.6%] right-[16.6%] h-12 border-t border-l border-r rounded-t-xl z-0 ${
-                  isPinkVariant ? "border-[#f2ccd7]/80" : isYellowVariant ? "border-[#e6dfc3]/80" : "border-neutral-200"
-                }`}></div>
-                <div className={`hidden md:block absolute top-[-48px] left-1/2 w-px h-12 z-0 ${
-                  isPinkVariant ? "bg-[#f2ccd7]/80" : isYellowVariant ? "bg-[#e6dfc3]/80" : "bg-neutral-200"
-                }`}></div>
-
-                {/* Module Card 1 */}
-                <div className={`rounded-2xl border relative z-10 flex flex-col items-center overflow-hidden transition-all shadow-sm ${
-                  isPinkVariant 
-                    ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
-                    : isYellowVariant 
-                      ? "bg-white border-[#e6dfc3] hover:border-amber-400" 
-                      : "bg-white border-neutral-200 hover:border-amber-400/60"
-                }`}>
-                  <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
-                    <video src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183410/120pie_%EC%98%81%EC%83%81_4_tylqqc.mp4" autoPlay muted loop playsInline aria-label="120겹파이 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
-                  </div>
-                  <div className="p-6 flex flex-col items-center">
-                    <div className={`text-[10px] font-bold mb-1.5 tracking-widest uppercase ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-500"}`}>Signature Pie</div>
-                    <div className={`text-lg font-black mb-1 ${isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-950"}`}>120겹파이 시리즈</div>
-                    <div className={`text-xs text-center font-bold leading-relaxed ${isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"}`}>겉은 바삭하고 속은 든든한 대표 파이 메뉴</div>
-                  </div>
-                </div>
-
-                {/* Module Card 2 */}
-                <div className={`rounded-2xl border relative z-10 flex flex-col items-center overflow-hidden transition-all shadow-sm ${
-                  isPinkVariant 
-                    ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
-                    : isYellowVariant 
-                      ? "bg-white border-[#e6dfc3] hover:border-amber-400" 
-                      : "bg-white border-neutral-200 hover:border-amber-400/60"
-                }`}>
-                  <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
-                    <video src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183413/egg120_%EC%98%81%EC%83%81_1_nyph02.mp4" autoPlay muted loop playsInline aria-label="에그120 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
-                  </div>
-                  <div className="p-6 flex flex-col items-center">
-                    <div className={`text-[10px] font-bold mb-1.5 tracking-widest uppercase ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-emerald-600" : "text-emerald-500"}`}>Sweet Choice</div>
-                    <div className={`text-lg font-black mb-1 ${isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-950"}`}>에그120 계란빵</div>
-                    <div className={`text-xs text-center font-bold leading-relaxed ${isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"}`}>부드러운 맛으로 가볍게 곁들이기 좋은 메뉴</div>
-                  </div>
-                </div>
-
-                {/* Module Card 3 */}
-                <div className={`rounded-2xl border relative z-10 flex flex-col items-center overflow-hidden transition-all shadow-sm ${
-                  isPinkVariant 
-                    ? "bg-white border-[#f2ccd7] hover:border-rose-400" 
-                    : isYellowVariant 
-                      ? "bg-white border-[#e6dfc3] hover:border-amber-400" 
-                      : "bg-white border-neutral-200 hover:border-amber-400/60"
-                }`}>
-                  <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
-                    <video src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183414/%EC%B8%84%EB%9F%AC%EC%8A%A4120_%EC%98%81%EC%83%81_1_ybpdnm.mp4" autoPlay muted loop playsInline aria-label="츄러스 메뉴 영상" className="absolute inset-0 block w-full h-full object-cover scale-[1.24]" />
-                  </div>
-                  <div className="p-6 flex flex-col items-center">
-                    <div className={`text-[10px] font-bold mb-1.5 tracking-widest uppercase ${isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-blue-600" : "text-blue-500"}`}>More Favorites</div>
-                    <div className={`text-lg font-black mb-1 ${isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-neutral-950"}`}>츄러스 · 핫도그 · 떡볶이</div>
-                    <div className={`text-xs text-center font-bold leading-relaxed ${isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"}`}>매장과 상권에 맞춰 더해볼 수 있는 인기 메뉴</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* ------------------------------------------------------------- */}
         {/* MODULAR MENU CATALOG SECTION [INTEGRATING EXCLUDED MENU DATA - V2 STYLE - KEY] */}
@@ -1835,7 +1857,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <motion.div className="max-w-3xl mb-14" {...fadeIn}>
-              <span className="text-amber-400 font-bold tracking-widest text-xs uppercase mb-2 block font-mono">Product Catalog</span>
+              <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${
+                isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-500" : "text-amber-400"
+              }`}>Product Catalog</span>
               <h2 className={`text-3xl sm:text-4xl font-black tracking-tight mb-4 leading-tight ${
                 isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
               }`}>
@@ -1848,86 +1872,167 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               </p>
             </motion.div>
 
-            {/* Editorial product grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                {
-                  id: "120겹파이",
-                  eyebrow: "Signature",
-                  title: "120파이 시리즈",
-                  desc: "고기파이부터 애플파이, 피자 파이까지. 커피와 자연스럽게 어울리는 브랜드의 대표 메뉴입니다.",
-                  image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg",
-                  alt: "120겹파이"
-                },
-                {
-                  id: "에그120",
-                  eyebrow: "Dessert",
-                  title: "에그120 계란빵",
-                  desc: "폭신하고 부드러운 식감에 다양한 토핑을 더해, 커피와 함께 즐기기 좋은 디저트 메뉴입니다.",
-                  image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184083/120egg_45_dqgrir.jpg",
-                  alt: "에그120 계란빵"
-                },
-                {
-                  id: "coffee120",
-                  eyebrow: "Beverage",
-                  title: "120커피 & 음료",
-                  desc: "아메리카노부터 시그니처 쉐이크, 에이드까지. 파이와 완벽히 페어링되는 프리미엄 음료입니다.",
-                  image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781187208/A4_01133_lzjp9l_j4lfgk.jpg",
-                  alt: "120커피 & 음료"
-                },
-                {
-                  id: "기타",
-                  eyebrow: "Side Menu",
-                  title: "츄러스 · 핫도그 · 떡볶이",
-                  desc: "간단한 조리로 선택 폭을 넓히고, 파이와 함께 추가 주문을 이끄는 사이드 메뉴입니다.",
-                  image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184099/IMG_0015_6_3_bxmolh.jpg",
-                  alt: "사이드 메뉴"
-                }
-              ].map((menu) => {
-                const tabParam = menu.id === "120겹파이" ? "pie" : menu.id === "에그120" ? "egg" : menu.id === "coffee120" ? "coffee" : "side";
-                return (
-                  <button
-                    key={menu.id}
-                    type="button"
-                    onClick={() => setSelectedMenu(menu.id)}
-                    className={`group text-left border-t border-x-0 border-b-0 bg-transparent pt-5 transition-colors flex flex-col w-full cursor-pointer focus:outline-none ${
+            {/* Category selection, filter and search */}
+            <div className="flex flex-col items-center w-full">
+              {/* Main Category tabs */}
+              <div className={`flex rounded-full border p-1 sm:p-1.5 w-full max-w-3xl justify-between relative ${tabWrapperClass}`}>
+                {Object.keys(MENU_DATA).map((tabId) => {
+                  const isActive = activeTab === tabId;
+                  return (
+                    <button
+                      key={tabId}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(tabId);
+                        setSubFilter("all");
+                        setSearchQuery("");
+                      }}
+                      className={`rounded-full py-2.5 sm:py-3.5 px-2 sm:px-4 flex-1 text-center text-[10px] sm:text-xs md:text-sm font-black transition-all relative border-0 cursor-pointer bg-transparent z-10 whitespace-nowrap ${
+                        isActive ? activeTabClass : inactiveTabClass
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.span
+                          layoutId="activeTabBackgroundHome"
+                          className={`absolute inset-0 rounded-full z-[-1] ${
+                            isPinkVariant ? "bg-rose-500" : "bg-amber-400"
+                          }`}
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                        />
+                      )}
+                      <span className="relative z-20 flex items-center justify-center gap-1 sm:gap-1.5">
+                        {MENU_DATA[tabId].label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Sub filters and Search input */}
+              <div className="w-full max-w-4xl mt-12 flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
+                {/* Sub filters */}
+                <div className="flex flex-wrap gap-2 items-center">
+                  {subFilters[activeTab]?.map((filter) => {
+                    const isActive = subFilter === filter.id;
+                    return (
+                      <button
+                        key={filter.id}
+                        type="button"
+                        onClick={() => setSubFilter(filter.id)}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          isActive ? activeTagClass : tagClass
+                        }`}
+                      >
+                        {filter.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Search input */}
+                <div className="relative flex-1 md:max-w-xs min-h-[42px]">
+                  <Search size={16} className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${
+                    isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-neutral-450" : "text-neutral-500"
+                  }`} />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="메뉴 이름 또는 설명 검색..."
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-2xl border text-xs font-bold transition-all focus:outline-none focus:ring-1 ${
                       isPinkVariant 
-                        ? "border-[#f2ccd7] hover:border-rose-400 text-[#735965]" 
-                        : isYellowVariant 
-                          ? "border-[#e6dfc3] hover:border-[#0d233a] text-[#576575]" 
-                          : "border-neutral-700 hover:border-amber-400 text-neutral-400"
+                        ? `${inputClass} focus:ring-rose-500` 
+                        : `${inputClass} focus:ring-amber-500`
                     }`}
-                  >
-                    <div className={`aspect-[4/3] overflow-hidden rounded-xl mb-6 w-full ${
-                      isPinkVariant ? "bg-rose-50/50" : isYellowVariant ? "bg-[#fffdf2]/80" : "bg-neutral-900"
-                    }`}>
-                      <img
-                        src={menu.image}
-                        alt={menu.alt}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
-                      />
-                    </div>
-                    <span className={`text-[10px] font-bold tracking-[0.22em] uppercase block mb-3 ${
-                      isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
-                    }`}>{menu.eyebrow}</span>
-                    <h3 className={`text-xl font-black mb-3 ${
-                      isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"
-                    }`}>{menu.title}</h3>
-                    <p className={`text-xs sm:text-sm font-medium leading-relaxed flex-1 ${
-                      isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
-                    }`}>{menu.desc}</p>
-                    <span className={`catalog-detail-button text-xs font-bold mt-7 inline-flex items-center gap-2 rounded-full border px-4 py-2.5 transition-colors ${
-                      isPinkVariant 
-                        ? "border-rose-500 text-rose-500 group-hover:bg-rose-500 group-hover:text-white" 
-                        : isYellowVariant 
-                          ? "border-[#0d233a] text-[#0d233a] group-hover:bg-[#0d233a] group-hover:text-white" 
-                          : "border-amber-400 text-amber-400 group-hover:bg-amber-400 group-hover:text-white"
-                    }`}>
-                      메뉴 자세히 보기 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-                    </span>
-                  </button>
-                );
-              })}
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 bg-transparent border-0 cursor-pointer"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Selected Category Heading */}
+              <div className="w-full max-w-4xl text-center md:text-left mt-14 mb-8">
+                <span className={`text-[10px] sm:text-xs font-bold tracking-widest uppercase block mb-1.5 ${
+                  isPinkVariant ? "text-rose-500" : isYellowVariant ? "text-amber-600" : "text-amber-400"
+                }`}>
+                  {activeTab} Selection
+                </span>
+                <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${isPinkVariant ? "text-[#4c2d3a]" : isYellowVariant ? "text-[#0d233a]" : "text-white"}`}>
+                  {MENU_DATA[activeTab]?.title}
+                </h2>
+                <p className={`text-xs sm:text-sm font-medium leading-relaxed max-w-2xl ${isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"}`}>
+                  {MENU_DATA[activeTab]?.desc}
+                </p>
+              </div>
+
+              {/* Grid Layout of Products */}
+              <div className="w-full max-w-4xl mt-8">
+                <AnimatePresence mode="wait">
+                  {filteredItems.length > 0 ? (
+                    <motion.div
+                      key={`${activeTab}-${subFilter}-${searchQuery}`}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -15 }}
+                      transition={{ duration: 0.3 }}
+                      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8"
+                    >
+                      {filteredItems.map((item) => (
+                        <article
+                          key={item.name}
+                          className={`group rounded-2xl border overflow-hidden transition-all duration-300 flex flex-col ${cardClass}`}
+                        >
+                          <div className={`aspect-[4/3] w-full overflow-hidden relative p-3 sm:p-5 ${imgContainerBg}`}>
+                            <img
+                              src={item.img}
+                              alt={item.name}
+                              className="w-full h-full transition-all duration-500 group-hover:scale-105 object-contain"
+                            />
+                            {item.badge && (
+                              <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wide shadow-sm z-10 ${
+                                isPinkVariant 
+                                  ? "bg-rose-500 text-white" 
+                                  : "bg-neutral-900 text-amber-400"
+                              }`}>
+                                {item.badge}
+                              </span>
+                            )}
+                          </div>
+                          
+                          <div className="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                              <h3 className={`text-base sm:text-lg font-black mb-1.5 ${cardTitleClass}`}>
+                                {item.name}
+                              </h3>
+                              <p className={`text-xs font-semibold leading-relaxed ${cardDescClass}`}>
+                                {item.desc}
+                              </p>
+                            </div>
+                          </div>
+                        </article>
+                      ))}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className={`text-center py-16 px-4 rounded-3xl border border-dashed flex flex-col items-center justify-center ${
+                        isPinkVariant ? "border-[#f2ccd7]/30 text-[#7c5d6c]" : isYellowVariant ? "border-[#e6dfc3] text-neutral-400" : "border-neutral-800 text-neutral-500"
+                      }`}
+                    >
+                      <HelpCircle size={40} className="mb-4 text-neutral-450 animate-pulse" />
+                      <h3 className="text-base font-black mb-1.5">검색 결과가 없습니다</h3>
+                      <p className="text-xs font-semibold leading-relaxed">다른 검색어나 카테고리 탭을 선택해보세요.</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
             {/* Recommended combinations */}

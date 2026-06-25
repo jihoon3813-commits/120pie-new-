@@ -147,4 +147,16 @@ export default defineSchema({
     ip: v.string(), // 접속 IP 주소
     date: v.string(), // YYYY-MM-DD
   }).index("by_date", ["date"]),
+  banners: defineTable({
+    mainTag: v.string(),
+    mainTitle: v.string(),
+    mainDesc: v.string(),
+    sideTag: v.string(),
+    sideTitle: v.string(),
+    sideDesc: v.string(),
+    sideBtnText: v.string(),
+    mainImage: v.optional(v.string()),
+    sideImage: v.optional(v.string()),
+    sideLink: v.optional(v.string()),
+  }),
 });

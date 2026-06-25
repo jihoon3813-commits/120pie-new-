@@ -91,7 +91,7 @@ export default function FranchisePageClient() {
   const [theme, setTheme] = useState<"pink" | "yellow">("yellow");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [selectedPlanTab, setSelectedPlanTab] = useState<"8py" | "10py">("8py");
-  const [activeMenuTab, setActiveMenuTab] = useState<"pie" | "egg" | "churros" | "side" | "drink">("pie");
+  const [activeMenuTab, setActiveMenuTab] = useState<"pie" | "egg" | "churros" | "side" | "drink" | "bakery" | "croffle">("pie");
   
   // Helper to optimize Cloudinary images (downscales large images to look crisp and clean)
   const getOptimizedImg = (url: string, width = 300) => {
@@ -939,6 +939,24 @@ export default function FranchisePageClient() {
                     "커피 / 에이드 / 스무디 / 뱅쇼 등"
                   ],
                   img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590222/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_36_29_dgybn5.png"
+                },
+                {
+                  title: "스콘 / 머핀 / 쿠키",
+                  points: [
+                    "플레인 / 초코칩 스콘",
+                    "블루베리 / 초코 / 치즈 머핀",
+                    "다크초코 / 마카다미아 / 캐슈넛 쿠키"
+                  ],
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782370423/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_25%EC%9D%BC_%EC%98%A4%ED%9B%84_03_53_25_kf4inf.png"
+                },
+                {
+                  title: "크로플 / 마카롱",
+                  points: [
+                    "딸기&크림 / 블루베리&크림 크로플",
+                    "솔티드카라멜 / 초코렛폭탄 / 흑당 크로플",
+                    "산딸기 / 블루베리 / 초코 마카롱"
+                  ],
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782370423/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_25%EC%9D%BC_%EC%98%A4%ED%9B%84_03_53_21_qjja4b.png"
                 }
               ].map((card, idx) => (
                 <div key={idx} className={`p-6 rounded-2xl ${innerCardBgAccent} ${innerCardHover} border ${isPink ? "border-neutral-850" : "border-amber-200/60"} flex flex-col justify-between h-[450px] group`}>
@@ -991,21 +1009,26 @@ export default function FranchisePageClient() {
             </div>
 
             {/* Tabs Navigation */}
-            <div className="flex flex-wrap justify-center gap-2 mb-8 select-none">
+            <div className="grid grid-cols-3 gap-2 max-w-3xl mx-auto mb-8 select-none">
               {[
                 { key: "pie", label: "120겹 파이 시리즈", emoji: "🥐" },
                 { key: "egg", label: "에그 120 시리즈", emoji: "🥚" },
                 { key: "churros", label: "츄러스 120 시리즈", emoji: "🥨" },
                 { key: "side", label: "떡볶이 & 핫도그", emoji: "🌭" },
-                { key: "drink", label: "커피 & 음료", emoji: "☕" }
-              ].map((tab) => {
+                { key: "drink", label: "커피 & 음료", emoji: "☕" },
+                { key: "bakery", label: "스콘/머핀/쿠키", emoji: "🍪" },
+                { key: "croffle", label: "크로플/마카롱", emoji: "🧇" }
+              ].map((tab, idx) => {
                 const isActive = activeMenuTab === tab.key;
+                const isLast = idx === 6;
                 return (
                   <button
                     key={tab.key}
                     type="button"
                     onClick={() => setActiveMenuTab(tab.key as any)}
-                    className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer border ${
+                    className={`flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer border ${
+                      isLast ? "col-span-3" : ""
+                    } ${
                       isActive
                         ? isPink
                           ? "bg-rose-500 border-rose-500 text-white shadow-md shadow-rose-500/10"
@@ -1174,6 +1197,58 @@ export default function FranchisePageClient() {
                           src={getOptimizedImg(item.img, 200)} 
                           alt={item.name} 
                           className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 opacity-95"
+                        />
+                      </div>
+                      <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeMenuTab === "bakery" && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                  {[
+                    { name: "초코칩 스콘", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365351/%EC%B4%88%EC%BD%94%EC%B9%A9_%EC%8A%A4%EC%BD%98_vaw70u.png" },
+                    { name: "플레인 스콘", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365356/%ED%94%8C%EB%A0%88%EC%9D%B8_%EC%8A%A4%EC%BD%98_zf7yz8.png" },
+                    { name: "블루베리 머핀", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365357/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EB%A8%B8%ED%95%80_jrqlkm.png" },
+                    { name: "초코 머핀", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365362/%EC%B4%88%EC%BD%94_%EB%A8%B8%ED%95%80_jvi1d3.png" },
+                    { name: "치즈 머핀", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365359/%EC%B9%98%EC%A6%88_%EB%A8%B8%ED%95%80_wncm5n.png" },
+                    { name: "다크초코쿠키", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365364/%EB%8B%A4%ED%81%AC%EC%B4%88%EC%BD%94%EC%BF%A0%ED%82%A4_zshapc.png" },
+                    { name: "마카다미아 초코쿠키", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365363/%EB%A7%88%EC%B9%B4%EB%8B%A4%EB%AF%B8%EC%95%84_%EC%B4%88%EC%BD%94%EC%BF%A0%ED%82%A4_evtonk.png" },
+                    { name: "캐슈넛쿠키", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365363/%EC%BA%90%EC%8A%88%EB%84%9B%EC%BF%A0%ED%82%A4_pt97ab.png" }
+                  ].map((item, idx) => (
+                    <div key={idx} className="group flex flex-col items-center">
+                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
+                        <img 
+                          src={getOptimizedImg(item.img, 300)} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
+                        />
+                      </div>
+                      <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeMenuTab === "croffle" && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                  {[
+                    { name: "딸기&크림 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365366/%EB%94%B8%EA%B8%B0_%ED%81%AC%EB%A6%BC_%ED%81%AC%EB%A1%9C%ED%94%8C_jjoz6d.png" },
+                    { name: "블루베리&크림 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365365/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%ED%81%AC%EB%A6%BC_%ED%81%AC%EB%A1%9C%ED%94%8C_mjc7pi.png" },
+                    { name: "솔티드카라멜 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365368/%EC%86%94%ED%8B%B0%EB%93%9C%EC%B9%B4%EB%9D%BC%EB%A9%9C_%ED%81%AC%EB%A1%9C%ED%94%8C_pfoegr.png" },
+                    { name: "초코렛폭탄 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365367/%EC%B4%88%EC%BD%94%EB%A0%9B%ED%8F%AD%ED%83%84_%ED%81%AC%EB%A1%9C%ED%94%8C_maupyq.png" },
+                    { name: "흑당 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365366/%ED%9D%91%EB%8B%B9_%ED%81%AC%EB%A1%9C%ED%94%8C_tul0cj.png" },
+                    { name: "산딸기 마카롱", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365369/edited-photo_79_x1ikz0.png" },
+                    { name: "블루베리 마카롱", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365369/edited-photo_80_gbtyyq.png" },
+                    { name: "초코 마카롱", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365370/edited-photo_81_ydg87f.png" }
+                  ].map((item, idx) => (
+                    <div key={idx} className="group flex flex-col items-center">
+                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
+                        <img 
+                          src={getOptimizedImg(item.img, 300)} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
                         />
                       </div>
                       <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{item.name}</span>

@@ -41,6 +41,10 @@ export default function MenuPageClient() {
           setActiveTab("기타");
         } else if (urlTab === "coffee") {
           setActiveTab("coffee120");
+        } else if (urlTab === "bakery" || urlTab === "scone") {
+          setActiveTab("스콘/머핀/쿠키");
+        } else if (urlTab === "croffle" || urlTab === "macaron") {
+          setActiveTab("크로플/마카롱");
         }
       } catch (err) {
         console.error("Failed to initialize theme and tab parameters", err);
@@ -67,6 +71,8 @@ export default function MenuPageClient() {
       if (tabId === "에그120") tabParam = "egg";
       else if (tabId === "기타") tabParam = "side";
       else if (tabId === "coffee120") tabParam = "coffee";
+      else if (tabId === "스콘/머핀/쿠키") tabParam = "bakery";
+      else if (tabId === "크로플/마카롱") tabParam = "croffle";
       url.searchParams.set("tab", tabParam);
       window.history.pushState(null, "", url.search);
     }
@@ -119,6 +125,17 @@ export default function MenuPageClient() {
       { label: "라떼 (Non-Coffee)", id: "latte" },
       { label: "스무디 & 쉐이크", id: "smoothie" },
       { label: "에이드 & 주스", id: "juice" }
+    ],
+    "스콘/머핀/쿠키": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "수제 스콘", id: "scone" },
+      { label: "촉촉 머핀", id: "muffin" },
+      { label: "바삭 쿠키", id: "cookie" }
+    ],
+    "크로플/마카롱": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "크로플", id: "croffle" },
+      { label: "마카롱", id: "macaron" }
     ]
   };
 
@@ -176,6 +193,20 @@ export default function MenuPageClient() {
           items = items.filter(item => 
             item.name.includes("에이드") || item.name.includes("주스") || item.name === "복숭아 아이스티" || item.name === "제주한라봉"
           );
+        }
+      } else if (activeTab === "스콘/머핀/쿠키") {
+        if (subFilter === "scone") {
+          items = items.filter(item => item.name.includes("스콘"));
+        } else if (subFilter === "muffin") {
+          items = items.filter(item => item.name.includes("머핀"));
+        } else if (subFilter === "cookie") {
+          items = items.filter(item => item.name.includes("쿠키"));
+        }
+      } else if (activeTab === "크로플/마카롱") {
+        if (subFilter === "croffle") {
+          items = items.filter(item => item.name.includes("크로플"));
+        } else if (subFilter === "macaron") {
+          items = items.filter(item => item.name.includes("마카롱"));
         }
       }
     }
@@ -458,22 +489,10 @@ export default function MenuPageClient() {
                             <h3 className={`text-base sm:text-lg font-black mb-1.5 ${cardTitleClass}`}>
                               {item.name}
                             </h3>
-                            <p className={`text-xs font-semibold leading-relaxed mb-4 ${cardDescClass}`}>
+                            <p className={`text-xs font-semibold leading-relaxed ${cardDescClass}`}>
                               {item.desc}
                             </p>
                           </div>
-                          
-                          <button
-                            type="button"
-                            onClick={() => setInquiryForcedOpen(true)}
-                            className={`w-full py-2.5 rounded-xl border text-[11px] font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                              isPink
-                                ? "border-rose-500/30 text-rose-400 hover:bg-rose-500 hover:text-white"
-                                : "border-amber-400 text-[#0d233a] hover:bg-amber-400"
-                            }`}
-                          >
-                            상담 및 가맹 도입 문의 <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
-                          </button>
                         </div>
                       </article>
                     ))}

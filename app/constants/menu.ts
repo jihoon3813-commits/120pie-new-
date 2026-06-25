@@ -112,5 +112,37 @@ export const MENU_DATA: Record<string, MenuCategory> = {
       { name: "애플망고 주스", desc: "고급스러운 단맛의 애플망고를 듬뿍 넣어 한 모금마다 향긋함을 가득 채우는 주스입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594821/%EC%95%A0%ED%94%8C%EB%A7%9D%EA%B3%A0_%EC%A3%BC%EC%8A%A42_acsy4h.png", badge: "인기" },
       { name: "오렌지 주스", desc: "상큼하고 싱그러운 오렌지 본연의 비타민을 가득 담아 가볍고 청량한 과일 주스입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594824/%EC%98%A4%EB%A0%8C%EC%A7%80_%EC%A3%BC%EC%8A%A42_uhicvy.png" }
     ]
+  },
+  "스콘/머핀/쿠키": {
+    id: "스콘/머핀/쿠키",
+    label: "스콘/머핀/쿠키",
+    title: "바삭하고 포근한 베이커리 디저트, 스콘 & 머핀 & 쿠키",
+    desc: "매일 아침 구워낸 듯 향긋한 버터 풍미를 선사합니다. 부드러운 스콘과 촉촉한 머핀, 바삭한 수제 쿠키로 가벼운 디저트 타임을 완성해보세요.",
+    items: [
+      { name: "초코칩 스콘", desc: "달콤한 초코칩이 아낌없이 박혀 씹을수록 깊은 단맛과 풍미를 전하는 스콘입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365351/%EC%B4%88%EC%BD%94%EC%B9%A9_%EC%8A%A4%EC%BD%98_vaw70u.png", badge: "인기" },
+      { name: "플레인 스콘", desc: "고소한 버터 본연의 풍미를 가득 담아 딸기잼이나 커피와 가장 잘 어울리는 클래식 스콘입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365356/%ED%94%8C%EB%A0%88%EC%9D%B8_%EC%8A%A4%EC%BD%98_zf7yz8.png", badge: "대표" },
+      { name: "블루베리 머핀", desc: "톡톡 터지는 새콤달콤한 블루베리 과육이 촉촉한 머핀 시트와 조화를 이루는 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365357/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EB%A8%B8%ED%95%80_jrqlkm.png" },
+      { name: "초코 머핀", desc: "진하고 꾸덕한 초콜릿의 달콤함과 부드러운 머핀의 식감을 동시에 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365362/%EC%B4%88%EC%BD%94_%EB%A8%B8%ED%95%80_jvi1d3.png", badge: "인기" },
+      { name: "치즈 머핀", desc: "고소하고 짭조름한 황치즈 풍미가 가득 담겨 촉촉하고 담백한 머핀입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365359/%EC%B9%98%EC%A6%88_%EB%A8%B8%ED%95%80_wncm5n.png" },
+      { name: "다크초코쿠키", desc: "진한 다크 초콜릿의 깊은 카카오 풍미와 바삭한 쿠키의 조화가 돋보입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365364/%EB%8B%A4%ED%81%AC%EC%B4%88%EC%BD%94%EC%BF%A0%ED%82%A4_zshapc.png" },
+      { name: "마카다미아 초코쿠키", desc: "오독오독 씹히는 고소한 마카다미아 넛츠와 부드러운 초코칩이 조화를 이룹니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365363/%EB%A7%88%EC%B9%B4%EB%8B%A4%EB%AF%B8%EC%95%84_%EC%B4%88%EC%BD%94%EC%BF%A0%ED%82%A4_evtonk.png", badge: "추천" },
+      { name: "캐슈넛쿠키", desc: "고소하고 담백한 캐슈넛을 듬뿍 토핑하여 구워낸 건강하고 달콤한 쿠키입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365363/%EC%BA%90%EC%8A%88%EB%84%9B%EC%BF%A0%ED%82%A4_pt97ab.png" }
+    ]
+  },
+  "크로플/마카롱": {
+    id: "크로플/마카롱",
+    label: "크로플/마카롱",
+    title: "트렌디한 단짠의 정석, 크로플 & 마카롱",
+    desc: "버터향 가득한 크루아상 생지를 바삭하게 구워낸 크로플과 입안 가득 쫀득하고 달콤한 뚱카롱입니다.",
+    items: [
+      { name: "딸기&크림 크로플", desc: "갓 구운 크로플 위에 부드러운 휩크림과 상큼한 딸기 잼, 토핑이 어우러진 비주얼 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365366/%EB%94%B8%EA%B8%B0_%ED%81%AC%EB%A6%BC_%ED%81%AC%EB%A1%9C%ED%94%8C_jjoz6d.png", badge: "인기" },
+      { name: "블루베리&크림 크로플", desc: "바삭한 크로플 위에 달콤 고소한 크림과 톡톡 씹히는 블루베리를 얹어 상큼함을 배가시켰습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365365/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%ED%81%AC%EB%A6%BC_%ED%81%AC%EB%A1%9C%ED%94%8C_mjc7pi.png" },
+      { name: "솔티드카라멜 크로플", desc: "단짠단짠의 정석! 짭짤한 솔트와 달콤하고 풍부한 카라멜 소스를 뿌린 크로플입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365368/%EC%86%94%ED%8B%B0%EB%93%9C%EC%B9%B4%EB%9D%BC%EB%A9%9C_%ED%81%AC%EB%A1%9C%ED%94%8C_pfoegr.png", badge: "대표" },
+      { name: "초코렛폭탄 크로플", desc: "초코 소스와 초콜릿 토핑을 폭탄처럼 얹어 초콜릿의 극대화된 단맛을 전하는 크로플입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365367/%EC%B4%88%EC%BD%94%EB%A0%9B%ED%8F%AD%ED%83%84_%ED%81%AC%EB%A1%9C%ED%94%8C_maupyq.png", badge: "초코덕후" },
+      { name: "흑당 크로플", desc: "대만 오리지널 흑당의 진한 풍미가 갓 구운 크로플 깊숙이 스며들어 달콤하고 향긋합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365366/%ED%9D%91%EB%8B%B9_%ED%81%AC%EB%A1%9C%ED%94%8C_tul0cj.png" },
+      { name: "산딸기 마카롱", desc: "쫀득한 꼬끄 속에 상큼한 산딸기 필링이 듬뿍 들어가 상쾌한 단맛을 전합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365369/edited-photo_79_x1ikz0.png", badge: "상큼단맛" },
+      { name: "블루베리 마카롱", desc: "진하고 부드러운 크림과 상큼한 블루베리 풍미가 쫀득한 꼬끄 사이에 가득한 마카롱입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365369/edited-photo_80_gbtyyq.png" },
+      { name: "초코 마카롱", desc: "쌉싸름하고 깊은 초콜릿 가나슈 필링이 쫀득하게 채워진 깊은 풍미의 마카롱입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365370/edited-photo_81_ydg87f.png", badge: "인기" }
+    ]
   }
 };
