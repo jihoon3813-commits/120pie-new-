@@ -11,6 +11,27 @@ import { MENU_DATA, MenuItem, MenuCategory } from "@/app/constants/menu";
 const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
 const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png";
 
+const getBadgeClasses = (badge: string, isPink: boolean) => {
+  if (badge === "ORIGINAL") {
+    return isPink 
+      ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400" 
+      : "bg-emerald-50 text-emerald-700 border border-emerald-250/65";
+  }
+  if (badge === "MEAT") {
+    return isPink 
+      ? "bg-rose-500/10 border border-rose-500/30 text-rose-400" 
+      : "bg-rose-50 text-rose-700 border border-rose-250/65";
+  }
+  if (badge === "PIZZA") {
+    return isPink 
+      ? "bg-amber-500/10 border border-amber-500/30 text-amber-400" 
+      : "bg-amber-50 text-amber-800 border border-amber-250/65";
+  }
+  return isPink 
+    ? "bg-rose-500 text-white" 
+    : "bg-neutral-900 text-amber-400";
+};
+
 export default function MenuPageClient() {
   const [theme, setTheme] = useState<"pink" | "yellow">("yellow");
   const [activeTab, setActiveTab] = useState<string>("120겹파이");
@@ -105,8 +126,9 @@ export default function MenuPageClient() {
   const subFilters: Record<string, { label: string; id: string }[]> = {
     "120겹파이": [
       { label: "전체 메뉴", id: "all" },
-      { label: "식사 대용 (든든함)", id: "meal" },
-      { label: "디저트 & 스윗", id: "sweet" }
+      { label: "ORIGINAL", id: "original" },
+      { label: "MEAT", id: "meat" },
+      { label: "PIZZA", id: "pizza" }
     ],
     "에그120": [
       { label: "전체 메뉴", id: "all" },
@@ -157,10 +179,12 @@ export default function MenuPageClient() {
     // Sub-category filter
     if (subFilter !== "all") {
       if (activeTab === "120겹파이") {
-        if (subFilter === "meal") {
-          items = items.filter(item => ["로제미트파이", "불고기파이", "페퍼로니피자파이"].includes(item.name));
-        } else if (subFilter === "sweet") {
-          items = items.filter(item => ["애플파이", "블루베리파이", "콘치즈파이", "커스터드파이", "팥치즈파이", "크림치즈파이", "망고파이", "고구마파이"].includes(item.name));
+        if (subFilter === "original") {
+          items = items.filter(item => item.badge === "ORIGINAL");
+        } else if (subFilter === "meat") {
+          items = items.filter(item => item.badge === "MEAT");
+        } else if (subFilter === "pizza") {
+          items = items.filter(item => item.badge === "PIZZA");
         }
       } else if (activeTab === "에그120") {
         if (subFilter === "savory") {
@@ -475,19 +499,28 @@ export default function MenuPageClient() {
                           />
                           {item.badge && (
                             <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wide shadow-sm z-10 ${
-                              isPink 
-                                ? "bg-rose-500 text-white" 
-                                : "bg-neutral-900 text-amber-400"
+                              getBadgeClasses(item.badge, isPink)
                             }`}>
                               {item.badge}
+                            </span>
+                          )}
+                          {item.tag && (
+                            <span className={`absolute top-3 right-3 px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider uppercase shadow-sm z-10 !text-white ${
+                              item.tag === "HIT" 
+                                ? "bg-rose-600" 
+                                : item.tag === "추천" 
+                                  ? "bg-blue-600" 
+                                  : "bg-emerald-600"
+                            }`}>
+                              {item.tag}
                             </span>
                           )}
                         </div>
                         
                         <div className="p-5 flex-1 flex flex-col justify-between">
                           <div>
-                            <h3 className={`text-base sm:text-lg font-black mb-1.5 ${cardTitleClass}`}>
-                              {item.name}
+                            <h3 className={`text-base sm:text-lg font-black mb-1.5 flex items-center flex-wrap gap-1.5 ${cardTitleClass}`}>
+                              <span>{item.name}</span>
                             </h3>
                             <p className={`text-xs font-semibold leading-relaxed ${cardDescClass}`}>
                               {item.desc}

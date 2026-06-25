@@ -3,6 +3,7 @@ export interface MenuItem {
   desc: string;
   img: string;
   badge?: string;
+  tag?: string;
 }
 
 export interface MenuCategory {
@@ -20,17 +21,23 @@ export const MENU_DATA: Record<string, MenuCategory> = {
     title: "커피와 함께 즐기기 좋은 대표 메뉴, 120파이",
     desc: "고소한 크림 파이부터 든든한 미트와 피자 파이까지, 손님의 취향과 시간대에 맞춰 폭넓게 제안할 수 있는 120파이 메뉴입니다.",
     items: [
-      { name: "로제미트파이", desc: "부드러운 로제 소스와 든든한 미트가 어우러진 식사형 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184221/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s3svi2.jpg", badge: "식사대용" },
-      { name: "애플파이", desc: "달콤한 사과 풍미로 따뜻한 커피와 편안하게 곁들이기 좋습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184723/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_kxykcu.jpg", badge: "클래식" },
-      { name: "블루베리파이", desc: "상큼한 블루베리 풍미가 바삭한 파이와 어울리는 달콤한 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184610/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_zfmatx.jpg", badge: "디저트" },
-      { name: "콘치즈파이", desc: "고소한 옥수수와 치즈의 조합으로 누구나 편하게 즐기기 좋은 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184643/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_lio2tj.jpg", badge: "인기" },
-      { name: "커스터드파이", desc: "부드럽고 달콤한 커스터드 크림을 채운 클래식 디저트 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184658/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_dule6z.jpg", badge: "대표" },
-      { name: "불고기파이", desc: "달큰한 불고기 풍미를 담아 간단한 한 끼로도 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184700/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ss1t8y.jpg", badge: "든든" },
-      { name: "팥치즈파이", desc: "달콤한 팥과 담백한 치즈가 만나 익숙하면서도 새로운 맛을 전합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184738/%ED%8C%A5%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_cvme5l.jpg" },
-      { name: "크림치즈파이", desc: "산뜻한 크림치즈의 부드러움을 바삭한 결 사이에 담았습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184763/%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_nvzwvc.jpg", badge: "추천" },
-      { name: "망고파이", desc: "달콤하고 향긋한 망고의 풍미가 돋보이는 산뜻한 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184783/%EB%A7%9D%EA%B3%A0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_yynprf.jpg" },
-      { name: "페퍼로니피자파이", desc: "페퍼로니와 치즈의 익숙한 풍미로 간식과 식사 모두 잘 어울립니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184808/%ED%8E%98%ED%8E%98%EB%A1%9C%EB%8B%88%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_izlrfv.jpg", badge: "신메뉴" },
-      { name: "고구마파이", desc: "달콤하고 포근한 고구마 맛으로 남녀노소 편하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184829/%EA%B3%A0%EA%B5%AC%EB%A7%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_qojchr.jpg" }
+      { name: "애플파이", desc: "달콤한 사과 풍미로 따뜻한 커피와 편안하게 곁들이기 좋습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/1._%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_n8szil.png", badge: "ORIGINAL", tag: "HIT" },
+      { name: "커스터드 파이", desc: "부드럽고 달콤한 커스터드 크림을 채운 클래식 디저트 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/2._%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s6r8bh.png", badge: "ORIGINAL" },
+      { name: "크림치즈 파이", desc: "산뜻한 크림치즈의 부드러움을 바삭한 결 사이에 담았습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/3._%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ktmh4z.png", badge: "ORIGINAL", tag: "추천" },
+      { name: "고구마 파이", desc: "달콤하고 포근한 고구마 맛으로 남녀노소 편하게 즐길 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/4._%EA%B3%A0%EA%B5%AC%EB%A7%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_rjtwp5.png", badge: "ORIGINAL" },
+      { name: "블루베리 파이", desc: "상큼한 블루베리 풍미가 바삭한 파이와 어울리는 달콤한 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397525/5._%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_hg03x0.png", badge: "ORIGINAL" },
+      { name: "망고 파이", desc: "달콤하고 향긋한 망고의 풍미가 돋보이는 산뜻한 디저트입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/6._%EB%A7%9D%EA%B3%A0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ms7oev.png", badge: "ORIGINAL" },
+      { name: "팥치즈 파이", desc: "달콤한 팥과 담백한 치즈가 만나 익숙하면서도 새로운 맛을 전합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397523/7._%ED%8C%A5%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_itmqgw.png", badge: "ORIGINAL" },
+      { name: "콘치즈 파이", desc: "고소한 옥수수와 치즈의 조합으로 누구나 편하게 즐기기 좋은 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397523/8._%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_u37u1i.png", badge: "ORIGINAL" },
+      { name: "꿀호떡 파이", desc: "달콤한 꿀 and 향긋한 계피향, 고소한 땅콩이 만나 호떡의 정취를 더한 달콤한 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397523/9._%EA%BF%80%ED%98%B8%EB%96%A1%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_mscin2.png", badge: "ORIGINAL", tag: "NEW" },
+      { name: "불고기 파이", desc: "달큰한 불고기 풍미를 담아 간단한 한 끼로도 든든한 메뉴입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/10._%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_x3jigh.png", badge: "MEAT", tag: "HIT" },
+      { name: "불닭 파이", desc: "매콤하고 중독성 있는 불닭 소스와 고소한 치즈가 조화를 이룬 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/11._%EB%B6%88%EB%8B%AD%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ji4ju9.png", badge: "MEAT" },
+      { name: "함박치즈 파이", desc: "육즙이 풍부한 함박 스테이크와 치즈가 만나 든든한 식사가 되는 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397525/12._%ED%95%A8%EB%B0%95%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_e7nbbg.png", badge: "MEAT" },
+      { name: "로제미트 파이", desc: "부드러운 로제 소스와 든든한 미트가 어우러진 식사형 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397525/13._%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_xbyshr.png", badge: "MEAT", tag: "추천" },
+      { name: "페페로니 피자파이", desc: "페페로니와 치즈의 익숙한 풍미로 간식과 식사 모두 잘 어울립니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397526/14._%ED%8E%98%ED%8D%BC%EB%A1%9C%EB%8B%88%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_ajaxxz.png", badge: "PIZZA", tag: "NEW" },
+      { name: "불고기 피자파이", desc: "달콤 짭조름한 불고기와 토마토 피자 소스가 조화를 이루는 피자 파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397527/15._%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_abbiac.png", badge: "PIZZA", tag: "추천" },
+      { name: "고구마베이컨 피자파이", desc: "달콤한 고구마 무스와 짭조름한 베이컨이 올라간 단짠 정석의 피자파이입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397527/16._%EA%B3%A0%EA%B5%AC%EB%A7%88%EB%B2%A0%EC%9D%B4%EC%BB%A8%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_xavfmd.png", badge: "PIZZA" },
+      { name: "포테이토베이컨 피자파이", desc: "담백하고 포근한 포테이토와 짭조름한 베이컨이 풍부한 치즈와 조화를 이룹니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397527/17._%ED%8F%AC%ED%85%8C%EC%9D%B4%ED%86%A0%EB%B2%A0%EC%9D%B4%EC%BB%A8%ED%94%BC%EC%9E%90_gnszt0.png", badge: "PIZZA", tag: "HIT" }
     ]
   },
   "에그120": {

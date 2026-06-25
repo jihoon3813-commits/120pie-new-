@@ -1050,18 +1050,18 @@ export default function FranchisePageClient() {
               {activeMenuTab === "pie" && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
                   {[
-                    { name: "꿀호떡 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184848/%EA%BF%80%ED%98%B8%EB%96%A1%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_dmpfos.jpg" },
-                    { name: "페페로니피자 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184808/%ED%8E%98%ED%8E%98%EB%A1%9C%EB%8B%88%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_izlrfv.jpg" },
-                    { name: "로제미트 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184221/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s3svi2.jpg" },
-                    { name: "팥치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184738/%ED%8C%A5%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_cvme5l.jpg" },
-                    { name: "애플 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184723/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_kxykcu.jpg" },
-                    { name: "불고기 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184700/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ss1t8y.jpg" },
-                    { name: "불닭 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184882/%EB%B6%88%EB%8B%AD%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_eaiujx.jpg" },
-                    { name: "크림치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184763/%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_nvzwvc.jpg" },
-                    { name: "망고 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184783/%EB%A7%9D%EA%B3%A0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_yynprf.jpg" },
-                    { name: "콘치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184643/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_lio2tj.jpg" },
-                    { name: "커스터드 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184658/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_dule6z.jpg" },
-                    { name: "블루베리 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184610/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_zfmatx.jpg" }
+                    { name: "꿀호떡 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397523/9._%EA%BF%80%ED%98%B8%EB%96%A1%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_mscin2.png" },
+                    { name: "페페로니피자 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397526/14._%ED%8E%98%ED%8D%BC%EB%A1%9C%EB%8B%88%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_ajaxxz.png" },
+                    { name: "로제미트 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397525/13._%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_xbyshr.png" },
+                    { name: "팥치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397523/7._%ED%8C%A5%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_itmqgw.png" },
+                    { name: "애플 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/1._%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_n8szil.png" },
+                    { name: "불고기 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/10._%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_x3jigh.png" },
+                    { name: "불닭 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/11._%EB%B6%88%EB%8B%AD%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ji4ju9.png" },
+                    { name: "크림치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/3._%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ktmh4z.png" },
+                    { name: "망고 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/6._%EB%A7%9D%EA%B3%A0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ms7oev.png" },
+                    { name: "콘치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397523/8._%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_u37u1i.png" },
+                    { name: "커스터드 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/2._%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s6r8bh.png" },
+                    { name: "블루베리 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397525/5._%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_hg03x0.png" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">

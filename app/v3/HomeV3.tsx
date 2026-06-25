@@ -68,6 +68,27 @@ function AnimatedNumber({ value, suffix = "" }: { value: number, suffix?: string
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 }
 
+const getBadgeClasses = (badge: string, isPink: boolean) => {
+  if (badge === "ORIGINAL") {
+    return isPink 
+      ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400" 
+      : "bg-emerald-50 text-emerald-700 border border-emerald-250/65";
+  }
+  if (badge === "MEAT") {
+    return isPink 
+      ? "bg-rose-500/10 border border-rose-500/30 text-rose-400" 
+      : "bg-rose-50 text-rose-700 border border-rose-250/65";
+  }
+  if (badge === "PIZZA") {
+    return isPink 
+      ? "bg-amber-500/10 border border-amber-500/30 text-amber-400" 
+      : "bg-amber-50 text-amber-800 border border-amber-250/65";
+  }
+  return isPink 
+    ? "bg-rose-500 text-white" 
+    : "bg-neutral-900 text-amber-400";
+};
+
 // 1. [MENU DETAIL MODAL] - V3 프리미엄 Glassmorphism 버전
 function MenuModal({ menuId, onClose, onInquiry, isPink = false }: { menuId: string | null, onClose: () => void, onInquiry: () => void, isPink?: boolean }) {
   if (!menuId) return null;
@@ -110,9 +131,29 @@ function MenuModal({ menuId, onClose, onInquiry, isPink = false }: { menuId: str
                 <div key={i} className="bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-850 shadow-lg hover:border-amber-400/40 transition-all group">
                   <div className="h-44 overflow-hidden relative bg-white flex items-center justify-center p-3">
                     <img src={item.img} alt={item.name} className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500" />
+                    {item.badge && (
+                      <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wide shadow-sm z-10 ${
+                        getBadgeClasses(item.badge, isPink)
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                    {item.tag && (
+                      <span className={`absolute top-3 right-3 px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider uppercase shadow-sm z-10 !text-white ${
+                        item.tag === "HIT" 
+                          ? "bg-rose-600" 
+                          : item.tag === "추천" 
+                            ? "bg-blue-600" 
+                            : "bg-emerald-600"
+                      }`}>
+                        {item.tag}
+                      </span>
+                    )}
                   </div>
                   <div className="p-5">
-                    <h4 className="font-extrabold text-white text-base mb-1.5">{item.name}</h4>
+                    <h4 className="font-extrabold text-white text-base mb-1.5 flex items-center flex-wrap gap-1.5">
+                      <span>{item.name}</span>
+                    </h4>
                     <p className="text-xs text-neutral-400 leading-relaxed font-medium">{item.desc}</p>
                   </div>
                 </div>
@@ -882,12 +923,35 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   const isPinkVariant = variant === "v4";
   const isYellowVariant = variant === "v5";
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   // Dynamic Header Variables
   const headerBgClass = isYellowVariant
-    ? "bg-[#fffdf2]/90 border-b border-[#e6dfc3]/60 shadow-[#0d233a]/[0.02]"
+    ? isScrolled
+      ? "bg-[#fffdf2]/70 border-b border-[#e6dfc3]/50 shadow-md backdrop-blur-md"
+      : "bg-[#fffdf2]/90 border-b border-[#e6dfc3]/60 shadow-[#0d233a]/[0.02] backdrop-blur-md"
     : isPinkVariant
-      ? "bg-[#0f0a0c]/90 border-b border-[#f2ccd7]/15 shadow-rose-950/20"
-      : "bg-neutral-950/95 border-b border-neutral-900/60";
+      ? isScrolled
+        ? "bg-[#0f0a0c]/70 border-b border-[#f2ccd7]/10 shadow-lg backdrop-blur-md"
+        : "bg-[#0f0a0c]/90 border-b border-[#f2ccd7]/15 shadow-rose-950/20 backdrop-blur-md"
+      : isScrolled
+        ? "bg-neutral-950/75 border-b border-neutral-900/40 shadow-xl backdrop-blur-md"
+        : "bg-neutral-950/95 border-b border-neutral-900/60 backdrop-blur-md";
 
   const logoImgSrc = isPinkVariant
     ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png"
@@ -1196,8 +1260,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   const subFilters: Record<string, { label: string; id: string }[]> = {
     "120겹파이": [
       { label: "전체 메뉴", id: "all" },
-      { label: "식사 대용 (든든함)", id: "meal" },
-      { label: "디저트 & 스윗", id: "sweet" }
+      { label: "ORIGINAL", id: "original" },
+      { label: "MEAT", id: "meat" },
+      { label: "PIZZA", id: "pizza" }
     ],
     "에그120": [
       { label: "전체 메뉴", id: "all" },
@@ -1246,10 +1311,12 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
     // Sub-category filter
     if (subFilter !== "all") {
       if (activeTab === "120겹파이") {
-        if (subFilter === "meal") {
-          items = items.filter(item => ["로제미트파이", "불고기파이", "페퍼로니피자파이"].includes(item.name));
-        } else if (subFilter === "sweet") {
-          items = items.filter(item => ["애플파이", "블루베리파이", "콘치즈파이", "커스터드파이", "팥치즈파이", "크림치즈파이", "망고파이", "고구마파이"].includes(item.name));
+        if (subFilter === "original") {
+          items = items.filter(item => item.badge === "ORIGINAL");
+        } else if (subFilter === "meat") {
+          items = items.filter(item => item.badge === "MEAT");
+        } else if (subFilter === "pizza") {
+          items = items.filter(item => item.badge === "PIZZA");
         }
       } else if (activeTab === "에그120") {
         if (subFilter === "savory") {
@@ -1320,7 +1387,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   const imgContainerBg = isPinkVariant ? "bg-white" : isYellowVariant ? "bg-white" : "bg-neutral-900";
 
   return (
-    <div id={isPinkVariant ? "landing-v4" : isYellowVariant ? "landing-v5" : "landing-v3"} className={`flex flex-col w-full scroll-smooth overflow-x-hidden font-sans antialiased transition-colors duration-300 ${
+    <div id={isPinkVariant ? "landing-v4" : isYellowVariant ? "landing-v5" : "landing-v3"} className={`flex flex-col w-full scroll-smooth overflow-x-clip font-sans antialiased transition-colors duration-300 ${
       isPinkVariant 
         ? "bg-[#fff9fb] text-neutral-900" 
         : isYellowVariant 
@@ -1332,13 +1399,21 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
       {/* HEADER (Sticky Minimal Tri-Tone) */}
       {/* ------------------------------------------------------------- */}
       <header className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 ${headerBgClass}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between min-h-[60px] sm:min-h-[80px] lg:min-h-[94px] gap-2.5 sm:gap-4">
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-all duration-300 gap-2.5 sm:gap-4 ${
+          isScrolled 
+            ? "min-h-[50px] sm:min-h-[60px] lg:min-h-[68px]" 
+            : "min-h-[60px] sm:min-h-[80px] lg:min-h-[94px]"
+        }`}>
           <div className="shrink-0 py-2">
             <Link className="flex items-center group shrink-0" href={logoTargetUrl} aria-label="120pie 홈으로 이동">
               <img
                 src={logoImgSrc}
                 alt="120pie & coffee"
-                className="h-5 sm:h-7 lg:h-8 w-auto object-contain group-hover:scale-102 transition-all duration-200"
+                className={`w-auto object-contain group-hover:scale-102 transition-all duration-300 ${
+                  isScrolled
+                    ? "h-4 sm:h-5 lg:h-6"
+                    : "h-5 sm:h-7 lg:h-8"
+                }`}
               />
             </Link>
           </div>
@@ -1996,19 +2071,28 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                             />
                             {item.badge && (
                               <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wide shadow-sm z-10 ${
-                                isPinkVariant 
-                                  ? "bg-rose-500 text-white" 
-                                  : "bg-neutral-900 text-amber-400"
+                                getBadgeClasses(item.badge, isPinkVariant)
                               }`}>
                                 {item.badge}
+                              </span>
+                            )}
+                            {item.tag && (
+                              <span className={`absolute top-3 right-3 px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider uppercase shadow-sm z-10 !text-white ${
+                                item.tag === "HIT" 
+                                  ? "bg-rose-600" 
+                                  : item.tag === "추천" 
+                                    ? "bg-blue-600" 
+                                    : "bg-emerald-600"
+                              }`}>
+                                {item.tag}
                               </span>
                             )}
                           </div>
                           
                           <div className="p-5 flex-1 flex flex-col justify-between">
                             <div>
-                              <h3 className={`text-base sm:text-lg font-black mb-1.5 ${cardTitleClass}`}>
-                                {item.name}
+                              <h3 className={`text-base sm:text-lg font-black mb-1.5 flex items-center flex-wrap gap-1.5 ${cardTitleClass}`}>
+                                <span>{item.name}</span>
                               </h3>
                               <p className={`text-xs font-semibold leading-relaxed ${cardDescClass}`}>
                                 {item.desc}
