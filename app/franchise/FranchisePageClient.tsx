@@ -40,7 +40,7 @@ import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
 import { api } from "@/convex/_generated/api";
 
-const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
+const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
 
 // Interface for Success Cases
 interface SuccessCase {
@@ -441,7 +441,7 @@ export default function FranchisePageClient() {
             <div className="lg:col-span-5 relative group">
               <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
                 <img 
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185662/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm_nxk2mq.jpg" 
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185662/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm_nxk2mq.jpg" 
                   alt="120pie signature dessert" 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
@@ -502,7 +502,7 @@ export default function FranchisePageClient() {
               <div className="lg:col-span-5 relative group">
                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950">
                   <img 
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590329/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C3_ibhumn.jpg" 
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590329/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C3_ibhumn.jpg" 
                     alt="Artisan rolling pastry dough" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                   />
@@ -583,7 +583,7 @@ export default function FranchisePageClient() {
               <div className="lg:col-span-5 relative group">
                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-square bg-neutral-950">
                   <img 
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590223/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_01_24_05_etbfvd.png" 
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590223/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_01_24_05_etbfvd.png" 
                     alt="6WAY packaging box" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                   />
@@ -686,7 +686,7 @@ export default function FranchisePageClient() {
               </div>
               <div className="rounded-xl overflow-hidden aspect-[16/10] bg-neutral-900 border border-neutral-800 relative group">
                 <img 
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590218/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_04_59_upd43s.png" 
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590218/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_04_59_upd43s.png" 
                   alt="Dough and baking process" 
                   className="w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-300"
                 />
@@ -776,8 +776,8 @@ export default function FranchisePageClient() {
               <div className="md:col-span-5 rounded-xl overflow-hidden bg-neutral-955 aspect-square border border-neutral-850/20 relative group">
                 <img 
                   src={selectedPlanTab === "8py" 
-                    ? "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590217/edited-photo_68_t9lc94.png"
-                    : "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590217/edited-photo_67_uqjalx.png"
+                    ? "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590217/edited-photo_68_t9lc94.png"
+                    : "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590217/edited-photo_67_uqjalx.png"
                   } 
                   alt="Floor plan spatial layout" 
                   className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-550"
@@ -845,7 +845,7 @@ export default function FranchisePageClient() {
               <div className="lg:col-span-5 relative group flex flex-col justify-center">
                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[350px]">
                   <img 
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590221/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_24_39_a38n7c.png" 
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590221/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_24_39_a38n7c.png" 
                     alt="Success advertising banner mockup" 
                     className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 opacity-90"
                   />
@@ -911,7 +911,7 @@ export default function FranchisePageClient() {
                     "함박치즈 / 망고 / 애플",
                     "흑임자크림 / 직화불고기 / 직화불닭"
                   ],
-                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183595/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A0%ED%94%8C_%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%97%B0%EC%B6%9C_bzyzzs.jpg"
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183595/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A0%ED%94%8C_%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%97%B0%EC%B6%9C_bzyzzs.jpg"
                 },
                 {
                   title: "에그 120",
@@ -921,7 +921,7 @@ export default function FranchisePageClient() {
                     "통팥 / 통모짜",
                     "로제미트 / 슈크림"
                   ],
-                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184083/120egg_45_dqgrir.jpg"
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184083/120egg_45_dqgrir.jpg"
                 },
                 {
                   title: "츄러스 120",
@@ -929,7 +929,7 @@ export default function FranchisePageClient() {
                     "오리지널 / 슈가",
                     "오레오 / 녹차"
                   ],
-                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184099/IMG_0015_6_3_bxmolh.jpg"
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184099/IMG_0015_6_3_bxmolh.jpg"
                 },
                 {
                   title: "사이드 & 음료",
@@ -938,7 +938,7 @@ export default function FranchisePageClient() {
                     "직화 불고기 핫도그",
                     "커피 / 에이드 / 스무디 / 뱅쇼 등"
                   ],
-                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590222/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_36_29_dgybn5.png"
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590222/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_36_29_dgybn5.png"
                 },
                 {
                   title: "스콘 / 머핀 / 쿠키",
@@ -947,7 +947,7 @@ export default function FranchisePageClient() {
                     "블루베리 / 초코 / 치즈 머핀",
                     "다크초코 / 마카다미아 / 캐슈넛 쿠키"
                   ],
-                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782370423/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_25%EC%9D%BC_%EC%98%A4%ED%9B%84_03_53_25_kf4inf.png"
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782370423/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_25%EC%9D%BC_%EC%98%A4%ED%9B%84_03_53_25_kf4inf.png"
                 },
                 {
                   title: "크로플 / 마카롱",
@@ -956,7 +956,7 @@ export default function FranchisePageClient() {
                     "솔티드카라멜 / 초코렛폭탄 / 흑당 크로플",
                     "산딸기 / 블루베리 / 초코 마카롱"
                   ],
-                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782370423/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_25%EC%9D%BC_%EC%98%A4%ED%9B%84_03_53_21_qjja4b.png"
+                  img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782370423/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_25%EC%9D%BC_%EC%98%A4%ED%9B%84_03_53_21_qjja4b.png"
                 }
               ].map((card, idx) => (
                 <div key={idx} className={`p-6 rounded-2xl ${innerCardBgAccent} ${innerCardHover} border ${isPink ? "border-neutral-850" : "border-amber-200/60"} flex flex-col justify-between h-[450px] group`}>
@@ -1050,18 +1050,18 @@ export default function FranchisePageClient() {
               {activeMenuTab === "pie" && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
                   {[
-                    { name: "꿀호떡 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397523/9._%EA%BF%80%ED%98%B8%EB%96%A1%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_mscin2.png" },
-                    { name: "페페로니피자 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397526/14._%ED%8E%98%ED%8D%BC%EB%A1%9C%EB%8B%88%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_ajaxxz.png" },
-                    { name: "로제미트 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397525/13._%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_xbyshr.png" },
-                    { name: "팥치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397523/7._%ED%8C%A5%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_itmqgw.png" },
-                    { name: "애플 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/1._%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_n8szil.png" },
-                    { name: "불고기 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/10._%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_x3jigh.png" },
-                    { name: "불닭 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/11._%EB%B6%88%EB%8B%AD%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ji4ju9.png" },
-                    { name: "크림치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/3._%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ktmh4z.png" },
-                    { name: "망고 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/6._%EB%A7%9D%EA%B3%A0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ms7oev.png" },
-                    { name: "콘치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397523/8._%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_u37u1i.png" },
-                    { name: "커스터드 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397524/2._%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s6r8bh.png" },
-                    { name: "블루베리 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782397525/5._%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_hg03x0.png" }
+                    { name: "꿀호떡 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397523/9._%EA%BF%80%ED%98%B8%EB%96%A1%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_mscin2.png" },
+                    { name: "페페로니피자 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397526/14._%ED%8E%98%ED%8D%BC%EB%A1%9C%EB%8B%88%ED%94%BC%EC%9E%90%ED%8C%8C%EC%9D%B4_ajaxxz.png" },
+                    { name: "로제미트 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397525/13._%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_xbyshr.png" },
+                    { name: "팥치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397523/7._%ED%8C%A5%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_itmqgw.png" },
+                    { name: "애플 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397524/1._%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_n8szil.png" },
+                    { name: "불고기 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397524/10._%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_x3jigh.png" },
+                    { name: "불닭 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397524/11._%EB%B6%88%EB%8B%AD%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ji4ju9.png" },
+                    { name: "크림치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397524/3._%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ktmh4z.png" },
+                    { name: "망고 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397524/6._%EB%A7%9D%EA%B3%A0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ms7oev.png" },
+                    { name: "콘치즈 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397523/8._%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_u37u1i.png" },
+                    { name: "커스터드 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397524/2._%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s6r8bh.png" },
+                    { name: "블루베리 파이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782397525/5._%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_hg03x0.png" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
@@ -1080,14 +1080,14 @@ export default function FranchisePageClient() {
               {activeMenuTab === "egg" && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
                   {[
-                    { name: "오리지널 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184985/edited-photo_4_y98ytv.jpg" },
-                    { name: "베이컨 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184987/edited-photo_2_rplfpn.jpg" },
-                    { name: "커스터드 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184988/edited-photo_5_shiudy.jpg" },
-                    { name: "콘치즈 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184986/edited-photo_6_mkz6ey.jpg" },
-                    { name: "로제미트 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184991/edited-photo_1_euib8f.jpg" },
-                    { name: "통모짜 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184989/edited-photo_7_usuk8g.jpg" },
-                    { name: "슈크림 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184989/edited-photo_3_syalvo.jpg" },
-                    { name: "팥 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184990/edited-photo_8_h7k4xt.jpg" }
+                    { name: "오리지널 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184985/edited-photo_4_y98ytv.jpg" },
+                    { name: "베이컨 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184987/edited-photo_2_rplfpn.jpg" },
+                    { name: "커스터드 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184988/edited-photo_5_shiudy.jpg" },
+                    { name: "콘치즈 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184986/edited-photo_6_mkz6ey.jpg" },
+                    { name: "로제미트 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184991/edited-photo_1_euib8f.jpg" },
+                    { name: "통모짜 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184989/edited-photo_7_usuk8g.jpg" },
+                    { name: "슈크림 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184989/edited-photo_3_syalvo.jpg" },
+                    { name: "팥 계란빵", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184990/edited-photo_8_h7k4xt.jpg" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
@@ -1106,10 +1106,10 @@ export default function FranchisePageClient() {
               {activeMenuTab === "churros" && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-2xl mx-auto">
                   {[
-                    { name: "오리지널 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185404/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_izqnfl.jpg" },
-                    { name: "슈가 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185405/%EC%8A%88%EA%B0%80_tzns46.jpg" },
-                    { name: "오레오 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185408/%EC%98%A4%EB%A0%88%EC%98%A4_bssm74.jpg" },
-                    { name: "녹차 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185408/%EB%85%B9%EC%B0%A8_jmac8h.jpg" }
+                    { name: "오리지널 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185404/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_izqnfl.jpg" },
+                    { name: "슈가 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185405/%EC%8A%88%EA%B0%80_tzns46.jpg" },
+                    { name: "오레오 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185408/%EC%98%A4%EB%A0%88%EC%98%A4_bssm74.jpg" },
+                    { name: "녹차 츄러스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185408/%EB%85%B9%EC%B0%A8_jmac8h.jpg" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
@@ -1128,10 +1128,10 @@ export default function FranchisePageClient() {
               {activeMenuTab === "side" && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-2xl mx-auto">
                   {[
-                    { name: "국물 떡볶이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185350/%EA%B5%AD%EB%AC%BC1_amnxed.png" },
-                    { name: "로제 떡볶이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185348/%EB%A1%9C%EC%A0%9C1_lwn2j7.png" },
-                    { name: "짜장 떡볶이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185349/%EC%A7%9C%EC%9E%A51_zktcnn.png" },
-                    { name: "직화불고기 핫도그", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185539/A4_07054_2_er4md2.jpg" }
+                    { name: "국물 떡볶이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185350/%EA%B5%AD%EB%AC%BC1_amnxed.png" },
+                    { name: "로제 떡볶이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185348/%EB%A1%9C%EC%A0%9C1_lwn2j7.png" },
+                    { name: "짜장 떡볶이", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185349/%EC%A7%9C%EC%9E%A51_zktcnn.png" },
+                    { name: "직화불고기 핫도그", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185539/A4_07054_2_er4md2.jpg" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
                       <div className={`w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md ${isPink ? "bg-neutral-900" : "bg-[#fffdf4]"} relative group-hover:border-amber-400 transition-all duration-300`}>
@@ -1150,46 +1150,46 @@ export default function FranchisePageClient() {
               {activeMenuTab === "drink" && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 sm:gap-6">
                   {[
-                    { name: "아메리카노", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594614/%EC%95%84%EB%A9%94%EB%A6%AC%EC%B9%B4%EB%85%B8_qn2vhm.png" },
-                    { name: "카페라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594617/%EC%B9%B4%ED%8E%98%EB%9D%BC%EB%96%BC_hxx4gl.png" },
-                    { name: "카푸치노", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594625/%EC%B9%B4%ED%91%B8%EC%B9%98%EB%85%B82_lzqz34.png" },
-                    { name: "바닐라라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594630/%EB%B0%94%EB%8B%90%EB%9D%BC%EB%9D%BC%EB%96%BC_egaeff.png" },
-                    { name: "카라멜마끼아또", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594637/%EC%B9%B4%EB%9D%BC%EB%A9%9C%EB%A7%88%EB%81%BC%EC%95%84%EB%98%902_lelmg4.png" },
-                    { name: "카페모카", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594639/%EC%B9%B4%ED%8E%98%EB%AA%A8%EC%B9%B42_vpcsd0.png" },
-                    { name: "연유카페라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594648/%EC%97%B0%EC%9C%A0%EC%B9%B4%ED%8E%98%EB%9D%BC%EB%96%BC2_qsvl7v.png" },
-                    { name: "콜드브루", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594651/%EC%BD%9C%EB%93%9C%EB%B8%8C%EB%A3%A8_mshias.png" },
-                    { name: "콜드브루라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594654/%EC%BD%9C%EB%93%9C%EB%B8%8C%EB%A3%A8%EB%9D%BC%EB%96%BC2_fgyrox.png" },
-                    { name: "연유 콜드브루", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594659/%EC%97%B0%EC%9C%A0_%EC%BD%9C%EB%93%9C%EB%B8%8C%EB%A3%A82_vozqcs.png" },
-                    { name: "흑당라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594662/%ED%9D%91%EB%8B%B9%EB%9D%BC%EB%96%BC_zg0rsf.png" },
-                    { name: "곡물라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594667/%EA%B3%A1%EB%AC%BC%EB%9D%BC%EB%96%BC2_xmudz1.png" },
-                    { name: "고구마라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594670/%EA%B3%A0%EA%B5%AC%EB%A7%88%EB%9D%BC%EB%96%BC2_ya5oyd.png" },
-                    { name: "딸기라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594673/%EB%94%B8%EA%B8%B0%EB%9D%BC%EB%96%BC_mefpyg.png" },
-                    { name: "토피넛라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594679/%ED%86%A0%ED%94%BC%EB%84%9B%EB%9D%BC%EB%96%BC2_fxx4la.png" },
-                    { name: "녹차라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594683/%EB%85%B9%EC%B0%A8%EB%9D%BC%EB%96%BC_c9q9wu.png" },
-                    { name: "달고나라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594687/%EB%8B%AC%EA%B3%A0%EB%82%98%EB%9D%BC%EB%96%BC2_rh97dz.png" },
-                    { name: "피스타치오라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594692/%ED%94%BC%EC%8A%A4%ED%83%80%EC%B9%98%EC%98%A4%EB%9D%BC%EB%96%BC2_qhmttf.png" },
-                    { name: "미숫가루", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594697/%EB%AF%B8%EC%88%AB%EA%B0%80%EB%A3%A82_h8gehs.png" },
-                    { name: "초당옥수수라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594702/%EC%B4%88%EB%8B%B9%EC%98%A5%EC%88%98%EC%88%98%EB%9D%BC%EB%96%BC2_etf8dq.png" },
-                    { name: "딸기 요거트스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594708/%EB%94%B8%EA%B8%B0_%EC%9A%94%EA%B1%B0%ED%8A%B8%EC%8A%A4%EB%AC%B4%EB%94%942_nbnyqp.png" },
-                    { name: "망고 요거트스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594714/%EB%A7%9D%EA%B3%A0_%EC%9A%94%EA%B1%B0%ED%8A%B8%EC%8A%A4%EB%AC%B4%EB%94%942_cwywih.png" },
-                    { name: "딸기망고블루베리 스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594718/%EB%94%B8%EA%B8%B0%EB%A7%9D%EA%B3%A0%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%8A%A4%EB%AC%B4%EB%94%94_af48jr.png" },
-                    { name: "딸기바나나 스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594721/%EB%94%B8%EA%B8%B0%EB%B0%94%EB%82%98%EB%82%98_%EC%8A%A4%EB%AC%B4%EB%94%94_k98pno.png" },
-                    { name: "수박 스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594724/%EC%88%98%EB%B0%95_%EC%8A%A4%EB%AC%B4%EB%94%94_xizimi.png" },
-                    { name: "복숭아 아이스티", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594750/%EB%B3%B5%EC%88%AD%EC%95%84_%EC%95%84%EC%9D%B4%EC%8A%A4%ED%8B%B02_zy1xrm.png" },
-                    { name: "자몽 에이드", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594779/%EC%9E%90%EB%AA%BD_%EC%97%90%EC%9D%B4%EB%93%9C2_dmdi0k.png" },
-                    { name: "레몬 에이드", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594783/%EB%A0%88%EB%AA%AC_%EC%97%90%EC%9D%B4%EB%93%9C2_z4g3g3.png" },
-                    { name: "청포도 에이드", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594786/%EC%B2%AD%ED%8F%AC%EB%8F%84_%EC%97%90%EC%9D%B4%EB%93%9C2_rbww0m.png" },
-                    { name: "제주한라봉", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594790/%EC%A0%9C%EC%A3%BC%ED%95%9C%EB%9D%BC%EB%B4%89_%EC%97%90%EC%9D%B4%EB%93%9C2_hwrd2x.png" },
-                    { name: "밀크 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594794/%EB%B0%80%ED%81%AC%EC%89%90%EC%9D%B4%ED%81%AC_olhchd.png" },
-                    { name: "딸기 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594797/%EB%94%B8%EA%B8%B0%EC%89%90%EC%9D%B4%ED%81%AC_luxgk0.png" },
-                    { name: "쿠앤크 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594800/%EC%BF%A0%EC%95%A4%ED%81%AC%EC%89%90%EC%9D%B4%ED%81%AC_mddmzw.png" },
-                    { name: "초코 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594803/%EC%B4%88%EC%BD%94%EC%89%90%EC%9D%B4%ED%81%AC_k13wi2.png" },
-                    { name: "커피 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594807/%EC%BB%A4%ED%94%BC_%EC%89%90%EC%9D%B4%ED%81%AC2_ypr12t.png" },
-                    { name: "딸기 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594811/%EB%94%B8%EA%B8%B0%EC%A3%BC%EC%8A%A4_uo7vkh.png" },
-                    { name: "망고 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594814/%EB%A7%9D%EA%B3%A0%EC%A3%BC%EC%8A%A4_stoklt.png" },
-                    { name: "블루베리 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594817/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%EC%A3%BC%EC%8A%A4_drjxl0.png" },
-                    { name: "애플망고 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594821/%EC%95%A0%ED%94%8C%EB%A7%9D%EA%B3%A0_%EC%A3%BC%EC%8A%A42_acsy4h.png" },
-                    { name: "오렌지 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781594824/%EC%98%A4%EB%A0%8C%EC%A7%80_%EC%A3%BC%EC%8A%A42_uhicvy.png" }
+                    { name: "아메리카노", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594614/%EC%95%84%EB%A9%94%EB%A6%AC%EC%B9%B4%EB%85%B8_qn2vhm.png" },
+                    { name: "카페라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594617/%EC%B9%B4%ED%8E%98%EB%9D%BC%EB%96%BC_hxx4gl.png" },
+                    { name: "카푸치노", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594625/%EC%B9%B4%ED%91%B8%EC%B9%98%EB%85%B82_lzqz34.png" },
+                    { name: "바닐라라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594630/%EB%B0%94%EB%8B%90%EB%9D%BC%EB%9D%BC%EB%96%BC_egaeff.png" },
+                    { name: "카라멜마끼아또", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594637/%EC%B9%B4%EB%9D%BC%EB%A9%9C%EB%A7%88%EB%81%BC%EC%95%84%EB%98%902_lelmg4.png" },
+                    { name: "카페모카", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594639/%EC%B9%B4%ED%8E%98%EB%AA%A8%EC%B9%B42_vpcsd0.png" },
+                    { name: "연유카페라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594648/%EC%97%B0%EC%9C%A0%EC%B9%B4%ED%8E%98%EB%9D%BC%EB%96%BC2_qsvl7v.png" },
+                    { name: "콜드브루", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594651/%EC%BD%9C%EB%93%9C%EB%B8%8C%EB%A3%A8_mshias.png" },
+                    { name: "콜드브루라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594654/%EC%BD%9C%EB%93%9C%EB%B8%8C%EB%A3%A8%EB%9D%BC%EB%96%BC2_fgyrox.png" },
+                    { name: "연유 콜드브루", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594659/%EC%97%B0%EC%9C%A0_%EC%BD%9C%EB%93%9C%EB%B8%8C%EB%A3%A82_vozqcs.png" },
+                    { name: "흑당라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594662/%ED%9D%91%EB%8B%B9%EB%9D%BC%EB%96%BC_zg0rsf.png" },
+                    { name: "곡물라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594667/%EA%B3%A1%EB%AC%BC%EB%9D%BC%EB%96%BC2_xmudz1.png" },
+                    { name: "고구마라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594670/%EA%B3%A0%EA%B5%AC%EB%A7%88%EB%9D%BC%EB%96%BC2_ya5oyd.png" },
+                    { name: "딸기라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594673/%EB%94%B8%EA%B8%B0%EB%9D%BC%EB%96%BC_mefpyg.png" },
+                    { name: "토피넛라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594679/%ED%86%A0%ED%94%BC%EB%84%9B%EB%9D%BC%EB%96%BC2_fxx4la.png" },
+                    { name: "녹차라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594683/%EB%85%B9%EC%B0%A8%EB%9D%BC%EB%96%BC_c9q9wu.png" },
+                    { name: "달고나라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594687/%EB%8B%AC%EA%B3%A0%EB%82%98%EB%9D%BC%EB%96%BC2_rh97dz.png" },
+                    { name: "피스타치오라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594692/%ED%94%BC%EC%8A%A4%ED%83%80%EC%B9%98%EC%98%A4%EB%9D%BC%EB%96%BC2_qhmttf.png" },
+                    { name: "미숫가루", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594697/%EB%AF%B8%EC%88%AB%EA%B0%80%EB%A3%A82_h8gehs.png" },
+                    { name: "초당옥수수라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594702/%EC%B4%88%EB%8B%B9%EC%98%A5%EC%88%98%EC%88%98%EB%9D%BC%EB%96%BC2_etf8dq.png" },
+                    { name: "딸기 요거트스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594708/%EB%94%B8%EA%B8%B0_%EC%9A%94%EA%B1%B0%ED%8A%B8%EC%8A%A4%EB%AC%B4%EB%94%942_nbnyqp.png" },
+                    { name: "망고 요거트스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594714/%EB%A7%9D%EA%B3%A0_%EC%9A%94%EA%B1%B0%ED%8A%B8%EC%8A%A4%EB%AC%B4%EB%94%942_cwywih.png" },
+                    { name: "딸기망고블루베리 스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594718/%EB%94%B8%EA%B8%B0%EB%A7%9D%EA%B3%A0%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%8A%A4%EB%AC%B4%EB%94%94_af48jr.png" },
+                    { name: "딸기바나나 스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594721/%EB%94%B8%EA%B8%B0%EB%B0%94%EB%82%98%EB%82%98_%EC%8A%A4%EB%AC%B4%EB%94%94_k98pno.png" },
+                    { name: "수박 스무디", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594724/%EC%88%98%EB%B0%95_%EC%8A%A4%EB%AC%B4%EB%94%94_xizimi.png" },
+                    { name: "복숭아 아이스티", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594750/%EB%B3%B5%EC%88%AD%EC%95%84_%EC%95%84%EC%9D%B4%EC%8A%A4%ED%8B%B02_zy1xrm.png" },
+                    { name: "자몽 에이드", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594779/%EC%9E%90%EB%AA%BD_%EC%97%90%EC%9D%B4%EB%93%9C2_dmdi0k.png" },
+                    { name: "레몬 에이드", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594783/%EB%A0%88%EB%AA%AC_%EC%97%90%EC%9D%B4%EB%93%9C2_z4g3g3.png" },
+                    { name: "청포도 에이드", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594786/%EC%B2%AD%ED%8F%AC%EB%8F%84_%EC%97%90%EC%9D%B4%EB%93%9C2_rbww0m.png" },
+                    { name: "제주한라봉", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594790/%EC%A0%9C%EC%A3%BC%ED%95%9C%EB%9D%BC%EB%B4%89_%EC%97%90%EC%9D%B4%EB%93%9C2_hwrd2x.png" },
+                    { name: "밀크 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594794/%EB%B0%80%ED%81%AC%EC%89%90%EC%9D%B4%ED%81%AC_olhchd.png" },
+                    { name: "딸기 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594797/%EB%94%B8%EA%B8%B0%EC%89%90%EC%9D%B4%ED%81%AC_luxgk0.png" },
+                    { name: "쿠앤크 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594800/%EC%BF%A0%EC%95%A4%ED%81%AC%EC%89%90%EC%9D%B4%ED%81%AC_mddmzw.png" },
+                    { name: "초코 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594803/%EC%B4%88%EC%BD%94%EC%89%90%EC%9D%B4%ED%81%AC_k13wi2.png" },
+                    { name: "커피 쉐이크", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594807/%EC%BB%A4%ED%94%BC_%EC%89%90%EC%9D%B4%ED%81%AC2_ypr12t.png" },
+                    { name: "딸기 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594811/%EB%94%B8%EA%B8%B0%EC%A3%BC%EC%8A%A4_uo7vkh.png" },
+                    { name: "망고 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594814/%EB%A7%9D%EA%B3%A0%EC%A3%BC%EC%8A%A4_stoklt.png" },
+                    { name: "블루베리 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594817/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%EC%A3%BC%EC%8A%A4_drjxl0.png" },
+                    { name: "애플망고 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594821/%EC%95%A0%ED%94%8C%EB%A7%9D%EA%B3%A0_%EC%A3%BC%EC%8A%A42_acsy4h.png" },
+                    { name: "오렌지 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594824/%EC%98%A4%EB%A0%8C%EC%A7%80_%EC%A3%BC%EC%8A%A42_uhicvy.png" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
                       <div className={`w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md ${isPink ? "bg-neutral-900" : "bg-[#fffdf4]"} relative group-hover:border-amber-400 transition-all duration-300`}>
@@ -1208,14 +1208,14 @@ export default function FranchisePageClient() {
               {activeMenuTab === "bakery" && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
                   {[
-                    { name: "초코칩 스콘", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365351/%EC%B4%88%EC%BD%94%EC%B9%A9_%EC%8A%A4%EC%BD%98_vaw70u.png" },
-                    { name: "플레인 스콘", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365356/%ED%94%8C%EB%A0%88%EC%9D%B8_%EC%8A%A4%EC%BD%98_zf7yz8.png" },
-                    { name: "블루베리 머핀", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365357/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EB%A8%B8%ED%95%80_jrqlkm.png" },
-                    { name: "초코 머핀", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365362/%EC%B4%88%EC%BD%94_%EB%A8%B8%ED%95%80_jvi1d3.png" },
-                    { name: "치즈 머핀", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365359/%EC%B9%98%EC%A6%88_%EB%A8%B8%ED%95%80_wncm5n.png" },
-                    { name: "다크초코쿠키", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365364/%EB%8B%A4%ED%81%AC%EC%B4%88%EC%BD%94%EC%BF%A0%ED%82%A4_zshapc.png" },
-                    { name: "마카다미아 초코쿠키", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365363/%EB%A7%88%EC%B9%B4%EB%8B%A4%EB%AF%B8%EC%95%84_%EC%B4%88%EC%BD%94%EC%BF%A0%ED%82%A4_evtonk.png" },
-                    { name: "캐슈넛쿠키", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365363/%EC%BA%90%EC%8A%88%EB%84%9B%EC%BF%A0%ED%82%A4_pt97ab.png" }
+                    { name: "초코칩 스콘", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365351/%EC%B4%88%EC%BD%94%EC%B9%A9_%EC%8A%A4%EC%BD%98_vaw70u.png" },
+                    { name: "플레인 스콘", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365356/%ED%94%8C%EB%A0%88%EC%9D%B8_%EC%8A%A4%EC%BD%98_zf7yz8.png" },
+                    { name: "블루베리 머핀", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365357/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EB%A8%B8%ED%95%80_jrqlkm.png" },
+                    { name: "초코 머핀", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365362/%EC%B4%88%EC%BD%94_%EB%A8%B8%ED%95%80_jvi1d3.png" },
+                    { name: "치즈 머핀", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365359/%EC%B9%98%EC%A6%88_%EB%A8%B8%ED%95%80_wncm5n.png" },
+                    { name: "다크초코쿠키", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365364/%EB%8B%A4%ED%81%AC%EC%B4%88%EC%BD%94%EC%BF%A0%ED%82%A4_zshapc.png" },
+                    { name: "마카다미아 초코쿠키", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365363/%EB%A7%88%EC%B9%B4%EB%8B%A4%EB%AF%B8%EC%95%84_%EC%B4%88%EC%BD%94%EC%BF%A0%ED%82%A4_evtonk.png" },
+                    { name: "캐슈넛쿠키", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365363/%EC%BA%90%EC%8A%88%EB%84%9B%EC%BF%A0%ED%82%A4_pt97ab.png" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
@@ -1234,14 +1234,14 @@ export default function FranchisePageClient() {
               {activeMenuTab === "croffle" && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
                   {[
-                    { name: "딸기&크림 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365366/%EB%94%B8%EA%B8%B0_%ED%81%AC%EB%A6%BC_%ED%81%AC%EB%A1%9C%ED%94%8C_jjoz6d.png" },
-                    { name: "블루베리&크림 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365365/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%ED%81%AC%EB%A6%BC_%ED%81%AC%EB%A1%9C%ED%94%8C_mjc7pi.png" },
-                    { name: "솔티드카라멜 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365368/%EC%86%94%ED%8B%B0%EB%93%9C%EC%B9%B4%EB%9D%BC%EB%A9%9C_%ED%81%AC%EB%A1%9C%ED%94%8C_pfoegr.png" },
-                    { name: "초코렛폭탄 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365367/%EC%B4%88%EC%BD%94%EB%A0%9B%ED%8F%AD%ED%83%84_%ED%81%AC%EB%A1%9C%ED%94%8C_maupyq.png" },
-                    { name: "흑당 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365366/%ED%9D%91%EB%8B%B9_%ED%81%AC%EB%A1%9C%ED%94%8C_tul0cj.png" },
-                    { name: "산딸기 마카롱", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365369/edited-photo_79_x1ikz0.png" },
-                    { name: "블루베리 마카롱", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365369/edited-photo_80_gbtyyq.png" },
-                    { name: "초코 마카롱", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1782365370/edited-photo_81_ydg87f.png" }
+                    { name: "딸기&크림 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365366/%EB%94%B8%EA%B8%B0_%ED%81%AC%EB%A6%BC_%ED%81%AC%EB%A1%9C%ED%94%8C_jjoz6d.png" },
+                    { name: "블루베리&크림 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365365/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%ED%81%AC%EB%A6%BC_%ED%81%AC%EB%A1%9C%ED%94%8C_mjc7pi.png" },
+                    { name: "솔티드카라멜 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365368/%EC%86%94%ED%8B%B0%EB%93%9C%EC%B9%B4%EB%9D%BC%EB%A9%9C_%ED%81%AC%EB%A1%9C%ED%94%8C_pfoegr.png" },
+                    { name: "초코렛폭탄 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365367/%EC%B4%88%EC%BD%94%EB%A0%9B%ED%8F%AD%ED%83%84_%ED%81%AC%EB%A1%9C%ED%94%8C_maupyq.png" },
+                    { name: "흑당 크로플", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365366/%ED%9D%91%EB%8B%B9_%ED%81%AC%EB%A1%9C%ED%94%8C_tul0cj.png" },
+                    { name: "산딸기 마카롱", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365369/edited-photo_79_x1ikz0.png" },
+                    { name: "블루베리 마카롱", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365369/edited-photo_80_gbtyyq.png" },
+                    { name: "초코 마카롱", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782365370/edited-photo_81_ydg87f.png" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
@@ -1331,7 +1331,7 @@ export default function FranchisePageClient() {
               <div className="lg:col-span-4 relative group">
                 <div className="relative rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[4/3] bg-neutral-950 w-full h-full">
                   <img 
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590218/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_44_25_dmwlfs.png" 
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590218/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_44_25_dmwlfs.png" 
                     alt="Arabica specialty coffee beans" 
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 opacity-90"
                   />
@@ -1798,7 +1798,7 @@ export default function FranchisePageClient() {
           {/* Bottom Storefront Image */}
           <div className="mt-8 rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[21/9] sm:aspect-[32/10] bg-neutral-950 w-full relative group">
             <img 
-              src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590223/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_02_58_dhg5yy.png" 
+              src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590223/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_02_58_dhg5yy.png" 
               alt="120PIE COFFEE store storefront exterior" 
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700 opacity-90"
             />
@@ -1997,7 +1997,7 @@ export default function FranchisePageClient() {
           {/* Bottom Store Interior Mockup Image */}
           <div className="mt-8 rounded-2xl overflow-hidden border border-neutral-200/20 shadow-xl aspect-[21/9] sm:aspect-[32/10] bg-neutral-950 w-full relative group">
             <img 
-              src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590220/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_12_23_dqjfic.png" 
+              src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590220/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_12_23_dqjfic.png" 
               alt="120PIE COFFEE store interior setup mockup" 
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700 opacity-90"
             />
@@ -2103,9 +2103,9 @@ export default function FranchisePageClient() {
               {/* Right Column: 3 Photos Stack */}
               <div className="lg:col-span-5 flex flex-col justify-between gap-4">
                 {[
-                  { src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590221/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_44_02_dvfuq7.png", alt: "창업 상담 및 매장 상황 분석" },
-                  { src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590220/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_25_41_psjtvg.png", alt: "본사 전문가의 메뉴 조리 교육" },
-                  { src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590223/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_25_48_ab8bal.png", alt: "매장 매출 관리 및 사후 지원" }
+                  { src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590221/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_44_02_dvfuq7.png", alt: "창업 상담 및 매장 상황 분석" },
+                  { src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590220/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_25_41_psjtvg.png", alt: "본사 전문가의 메뉴 조리 교육" },
+                  { src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590223/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_25_48_ab8bal.png", alt: "매장 매출 관리 및 사후 지원" }
                 ].map((photo, idx) => (
                   <div 
                     key={idx} 
@@ -2192,7 +2192,7 @@ export default function FranchisePageClient() {
             <div className="lg:col-span-5 relative group">
               <div className="relative rounded-3xl overflow-hidden border border-neutral-200/20 shadow-2xl aspect-[4/5] bg-neutral-950 w-full h-full min-h-[350px]">
                 <img 
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781590221/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_24_39_a38n7c.png" 
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781590221/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_05_24_39_a38n7c.png" 
                   alt="120PIE COFFEE premium success storefront and menu" 
                   className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 opacity-90"
                 />

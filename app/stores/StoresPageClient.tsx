@@ -5,9 +5,11 @@ import { ArrowLeft, ArrowUpRight, MapPin, Store, ExternalLink, Menu, X, ArrowRig
 import { useState, useEffect, useRef } from "react";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
-const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
-const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png";
+const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
+const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png";
 
 interface StoreInfo {
   id: string;
@@ -103,7 +105,10 @@ export default function StoresPageClient() {
   const [theme, setTheme] = useState<"pink" | "yellow">("yellow");
   const [inquiryForcedOpen, setInquiryForcedOpen] = useState(false);
 
-  // Load theme and stores dynamically from browser environment
+  // Fetch stores in real-time from Convex backend
+  const convexStores = useQuery(api.stores.get);
+
+  // Load theme and stores dynamically from browser environment (local cache fallback)
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -120,7 +125,6 @@ export default function StoresPageClient() {
           const parsed = JSON.parse(stored) as StoreInfo[];
           setStores(parsed);
         } else {
-          localStorage.setItem("120_stores", JSON.stringify(DEFAULT_STORES));
           setStores(DEFAULT_STORES);
         }
       } catch (err) {
@@ -129,6 +133,14 @@ export default function StoresPageClient() {
       }
     }
   }, []);
+
+  // Update state and local storage when stores are loaded/updated from Convex
+  useEffect(() => {
+    if (convexStores) {
+      setStores(convexStores as StoreInfo[]);
+      localStorage.setItem("120_stores", JSON.stringify(convexStores));
+    }
+  }, [convexStores]);
 
   // Update theme state and URL parameters smoothly on toggle click
   const handleThemeChange = (newTheme: "pink" | "yellow") => {

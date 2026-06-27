@@ -7,6 +7,7 @@ import { useQuery, useMutation } from "convex/react";
 import Footer from "@/app/components/Footer";
 import { MENU_DATA, MenuItem } from "@/app/constants/menu";
 import { api } from "../../convex/_generated/api";
+import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 import {
   ArrowRight,
   TrendingUp,
@@ -358,24 +359,24 @@ function AdoptionModal({ exampleId, onClose }: { exampleId: string | null, onClo
 }
 
 const MARQUEE_IMAGES = [
-  { name: "로제미트파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184221/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s3svi2.jpg" },
-  { name: "블루베리파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184610/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_zfmatx.jpg" },
-  { name: "콘치즈파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184643/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_lio2tj.jpg" },
-  { name: "흑임자크림파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%ED%9D%91%EC%9E%84%EC%9E%90%ED%81%AC%EB%A6%BC_g0p6sk.jpg" },
-  { name: "커스터드파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184658/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_dule6z.jpg" },
-  { name: "불고기파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184700/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ss1t8y.jpg" },
-  { name: "두바이쫀득파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EB%91%90%EB%B0%94%EC%9D%B4%EC%AA%BD%EB%93%9D%ED%8C%8C%EC%9D%B4_vjl5zb.jpg" },
-  { name: "애플시나몬파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184723/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_kxykcu.jpg" },
-  { name: "오리지널 계란빵", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184985/edited-photo_4_y98ytv.jpg" },
-  { name: "오리지널 츄러스", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185404/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_izqnfl.jpg" }
+  { name: "로제미트파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184221/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s3svi2.jpg" },
+  { name: "블루베리파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184610/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_zfmatx.jpg" },
+  { name: "콘치즈파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184643/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_lio2tj.jpg" },
+  { name: "흑임자크림파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760050/%ED%9D%91%EC%9E%84%EC%9E%90%ED%81%AC%EB%A6%BC_g0p6sk.jpg" },
+  { name: "커스터드파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184658/%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_dule6z.jpg" },
+  { name: "불고기파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184700/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ss1t8y.jpg" },
+  { name: "두바이쫀득파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760051/%EB%91%90%EB%B0%94%EC%9D%B4%EC%AA%BD%EB%93%9D%ED%8C%8C%EC%9D%B4_vjl5zb.jpg" },
+  { name: "애플시나몬파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184723/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_kxykcu.jpg" },
+  { name: "오리지널 계란빵", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184985/edited-photo_4_y98ytv.jpg" },
+  { name: "오리지널 츄러스", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185404/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_izqnfl.jpg" }
 ];
 
 // V3 StoresPreviewSection
 function StoresPreviewSection({ isPink = false, isYellow = false }: { isPink?: boolean, isYellow?: boolean }) {
   const previewStores = [
-    { name: "120겹파이 AK플라자 금정점", region: "경기 군포시 엘에스로 143 1층 1001호", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186013/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs_bmrkku.jpg" },
-    { name: "120겹파이 본점", region: "서울 성북구 돌곶이로14길 35 1층", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185938/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon_z90vyq.jpg" },
-    { name: "120겹파이 삼산점", region: "인천 부평구 장제로228번길 24", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186018/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy_m3wmdr.jpg" },
+    { name: "120겹파이 AK플라자 금정점", region: "경기 군포시 엘에스로 143 1층 1001호", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186013/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_AK%ED%94%8C%EB%9D%BC%EC%9E%90_%EA%B8%88%EC%A0%95%EC%A0%90_%EA%B2%BD%EA%B8%B0_%EA%B5%B0%ED%8F%AC%EC%8B%9C_%EC%97%98%EC%97%90%EC%8A%A4%EB%A1%9C_143_1%EC%B8%B5_1001%ED%98%B8_qcmpgs_bmrkku.jpg" },
+    { name: "120겹파이 본점", region: "서울 성북구 돌곶이로14길 35 1층", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185938/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon_z90vyq.jpg" },
+    { name: "120겹파이 삼산점", region: "인천 부평구 장제로228번길 24", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186018/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%82%BC%EC%82%B0%EC%A0%90_%EC%9D%B8%EC%B2%9C_%EB%B6%80%ED%8F%89%EA%B5%AC_%EC%9E%A5%EC%A0%9C%EB%A1%9C228%EB%B2%88%EA%B8%B8_24_o9q4qy_m3wmdr.jpg" },
   ];
 
   return (
@@ -514,7 +515,7 @@ function OwnerSystemSection({ isPink = false, isYellow = false }: { isPink?: boo
               isPink ? "bg-white border border-[#f2ccd7]" : isYellow ? "bg-white border border-[#e6dfc3]" : "bg-neutral-900"
             }`}>
               <video
-                src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183441/120pie_%EC%8B%9C%EC%8A%A4%ED%85%9C_bpwa5d.mp4"
+                src="https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183441/120pie_%EC%8B%9C%EC%8A%A4%ED%85%9C_bpwa5d.mp4"
                 autoPlay
                 muted
                 loop
@@ -688,7 +689,7 @@ function GallerySection({ filter, setFilter, isPink = false, isYellow = false }:
                 <div className={`aspect-[4/3] rounded-xl overflow-hidden mb-4 relative shadow-sm hover:shadow transition-all group-hover:shadow-md ${
                   isPink ? "bg-rose-50/10 border border-[#f2ccd7]/30" : isYellow ? "bg-amber-50/10 border border-[#e6dfc3]/30" : "bg-neutral-100"
                 }`}>
-                  <img src={img.url} alt={img.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
+                  <img src={optimizeCloudinaryUrl(img.url)} alt={img.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
                 </div>
                 <span className={`${
                   isPink ? "text-rose-500" : isYellow ? "text-amber-600" : "text-amber-600"
@@ -893,7 +894,7 @@ function GallerySection({ filter, setFilter, isPink = false, isYellow = false }:
               }`}
             >
               <img
-                src={selectedImage.url}
+                src={optimizeCloudinaryUrl(selectedImage.url)}
                 alt={selectedImage.name}
                 className="max-w-full max-h-[68dvh] sm:max-h-[70vh] object-contain block w-auto h-auto mx-auto"
               />
@@ -954,10 +955,10 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         : "bg-neutral-950/95 border-b border-neutral-900/60 backdrop-blur-md";
 
   const logoImgSrc = isPinkVariant
-    ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png"
+    ? "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png"
     : isYellowVariant
       ? "/logo_yellow_blue.png"
-      : "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
+      : "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
 
   const logoTargetUrl = isPinkVariant ? "/pink" : isYellowVariant ? "/" : "/v3";
 
@@ -1560,11 +1561,11 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   <video
                     ref={mobileHeroVideoRef}
                     src={isPinkVariant
-                      ? "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"
-                      : "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"}
+                      ? "https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"
+                      : "https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"}
                     poster={isPinkVariant
-                      ? "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"
-                      : "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"}
+                      ? "https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"
+                      : "https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"}
                     autoPlay
                     muted
                     loop
@@ -1624,8 +1625,8 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               >
                 <video
                   src={isPinkVariant
-                    ? "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"
-                    : "https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"}
+                    ? "https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"
+                    : "https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183199/120pie_%EC%98%81%EC%83%81_7_ijgrwj.mp4"}
                   autoPlay
                   muted
                   loop
@@ -1720,7 +1721,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <video
-                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183394/120pie_%EC%98%81%EC%83%81_3_xqmdny.mp4"
+                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183394/120pie_%EC%98%81%EC%83%81_3_xqmdny.mp4"
                   autoPlay
                   muted
                   loop
@@ -1752,7 +1753,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <img
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183595/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A0%ED%94%8C_%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%97%B0%EC%B6%9C_bzyzzs.jpg"
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183595/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A0%ED%94%8C_%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC_%EC%97%B0%EC%B6%9C_bzyzzs.jpg"
                   alt="120겹 파이 크림치즈 애플 블루베리 연출"
                   className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
                 />
@@ -1842,7 +1843,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <img
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183720/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_yszrts.jpg"
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183720/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_yszrts.jpg"
                   alt="120겹 파이 초간편 3분 조리 연출"
                   className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-500 opacity-100"
                 />
@@ -1870,7 +1871,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <img
-                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186392/7c2cce19-579e-4810-9b4d-692bf40cae03_xmarwy.png"
+                  src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186392/7c2cce19-579e-4810-9b4d-692bf40cae03_xmarwy.png"
                   alt="에그120 계란빵 조리 및 폐기율 제로 연출"
                   className="absolute inset-0 w-full h-full object-cover hover:scale-[1.05] transition-all duration-550 opacity-100"
                 />
@@ -2144,21 +2145,21 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     title: "떡볶이 + 120파이",
                     desc: "든든한 간식과 식사 대용 메뉴를 찾는 오피스·학원가 매장에 어울리는 구성입니다.",
                     location: "오피스 · 대학가",
-                    image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185663/%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%9C%84%EC%97%90_%EC%9C%84_202605271143_npntmg_cbmmh0.jpg"
+                    image: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185663/%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%9C%84%EC%97%90_%EC%9C%84_202605271143_npntmg_cbmmh0.jpg"
                   },
                   {
                     label: "TREND",
                     title: "에그120 + 시그니처 음료",
                     desc: "사진 찍기 좋은 디저트 메뉴로 젊은 고객의 방문과 공유를 기대하는 매장에 적합합니다.",
                     location: "로드샵 · 번화가",
-                    image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185661/%EB%91%90_%EB%A9%94%EB%89%B4_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271147_1_rkb6ns_wr8gno.jpg"
+                    image: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185661/%EB%91%90_%EB%A9%94%EB%89%B4_%ED%85%8C%EC%9D%B4%EB%B8%94_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271147_1_rkb6ns_wr8gno.jpg"
                   },
                   {
                     label: "DELIVERY",
                     title: "츄러스 + 핫도그 + 파이",
                     desc: "함께 나눠 먹기 좋은 구성을 통해 포장과 배달 주문을 넓히기 좋은 조합입니다.",
                     location: "주거 · 배달 상권",
-                    image: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185662/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm_nxk2mq.jpg"
+                    image: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185662/%EB%A9%94%EB%89%B4_%ED%94%8C%EB%A0%88%EC%9D%B4%ED%8C%85_%EC%98%88%EC%81%9C_%EC%B9%B4%ED%8E%98_202605271150_qfswzm_nxk2mq.jpg"
                   }
                 ].map((set) => (
                   <article key={set.label} className={`group text-left border-t pt-6 transition-colors flex flex-col ${
@@ -2289,7 +2290,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.6 }}
               >
                 <video
-                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781185778/120pie_%EC%98%81%EC%83%81_2_2_j4zc5s.mp4"
+                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781185778/120pie_%EC%98%81%EC%83%81_2_2_j4zc5s.mp4"
                   autoPlay
                   muted
                   loop
@@ -2472,7 +2473,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                     aria-label="영상 크게보기"
                   >
                     <video
-                      src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4"
+                      src="https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4"
                       autoPlay
                       muted
                       loop
@@ -2523,7 +2524,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
             >
               <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl bg-black shadow-2xl" onClick={(e) => e.stopPropagation()}>
                 <video
-                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4"
+                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4"
                   autoPlay
                   muted={false}
                   loop
@@ -2600,7 +2601,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
                 <div className="aspect-[4/3] rounded-xl overflow-hidden relative border border-neutral-200 bg-neutral-100">
                   <img
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185881/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_26%EC%9D%BC_%EC%98%A4%ED%9B%84_12_13_48_asivm6_cvxjzp.png"
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185881/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_26%EC%9D%BC_%EC%98%A4%ED%9B%84_12_13_48_asivm6_cvxjzp.png"
                     alt="커피 한 잔만으로 아쉬운 매출을 표현한 이미지"
                     className="w-full h-full object-cover"
                   />
@@ -2666,7 +2667,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
                 <div className="aspect-[4/3] rounded-xl overflow-hidden relative border border-neutral-800">
                   <img
-                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185897/230515_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%95%A0%ED%94%8C%EC%B9%98%EC%A6%88_2_sddz7b_ctaarg.jpg"
+                    src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185897/230515_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%95%A0%ED%94%8C%EC%B9%98%EC%A6%88_2_sddz7b_ctaarg.jpg"
                     alt="커피와 파이를 함께 찾는 카페 이미지"
                     className="w-full h-full object-cover"
                   />
@@ -2707,10 +2708,10 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7 mb-20">
               {[
-                { num: "01", title: "메뉴부터 가볍게 시작", desc: "작은 판매 공간에 파이 메뉴를 더해 손님의 반응을 먼저 살펴봅니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185929/KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp_xoc0oc.jpg" },
-                { num: "02", title: "매장 안에서 알리기", desc: "메뉴보드와 안내물을 활용해 파이를 판매하는 카페임을 자연스럽게 알립니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185933/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd_ddvcvz.jpg" },
-                { num: "03", title: "필요하면 외부 표기 추가", desc: "원하는 매장에 한해 기존 간판 옆에 브랜드 표기를 더할 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185936/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm_zbuqaq.jpg" },
-                { num: "04", title: "검증 후 확장 선택", desc: "매출과 고객 반응을 확인한 뒤, 매장 전환 여부를 차분히 결정합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781185938/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon_z90vyq.jpg" }
+                { num: "01", title: "메뉴부터 가볍게 시작", desc: "작은 판매 공간에 파이 메뉴를 더해 손님의 반응을 먼저 살펴봅니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185929/KakaoTalk_Photo_2023-03-17-18-30-28_003_2_r2ywjp_xoc0oc.jpg" },
+                { num: "02", title: "매장 안에서 알리기", desc: "메뉴보드와 안내물을 활용해 파이를 판매하는 카페임을 자연스럽게 알립니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185933/KakaoTalk_Photo_2023-03-17-18-30-49_003_2_g9jkkd_ddvcvz.jpg" },
+                { num: "03", title: "필요하면 외부 표기 추가", desc: "원하는 매장에 한해 기존 간판 옆에 브랜드 표기를 더할 수 있습니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185936/KakaoTalk_Photo_2023-03-17-18-30-29_013_2_fcl1vm_zbuqaq.jpg" },
+                { num: "04", title: "검증 후 확장 선택", desc: "매출과 고객 반응을 확인한 뒤, 매장 전환 여부를 차분히 결정합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185938/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%B3%B8%EC%A0%90_%EC%84%9C%EC%9A%B8_%EC%84%B1%EB%B6%81%EA%B5%AC_%EB%8F%8C%EA%B3%B6%EC%9D%B4%EB%A1%9C14%EA%B8%B8_35_1%EC%B8%B5_k9mjon_z90vyq.jpg" }
               ].map((step) => (
                 <article key={step.num} className={`group border-t pt-5 flex flex-col h-full transition-colors ${
                   isPinkVariant ? "border-[#f2ccd7]/60" : isYellowVariant ? "border-[#e6dfc3]/60" : "border-neutral-700"
@@ -3073,7 +3074,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 transition={{ duration: 0.6 }}
               >
                 <video
-                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/v1781186151/Video_Project_15-2_sypvht.mp4"
+                  src="https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781186151/Video_Project_15-2_sypvht.mp4"
                   autoPlay
                   muted
                   loop
@@ -3157,7 +3158,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                         }`}>
                           <div className="w-9 h-9 shrink-0 flex items-center justify-center">
                             <img
-                              src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png"}
+                              src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png"}
                               alt="120pie 로고"
                               className="w-full h-full object-contain"
                             />
@@ -3222,7 +3223,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                         }`}>
                           <div className="w-9 h-9 shrink-0 flex items-center justify-center">
                             <img
-                              src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png"}
+                              src={isPinkVariant ? "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png" : "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png"}
                               alt="120pie 로고"
                               className="w-full h-full object-contain"
                             />
@@ -3573,7 +3574,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 popupSettings.image ? "" : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a]"
               }`}
               style={popupSettings.image ? {
-                backgroundImage: `url(${popupSettings.image})`,
+                backgroundImage: `url(${optimizeCloudinaryUrl(popupSettings.image)})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center"
               } : undefined}

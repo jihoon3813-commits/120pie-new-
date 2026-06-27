@@ -13,7 +13,7 @@ export const metadata = {
   description:
     "기존 카페에 바로 도입 가능한 120겹 파이와 에그120 샵인샵 디저트 솔루션. 소자본 샵인샵 도입으로 객단가 상승 및 디저트 매출 극대화!",
   icons: {
-    icon: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
+    icon: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
   },
   keywords: [
     "120pie",
@@ -34,7 +34,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183720/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_yszrts.jpg",
+        url: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183720/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_yszrts.jpg",
         width: 1200,
         height: 630,
         alt: "120pie & coffee 디저트 솔루션 대표 이미지"
@@ -45,7 +45,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "120pie&coffee | 카페 사장님을 위한 디저트 매출 솔루션",
     description: "기존 카페에 바로 도입 가능한 120겹 파이와 에그120 샵인샵 디저트 솔루션.",
-    images: ["https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183720/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_yszrts.jpg"]
+    images: ["https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183720/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_yszrts.jpg"]
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "google-site-verification-placeholder"
@@ -71,7 +71,7 @@ export default function RootLayout({
     "name": "120pie & coffee",
     "alternateName": "(주)고우웰라이프",
     "url": "https://120piecoffee.com",
-    "logo": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
+    "logo": "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": "1566-3594",
@@ -92,7 +92,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "120pie & coffee",
-    "image": "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
+    "image": "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
     "telephone": "1566-3594",
     "email": "120piecoffee@gmail.com",
     "address": {

@@ -42,6 +42,7 @@ import {
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import Footer from "@/app/components/Footer";
+import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 
 // ==========================================
 // TYPES DEFINITIONS
@@ -118,7 +119,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: "냉동생지/자재",
     price: 42000,
     packSize: "1박스 (60개입)",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg",
     stock: "in_stock",
     desc: "육즙 가득 미트소스와 로제 크림이 가미된 시그니처 대표 생지"
   },
@@ -128,7 +129,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: "냉동생지/자재",
     price: 42000,
     packSize: "1박스 (60개입)",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_yurkh5.jpg",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760051/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_yurkh5.jpg",
     stock: "in_stock",
     desc: "달콤 상큼한 사과 과육 and 시나몬 아로마가 어우러진 스테디셀러 디저트 생지"
   },
@@ -138,7 +139,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: "냉동생지/자재",
     price: 42000,
     packSize: "1박스 (60개입)",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_qvb2u5.jpg",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760050/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_qvb2u5.jpg",
     stock: "low_stock",
     desc: "고소한 스위트콘 and 부드러운 치즈가 조합된 남녀노소 취향저격 생지"
   },
@@ -148,7 +149,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: "냉동생지/자재",
     price: 21000,
     packSize: "1팩 (5kg)",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg",
     stock: "in_stock",
     desc: "에그120 전용 100% 국산 쌀가루 계란빵 전용 반죽 파우더 믹스"
   },
@@ -158,7 +159,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: "냉동생지/자재",
     price: 36000,
     packSize: "1박스 (100개입)",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762878/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_koyjlk.jpg",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779762878/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_koyjlk.jpg",
     stock: "in_stock",
     desc: "기름 없이 오븐 조리가 가능한 바삭하고 쫀득한 츄러스 전용 냉동 생지"
   },
@@ -168,7 +169,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: "부자재/포장재",
     price: 5000,
     packSize: "1개 (1개입)",
-    img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg",
+    img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg",
     stock: "in_stock",
     desc: "120pie 브랜드 컬러의 매장 유리창 부착용 홍보 포스터 세트",
     options: ["A4 사이즈 포스터", "A3 사이즈 포스터", "카운터용 미니 스티커 5매"]
@@ -245,7 +246,7 @@ const INITIAL_TRAINING: Material[] = [
     size: "12.4 MB",
     format: "PDF",
     desc: "120겹 파이 냉동 생지의 완벽한 보관법, 해동 및 미해동 조리 시 타이머 세팅 가이드, 계절별 조리 온도 보정 기준이 집약된 표준 교육 책자 파일입니다.",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779718433/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A4_%EC%BD%98%EC%B9%98%EC%A6%88_t7mopc.jpg"
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779718433/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%95%A4_%EC%BD%98%EC%B9%98%EC%A6%88_t7mopc.jpg"
   },
   {
     id: "TRN-02",
@@ -254,7 +255,7 @@ const INITIAL_TRAINING: Material[] = [
     size: "85.6 MB",
     format: "MP4",
     desc: "반죽 성형의 미세 오차를 방지하고 폭신한 볼륨감을 살리기 위해 100% 쌀믹스 파우더와 물, 토핑의 정량 황금 비율 배합법 및 기기 청소 요령을 담은 비디오 교육 강좌입니다.",
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg"
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg"
   }
 ];
 
@@ -266,7 +267,7 @@ const INITIAL_PR: Material[] = [
     size: "45.2 MB",
     format: "AI/PSD/JPG",
     desc: "여름 신메뉴 출시를 알리는 고화질 매장 부착용 포스터 2종 및 각 좌석 배치용 삼각 테이블텐트 시안 파일 세트입니다.",
-    img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
+    img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
   }
 ];
 
@@ -1818,7 +1819,7 @@ export default function PortalPage() {
                 <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
                   <div className="flex items-center gap-2">
                     <img
-                      src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png"
+                      src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png"
                       alt="로고"
                       className="w-7 h-7"
                     />
@@ -1959,7 +1960,7 @@ export default function PortalPage() {
                     banner?.mainImage ? "" : "bg-[#ffd3df]/60"
                   }`}
                   style={{
-                    backgroundImage: banner?.mainImage ? `url(${banner.mainImage})` : undefined,
+                    backgroundImage: banner?.mainImage ? `url(${optimizeCloudinaryUrl(banner.mainImage)})` : undefined,
                     backgroundSize: "cover",
                     backgroundPosition: "center"
                   }}
@@ -1987,7 +1988,7 @@ export default function PortalPage() {
                     banner?.sideImage ? "" : "bg-white"
                   }`}
                   style={{
-                    backgroundImage: banner?.sideImage ? `url(${banner.sideImage})` : undefined,
+                    backgroundImage: banner?.sideImage ? `url(${optimizeCloudinaryUrl(banner.sideImage)})` : undefined,
                     backgroundSize: "cover",
                     backgroundPosition: "center"
                   }}
@@ -2266,7 +2267,7 @@ export default function PortalPage() {
                         >
                           {/* Left: Thumbnail & Stock State */}
                           <div className="w-16 h-16 rounded-lg bg-[#fff1f5] overflow-hidden shrink-0 border border-[#f2ccd7]/60 relative">
-                            <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
+                            <img src={optimizeCloudinaryUrl(p.img)} alt={p.name} className="w-full h-full object-cover" />
                             {p.stock === "out_of_stock" && (
                               <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
                                 <span className="text-white font-black text-[9px] px-1 py-0.5 rounded bg-red-500 shadow-sm">품절</span>
@@ -2333,7 +2334,7 @@ export default function PortalPage() {
                         >
                           {/* Thumbnail image & stock state badge (Strictly 52% height) */}
                           <div className="h-[52%] w-full relative bg-[#fff1f5] overflow-hidden shrink-0 border-b border-[#f2ccd7]/40">
-                            <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
+                            <img src={optimizeCloudinaryUrl(p.img)} alt={p.name} className="w-full h-full object-cover" />
                             <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1 max-w-[80%]">
                               {p.stock === "low_stock" && (
                                 <span className="bg-orange-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">품절임박</span>
@@ -2464,7 +2465,7 @@ export default function PortalPage() {
                                 if (!p) return null;
                                 return (
                                   <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7]/60 p-2.5 rounded-xl">
-                                    <img src={p.img} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                                    <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
                                     <div className="flex-1 min-w-0">
                                       <h4 className="font-bold text-[11px] text-[#2d2026] truncate">{p.name}</h4>
                                       {item.selectedOption && (
@@ -2752,7 +2753,7 @@ export default function PortalPage() {
                     >
                       {t.img ? (
                         <div className="h-44 bg-[#fff1f5] overflow-hidden relative shrink-0">
-                          <img src={t.img} alt="" className="w-full h-full object-cover" />
+                          <img src={optimizeCloudinaryUrl(t.img)} alt="" className="w-full h-full object-cover" />
                           <span className="absolute bottom-3 right-3 bg-white/95 text-[10px] text-[#bf3e67] font-bold px-2.5 py-1 rounded border border-[#f2ccd7]">
                             {t.format}
                           </span>
@@ -2819,7 +2820,7 @@ export default function PortalPage() {
                     >
                       {p.img ? (
                         <div className="h-44 bg-[#fff1f5] overflow-hidden relative shrink-0">
-                          <img src={p.img} alt="" className="w-full h-full object-cover" />
+                          <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-full h-full object-cover" />
                           <span className="absolute bottom-3 right-3 bg-white/95 text-[10px] text-[#bf3e67] font-bold px-2.5 py-1 rounded border border-[#f2ccd7]">
                             {p.format}
                           </span>
@@ -3029,7 +3030,7 @@ export default function PortalPage() {
             <div className="p-6 overflow-y-auto space-y-5 flex-1">
               {selectedMaterial.img && (
                 <div className="w-full h-48 rounded-xl overflow-hidden bg-[#fff1f5]">
-                  <img src={selectedMaterial.img} alt="" className="w-full h-full object-cover" />
+                  <img src={optimizeCloudinaryUrl(selectedMaterial.img)} alt="" className="w-full h-full object-cover" />
                 </div>
               )}
               <h3 className="text-lg font-bold text-[#2d2026] leading-tight">{selectedMaterial.title}</h3>
@@ -3625,7 +3626,7 @@ export default function PortalPage() {
                 {/* 1. Thumbnail Image */}
                 <div className="md:col-span-5 border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm bg-[#fff1f5]/30 aspect-square flex items-center justify-center relative w-full">
                   <img 
-                    src={selectedProductDetail.img} 
+                    src={optimizeCloudinaryUrl(selectedProductDetail.img)} 
                     alt={selectedProductDetail.name} 
                     className="w-full h-full object-cover"
                   />
@@ -3754,7 +3755,7 @@ export default function PortalPage() {
                   {selectedProductDetail.detailImg && (
                     <div className="border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm bg-neutral-50 flex items-center justify-center p-2 min-h-[200px]">
                       <img 
-                        src={selectedProductDetail.detailImg} 
+                        src={optimizeCloudinaryUrl(selectedProductDetail.detailImg)} 
                         alt={`${selectedProductDetail.name} 상세페이지`} 
                         className="w-full h-auto object-contain rounded-lg"
                       />
@@ -3988,7 +3989,7 @@ export default function PortalPage() {
                 popupSettings.image ? "" : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a]"
               }`}
               style={popupSettings.image ? {
-                backgroundImage: `url(${popupSettings.image})`,
+                backgroundImage: `url(${optimizeCloudinaryUrl(popupSettings.image)})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center"
               } : undefined}
@@ -4267,7 +4268,7 @@ export default function PortalPage() {
                             if (!p) return null;
                             return (
                               <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7]/60 p-2.5 rounded-xl">
-                                <img src={p.img} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                                <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
                                 <div className="flex-1 min-w-0 text-left">
                                   <h4 className="font-bold text-[11px] text-[#2d2026] truncate">{p.name}</h4>
                                   {item.selectedOption && (

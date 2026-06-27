@@ -261,7 +261,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 45000,
     discountAmount: 3000,
     discountedPrice: 42000,
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg",
     detailImg: "",
     isActive: true,
     desc: "육즙 가득 미트소스와 로제 크림이 가미된 시그니처 대표 생지",
@@ -279,7 +279,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 42000,
     discountAmount: 0,
     discountedPrice: 42000,
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760051/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_yurkh5.jpg",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760051/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_yurkh5.jpg",
     detailImg: "",
     isActive: true,
     desc: "달콤 상큼한 사과 과육과 시나몬 아로마가 어우러진 스테디셀러 디저트 생지",
@@ -297,7 +297,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 43000,
     discountAmount: 1000,
     discountedPrice: 42000,
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779760050/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_qvb2u5.jpg",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760050/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_qvb2u5.jpg",
     detailImg: "",
     isActive: true,
     desc: "고소한 스위트콘 and 부드러운 치즈가 조합된 남녀노소 취향저격 생지",
@@ -315,7 +315,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 21000,
     discountAmount: 0,
     discountedPrice: 21000,
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779761729/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90%EA%B3%84%EB%9E%80%EB%B9%B52_kdqsqv.jpg",
     detailImg: "",
     isActive: true,
     desc: "에그120 전용 100% 국산 쌀가루 계란빵 전용 반죽 파우더 믹스",
@@ -333,7 +333,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 38000,
     discountAmount: 2000,
     discountedPrice: 36000,
-    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779762878/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_koyjlk.jpg",
+    img: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779762878/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_koyjlk.jpg",
     detailImg: "",
     isActive: true,
     desc: "기름 없이 오븐 조리가 가능한 바삭하고 쫀득한 츄러스 전용 냉동 생지",
@@ -351,7 +351,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 5000,
     discountAmount: 0,
     discountedPrice: 5000,
-    img: "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg",
+    img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg",
     detailImg: "",
     isActive: true,
     desc: "120pie 브랜드 컬러의 매장 유리창 부착용 홍보 포스터 세트",
@@ -3401,7 +3401,7 @@ export default function AdminPage() {
                 <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
                   <div className="flex items-center gap-2">
                     <img
-                      src="https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png"
+                      src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png"
                       alt="로고"
                       className="w-7 h-7"
                     />

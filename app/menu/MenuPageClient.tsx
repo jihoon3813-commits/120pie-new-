@@ -7,9 +7,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
 import { MENU_DATA, MenuItem, MenuCategory } from "@/app/constants/menu";
+import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 
-const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
-const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/v1779846449/logo_120pie_coffee3_jzgtyi.png";
+const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
+const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png";
 
 const getBadgeClasses = (badge: string, isPink: boolean) => {
   if (badge === "ORIGINAL") {
@@ -493,7 +494,7 @@ export default function MenuPageClient() {
                       >
                         <div className="aspect-[4/3] w-full overflow-hidden relative bg-white p-3 sm:p-5">
                           <img
-                            src={item.img}
+                            src={optimizeCloudinaryUrl(item.img)}
                             alt={item.name}
                             className="w-full h-full transition-all duration-500 group-hover:scale-105 object-contain"
                           />
