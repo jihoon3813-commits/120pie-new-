@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { triggerConsultationSms } from "@/app/utils/sms";
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -31,6 +32,7 @@ export default function ProposalDeck() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const addInquiryMutation = useMutation(api.inquiries.add);
+  const sendSmsAction = useAction(api.aligo.sendSms);
 
   const totalSlides = 12;
 
@@ -87,6 +89,7 @@ export default function ProposalDeck() {
         message: formData.message || "B2B 제안서 페이지를 통한 상담 신청",
         regDate: new Date().toISOString().split("T")[0],
       });
+      triggerConsultationSms(sendSmsAction, formData.name, formData.phone, formData.storeType);
       setSubmitSuccess(true);
     } catch (error) {
       console.error("Failed to submit inquiry:", error);

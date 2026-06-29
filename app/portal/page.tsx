@@ -36,7 +36,11 @@ import {
   Phone,
   MessageCircle,
   ClipboardList,
-  ExternalLink
+  ExternalLink,
+  MapPin,
+  Copy,
+  CreditCard,
+  Landmark
 } from "lucide-react";
 
 import { useQuery, useMutation, useAction } from "convex/react";
@@ -312,6 +316,33 @@ export default function PortalPage() {
   const [localSelectedOptions, setLocalSelectedOptions] = useState<{ optionName: string; quantity: number }[]>([]);
   const [localSingleQty, setLocalSingleQty] = useState<number>(1);
 
+  // 배송지 정보 상태 (가맹점 기본정보 프리필)
+  const [deliveryAddress, setDeliveryAddress] = useState<string>("");
+  const [deliveryDetailAddress, setDeliveryDetailAddress] = useState<string>("");
+  const [recipientName, setRecipientName] = useState<string>("");
+  const [recipientPhone, setRecipientPhone] = useState<string>("");
+  const [deliveryInfoLoaded, setDeliveryInfoLoaded] = useState<boolean>(false);
+  const [orderPayMethod, setOrderPayMethod] = useState<"card" | "bank">("card");
+
+  // 가맹점 등록 신청 관련 상태
+  const [showRegisterModal, setShowRegisterModal] = useState<boolean>(false);
+  const [regId, setRegId] = useState<string>("");
+  const [regPw, setRegPw] = useState<string>("");
+  const [regPwConfirm, setRegPwConfirm] = useState<string>("");
+  const [regName, setRegName] = useState<string>("");
+  const [regOwner, setRegOwner] = useState<string>("");
+  const [regPhone, setRegPhone] = useState<string>("");
+  const [regRoadAddress, setRegRoadAddress] = useState<string>("");
+  const [regDetailAddress, setRegDetailAddress] = useState<string>("");
+  const [regDate, setRegDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const [regAdoptionMenu, setRegAdoptionMenu] = useState<string[]>([]);
+
+  // 주소 검색 팝업 관련 상태
+  const [showAddressPopup, setShowAddressPopup] = useState<boolean>(false);
+  const [addressTab, setAddressTab] = useState<"kakao" | "simulated">("kakao");
+  const [addressSearchKeyword, setAddressSearchKeyword] = useState<string>("");
+  const [addressSearchResults, setAddressSearchResults] = useState<string[]>([]);
+
   // ==========================================
   // CONVEX REAL-TIME SYNC HOOKS
   // ==========================================
@@ -326,6 +357,8 @@ export default function PortalPage() {
   const convexNotices = useQuery(api.notices.list);
   const convexProductCategories = useQuery(api.categories.get);
 
+  const createStoreMutation = useMutation(api.stores.createOrUpdate);
+
   const saveOrderMutation = useMutation(api.orders.createOrUpdate);
   const syncProductsMutation = useMutation(api.products.syncProducts);
   const syncOrdersMutation = useMutation(api.orders.syncOrders);
@@ -333,6 +366,7 @@ export default function PortalPage() {
   const incrementNoticeViewsMutation = useMutation(api.notices.incrementViews);
   const updateOrderStatusMutation = useMutation(api.orders.updateStatus);
   const verifyAndSaveOrderAction = useAction(api.payments.verifyAndSaveOrder);
+  const sendSmsAction = useAction(api.aligo.sendSms);
 
 
 
@@ -353,6 +387,19 @@ export default function PortalPage() {
       localStorage.setItem("120_stores", JSON.stringify(convexStores));
     }
   }, [convexStores]);
+
+  // 배송지 기본정보 프리필 (가맹점 정보 기반)
+  useEffect(() => {
+    if (deliveryInfoLoaded) return;
+    const storeData = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+    if (storeData) {
+      setDeliveryAddress(storeData.roadAddress || "");
+      setDeliveryDetailAddress(storeData.detailAddress || "");
+      setRecipientName(storeData.owner || "");
+      setRecipientPhone(storeData.phone || "");
+      setDeliveryInfoLoaded(true);
+    }
+  }, [stores, activeStoreId, deliveryInfoLoaded]);
 
   // Sync Convex notices to React state and localStorage (Fallback to local mock if empty)
   useEffect(() => {
@@ -809,6 +856,10 @@ export default function PortalPage() {
               amount: pendingAmount,
               storeId: pendingStoreId,
               items: pendingItems,
+              deliveryAddress: localStorage.getItem("120_pending_delivery_address") || undefined,
+              deliveryDetailAddress: localStorage.getItem("120_pending_delivery_detail") || undefined,
+              recipientName: localStorage.getItem("120_pending_recipient_name") || undefined,
+              recipientPhone: localStorage.getItem("120_pending_recipient_phone") || undefined,
             })
               .then((result: any) => {
                 if (result.success) {
@@ -854,6 +905,10 @@ export default function PortalPage() {
                 localStorage.removeItem("120_pending_order_items");
                 localStorage.removeItem("120_pending_order_amount");
                 localStorage.removeItem("120_pending_order_store_id");
+                localStorage.removeItem("120_pending_delivery_address");
+                localStorage.removeItem("120_pending_delivery_detail");
+                localStorage.removeItem("120_pending_recipient_name");
+                localStorage.removeItem("120_pending_recipient_phone");
                 
                 // Clean URL query parameters
                 const newUrl = window.location.pathname;
@@ -1059,6 +1114,279 @@ export default function PortalPage() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
+  // 클립보드 복사 헬퍼 함수
+  const handleCopyToClipboard = (text: string, label: string) => {
+    if (typeof window !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        triggerToast(`${label} 복사되었습니다!`);
+      }).catch(err => {
+        console.error("복사 실패:", err);
+      });
+    }
+  };
+
+  // Unified Aligo SMS sending function supporting customer/admin separation
+  const triggerSmsSend = async (category: string, variables: Record<string, string>) => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("120_sms_settings");
+    if (!stored) return;
+    
+    try {
+      const smsSettings = JSON.parse(stored);
+      const eventConfig = smsSettings[category];
+      if (!eventConfig) {
+        console.log(`[SMS Send Skip] Category '${category}' not found.`);
+        return;
+      }
+
+      // Check if Aligo settings exist
+      const hasAligoCreds = smsSettings.aligoKey && smsSettings.aligoUserId;
+
+      // 1. 고객용 발송 (Customer-facing)
+      if (eventConfig.customer && eventConfig.customer.isActive) {
+        let customerPhone = variables.phone || "";
+        if (!customerPhone) {
+          const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+          customerPhone = activeStore?.phone || "010-3813-1200";
+        }
+        
+        let msg = eventConfig.customer.template;
+        Object.entries(variables).forEach(([key, val]) => {
+          msg = msg.replace(new RegExp(`{${key}}`, "g"), val);
+        });
+
+        const formattedSender = eventConfig.customer.sender.replace(/[^0-9]/g, "");
+        const formattedReceiver = customerPhone.replace(/[^0-9]/g, "");
+
+        console.log(`[SMS Customer Trigger] Category: ${category} | From: ${eventConfig.customer.sender} | To: ${customerPhone}`);
+        console.log(`[SMS Customer Content]:\n${msg}`);
+
+        if (hasAligoCreds) {
+          const response = await sendSmsAction({
+            key: smsSettings.aligoKey,
+            userId: smsSettings.aligoUserId,
+            sender: formattedSender,
+            receiver: formattedReceiver,
+            msg: msg,
+            isTest: smsSettings.aligoTestMode !== false
+          });
+          console.log("[Aligo Customer Response]:", response);
+          if (response.success) {
+            triggerToast("고객용 SMS 발송 완료");
+          } else {
+            console.error("[Aligo Customer API Failure]:", response.error || response.message);
+          }
+        } else {
+          // Simulation fallback
+          alert(`[고객용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${eventConfig.customer.sender}\n받는사람(고객): ${customerPhone}\n\n내용:\n${msg}`);
+        }
+      }
+
+      // 2. 관리자용 발송 (Admin-facing)
+      if (eventConfig.admin && eventConfig.admin.isActive) {
+        const adminReceivers = eventConfig.admin.receivers || [];
+        if (adminReceivers.length > 0) {
+          let msg = eventConfig.admin.template;
+          Object.entries(variables).forEach(([key, val]) => {
+            msg = msg.replace(new RegExp(`{${key}}`, "g"), val);
+          });
+
+          const formattedSender = eventConfig.admin.sender.replace(/[^0-9]/g, "");
+          const formattedReceiver = adminReceivers.map((num: string) => num.replace(/[^0-9]/g, "")).join(",");
+
+          console.log(`[SMS Admin Trigger] Category: ${category} | From: ${eventConfig.admin.sender} | To: ${adminReceivers.join(", ")}`);
+          console.log(`[SMS Admin Content]:\n${msg}`);
+
+          if (hasAligoCreds) {
+            const response = await sendSmsAction({
+              key: smsSettings.aligoKey,
+              userId: smsSettings.aligoUserId,
+              sender: formattedSender,
+              receiver: formattedReceiver,
+              msg: msg,
+              isTest: smsSettings.aligoTestMode !== false
+            });
+            console.log("[Aligo Admin Response]:", response);
+            if (response.success) {
+              triggerToast("관리자용 SMS 발송 완료");
+            } else {
+              console.error("[Aligo Admin API Failure]:", response.error || response.message);
+            }
+          } else {
+            // Simulation fallback
+            alert(`[관리자용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${eventConfig.admin.sender}\n받는사람(관리자): ${adminReceivers.join(", ")}\n\n내용:\n${msg}`);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("SMS 전송 로직 에러:", e);
+    }
+  };
+
+  // Format phone number to automatically include hyphens: 010-XXXX-XXXX
+  const handleRegPhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/[^0-9]/g, ""); // Remove non-digits
+    if (value.length > 3 && value.length <= 7) {
+      value = `${value.slice(0, 3)}-${value.slice(3)}`;
+    } else if (value.length > 7) {
+      value = `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7, 11)}`;
+    }
+    setRegPhone(value);
+  };
+
+  // Real Road Address Search using Daum/Kakao Postcode API (Iframe Embedded Layer Style)
+  const openDaumPostcodeForReg = () => {
+    setShowAddressPopup(true);
+    setAddressTab("kakao");
+    setAddressSearchKeyword("");
+    
+    if (typeof window !== "undefined") {
+      const scriptId = "daum-postcode-script";
+      let script = document.getElementById(scriptId) as HTMLScriptElement | null;
+      
+      const embedPostcode = () => {
+        let attempts = 0;
+        
+        // Double-safety polling: wait for window.daum.Postcode to be fully loaded and container to be rendered
+        const tryEmbed = () => {
+          const container = document.getElementById("daum-postcode-container");
+          const daumNamespace = (window as any).daum;
+          
+          if (daumNamespace && daumNamespace.Postcode && container) {
+            new daumNamespace.Postcode({
+              oncomplete: (data: any) => {
+                let fullRoadAddr = data.roadAddress; // 도로명 주소 변수
+                let extraRoadAddr = ''; // 참고항목 변수
+
+                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                  extraRoadAddr += data.bname;
+                }
+                if (data.buildingName !== '') {
+                  extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                if (extraRoadAddr !== '') {
+                  extraRoadAddr = ' (' + extraRoadAddr + ')';
+                }
+
+                const finalAddress = fullRoadAddr + extraRoadAddr;
+                setRegRoadAddress(finalAddress);
+                
+                setShowAddressPopup(false);
+                triggerToast("도로명 주소가 자동 입력되었습니다.");
+              },
+              width: "100%",
+              height: "100%"
+            }).embed(container);
+          } else {
+            if (attempts < 30) {
+              attempts++;
+              setTimeout(tryEmbed, 100);
+            } else {
+              console.error("[Kakao API] Failed to load Kakao Postcode library safely.");
+              triggerToast("주소 검색 라이브러리를 로드하는 데 실패했습니다.");
+            }
+          }
+        };
+
+        setTimeout(tryEmbed, 100);
+      };
+
+      if (!script) {
+        script = document.createElement("script");
+        script.id = scriptId;
+        script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+        script.async = true;
+        script.onload = () => {
+          embedPostcode();
+        };
+        document.head.appendChild(script);
+      } else {
+        embedPostcode();
+      }
+    }
+  };
+
+  // Simulated Road Address Search
+  const handleRegAddressSearch = (keyword: string) => {
+    setAddressSearchKeyword(keyword);
+    if (!keyword.trim()) {
+      setAddressSearchResults([]);
+      return;
+    }
+    const mockDb = [
+      "서울 강남구 테헤란로 123 (역삼동, 강남빌딩)",
+      "서울 강남구 테헤란로 152 (역삼동, 강남파이낸스센터)",
+      "서울 강남구 역삼로 101 (역삼동)",
+      "경기 군포시 엘에스로 143 (금정동, 1층 1001호)",
+      "서울 마포구 양화로 160 (동교동, 홍대입구역)",
+      "부산 부산진구 중앙대로 730 (부전동, 서면역)"
+    ];
+    const filtered = mockDb.filter(addr => addr.toLowerCase().includes(keyword.toLowerCase()));
+    setAddressSearchResults(filtered);
+  };
+
+  const handleRegisterStoreSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!regId || !regPw || !regPwConfirm || !regName || !regOwner || !regPhone || !regRoadAddress) {
+      showCustomAlert("입력 확인", "필수 항목(*)을 모두 입력해 주세요.");
+      return;
+    }
+    if (regPw !== regPwConfirm) {
+      showCustomAlert("비밀번호 불일치", "비밀번호와 비밀번호 확인이 서로 일치하지 않습니다.");
+      return;
+    }
+
+    createStoreMutation({
+      id: regId,
+      pw: regPw,
+      pwConfirm: regPwConfirm,
+      name: regName,
+      owner: regOwner,
+      phone: regPhone,
+      status: "대기",
+      roadAddress: regRoadAddress,
+      detailAddress: regDetailAddress,
+      regDate: regDate,
+      cancelDate: "",
+      adoptionMenu: regAdoptionMenu,
+      monthlySales: 0,
+    })
+      .then((res: any) => {
+        if (res.success) {
+          showCustomAlert(
+            "등록 신청 완료",
+            "가맹점 신규 등록 신청이 성공적으로 접수되었습니다. 본사 관리자의 승인 처리 완료 후 로그인이 가능합니다."
+          );
+
+          // SMS 발송 연동 (가맹점 등록 신청)
+          triggerSmsSend("store_reg", {
+            storeId: regId,
+            storeName: regName,
+            owner: regOwner,
+            phone: regPhone
+          });
+
+          setRegId("");
+          setRegPw("");
+          setRegPwConfirm("");
+          setRegName("");
+          setRegOwner("");
+          setRegPhone("");
+          setRegRoadAddress("");
+          setRegDetailAddress("");
+          setRegAdoptionMenu([]);
+          setRegDate(new Date().toISOString().split("T")[0]);
+          setShowRegisterModal(false);
+        } else {
+          showCustomAlert("등록 실패", res.error || "가맹점 등록 중 오류가 발생했습니다.");
+        }
+      })
+      .catch((err) => {
+        console.error("가맹점 등록 오류:", err);
+        showCustomAlert("서버 오류", "서버 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+      });
+  };
+
   // ==========================================
   // CART ACTIONS
   // ==========================================
@@ -1250,6 +1578,79 @@ export default function PortalPage() {
   const placeOrder = () => {
     if (cart.length === 0) return;
 
+    const newOrderItems = cart.map((item) => {
+      const p = (products || []).find((prod) => prod.id === item.productId);
+      return {
+        productName: p 
+          ? (item.selectedOption ? `${p.name} [옵션: ${item.selectedOption}]` : p.name) 
+          : "미지 상품",
+        quantity: item.quantity,
+        price: p ? p.price : 0,
+        selectedOption: item.selectedOption,
+      };
+    });
+
+    const newOrderId = `ORD${new Date().getFullYear()}${String(
+      new Date().getMonth() + 1
+    ).padStart(2, "0")}${String(new Date().getDate()).padStart(2, "0")}${String(
+      Math.floor(100 + Math.random() * 900)
+    )}`;
+
+    if (orderPayMethod === "bank") {
+      showCustomConfirm("발주 신청", "무통장입금으로 발주를 신청하시겠습니까?", () => {
+        saveOrderMutation({
+          id: newOrderId,
+          date: new Date().toISOString().split("T")[0],
+          items: newOrderItems,
+          totalPrice: cartTotal,
+          status: "입금대기",
+          storeId: activeStoreId || "owner",
+          payMethod: "bank",
+          deliveryAddress: deliveryAddress || undefined,
+          deliveryDetailAddress: deliveryDetailAddress || undefined,
+          recipientName: recipientName || undefined,
+          recipientPhone: recipientPhone || undefined,
+        })
+          .then(() => {
+            const newOrder: Order = {
+              id: newOrderId,
+              date: new Date().toISOString().split("T")[0],
+              items: newOrderItems,
+              totalPrice: cartTotal,
+              status: "입금대기",
+              courier: "",
+              trackingNo: "",
+            };
+
+            const updatedOrders = [newOrder, ...orders];
+            setOrders(updatedOrders);
+            localStorage.setItem("120_orders", JSON.stringify(updatedOrders));
+
+            clearCart();
+            showCustomAlert(
+              "발주 신청 완료", 
+              `무통장입금 발주 신청이 완료되었습니다.\n\n[입금 계좌]\nK뱅크 700-120-270001\n예금주: (주)고우웰라이프\n입금액: ${cartTotal.toLocaleString()}원\n\n입금 확인 후 배송이 시작됩니다.`
+            );
+
+            // SMS 발송 연동 (주문완료 - 무통장입금)
+            const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+            const storeName = activeStore?.name || "강남역삼점";
+            triggerSmsSend("order_cash", {
+              storeName: storeName,
+              orderId: newOrderId,
+              amount: String(cartTotal)
+            });
+
+            setCurrentMenu("history");
+          })
+          .catch((err) => {
+            console.error("무통장 주문 등록 오류:", err);
+            showCustomAlert("주문 등록 오류", "주문 등록 중 오류가 발생했습니다. 고객센터에 문의바랍니다.");
+          });
+      });
+      return;
+    }
+
     const PortOne = (window as any).PortOne;
     if (!PortOne) {
       showCustomAlert("결제 오류", "결제 모듈을 로드하는 중입니다. 잠시 후 다시 시도해 주세요.");
@@ -1257,24 +1658,6 @@ export default function PortalPage() {
     }
 
     showCustomConfirm("발주 신청", "선택한 자재의 결제 및 발주를 신청하시겠습니까?", () => {
-      const newOrderItems = cart.map((item) => {
-        const p = (products || []).find((prod) => prod.id === item.productId);
-        return {
-          productName: p 
-            ? (item.selectedOption ? `${p.name} [옵션: ${item.selectedOption}]` : p.name) 
-            : "미지 상품",
-          quantity: item.quantity,
-          price: p ? p.price : 0,
-          selectedOption: item.selectedOption,
-        };
-      });
-
-      const newOrderId = `ORD${new Date().getFullYear()}${String(
-        new Date().getMonth() + 1
-      ).padStart(2, "0")}${String(new Date().getDate()).padStart(2, "0")}${String(
-        Math.floor(100 + Math.random() * 900)
-      )}`;
-
       const firstItemName = (products || []).find((prod) => prod.id === cart[0].productId)?.name || "자재 주문";
       
       const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "store-1ba40e9a-5edf-4497-b8dc-ae82194fcf42";
@@ -1296,6 +1679,10 @@ export default function PortalPage() {
       localStorage.setItem("120_pending_order_items", JSON.stringify(newOrderItems));
       localStorage.setItem("120_pending_order_amount", String(cartTotal));
       localStorage.setItem("120_pending_order_store_id", activeStoreId || "owner");
+      localStorage.setItem("120_pending_delivery_address", deliveryAddress);
+      localStorage.setItem("120_pending_delivery_detail", deliveryDetailAddress);
+      localStorage.setItem("120_pending_recipient_name", recipientName);
+      localStorage.setItem("120_pending_recipient_phone", recipientPhone);
 
       PortOne.requestPayment({
         storeId: storeId,
@@ -1320,6 +1707,10 @@ export default function PortalPage() {
             amount: cartTotal,
             storeId: activeStoreId || "owner",
             items: newOrderItems,
+            deliveryAddress: deliveryAddress || undefined,
+            deliveryDetailAddress: deliveryDetailAddress || undefined,
+            recipientName: recipientName || undefined,
+            recipientPhone: recipientPhone || undefined,
           })
             .then((result: any) => {
               if (result.success) {
@@ -1339,6 +1730,16 @@ export default function PortalPage() {
 
                 clearCart();
                 triggerToast("발주 주문 및 결제가 완료되었습니다!");
+
+                // SMS 발송 연동 (주문완료 - 신용카드)
+                const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+                const storeName = activeStore?.name || "강남역삼점";
+                triggerSmsSend("order_card", {
+                  storeName: storeName,
+                  orderId: newOrderId,
+                  amount: String(cartTotal)
+                });
+
                 setCurrentMenu("history");
               } else {
                 showCustomAlert("결제 검증 오류", `결제 검증 실패: ${result.message}`);
@@ -1422,6 +1823,14 @@ export default function PortalPage() {
       console.log("[Convex] Inquiry submitted successfully.");
     }).catch(err => {
       console.error("[Convex] Failed to submit inquiry to cloud DB:", err);
+    });
+
+    // SMS 발송 연동 (1:1 문의)
+    const storeName = activeStore?.name || "강남역삼점";
+    triggerSmsSend("inquiry_1to1", {
+      storeName: storeName,
+      title: inquiryTitle,
+      category: inquiryCategory
     });
 
     setInquiryTitle("");
@@ -1674,9 +2083,17 @@ export default function PortalPage() {
 
             <button
               type="submit"
-              className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_16px_rgba(242,95,138,0.2)] flex items-center justify-center gap-2 hover:scale-[1.01]"
+              className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_16px_rgba(242,95,138,0.2)] flex items-center justify-center gap-2 hover:scale-[1.01] border-0"
             >
               로그인 완료
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowRegisterModal(true)}
+              className="w-full py-4 bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-[#bf3e67] text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 mt-3 hover:scale-[1.01] cursor-pointer"
+            >
+              🏢 가맹점 등록 신청
             </button>
           </form>
 
@@ -1688,6 +2105,300 @@ export default function PortalPage() {
             </Link>
           </div>
         </div>
+
+        {/* 가맹점 신규 등록 대장 작성 모달 */}
+        {showRegisterModal && (
+          <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
+            <div 
+              className="w-full max-w-2xl bg-[#fffdf9] border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col my-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="p-5 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/60">
+                <h3 className="font-extrabold text-stone-900 text-sm sm:text-base flex items-center gap-2">
+                  🏢 가맹점 신규 등록 대장 작성
+                </h3>
+                <button 
+                  type="button"
+                  onClick={() => setShowRegisterModal(false)}
+                  className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleRegisterStoreSubmit} className="p-6 overflow-y-auto max-h-[75vh] space-y-5 text-xs sm:text-sm text-left">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-[#2d2026]">로그인 계정 ID *</label>
+                    <input 
+                      type="text"
+                      placeholder="계정 아이디를 입력해 주세요 (영문/숫자)"
+                      value={regId}
+                      onChange={(e) => setRegId(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
+                      required
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-[#2d2026]">가맹점명 *</label>
+                    <input 
+                      type="text"
+                      placeholder="예시) 120겹파이 강남역삼점"
+                      value={regName}
+                      onChange={(e) => setRegName(e.target.value)}
+                      required
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-[#2d2026]">비밀번호 *</label>
+                    <input 
+                      type="password"
+                      placeholder="비밀번호 설정"
+                      value={regPw}
+                      onChange={(e) => setRegPw(e.target.value)}
+                      required
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-[#2d2026]">비밀번호 확인 *</label>
+                    <input 
+                      type="password"
+                      placeholder="동일 비밀번호 재입력"
+                      value={regPwConfirm}
+                      onChange={(e) => setRegPwConfirm(e.target.value)}
+                      required
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-[#2d2026]">점주 실명 *</label>
+                    <input 
+                      type="text"
+                      placeholder="점주 대표자 성함"
+                      value={regOwner}
+                      onChange={(e) => setRegOwner(e.target.value)}
+                      required
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-[#2d2026]">연락처 (하이픈 자동입력) *</label>
+                    <input 
+                      type="text"
+                      placeholder="휴대폰 혹은 대표번호"
+                      value={regPhone}
+                      onChange={handleRegPhoneChange}
+                      required
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-[#2d2026]">가맹 거래 상태 구분 *</label>
+                    <select 
+                      disabled
+                      value="대기"
+                      className="w-full bg-stone-100 border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none cursor-not-allowed font-bold"
+                    >
+                      <option value="대기">대기 (서류 검토 / 가맹 보류)</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-[#2d2026]">가맹 등록일</label>
+                    <input 
+                      type="date"
+                      value={regDate}
+                      onChange={(e) => setRegDate(e.target.value)}
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-3 text-xs text-[#2d2026] font-semibold"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-[#2d2026]">가맹 해지일</label>
+                    <input 
+                      type="text"
+                      disabled
+                      placeholder="연도-월-일"
+                      className="w-full bg-stone-50 border border-[#f2ccd7]/60 rounded-xl px-3 py-3 text-xs text-[#735965]/40 cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="font-bold text-[#2d2026] block">가맹 매장 도로명 주소 *</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text"
+                      placeholder="도로명 주소 (우측 '주소 검색' 버튼을 사용하거나 직접 입력하세요)"
+                      value={regRoadAddress}
+                      onChange={(e) => setRegRoadAddress(e.target.value)}
+                      required
+                      className="flex-1 bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                    <button
+                      type="button"
+                      onClick={openDaumPostcodeForReg}
+                      className="px-4 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-stone-900 text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer border-0"
+                    >
+                      주소 검색
+                    </button>
+                  </div>
+                  <input 
+                    type="text"
+                    placeholder="매장 상세 주소 (e.g. 1층 101호, 2층 전부)"
+                    value={regDetailAddress}
+                    onChange={(e) => setRegDetailAddress(e.target.value)}
+                    className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a] mt-2"
+                  />
+                </div>
+
+                {/* 도입 적용 패키지 브랜드 선택 */}
+                <div className="space-y-3">
+                  <label className="font-bold text-[#2d2026] block">도입 적용 패키지 브랜드 선택 (중복 체크 가능)</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-amber-50/30 border border-[#f2ccd7]/60 rounded-2xl p-4">
+                    {[
+                      { key: "120pie", label: "120pie" },
+                      { key: "egg120", label: "egg120" },
+                      { key: "츄러스120", label: "츄러스120" },
+                      { key: "떡볶이120", label: "떡볶이120" },
+                      { key: "핫도그120", label: "핫도그120" },
+                      { key: "120coffee", label: "120coffee" },
+                    ].map((menu) => (
+                      <label key={menu.key} className="flex items-center gap-2 cursor-pointer select-none py-1 text-xs text-[#735965] font-semibold">
+                        <input 
+                          type="checkbox"
+                          checked={regAdoptionMenu.includes(menu.key)}
+                          onChange={() => {
+                            if (regAdoptionMenu.includes(menu.key)) {
+                              setRegAdoptionMenu(regAdoptionMenu.filter(m => m !== menu.key));
+                            } else {
+                              setRegAdoptionMenu([...regAdoptionMenu, menu.key]);
+                            }
+                          }}
+                          className="w-4 h-4 accent-[#f25f8a] rounded border-stone-300 cursor-pointer"
+                        />
+                        <span>{menu.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  className="w-full py-4 bg-amber-400 hover:bg-amber-500 text-stone-900 text-sm font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-6 hover:scale-[1.01]"
+                >
+                  신규 가맹 계약 지점 공식 등록
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 도로명 주소 실시간 검색 모달 */}
+        {showAddressPopup && (
+          <div 
+            className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+            onClick={() => setShowAddressPopup(false)}
+          >
+            <div 
+              className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-5 border-b border-[#f2ccd7]/60 flex flex-col gap-3 bg-[#fff1f5]/80">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-sm font-bold text-[#2d2026]">도로명 주소 실시간 검색</h4>
+                  <button onClick={() => setShowAddressPopup(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer">
+                    <X size={13} />
+                  </button>
+                </div>
+                
+                {/* Tabs */}
+                <div className="flex bg-[#ffd3df]/50 p-1 rounded-xl border border-[#f2ccd7]/60">
+                  <button
+                    type="button"
+                    onClick={() => setAddressTab("kakao")}
+                    className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer ${
+                      addressTab === "kakao" 
+                        ? "bg-white text-[#bf3e67] shadow-sm border border-[#f2ccd7]/40" 
+                        : "text-[#735965] hover:text-[#bf3e67]"
+                    }`}
+                  >
+                    카카오 우편번호 API
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAddressTab("simulated")}
+                    className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer ${
+                      addressTab === "simulated" 
+                        ? "bg-white text-[#bf3e67] shadow-sm border border-[#f2ccd7]/40" 
+                        : "text-[#735965] hover:text-[#bf3e67]"
+                    }`}
+                  >
+                    모의 간편 검색 (대안)
+                  </button>
+                </div>
+              </div>
+
+              {/* Content Body */}
+              {addressTab === "kakao" ? (
+                <div className="flex-1 w-full bg-[#fff9fb] overflow-hidden relative">
+                  <div 
+                    id="daum-postcode-container" 
+                    className="w-full h-full"
+                  ></div>
+                </div>
+              ) : (
+                <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-[#fff9fb]">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-[#735965] block">지번/도로명 검색어 입력</label>
+                    <input
+                      type="text"
+                      placeholder="예: 테헤란로, 엘에스로, 당동"
+                      value={addressSearchKeyword}
+                      onChange={(e) => handleRegAddressSearch(e.target.value)}
+                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 font-semibold focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                  
+                  {addressSearchResults.length > 0 ? (
+                    <div className="border border-[#f2ccd7]/60 rounded-xl overflow-hidden divide-y divide-[#f2ccd7]/40 bg-white">
+                      {addressSearchResults.map((addr, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setRegRoadAddress(addr);
+                            setShowAddressPopup(false);
+                            triggerToast("도로명 주소가 자동 선택되었습니다.");
+                          }}
+                          className="w-full px-4 py-3 text-left text-xs font-semibold text-[#735965] hover:bg-[#fff1f5] hover:text-[#bf3e67] transition-all block cursor-pointer border-0 bg-transparent"
+                        >
+                          {addr}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    addressSearchKeyword.trim() !== "" && (
+                      <p className="text-center text-xs text-[#735965] font-bold py-6">검색 결과가 존재하지 않습니다.</p>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -2515,13 +3226,154 @@ export default function PortalPage() {
                         </div>
                       </div>
 
+                      {/* 배송지 / 받는 사람 정보 확인 · 수정 */}
+                      <div className="border-t border-[#f2ccd7] pt-4 space-y-3">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <MapPin size={14} className="text-[#f25f8a] shrink-0" />
+                          <span className="font-extrabold text-xs text-[#2d2026]">배송지 정보</span>
+                          <span className="text-[9px] text-[#735965] font-bold ml-auto">가맹점 기본정보 자동 입력</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div>
+                            <label className="text-[10px] font-bold text-[#735965] block mb-1">배송지 주소 (도로명)</label>
+                            <input
+                              type="text"
+                              value={deliveryAddress}
+                              onChange={(e) => setDeliveryAddress(e.target.value)}
+                              placeholder="도로명 주소를 입력해 주세요"
+                              className="w-full px-3 py-2 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-[#735965] block mb-1">상세 주소</label>
+                            <input
+                              type="text"
+                              value={deliveryDetailAddress}
+                              onChange={(e) => setDeliveryDetailAddress(e.target.value)}
+                              placeholder="상세 주소 (동/호수 등)"
+                              className="w-full px-3 py-2 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="text-[10px] font-bold text-[#735965] block mb-1">받는 사람</label>
+                              <input
+                                type="text"
+                                value={recipientName}
+                                onChange={(e) => setRecipientName(e.target.value)}
+                                placeholder="수령인 이름"
+                                className="w-full px-3 py-2 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-bold text-[#735965] block mb-1">연락처</label>
+                              <input
+                                type="tel"
+                                value={recipientPhone}
+                                onChange={(e) => setRecipientPhone(e.target.value)}
+                                placeholder="010-0000-0000"
+                                className="w-full px-3 py-2 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 결제 수단 선택 */}
+                      <div className="border-t border-[#f2ccd7] pt-4 space-y-3">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <CreditCard size={14} className="text-[#f25f8a] shrink-0" />
+                          <span className="font-extrabold text-xs text-[#2d2026]">결제 수단 선택</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setOrderPayMethod("card")}
+                            className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                              orderPayMethod === "card"
+                                ? "bg-[#fff1f5] border-[#f25f8a] text-[#bf3e67] shadow-sm font-black"
+                                : "bg-white border-[#f2ccd7] text-[#735965] hover:bg-[#fff9fb]"
+                            }`}
+                          >
+                            <CreditCard size={14} />
+                            신용카드
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setOrderPayMethod("bank")}
+                            className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                              orderPayMethod === "bank"
+                                ? "bg-[#fff1f5] border-[#f25f8a] text-[#bf3e67] shadow-sm font-black"
+                                : "bg-white border-[#f2ccd7] text-[#735965] hover:bg-[#fff9fb]"
+                            }`}
+                          >
+                            <Landmark size={14} />
+                            무통장입금
+                          </button>
+                        </div>
+
+                        {/* 무통장입금 정보 박스 */}
+                        {orderPayMethod === "bank" && (
+                          <div className="bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl space-y-3 animate-fadeIn text-xs">
+                            <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-2">
+                              <span className="font-extrabold text-[#bf3e67] flex items-center gap-1">
+                                <Landmark size={12} /> 입금 계좌 정보
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyToClipboard(`K뱅크 700-120-270001 (주)고우웰라이프 ${cartTotal.toLocaleString()}원`, "전체 계좌 정보")}
+                                className="text-[10px] text-[#f25f8a] hover:text-[#df4977] font-bold flex items-center gap-0.5 cursor-pointer bg-white px-2 py-1 rounded border border-[#f2ccd7] transition-all hover:shadow-sm"
+                              >
+                                <Copy size={10} /> 전체 복사
+                              </button>
+                            </div>
+                            <div className="space-y-2 text-[#735965] font-semibold">
+                              <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
+                                <div>
+                                  <span className="block text-[8px] text-[#735965]/60 font-bold">은행 / 예금주</span>
+                                  <span className="text-xs font-bold text-[#2d2026]">K뱅크 / (주)고우웰라이프</span>
+                                </div>
+                              </div>
+                              <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
+                                <div>
+                                  <span className="block text-[8px] text-[#735965]/60 font-bold">계좌번호</span>
+                                  <span className="text-xs font-mono font-bold text-[#2d2026]">700-120-270001</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyToClipboard("700-120-270001", "계좌번호")}
+                                  className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/60 rounded-md shrink-0 cursor-pointer transition-all hover:shadow-sm"
+                                  title="계좌번호 복사"
+                                >
+                                  <Copy size={11} />
+                                </button>
+                              </div>
+                              <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
+                                <div>
+                                  <span className="block text-[8px] text-[#735965]/60 font-bold">입금 금액</span>
+                                  <span className="text-xs font-bold text-[#f25f8a]">{cartTotal.toLocaleString()} 원</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyToClipboard(String(cartTotal), "입금 금액")}
+                                  className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/60 rounded-md shrink-0 cursor-pointer transition-all hover:shadow-sm"
+                                  title="금액 복사"
+                                >
+                                  <Copy size={11} />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                       {/* Order action button */}
                       <button 
                         onClick={placeOrder}
                         className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-0"
                       >
                         <CheckCircle2 size={16} />
-                        결제 진행하기
+                        {orderPayMethod === "card" ? "결제 진행하기" : "발주 신청하기 (무통장입금)"}
                       </button>
                     </>
                   )}
@@ -3246,15 +4098,57 @@ export default function PortalPage() {
               </div>
 
               {/* Payment Summary */}
-              <div className="bg-[#fff1f5]/20 border border-[#f2ccd7] rounded-2xl p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-                <div className="space-y-1">
-                  <span className="text-[10px] text-[#735965] font-extrabold block">결제 수단 정보</span>
-                  <strong className="text-xs text-[#2d2026] block font-bold">현금 입금 진행</strong>
+              <div className="bg-[#fff1f5]/20 border border-[#f2ccd7] rounded-2xl p-5 flex flex-col justify-between gap-4">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-[#735965] font-extrabold block">결제 수단 정보</span>
+                    <strong className="text-xs text-[#2d2026] block font-bold">
+                      {(selectedOrder as any).payMethod === "bank" ? "무통장입금" : "신용카드 결제"}
+                    </strong>
+                  </div>
+                  <div className="text-left sm:text-right border-t sm:border-t-0 border-[#f2ccd7]/60 pt-3 sm:pt-0">
+                    <span className="text-[10px] text-[#735965] font-bold block">총 결제 금액 (VAT 포함)</span>
+                    <strong className="text-base font-black text-[#bf3e67]">{selectedOrder.totalPrice.toLocaleString()} 원</strong>
+                  </div>
                 </div>
-                <div className="text-left sm:text-right border-t sm:border-t-0 border-[#f2ccd7]/60 pt-3 sm:pt-0">
-                  <span className="text-[10px] text-[#735965] font-bold block">총 결제 금액 (VAT 포함)</span>
-                  <strong className="text-base font-black text-[#bf3e67]">{selectedOrder.totalPrice.toLocaleString()} 원</strong>
-                </div>
+
+                {/* 무통장입금 선택 시 계좌 입금 안내 추가 */}
+                {((selectedOrder as any).payMethod === "bank" || selectedOrder.status === "입금대기") && (
+                  <div className="bg-white border border-[#f2ccd7] p-3.5 rounded-xl space-y-2.5 text-xs mt-2">
+                    <div className="flex justify-between items-center border-b border-[#f2ccd7]/60 pb-1.5">
+                      <span className="font-extrabold text-[#bf3e67] flex items-center gap-1">
+                        <Landmark size={12} /> 무통장 입금 안내
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyToClipboard(`K뱅크 700-120-270001 (주)고우웰라이프 ${selectedOrder.totalPrice.toLocaleString()}원`, "전체 계좌 정보")}
+                        className="text-[9px] text-[#f25f8a] hover:text-[#df4977] font-bold flex items-center gap-0.5 cursor-pointer bg-[#fff9fb] px-2 py-0.5 rounded border border-[#f2ccd7]"
+                      >
+                        <Copy size={9} /> 전체 복사
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[#735965] font-semibold text-[11px]">
+                      <div className="flex justify-between items-center bg-[#fff9fb] px-2.5 py-1.5 rounded-lg border border-[#f2ccd7]/30">
+                        <span>은행 / 예금주</span>
+                        <strong className="text-[#2d2026]">K뱅크 / (주)고우웰라이프</strong>
+                      </div>
+                      <div className="flex justify-between items-center bg-[#fff9fb] px-2.5 py-1.5 rounded-lg border border-[#f2ccd7]/30">
+                        <span>계좌번호</span>
+                        <div className="flex items-center gap-1.5">
+                          <strong className="text-[#2d2026] font-mono">700-120-270001</strong>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyToClipboard("700-120-270001", "계좌번호")}
+                            className="p-1 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/50 rounded shrink-0 cursor-pointer"
+                            title="계좌 복사"
+                          >
+                            <Copy size={9} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Delivery Carrier Info */}

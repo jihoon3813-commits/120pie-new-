@@ -13,7 +13,7 @@ export const metadata = {
   description:
     "기존 카페에 바로 도입 가능한 120겹 파이와 에그120 샵인샵 디저트 솔루션. 소자본 샵인샵 도입으로 객단가 상승 및 디저트 매출 극대화!",
   icons: {
-    icon: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png"
+    icon: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png"
   },
   keywords: [
     "120pie",
@@ -71,7 +71,7 @@ export default function RootLayout({
     "name": "120pie & coffee",
     "alternateName": "(주)고우웰라이프",
     "url": "https://120piecoffee.com",
-    "logo": "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
+    "logo": "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png",
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": "1566-3594",
@@ -92,7 +92,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "120pie & coffee",
-    "image": "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779713831/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%9B%90%ED%98%95%EB%A1%9C%EA%B3%A02_nu_o4omab.png",
+    "image": "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png",
     "telephone": "1566-3594",
     "email": "120piecoffee@gmail.com",
     "address": {

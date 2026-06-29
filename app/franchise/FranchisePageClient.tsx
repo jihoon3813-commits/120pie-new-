@@ -35,10 +35,11 @@ import {
   Percent
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
 import { api } from "@/convex/_generated/api";
+import { triggerConsultationSms } from "@/app/utils/sms";
 
 const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
 
@@ -114,6 +115,7 @@ export default function FranchisePageClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const addInquiry = useMutation(api.inquiries.add);
+  const sendSmsAction = useAction(api.aligo.sendSms);
 
   // Load theme dynamically from browser environment
   useEffect(() => {
@@ -179,6 +181,7 @@ export default function FranchisePageClient() {
         message: formData.message || "창업 안내 페이지를 통한 상담 신청",
         regDate: new Date().toISOString().split("T")[0]
       });
+      triggerConsultationSms(sendSmsAction, formData.name, formData.phone, formData.storeType);
       setFormSubmitted(true);
     } catch (err) {
       console.error("Failed to submit inquiry to Convex", err);
@@ -193,6 +196,7 @@ export default function FranchisePageClient() {
         };
         localStorage.setItem("120_inquiries", JSON.stringify([...list, newInq]));
       }
+      triggerConsultationSms(sendSmsAction, formData.name, formData.phone, formData.storeType);
       setFormSubmitted(true);
     } finally {
       setIsSubmitting(false);

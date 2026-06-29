@@ -16,6 +16,10 @@ export const verifyAndSaveOrder = action({
         selectedOption: v.optional(v.string()),
       })
     ),
+    deliveryAddress: v.optional(v.string()),
+    deliveryDetailAddress: v.optional(v.string()),
+    recipientName: v.optional(v.string()),
+    recipientPhone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const impKey = process.env.PORTONE_API_KEY;
@@ -37,6 +41,10 @@ export const verifyAndSaveOrder = action({
         storeId: args.storeId,
         impUid: args.impUid,
         payMethod: "card",
+        deliveryAddress: args.deliveryAddress,
+        deliveryDetailAddress: args.deliveryDetailAddress,
+        recipientName: args.recipientName,
+        recipientPhone: args.recipientPhone,
       });
 
       return { success: true, message: "결제 키 미설정으로 테스트 모드로 자동 승인 및 등록되었습니다." };
@@ -101,6 +109,10 @@ export const verifyAndSaveOrder = action({
         storeId: args.storeId,
         impUid: args.impUid,
         payMethod: "card",
+        deliveryAddress: args.deliveryAddress,
+        deliveryDetailAddress: args.deliveryDetailAddress,
+        recipientName: args.recipientName,
+        recipientPhone: args.recipientPhone,
       });
 
       return { success: true, message: "결제 검증 및 주문 등록이 완료되었습니다." };

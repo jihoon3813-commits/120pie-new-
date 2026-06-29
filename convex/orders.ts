@@ -31,6 +31,10 @@ export const createOrUpdate = mutation({
     trackingNo: v.optional(v.string()),
     impUid: v.optional(v.string()),
     payMethod: v.optional(v.string()),
+    deliveryAddress: v.optional(v.string()),
+    deliveryDetailAddress: v.optional(v.string()),
+    recipientName: v.optional(v.string()),
+    recipientPhone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -65,6 +69,12 @@ export const createOrUpdate = mutation({
         storeName: storeName || undefined,
         totalPrice: args.totalPrice,
         items: args.items,
+        deliveryAddress: args.deliveryAddress,
+        deliveryDetailAddress: args.deliveryDetailAddress,
+        recipientName: args.recipientName,
+        recipientPhone: args.recipientPhone,
+        payMethod: args.payMethod,
+        status: args.status,
       });
 
       return newId;
@@ -94,6 +104,10 @@ export const syncOrders = mutation({
         trackingNo: v.optional(v.string()),
         impUid: v.optional(v.string()),
         payMethod: v.optional(v.string()),
+        deliveryAddress: v.optional(v.string()),
+        deliveryDetailAddress: v.optional(v.string()),
+        recipientName: v.optional(v.string()),
+        recipientPhone: v.optional(v.string()),
       })
     ),
   },
@@ -115,6 +129,10 @@ export const syncOrders = mutation({
         trackingNo: ord.trackingNo,
         impUid: ord.impUid,
         payMethod: ord.payMethod,
+        deliveryAddress: ord.deliveryAddress,
+        deliveryDetailAddress: ord.deliveryDetailAddress,
+        recipientName: ord.recipientName,
+        recipientPhone: ord.recipientPhone,
       };
 
       if (existing) {

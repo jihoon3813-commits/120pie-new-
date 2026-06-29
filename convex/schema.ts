@@ -104,6 +104,10 @@ export default defineSchema({
     trackingNo: v.optional(v.string()), // 송장번호
     impUid: v.optional(v.string()), // 포트원 고유 결제번호
     payMethod: v.optional(v.string()), // 결제수단 (e.g. "card")
+    deliveryAddress: v.optional(v.string()),       // 배송지 주소 (도로명)
+    deliveryDetailAddress: v.optional(v.string()),  // 배송지 상세주소
+    recipientName: v.optional(v.string()),          // 받는 사람
+    recipientPhone: v.optional(v.string()),         // 받는 사람 연락처
   }),
   materials: defineTable({
     title: v.string(),

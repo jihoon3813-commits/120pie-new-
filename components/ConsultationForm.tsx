@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useAction } from "convex/react";
+import { api } from "../convex/_generated/api";
 
 const storeTypes = ["기존 카페 운영 중", "저가커피 매장 운영 중", "디저트 카페 운영 중", "배달형 매장 운영 중", "예비 창업자", "기타"];
 const goals = ["객단가 상승", "디저트 매출 강화", "샵인샵 도입", "창업비용 확인", "박람회 방문", "배달 메뉴 강화"];
@@ -21,6 +23,7 @@ const initialForm = {
 };
 
 export default function ConsultationForm() {
+  const sendSmsAction = useAction(api.aligo.sendSms);
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -43,6 +46,88 @@ export default function ConsultationForm() {
       return;
     }
     console.log("consultation submit", form);
+
+    // SMS 발송 연동 (상담문의)
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("120_sms_settings");
+      if (stored) {
+        try {
+          const smsSettings = JSON.parse(stored);
+          const eventConfig = smsSettings.consultation;
+          if (eventConfig) {
+            const hasAligoCreds = smsSettings.aligoKey && smsSettings.aligoUserId;
+
+            // 1. 고객용 발송 (신청자)
+            if (eventConfig.customer && eventConfig.customer.isActive) {
+              let msg = eventConfig.customer.template;
+              msg = msg.replace(/{name}/g, form.name);
+              msg = msg.replace(/{phone}/g, form.phone);
+              msg = msg.replace(/{storeType}/g, form.storeStatus);
+
+              const formattedSender = eventConfig.customer.sender.replace(/[^0-9]/g, "");
+              const formattedReceiver = form.phone.replace(/[^0-9]/g, "");
+
+              console.log(`[Consultation Customer SMS] From: ${eventConfig.customer.sender} | To: ${form.phone}`);
+              console.log(`[Content]:\n${msg}`);
+
+              if (hasAligoCreds) {
+                sendSmsAction({
+                  key: smsSettings.aligoKey,
+                  userId: smsSettings.aligoUserId,
+                  sender: formattedSender,
+                  receiver: formattedReceiver,
+                  msg: msg,
+                  isTest: smsSettings.aligoTestMode !== false
+                }).then(res => {
+                  console.log("[Aligo Customer Consultation Response]:", res);
+                }).catch(err => {
+                  console.error(err);
+                });
+              } else {
+                alert(`[고객용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${eventConfig.customer.sender}\n받는사람(고객): ${form.phone}\n\n내용:\n${msg}`);
+              }
+            }
+
+            // 2. 관리자용 발송
+            if (eventConfig.admin && eventConfig.admin.isActive) {
+              const adminReceivers = eventConfig.admin.receivers || [];
+              if (adminReceivers.length > 0) {
+                let msg = eventConfig.admin.template;
+                msg = msg.replace(/{name}/g, form.name);
+                msg = msg.replace(/{phone}/g, form.phone);
+                msg = msg.replace(/{storeType}/g, form.storeStatus);
+
+                const formattedSender = eventConfig.admin.sender.replace(/[^0-9]/g, "");
+                const formattedReceiver = adminReceivers.map((num: string) => num.replace(/[^0-9]/g, "")).join(",");
+
+                console.log(`[Consultation Admin SMS] From: ${eventConfig.admin.sender} | To: ${adminReceivers.join(", ")}`);
+                console.log(`[Content]:\n${msg}`);
+
+                if (hasAligoCreds) {
+                  sendSmsAction({
+                    key: smsSettings.aligoKey,
+                    userId: smsSettings.aligoUserId,
+                    sender: formattedSender,
+                    receiver: formattedReceiver,
+                    msg: msg,
+                    isTest: smsSettings.aligoTestMode !== false
+                  }).then(res => {
+                    console.log("[Aligo Admin Consultation Response]:", res);
+                  }).catch(err => {
+                    console.error(err);
+                  });
+                } else {
+                  alert(`[관리자용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${eventConfig.admin.sender}\n받는사람(관리자): ${adminReceivers.join(", ")}\n\n내용:\n${msg}`);
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error("SMS 설정 파싱 에러:", e);
+        }
+      }
+    }
+
     setSuccess("상담 신청이 접수되었습니다. 담당자가 매장 상황에 맞춰 안내드릴 예정입니다.");
     setForm(initialForm);
   };

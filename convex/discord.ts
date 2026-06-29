@@ -60,6 +60,12 @@ export const notifyOrder = internalAction({
         selectedOption: v.optional(v.string()),
       })
     ),
+    deliveryAddress: v.optional(v.string()),
+    deliveryDetailAddress: v.optional(v.string()),
+    recipientName: v.optional(v.string()),
+    recipientPhone: v.optional(v.string()),
+    payMethod: v.optional(v.string()),
+    status: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const storeInfo = args.storeName 
@@ -70,6 +76,13 @@ export const notifyOrder = internalAction({
       (item) => `  - ${item.productName} ${item.quantity}개 (${item.price.toLocaleString()}원)${item.selectedOption ? ` [옵션: ${item.selectedOption}]` : ""}`
     ).join("\n");
 
+    const deliveryText = args.deliveryAddress
+      ? `\n• **배송지:** ${args.deliveryAddress}${args.deliveryDetailAddress ? ` ${args.deliveryDetailAddress}` : ""}\n• **받는 분:** ${args.recipientName || "-"}\n• **연락처:** ${args.recipientPhone || "-"}`
+      : "";
+
+    const payMethodName = args.payMethod === "bank" ? "무통장입금" : (args.payMethod === "card" || args.payMethod === "CARD" ? "신용카드" : args.payMethod || "신용카드");
+    const statusLabel = args.status || "접수완료";
+
     const message = [
       `🛒 **[120겹파이] 새로운 발주 주문 접수**`,
       `• **주문 ID:** ${args.id}`,
@@ -77,7 +90,8 @@ export const notifyOrder = internalAction({
       `• **주문 일자:** ${args.date}`,
       `• **주문 내역:**`,
       itemsText,
-      `• **총 금액:** ${args.totalPrice.toLocaleString()}원`
+      `• **총 금액:** ${args.totalPrice.toLocaleString()}원`,
+      `• **결제 상태:** ${payMethodName} (${statusLabel})${deliveryText}`
     ].join("\n");
 
     await sendDiscordMessage(WEBHOOK_URLS.order, message);

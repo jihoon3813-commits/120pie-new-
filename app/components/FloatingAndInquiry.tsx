@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { triggerConsultationSms } from "@/app/utils/sms";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus } from "lucide-react";
 
@@ -149,6 +150,7 @@ export default function FloatingAndInquiry({
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const addInquiry = useMutation(api.inquiries.add);
+  const sendSmsAction = useAction(api.aligo.sendSms);
   const convexFloating = useQuery(api.floatings.get);
 
   // Sync forced open state from parent
@@ -197,6 +199,7 @@ export default function FloatingAndInquiry({
         message: formData.message || "",
         regDate: new Date().toISOString().split("T")[0]
       });
+      triggerConsultationSms(sendSmsAction, formData.name, formData.phone, formData.storeType);
       setFormSubmitted(true);
       
       // Track successful inquiry submission
@@ -236,6 +239,7 @@ export default function FloatingAndInquiry({
         };
         localStorage.setItem("120_inquiries", JSON.stringify([...list, newInq]));
       }
+      triggerConsultationSms(sendSmsAction, formData.name, formData.phone, formData.storeType);
       setFormSubmitted(true);
       
       // Track fallback successful inquiry submission

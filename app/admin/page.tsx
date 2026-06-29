@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import Link from "next/link";
 import {
@@ -547,6 +547,7 @@ export default function AdminPage() {
   // Convex Hooks
   const convexBanners = useQuery(api.banners.get);
   const updateBannersMutation = useMutation(api.banners.update);
+  const sendSmsAction = useAction(api.aligo.sendSms);
   const convexPopup = useQuery(api.popups.get);
   const convexFloating = useQuery(api.floatings.get);
   const convexInquiries = useQuery(api.inquiries.list);
@@ -1110,6 +1111,17 @@ export default function AdminPage() {
     triggerToast("발주 내역 엑셀 다운로드가 완료되었습니다!");
   };
   
+  const formatPhoneNumber = (value: string) => {
+    if (!value) return value;
+    const phoneNumber = value.replace(/[^\d]/g, "");
+    const phoneNumberLength = phoneNumber.length;
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 8) {
+      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+    }
+    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`;
+  };
+
   // Settings & Status Management States
   const [deliveryStatuses, setDeliveryStatuses] = useState<string[]>(["주문완료", "배송준비중", "배송중", "배송완료"]);
   const [newStatusName, setNewStatusName] = useState<string>("");
@@ -1120,6 +1132,11 @@ export default function AdminPage() {
   const [termsOfUseSetting, setTermsOfUseSetting] = useState<string>("");
   const [privacyPolicySetting, setPrivacyPolicySetting] = useState<string>("");
   const [refundPolicySetting, setRefundPolicySetting] = useState<string>("");
+  const [smsSettings, setSmsSettings] = useState<any>(null);
+  const [newAdminPhoneInputs, setNewAdminPhoneInputs] = useState<Record<string, string>>({});
+  const [testReceiverPhone, setTestReceiverPhone] = useState<string>("");
+  const [testSenderPhone, setTestSenderPhone] = useState<string>("");
+  const [isTestingSms, setIsTestingSms] = useState<boolean>(false);
 
   // Toast and navigation
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -1165,6 +1182,87 @@ export default function AdminPage() {
       setPrivacyPolicySetting(storedPrivacy);
       const storedRefund = localStorage.getItem("120_refund_policy") || DEFAULT_REFUND;
       setRefundPolicySetting(storedRefund);
+
+      const DEFAULT_SMS_SETTINGS = {
+        aligoKey: "",
+        aligoUserId: "",
+        aligoTestMode: true,
+        store_reg: {
+          customer: {
+            isActive: true,
+            sender: "02-120-1200",
+            template: "[120겹파이] 가맹점 등록 신청이 완료되었습니다. 본사 검토 후 연락드리겠습니다. ID: {storeId}, 가맹점명: {storeName}."
+          },
+          admin: {
+            isActive: true,
+            sender: "02-120-1200",
+            receivers: ["010-3813-1200"],
+            template: "[120겹파이] 신규 가맹점 등록 신청이 접수되었습니다. ID: {storeId}, 가맹점명: {storeName}, 점주명: {owner}, 연락처: {phone}."
+          }
+        },
+        order_card: {
+          customer: {
+            isActive: true,
+            sender: "02-120-1200",
+            template: "[120겹파이] 카드 결제 자재 주문이 정상 완료되었습니다. 주문ID: {orderId}, 결제금액: {amount}원. 신속하게 배송해 드리겠습니다."
+          },
+          admin: {
+            isActive: true,
+            sender: "02-120-1200",
+            receivers: ["010-3813-1200"],
+            template: "[120겹파이] {storeName} 가맹점의 카드 결제 자재 발주가 완료되었습니다. 주문ID: {orderId}, 금액: {amount}원."
+          }
+        },
+        order_cash: {
+          customer: {
+            isActive: true,
+            sender: "02-120-1200",
+            template: "[120겹파이] 무통장입금 자재 주문이 접수되었습니다. 주문ID: {orderId}, 입금예정금액: {amount}원. K뱅크 700-120-270001 (주)고우웰라이프. 입금 확인 시 배송이 개시됩니다."
+          },
+          admin: {
+            isActive: true,
+            sender: "02-120-1200",
+            receivers: ["010-3813-1200"],
+            template: "[120겹파이] {storeName} 가맹점의 무통장입금 자재 발주가 신청되었습니다. 주문ID: {orderId}, 금액: {amount}원. 입금 확인이 필요합니다."
+          }
+        },
+        consultation: {
+          customer: {
+            isActive: true,
+            sender: "02-120-1200",
+            template: "[120겹파이] 무료 가맹 상담 신청이 정상 접수되었습니다. 빠른 시간 내에 전문 컨설턴트가 연락드리겠습니다. 신청자: {name}님."
+          },
+          admin: {
+            isActive: true,
+            sender: "02-120-1200",
+            receivers: ["010-3813-1200"],
+            template: "[120겹파이] 홈페이지에 새로운 상담문의가 접수되었습니다. 이름: {name}, 연락처: {phone}, 점포유형: {storeType}."
+          }
+        },
+        inquiry_1to1: {
+          customer: {
+            isActive: true,
+            sender: "02-120-1200",
+            template: "[120겹파이] 1:1 문의가 성공적으로 접수되었습니다. 담당 부서 확인 후 빠르게 답변드리겠습니다. 문의유형: {category}, 제목: {title}."
+          },
+          admin: {
+            isActive: true,
+            sender: "02-120-1200",
+            receivers: ["010-3813-1200"],
+            template: "[120겹파이] {storeName} 가맹점에서 새로운 1:1 문의를 등록했습니다. 제목: {title}, 유형: {category}."
+          }
+        }
+      };
+
+      const sms = loadState("120_sms_settings", DEFAULT_SMS_SETTINGS);
+      const healedSms = { ...DEFAULT_SMS_SETTINGS, ...sms };
+      ["store_reg", "order_card", "order_cash", "consultation", "inquiry_1to1"].forEach((key) => {
+        if (!healedSms[key] || !healedSms[key].customer || !healedSms[key].admin) {
+          healedSms[key] = DEFAULT_SMS_SETTINGS[key as keyof typeof DEFAULT_SMS_SETTINGS];
+        }
+      });
+      setSmsSettings(healedSms);
+      setTestSenderPhone(healedSms.store_reg?.admin?.sender || "02-120-1200");
 
       // Seeds
       const st = loadState("120_stores", DEFAULT_STORES);
@@ -1305,6 +1403,23 @@ export default function AdminPage() {
               mainImage: parsedBanner.mainImage || undefined,
               sideImage: parsedBanner.sideImage || undefined,
               sideLink: parsedBanner.sideLink || undefined
+            }).catch((err) => {
+              console.warn("[Migration] Failed to migrate banner with images, trying without images:", err);
+              // Fallback: migrate without images to avoid Convex 1MB document size limit crash
+              updateBannersMutation({
+                mainTag: parsedBanner.mainTag || DEFAULT_BANNER.mainTag,
+                mainTitle: parsedBanner.mainTitle || DEFAULT_BANNER.mainTitle,
+                mainDesc: parsedBanner.mainDesc || DEFAULT_BANNER.mainDesc,
+                sideTag: parsedBanner.sideTag || DEFAULT_BANNER.sideTag,
+                sideTitle: parsedBanner.sideTitle || DEFAULT_BANNER.sideTitle,
+                sideDesc: parsedBanner.sideDesc || DEFAULT_BANNER.sideDesc,
+                sideBtnText: parsedBanner.sideBtnText || DEFAULT_BANNER.sideBtnText,
+                mainImage: undefined,
+                sideImage: undefined,
+                sideLink: parsedBanner.sideLink || undefined
+              }).catch((fallbackErr) => {
+                console.error("[Migration] Failed even without images:", fallbackErr);
+              });
             });
           }
         } catch (e) {
@@ -2642,6 +2757,114 @@ export default function AdminPage() {
     localStorage.setItem("120_privacy_policy", privacyPolicySetting);
     localStorage.setItem("120_refund_policy", refundPolicySetting);
     triggerToast("이용약관, 개인정보처리방침 및 환불정책이 성공적으로 저장되었습니다!");
+  };
+
+  const handleUpdateSmsSettings = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem("120_sms_settings", JSON.stringify(smsSettings));
+    triggerToast("실시간 SMS 알림 연동 및 문구 설정이 저장되었습니다.");
+  };
+
+  const handleTestSendSms = async () => {
+    if (!smsSettings || !smsSettings.aligoKey || !smsSettings.aligoUserId) {
+      alert("알리고 API Key와 User ID를 먼저 입력하고 저장해 주세요.");
+      return;
+    }
+    if (!testSenderPhone.trim()) {
+      alert("알리고에 가입/등록된 발신 번호를 입력해 주세요.");
+      return;
+    }
+    if (!testReceiverPhone.trim()) {
+      alert("테스트 수신 번호를 입력해 주세요.");
+      return;
+    }
+    
+    setIsTestingSms(true);
+    try {
+      const formattedSender = testSenderPhone.replace(/[^0-9]/g, "");
+      const formattedReceiver = testReceiverPhone.replace(/[^0-9]/g, "");
+      
+      const response = await sendSmsAction({
+        key: smsSettings.aligoKey,
+        userId: smsSettings.aligoUserId,
+        sender: formattedSender,
+        receiver: formattedReceiver,
+        msg: "[120겹파이] 알리고 SMS API 연동 테스트가 성공했습니다.",
+        isTest: smsSettings.aligoTestMode !== false
+      });
+      
+      if (response.success) {
+        if (smsSettings.aligoTestMode !== false) {
+          alert("테스트 발송 요청 성공! (현재 테스트 모드가 켜져 있으므로 전송 로그만 정상 반환되었으며, 실제 문자는 전송되지 않았습니다.)");
+        } else {
+          alert("테스트 문자가 실제로 성공적으로 발송되었습니다!");
+        }
+      } else {
+        alert(`발송 실패: ${response.message || response.error || "알 수 없는 오류"}`);
+      }
+    } catch (e: any) {
+      console.error(e);
+      alert(`발송 오류: ${e.message || e}`);
+    } finally {
+      setIsTestingSms(false);
+    }
+  };
+
+  const addAdminReceiver = (eventKey: string) => {
+    const number = newAdminPhoneInputs[eventKey] || "";
+    if (!number.trim()) return;
+    
+    // Auto format hyphens if not present
+    let formatted = number.replace(/[^0-9]/g, "");
+    if (formatted.length === 11) {
+      formatted = `${formatted.slice(0, 3)}-${formatted.slice(3, 7)}-${formatted.slice(7)}`;
+    } else if (formatted.length === 10) {
+      formatted = `${formatted.slice(0, 3)}-${formatted.slice(3, 6)}-${formatted.slice(6)}`;
+    } else {
+      formatted = number.trim();
+    }
+
+    const currentEvent = smsSettings[eventKey];
+    const currentReceivers = currentEvent?.admin?.receivers || [];
+    
+    if (currentReceivers.includes(formatted)) {
+      triggerToast("이미 등록된 번호입니다.");
+      return;
+    }
+
+    setSmsSettings({
+      ...smsSettings,
+      [eventKey]: {
+        ...currentEvent,
+        admin: {
+          ...currentEvent.admin,
+          receivers: [...currentReceivers, formatted]
+        }
+      }
+    });
+
+    setNewAdminPhoneInputs({
+      ...newAdminPhoneInputs,
+      [eventKey]: ""
+    });
+    triggerToast("관리자 수신 번호가 목록에 추가되었습니다. (저장 버튼을 눌러야 반영됩니다.)");
+  };
+
+  const removeAdminReceiver = (eventKey: string, number: string) => {
+    const currentEvent = smsSettings[eventKey];
+    const currentReceivers = currentEvent?.admin?.receivers || [];
+
+    setSmsSettings({
+      ...smsSettings,
+      [eventKey]: {
+        ...currentEvent,
+        admin: {
+          ...currentEvent.admin,
+          receivers: currentReceivers.filter((num: string) => num !== number)
+        }
+      }
+    });
+    triggerToast("수신 번호가 제거되었습니다. (저장 버튼을 눌러야 반영됩니다.)");
   };
 
   // ==========================================
@@ -6197,6 +6420,316 @@ export default function AdminPage() {
                     </button>
                   </form>
                 </div>
+
+                {/* 5. 실시간 SMS 발송 자동 연동 및 문구 설정 */}
+                {smsSettings && (
+                  <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 lg:col-span-2">
+                    <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
+                      <MessageSquare size={18} className="text-[#f25f8a]" />
+                      5. 실시간 SMS 발송 자동 연동 및 문구 설정 (알리고 API 연동)
+                    </h3>
+                    
+                    <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
+                      가맹점 신청, 자재 주문, 1:1 문의 등 주요 이벤트 발생 시 지정된 고객 및 본사 담당자에게 실시간 문자(SMS/LMS)를 자동 전송합니다.<br />
+                      국내 최고 SMS 대행사인 <strong>알리고(Aligo)</strong> 서비스 API를 공식 지원하며, 각 구분별로 고객용/관리자용 템플릿과 활성화 여부를 따로 설정할 수 있습니다.
+                    </p>
+
+                    <form onSubmit={handleUpdateSmsSettings} className="space-y-6">
+                      
+                      {/* A. 알리고 API 연동 Key 관리 */}
+                      <div className="bg-[#fff9fb]/40 border border-[#f2ccd7]/60 rounded-2xl p-5 space-y-4">
+                        <h4 className="text-xs font-black text-[#bf3e67] border-b border-[#f2ccd7]/30 pb-2">
+                          🔌 알리고 SMS API 연동 자격증명 설정
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold text-[#735965]">
+                          <div className="space-y-1.5">
+                            <span>알리고 API Key (발송용 비밀키) *</span>
+                            <input 
+                              type="password"
+                              placeholder="알리고에서 발급받은 API Key를 입력하세요"
+                              value={smsSettings.aligoKey || ""}
+                              onChange={(e) => setSmsSettings({
+                                ...smsSettings,
+                                aligoKey: e.target.value
+                              })}
+                              className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <span>알리고 User ID (계정 아이디) *</span>
+                            <input 
+                              type="text"
+                              placeholder="알리고 아이디를 입력하세요"
+                              value={smsSettings.aligoUserId || ""}
+                              onChange={(e) => setSmsSettings({
+                                ...smsSettings,
+                                aligoUserId: e.target.value
+                              })}
+                              className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 pt-1 border-t border-[#f2ccd7]/20">
+                          <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-extrabold text-[#735965] select-none">
+                            <input 
+                              type="checkbox"
+                              checked={smsSettings.aligoTestMode !== false}
+                              onChange={(e) => setSmsSettings({
+                                ...smsSettings,
+                                aligoTestMode: e.target.checked
+                              })}
+                              className="w-3.5 h-3.5 accent-[#f25f8a] rounded cursor-pointer"
+                            />
+                            테스트 모드 활성화 (체크 시 충전 포인트 미차감, 실제 문자는 전송되지 않음)
+                          </label>
+                        </div>
+                        <p className="text-[9px] text-[#735965] leading-relaxed font-semibold">
+                          * 알리고 API Key와 User ID를 올바르게 설정하면 실제 가맹점 신청 및 발주 시 알리고 서버를 경유하여 자동 전송됩니다.<br />
+                          * 테스트 모드가 체크되어 있으면 실제 과금이 발생하지 않고 전송 성공 로그만 반환됩니다. 실무에 적용하실 때는 해제해 주세요.
+                        </p>
+                      </div>
+
+                      {/* C. 알리고 API 연동 테스트 발송 (신설) */}
+                      <div className="bg-[#fff9fb]/40 border border-[#f2ccd7]/60 rounded-2xl p-5 space-y-4">
+                        <h4 className="text-xs font-black text-[#bf3e67] border-b border-[#f2ccd7]/30 pb-2 flex items-center gap-1.5">
+                          🧪 알리고 API 실시간 발송 테스트
+                        </h4>
+                        <p className="text-[10px] text-[#735965] font-semibold leading-relaxed">
+                          입력된 알리고 API Key와 User ID가 올바른지 실제 문자를 발송하여 테스트합니다.<br />
+                          * 테스트 모드가 <strong>활성화</strong>된 상태이면 실제 문자가 가지 않고 로그만 반환되므로, 실제 전송을 확인하려면 위 테스트 모드를 <strong>해제</strong>하고 진행해 주세요.
+                        </p>
+                        <div className="flex flex-wrap items-end gap-3 text-xs font-semibold text-[#735965]">
+                          <div className="space-y-1.5 flex-1 min-w-[150px]">
+                            <span>발신 번호 (알리고에 등록된 번호)</span>
+                            <input 
+                              type="text"
+                              placeholder="알리고에 등록된 발신 번호를 적어주세요"
+                              value={testSenderPhone}
+                              onChange={(e) => setTestSenderPhone(formatPhoneNumber(e.target.value))}
+                              className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                            />
+                          </div>
+                          <div className="space-y-1.5 flex-1 min-w-[150px]">
+                            <span>테스트 수신 번호</span>
+                            <input 
+                              type="text"
+                              placeholder="010-0000-0000"
+                              value={testReceiverPhone}
+                              onChange={(e) => setTestReceiverPhone(formatPhoneNumber(e.target.value))}
+                              className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleTestSendSms}
+                            disabled={isTestingSms}
+                            className="px-5 py-2 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-black rounded-xl transition-all shadow-sm flex items-center gap-1.5 h-[38px] disabled:opacity-50 cursor-pointer border-0 shrink-0"
+                          >
+                            {isTestingSms ? "전송 중..." : "테스트 문자 발송"}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* B. 각 5대 구분별 설정 리스트 */}
+                      <div className="grid grid-cols-1 gap-6">
+                        {[
+                          { key: "store_reg", label: "🏢 가맹점 등록 신청", vars: "{storeId}, {storeName}, {owner}, {phone}", custLabel: "신청 점주 수신" },
+                          { key: "order_card", label: "💳 주문완료 (신용카드)", vars: "{storeName}, {orderId}, {amount}", custLabel: "발주 점주 수신" },
+                          { key: "order_cash", label: "🏦 주문완료 (무통장입금)", vars: "{storeName}, {orderId}, {amount}", custLabel: "발주 점주 수신" },
+                          { key: "consultation", label: "📞 홈페이지 무료 가맹상담문의", vars: "{name}, {phone}, {storeType}", custLabel: "상담 신청 고객 수신" },
+                          { key: "inquiry_1to1", label: "💬 가맹점 전용 1:1 상담문의 접수", vars: "{storeName}, {title}, {category}", custLabel: "접수 점주 수신" }
+                        ].map((evt) => {
+                          const config = smsSettings[evt.key];
+                          if (!config) return null;
+                          return (
+                            <div key={evt.key} className="border border-[#f2ccd7]/60 rounded-3xl p-6 bg-[#fff9fb]/10 shadow-sm space-y-4">
+                              <h4 className="text-xs font-black text-[#bf3e67] border-b border-[#f2ccd7]/60 pb-2 flex items-center gap-1.5 justify-between">
+                                <span className="flex items-center gap-1.5">{evt.label}</span>
+                                <span className="text-[10px] text-neutral-400 font-medium">변수: {evt.vars}</span>
+                              </h4>
+                              
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* 고객용 */}
+                                <div className="space-y-3.5 bg-white border border-[#f2ccd7]/40 p-4 rounded-2xl relative">
+                                  <div className="flex justify-between items-center border-b border-[#f2ccd7]/20 pb-1.5">
+                                    <span className="text-[11px] font-bold text-[#2d2026]">고객용 ({evt.custLabel})</span>
+                                    <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-[#735965] select-none">
+                                      <input 
+                                        type="checkbox"
+                                        checked={config.customer.isActive}
+                                        onChange={(e) => setSmsSettings({
+                                          ...smsSettings,
+                                          [evt.key]: {
+                                            ...config,
+                                            customer: { ...config.customer, isActive: e.target.checked }
+                                          }
+                                        })}
+                                        className="w-3.5 h-3.5 accent-[#f25f8a] rounded cursor-pointer"
+                                      />
+                                      활성화
+                                    </label>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-3 text-[10px] font-semibold text-[#735965]">
+                                    <div className="space-y-1">
+                                      <span>발신 번호</span>
+                                      <input 
+                                        type="text"
+                                        value={config.customer.sender}
+                                        onChange={(e) => setSmsSettings({
+                                          ...smsSettings,
+                                          [evt.key]: {
+                                            ...config,
+                                            customer: { ...config.customer, sender: formatPhoneNumber(e.target.value) }
+                                          }
+                                        })}
+                                        className="w-full bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg px-2.5 py-1.5 text-xs text-[#2d2026]"
+                                      />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <span>수신 번호</span>
+                                      <input 
+                                        type="text"
+                                        disabled
+                                        value="해당 수신자 (자동)"
+                                        className="w-full bg-stone-50 border border-stone-200 text-stone-400 rounded-lg px-2.5 py-1.5 text-xs font-bold cursor-not-allowed"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <span className="text-[10px] text-[#735965] font-bold">메시지 템플릿</span>
+                                    <textarea 
+                                      value={config.customer.template}
+                                      onChange={(e) => setSmsSettings({
+                                        ...smsSettings,
+                                        [evt.key]: {
+                                          ...config,
+                                          customer: { ...config.customer, template: e.target.value }
+                                        }
+                                      })}
+                                      rows={3}
+                                      className="w-full bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg px-3 py-2 text-xs text-[#2d2026] leading-relaxed resize-none font-sans font-semibold"
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* 관리자용 */}
+                                <div className="space-y-3.5 bg-white border border-[#f2ccd7]/40 p-4 rounded-2xl relative">
+                                  <div className="flex justify-between items-center border-b border-[#f2ccd7]/20 pb-1.5">
+                                    <span className="text-[11px] font-bold text-[#2d2026]">관리자용 (본사 알림 수신)</span>
+                                    <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-[#735965] select-none">
+                                      <input 
+                                        type="checkbox"
+                                        checked={config.admin.isActive}
+                                        onChange={(e) => setSmsSettings({
+                                          ...smsSettings,
+                                          [evt.key]: {
+                                            ...config,
+                                            admin: { ...config.admin, isActive: e.target.checked }
+                                          }
+                                        })}
+                                        className="w-3.5 h-3.5 accent-[#f25f8a] rounded cursor-pointer"
+                                      />
+                                      활성화
+                                    </label>
+                                  </div>
+                                  <div className="space-y-2.5">
+                                    <div className="grid grid-cols-2 gap-3 text-[10px] font-semibold text-[#735965]">
+                                      <div className="space-y-1">
+                                        <span>발신 번호</span>
+                                        <input 
+                                          type="text"
+                                          value={config.admin.sender}
+                                          onChange={(e) => setSmsSettings({
+                                            ...smsSettings,
+                                            [evt.key]: {
+                                              ...config,
+                                              admin: { ...config.admin, sender: formatPhoneNumber(e.target.value) }
+                                            }
+                                          })}
+                                          className="w-full bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg px-2.5 py-1.5 text-xs text-[#2d2026]"
+                                        />
+                                      </div>
+                                      <div className="space-y-1">
+                                        <span>수신 번호 추가</span>
+                                        <div className="flex gap-1.5">
+                                          <input 
+                                            type="text"
+                                            placeholder="010-0000-0000"
+                                            value={newAdminPhoneInputs[evt.key] || ""}
+                                            onChange={(e) => setNewAdminPhoneInputs({
+                                              ...newAdminPhoneInputs,
+                                              [evt.key]: formatPhoneNumber(e.target.value)
+                                            })}
+                                            className="min-w-0 flex-1 bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg px-2 py-1.5 text-xs text-[#2d2026] placeholder-[#c4a0ae]"
+                                          />
+                                          <button 
+                                            type="button"
+                                            onClick={() => addAdminReceiver(evt.key)}
+                                            className="px-2.5 py-1.5 bg-[#f25f8a] hover:bg-[#df4977] text-white text-[10px] font-extrabold rounded-lg shrink-0 cursor-pointer border-0"
+                                          >
+                                            추가
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* 수신자 번호 리스트 태그 */}
+                                    <div className="space-y-1">
+                                      <span className="text-[10px] text-[#735965] font-bold">수신 번호 리스트 ({(config.admin.receivers || []).length}개)</span>
+                                      <div className="flex flex-wrap gap-1.5 bg-[#fff9fb] border border-[#f2ccd7]/30 p-2 rounded-xl min-h-[42px] max-h-[100px] overflow-y-auto">
+                                        {(config.admin.receivers || []).map((num: string) => (
+                                          <span key={num} className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-white border border-[#f2ccd7]/60 rounded-lg text-[10px] text-[#2d2026] font-bold">
+                                            {num}
+                                            <button 
+                                              type="button" 
+                                              onClick={() => removeAdminReceiver(evt.key, num)}
+                                              className="text-red-400 hover:text-red-600 font-extrabold shrink-0 border-0 bg-transparent cursor-pointer"
+                                            >
+                                              &times;
+                                            </button>
+                                          </span>
+                                        ))}
+                                        {(config.admin.receivers || []).length === 0 && (
+                                          <span className="text-[9px] text-[#735965]/50 font-bold m-auto">등록된 수신자가 없습니다.</span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <span className="text-[10px] text-[#735965] font-bold">메시지 템플릿</span>
+                                    <textarea 
+                                      value={config.admin.template}
+                                      onChange={(e) => setSmsSettings({
+                                        ...smsSettings,
+                                        [evt.key]: {
+                                          ...config,
+                                          admin: { ...config.admin, template: e.target.value }
+                                        }
+                                      })}
+                                      rows={3}
+                                      className="w-full bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg px-3 py-2 text-xs text-[#2d2026] leading-relaxed resize-none font-sans font-semibold"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* 저장 버튼 */}
+                      <div className="flex justify-end border-t border-[#f2ccd7]/40 pt-4">
+                        <button
+                          type="submit"
+                          className="py-3 px-6 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer border-0"
+                        >
+                          <Check size={14} />
+                          SMS 알림 및 템플릿 설정 일괄 저장
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
 
               </div>
 

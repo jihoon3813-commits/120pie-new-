@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import Footer from "@/app/components/Footer";
 import { MENU_DATA, MenuItem } from "@/app/constants/menu";
 import { api } from "../../convex/_generated/api";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
+import { triggerConsultationSms } from "@/app/utils/sms";
 import {
   ArrowRight,
   TrendingUp,
@@ -1101,6 +1102,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   const convexPopup = useQuery(api.popups.get, { targetPage: "landing" });
   const convexFloating = useQuery(api.floatings.get);
   const addInquiry = useMutation(api.inquiries.add);
+  const sendSmsAction = useAction(api.aligo.sendSms);
 
   // Dynamic Popup & Floating data loading synced with Convex (fallback to localStorage if not yet loaded)
   useEffect(() => {
@@ -1234,6 +1236,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         message: formData.message || "",
         regDate: new Date().toISOString().split("T")[0]
       });
+      triggerConsultationSms(sendSmsAction, formData.name, formData.phone, formData.storeType);
       setFormSubmitted(true);
     } catch (err) {
       console.error("Failed to submit inquiry to Convex", err);
@@ -1245,6 +1248,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         regDate: new Date().toISOString().split("T")[0]
       };
       localStorage.setItem("120_inquiries", JSON.stringify([...list, newInq]));
+      triggerConsultationSms(sendSmsAction, formData.name, formData.phone, formData.storeType);
       setFormSubmitted(true);
     }
   };

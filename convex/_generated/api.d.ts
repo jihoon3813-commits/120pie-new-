@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as aligo from "../aligo.js";
 import type * as analytics from "../analytics.js";
 import type * as banners from "../banners.js";
 import type * as categories from "../categories.js";
@@ -31,6 +32,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  aligo: typeof aligo;
   analytics: typeof analytics;
   banners: typeof banners;
   categories: typeof categories;
