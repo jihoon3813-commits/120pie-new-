@@ -298,7 +298,7 @@ function NaverMap({
       map.fitBounds(bounds);
     } else {
       map.setCenter(initialCenter);
-      map.setZoom(16);
+      map.setZoom(14);
     }
   }, [resolvedCoords, stores, isPink, useFallback]);
 
@@ -311,6 +311,7 @@ function NaverMap({
       const naver = window.naver;
       const targetLatLng = new naver.maps.LatLng(coord.lat, coord.lng);
       map.panTo(targetLatLng);
+      map.setZoom(14);
 
       Object.keys(infoWindowsRef.current).forEach((id) => {
         if (id === activeStoreId) {
