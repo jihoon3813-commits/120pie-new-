@@ -1271,82 +1271,79 @@ export default function PortalPage() {
   };
 
   // Real Road Address Search using Daum/Kakao Postcode API (Iframe Embedded Layer Style)
-  const openDaumPostcodeForReg = () => {
-    setAddressSearchTarget("register");
-    addressSearchTargetRef.current = "register";
+  const openDaumPostcode = (target: "register" | "profile") => {
+    setAddressSearchTarget(target);
+    addressSearchTargetRef.current = target;
     setShowAddressPopup(true);
     setAddressTab("kakao");
     setAddressSearchKeyword("");
-    
-    if (typeof window !== "undefined") {
-      const scriptId = "daum-postcode-script";
-      let script = document.getElementById(scriptId) as HTMLScriptElement | null;
-      
-      const embedPostcode = () => {
-        let attempts = 0;
-        
-        // Double-safety polling: wait for window.daum.Postcode to be fully loaded and container to be rendered
-        const tryEmbed = () => {
-          const container = document.getElementById("daum-postcode-container");
-          const daumNamespace = (window as any).daum;
-          
-          if (daumNamespace && daumNamespace.Postcode && container) {
-            new daumNamespace.Postcode({
-              oncomplete: (data: any) => {
-                let fullRoadAddr = data.roadAddress; // 도로명 주소 변수
-                let extraRoadAddr = ''; // 참고항목 변수
-
-                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                  extraRoadAddr += data.bname;
-                }
-                if (data.buildingName !== '') {
-                  extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                }
-                if (extraRoadAddr !== '') {
-                  extraRoadAddr = ' (' + extraRoadAddr + ')';
-                }
-
-                const finalAddress = fullRoadAddr + extraRoadAddr;
-                if (addressSearchTargetRef.current === "profile") {
-                  setProfileRoadAddress(finalAddress);
-                } else {
-                  setRegRoadAddress(finalAddress);
-                }
-                
-                setShowAddressPopup(false);
-                triggerToast("도로명 주소가 자동 입력되었습니다.");
-              },
-              width: "100%",
-              height: "100%"
-            }).embed(container);
-          } else {
-            if (attempts < 30) {
-              attempts++;
-              setTimeout(tryEmbed, 100);
-            } else {
-              console.error("[Kakao API] Failed to load Kakao Postcode library safely.");
-              triggerToast("주소 검색 라이브러리를 로드하는 데 실패했습니다.");
-            }
-          }
-        };
-
-        setTimeout(tryEmbed, 100);
-      };
-
-      if (!script) {
-        script = document.createElement("script");
-        script.id = scriptId;
-        script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-        script.async = true;
-        script.onload = () => {
-          embedPostcode();
-        };
-        document.head.appendChild(script);
-      } else {
-        embedPostcode();
-      }
-    }
   };
+
+  // Embed Daum Postcode whenever the popup is open and tab is "kakao"
+  useEffect(() => {
+    if (!showAddressPopup || addressTab !== "kakao" || typeof window === "undefined") return;
+
+    const scriptId = "daum-postcode-script";
+    let script = document.getElementById(scriptId) as HTMLScriptElement | null;
+    let attempts = 0;
+
+    const embedPostcode = () => {
+      const container = document.getElementById("daum-postcode-container");
+      const daumNamespace = (window as any).daum;
+      
+      if (daumNamespace && daumNamespace.Postcode && container) {
+        new daumNamespace.Postcode({
+          oncomplete: (data: any) => {
+            let fullRoadAddr = data.roadAddress;
+            let extraRoadAddr = '';
+
+            if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+              extraRoadAddr += data.bname;
+            }
+            if (data.buildingName !== '') {
+              extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+            }
+            if (extraRoadAddr !== '') {
+              extraRoadAddr = ' (' + extraRoadAddr + ')';
+            }
+
+            const finalAddress = fullRoadAddr + extraRoadAddr;
+            if (addressSearchTargetRef.current === "profile") {
+              setProfileRoadAddress(finalAddress);
+            } else {
+              setRegRoadAddress(finalAddress);
+            }
+            
+            setShowAddressPopup(false);
+            triggerToast("도로명 주소가 자동 입력되었습니다.");
+          },
+          width: "100%",
+          height: "100%"
+        }).embed(container);
+      } else {
+        if (attempts < 40) {
+          attempts++;
+          setTimeout(embedPostcode, 100);
+        } else {
+          console.error("[Kakao API] Failed to load Kakao Postcode library safely.");
+          triggerToast("주소 검색 라이브러리를 로드하는 데 실패했습니다.");
+        }
+      }
+    };
+
+    if (!script) {
+      script = document.createElement("script");
+      script.id = scriptId;
+      script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+      script.async = true;
+      script.onload = () => {
+        embedPostcode();
+      };
+      document.head.appendChild(script);
+    } else {
+      embedPostcode();
+    }
+  }, [showAddressPopup, addressTab]);
 
   // Simulated Road Address Search
   const handleRegAddressSearch = (keyword: string) => {
@@ -2341,7 +2338,7 @@ export default function PortalPage() {
                     />
                     <button
                       type="button"
-                      onClick={openDaumPostcodeForReg}
+                      onClick={() => openDaumPostcode("register")}
                       className="px-4 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-stone-900 text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer border-0"
                     >
                       주소 검색
@@ -3907,11 +3904,7 @@ export default function PortalPage() {
                       />
                       <button
                         type="button"
-                        onClick={() => {
-                          setAddressSearchTarget("profile");
-                          addressSearchTargetRef.current = "profile";
-                          setShowAddressPopup(true);
-                        }}
+                        onClick={() => openDaumPostcode("profile")}
                         className="px-4 py-2.5 bg-[#735965] hover:bg-[#5a444f] text-white text-xs font-bold rounded-xl transition-all cursor-pointer border-0 shrink-0"
                       >
                         주소 검색
