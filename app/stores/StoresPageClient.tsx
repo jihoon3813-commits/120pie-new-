@@ -90,6 +90,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [submoduleReady, setSubmoduleReady] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
+  const [fallbackReason, setFallbackReason] = useState("");
   const [clientId, setClientId] = useState("");
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInitializedRef = useRef(false);
@@ -109,6 +110,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
         }
       }
     } else {
+      setFallbackReason("CLIENT_ID_MISSING");
       setUseFallback(true);
     }
   }, []);
@@ -120,6 +122,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
     const timer = setTimeout(() => {
       if (!mapInitializedRef.current) {
         console.warn("Naver Map initialization timed out. Falling back to Google Maps.");
+        setFallbackReason("TIMEOUT_2500MS");
         setUseFallback(true);
       }
     }, 2500);
@@ -157,6 +160,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
         (status: any, response: any) => {
           if (status !== naver.maps.Service.Status.OK || !response.v2.addresses[0]) {
             console.error("Geocoding failed for address:", cleanAddr);
+            setFallbackReason(`GEOCODE_FAIL_STATUS_${status}`);
             setUseFallback(true);
             return;
           }
@@ -239,6 +243,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
       );
     } catch (e) {
       console.error("Failed to initialize Naver Map:", e);
+      setFallbackReason(`EXCEPTION_${e instanceof Error ? e.message : String(e)}`);
       setUseFallback(true);
     }
   }, [scriptLoaded, submoduleReady, address, name, isPink, useFallback]);
@@ -264,7 +269,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
           title={`${name} 지도 위치`}
         />
         <div className="absolute bottom-2 left-2 right-2 bg-white/95 backdrop-blur-sm border border-[#ffd500]/30 rounded-lg p-2.5 text-[9px] text-[#0d233a] font-bold text-center z-30 shadow-md leading-normal">
-          💡 네이버 지도 API 인증 대기 중이거나 등록되지 않아 안전하게 구글 지도로 로드되었습니다. (인증키 등록 및 네이버 콘솔에 웹 사이트 주소 URL 추가 시 네이버 지도로 즉시 자동 전환됩니다.)
+          💡 네이버 지도 API 인증 대기 중이거나 등록되지 않아 안전하게 구글 지도로 로드되었습니다. (이유: {fallbackReason || "알 수 없음"}, 키: {clientId || "없음"}) (인증키 등록 및 네이버 콘솔에 웹 사이트 주소 URL 추가 시 네이버 지도로 즉시 자동 전환됩니다.)
         </div>
       </div>
     );
@@ -275,7 +280,10 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
       <Script
         src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`}
         onLoad={() => setScriptLoaded(true)}
-        onError={() => setUseFallback(true)}
+        onError={(err) => {
+          setFallbackReason("SCRIPT_LOAD_ERROR");
+          setUseFallback(true);
+        }}
       />
       <div ref={mapRef} className="w-full h-full" />
     </div>
