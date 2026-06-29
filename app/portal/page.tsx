@@ -419,7 +419,7 @@ export default function PortalPage() {
       setDeliveryAddress(storeData.roadAddress || "");
       setDeliveryDetailAddress(storeData.detailAddress || "");
       setRecipientName(storeData.owner || "");
-      setRecipientPhone(storeData.phone || "");
+      setRecipientPhone(formatPhoneNumber(storeData.phone || ""));
       setDeliveryInfoLoaded(true);
     }
   }, [stores, activeStoreId, deliveryInfoLoaded]);
@@ -3335,12 +3335,12 @@ export default function PortalPage() {
                         <div className="space-y-2">
                           <div>
                             <label className="text-[10px] font-bold text-[#735965] block mb-1">배송지 주소 (도로명)</label>
-                            <input
-                              type="text"
+                            <textarea
                               value={deliveryAddress}
                               onChange={(e) => setDeliveryAddress(e.target.value)}
                               placeholder="도로명 주소를 입력해 주세요"
-                              className="w-full px-3 py-2 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                              rows={2}
+                              className="w-full px-3 py-1.5 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae] resize-none leading-relaxed"
                             />
                           </div>
                           <div>
@@ -3369,7 +3369,7 @@ export default function PortalPage() {
                               <input
                                 type="tel"
                                 value={recipientPhone}
-                                onChange={(e) => setRecipientPhone(e.target.value)}
+                                onChange={(e) => setRecipientPhone(formatPhoneNumber(e.target.value))}
                                 placeholder="010-0000-0000"
                                 className="w-full px-3 py-2 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
                               />
