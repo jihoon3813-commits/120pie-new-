@@ -7,6 +7,7 @@ import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import Script from "next/script";
 
 const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
 const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png";
@@ -80,20 +81,137 @@ const cleanStoreName = (name: string) => {
 declare global {
   interface Window {
     kakao: any;
+    naver: any;
   }
 }
 
-function KakaoMap({ address, name }: { address: string; name: string; isPink?: boolean }) {
+function NaverMap({ address, name, isPink }: { address: string; name: string; isPink?: boolean }) {
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || "";
+
+  useEffect(() => {
+    if (window.naver && window.naver.maps) {
+      setScriptLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!scriptLoaded || !window.naver || !mapRef.current || !address) return;
+
+    const naver = window.naver;
+    const cleanAddr = address.split("(")[0].trim();
+
+    naver.maps.Service.geocode(
+      { query: cleanAddr },
+      (status: any, response: any) => {
+        if (status !== naver.maps.Service.Status.OK || !response.v2.addresses[0]) {
+          console.error("Geocoding failed for address:", cleanAddr);
+          return;
+        }
+
+        const item = response.v2.addresses[0];
+        const latlng = new naver.maps.LatLng(item.y, item.x);
+
+        const mapOptions = {
+          center: latlng,
+          zoom: 16,
+          zoomControl: true,
+          zoomControlOptions: {
+            position: naver.maps.Position.TOP_RIGHT,
+          },
+        };
+
+        const map = new naver.maps.Map(mapRef.current, mapOptions);
+
+        const markerIcon = {
+          content: `
+            <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+              <div style="
+                background: white; 
+                border: 2px solid ${isPink ? '#f25f8a' : '#ffd500'}; 
+                border-radius: 50%; 
+                width: 44px; 
+                height: 44px; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+                overflow: hidden;
+              ">
+                <img src="${isPink ? 'https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png' : 'https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png'}" style="width: 32px; height: 32px; object-fit: contain;" />
+              </div>
+              <div style="
+                width: 0; 
+                height: 0; 
+                border-left: 6px solid transparent; 
+                border-right: 6px solid transparent; 
+                border-top: 8px solid ${isPink ? '#f25f8a' : '#ffd500'};
+                margin-top: -1px;
+              "></div>
+            </div>
+          `,
+          size: new naver.maps.Size(44, 51),
+          anchor: new naver.maps.Point(22, 51),
+        };
+
+        const marker = new naver.maps.Marker({
+          position: latlng,
+          map: map,
+          icon: markerIcon,
+        });
+
+        const infoWindow = new naver.maps.InfoWindow({
+          content: `
+            <div style="padding: 6px 10px; font-size: 10px; font-weight: bold; color: #2d2026; background: white; border-radius: 6px; border: 1px solid ${isPink ? '#f25f8a' : '#ffd500'}">
+              ${name}
+            </div>
+          `,
+          borderWidth: 0,
+          backgroundColor: "transparent",
+          disableAnchor: true,
+          pixelOffset: new naver.maps.Point(0, -10),
+        });
+
+        infoWindow.open(map, marker);
+
+        naver.maps.Event.addListener(marker, "click", () => {
+          if (infoWindow.getMap()) {
+            infoWindow.close();
+          } else {
+            infoWindow.open(map, marker);
+          }
+        });
+      }
+    );
+  }, [scriptLoaded, address, name, isPink]);
+
   const cleanAddr = address.split("(")[0].trim();
+
+  if (!clientId) {
+    return (
+      <div className="absolute inset-0 w-full h-full">
+        <iframe
+          src={`https://maps.google.com/maps?q=${encodeURIComponent(cleanAddr)}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
+          className="w-full h-full border-0"
+          allowFullScreen
+          loading="lazy"
+          title={`${name} 지도 위치`}
+        />
+        <div className="absolute bottom-2 left-2 right-2 bg-white/95 backdrop-blur-sm border border-[#ffd500]/30 rounded-lg p-2.5 text-[9px] text-[#0d233a] font-bold text-center z-30 shadow-md leading-normal">
+          💡 네이버 지도 Client ID(.env.local의 NEXT_PUBLIC_NAVER_MAP_CLIENT_ID)를 설정하시면 120pie 로고가 표시된 네이버 지도로 작동합니다.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="absolute inset-0 w-full h-full">
-      <iframe
-        src={`https://maps.google.com/maps?q=${encodeURIComponent(cleanAddr)}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
-        className="w-full h-full border-0"
-        allowFullScreen
-        loading="lazy"
-        title={`${name} 지도 위치`}
+      <Script
+        src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`}
+        onLoad={() => setScriptLoaded(true)}
       />
+      <div ref={mapRef} className="w-full h-full" />
     </div>
   );
 }
@@ -620,7 +738,7 @@ export default function StoresPageClient() {
 
             {/* Right Side: Map Area (Explicitly positioned relative wrapper with full dimensions) */}
             <div className="flex-1 relative h-[55%] lg:h-full w-full bg-neutral-100 z-10">
-              <KakaoMap
+              <NaverMap
                 address={activeStore ? activeStore.roadAddress : "서울 송파구 삼학사로 73"}
                 name={activeStore ? cleanStoreName(activeStore.name) : "120겹파이"}
                 isPink={isPink}
