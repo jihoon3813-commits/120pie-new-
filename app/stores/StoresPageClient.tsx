@@ -310,8 +310,7 @@ function NaverMap({
     if (coord) {
       const naver = window.naver;
       const targetLatLng = new naver.maps.LatLng(coord.lat, coord.lng);
-      map.panTo(targetLatLng);
-      map.setZoom(14);
+      map.morph(targetLatLng, 14);
 
       Object.keys(infoWindowsRef.current).forEach((id) => {
         if (id === activeStoreId) {
