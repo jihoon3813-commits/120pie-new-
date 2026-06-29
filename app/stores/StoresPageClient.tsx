@@ -115,17 +115,17 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
     }
   }, []);
 
-  // Timeout fallback: if Naver Map is not initialized within 2.5 seconds, use Google Maps fallback
+  // Timeout fallback: if Naver Map is not initialized within 8.0 seconds, use Google Maps fallback
   useEffect(() => {
     if (!mounted || !clientId) return;
 
     const timer = setTimeout(() => {
       if (!mapInitializedRef.current) {
         console.warn("Naver Map initialization timed out. Falling back to Google Maps.");
-        setFallbackReason("TIMEOUT_2500MS");
+        setFallbackReason("TIMEOUT_8000MS");
         setUseFallback(true);
       }
-    }, 2500);
+    }, 8000);
 
     return () => clearTimeout(timer);
   }, [mounted, clientId, address]);
@@ -248,6 +248,50 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
     }
   }, [scriptLoaded, submoduleReady, address, name, isPink, useFallback]);
 
+  // Dynamic script loader to bypass Next.js Script caching bugs
+  useEffect(() => {
+    if (!clientId || !mounted) return;
+
+    const scriptId = "naver-map-script";
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
+
+    const handleScriptLoad = () => {
+      setScriptLoaded(true);
+    };
+
+    const handleScriptError = () => {
+      setFallbackReason("SCRIPT_LOAD_ERROR");
+      setUseFallback(true);
+    };
+
+    if (!script) {
+      script = document.createElement("script");
+      script.id = scriptId;
+      script.src = `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`;
+      script.async = true;
+      script.onload = handleScriptLoad;
+      script.onerror = handleScriptError;
+      document.head.appendChild(script);
+    } else {
+      if (window.naver && window.naver.maps) {
+        setScriptLoaded(true);
+        if (window.naver.maps.Service) {
+          setSubmoduleReady(true);
+        }
+      } else {
+        script.addEventListener("load", handleScriptLoad);
+        script.addEventListener("error", handleScriptError);
+      }
+    }
+
+    return () => {
+      if (script) {
+        script.removeEventListener("load", handleScriptLoad);
+        script.removeEventListener("error", handleScriptError);
+      }
+    };
+  }, [clientId, mounted]);
+
   const cleanAddr = address.split("(")[0].trim();
 
   if (!mounted) {
@@ -277,14 +321,6 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
 
   return (
     <div className="absolute inset-0 w-full h-full">
-      <Script
-        src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`}
-        onLoad={() => setScriptLoaded(true)}
-        onError={(err) => {
-          setFallbackReason("SCRIPT_LOAD_ERROR");
-          setUseFallback(true);
-        }}
-      />
       <div ref={mapRef} className="w-full h-full" />
     </div>
   );
