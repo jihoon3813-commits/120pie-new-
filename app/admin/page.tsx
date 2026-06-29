@@ -1128,7 +1128,7 @@ export default function AdminPage() {
   const [adminIdSetting, setAdminIdSetting] = useState<string>("admin");
   const [adminPwSetting, setAdminPwSetting] = useState<string>("");
   const [adminPwSettingConfirm, setAdminPwSettingConfirm] = useState<string>("");
-  const [kakaoMapKeySetting, setKakaoMapKeySetting] = useState<string>("");
+  const [naverClientIdSetting, setNaverClientIdSetting] = useState<string>("");
   const [termsOfUseSetting, setTermsOfUseSetting] = useState<string>("");
   const [privacyPolicySetting, setPrivacyPolicySetting] = useState<string>("");
   const [refundPolicySetting, setRefundPolicySetting] = useState<string>("");
@@ -1174,8 +1174,8 @@ export default function AdminPage() {
       setDeliveryStatuses(ds);
       const storedAdminId = localStorage.getItem("120_admin_id") || "admin";
       setAdminIdSetting(storedAdminId);
-      const storedKakaoKey = localStorage.getItem("120_kakao_api_key") || "";
-      setKakaoMapKeySetting(storedKakaoKey);
+      const storedNaverKey = localStorage.getItem("120_naver_client_id") || "";
+      setNaverClientIdSetting(storedNaverKey);
       const storedTerms = localStorage.getItem("120_terms_of_use") || DEFAULT_TERMS;
       setTermsOfUseSetting(storedTerms);
       const storedPrivacy = localStorage.getItem("120_privacy_policy") || DEFAULT_PRIVACY;
@@ -2745,10 +2745,10 @@ export default function AdminPage() {
     triggerToast("본사 최고 관리자 계정 정보가 성공적으로 변경되었습니다.");
   };
 
-  const handleUpdateKakaoMapKey = (e: React.FormEvent) => {
+  const handleUpdateNaverClientId = (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem("120_kakao_api_key", kakaoMapKeySetting.trim());
-    triggerToast("카카오맵 API 설정이 성공적으로 저장되었습니다!");
+    localStorage.setItem("120_naver_client_id", naverClientIdSetting.trim());
+    triggerToast("네이버 지도 API 설정이 성공적으로 저장되었습니다!");
   };
 
   const handleSavePolicies = (e: React.FormEvent) => {
@@ -6320,32 +6320,32 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* 3. Kakao Map API Key Integration (외부 지도 API 연동) */}
+                {/* 3. Naver Map API Key Integration (외부 지도 API 연동) */}
                 <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 lg:col-span-2">
                   <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
                     <Map size={18} className="text-[#f25f8a]" />
-                    가맹점 현황 지도 연동 설정 (다음/카카오맵 API)
+                    가맹점 현황 지도 연동 설정 (네이버 지도 API)
                   </h3>
                   
                   <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
-                    공식 가맹점 안내 페이지의 지도를 구글 맵 대신 국내 환경에 친화적인 <strong>카카오맵(다음지도)</strong>으로 직접 연동할 수 있습니다.<br />
-                    카카오맵 JavaScript API Key를 등록하면 실시간 지점 좌표 변환 및 위치 핀 표시 기능이 활성화됩니다.<br />
+                    공식 가맹점 안내 페이지의 지도를 구글 맵 대신 국내 환경에 친화적인 <strong>네이버 지도(Naver Maps)</strong>로 직접 연동할 수 있습니다.<br />
+                    네이버 클라우드 플랫폼에서 발급받은 Client ID를 등록하면 실시간 지점 좌표 변환 및 120겹파이 로고 이미지 마커 핀 표시 기능이 활성화됩니다.<br />
                     <span className="text-[#bf3e67] font-extrabold">* 미등록 상태인 경우, 가맹점 안내 페이지는 구글 지도를 통해 안전하게 자동 대체 작동합니다.</span>
                   </p>
 
-                  <form onSubmit={handleUpdateKakaoMapKey} className="space-y-4 max-w-xl">
+                  <form onSubmit={handleUpdateNaverClientId} className="space-y-4 max-w-xl">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">카카오 개발자 JavaScript 앱 키 (App Key)</label>
+                      <label className="text-xs font-bold text-[#735965]">네이버 클라우드 플랫폼 Client ID</label>
                       <input 
                         type="text"
-                        placeholder="카카오디벨로퍼스에서 발급받은 JavaScript 키를 입력하세요"
-                        value={kakaoMapKeySetting}
-                        onChange={(e) => setKakaoMapKeySetting(e.target.value)}
+                        placeholder="네이버 클라우드 플랫폼에서 발급받은 Client ID를 입력하세요"
+                        value={naverClientIdSetting}
+                        onChange={(e) => setNaverClientIdSetting(e.target.value)}
                         className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
                       />
                       <p className="text-[10px] text-neutral-400 font-medium leading-relaxed">
-                        발급처: <a href="https://developers.kakao.com" target="_blank" rel="noopener noreferrer" className="text-[#f25f8a] underline hover:text-[#df4977]">Kakao Developers Console</a><br />
-                        ⚙️ <strong>플랫폼 설정 방법</strong>: 내 애플리케이션 &gt; 앱 설정 &gt; 플랫폼 &gt; <strong>Web 플랫폼</strong>에 아래 도메인을 등록해주세요.<br />
+                        발급처: <a href="https://console.ncloud.com" target="_blank" rel="noopener noreferrer" className="text-[#f25f8a] underline hover:text-[#df4977]">Naver Cloud Platform Console</a><br />
+                        ⚙️ <strong>플랫폼 설정 방법</strong>: AI·NAVER API &gt; Application 등록 &gt; <strong>Web 서비스 URL</strong>에 아래 도메인을 등록해주세요.<br />
                         👉 등록할 사이트 도메인: <code className="bg-neutral-100 text-[#bf3e67] px-1.5 py-0.5 rounded font-mono font-bold text-[11px]">{typeof window !== "undefined" ? window.location.origin : "https://120pie-new.vercel.app"}</code>
                       </p>
                     </div>
@@ -6355,7 +6355,7 @@ export default function AdminPage() {
                       className="py-3 px-6 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5"
                     >
                       <Check size={14} />
-                      카카오맵 API 설정 저장
+                      네이버 지도 API 설정 저장
                     </button>
                   </form>
                 </div>

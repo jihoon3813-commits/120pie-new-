@@ -89,7 +89,15 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [submoduleReady, setSubmoduleReady] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
-  const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || "";
+  const [clientId, setClientId] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedKey = localStorage.getItem("120_naver_client_id") || "";
+      const envKey = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || "";
+      setClientId(storedKey.trim() || envKey.trim());
+    }
+  }, []);
 
   useEffect(() => {
     if (window.naver && window.naver.maps) {
