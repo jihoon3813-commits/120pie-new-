@@ -86,37 +86,36 @@ declare global {
 }
 
 function NaverMap({ address, name, isPink }: { address: string; name: string; isPink?: boolean }) {
+  const [mounted, setMounted] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [submoduleReady, setSubmoduleReady] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
-  const mapRef = useRef<HTMLDivElement>(null);
   const [clientId, setClientId] = useState("");
+  const mapRef = useRef<HTMLDivElement>(null);
   const mapInitializedRef = useRef(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedKey = localStorage.getItem("120_naver_client_id") || "";
-      const envKey = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || "";
-      setClientId(storedKey.trim() || envKey.trim());
-    }
-  }, []);
+    setMounted(true);
+    const storedKey = localStorage.getItem("120_naver_client_id") || "";
+    const envKey = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || "";
+    const activeKey = storedKey.trim() || envKey.trim();
+    setClientId(activeKey);
 
-  // Check if Naver Maps is already loaded on mount
-  useEffect(() => {
-    if (window.naver && window.naver.maps) {
-      setScriptLoaded(true);
-      if (window.naver.maps.Service) {
-        setSubmoduleReady(true);
+    if (activeKey) {
+      if (window.naver && window.naver.maps) {
+        setScriptLoaded(true);
+        if (window.naver.maps.Service) {
+          setSubmoduleReady(true);
+        }
       }
+    } else {
+      setUseFallback(true);
     }
   }, []);
 
   // Timeout fallback: if Naver Map is not initialized within 2.5 seconds, use Google Maps fallback
   useEffect(() => {
-    if (!clientId) {
-      setUseFallback(true);
-      return;
-    }
+    if (!mounted || !clientId) return;
 
     const timer = setTimeout(() => {
       if (!mapInitializedRef.current) {
@@ -126,7 +125,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
     }, 2500);
 
     return () => clearTimeout(timer);
-  }, [clientId, address]);
+  }, [mounted, clientId, address]);
 
   useEffect(() => {
     if (!scriptLoaded) return;
@@ -245,6 +244,14 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
   }, [scriptLoaded, submoduleReady, address, name, isPink, useFallback]);
 
   const cleanAddr = address.split("(")[0].trim();
+
+  if (!mounted) {
+    return (
+      <div className="absolute inset-0 w-full h-full bg-neutral-100 flex items-center justify-center text-xs font-bold text-neutral-400">
+        지도를 로드하는 중...
+      </div>
+    );
+  }
 
   if (useFallback || !clientId) {
     return (
