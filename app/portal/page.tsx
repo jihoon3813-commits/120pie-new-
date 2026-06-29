@@ -595,7 +595,7 @@ export default function PortalPage() {
   // Sync Convex orders to React state and localStorage (Filter by storeId)
   useEffect(() => {
     if (convexOrders !== undefined && convexOrders !== null) {
-      const myOrders = convexOrders.filter((o: any) => o.storeId === activeStoreId || o.storeId === "owner");
+      const myOrders = convexOrders.filter((o: any) => o.storeId === activeStoreId);
       const mappedOrders = myOrders.map((o: any) => ({
         id: o.id,
         date: o.date,
@@ -3490,7 +3490,7 @@ export default function PortalPage() {
               
               <div>
                 <h2 className="text-xl font-bold text-[#2d2026]">정기 자재 발주 내역</h2>
-                <p className="text-xs text-[#735965] font-bold mt-1">강남역삼점에서 신청한 역대 자재 발주 히스토리와 배송 현황입니다.</p>
+                <p className="text-xs text-[#735965] font-bold mt-1">{activeStore?.name || "가맹점"}에서 신청한 역대 자재 발주 히스토리와 배송 현황입니다.</p>
               </div>
 
               {/* Order List Table */}
@@ -4228,7 +4228,7 @@ export default function PortalPage() {
               <div className="flex-1">
                 <h3 className="text-sm sm:text-base font-black text-[#2d2026] flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                   <span>발주 상세 내역</span>
-                  <span className="text-[10px] sm:text-xs text-[#735965] font-bold block">강남역삼점 · 발주 코드: <span className="font-mono text-[#bf3e67] font-black">{selectedOrder.id}</span></span>
+                  <span className="text-[10px] sm:text-xs text-[#735965] font-bold block">{activeStore?.name || "가맹점"} · 발주 코드: <span className="font-mono text-[#bf3e67] font-black">{selectedOrder.id}</span></span>
                 </h3>
               </div>
               <button onClick={() => closeModal(() => setSelectedOrder(null))} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 ml-4">
