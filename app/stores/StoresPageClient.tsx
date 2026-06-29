@@ -88,8 +88,10 @@ declare global {
 function NaverMap({ address, name, isPink }: { address: string; name: string; isPink?: boolean }) {
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [submoduleReady, setSubmoduleReady] = useState(false);
+  const [useFallback, setUseFallback] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const [clientId, setClientId] = useState("");
+  const mapInitializedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -99,6 +101,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
     }
   }, []);
 
+  // Check if Naver Maps is already loaded on mount
   useEffect(() => {
     if (window.naver && window.naver.maps) {
       setScriptLoaded(true);
@@ -107,6 +110,23 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
       }
     }
   }, []);
+
+  // Timeout fallback: if Naver Map is not initialized within 2.5 seconds, use Google Maps fallback
+  useEffect(() => {
+    if (!clientId) {
+      setUseFallback(true);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (!mapInitializedRef.current) {
+        console.warn("Naver Map initialization timed out. Falling back to Google Maps.");
+        setUseFallback(true);
+      }
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [clientId, address]);
 
   useEffect(() => {
     if (!scriptLoaded) return;
@@ -127,98 +147,106 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
   }, [scriptLoaded]);
 
   useEffect(() => {
-    if (!scriptLoaded || !submoduleReady || !window.naver || !window.naver.maps || !window.naver.maps.Service || !mapRef.current || !address) return;
+    if (!scriptLoaded || !submoduleReady || !window.naver || !window.naver.maps || !window.naver.maps.Service || !mapRef.current || !address || useFallback) return;
 
-    const naver = window.naver;
-    const cleanAddr = address.split("(")[0].trim();
+    try {
+      const naver = window.naver;
+      const cleanAddr = address.split("(")[0].trim();
 
-    naver.maps.Service.geocode(
-      { query: cleanAddr },
-      (status: any, response: any) => {
-        if (status !== naver.maps.Service.Status.OK || !response.v2.addresses[0]) {
-          console.error("Geocoding failed for address:", cleanAddr);
-          return;
-        }
-
-        const item = response.v2.addresses[0];
-        const latlng = new naver.maps.LatLng(item.y, item.x);
-
-        const mapOptions = {
-          center: latlng,
-          zoom: 16,
-          zoomControl: true,
-          zoomControlOptions: {
-            position: naver.maps.Position.TOP_RIGHT,
-          },
-        };
-
-        const map = new naver.maps.Map(mapRef.current, mapOptions);
-
-        const markerIcon = {
-          content: `
-            <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
-              <div style="
-                background: white; 
-                border: 2px solid ${isPink ? '#f25f8a' : '#ffd500'}; 
-                border-radius: 50%; 
-                width: 44px; 
-                height: 44px; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                box-shadow: 0 3px 8px rgba(0,0,0,0.18);
-                overflow: hidden;
-              ">
-                <img src="${isPink ? 'https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png' : 'https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png'}" style="width: 32px; height: 32px; object-fit: contain;" />
-              </div>
-              <div style="
-                width: 0; 
-                height: 0; 
-                border-left: 6px solid transparent; 
-                border-right: 6px solid transparent; 
-                border-top: 8px solid ${isPink ? '#f25f8a' : '#ffd500'};
-                margin-top: -1px;
-              "></div>
-            </div>
-          `,
-          size: new naver.maps.Size(44, 51),
-          anchor: new naver.maps.Point(22, 51),
-        };
-
-        const marker = new naver.maps.Marker({
-          position: latlng,
-          map: map,
-          icon: markerIcon,
-        });
-
-        const infoWindow = new naver.maps.InfoWindow({
-          content: `
-            <div style="padding: 6px 10px; font-size: 10px; font-weight: bold; color: #2d2026; background: white; border-radius: 6px; border: 1px solid ${isPink ? '#f25f8a' : '#ffd500'}">
-              ${name}
-            </div>
-          `,
-          borderWidth: 0,
-          backgroundColor: "transparent",
-          disableAnchor: true,
-          pixelOffset: new naver.maps.Point(0, -10),
-        });
-
-        infoWindow.open(map, marker);
-
-        naver.maps.Event.addListener(marker, "click", () => {
-          if (infoWindow.getMap()) {
-            infoWindow.close();
-          } else {
-            infoWindow.open(map, marker);
+      naver.maps.Service.geocode(
+        { query: cleanAddr },
+        (status: any, response: any) => {
+          if (status !== naver.maps.Service.Status.OK || !response.v2.addresses[0]) {
+            console.error("Geocoding failed for address:", cleanAddr);
+            setUseFallback(true);
+            return;
           }
-        });
-      }
-    );
-  }, [scriptLoaded, submoduleReady, address, name, isPink]);
+
+          const item = response.v2.addresses[0];
+          const latlng = new naver.maps.LatLng(item.y, item.x);
+
+          const mapOptions = {
+            center: latlng,
+            zoom: 16,
+            zoomControl: true,
+            zoomControlOptions: {
+              position: naver.maps.Position.TOP_RIGHT,
+            },
+          };
+
+          const map = new naver.maps.Map(mapRef.current, mapOptions);
+
+          const markerIcon = {
+            content: `
+              <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+                <div style="
+                  background: white; 
+                  border: 2px solid ${isPink ? '#f25f8a' : '#ffd500'}; 
+                  border-radius: 50%; 
+                  width: 44px; 
+                  height: 44px; 
+                  display: flex; 
+                  align-items: center; 
+                  justify-content: center; 
+                  box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+                  overflow: hidden;
+                ">
+                  <img src="${isPink ? 'https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png' : 'https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png'}" style="width: 32px; height: 32px; object-fit: contain;" />
+                </div>
+                <div style="
+                  width: 0; 
+                  height: 0; 
+                  border-left: 6px solid transparent; 
+                  border-right: 6px solid transparent; 
+                  border-top: 8px solid ${isPink ? '#f25f8a' : '#ffd500'};
+                  margin-top: -1px;
+                "></div>
+              </div>
+            `,
+            size: new naver.maps.Size(44, 51),
+            anchor: new naver.maps.Point(22, 51),
+          };
+
+          const marker = new naver.maps.Marker({
+            position: latlng,
+            map: map,
+            icon: markerIcon,
+          });
+
+          const infoWindow = new naver.maps.InfoWindow({
+            content: `
+              <div style="padding: 6px 10px; font-size: 10px; font-weight: bold; color: #2d2026; background: white; border-radius: 6px; border: 1px solid ${isPink ? '#f25f8a' : '#ffd500'}">
+                ${name}
+              </div>
+            `,
+            borderWidth: 0,
+            backgroundColor: "transparent",
+            disableAnchor: true,
+            pixelOffset: new naver.maps.Point(0, -10),
+          });
+
+          infoWindow.open(map, marker);
+
+          naver.maps.Event.addListener(marker, "click", () => {
+            if (infoWindow.getMap()) {
+              infoWindow.close();
+            } else {
+              infoWindow.open(map, marker);
+            }
+          });
+
+          mapInitializedRef.current = true;
+        }
+      );
+    } catch (e) {
+      console.error("Failed to initialize Naver Map:", e);
+      setUseFallback(true);
+    }
+  }, [scriptLoaded, submoduleReady, address, name, isPink, useFallback]);
 
   const cleanAddr = address.split("(")[0].trim();
 
-  if (!clientId) {
+  if (useFallback || !clientId) {
     return (
       <div className="absolute inset-0 w-full h-full">
         <iframe
@@ -229,7 +257,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
           title={`${name} 지도 위치`}
         />
         <div className="absolute bottom-2 left-2 right-2 bg-white/95 backdrop-blur-sm border border-[#ffd500]/30 rounded-lg p-2.5 text-[9px] text-[#0d233a] font-bold text-center z-30 shadow-md leading-normal">
-          💡 네이버 지도 Client ID(.env.local의 NEXT_PUBLIC_NAVER_MAP_CLIENT_ID)를 설정하시면 120pie 로고가 표시된 네이버 지도로 작동합니다.
+          💡 네이버 지도 API 인증 대기 중이거나 등록되지 않아 안전하게 구글 지도로 로드되었습니다. (인증키 등록 및 네이버 콘솔에 웹 사이트 주소 URL 추가 시 네이버 지도로 즉시 자동 전환됩니다.)
         </div>
       </div>
     );
@@ -240,6 +268,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
       <Script
         src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`}
         onLoad={() => setScriptLoaded(true)}
+        onError={() => setUseFallback(true)}
       />
       <div ref={mapRef} className="w-full h-full" />
     </div>
