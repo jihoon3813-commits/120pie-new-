@@ -40,13 +40,34 @@ import {
   Settings,
   Map,
   Copy,
-  BarChart3
+  BarChart3,
+  Palette
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
 
 // ==========================================
 // TYPES DEFINITIONS
+const COLOR_PRESETS = {
+  blue: { label: "블루", bg: "bg-blue-50", text: "text-blue-500", border: "border-blue-200", hexBg: "#eff6ff", hexText: "#3b82f6", hexBorder: "#bfdbfe" },
+  emerald: { label: "초록", bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-200", hexBg: "#ecfdf5", hexText: "#059669", hexBorder: "#a7f3d0" },
+  orange: { label: "오렌지", bg: "bg-orange-50", text: "text-orange-500", border: "border-orange-200", hexBg: "#fff7ed", hexText: "#f97316", hexBorder: "#ffedd5" },
+  pink: { label: "핑크", bg: "bg-[#ffd3df]", text: "text-[#bf3e67]", border: "border-[#f2ccd7]", hexBg: "#ffd3df", hexText: "#bf3e67", hexBorder: "#f2ccd7" },
+  yellow: { label: "옐로", bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200", hexBg: "#fef3c7", hexText: "#d97706", hexBorder: "#fde68a" },
+  purple: { label: "보라", bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200", hexBg: "#f5f3ff", hexText: "#7c3aed", hexBorder: "#ddd6fe" },
+  gray: { label: "회색", bg: "bg-neutral-50", text: "text-neutral-600", border: "border-neutral-200", hexBg: "#f5f5f5", hexText: "#525252", hexBorder: "#e5e5e5" }
+};
+
+const DEFAULT_STATUS_COLORS: { [status: string]: string } = {
+  "주문완료": "pink",
+  "입금대기": "yellow",
+  "결제완료": "emerald",
+  "배송준비중": "orange",
+  "배송중": "blue",
+  "배송완료": "emerald",
+  "주문취소": "gray"
+};
+
 // ==========================================
 interface StoreInfo {
   id: string; // 로그인 아이디
@@ -1132,6 +1153,7 @@ export default function AdminPage() {
   const [termsOfUseSetting, setTermsOfUseSetting] = useState<string>("");
   const [privacyPolicySetting, setPrivacyPolicySetting] = useState<string>("");
   const [refundPolicySetting, setRefundPolicySetting] = useState<string>("");
+  const [statusColors, setStatusColors] = useState<Record<string, string>>(DEFAULT_STATUS_COLORS);
   const [smsSettings, setSmsSettings] = useState<any>(null);
   const [newAdminPhoneInputs, setNewAdminPhoneInputs] = useState<Record<string, string>>({});
   const [testReceiverPhone, setTestReceiverPhone] = useState<string>("");
@@ -1182,6 +1204,8 @@ export default function AdminPage() {
       setPrivacyPolicySetting(storedPrivacy);
       const storedRefund = localStorage.getItem("120_refund_policy") || DEFAULT_REFUND;
       setRefundPolicySetting(storedRefund);
+      const storedColors = loadState("120_status_colors", DEFAULT_STATUS_COLORS);
+      setStatusColors(storedColors);
 
       const DEFAULT_SMS_SETTINGS = {
         aligoKey: "",
@@ -4589,13 +4613,11 @@ export default function AdminPage() {
                               <td className="p-4 sm:p-5 font-bold text-[#2d2026] text-right whitespace-nowrap">{order.totalPrice.toLocaleString()} 원</td>
                               <td className="p-4 sm:p-5 text-center whitespace-nowrap">
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
-                                  order.status === "배송중" 
-                                    ? "bg-blue-50 text-blue-500 border border-blue-200" 
-                                    : order.status === "배송완료" 
-                                    ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
-                                    : order.status === "배송준비중"
-                                    ? "bg-orange-50 text-orange-500 border border-orange-200"
-                                    : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
+                                  (() => {
+                                    const colorKey = statusColors[order.status] || DEFAULT_STATUS_COLORS[order.status] || "pink";
+                                    const preset = COLOR_PRESETS[colorKey as keyof typeof COLOR_PRESETS] || COLOR_PRESETS.pink;
+                                    return `${preset.bg} ${preset.text} ${preset.border}`;
+                                  })()
                                 }`}>
                                   {order.status}
                                 </span>
@@ -6320,7 +6342,78 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* 3. Naver Map API Key Integration (외부 지도 API 연동) */}
+                {/* 3. Status Colors Settings (진행상태 버튼 색상 설정) */}
+                <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
+                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
+                    <Palette size={18} className="text-[#f25f8a]" />
+                    진행상태 버튼 색상 설정
+                  </h3>
+                  
+                  <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
+                    주문 현황판 및 각 가맹점 포털 페이지에서 사용될 진행상태 버튼(태그)의 색상을 개별로 설정할 수 있습니다.
+                  </p>
+
+                  <div className="space-y-3 pt-2 max-h-[300px] overflow-y-auto pr-1">
+                    {Array.from(new Set([
+                      "주문완료",
+                      "입금대기",
+                      "결제완료",
+                      "배송준비중",
+                      "배송중",
+                      "배송완료",
+                      "주문취소",
+                      ...deliveryStatuses
+                    ])).map((status) => {
+                      const currentColor = statusColors[status] || "pink";
+                      return (
+                        <div key={status} className="flex items-center justify-between gap-4 bg-[#fff9fb] p-3 rounded-xl border border-[#f2ccd7]/40">
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs font-bold text-[#2d2026]">{status}</span>
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
+                              (() => {
+                                const preset = COLOR_PRESETS[currentColor as keyof typeof COLOR_PRESETS] || COLOR_PRESETS.pink;
+                                return `${preset.bg} ${preset.text} ${preset.border}`;
+                              })()
+                            }`}>
+                              표시
+                            </span>
+                          </div>
+                          
+                          <select
+                            value={currentColor}
+                            onChange={(e) => {
+                              const newColors = { ...statusColors, [status]: e.target.value };
+                              setStatusColors(newColors);
+                            }}
+                            className="bg-white border border-[#f2ccd7] rounded-lg px-2.5 py-1 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] cursor-pointer"
+                          >
+                            {Object.entries(COLOR_PRESETS).map(([key, value]) => (
+                              <option key={key} value={key}>
+                                {value.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      localStorage.setItem("120_status_colors", JSON.stringify(statusColors));
+                      // Dispatch a storage event so portal tab can sync in real-time if open in another tab
+                      window.dispatchEvent(new Event("storage"));
+                      triggerToast("진행상태 버튼 색상 설정이 성공적으로 저장되었습니다!");
+                    }}
+                    className="w-full py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer border-0"
+                  >
+                    <Check size={14} />
+                    색상 설정 저장하기
+                  </button>
+                </div>
+
+                {/* 4. Naver Map API Key Integration (외부 지도 API 연동) */}
                 <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 lg:col-span-2">
                   <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
                     <Map size={18} className="text-[#f25f8a]" />

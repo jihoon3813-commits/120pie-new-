@@ -49,6 +49,26 @@ import { api } from "../../convex/_generated/api";
 import Footer from "@/app/components/Footer";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 
+const COLOR_PRESETS = {
+  blue: { label: "블루", bg: "bg-blue-50", text: "text-blue-500", border: "border-blue-200", hexBg: "#eff6ff", hexText: "#3b82f6", hexBorder: "#bfdbfe" },
+  emerald: { label: "초록", bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-200", hexBg: "#ecfdf5", hexText: "#059669", hexBorder: "#a7f3d0" },
+  orange: { label: "오렌지", bg: "bg-orange-50", text: "text-orange-500", border: "border-orange-200", hexBg: "#fff7ed", hexText: "#f97316", hexBorder: "#ffedd5" },
+  pink: { label: "핑크", bg: "bg-[#ffd3df]", text: "text-[#bf3e67]", border: "border-[#f2ccd7]", hexBg: "#ffd3df", hexText: "#bf3e67", hexBorder: "#f2ccd7" },
+  yellow: { label: "옐로", bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200", hexBg: "#fef3c7", hexText: "#d97706", hexBorder: "#fde68a" },
+  purple: { label: "보라", bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200", hexBg: "#f5f3ff", hexText: "#7c3aed", hexBorder: "#ddd6fe" },
+  gray: { label: "회색", bg: "bg-neutral-50", text: "text-neutral-600", border: "border-neutral-200", hexBg: "#f5f5f5", hexText: "#525252", hexBorder: "#e5e5e5" }
+};
+
+const DEFAULT_STATUS_COLORS: { [status: string]: string } = {
+  "주문완료": "pink",
+  "입금대기": "yellow",
+  "결제완료": "emerald",
+  "배송준비중": "orange",
+  "배송중": "blue",
+  "배송완료": "emerald",
+  "주문취소": "gray"
+};
+
 // ==========================================
 // TYPES DEFINITIONS
 // ==========================================
@@ -301,7 +321,23 @@ export default function PortalPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  
+  const [statusColors, setStatusColors] = useState<Record<string, string>>(DEFAULT_STATUS_COLORS);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const stored = localStorage.getItem("120_status_colors");
+      if (stored) {
+        try {
+          setStatusColors(JSON.parse(stored));
+        } catch (e) {
+          console.error("Failed to parse status colors:", e);
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   // Dynamic collections synced via localStorage
   const [products, setProducts] = useState<Product[]>([]);
   const [stores, setStores] = useState<any[]>([]);
@@ -997,6 +1033,8 @@ export default function PortalPage() {
       setCategories(loadState("120_categories", []));
       setBanner(loadState("120_banners", null));
       setActiveStoreId(localStorage.getItem("120_active_store_id") || "owner");
+      const storedColors = loadState("120_status_colors", DEFAULT_STATUS_COLORS);
+      setStatusColors(storedColors);
 
       let pr = loadState("120_products", []);
       // Filter out legacy mock seed products (prod-1 to prod-6) to ensure they are completely deleted
@@ -2973,13 +3011,12 @@ export default function PortalPage() {
                             <div className="flex justify-between items-center text-[10px]">
                               <span className="text-[#735965] font-bold">{order.date}</span>
                               <span className={`px-2 py-0.5 rounded font-bold ${
-                                order.status === "배송중" 
-                                  ? "bg-blue-50 text-blue-500 border border-blue-200 animate-pulse" 
-                                  : order.status === "배송완료" 
-                                  ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
-                                  : order.status === "배송준비중"
-                                  ? "bg-orange-50 text-orange-500 border border-orange-200"
-                                  : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
+                                (() => {
+                                  const colorKey = statusColors[order.status] || DEFAULT_STATUS_COLORS[order.status] || "pink";
+                                  const preset = COLOR_PRESETS[colorKey as keyof typeof COLOR_PRESETS] || COLOR_PRESETS.pink;
+                                  const pulse = order.status === "배송중" ? " animate-pulse" : "";
+                                  return `${preset.bg} ${preset.text} ${preset.border}${pulse}`;
+                                })()
                               }`}>
                                 {order.status}
                               </span>
@@ -3404,13 +3441,12 @@ export default function PortalPage() {
                             <td className="p-4 sm:p-5 font-black text-[#bf3e67] whitespace-nowrap">{order.totalPrice.toLocaleString()} 원</td>
                             <td className="p-4 sm:p-5">
                               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
-                                order.status === "배송중" 
-                                  ? "bg-blue-50 text-blue-500 border border-blue-200 animate-pulse" 
-                                  : order.status === "배송완료" 
-                                  ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
-                                  : order.status === "배송준비중"
-                                  ? "bg-orange-50 text-orange-500 border border-orange-200"
-                                  : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
+                                (() => {
+                                  const colorKey = statusColors[order.status] || DEFAULT_STATUS_COLORS[order.status] || "pink";
+                                  const preset = COLOR_PRESETS[colorKey as keyof typeof COLOR_PRESETS] || COLOR_PRESETS.pink;
+                                  const pulse = order.status === "배송중" ? " animate-pulse" : "";
+                                  return `${preset.bg} ${preset.text} ${preset.border}${pulse}`;
+                                })()
                               }`}>
                                 {order.status === "배송중" && <Truck size={12} />}
                                 {order.status === "배송완료" && <Check size={12} />}
