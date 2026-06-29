@@ -274,6 +274,8 @@ function NaverMap({
             border: 1px solid ${isPink ? '#f25f8a' : '#ffd500'};
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
             white-space: nowrap;
+            display: inline-block;
+            width: max-content;
           ">
             ${cleanStoreName(store.name)}
           </div>
@@ -281,7 +283,7 @@ function NaverMap({
         borderWidth: 0,
         backgroundColor: "transparent",
         disableAnchor: true,
-        pixelOffset: new naver.maps.Point(0, -10),
+        pixelOffset: new naver.maps.Point(0, -55),
       });
 
       markers[store.id] = marker;
