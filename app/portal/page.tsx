@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -40,7 +40,8 @@ import {
   MapPin,
   Copy,
   CreditCard,
-  Landmark
+  Landmark,
+  User
 } from "lucide-react";
 
 import { useQuery, useMutation, useAction } from "convex/react";
@@ -279,6 +280,17 @@ export default function PortalPage() {
   // ==========================================
   // STATE MANAGEMENT (LOCAL STORAGE SYNCD)
   // ==========================================
+  const formatPhoneNumber = (value: string) => {
+    if (!value) return value;
+    const phoneNumber = value.replace(/[^\d]/g, "");
+    const phoneNumberLength = phoneNumber.length;
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 8) {
+      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+    }
+    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`;
+  };
+
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
   const [loginId, setLoginId] = useState<string>("");
@@ -343,6 +355,17 @@ export default function PortalPage() {
   const [addressSearchKeyword, setAddressSearchKeyword] = useState<string>("");
   const [addressSearchResults, setAddressSearchResults] = useState<string[]>([]);
 
+  // Profile Update States
+  const [profilePw, setProfilePw] = useState<string>("");
+  const [profilePwConfirm, setProfilePwConfirm] = useState<string>("");
+  const [profileOwner, setProfileOwner] = useState<string>("");
+  const [profilePhone, setProfilePhone] = useState<string>("");
+  const [profileRoadAddress, setProfileRoadAddress] = useState<string>("");
+  const [profileDetailAddress, setProfileDetailAddress] = useState<string>("");
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState<boolean>(false);
+  const [addressSearchTarget, setAddressSearchTarget] = useState<"register" | "profile">("register");
+  const addressSearchTargetRef = useRef<"register" | "profile">("register");
+
   // ==========================================
   // CONVEX REAL-TIME SYNC HOOKS
   // ==========================================
@@ -400,6 +423,19 @@ export default function PortalPage() {
       setDeliveryInfoLoaded(true);
     }
   }, [stores, activeStoreId, deliveryInfoLoaded]);
+
+  // 점주 정보 변경 입력 필드 동기화
+  useEffect(() => {
+    const storeData = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+    if (storeData) {
+      setProfileOwner(storeData.owner || "");
+      setProfilePhone(storeData.phone || "");
+      setProfileRoadAddress(storeData.roadAddress || "");
+      setProfileDetailAddress(storeData.detailAddress || "");
+      setProfilePw(storeData.pw || "");
+      setProfilePwConfirm(storeData.pwConfirm || "");
+    }
+  }, [stores, activeStoreId]);
 
   // Sync Convex notices to React state and localStorage (Fallback to local mock if empty)
   useEffect(() => {
@@ -1236,6 +1272,8 @@ export default function PortalPage() {
 
   // Real Road Address Search using Daum/Kakao Postcode API (Iframe Embedded Layer Style)
   const openDaumPostcodeForReg = () => {
+    setAddressSearchTarget("register");
+    addressSearchTargetRef.current = "register";
     setShowAddressPopup(true);
     setAddressTab("kakao");
     setAddressSearchKeyword("");
@@ -1269,7 +1307,11 @@ export default function PortalPage() {
                 }
 
                 const finalAddress = fullRoadAddr + extraRoadAddr;
-                setRegRoadAddress(finalAddress);
+                if (addressSearchTargetRef.current === "profile") {
+                  setProfileRoadAddress(finalAddress);
+                } else {
+                  setRegRoadAddress(finalAddress);
+                }
                 
                 setShowAddressPopup(false);
                 triggerToast("도로명 주소가 자동 입력되었습니다.");
@@ -1323,6 +1365,57 @@ export default function PortalPage() {
     ];
     const filtered = mockDb.filter(addr => addr.toLowerCase().includes(keyword.toLowerCase()));
     setAddressSearchResults(filtered);
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!profileOwner.trim()) {
+      showCustomAlert("입력 확인", "점주명(대표자)을 입력해 주세요.");
+      return;
+    }
+    if (!profilePhone.trim()) {
+      showCustomAlert("입력 확인", "연락처를 입력해 주세요.");
+      return;
+    }
+    if (!profileRoadAddress.trim()) {
+      showCustomAlert("입력 확인", "매장 주소(도로명 주소)를 입력해 주세요.");
+      return;
+    }
+    if (profilePw !== profilePwConfirm) {
+      showCustomAlert("비밀번호 불일치", "비밀번호와 비밀번호 확인이 서로 일치하지 않습니다.");
+      return;
+    }
+
+    setIsUpdatingProfile(true);
+    try {
+      const response = await createStoreMutation({
+        id: activeStore.id,
+        pw: profilePw || activeStore.pw || "owner",
+        pwConfirm: profilePwConfirm || activeStore.pwConfirm || "owner",
+        name: activeStore.name,
+        owner: profileOwner,
+        phone: profilePhone,
+        status: activeStore.status,
+        roadAddress: profileRoadAddress,
+        detailAddress: profileDetailAddress,
+        regDate: activeStore.regDate || new Date().toISOString().split("T")[0],
+        cancelDate: activeStore.cancelDate || "",
+        adoptionMenu: activeStore.adoptionMenu || [],
+        monthlySales: activeStore.monthlySales || 0,
+      });
+
+      if (response.success) {
+        triggerToast("점주 정보가 성공적으로 변경되었습니다.");
+        setProfilePw("");
+        setProfilePwConfirm("");
+      } else {
+        showCustomAlert("정보 변경 실패", "정보 변경에 실패했습니다. 다시 시도해 주세요.");
+      }
+    } catch (e: any) {
+      console.error(e);
+      showCustomAlert("오류 발생", `서버 통신 오류가 발생했습니다: ${e.message || e}`);
+    } finally {
+      setIsUpdatingProfile(false);
+    }
   };
 
   const handleRegisterStoreSubmit = (e: React.FormEvent) => {
@@ -2379,7 +2472,11 @@ export default function PortalPage() {
                           key={idx}
                           type="button"
                           onClick={() => {
-                            setRegRoadAddress(addr);
+                            if (addressSearchTarget === "profile") {
+                              setProfileRoadAddress(addr);
+                            } else {
+                              setRegRoadAddress(addr);
+                            }
                             setShowAddressPopup(false);
                             triggerToast("도로명 주소가 자동 선택되었습니다.");
                           }}
@@ -2478,7 +2575,8 @@ export default function PortalPage() {
                 { key: "notice", label: "공지사항", icon: Megaphone, badge: newNoticesCount },
                 { key: "inquiry", label: "1:1 문의", icon: MessageSquare },
                 { key: "training", label: "교육 자료", icon: BookOpen },
-                { key: "pr", label: "홍보 자재", icon: ImageIcon }
+                { key: "pr", label: "홍보 자재", icon: ImageIcon },
+                { key: "profile", label: "정보변경", icon: User }
               ].map(({ key, label, icon: Icon, badge }) => (
                 <button
                   key={key}
@@ -2556,7 +2654,8 @@ export default function PortalPage() {
                     { key: "notice", label: "공지사항", icon: Megaphone, badge: newNoticesCount },
                     { key: "inquiry", label: "1:1 문의", icon: MessageSquare },
                     { key: "training", label: "교육 자료", icon: BookOpen },
-                    { key: "pr", label: "홍보 자재", icon: ImageIcon }
+                    { key: "pr", label: "홍보 자재", icon: ImageIcon },
+                    { key: "profile", label: "정보변경", icon: User }
                   ].map(({ key, label, icon: Icon, badge }) => (
                     <button
                       key={key}
@@ -3710,6 +3809,140 @@ export default function PortalPage() {
                 )}
               </div>
 
+            </div>
+          )}
+
+          {/* ==========================================
+              MENU CONTENT: 8. 정보변경 (Profile Update)
+             ========================================== */}
+          {currentMenu === "profile" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-xl font-bold text-[#2d2026]">점주 정보 변경</h2>
+                <p className="text-xs text-[#735965] font-bold mt-1">로그인 비밀번호, 점주명, 연락처 및 배송 주소 등 가맹점 정보를 수정할 수 있습니다.</p>
+              </div>
+
+              <div className="bg-white border border-[#f2ccd7] rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs font-semibold text-[#735965]">
+                  {/* 로그인 ID (읽기전용) */}
+                  <div className="space-y-1.5">
+                    <span>로그인 ID (변경 불가)</span>
+                    <input 
+                      type="text"
+                      disabled
+                      value={activeStore.id}
+                      className="w-full bg-[#fcf8fa] border border-[#f2ccd7]/60 rounded-xl px-3.5 py-2.5 text-xs text-[#735965] font-bold cursor-not-allowed"
+                    />
+                  </div>
+
+                  {/* 가맹점명 (읽기전용) */}
+                  <div className="space-y-1.5">
+                    <span>가맹점명 (변경 불가)</span>
+                    <input 
+                      type="text"
+                      disabled
+                      value={activeStore.name}
+                      className="w-full bg-[#fcf8fa] border border-[#f2ccd7]/60 rounded-xl px-3.5 py-2.5 text-xs text-[#735965] font-bold cursor-not-allowed"
+                    />
+                  </div>
+
+                  {/* 비밀번호 */}
+                  <div className="space-y-1.5">
+                    <span>새 비밀번호</span>
+                    <input 
+                      type="password"
+                      placeholder="변경할 비밀번호 입력 (기존 유지 시 그대로 두세요)"
+                      value={profilePw}
+                      onChange={(e) => setProfilePw(e.target.value)}
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+
+                  {/* 비밀번호 확인 */}
+                  <div className="space-y-1.5">
+                    <span>새 비밀번호 확인</span>
+                    <input 
+                      type="password"
+                      placeholder="변경할 비밀번호 다시 입력"
+                      value={profilePwConfirm}
+                      onChange={(e) => setProfilePwConfirm(e.target.value)}
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+
+                  {/* 점주명 */}
+                  <div className="space-y-1.5">
+                    <span>점주명 (대표자) *</span>
+                    <input 
+                      type="text"
+                      placeholder="점주명을 입력하세요"
+                      value={profileOwner}
+                      onChange={(e) => setProfileOwner(e.target.value)}
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+
+                  {/* 전화번호 */}
+                  <div className="space-y-1.5">
+                    <span>연락처 (휴대폰 번호) *</span>
+                    <input 
+                      type="text"
+                      placeholder="010-0000-0000"
+                      value={profilePhone}
+                      onChange={(e) => setProfilePhone(formatPhoneNumber(e.target.value))}
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+
+                  {/* 도로명 주소 */}
+                  <div className="col-span-1 md:col-span-2 space-y-1.5">
+                    <span>매장 주소 (배송 기본 주소) *</span>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text"
+                        placeholder="우편물 배송용 도로명 주소를 검색 또는 입력해 주세요"
+                        value={profileRoadAddress}
+                        onChange={(e) => setProfileRoadAddress(e.target.value)}
+                        className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressSearchTarget("profile");
+                          addressSearchTargetRef.current = "profile";
+                          setShowAddressPopup(true);
+                        }}
+                        className="px-4 py-2.5 bg-[#735965] hover:bg-[#5a444f] text-white text-xs font-bold rounded-xl transition-all cursor-pointer border-0 shrink-0"
+                      >
+                        주소 검색
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 상세 주소 */}
+                  <div className="col-span-1 md:col-span-2 space-y-1.5">
+                    <span>상세 주소</span>
+                    <input 
+                      type="text"
+                      placeholder="동, 호수, 층 등 상세 주소를 입력하세요"
+                      value={profileDetailAddress}
+                      onChange={(e) => setProfileDetailAddress(e.target.value)}
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t border-[#f2ccd7]/40 pt-5 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleUpdateProfile}
+                    disabled={isUpdatingProfile}
+                    className="px-6 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-black rounded-xl transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-50 cursor-pointer border-0 animate-pulse-once"
+                  >
+                    {isUpdatingProfile ? "저장 중..." : "정보 변경 내용 저장"}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
