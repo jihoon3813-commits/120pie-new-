@@ -64,6 +64,7 @@ const MENU_MAP: Record<string, { label: string; colorClass: string }> = {
   "egg120": { label: "에그120", colorClass: "bg-amber-500/10 text-amber-600 border border-amber-500/20" },
   "츄러스120": { label: "츄러스120", colorClass: "bg-orange-500/10 text-orange-600 border border-orange-500/20" },
   "핫도그120": { label: "핫도그120", colorClass: "bg-red-500/10 text-red-600 border border-red-500/20" },
+  "떡볶이120": { label: "떡볶이120", colorClass: "bg-purple-500/10 text-purple-600 border border-purple-500/20" },
   "120coffee": { label: "120커피", colorClass: "bg-cyan-500/10 text-cyan-600 border border-cyan-500/20" }
 };
 
