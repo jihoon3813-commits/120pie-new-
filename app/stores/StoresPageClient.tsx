@@ -85,7 +85,17 @@ declare global {
   }
 }
 
-function NaverMap({ address, name, isPink }: { address: string; name: string; isPink?: boolean }) {
+function NaverMap({
+  stores,
+  activeStoreId,
+  onSelectStore,
+  isPink,
+}: {
+  stores: StoreInfo[];
+  activeStoreId: string;
+  onSelectStore: (id: string) => void;
+  isPink?: boolean;
+}) {
   const [mounted, setMounted] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [submoduleReady, setSubmoduleReady] = useState(false);
@@ -93,7 +103,10 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
   const [fallbackReason, setFallbackReason] = useState("");
   const [clientId, setClientId] = useState("");
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInitializedRef = useRef(false);
+  const mapInstanceRef = useRef<any>(null);
+  const markersRef = useRef<{ [id: string]: any }>({});
+  const infoWindowsRef = useRef<{ [id: string]: any }>({});
+  const [resolvedCoords, setResolvedCoords] = useState<{ [id: string]: { lat: number; lng: number } }>({});
 
   useEffect(() => {
     setMounted(true);
@@ -115,12 +128,11 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
     }
   }, []);
 
-  // Timeout fallback: if Naver Map is not initialized within 8.0 seconds, use Google Maps fallback
   useEffect(() => {
     if (!mounted || !clientId) return;
 
     const timer = setTimeout(() => {
-      if (!mapInitializedRef.current) {
+      if (!mapInstanceRef.current && Object.keys(resolvedCoords).length === 0) {
         console.warn("Naver Map initialization timed out. Falling back to Google Maps.");
         setFallbackReason("TIMEOUT_8000MS");
         setUseFallback(true);
@@ -128,7 +140,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
     }, 8000);
 
     return () => clearTimeout(timer);
-  }, [mounted, clientId, address]);
+  }, [mounted, clientId, resolvedCoords]);
 
   useEffect(() => {
     if (!scriptLoaded) return;
@@ -149,106 +161,167 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
   }, [scriptLoaded]);
 
   useEffect(() => {
-    if (!scriptLoaded || !submoduleReady || !window.naver || !window.naver.maps || !window.naver.maps.Service || !mapRef.current || !address || useFallback) return;
+    if (!scriptLoaded || !submoduleReady || !window.naver || !window.naver.maps || !window.naver.maps.Service || stores.length === 0 || useFallback) return;
 
-    try {
-      const naver = window.naver;
-      const cleanAddr = address.split("(")[0].trim();
+    const naver = window.naver;
+    const newCoords: { [id: string]: { lat: number; lng: number } } = {};
+    let pendingCount = stores.length;
 
+    stores.forEach((store) => {
+      const cleanAddr = store.roadAddress.split("(")[0].trim();
       naver.maps.Service.geocode(
         { query: cleanAddr },
         (status: any, response: any) => {
-          if (status !== naver.maps.Service.Status.OK || !response.v2.addresses[0]) {
-            console.error("Geocoding failed for address:", cleanAddr);
-            setFallbackReason(`GEOCODE_FAIL_STATUS_${status}`);
-            setUseFallback(true);
-            return;
+          if (status === naver.maps.Service.Status.OK && response.v2.addresses[0]) {
+            const item = response.v2.addresses[0];
+            newCoords[store.id] = { lat: parseFloat(item.y), lng: parseFloat(item.x) };
+          } else {
+            console.error(`Geocoding failed for ${store.name}: ${status}`);
           }
-
-          const item = response.v2.addresses[0];
-          const latlng = new naver.maps.LatLng(item.y, item.x);
-
-          const mapOptions = {
-            center: latlng,
-            zoom: 16,
-            zoomControl: true,
-            zoomControlOptions: {
-              position: naver.maps.Position.TOP_RIGHT,
-            },
-          };
-
-          const map = new naver.maps.Map(mapRef.current, mapOptions);
-
-          const markerIcon = {
-            content: `
-              <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
-                <div style="
-                  background: white; 
-                  border: 2px solid ${isPink ? '#f25f8a' : '#ffd500'}; 
-                  border-radius: 50%; 
-                  width: 44px; 
-                  height: 44px; 
-                  display: flex; 
-                  align-items: center; 
-                  justify-content: center; 
-                  box-shadow: 0 3px 8px rgba(0,0,0,0.18);
-                  overflow: hidden;
-                ">
-                  <img src="${isPink ? 'https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png' : 'https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png'}" style="width: 32px; height: 32px; object-fit: contain;" />
-                </div>
-                <div style="
-                  width: 0; 
-                  height: 0; 
-                  border-left: 6px solid transparent; 
-                  border-right: 6px solid transparent; 
-                  border-top: 8px solid ${isPink ? '#f25f8a' : '#ffd500'};
-                  margin-top: -1px;
-                "></div>
-              </div>
-            `,
-            size: new naver.maps.Size(44, 51),
-            anchor: new naver.maps.Point(22, 51),
-          };
-
-          const marker = new naver.maps.Marker({
-            position: latlng,
-            map: map,
-            icon: markerIcon,
-          });
-
-          const infoWindow = new naver.maps.InfoWindow({
-            content: `
-              <div style="padding: 6px 10px; font-size: 10px; font-weight: bold; color: #2d2026; background: white; border-radius: 6px; border: 1px solid ${isPink ? '#f25f8a' : '#ffd500'}">
-                ${name}
-              </div>
-            `,
-            borderWidth: 0,
-            backgroundColor: "transparent",
-            disableAnchor: true,
-            pixelOffset: new naver.maps.Point(0, -10),
-          });
-
-          infoWindow.open(map, marker);
-
-          naver.maps.Event.addListener(marker, "click", () => {
-            if (infoWindow.getMap()) {
-              infoWindow.close();
-            } else {
-              infoWindow.open(map, marker);
-            }
-          });
-
-          mapInitializedRef.current = true;
+          pendingCount--;
+          if (pendingCount === 0) {
+            setResolvedCoords(newCoords);
+          }
         }
       );
-    } catch (e) {
-      console.error("Failed to initialize Naver Map:", e);
-      setFallbackReason(`EXCEPTION_${e instanceof Error ? e.message : String(e)}`);
-      setUseFallback(true);
-    }
-  }, [scriptLoaded, submoduleReady, address, name, isPink, useFallback]);
+    });
+  }, [scriptLoaded, submoduleReady, stores, useFallback]);
 
-  // Dynamic script loader to bypass Next.js Script caching bugs
+  useEffect(() => {
+    if (Object.keys(resolvedCoords).length === 0 || !mapRef.current || useFallback) return;
+    
+    const naver = window.naver;
+
+    if (mapInstanceRef.current) {
+      Object.values(markersRef.current).forEach((m: any) => m.setMap(null));
+      markersRef.current = {};
+      infoWindowsRef.current = {};
+      mapInstanceRef.current = null;
+    }
+
+    const firstCoord = Object.values(resolvedCoords)[0];
+    const initialCenter = new naver.maps.LatLng(firstCoord.lat, firstCoord.lng);
+
+    const mapOptions = {
+      center: initialCenter,
+      zoom: 12,
+      zoomControl: true,
+      zoomControlOptions: {
+        position: naver.maps.Position.TOP_RIGHT,
+      },
+    };
+
+    const map = new naver.maps.Map(mapRef.current, mapOptions);
+    mapInstanceRef.current = map;
+
+    const markers: { [id: string]: any } = {};
+    const infoWindows: { [id: string]: any } = {};
+    const bounds = new naver.maps.LatLngBounds();
+
+    stores.forEach((store) => {
+      const coord = resolvedCoords[store.id];
+      if (!coord) return;
+
+      const latlng = new naver.maps.LatLng(coord.lat, coord.lng);
+      bounds.extend(latlng);
+
+      const markerIcon = {
+        content: `
+          <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+            <div style="
+              background: ${isPink ? '#f25f8a' : '#ffd500'}; 
+              border: 2px solid ${isPink ? '#f25f8a' : '#ffd500'}; 
+              border-radius: 50%; 
+              width: 44px; 
+              height: 44px; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center; 
+              box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+              overflow: hidden;
+            ">
+              <img src="${isPink ? 'https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png' : 'https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png'}" style="width: 32px; height: 32px; object-fit: contain;" />
+            </div>
+            <div style="
+              width: 0; 
+              height: 0; 
+              border-left: 6px solid transparent; 
+              border-right: 6px solid transparent; 
+              border-top: 8px solid ${isPink ? '#f25f8a' : '#ffd500'};
+              margin-top: -1px;
+            "></div>
+          </div>
+        `,
+        size: new naver.maps.Size(44, 51),
+        anchor: new naver.maps.Point(22, 51),
+      };
+
+      const marker = new naver.maps.Marker({
+        position: latlng,
+        map: map,
+        icon: markerIcon,
+      });
+
+      const infoWindow = new naver.maps.InfoWindow({
+        content: `
+          <div style="
+            padding: 6px 10px; 
+            font-size: 10px; 
+            font-weight: bold; 
+            color: #2d2026; 
+            background: white; 
+            border-radius: 6px; 
+            border: 1px solid ${isPink ? '#f25f8a' : '#ffd500'};
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+          ">
+            ${cleanStoreName(store.name)}
+          </div>
+        `,
+        borderWidth: 0,
+        backgroundColor: "transparent",
+        disableAnchor: true,
+        pixelOffset: new naver.maps.Point(0, -10),
+      });
+
+      markers[store.id] = marker;
+      infoWindows[store.id] = infoWindow;
+
+      naver.maps.Event.addListener(marker, "click", () => {
+        onSelectStore(store.id);
+      });
+    });
+
+    markersRef.current = markers;
+    infoWindowsRef.current = infoWindows;
+
+    if (Object.keys(resolvedCoords).length > 1) {
+      map.fitBounds(bounds);
+    } else {
+      map.setCenter(initialCenter);
+      map.setZoom(16);
+    }
+  }, [resolvedCoords, stores, isPink, useFallback]);
+
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || Object.keys(resolvedCoords).length === 0) return;
+
+    const coord = resolvedCoords[activeStoreId];
+    if (coord) {
+      const naver = window.naver;
+      const targetLatLng = new naver.maps.LatLng(coord.lat, coord.lng);
+      map.panTo(targetLatLng);
+
+      Object.keys(infoWindowsRef.current).forEach((id) => {
+        if (id === activeStoreId) {
+          infoWindowsRef.current[id].open(map, markersRef.current[id]);
+        } else {
+          infoWindowsRef.current[id].close();
+        }
+      });
+    }
+  }, [activeStoreId, resolvedCoords]);
+
   useEffect(() => {
     if (!clientId || !mounted) return;
 
@@ -267,7 +340,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
     if (!script) {
       script = document.createElement("script");
       script.id = scriptId;
-      script.src = `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`;
+      script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}&submodules=geocoder`;
       script.async = true;
       script.onload = handleScriptLoad;
       script.onerror = handleScriptError;
@@ -292,8 +365,6 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
     };
   }, [clientId, mounted]);
 
-  const cleanAddr = address.split("(")[0].trim();
-
   if (!mounted) {
     return (
       <div className="absolute inset-0 w-full h-full bg-neutral-100 flex items-center justify-center text-xs font-bold text-neutral-400">
@@ -303,6 +374,8 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
   }
 
   if (useFallback || !clientId) {
+    const activeStore = stores.find((s) => s.id === activeStoreId) || stores[0];
+    const cleanAddr = activeStore ? activeStore.roadAddress.split("(")[0].trim() : "서울 송파구 삼학사로 73";
     return (
       <div className="absolute inset-0 w-full h-full">
         <iframe
@@ -310,7 +383,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
           className="w-full h-full border-0"
           allowFullScreen
           loading="lazy"
-          title={`${name} 지도 위치`}
+          title={`${activeStore?.name || "120겹파이"} 지도 위치`}
         />
         <div className="absolute bottom-2 left-2 right-2 bg-white/95 backdrop-blur-sm border border-[#ffd500]/30 rounded-lg p-2.5 text-[9px] text-[#0d233a] font-bold text-center z-30 shadow-md leading-normal">
           💡 네이버 지도 API 인증 대기 중이거나 등록되지 않아 안전하게 구글 지도로 로드되었습니다. (이유: {fallbackReason || "알 수 없음"}, 키: {clientId || "없음"}) (인증키 등록 및 네이버 콘솔에 웹 사이트 주소 URL 추가 시 네이버 지도로 즉시 자동 전환됩니다.)
@@ -849,8 +922,9 @@ export default function StoresPageClient() {
             {/* Right Side: Map Area (Explicitly positioned relative wrapper with full dimensions) */}
             <div className="flex-1 relative h-[55%] lg:h-full w-full bg-neutral-100 z-10">
               <NaverMap
-                address={activeStore ? activeStore.roadAddress : "서울 송파구 삼학사로 73"}
-                name={activeStore ? cleanStoreName(activeStore.name) : "120겹파이"}
+                stores={finalFilteredStores}
+                activeStoreId={activeStore ? activeStore.id : ""}
+                onSelectStore={setSelectedStoreId}
                 isPink={isPink}
               />
             </div>
