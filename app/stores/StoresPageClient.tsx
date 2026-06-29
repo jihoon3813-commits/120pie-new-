@@ -87,17 +87,39 @@ declare global {
 
 function NaverMap({ address, name, isPink }: { address: string; name: string; isPink?: boolean }) {
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [submoduleReady, setSubmoduleReady] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || "";
 
   useEffect(() => {
     if (window.naver && window.naver.maps) {
       setScriptLoaded(true);
+      if (window.naver.maps.Service) {
+        setSubmoduleReady(true);
+      }
     }
   }, []);
 
   useEffect(() => {
-    if (!scriptLoaded || !window.naver || !mapRef.current || !address) return;
+    if (!scriptLoaded) return;
+
+    if (window.naver && window.naver.maps && window.naver.maps.Service) {
+      setSubmoduleReady(true);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      if (window.naver && window.naver.maps && window.naver.maps.Service) {
+        setSubmoduleReady(true);
+        clearInterval(interval);
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [scriptLoaded]);
+
+  useEffect(() => {
+    if (!scriptLoaded || !submoduleReady || !window.naver || !window.naver.maps || !window.naver.maps.Service || !mapRef.current || !address) return;
 
     const naver = window.naver;
     const cleanAddr = address.split("(")[0].trim();
@@ -184,7 +206,7 @@ function NaverMap({ address, name, isPink }: { address: string; name: string; is
         });
       }
     );
-  }, [scriptLoaded, address, name, isPink]);
+  }, [scriptLoaded, submoduleReady, address, name, isPink]);
 
   const cleanAddr = address.split("(")[0].trim();
 
