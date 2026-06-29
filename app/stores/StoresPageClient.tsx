@@ -273,6 +273,7 @@ function NaverMap({
             border-radius: 6px; 
             border: 1px solid ${isPink ? '#f25f8a' : '#ffd500'};
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            white-space: nowrap;
           ">
             ${cleanStoreName(store.name)}
           </div>
