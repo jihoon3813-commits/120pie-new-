@@ -401,213 +401,232 @@ export default function StoresPageClient() {
         )}
       </header>
 
-      <main className="flex-1 w-full relative flex flex-col lg:flex-row h-[calc(100vh-60px)] sm:h-[calc(100vh-80px)] lg:h-[calc(100vh-94px)] overflow-hidden">
-        
-        {/* Left Side Panel: Search & Store List (Floating Style matching Image 2) */}
-        <div className={`w-full lg:w-[380px] h-[45vh] lg:h-full shrink-0 flex flex-col z-20 shadow-2xl relative border-r transition-colors duration-300 ${
-          isPink ? "bg-[#140e11] border-neutral-850" : "bg-white border-[#e6dfc3]"
-        }`}>
-          {/* A. Search Panel Header */}
-          <div className={`p-4 border-b space-y-3.5 transition-colors ${
-            isPink ? "border-neutral-850" : "border-[#e6dfc3]/60 bg-[#fffdf9]/50"
-          }`}>
-            <div className="flex items-center gap-2">
-              <span className={`text-[9px] tracking-widest font-black uppercase font-mono ${labelAccent}`}>STORE LOCATOR</span>
-              <h2 className={`text-sm font-black ${textTitle}`}>120pie 매장 찾기</h2>
-            </div>
-            
-            {/* Search Type Tabs */}
-            <div className={`flex p-1 rounded-xl border ${
-              isPink ? "bg-neutral-950 border-neutral-850" : "bg-[#fff9e6] border-[#ffd500]/15"
-            }`}>
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchType("direct");
-                  setSelectedRegion("전체");
-                }}
-                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all border-0 cursor-pointer ${
-                  searchType === "direct"
-                    ? isPink
-                      ? "bg-rose-500 text-white shadow-sm font-extrabold"
-                      : "bg-[#ffd500] text-[#0d233a] shadow-sm font-extrabold"
-                    : isPink ? "text-neutral-400 hover:text-white" : "text-[#735965] hover:text-[#bf3e67]"
-                }`}
-              >
-                직접 검색
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchType("region");
-                  setSearchQuery("");
-                }}
-                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all border-0 cursor-pointer ${
-                  searchType === "region"
-                    ? isPink
-                      ? "bg-rose-500 text-white shadow-sm font-extrabold"
-                      : "bg-[#ffd500] text-[#0d233a] shadow-sm font-extrabold"
-                    : isPink ? "text-neutral-400 hover:text-white" : "text-[#735965] hover:text-[#bf3e67]"
-                }`}
-              >
-                지역 검색
-              </button>
-            </div>
-
-            {/* Input / Filters depending on searchType */}
-            {searchType === "direct" ? (
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="매장명 또는 주소를 입력하세요"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full border rounded-xl pl-3 pr-10 py-2 text-xs transition-colors ${
-                    isPink
-                      ? "bg-neutral-950 border-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:border-rose-500"
-                      : "bg-white border-[#e6dfc3] text-[#0d233a] placeholder-[#735965]/40 font-semibold focus:outline-none focus:border-[#ffd500]"
-                  }`}
-                />
-                <Search size={14} className={`absolute right-3 top-2.5 ${isPink ? "text-neutral-500" : "text-[#735965]/50"}`} />
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-1">
-                {regions.map(region => {
-                  const isActive = selectedRegion === region;
-                  return (
-                    <button
-                      key={region}
-                      type="button"
-                      onClick={() => setSelectedRegion(region)}
-                      className={`px-2 py-1.5 rounded-lg text-[9px] font-extrabold transition-all border cursor-pointer ${
-                        isActive
-                          ? isPink
-                            ? "bg-rose-500 border-rose-500 text-white"
-                            : "bg-[#ffd500] border-[#ffd500] text-[#0d233a]"
-                          : isPink
-                            ? "bg-neutral-950 border-neutral-850 text-neutral-400 hover:bg-neutral-800"
-                            : "bg-white border-[#e6dfc3] text-[#735965] hover:bg-[#fff9e6]"
-                      }`}
-                    >
-                      {region} ({getRegionCount(region)})
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* 현 위치로 매장 검색하기 Button */}
-            <button
-              type="button"
-              onClick={handleCurrentLocationSearch}
-              className={`w-full py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 border-0 cursor-pointer ${
-                isPink
-                  ? "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
-                  : "bg-[#ffd500]/10 text-[#0d233a] hover:bg-[#ffd500]/20"
-              }`}
-            >
-              <MapPin size={12} /> 현 위치로 매장 검색하기
-            </button>
+      {/* Main content wrapper with margin alignment matching header & footer */}
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 flex flex-col items-center">
+        <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
+          {/* Main Title Section */}
+          <div className="max-w-2xl">
+            <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${labelAccent}`}>FRANCHISE PARTNERS</span>
+            <h1 className={`text-3xl sm:text-4xl font-black tracking-tight leading-tight mb-2 ${textTitle}`}>
+              120pie 매장 현황
+            </h1>
+            <p className={`text-xs sm:text-sm font-medium leading-relaxed ${textDesc}`}>
+              지도로 확인하고 상세 위치를 실시간 지도로 조회할 수 있습니다.
+            </p>
           </div>
 
-          {/* B. Scrollable Store Cards List */}
-          <div className={`flex-1 overflow-y-auto divide-y transition-colors ${
-            isPink ? "divide-neutral-850 bg-neutral-950" : "divide-[#e6dfc3]/40 bg-[#fffdfa]/50"
+          {/* Map & List Split Box (Explicit height and border matching the header margins) */}
+          <div className={`w-full h-[550px] sm:h-[650px] lg:h-[700px] flex flex-col lg:flex-row rounded-3xl overflow-hidden shadow-xl border transition-colors duration-300 ${
+            isPink ? "bg-[#140e11] border-neutral-850" : "bg-white border-[#e6dfc3]"
           }`}>
-            {finalFilteredStores.length === 0 ? (
-              <div className={`py-12 text-center text-xs font-bold ${isPink ? "text-neutral-500" : "text-[#735965]"}`}>
-                검색 조건에 맞는 매장이 없습니다.
-              </div>
-            ) : (
-              finalFilteredStores.map(store => {
-                const isSelected = activeStore && activeStore.id === store.id;
-                return (
-                  <div
-                    key={store.id}
-                    onClick={() => setSelectedStoreId(store.id)}
-                    className={`p-4 text-left cursor-pointer transition-all border-l-4 ${
-                      isSelected
+            
+            {/* Left Side Panel: Search & Store List */}
+            <div className={`w-full lg:w-[380px] h-[45%] lg:h-full shrink-0 flex flex-col relative lg:border-r transition-colors ${
+              isPink ? "bg-[#140e11] border-neutral-850" : "bg-white border-[#e6dfc3]/80"
+            }`}>
+              {/* A. Search Panel Header */}
+              <div className={`p-4 border-b space-y-3.5 transition-colors ${
+                isPink ? "border-neutral-850" : "border-[#e6dfc3]/60 bg-[#fffdf9]/50"
+              }`}>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[9px] tracking-widest font-black uppercase font-mono ${labelAccent}`}>STORE LOCATOR</span>
+                  <h2 className={`text-sm font-black ${textTitle}`}>120pie 매장 찾기</h2>
+                </div>
+                
+                {/* Search Type Tabs */}
+                <div className={`flex p-1 rounded-xl border ${
+                  isPink ? "bg-neutral-950 border-neutral-850" : "bg-[#fff9e6] border-[#ffd500]/15"
+                }`}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchType("direct");
+                      setSelectedRegion("전체");
+                    }}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all border-0 cursor-pointer ${
+                      searchType === "direct"
                         ? isPink
-                          ? "border-rose-500 bg-rose-500/5"
-                          : "border-[#ffd500] bg-[#fff9e6]"
-                        : isPink
-                          ? "border-transparent hover:bg-neutral-900/60"
-                          : "border-transparent hover:bg-[#fffdf4]"
+                          ? "bg-rose-500 text-white shadow-sm font-extrabold"
+                          : "bg-[#ffd500] text-[#0d233a] shadow-sm font-extrabold"
+                        : isPink ? "text-neutral-400 hover:text-white" : "text-[#735965] hover:text-[#bf3e67]"
                     }`}
                   >
-                    <div className="flex flex-col gap-1">
-                      <span className={`text-[8px] font-black tracking-widest uppercase font-mono ${
-                        isPink ? "text-rose-500/80" : "text-amber-600/80"
-                      }`}>
-                        120pie & coffee
-                      </span>
-                      <h3 className={`font-black text-xs sm:text-sm ${isPink ? "text-white" : "text-[#0d233a]"}`}>
-                        {store.name}
-                      </h3>
-                      <p className={`text-[11px] leading-relaxed font-semibold ${isPink ? "text-neutral-400" : "text-[#576575]"}`}>
-                        {store.roadAddress} {store.detailAddress}
-                      </p>
-                      {store.phone && (
-                        <p className={`text-[10px] font-bold flex items-center gap-1 mt-0.5 ${isPink ? "text-rose-400" : "text-[#bf3e67]"}`}>
-                          연락처: {formatPhoneNumber(store.phone)}
-                        </p>
-                      )}
-                      
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {store.adoptionMenu && store.adoptionMenu.map(menu => {
-                          const config = MENU_MAP[menu] || { label: menu, colorClass: isPink ? "bg-neutral-850 text-neutral-500" : "bg-neutral-100 text-neutral-600" };
-                          return (
-                            <span key={menu} className={`px-1.5 py-0.5 rounded text-[8px] font-black ${config.colorClass}`}>
-                              {config.label}
-                            </span>
-                          );
-                        })}
-                      </div>
+                    직접 검색
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchType("region");
+                      setSearchQuery("");
+                    }}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all border-0 cursor-pointer ${
+                      searchType === "region"
+                        ? isPink
+                          ? "bg-rose-500 text-white shadow-sm font-extrabold"
+                          : "bg-[#ffd500] text-[#0d233a] shadow-sm font-extrabold"
+                        : isPink ? "text-neutral-400 hover:text-white" : "text-[#735965] hover:text-[#bf3e67]"
+                    }`}
+                  >
+                    지역 검색
+                  </button>
+                </div>
 
-                      {/* Expand to show Naver/Kakao map buttons if selected */}
-                      {isSelected && (
-                        <div className={`flex gap-2 mt-3 pt-3 border-t ${isPink ? "border-neutral-800" : "border-[#e6dfc3]/40"}`}>
-                          <a
-                            href={naverMapUrl(store.roadAddress)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 py-1.5 rounded-lg bg-[#03C75A] text-white text-[10px] font-black text-center hover:bg-[#02b350] transition-colors decoration-none"
-                          >
-                            네이버 지도 ↗
-                          </a>
-                          <a
-                            href={kakaoMapUrl(store.roadAddress)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 py-1.5 rounded-lg bg-[#FEE500] text-[#191919] text-[10px] font-black text-center hover:bg-[#ebd300] transition-colors decoration-none"
-                          >
-                            카카오맵 ↗
-                          </a>
-                        </div>
-                      )}
-                    </div>
+                {/* Input / Filters depending on searchType */}
+                {searchType === "direct" ? (
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="매장명 또는 주소를 입력하세요"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className={`w-full border rounded-xl pl-3 pr-10 py-2 text-xs transition-colors ${
+                        isPink
+                          ? "bg-neutral-950 border-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:border-rose-500"
+                          : "bg-white border-[#e6dfc3] text-[#0d233a] placeholder-[#735965]/40 font-semibold focus:outline-none focus:border-[#ffd500]"
+                      }`}
+                    />
+                    <Search size={14} className={`absolute right-3 top-2.5 ${isPink ? "text-neutral-500" : "text-[#735965]/50"}`} />
                   </div>
-                );
-              })
-            )}
+                ) : (
+                  <div className="flex flex-wrap gap-1">
+                    {regions.map(region => {
+                      const isActive = selectedRegion === region;
+                      return (
+                        <button
+                          key={region}
+                          type="button"
+                          onClick={() => setSelectedRegion(region)}
+                          className={`px-2 py-1.5 rounded-lg text-[9px] font-extrabold transition-all border cursor-pointer ${
+                            isActive
+                              ? isPink
+                                ? "bg-rose-500 border-rose-500 text-white"
+                                : "bg-[#ffd500] border-[#ffd500] text-[#0d233a]"
+                              : isPink
+                                ? "bg-neutral-950 border-neutral-850 text-neutral-400 hover:bg-neutral-800"
+                                : "bg-white border-[#e6dfc3] text-[#735965] hover:bg-[#fff9e6]"
+                          }`}
+                        >
+                          {region} ({getRegionCount(region)})
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
 
-            {/* Embedded Footer inside Left-side scroll list so it is scrollable and accessible */}
-            <div className="p-4 bg-neutral-900/5 transition-colors">
-              <p className="text-[10px] text-neutral-400 font-medium text-center leading-relaxed">
-                선택한 가맹점의 공식 도로명 주소 기준으로 위치 조회를 시작합니다.<br />
-                (주소 매칭의 무결성을 위해 가맹점명은 검색어에 가미하지 않습니다.)
-              </p>
+                {/* 현 위치로 매장 검색하기 Button */}
+                <button
+                  type="button"
+                  onClick={handleCurrentLocationSearch}
+                  className={`w-full py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 border-0 cursor-pointer ${
+                    isPink
+                      ? "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+                      : "bg-[#ffd500]/10 text-[#0d233a] hover:bg-[#ffd500]/20"
+                  }`}
+                >
+                  <MapPin size={12} /> 현 위치로 매장 검색하기
+                </button>
+              </div>
+
+              {/* B. Scrollable Store Cards List */}
+              <div className={`flex-1 overflow-y-auto divide-y transition-colors ${
+                isPink ? "divide-neutral-850 bg-neutral-950" : "divide-[#e6dfc3]/40 bg-[#fffdfa]/50"
+              }`}>
+                {finalFilteredStores.length === 0 ? (
+                  <div className={`py-12 text-center text-xs font-bold ${isPink ? "text-neutral-500" : "text-[#735965]"}`}>
+                    검색 조건에 맞는 매장이 없습니다.
+                  </div>
+                ) : (
+                  finalFilteredStores.map(store => {
+                    const isSelected = activeStore && activeStore.id === store.id;
+                    return (
+                      <div
+                        key={store.id}
+                        onClick={() => setSelectedStoreId(store.id)}
+                        className={`p-4 text-left cursor-pointer transition-all border-l-4 ${
+                          isSelected
+                            ? isPink
+                              ? "border-rose-500 bg-rose-500/5"
+                              : "border-[#ffd500] bg-[#fff9e6]"
+                            : isPink
+                              ? "border-transparent hover:bg-neutral-900/60"
+                              : "border-transparent hover:bg-[#fffdf4]"
+                        }`}
+                      >
+                        <div className="flex flex-col gap-1">
+                          <span className={`text-[8px] font-black tracking-widest uppercase font-mono ${
+                            isPink ? "text-rose-500/80" : "text-amber-600/80"
+                          }`}>
+                            120pie & coffee
+                          </span>
+                          <h3 className={`font-black text-xs sm:text-sm ${isPink ? "text-white" : "text-[#0d233a]"}`}>
+                            {store.name}
+                          </h3>
+                          <p className={`text-[11px] leading-relaxed font-semibold ${isPink ? "text-neutral-400" : "text-[#576575]"}`}>
+                            {store.roadAddress} {store.detailAddress}
+                          </p>
+                          {store.phone && (
+                            <p className={`text-[10px] font-bold flex items-center gap-1 mt-0.5 ${isPink ? "text-rose-400" : "text-[#bf3e67]"}`}>
+                              연락처: {formatPhoneNumber(store.phone)}
+                            </p>
+                          )}
+                          
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {store.adoptionMenu && store.adoptionMenu.map(menu => {
+                              const config = MENU_MAP[menu] || { label: menu, colorClass: isPink ? "bg-neutral-850 text-neutral-500" : "bg-neutral-100 text-neutral-600" };
+                              return (
+                                <span key={menu} className={`px-1.5 py-0.5 rounded text-[8px] font-black ${config.colorClass}`}>
+                                  {config.label}
+                                </span>
+                              );
+                            })}
+                          </div>
+
+                          {/* Expand to show Naver/Kakao map buttons if selected */}
+                          {isSelected && (
+                            <div className={`flex gap-2 mt-3 pt-3 border-t ${isPink ? "border-neutral-800" : "border-[#e6dfc3]/40"}`}>
+                              <a
+                                href={naverMapUrl(store.roadAddress)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 py-1.5 rounded-lg bg-[#03C75A] text-white text-[10px] font-black text-center hover:bg-[#02b350] transition-colors decoration-none"
+                              >
+                                네이버 지도 ↗
+                              </a>
+                              <a
+                                href={kakaoMapUrl(store.roadAddress)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 py-1.5 rounded-lg bg-[#FEE500] text-[#191919] text-[10px] font-black text-center hover:bg-[#ebd300] transition-colors decoration-none"
+                              >
+                                카카오맵 ↗
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+
+                {/* Embedded Footer inside Left-side scroll list so it is scrollable and accessible */}
+                <div className="p-4 bg-neutral-900/5 transition-colors">
+                  <p className="text-[10px] text-neutral-400 font-medium text-center leading-relaxed">
+                    선택한 가맹점의 공식 도로명 주소 기준으로 위치 조회를 시작합니다.<br />
+                    (주소 매칭의 무결성을 위해 가맹점명은 검색어에 가미하지 않습니다.)
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side: Map Area (Explicitly positioned relative wrapper with full dimensions) */}
+            <div className="flex-1 relative h-[55%] lg:h-full w-full bg-neutral-100 z-10">
+              <KakaoMap
+                address={activeStore ? activeStore.roadAddress : "서울 송파구 삼학사로 73"}
+                name={activeStore ? cleanStoreName(activeStore.name) : "120겹파이"}
+                isPink={isPink}
+              />
             </div>
           </div>
-        </div>
-
-        {/* Right Side: Map Area (Full screen fill matching Image 2) */}
-        <div className="flex-1 relative h-[55vh] lg:h-full w-full bg-neutral-100 z-10">
-          <KakaoMap
-            address={activeStore ? activeStore.roadAddress : "서울 송파구 삼학사로 73"}
-            name={activeStore ? cleanStoreName(activeStore.name) : "120겹파이"}
-            isPink={isPink}
-          />
         </div>
 
         <FloatingAndInquiry
