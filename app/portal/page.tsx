@@ -350,6 +350,7 @@ export default function PortalPage() {
   const [regAdoptionMenu, setRegAdoptionMenu] = useState<string[]>([]);
 
   // 주소 검색 팝업 관련 상태
+  const [showCheckoutModal, setShowCheckoutModal] = useState<boolean>(false);
   const [showAddressPopup, setShowAddressPopup] = useState<boolean>(false);
   const [addressTab, setAddressTab] = useState<"kakao" | "simulated">("kakao");
   const [addressSearchKeyword, setAddressSearchKeyword] = useState<string>("");
@@ -363,8 +364,8 @@ export default function PortalPage() {
   const [profileRoadAddress, setProfileRoadAddress] = useState<string>("");
   const [profileDetailAddress, setProfileDetailAddress] = useState<string>("");
   const [isUpdatingProfile, setIsUpdatingProfile] = useState<boolean>(false);
-  const [addressSearchTarget, setAddressSearchTarget] = useState<"register" | "profile">("register");
-  const addressSearchTargetRef = useRef<"register" | "profile">("register");
+  const [addressSearchTarget, setAddressSearchTarget] = useState<"register" | "profile" | "delivery">("register");
+  const addressSearchTargetRef = useRef<"register" | "profile" | "delivery">("register");
 
   // ==========================================
   // CONVEX REAL-TIME SYNC HOOKS
@@ -1271,7 +1272,7 @@ export default function PortalPage() {
   };
 
   // Real Road Address Search using Daum/Kakao Postcode API (Iframe Embedded Layer Style)
-  const openDaumPostcode = (target: "register" | "profile") => {
+  const openDaumPostcode = (target: "register" | "profile" | "delivery") => {
     setAddressSearchTarget(target);
     addressSearchTargetRef.current = target;
     setShowAddressPopup(true);
@@ -1310,6 +1311,8 @@ export default function PortalPage() {
             const finalAddress = fullRoadAddr + extraRoadAddr;
             if (addressSearchTargetRef.current === "profile") {
               setProfileRoadAddress(finalAddress);
+            } else if (addressSearchTargetRef.current === "delivery") {
+              setDeliveryAddress(finalAddress);
             } else {
               setRegRoadAddress(finalAddress);
             }
@@ -2471,6 +2474,8 @@ export default function PortalPage() {
                           onClick={() => {
                             if (addressSearchTarget === "profile") {
                               setProfileRoadAddress(addr);
+                            } else if (addressSearchTarget === "delivery") {
+                              setDeliveryAddress(addr);
                             } else {
                               setRegRoadAddress(addr);
                             }
@@ -3322,155 +3327,27 @@ export default function PortalPage() {
                         </div>
                       </div>
 
-                      {/* 배송지 / 받는 사람 정보 확인 · 수정 */}
-                      <div className="border-t border-[#f2ccd7] pt-4 space-y-3">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <MapPin size={14} className="text-[#f25f8a] shrink-0" />
-                          <span className="font-extrabold text-xs text-[#2d2026]">배송지 정보</span>
-                          <span className="text-[9px] text-[#735965] font-bold ml-auto">가맹점 기본정보 자동 입력</span>
-                        </div>
-                        <div className="space-y-2">
-                          <div>
-                            <label className="text-[10px] font-bold text-[#735965] block mb-1">배송지 주소 (도로명)</label>
-                            <textarea
-                              value={deliveryAddress}
-                              onChange={(e) => setDeliveryAddress(e.target.value)}
-                              placeholder="도로명 주소를 입력해 주세요"
-                              rows={2}
-                              className="w-full px-3 py-1.5 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae] resize-none leading-relaxed"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[10px] font-bold text-[#735965] block mb-1">상세 주소</label>
-                            <input
-                              type="text"
-                              value={deliveryDetailAddress}
-                              onChange={(e) => setDeliveryDetailAddress(e.target.value)}
-                              placeholder="상세 주소 (동/호수 등)"
-                              className="w-full px-3 py-2 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
-                            />
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div>
-                              <label className="text-[10px] font-bold text-[#735965] block mb-1">받는 사람</label>
-                              <input
-                                type="text"
-                                value={recipientName}
-                                onChange={(e) => setRecipientName(e.target.value)}
-                                placeholder="수령인 이름"
-                                className="w-full px-3 py-2 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] font-bold text-[#735965] block mb-1">연락처</label>
-                              <input
-                                type="tel"
-                                value={recipientPhone}
-                                onChange={(e) => setRecipientPhone(formatPhoneNumber(e.target.value))}
-                                placeholder="010-0000-0000"
-                                className="w-full px-3 py-2 text-xs border border-[#f2ccd7] rounded-lg bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 결제 수단 선택 */}
-                      <div className="border-t border-[#f2ccd7] pt-4 space-y-3">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <CreditCard size={14} className="text-[#f25f8a] shrink-0" />
-                          <span className="font-extrabold text-xs text-[#2d2026]">결제 수단 선택</span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setOrderPayMethod("card")}
-                            className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                              orderPayMethod === "card"
-                                ? "bg-[#fff1f5] border-[#f25f8a] text-[#bf3e67] shadow-sm font-black"
-                                : "bg-white border-[#f2ccd7] text-[#735965] hover:bg-[#fff9fb]"
-                            }`}
-                          >
-                            <CreditCard size={14} />
-                            신용카드
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setOrderPayMethod("bank")}
-                            className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                              orderPayMethod === "bank"
-                                ? "bg-[#fff1f5] border-[#f25f8a] text-[#bf3e67] shadow-sm font-black"
-                                : "bg-white border-[#f2ccd7] text-[#735965] hover:bg-[#fff9fb]"
-                            }`}
-                          >
-                            <Landmark size={14} />
-                            무통장입금
-                          </button>
-                        </div>
-
-                        {/* 무통장입금 정보 박스 */}
-                        {orderPayMethod === "bank" && (
-                          <div className="bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl space-y-3 animate-fadeIn text-xs">
-                            <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-2">
-                              <span className="font-extrabold text-[#bf3e67] flex items-center gap-1">
-                                <Landmark size={12} /> 입금 계좌 정보
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => handleCopyToClipboard(`K뱅크 700-120-270001 (주)고우웰라이프 ${cartTotal.toLocaleString()}원`, "전체 계좌 정보")}
-                                className="text-[10px] text-[#f25f8a] hover:text-[#df4977] font-bold flex items-center gap-0.5 cursor-pointer bg-white px-2 py-1 rounded border border-[#f2ccd7] transition-all hover:shadow-sm"
-                              >
-                                <Copy size={10} /> 전체 복사
-                              </button>
-                            </div>
-                            <div className="space-y-2 text-[#735965] font-semibold">
-                              <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
-                                <div>
-                                  <span className="block text-[8px] text-[#735965]/60 font-bold">은행 / 예금주</span>
-                                  <span className="text-xs font-bold text-[#2d2026]">K뱅크 / (주)고우웰라이프</span>
-                                </div>
-                              </div>
-                              <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
-                                <div>
-                                  <span className="block text-[8px] text-[#735965]/60 font-bold">계좌번호</span>
-                                  <span className="text-xs font-mono font-bold text-[#2d2026]">700-120-270001</span>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleCopyToClipboard("700-120-270001", "계좌번호")}
-                                  className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/60 rounded-md shrink-0 cursor-pointer transition-all hover:shadow-sm"
-                                  title="계좌번호 복사"
-                                >
-                                  <Copy size={11} />
-                                </button>
-                              </div>
-                              <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
-                                <div>
-                                  <span className="block text-[8px] text-[#735965]/60 font-bold">입금 금액</span>
-                                  <span className="text-xs font-bold text-[#f25f8a]">{cartTotal.toLocaleString()} 원</span>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleCopyToClipboard(String(cartTotal), "입금 금액")}
-                                  className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/60 rounded-md shrink-0 cursor-pointer transition-all hover:shadow-sm"
-                                  title="금액 복사"
-                                >
-                                  <Copy size={11} />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
                       {/* Order action button */}
-                      <button 
-                        onClick={placeOrder}
-                        className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-0"
-                      >
-                        <CheckCircle2 size={16} />
-                        {orderPayMethod === "card" ? "결제 진행하기" : "발주 신청하기 (무통장입금)"}
-                      </button>
+                      <div className="border-t border-[#f2ccd7] pt-4">
+                        <button 
+                          onClick={() => {
+                            // Automatically initialize recipient if blank
+                            if (!recipientName) {
+                              const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+                              setRecipientName(activeStore?.owner || "");
+                            }
+                            if (!recipientPhone) {
+                              const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+                              setRecipientPhone(activeStore?.phone || "");
+                            }
+                            setShowCheckoutModal(true);
+                          }}
+                          className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-0"
+                        >
+                          <CheckCircle2 size={16} />
+                          결제 진행하기
+                        </button>
+                      </div>
                     </>
                   )}
                 </div>
@@ -5084,6 +4961,334 @@ export default function PortalPage() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 발주 장바구니 상세 및 결제 모달 (Side Cart -> Checkout Modal Flow) */}
+      {showCheckoutModal && (
+        <div 
+          className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setShowCheckoutModal(false)}
+        >
+          <div 
+            className="w-full max-w-4xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-scaleIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-5 border-b border-[#f2ccd7]/60 flex items-center justify-between bg-[#fff1f5]/80">
+              <div className="flex items-center gap-2">
+                <ShoppingBag size={18} className="text-[#f25f8a]" />
+                <h4 className="text-base font-black text-[#2d2026]">
+                  발주 장바구니 및 결제 ({cart.reduce((sum, item) => sum + item.quantity, 0)}개)
+                </h4>
+              </div>
+              <div className="flex items-center gap-2">
+                {cart.length > 0 && (
+                  <button 
+                    onClick={() => {
+                      clearCart();
+                      setShowCheckoutModal(false);
+                    }} 
+                    className="text-[11px] font-bold text-[#735965] hover:text-red-500 transition-colors flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-[#f2ccd7]"
+                  >
+                    <Trash2 size={12} /> 비우기
+                  </button>
+                )}
+                <button 
+                  onClick={() => setShowCheckoutModal(false)} 
+                  className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {cart.length === 0 ? (
+                <div className="py-20 text-center space-y-3">
+                  <ShoppingBag size={48} className="text-[#f2ccd7] mx-auto" />
+                  <p className="text-sm text-[#735965] font-bold">
+                    장바구니가 비어 있습니다.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* Left Column: Items List & Address & Payment */}
+                  <div className="lg:col-span-7 space-y-6">
+                    
+                    {/* 1. 발주 품목 확인 */}
+                    <div className="space-y-3">
+                      <span className="font-extrabold text-xs text-[#2d2026] flex items-center gap-1.5 border-b border-[#f2ccd7]/60 pb-1.5">
+                        <CheckCircle2 size={14} className="text-[#f25f8a]" /> 발주 품목 확인
+                      </span>
+                      
+                      <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+                        {groupedCartItems.map(([typeKey, group]) => (
+                          <div key={typeKey} className="space-y-2">
+                            <div className="flex justify-between items-center bg-[#ffd3df]/30 px-2 py-1 rounded-md border border-[#f2ccd7]/40 select-none">
+                              <span className="font-extrabold text-[10px] text-[#bf3e67]">{group.title}</span>
+                              {group.feeLabel && (
+                                <span className="text-[9px] text-[#735965] font-black">
+                                  배송비: {group.feeLabel}
+                                </span>
+                              )}
+                            </div>
+                            
+                            <div className="space-y-1.5">
+                              {group.items.map((item) => {
+                                const p = (products || []).find((prod) => prod.id === item.productId);
+                                if (!p) return null;
+                                return (
+                                  <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7]/40 p-2.5 rounded-xl">
+                                    <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="font-bold text-[11px] text-[#2d2026] truncate">{p.name}</h4>
+                                      {item.selectedOption && (
+                                        <span className="text-[9px] text-[#bf3e67] font-black block mt-0.5 select-none">
+                                          [옵션: {item.selectedOption}]
+                                        </span>
+                                      )}
+                                      <span className="text-[9px] text-[#735965] font-semibold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                      <button onClick={() => removeCartItem(p.id, item.selectedOption)} className="text-[#735965]/60 hover:text-red-500 transition-colors p-0.5 cursor-pointer" aria-label="삭제">
+                                        <X size={12} />
+                                      </button>
+                                      <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
+                                        <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
+                                          <Minus size={9} />
+                                        </button>
+                                        <span className="px-1.5 text-[9px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
+                                        <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
+                                          <Plus size={9} />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 2. 배송지 정보 입력 */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-1.5 border-b border-[#f2ccd7]/60 pb-1.5">
+                        <MapPin size={14} className="text-[#f25f8a] shrink-0" />
+                        <span className="font-extrabold text-xs text-[#2d2026]">배송지 정보 입력</span>
+                        <span className="text-[9px] text-[#735965] font-bold ml-auto bg-[#fff1f5] border border-[#f2ccd7]/40 px-2 py-0.5 rounded-md select-none">
+                          기본 주소지 정보 자동 입력됨
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-2.5">
+                        <div>
+                          <label className="text-[10px] font-bold text-[#735965] block mb-1">배송지 주소 (도로명)</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={deliveryAddress}
+                              onChange={(e) => setDeliveryAddress(e.target.value)}
+                              placeholder="도로명 주소를 검색 또는 직접 입력하세요"
+                              className="flex-1 px-3.5 py-2.5 text-xs border border-[#f2ccd7] rounded-xl bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => openDaumPostcode("delivery")}
+                              className="px-4 py-2.5 bg-[#735965] hover:bg-[#5a444f] text-white text-xs font-bold rounded-xl transition-all cursor-pointer border-0 shrink-0"
+                            >
+                              주소 검색
+                            </button>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-[#735965] block mb-1">상세 주소</label>
+                          <input
+                            type="text"
+                            value={deliveryDetailAddress}
+                            onChange={(e) => setDeliveryDetailAddress(e.target.value)}
+                            placeholder="상세 주소 (동/호수/층 등)"
+                            className="w-full px-3.5 py-2 text-xs border border-[#f2ccd7] rounded-xl bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-[10px] font-bold text-[#735965] block mb-1">받는 사람</label>
+                            <input
+                              type="text"
+                              value={recipientName}
+                              onChange={(e) => setRecipientName(e.target.value)}
+                              placeholder="수령인 이름"
+                              className="w-full px-3.5 py-2 text-xs border border-[#f2ccd7] rounded-xl bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-[#735965] block mb-1">연락처</label>
+                            <input
+                              type="tel"
+                              value={recipientPhone}
+                              onChange={(e) => setRecipientPhone(formatPhoneNumber(e.target.value))}
+                              placeholder="010-0000-0000"
+                              className="w-full px-3.5 py-2 text-xs border border-[#f2ccd7] rounded-xl bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Right Column: Payment Method & Totals & Action */}
+                  <div className="lg:col-span-5 space-y-6">
+                    
+                    {/* 3. 결제 수단 선택 */}
+                    <div className="space-y-3">
+                      <span className="font-extrabold text-xs text-[#2d2026] flex items-center gap-1.5 border-b border-[#f2ccd7]/60 pb-1.5">
+                        <CreditCard size={14} className="text-[#f25f8a]" /> 결제 수단 선택
+                      </span>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setOrderPayMethod("card")}
+                          className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                            orderPayMethod === "card"
+                              ? "bg-[#fff1f5] border-[#f25f8a] text-[#bf3e67] shadow-sm font-black"
+                              : "bg-white border-[#f2ccd7] text-[#735965] hover:bg-[#fff9fb]"
+                          }`}
+                        >
+                          <CreditCard size={14} />
+                          신용카드
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setOrderPayMethod("bank")}
+                          className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                            orderPayMethod === "bank"
+                              ? "bg-[#fff1f5] border-[#f25f8a] text-[#bf3e67] shadow-sm font-black"
+                              : "bg-white border-[#f2ccd7] text-[#735965] hover:bg-[#fff9fb]"
+                          }`}
+                        >
+                          <Landmark size={14} />
+                          무통장입금
+                        </button>
+                      </div>
+
+                      {/* 무통장입금 정보 박스 */}
+                      {orderPayMethod === "bank" && (
+                        <div className="bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl space-y-3 animate-fadeIn text-xs">
+                          <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-2">
+                            <span className="font-extrabold text-[#bf3e67] flex items-center gap-1">
+                              <Landmark size={12} /> 입금 계좌 정보
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyToClipboard(`K뱅크 700-120-270001 (주)고우웰라이프 ${cartTotal.toLocaleString()}원`, "전체 계좌 정보")}
+                              className="text-[10px] text-[#f25f8a] hover:text-[#df4977] font-bold flex items-center gap-0.5 cursor-pointer bg-white px-2 py-1 rounded border border-[#f2ccd7] transition-all hover:shadow-sm"
+                            >
+                              <Copy size={10} /> 전체 복사
+                            </button>
+                          </div>
+                          <div className="space-y-2 text-[#735965] font-semibold">
+                            <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
+                              <div>
+                                <span className="block text-[8px] text-[#735965]/60 font-bold">은행 / 예금주</span>
+                                <span className="text-xs font-bold text-[#2d2026]">K뱅크 / (주)고우웰라이프</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
+                              <div>
+                                <span className="block text-[8px] text-[#735965]/60 font-bold">계좌번호</span>
+                                <span className="text-xs font-mono font-bold text-[#2d2026]">700-120-270001</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyToClipboard("700-120-270001", "계좌번호")}
+                                className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/60 rounded-md shrink-0 cursor-pointer transition-all hover:shadow-sm"
+                                title="계좌번호 복사"
+                              >
+                                <Copy size={11} />
+                              </button>
+                            </div>
+                            <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
+                              <div>
+                                <span className="block text-[8px] text-[#735965]/60 font-bold">입금 금액</span>
+                                <span className="text-xs font-bold text-[#f25f8a]">{cartTotal.toLocaleString()} 원</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyToClipboard(String(cartTotal), "입금 금액")}
+                                className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/60 rounded-md shrink-0 cursor-pointer transition-all hover:shadow-sm"
+                                title="금액 복사"
+                              >
+                                <Copy size={11} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 4. 최종 결제 내역 확인 */}
+                    <div className="bg-[#fff9fb] border border-[#f2ccd7] rounded-2xl p-5 space-y-4">
+                      <span className="font-extrabold text-xs text-[#2d2026] flex items-center gap-1.5 border-b border-[#f2ccd7]/60 pb-1.5 select-none">
+                        <CheckCircle2 size={14} className="text-[#f25f8a]" /> 최종 금액 확인
+                      </span>
+                      
+                      <div className="space-y-2.5 text-xs">
+                        <div className="flex justify-between text-[#735965] font-bold">
+                          <span>상품 합계</span>
+                          <span>{cartSubtotal.toLocaleString()} 원</span>
+                        </div>
+                        <div className="flex justify-between text-[#735965] font-bold">
+                          <div className="flex flex-col">
+                            <span>배송비</span>
+                            {shippingFee > 0 && (
+                              <span className="text-[10px] text-[#bf3e67] font-bold">({shippingTypeLabel} 적용)</span>
+                            )}
+                          </div>
+                          <span>{shippingFee === 0 ? "무료" : `${shippingFee.toLocaleString()} 원`}</span>
+                        </div>
+                        <div className="flex justify-between text-[#2d2026] font-black text-sm border-t border-[#f2ccd7] pt-3">
+                          <span>최종 발주 금액</span>
+                          <span className="text-[#f25f8a]">{cartTotal.toLocaleString()} 원</span>
+                        </div>
+                      </div>
+
+                      {/* Pay Button */}
+                      <button 
+                        onClick={() => {
+                          if (!deliveryAddress.trim()) {
+                            showCustomAlert("발주 불가", "배송지 주소(도로명)를 입력해 주세요.");
+                            return;
+                          }
+                          if (!recipientName.trim()) {
+                            showCustomAlert("발주 불가", "받는 사람 이름을 입력해 주세요.");
+                            return;
+                          }
+                          if (!recipientPhone.trim()) {
+                            showCustomAlert("발주 불가", "받는 사람 연락처를 입력해 주세요.");
+                            return;
+                          }
+                          
+                          placeOrder();
+                          setShowCheckoutModal(false);
+                        }}
+                        className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-black rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-0"
+                      >
+                        <CheckCircle2 size={16} />
+                        {orderPayMethod === "card" ? "최종 결제 진행" : "발주 신청 완료 (무통장입금)"}
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
