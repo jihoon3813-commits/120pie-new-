@@ -78,6 +78,8 @@ export const MENU_DATA: Record<string, MenuCategory> = {
     title: "달콤한 디저트와 완벽한 조화를 이루는 120 음료 라인업",
     desc: "엄선된 에스프레소 음료부터 신선한 과일 주스, 달콤한 쉐이크까지 120pie와 완벽히 페어링되는 다양한 음료들을 소개합니다.",
     items: [
+      { name: "말차컵팥빙수", desc: "진하고 쌉싸름한 말차와 달콤한 팥, 쫄깃한 떡이 어우러져 컵으로 간편하게 즐기는 시원한 빙수 음료입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782829593/%EB%A7%90%EC%B0%A8%EC%BB%B5%ED%8C%A5%EB%B9%99%EC%88%98_zligph.png", badge: "NEW" },
+      { name: "인절미컵팥빙수", desc: "고소한 인절미 콩가루와 달콤한 팥, 쫄깃한 떡이 가득해 할매입맛 취향을 저격하는 시원한 컵빙수입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782829593/%EC%9D%B8%EC%A0%88%EB%AF%B8%EC%BB%B5%ED%8C%A5%EB%B9%99%EC%88%98_jekx06.png", badge: "NEW" },
       { name: "아메리카노", desc: "고소하고 묵직한 바디감으로 120파이와 가장 완벽하게 어울리는 대표 에스프레소 음료입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594614/%EC%95%84%EB%A9%94%EB%A6%AC%EC%B9%B4%EB%85%B8_qn2vhm.png", badge: "인기" },
       { name: "카페라떼", desc: "에스프레소의 묵직함에 부드러운 우유의 고소함을 더해 부드러운 목넘김을 선사합니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594617/%EC%B9%B4%ED%8E%98%EB%9D%BC%EB%96%BC_hxx4gl.png" },
       { name: "카푸치노", desc: "풍성하고 고운 우유 거품 and 은은한 시나몬 향이 조화롭게 어우러진 클래식 커피입니다.", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594625/%EC%B9%B4%ED%91%B8%EC%B9%98%EB%85%B82_lzqz34.png" },

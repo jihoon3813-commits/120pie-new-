@@ -28,6 +28,11 @@ const getBadgeClasses = (badge: string, isPink: boolean) => {
       ? "bg-amber-500/10 border border-amber-500/30 text-amber-400" 
       : "bg-amber-50 text-amber-800 border border-amber-250/65";
   }
+  if (badge === "NEW") {
+    return isPink 
+      ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400" 
+      : "bg-emerald-600 text-white";
+  }
   return isPink 
     ? "bg-rose-500 text-white" 
     : "bg-neutral-900 text-amber-400";
@@ -212,7 +217,7 @@ export default function MenuPageClient() {
           );
         } else if (subFilter === "smoothie") {
           items = items.filter(item => 
-            item.name.includes("스무디") || item.name.includes("쉐이크")
+            item.name.includes("스무디") || item.name.includes("쉐이크") || item.name.includes("빙수")
           );
         } else if (subFilter === "juice") {
           items = items.filter(item => 
@@ -492,7 +497,9 @@ export default function MenuPageClient() {
                         key={item.name}
                         className={`group rounded-2xl border overflow-hidden transition-all duration-300 flex flex-col ${cardClass}`}
                       >
-                        <div className="aspect-[4/3] w-full overflow-hidden relative bg-white p-3 sm:p-5">
+                        <div className={`aspect-[4/3] w-full overflow-hidden relative bg-white transition-all ${
+                          item.name.includes("컵팥빙수") ? "p-6 sm:p-8" : "p-3 sm:p-5"
+                        }`}>
                           <img
                             src={optimizeCloudinaryUrl(item.img)}
                             alt={item.name}

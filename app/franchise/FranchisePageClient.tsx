@@ -1154,6 +1154,8 @@ export default function FranchisePageClient() {
               {activeMenuTab === "drink" && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 sm:gap-6">
                   {[
+                    { name: "말차컵팥빙수", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782829593/%EB%A7%90%EC%B0%A8%EC%BB%B5%ED%8C%A5%EB%B9%99%EC%88%98_zligph.png" },
+                    { name: "인절미컵팥빙수", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1782829593/%EC%9D%B8%EC%A0%88%EB%AF%B8%EC%BB%B5%ED%8C%A5%EB%B9%99%EC%88%98_jekx06.png" },
                     { name: "아메리카노", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594614/%EC%95%84%EB%A9%94%EB%A6%AC%EC%B9%B4%EB%85%B8_qn2vhm.png" },
                     { name: "카페라떼", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594617/%EC%B9%B4%ED%8E%98%EB%9D%BC%EB%96%BC_hxx4gl.png" },
                     { name: "카푸치노", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594625/%EC%B9%B4%ED%91%B8%EC%B9%98%EB%85%B82_lzqz34.png" },
@@ -1196,7 +1198,9 @@ export default function FranchisePageClient() {
                     { name: "오렌지 주스", img: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781594824/%EC%98%A4%EB%A0%8C%EC%A7%80_%EC%A3%BC%EC%8A%A42_uhicvy.png" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
-                      <div className={`w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md ${isPink ? "bg-neutral-900" : "bg-[#fffdf4]"} relative group-hover:border-amber-400 transition-all duration-300`}>
+                      <div className={`w-full aspect-square rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md ${isPink ? "bg-neutral-900" : "bg-[#fffdf4]"} relative group-hover:border-amber-400 transition-all duration-300 ${
+                        item.name.includes("컵팥빙수") ? "p-3.5" : ""
+                      }`}>
                         <img 
                           src={getOptimizedImg(item.img, 200)} 
                           alt={item.name} 

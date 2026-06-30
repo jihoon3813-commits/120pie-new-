@@ -86,6 +86,11 @@ const getBadgeClasses = (badge: string, isPink: boolean) => {
       ? "bg-amber-500/10 border border-amber-500/30 text-amber-400" 
       : "bg-amber-50 text-amber-800 border border-amber-250/65";
   }
+  if (badge === "NEW") {
+    return isPink 
+      ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400" 
+      : "bg-emerald-600 text-white";
+  }
   return isPink 
     ? "bg-rose-500 text-white" 
     : "bg-neutral-900 text-amber-400";
@@ -131,7 +136,9 @@ function MenuModal({ menuId, onClose, onInquiry, isPink = false }: { menuId: str
             <div className="p-5 sm:p-8 grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 bg-neutral-950">
               {data.items.map((item, i) => (
                 <div key={i} className="bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-850 shadow-lg hover:border-amber-400/40 transition-all group">
-                  <div className="h-44 overflow-hidden relative bg-white flex items-center justify-center p-3">
+                  <div className={`h-44 overflow-hidden relative bg-white flex items-center justify-center transition-all ${
+                    item.name.includes("컵팥빙수") ? "p-6" : "p-3"
+                  }`}>
                     <img src={item.img} alt={item.name} className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500" />
                     {item.badge && (
                       <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wide shadow-sm z-10 ${
@@ -1348,7 +1355,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
           );
         } else if (subFilter === "smoothie") {
           items = items.filter(item => 
-            item.name.includes("스무디") || item.name.includes("쉐이크")
+            item.name.includes("스무디") || item.name.includes("쉐이크") || item.name.includes("빙수")
           );
         } else if (subFilter === "juice") {
           items = items.filter(item => 
@@ -2068,7 +2075,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                           key={item.name}
                           className={`group rounded-2xl border overflow-hidden transition-all duration-300 flex flex-col ${cardClass}`}
                         >
-                          <div className={`aspect-[4/3] w-full overflow-hidden relative p-3 sm:p-5 ${imgContainerBg}`}>
+                          <div className={`aspect-[4/3] w-full overflow-hidden relative transition-all ${imgContainerBg} ${
+                            item.name.includes("컵팥빙수") ? "p-6 sm:p-8" : "p-3 sm:p-5"
+                          }`}>
                             <img
                               src={item.img}
                               alt={item.name}
