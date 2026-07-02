@@ -163,4 +163,42 @@ export default defineSchema({
     sideImage: v.optional(v.string()),
     sideLink: v.optional(v.string()),
   }),
+  contracts: defineTable({
+    ownerName: v.string(), // 가맹사업자명
+    ownerBirth: v.string(), // 가맹사업자 생년월일
+    ownerPhone: v.string(), // 가맹사업자 연락처
+    storeAddress: v.string(), // 가맹점 주소
+    storeName: v.string(), // 가맹점 명칭
+    storeSize: v.number(), // 가맹점 규모 (㎡)
+    businessArea: v.string(), // 영업 지역
+    contractStart: v.string(), // 계약 기간 시작일 (YYYY-MM-DD)
+    contractEnd: v.string(), // 계약 기간 종료일 (YYYY-MM-DD)
+    
+    // 금액 관련
+    supervisionFee: v.number(), // 공사감리비
+    initialFranchiseFee: v.number(), // 최초가맹금
+    
+    // 예치가맹금
+    depositMembershipFee: v.number(), // 가입비
+    depositEduFee: v.number(), // 오픈교육비
+    depositSupportFee: v.number(), // 오픈지원비
+    depositGuaranteeFee: v.number(), // 계약이행보증금
+    depositTotalFee: v.number(), // 합계
+    
+    royaltyFee: v.number(), // 로열티
+    guaranteeFee: v.number(), // 계약이행보증금 (부가세 없음)
+    
+    // 교육비
+    eduOpenFee: v.number(), // 오픈교육 (최초가맹금에 포함)
+    eduNewFee: v.number(), // 신입교육 (1인 기준)
+    
+    initialSupplyFee: v.number(), // 초도물품
+    reFranchiseFee: v.number(), // 재가맹비
+    penaltyFee: v.number(), // 위약금
+    
+    status: v.string(), // 상태 ("기본정보 등록" | "계약서 발송완료" | "계약서 서명완료" | "계약서 진행취소")
+    createdAt: v.string(), // 등록일시 (YYYY-MM-DD HH:mm:ss)
+    fileUrl: v.optional(v.string()), // 최종 계약 서명한 파일 URL (Base64 Data URL)
+    fileName: v.optional(v.string()), // 업로드된 실제 파일명
+  }),
 });
