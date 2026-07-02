@@ -4886,11 +4886,11 @@ export default function AdminPage() {
                           
                           {/* 예치가맹금(표) */}
                           <div className="border border-[#f2ccd7] rounded-lg overflow-hidden my-3">
-                            <table className="w-full text-left border-collapse text-xs">
+                            <table className="w-full text-left border-collapse text-xs table-fixed">
                               <thead>
                                 <tr className="bg-[#fff9fb] border-b border-[#f2ccd7] font-extrabold text-[#735965] text-[10px]">
-                                  <th className="p-2 border-r border-[#f2ccd7]">예치가맹금 항목</th>
-                                  <th className="p-2">금액(원)</th>
+                                  <th className="p-2 border-r border-[#f2ccd7] w-[60%]">예치가맹금 항목</th>
+                                  <th className="p-2 w-[40%]">금액(원)</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -4928,11 +4928,11 @@ export default function AdminPage() {
                           
                           {/* 교육비(표) */}
                           <div className="border border-[#f2ccd7] rounded-lg overflow-hidden my-3">
-                            <table className="w-full text-left border-collapse text-xs">
+                            <table className="w-full text-left border-collapse text-xs table-fixed">
                               <thead>
                                 <tr className="bg-[#fff9fb] border-b border-[#f2ccd7] font-extrabold text-[#735965] text-[10px]">
-                                  <th className="p-2 border-r border-[#f2ccd7]">교육비 구분</th>
-                                  <th className="p-2">금액(원)</th>
+                                  <th className="p-2 border-r border-[#f2ccd7] w-[60%]">교육비 구분</th>
+                                  <th className="p-2 w-[40%]">금액(원)</th>
                                 </tr>
                               </thead>
                               <tbody>
