@@ -46,6 +46,7 @@ export const createOrUpdate = mutation({
     createdAt: v.string(),
     fileUrl: v.optional(v.string()),
     fileName: v.optional(v.string()),
+    contractType: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { id, ...data } = args;

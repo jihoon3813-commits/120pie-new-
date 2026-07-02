@@ -200,5 +200,6 @@ export default defineSchema({
     createdAt: v.string(), // 등록일시 (YYYY-MM-DD HH:mm:ss)
     fileUrl: v.optional(v.string()), // 최종 계약 서명한 파일 URL (Base64 Data URL)
     fileName: v.optional(v.string()), // 업로드된 실제 파일명
+    contractType: v.optional(v.string()), // 계약 구분 ("신규" | "갱신" | "양수")
   }),
 });

@@ -865,6 +865,7 @@ export default function AdminPage() {
     status: string;
     fileUrl: string;
     fileName: string;
+    contractType: string;
   }
 
   // Contracts Management States
@@ -904,6 +905,7 @@ export default function AdminPage() {
     status: "기본정보 등록",
     fileUrl: "",
     fileName: "",
+    contractType: "신규",
   };
   const [contractForm, setContractForm] = useState<ContractFormType>(initialContractForm);
 
@@ -1035,6 +1037,7 @@ export default function AdminPage() {
       status: selectedContract.status,
       fileUrl: selectedContract.fileUrl || "",
       fileName: selectedContract.fileName || "",
+      contractType: selectedContract.contractType || "신규",
     });
     setIsContractEditMode(true);
     setIsContractFormOpen(true);
@@ -1121,6 +1124,7 @@ export default function AdminPage() {
       status: contractForm.status || "기본정보 등록",
       fileUrl: contractForm.fileUrl || "",
       fileName: contractForm.fileName || "",
+      contractType: contractForm.contractType || "신규",
       id: isContractEditMode && selectedContract ? selectedContract._id : undefined,
       createdAt: isContractEditMode && selectedContract ? selectedContract.createdAt : getFormattedDateTime(),
     };
@@ -4445,6 +4449,27 @@ export default function AdminPage() {
                       {/* Section 1: 인적 정보 */}
                       <div>
                         <h4 className="text-xs font-black text-[#bf3e67] uppercase tracking-wider mb-3 pb-1 border-b border-[#ffd3df]/20">1. 계약자 및 가맹점 인적 정보</h4>
+                        
+                        {/* 계약 구분 선택 */}
+                        <div className="mb-4 bg-[#fff9fb]/40 border border-[#f2ccd7] p-3 rounded-xl flex flex-col gap-2">
+                          <span className="text-xs font-black text-[#bf3e67]">계약 구분 <span className="text-red-500">*</span></span>
+                          <div className="flex items-center gap-6">
+                            {["신규", "갱신", "양수"].map((type) => (
+                              <label key={type} className="flex items-center gap-2 cursor-pointer font-bold text-xs text-[#2d2026] select-none">
+                                <input
+                                  type="radio"
+                                  name="contractType"
+                                  value={type}
+                                  checked={contractForm.contractType === type}
+                                  onChange={(e) => setContractForm(prev => ({ ...prev, contractType: e.target.value }))}
+                                  className="w-4 h-4 accent-[#bf3e67] cursor-pointer"
+                                />
+                                {type}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-xs font-bold text-[#735965] mb-1">가맹사업자명 <span className="text-red-500">*</span></label>
@@ -4836,7 +4861,7 @@ export default function AdminPage() {
                           <button
                             type="button"
                             onClick={() => {
-                              const summaryText = `가맹사업자명: ${selectedContract.ownerName}\n생년월일: ${selectedContract.ownerBirth}\n연락처: ${selectedContract.ownerPhone}\n가맹점명: ${selectedContract.storeName}\n주소: ${selectedContract.storeAddress}\n규모: ${selectedContract.storeSize}㎡\n영업지역: ${selectedContract.businessArea}`;
+                              const summaryText = `계약구분: ${selectedContract.contractType || "신규"}\n가맹사업자명: ${selectedContract.ownerName}\n생년월일: ${selectedContract.ownerBirth}\n연락처: ${selectedContract.ownerPhone}\n가맹점명: ${selectedContract.storeName}\n주소: ${selectedContract.storeAddress}\n규모: ${selectedContract.storeSize}㎡\n영업지역: ${selectedContract.businessArea}`;
                               handleCopyText(summaryText, "인적 정보 일괄");
                             }}
                             className="text-[10px] text-[#bf3e67] font-black border border-[#f2ccd7] bg-white hover:bg-[#ffd3df]/20 px-2 py-0.5 rounded transition-all cursor-pointer"
@@ -4845,6 +4870,7 @@ export default function AdminPage() {
                           </button>
                         </div>
                         <div className="p-4 space-y-2 text-xs text-[#2d2026]">
+                          {renderDetailRow("계약 구분", selectedContract.contractType || "신규")}
                           {renderDetailRow("계약 상태", selectedContract.status)}
                           {renderDetailRow("가맹사업자명", selectedContract.ownerName)}
                           {renderDetailRow("가맹사업자 생년월일", selectedContract.ownerBirth)}
