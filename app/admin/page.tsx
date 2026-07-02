@@ -1178,8 +1178,10 @@ export default function AdminPage() {
   };
 
   const getFormattedKoreanAmount = (num: any, defaultText: string) => {
+    if (num === "" || num === undefined || num === null) return defaultText;
     const n = Number(num);
-    if (!n || isNaN(n) || n === 0) return defaultText;
+    if (isNaN(n)) return defaultText;
+    if (n === 0) return `일금영원(￦0)`;
     const kor = numberToKorean(n);
     return `일금${kor}원(￦${n.toLocaleString()})`;
   };
