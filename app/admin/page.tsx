@@ -1290,18 +1290,19 @@ export default function AdminPage() {
   const renderTableDetailRow = (label: string, val: number) => {
     const formattedVal = val.toLocaleString();
     return (
-      <tr className="border-b border-[#f2ccd7] hover:bg-[#fff9fb]/45 transition-colors">
+      <tr className="border-b border-[#f2ccd7] hover:bg-[#fff9fb]/45 transition-colors text-xs">
         <td className="p-2 border-r border-[#f2ccd7] font-bold text-[#735965]">{label}</td>
-        <td className="p-2 border-r border-[#f2ccd7] font-extrabold text-[#2d2026]">{formattedVal}</td>
-        <td className="p-2 text-center">
-          <button
-            key={label}
-            type="button"
-            onClick={() => handleCopyText(formattedVal, label)}
-            className="text-[#bf3e67] hover:underline font-bold"
-          >
-            복사
-          </button>
+        <td className="p-2 font-extrabold text-[#2d2026]">
+          <div className="flex items-center justify-between gap-2">
+            <span>{formattedVal}</span>
+            <button
+              type="button"
+              onClick={() => handleCopyText(formattedVal, label)}
+              className="text-[10px] text-[#bf3e67] border border-[#f2ccd7] bg-white hover:bg-[#ffd3df]/20 px-1.5 py-0.5 rounded transition-all cursor-pointer font-bold shrink-0"
+            >
+              복사
+            </button>
+          </div>
         </td>
       </tr>
     );
@@ -3814,7 +3815,7 @@ export default function AdminPage() {
 
   if (!isLoggedIn) {
     return (
-      <div id="admin-portal" className="h-screen w-screen bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans select-none antialiased justify-center items-center p-4">
+      <div id="admin-portal" className="h-screen w-screen bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans antialiased justify-center items-center p-4">
         {toastMessage && (
           <div className="fixed bottom-6 right-6 z-[150] bg-[#f25f8a] text-white px-5 py-3.5 rounded-xl font-bold text-sm shadow-[0_8px_30px_rgba(242,95,138,0.25)] flex items-center gap-2.5 animate-bounce">
             <CheckCircle2 size={16} />
@@ -4002,7 +4003,7 @@ export default function AdminPage() {
   const paginatedIps = filteredIpsList.slice((ipListPage - 1) * ipItemsPerPage, ipListPage * ipItemsPerPage);
 
   return (
-    <div id="admin-portal" className="h-screen overflow-hidden bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans select-none antialiased">
+    <div id="admin-portal" className="h-screen overflow-hidden bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans antialiased">
       
       {/* TOAST SYSTEM */}
       {toastMessage && (
@@ -4889,8 +4890,7 @@ export default function AdminPage() {
                               <thead>
                                 <tr className="bg-[#fff9fb] border-b border-[#f2ccd7] font-extrabold text-[#735965] text-[10px]">
                                   <th className="p-2 border-r border-[#f2ccd7]">예치가맹금 항목</th>
-                                  <th className="p-2 border-r border-[#f2ccd7]">금액(원)</th>
-                                  <th className="p-2 w-16 text-center">복사</th>
+                                  <th className="p-2">금액(원)</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -4898,19 +4898,19 @@ export default function AdminPage() {
                                 {renderTableDetailRow("오픈교육비", selectedContract.depositEduFee)}
                                 {renderTableDetailRow("오픈지원비", selectedContract.depositSupportFee)}
                                 {renderTableDetailRow("계약이행보증금", selectedContract.depositGuaranteeFee)}
-                                <tr className="font-extrabold bg-[#ffd3df]/20">
+                                <tr className="font-extrabold bg-[#ffd3df]/20 text-xs">
                                   <td className="p-2 border-t border-r border-[#f2ccd7] text-[#bf3e67]">합계</td>
-                                  <td className="p-2 border-t border-r border-[#f2ccd7] text-[#bf3e67] font-black">
-                                    {selectedContract.depositTotalFee.toLocaleString()}
-                                  </td>
-                                  <td className="p-2 border-t border-[#f2ccd7] text-center">
-                                    <button
-                                      type="button"
-                                      onClick={() => handleCopyText(selectedContract.depositTotalFee.toLocaleString(), "예치가맹금 합계")}
-                                      className="text-[#bf3e67] hover:underline font-black cursor-pointer"
-                                    >
-                                      복사
-                                    </button>
+                                  <td className="p-2 border-t border-[#f2ccd7] text-[#bf3e67] font-black">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span>{selectedContract.depositTotalFee.toLocaleString()}</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopyText(selectedContract.depositTotalFee.toLocaleString(), "예치가맹금 합계")}
+                                        className="text-[10px] text-[#bf3e67] border border-[#f2ccd7] bg-white hover:bg-[#ffd3df]/20 px-1.5 py-0.5 rounded transition-all cursor-pointer font-black shrink-0"
+                                      >
+                                        복사
+                                      </button>
+                                    </div>
                                   </td>
                                 </tr>
                               </tbody>
@@ -4932,8 +4932,7 @@ export default function AdminPage() {
                               <thead>
                                 <tr className="bg-[#fff9fb] border-b border-[#f2ccd7] font-extrabold text-[#735965] text-[10px]">
                                   <th className="p-2 border-r border-[#f2ccd7]">교육비 구분</th>
-                                  <th className="p-2 border-r border-[#f2ccd7]">금액(원)</th>
-                                  <th className="p-2 w-16 text-center">복사</th>
+                                  <th className="p-2">금액(원)</th>
                                 </tr>
                               </thead>
                               <tbody>
