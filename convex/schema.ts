@@ -202,4 +202,15 @@ export default defineSchema({
     fileName: v.optional(v.string()), // 업로드된 실제 파일명
     contractType: v.optional(v.string()), // 계약 구분 ("신규" | "갱신" | "양수")
   }),
+  deliveryCredentials: defineTable({
+    noticeId: v.string(), // 공지사항 ID ("NOT-XXX")
+    storeId: v.string(), // 가맹점 로그인 ID
+    storeName: v.string(), // 가맹점명
+    baeminId: v.string(),
+    baeminPw: v.string(),
+    coupangId: v.string(),
+    coupangPw: v.string(),
+    submittedAt: v.string(), // YYYY-MM-DD HH:mm:ss
+  }).index("by_noticeId", ["noticeId"])
+    .index("by_storeId_and_noticeId", ["storeId", "noticeId"]),
 });

@@ -351,6 +351,12 @@ export default function PortalPage() {
 
   // Selected Detail Modals
   const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
+  const [showCredentialModal, setShowCredentialModal] = useState<boolean>(false);
+  const [baeminId, setBaeminId] = useState<string>("");
+  const [baeminPw, setBaeminPw] = useState<string>("");
+  const [coupangId, setCoupangId] = useState<string>("");
+  const [coupangPw, setCoupangPw] = useState<string>("");
+
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -416,6 +422,10 @@ export default function PortalPage() {
   const convexStoreInquiries = useQuery(api.storeInquiries.listByStore, { storeId: activeStoreId || "owner" });
   const convexNotices = useQuery(api.notices.list);
   const convexProductCategories = useQuery(api.categories.get);
+  const savedCredentials = useQuery(api.deliveryCredentials.getByStoreAndNotice, {
+    noticeId: selectedNotice?.id || "",
+    storeId: activeStoreId || "owner",
+  });
 
   const createStoreMutation = useMutation(api.stores.createOrUpdate);
 
@@ -424,6 +434,7 @@ export default function PortalPage() {
   const syncOrdersMutation = useMutation(api.orders.syncOrders);
   const createInquiryMutation = useMutation(api.storeInquiries.createOrUpdate);
   const incrementNoticeViewsMutation = useMutation(api.notices.incrementViews);
+  const submitDeliveryCredentials = useMutation(api.deliveryCredentials.submit);
   const updateOrderStatusMutation = useMutation(api.orders.updateStatus);
   const verifyAndSaveOrderAction = useAction(api.payments.verifyAndSaveOrder);
   const sendSmsAction = useAction(api.aligo.sendSms);
@@ -490,6 +501,21 @@ export default function PortalPage() {
       localStorage.setItem("120_notices", JSON.stringify(mappedNotices));
     }
   }, [convexNotices]);
+
+  // Sync saved delivery credentials for the current store and notice
+  useEffect(() => {
+    if (savedCredentials) {
+      setBaeminId(savedCredentials.baeminId || "");
+      setBaeminPw(savedCredentials.baeminPw || "");
+      setCoupangId(savedCredentials.coupangId || "");
+      setCoupangPw(savedCredentials.coupangPw || "");
+    } else {
+      setBaeminId("");
+      setBaeminPw("");
+      setCoupangId("");
+      setCoupangPw("");
+    }
+  }, [savedCredentials]);
 
   // Sync Convex materials to React state and localStorage (Fallback to local mock if empty)
   useEffect(() => {
@@ -1969,6 +1995,31 @@ export default function PortalPage() {
     setShowInquiryModal(false);
     triggerToast("1:1 문의 상담건이 정식 접수되었습니다!");
     setCurrentMenu("inquiry");
+  };
+
+  const handleSubmitCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedNotice) return;
+    const storeData = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+    const storeName = storeData?.name || "강남역삼점";
+
+    try {
+      await submitDeliveryCredentials({
+        noticeId: selectedNotice.id,
+        storeId: activeStoreId || "owner",
+        storeName,
+        baeminId,
+        baeminPw,
+        coupangId,
+        coupangPw,
+        submittedAt: new Date().toISOString().replace("T", " ").substring(0, 19),
+      });
+      triggerToast("배민/쿠팡이츠 계정 정보가 성공적으로 제출되었습니다!");
+      setShowCredentialModal(false);
+    } catch (err) {
+      console.error("Failed to submit credentials:", err);
+      alert("계정 정보 제출 중 오류가 발생했습니다.");
+    }
   };
 
   // ==========================================
@@ -3911,6 +3962,20 @@ export default function PortalPage() {
               <p className="text-xs sm:text-sm text-[#2d2026] leading-relaxed font-medium whitespace-pre-wrap">
                 {selectedNotice.content}
               </p>
+              
+              {selectedNotice.title.includes("배달앱 메뉴 리뉴얼") && (
+                <div className="mt-6 p-5 bg-[#fff1f5] border border-[#f2ccd7] rounded-2xl flex flex-col items-center gap-3">
+                  <p className="text-xs sm:text-sm text-[#735965] font-extrabold text-center">
+                    📢 배달앱 메뉴 리뉴얼 무료 작업을 위한 배민/쿠팡이츠 계정을 입력해 주세요.
+                  </p>
+                  <button
+                    onClick={() => setShowCredentialModal(true)}
+                    className="w-full sm:w-auto px-6 py-3.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>배민/쿠팡이츠 정보 입력 바로가기 ✍</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 text-center">
@@ -3921,6 +3986,115 @@ export default function PortalPage() {
                 닫기
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 1.5. Delivery App Credentials Popup Modal */}
+      {showCredentialModal && (
+        <div 
+          className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setShowCredentialModal(false)}
+        >
+          <div 
+            className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
+              <h3 className="text-base font-bold text-[#2d2026]">배민/쿠팡이츠 정보 입력</h3>
+              <button 
+                onClick={() => setShowCredentialModal(false)} 
+                className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitCredentials} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm">
+              <div className="flex flex-col gap-1.5">
+                <label className="font-bold text-[#2d2026]">가맹점명</label>
+                <input 
+                  type="text"
+                  value={(() => {
+                    const storeData = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+                    return storeData?.name || "강남역삼점";
+                  })()}
+                  disabled
+                  className="w-full bg-[#fff1f5]/50 border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] font-bold focus:outline-none opacity-80"
+                />
+              </div>
+
+              {/* 배민 정보 */}
+              <div className="p-4 bg-[#fff1f5]/30 border border-[#f2ccd7]/60 rounded-2xl space-y-3">
+                <h4 className="font-extrabold text-xs text-[#bf3e67]">배달의민족 사장님 계정</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold text-[#735965]">아이디(ID)</span>
+                    <input 
+                      type="text"
+                      placeholder="배민 사장님 ID"
+                      value={baeminId}
+                      onChange={(e) => setBaeminId(e.target.value)}
+                      required
+                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold text-[#735965]">비밀번호(PW)</span>
+                    <input 
+                      type="password"
+                      placeholder="배민 사장님 PW"
+                      value={baeminPw}
+                      onChange={(e) => setBaeminPw(e.target.value)}
+                      required
+                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 쿠팡 정보 */}
+              <div className="p-4 bg-[#fff1f5]/30 border border-[#f2ccd7]/60 rounded-2xl space-y-3">
+                <h4 className="font-extrabold text-xs text-[#bf3e67]">쿠팡이츠 사장님 계정</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold text-[#735965]">아이디(ID)</span>
+                    <input 
+                      type="text"
+                      placeholder="쿠팡 사장님 ID"
+                      value={coupangId}
+                      onChange={(e) => setCoupangId(e.target.value)}
+                      required
+                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold text-[#735965]">비밀번호(PW)</span>
+                    <input 
+                      type="password"
+                      placeholder="쿠팡 사장님 PW"
+                      value={coupangPw}
+                      onChange={(e) => setCoupangPw(e.target.value)}
+                      required
+                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 안내 문구 */}
+              <div className="text-[11px] text-[#735965] font-semibold space-y-1.5 leading-relaxed bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-2xl">
+                <p className="text-[#bf3e67] font-black">* 전달해주신 계정 정보는 메뉴 리뉴얼 작업 목적으로만 사용되며, 작업 완료 후 즉시 폐기하거나 사장님께서 비밀번호를 변경하셔도 무방합니다.</p>
+                <p>※ 계정 정보는 외부에 공유되지 않으며 안전하게 관리됩니다.</p>
+              </div>
+
+              <button 
+                type="submit"
+                className="w-full py-3.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm cursor-pointer"
+              >
+                정보 제출하기 📢
+              </button>
+            </form>
           </div>
         </div>
       )}

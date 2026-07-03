@@ -13,6 +13,7 @@ import type * as analytics from "../analytics.js";
 import type * as banners from "../banners.js";
 import type * as categories from "../categories.js";
 import type * as contracts from "../contracts.js";
+import type * as deliveryCredentials from "../deliveryCredentials.js";
 import type * as discord from "../discord.js";
 import type * as floatings from "../floatings.js";
 import type * as gallery from "../gallery.js";
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   banners: typeof banners;
   categories: typeof categories;
   contracts: typeof contracts;
+  deliveryCredentials: typeof deliveryCredentials;
   discord: typeof discord;
   floatings: typeof floatings;
   gallery: typeof gallery;

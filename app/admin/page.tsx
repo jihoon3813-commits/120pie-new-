@@ -1348,6 +1348,9 @@ export default function AdminPage() {
   // Notice Creation Form states
   const [showNoticeModal, setShowNoticeModal] = useState<boolean>(false);
   const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
+  const submittedCredentials = useQuery(api.deliveryCredentials.getByNotice, {
+    noticeId: selectedNotice?.id || "",
+  });
   const [newNoticeTag, setNewNoticeTag] = useState<"필독" | "일반" | "이벤트" | "물류">("일반");
   const [newNoticeTitle, setNewNoticeTitle] = useState<string>("");
   const [newNoticeContent, setNewNoticeContent] = useState<string>("");
@@ -8727,6 +8730,52 @@ export default function AdminPage() {
                 {selectedNotice ? "공지사항 수정 및 저장하기 💾" : "공지사항 공식 배포하기 📢"}
               </button>
             </form>
+
+            {selectedNotice && selectedNotice.title.includes("배달앱 메뉴 리뉴얼") && (
+              <div className="p-6 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 space-y-3 shrink-0">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-sm text-[#2d2026]">가맹점별 배달앱 계정 제출 현황</h4>
+                  <span className="text-xs font-bold text-[#bf3e67] bg-[#ffd3df] border border-[#f2ccd7] px-2.5 py-0.5 rounded-full">
+                    총 {submittedCredentials?.length || 0}건 접수
+                  </span>
+                </div>
+                
+                <div className="border border-[#f2ccd7] rounded-2xl overflow-hidden bg-white max-h-[220px] overflow-y-auto shadow-sm">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[10px] font-bold text-[#735965] uppercase tracking-wider">
+                        <th className="p-3">가맹점명</th>
+                        <th className="p-3">배달의민족 계정</th>
+                        <th className="p-3">쿠팡이츠 계정</th>
+                        <th className="p-3">제출 일시</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#f2ccd7]/60">
+                      {!submittedCredentials || submittedCredentials.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="p-5 text-center text-[#735965] font-bold">아직 제출된 가맹점 계정 정보가 없습니다.</td>
+                        </tr>
+                      ) : (
+                        submittedCredentials.map((cred: any) => (
+                          <tr key={cred._id} className="hover:bg-[#fff9fb] transition-colors">
+                            <td className="p-3 font-extrabold text-[#2d2026]">{cred.storeName}</td>
+                            <td className="p-3 text-[#735965] font-semibold">
+                              <div>ID: <span className="text-[#2d2026] font-bold">{cred.baeminId}</span></div>
+                              <div className="text-[11px] mt-0.5">PW: <span className="text-[#bf3e67] font-bold">{cred.baeminPw}</span></div>
+                            </td>
+                            <td className="p-3 text-[#735965] font-semibold">
+                              <div>ID: <span className="text-[#2d2026] font-bold">{cred.coupangId}</span></div>
+                              <div className="text-[11px] mt-0.5">PW: <span className="text-[#bf3e67] font-bold">{cred.coupangPw}</span></div>
+                            </td>
+                            <td className="p-3 text-[#735965] font-bold whitespace-nowrap">{cred.submittedAt}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
