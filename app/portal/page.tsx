@@ -5586,7 +5586,8 @@ export default function PortalPage() {
                           order: "orders",
                           training: "training",
                           material: "material",
-                          inquiry: "inquiry"
+                          inquiry: "inquiry",
+                          notice: "notice"
                         };
                         setCurrentMenu(menuMapping[link] || "dashboard");
                         setShowPopup(false);

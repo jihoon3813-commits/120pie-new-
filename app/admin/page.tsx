@@ -6981,6 +6981,7 @@ export default function AdminPage() {
                                 <option value="training">교육자료실 (내부 메뉴 연동)</option>
                                 <option value="material">홍보자료실 (내부 메뉴 연동)</option>
                                 <option value="inquiry">1:1 문의게시판 (내부 메뉴 연동)</option>
+                                <option value="notice">공지사항 페이지 (내부 메뉴 연동)</option>
                                 <option value="custom">외부 웹주소 URL 직접 지정</option>
                               </select>
                               {popupLink.startsWith("http") && (
