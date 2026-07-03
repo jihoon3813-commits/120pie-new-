@@ -43,7 +43,8 @@ import {
   BarChart3,
   Palette,
   Upload,
-  Paperclip
+  Paperclip,
+  Edit
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
@@ -1346,6 +1347,7 @@ export default function AdminPage() {
 
   // Notice Creation Form states
   const [showNoticeModal, setShowNoticeModal] = useState<boolean>(false);
+  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
   const [newNoticeTag, setNewNoticeTag] = useState<"필독" | "일반" | "이벤트" | "물류">("일반");
   const [newNoticeTitle, setNewNoticeTitle] = useState<string>("");
   const [newNoticeContent, setNewNoticeContent] = useState<string>("");
@@ -2113,8 +2115,24 @@ export default function AdminPage() {
   };
 
   // ==========================================
-  // NOTICE ACTIONS: Add & Delete
+  // NOTICE ACTIONS: Add, Edit, Delete
   // ==========================================
+  const handleOpenEditNoticeModal = (notice: Notice) => {
+    setSelectedNotice(notice);
+    setNewNoticeTag(notice.tag);
+    setNewNoticeTitle(notice.title);
+    setNewNoticeContent(notice.content);
+    setShowNoticeModal(true);
+  };
+
+  const handleCloseNoticeModal = () => {
+    setShowNoticeModal(false);
+    setSelectedNotice(null);
+    setNewNoticeTag("일반");
+    setNewNoticeTitle("");
+    setNewNoticeContent("");
+  };
+
   const handleCreateNotice = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNoticeTitle || !newNoticeContent) {
@@ -2122,38 +2140,69 @@ export default function AdminPage() {
       return;
     }
 
-    const newNoticeId = `NOT-${Math.floor(100 + Math.random() * 900)}`;
-    const newNotice: Notice = {
-      id: newNoticeId,
-      tag: newNoticeTag,
-      title: newNoticeTitle,
-      date: new Date().toISOString().split("T")[0],
-      views: 0,
-      content: newNoticeContent
-    };
+    if (selectedNotice) {
+      // Update existing notice
+      const updatedNotice: Notice = {
+        ...selectedNotice,
+        tag: newNoticeTag,
+        title: newNoticeTitle,
+        content: newNoticeContent,
+      };
 
-    const updatedNotices = [newNotice, ...notices];
-    setNotices(updatedNotices);
-    localStorage.setItem("120_notices", JSON.stringify(updatedNotices));
+      const updatedNotices = notices.map((n) => (n.id === selectedNotice.id ? updatedNotice : n));
+      setNotices(updatedNotices);
+      localStorage.setItem("120_notices", JSON.stringify(updatedNotices));
 
-    // Save to Convex Cloud DB
-    saveNoticeMutation({
-      id: newNoticeId,
-      tag: newNoticeTag,
-      title: newNoticeTitle,
-      content: newNoticeContent,
-      date: newNotice.date,
-      views: 0
-    }).then(() => {
-      console.log("[Convex] Notice created successfully.");
-    }).catch(err => {
-      console.error("[Convex] Failed to create notice:", err);
-    });
+      // Save to Convex Cloud DB (Updating)
+      saveNoticeMutation({
+        _id: selectedNotice._id,
+        id: selectedNotice.id,
+        tag: newNoticeTag,
+        title: newNoticeTitle,
+        content: newNoticeContent,
+        date: selectedNotice.date,
+        views: selectedNotice.views
+      }).then(() => {
+        console.log("[Convex] Notice updated successfully.");
+      }).catch(err => {
+        console.error("[Convex] Failed to update notice:", err);
+      });
 
-    setNewNoticeTitle("");
-    setNewNoticeContent("");
-    setShowNoticeModal(false);
-    triggerToast("신규 공지사항이 정식 배포되었습니다!");
+      triggerToast("공지사항이 정상적으로 수정되었습니다.");
+    } else {
+      // Create new notice
+      const newNoticeId = `NOT-${Math.floor(100 + Math.random() * 900)}`;
+      const newNotice: Notice = {
+        id: newNoticeId,
+        tag: newNoticeTag,
+        title: newNoticeTitle,
+        date: new Date().toISOString().split("T")[0],
+        views: 0,
+        content: newNoticeContent
+      };
+
+      const updatedNotices = [newNotice, ...notices];
+      setNotices(updatedNotices);
+      localStorage.setItem("120_notices", JSON.stringify(updatedNotices));
+
+      // Save to Convex Cloud DB
+      saveNoticeMutation({
+        id: newNoticeId,
+        tag: newNoticeTag,
+        title: newNoticeTitle,
+        content: newNoticeContent,
+        date: newNotice.date,
+        views: 0
+      }).then(() => {
+        console.log("[Convex] Notice created successfully.");
+      }).catch(err => {
+        console.error("[Convex] Failed to create notice:", err);
+      });
+
+      triggerToast("신규 공지사항이 정식 배포되었습니다!");
+    }
+
+    handleCloseNoticeModal();
   };
 
   const handleDeleteNotice = (id: string, _id?: any) => {
@@ -5948,17 +5997,31 @@ export default function AdminPage() {
                                 {n.tag}
                               </span>
                             </td>
-                            <td className="p-4 sm:p-5 font-bold text-[#2d2026] max-w-xs truncate">{n.title}</td>
+                            <td 
+                              className="p-4 sm:p-5 font-bold text-[#2d2026] max-w-xs truncate hover:text-[#f25f8a] hover:underline cursor-pointer"
+                              onClick={() => handleOpenEditNoticeModal(n)}
+                            >
+                              {n.title}
+                            </td>
                             <td className="p-4 sm:p-5 text-[#735965] font-semibold">{n.date}</td>
                             <td className="p-4 sm:p-5 font-bold text-[#735965]">{n.views} 회</td>
                             <td className="p-4 sm:p-5 text-center">
-                              <button
-                                onClick={() => handleDeleteNotice(n.id, n._id)}
-                                className="p-1.5 rounded-lg border border-[#f2ccd7] bg-white hover:bg-[#fff1f5] text-red-500 hover:border-red-300 transition-all text-xs"
-                                title="삭제"
-                              >
-                                <Trash2 size={14} />
-                              </button>
+                              <div className="flex items-center justify-center gap-1.5">
+                                <button
+                                  onClick={() => handleOpenEditNoticeModal(n)}
+                                  className="p-1.5 rounded-lg border border-[#f2ccd7] bg-white hover:bg-[#fff1f5] text-[#bf3e67] hover:border-[#ffd3df] transition-all text-xs cursor-pointer"
+                                  title="수정"
+                                >
+                                  <Edit size={14} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteNotice(n.id, n._id)}
+                                  className="p-1.5 rounded-lg border border-[#f2ccd7] bg-white hover:bg-red-50 text-red-500 hover:border-red-300 transition-all text-xs cursor-pointer"
+                                  title="삭제"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))
@@ -8603,15 +8666,17 @@ export default function AdminPage() {
       {showNoticeModal && (
         <div 
           className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={() => setShowNoticeModal(false)}
+          onClick={handleCloseNoticeModal}
         >
           <div 
             className="w-full max-w-xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <h3 className="text-base font-bold text-[#2d2026]">신규 가맹 공지사항 정식 작성</h3>
-              <button onClick={() => setShowNoticeModal(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
+              <h3 className="text-base font-bold text-[#2d2026]">
+                {selectedNotice ? "가맹 공지사항 상세조회 및 수정" : "신규 가맹 공지사항 정식 작성"}
+              </h3>
+              <button onClick={handleCloseNoticeModal} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
                 <X size={15} />
               </button>
             </div>
@@ -8659,7 +8724,7 @@ export default function AdminPage() {
                 type="submit"
                 className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-sm mt-2"
               >
-                공지사항 공식 배포하기 📢
+                {selectedNotice ? "공지사항 수정 및 저장하기 💾" : "공지사항 공식 배포하기 📢"}
               </button>
             </form>
           </div>
