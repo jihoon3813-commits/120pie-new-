@@ -3964,15 +3964,36 @@ export default function PortalPage() {
               </p>
               
               {selectedNotice.title.includes("배달앱 메뉴 리뉴얼") && (
-                <div className="mt-6 p-5 bg-[#fff1f5] border border-[#f2ccd7] rounded-2xl flex flex-col items-center gap-3">
-                  <p className="text-xs sm:text-sm text-[#735965] font-extrabold text-center">
+                <div className="mt-6 p-5 bg-[#fff1f5] border border-[#f2ccd7] rounded-2xl flex flex-col items-center gap-3 relative">
+                  {/* 제출 상태 배지 */}
+                  <div className="absolute top-4 right-4">
+                    {savedCredentials ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-200">
+                        ● 제출 완료
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-red-50 text-red-500 border border-red-200">
+                        ● 제출 전
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-[#735965] font-extrabold text-center mt-3">
                     📢 배달앱 메뉴 리뉴얼 무료 작업을 위한 배민/쿠팡이츠 계정을 입력해 주세요.
                   </p>
                   <button
                     onClick={() => setShowCredentialModal(true)}
-                    className="w-full sm:w-auto px-6 py-3.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                    className={`w-full sm:w-auto px-6 py-3.5 text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                      savedCredentials 
+                        ? "bg-emerald-600 hover:bg-emerald-700" 
+                        : "bg-[#f25f8a] hover:bg-[#df4977]"
+                    }`}
                   >
-                    <span>배민/쿠팡이츠 정보 입력 바로가기 ✍</span>
+                    <span>
+                      {savedCredentials 
+                        ? "배민/쿠팡이츠 정보 확인 및 수정 ✍" 
+                        : "배민/쿠팡이츠 정보 입력 바로가기 ✍"}
+                    </span>
                   </button>
                 </div>
               )}
