@@ -186,6 +186,8 @@ interface Order {
   storeId?: string;
   courier?: string;
   trackingNo?: string;
+  impUid?: string;
+  payMethod?: string;
 }
 
 interface Inquiry {
@@ -1582,7 +1584,7 @@ export default function AdminPage() {
       return;
     }
 
-    const headers = ["신청일자", "주문번호", "가맹점명", "점주명", "연락처", "주소", "주문품목", "결제대금", "진행상태"];
+    const headers = ["신청일자", "주문번호", "가맹점명", "점주명", "연락처", "주소", "주문품목", "결제대금", "결제방식", "진행상태"];
     const rows = filteredOrders.map((order) => {
       const storeInfo = stores.find(s => s.id === order.storeId) || {
         name: order.storeId === "owner" ? "본사 테스트" : "강남역삼점",
@@ -1593,6 +1595,7 @@ export default function AdminPage() {
       };
       const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`;
       const itemDetails = order.items.map(it => `${it.productName}(${it.quantity}개)`).join(" / ");
+      const payMethodStr = order.payMethod === "card" || order.payMethod === "CARD" ? "카드" : "현금";
       
       return [
         order.date,
@@ -1603,6 +1606,7 @@ export default function AdminPage() {
         `"${storeAddress.replace(/"/g, '""')}"`,
         `"${itemDetails.replace(/"/g, '""')}"`,
         order.totalPrice,
+        payMethodStr,
         order.status
       ];
     });
@@ -5871,6 +5875,7 @@ export default function AdminPage() {
                         <th className="p-4 sm:p-5" style={{ width: '220px' }}>주소</th>
                         <th className="p-4 sm:p-5" style={{ width: '180px' }}>주문 품목</th>
                         <th className="p-4 sm:p-5 text-right" style={{ width: '110px' }}>결제대금</th>
+                        <th className="p-4 sm:p-5 text-center" style={{ width: '90px' }}>결제방식</th>
                         <th className="p-4 sm:p-5 text-center" style={{ width: '100px' }}>진행상태</th>
                         <th className="p-4 sm:p-5 text-center" style={{ width: '90px' }}>상세정보</th>
                       </tr>
@@ -5878,7 +5883,7 @@ export default function AdminPage() {
                     <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
                       {filteredOrders.length === 0 ? (
                         <tr>
-                          <td colSpan={10} className="p-8 text-center text-[#735965] font-bold">검색 조건에 맞는 가맹점 발주 주문이 존재하지 않습니다.</td>
+                          <td colSpan={11} className="p-8 text-center text-[#735965] font-bold">검색 조건에 맞는 가맹점 발주 주문이 존재하지 않습니다.</td>
                         </tr>
                       ) : (
                         filteredOrders.map((order, idx) => {
@@ -5908,6 +5913,15 @@ export default function AdminPage() {
                                 </span>
                               </td>
                               <td className="p-4 sm:p-5 font-bold text-[#2d2026] text-right whitespace-nowrap">{order.totalPrice.toLocaleString()} 원</td>
+                              <td className="p-4 sm:p-5 text-center whitespace-nowrap">
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
+                                  order.payMethod === "card" || order.payMethod === "CARD"
+                                    ? "bg-purple-50 text-purple-600 border border-purple-200"
+                                    : "bg-orange-50 text-orange-600 border border-orange-200"
+                                }`}>
+                                  {order.payMethod === "card" || order.payMethod === "CARD" ? "카드" : "현금"}
+                                </span>
+                              </td>
                               <td className="p-4 sm:p-5 text-center whitespace-nowrap">
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
                                   (() => {
@@ -9922,7 +9936,9 @@ export default function AdminPage() {
 
                 <div className="bg-[#fff1f5]/80 border border-[#f2ccd7]/60 p-4 rounded-xl flex flex-col justify-center items-end text-right">
                   <span className="text-[10px] text-[#735965] font-bold block mb-1">결제 수단 정보</span>
-                  <span className="text-xs text-[#bf3e67] font-black block mb-2">현금 입금 진행</span>
+                  <span className="text-xs text-[#bf3e67] font-black block mb-2">
+                    {selectedOrder.payMethod === "card" || selectedOrder.payMethod === "CARD" ? "카드결제" : "현금 입금 진행"}
+                  </span>
                   <span className="text-[10px] text-[#735965]/80 font-bold block mb-1">총 결제 합계액 (부가세 포함)</span>
                   <strong className="text-xl font-black text-[#bf3e67]">
                     {selectedOrder.totalPrice.toLocaleString()} 원
