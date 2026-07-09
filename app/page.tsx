@@ -1,5 +1,5 @@
-import HomeV3 from "./v3/HomeV3";
+import LandingV6Client from "../components/landing-v6/LandingV6Client";
 
 export default function Home() {
-  return <HomeV3 variant="v5" />;
+  return <LandingV6Client />;
 }
