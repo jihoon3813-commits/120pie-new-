@@ -56,7 +56,7 @@ const cleanStoreName = (name: string) => {
 
 export default function StoresSubpage() {
   const convexStores = useQuery(api.stores.get);
-  const [stores, setStores] = useState<StoreInfo[]>(DEFAULT_STORES);
+  const [stores, setStores] = useState<StoreInfo[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStore, setSelectedStore] = useState<StoreInfo | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -74,7 +74,7 @@ export default function StoresSubpage() {
 
   // Sync convex data
   useEffect(() => {
-    if (convexStores && convexStores.length > 0) {
+    if (convexStores) {
       const mapped: StoreInfo[] = (convexStores as any[]).map((s: any) => ({
         id: s.id,
         name: s.name,

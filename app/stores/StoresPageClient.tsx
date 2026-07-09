@@ -438,11 +438,11 @@ export default function StoresPageClient() {
           const parsed = JSON.parse(stored) as StoreInfo[];
           setStores(parsed);
         } else {
-          setStores(DEFAULT_STORES);
+          setStores([]);
         }
       } catch (err) {
         console.error("Failed to initialize in useEffect", err);
-        setStores(DEFAULT_STORES);
+        setStores([]);
       }
     }
   }, []);
