@@ -12,6 +12,7 @@ import CrispyIdentity from "./CrispyIdentity";
 import OperationSystem from "./OperationSystem";
 import StoreConcept from "./StoreConcept";
 import BrandCompetitiveness from "./BrandCompetitiveness";
+import MenuPosterBanner from "./MenuPosterBanner";
 import MenuGallery from "./MenuGallery";
 import CustomerReviews from "./CustomerReviews";
 import FranchiseCost from "./FranchiseCost";
@@ -62,6 +63,9 @@ export default function LandingV6Client() {
 
         {/* Brand Competitiveness Section */}
         <BrandCompetitiveness />
+
+        {/* Season & New Menu Poster Sliding Banner */}
+        <MenuPosterBanner />
 
         {/* Menu Showcase Gallery */}
         <MenuGallery />
