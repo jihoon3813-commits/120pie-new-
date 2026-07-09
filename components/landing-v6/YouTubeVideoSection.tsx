@@ -20,10 +20,20 @@ export default function YouTubeVideoSection() {
       </div>
 
       {/* Subtle brand watermark or overlay in the corner for premium feel (Optional) */}
-      <div className="absolute bottom-6 right-6 z-10 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 hidden sm:block">
+      <div className="absolute bottom-16 right-6 z-10 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 hidden sm:block">
         <span className="text-[10px] font-black uppercase tracking-widest text-white/80 font-mono">
           120PIE & COFFEE
         </span>
+      </div>
+
+      {/* Bottom Wavy transition boundary to PieBrandConcept (Matching white background) */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10 translate-y-[2px]">
+        <svg viewBox="0 0 1200 100" preserveAspectRatio="none" className="relative block w-full h-[24px] sm:h-[40px] lg:h-[55px] text-white dark:text-neutral-950">
+          <path
+            d="M 0 50 Q 25 10, 50 50 Q 75 90, 100 50 Q 125 10, 150 50 Q 175 90, 200 50 Q 225 10, 250 50 Q 275 90, 300 50 Q 325 10, 350 50 Q 375 90, 400 50 Q 425 10, 450 50 Q 475 90, 500 50 Q 525 10, 550 50 Q 575 90, 600 50 Q 625 10, 650 50 Q 675 90, 700 50 Q 725 10, 750 50 Q 775 90, 800 50 Q 825 10, 850 50 Q 875 90, 900 50 Q 925 10, 950 50 Q 975 90, 1000 50 Q 1025 10, 1050 50 Q 1075 90, 1100 50 Q 1125 10, 1150 50 Q 1175 90, 1200 50 L 1200 100 L 0 100 Z"
+            fill="currentColor"
+          />
+        </svg>
       </div>
     </section>
   );
