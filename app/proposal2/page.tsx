@@ -49,6 +49,15 @@ export default function ModernWebProposal() {
   const sendSmsAction = useAction(api.aligo.sendSms);
   const totalSlides = 12;
 
+  const formatPhoneNumber = (value: string) => {
+    const raw = value.replace(/[^\d]/g, "");
+    if (raw.length < 4) return raw;
+    if (raw.length < 8) {
+      return `${raw.slice(0, 3)}-${raw.slice(3)}`;
+    }
+    return `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
+  };
+
   // Autoplay function
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -1071,7 +1080,7 @@ export default function ModernWebProposal() {
                             type="text"
                             placeholder="연락처 번호 입력"
                             value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, phone: formatPhoneNumber(e.target.value) })}
                             required
                             className="w-full bg-[#FAF8F5] border border-[#B39567]/30 rounded-[4px] px-3.5 py-2 text-xs sm:text-sm text-[#2C2520] placeholder-slate-400 focus:outline-none focus:border-[#B39567] transition-all"
                           />

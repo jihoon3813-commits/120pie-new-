@@ -34,7 +34,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183720/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_yszrts.jpg",
+        url: "https://res.cloudinary.com/dfkntvpmv/image/upload/f_auto,q_auto/v1783488020/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._10_bbqpma.png",
         width: 1200,
         height: 630,
         alt: "120pie & coffee 디저트 솔루션 대표 이미지"
@@ -45,7 +45,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "120pie&coffee | 카페 사장님을 위한 디저트 매출 솔루션",
     description: "기존 카페에 바로 도입 가능한 120겹 파이와 에그120 샵인샵 디저트 솔루션.",
-    images: ["https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183720/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EC%97%B0%EC%B6%9C4_yszrts.jpg"]
+    images: ["https://res.cloudinary.com/dfkntvpmv/image/upload/f_auto,q_auto/v1783488020/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._10_bbqpma.png"]
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "google-site-verification-placeholder"

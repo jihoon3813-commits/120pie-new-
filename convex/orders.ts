@@ -29,6 +29,14 @@ export const createOrUpdate = mutation({
     storeId: v.optional(v.string()),
     courier: v.optional(v.string()),
     trackingNo: v.optional(v.string()),
+    trackingList: v.optional(
+      v.array(
+        v.object({
+          courier: v.string(),
+          trackingNo: v.string(),
+        })
+      )
+    ),
     impUid: v.optional(v.string()),
     payMethod: v.optional(v.string()),
     deliveryAddress: v.optional(v.string()),
@@ -185,8 +193,16 @@ export const seedOrders = mutation({
 export const updateTracking = mutation({
   args: {
     id: v.string(),
-    courier: v.string(),
-    trackingNo: v.string(),
+    courier: v.optional(v.string()),
+    trackingNo: v.optional(v.string()),
+    trackingList: v.optional(
+      v.array(
+        v.object({
+          courier: v.string(),
+          trackingNo: v.string(),
+        })
+      )
+    ),
     status: v.optional(v.string()),
   },
   handler: async (ctx: any, args: any) => {
@@ -196,10 +212,21 @@ export const updateTracking = mutation({
       .first();
 
     if (existing) {
-      const patchData: any = {
-        courier: args.courier,
-        trackingNo: args.trackingNo,
-      };
+      const patchData: any = {};
+      
+      if (args.trackingList !== undefined) {
+        patchData.trackingList = args.trackingList;
+        if (args.trackingList.length > 0) {
+          patchData.courier = args.trackingList[0].courier;
+          patchData.trackingNo = args.trackingList[0].trackingNo;
+        } else {
+          patchData.courier = "";
+          patchData.trackingNo = "";
+        }
+      } else {
+        if (args.courier !== undefined) patchData.courier = args.courier;
+        if (args.trackingNo !== undefined) patchData.trackingNo = args.trackingNo;
+      }
       
       // 송장이 입력되면 자동으로 배송중으로 상태를 영리하게 전이시킵니다.
       patchData.status = args.status || "배송중";

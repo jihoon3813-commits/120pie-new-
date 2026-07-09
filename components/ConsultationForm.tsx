@@ -28,8 +28,21 @@ export default function ConsultationForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const formatPhoneNumber = (value: string) => {
+    const raw = value.replace(/[^\d]/g, "");
+    if (raw.length < 4) return raw;
+    if (raw.length < 8) {
+      return `${raw.slice(0, 3)}-${raw.slice(3)}`;
+    }
+    return `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
+  };
+
   const update = (name: string, value: string) => {
-    setForm((current) => ({ ...current, [name]: value }));
+    let finalValue = value;
+    if (name === "phone") {
+      finalValue = formatPhoneNumber(value);
+    }
+    setForm((current) => ({ ...current, [name]: finalValue }));
     setError("");
     setSuccess("");
   };

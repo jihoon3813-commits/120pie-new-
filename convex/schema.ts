@@ -102,6 +102,14 @@ export default defineSchema({
     storeId: v.optional(v.string()), // 발주 넣은 가맹점의 ID
     courier: v.optional(v.string()),    // 택배사명 (e.g. "CJ대한통운", "한진택배" 등)
     trackingNo: v.optional(v.string()), // 송장번호
+    trackingList: v.optional(
+      v.array(
+        v.object({
+          courier: v.string(),
+          trackingNo: v.string(),
+        })
+      )
+    ), // 다중 송장번호 리스트
     impUid: v.optional(v.string()), // 포트원 고유 결제번호
     payMethod: v.optional(v.string()), // 결제수단 (e.g. "card")
     deliveryAddress: v.optional(v.string()),       // 배송지 주소 (도로명)

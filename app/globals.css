@@ -1797,3 +1797,247 @@ td:first-child,
     padding: 0 10px;
   }
 }
+
+/* ==========================================================================
+   GOWELL-LIFE Portal Dashboards Styles (Modern SaaS Dashboard Overrides)
+   ========================================================================== */
+#admin-portal,
+#owner-portal {
+  background-color: #ffffff !important; /* Pure white background */
+}
+
+/* Modest rounded corners for a modern, clean look */
+#admin-portal .rounded-3xl,
+#admin-portal .rounded-2xl,
+#owner-portal .rounded-3xl,
+#owner-portal .rounded-2xl {
+  border-radius: 8px !important;
+}
+#admin-portal .rounded-xl,
+#admin-portal .rounded-lg,
+#admin-portal .rounded-md,
+#owner-portal .rounded-xl,
+#owner-portal .rounded-lg,
+#owner-portal .rounded-md {
+  border-radius: 6px !important;
+}
+
+/* Sidebar Custom Restyling (Vibrant Brand Yellow & Deep Slate Blue Contrast) */
+#admin-portal aside,
+#owner-portal aside {
+  background-color: #F5AC00 !important; /* Rich brand yellow from the user's reference image */
+  border-right: 1px solid #E6B533 !important;
+}
+
+/* Sidebar user block */
+#admin-portal aside .bg-white\/10,
+#owner-portal aside .bg-white\/10,
+#owner-portal aside .bg-white {
+  background-color: rgba(13, 35, 58, 0.08) !important;
+  border-color: rgba(13, 35, 58, 0.12) !important;
+}
+#admin-portal aside h4,
+#owner-portal aside h4 {
+  color: #0D233A !important;
+}
+#admin-portal aside p,
+#owner-portal aside p {
+  color: rgba(13, 35, 58, 0.7) !important;
+}
+#admin-portal aside .bg-white\/10 .bg-\[\#F5AC00\],
+#owner-portal aside .bg-white\/10 .bg-\[\#f25f8a\],
+#owner-portal aside .bg-white .bg-white,
+#owner-portal aside .bg-white .bg-\[\#f25f8a\] {
+  background-color: #0D233A !important;
+  color: #ffffff !important;
+}
+
+/* Sidebar nav buttons */
+#admin-portal aside nav button,
+#owner-portal aside nav button {
+  color: #3b2c00 !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  cursor: pointer;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+}
+
+#admin-portal aside nav button:hover,
+#owner-portal aside nav button:hover {
+  background-color: rgba(13, 35, 58, 0.06) !important;
+  color: #0D233A !important;
+}
+
+/* Selected menu tab (Deep Navy & White text) */
+#admin-portal aside nav button.bg-\[\#f25f8a\],
+#admin-portal aside nav button.bg-pink-500,
+#admin-portal aside nav button.bg-rose-500,
+#owner-portal aside nav button.bg-\[\#f25f8a\],
+#owner-portal aside nav button.bg-pink-500,
+#owner-portal aside nav button.bg-rose-500 {
+  background-color: #0D233A !important; 
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(13, 35, 58, 0.15) !important;
+}
+
+#admin-portal aside nav button.bg-\[\#f25f8a\] svg,
+#owner-portal aside nav button.bg-\[\#f25f8a\] svg {
+  color: #ffffff !important;
+}
+
+#admin-portal aside nav button.bg-\[\#f25f8a\] span,
+#owner-portal aside nav button.bg-\[\#f25f8a\] span {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+#admin-portal aside nav button.bg-\[\#f25f8a\] span.bg-white,
+#owner-portal aside nav button.bg-\[\#f25f8a\] span.bg-white {
+  background-color: #F5AC00 !important;
+  color: #0D233A !important;
+}
+
+/* Logout button */
+#admin-portal aside .border-white\/10 button,
+#owner-portal aside .border-t button {
+  color: #5A4300 !important;
+}
+#admin-portal aside .border-white\/10 button:hover,
+#owner-portal aside .border-t button:hover {
+  color: #a30000 !important;
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+/* Header customization */
+#admin-portal header,
+#owner-portal header {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #f1f1f0 !important;
+  box-shadow: none !important;
+}
+#admin-portal header .text-white,
+#owner-portal header .text-white {
+  background-color: #0F3A8C !important; /* brand blue */
+}
+#admin-portal header a.border-\[\#D0CBB5\],
+#owner-portal header a.border-\[\#D0CBB5\],
+#owner-portal header a.border-\[\#f2ccd7\] {
+  border-color: #e5e5e5 !important;
+  background-color: #ffffff !important;
+  color: #404040 !important;
+}
+#admin-portal header a.border-\[\#D0CBB5\]:hover,
+#owner-portal header a.border-\[\#f2ccd7\]:hover {
+  background-color: #fafafa !important;
+}
+
+/* Main workspace backgrounds */
+#admin-portal main,
+#owner-portal main {
+  background-color: #ffffff !important;
+}
+#admin-portal main .bg-white,
+#owner-portal main .bg-white {
+  background-color: #ffffff !important;
+  border-color: #f1f1f0 !important;
+}
+
+/* SaaS styled Tables (Clean, Borderless-side, Soft hover) */
+#admin-portal table,
+#owner-portal table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+
+#admin-portal th,
+#owner-portal th {
+  background-color: #fafafa !important;
+  color: #6b7280 !important; /* Muted grey text */
+  font-weight: 700 !important;
+  border: 0 !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  padding: 12px 16px !important;
+  font-size: 12px !important;
+  text-transform: none !important;
+  text-align: left;
+}
+
+#admin-portal td,
+#owner-portal td {
+  border: 0 !important;
+  border-bottom: 1px solid #f3f4f6 !important; /* Soft bottom border only */
+  padding: 12px 16px !important;
+  font-size: 13px !important;
+  background-color: #ffffff !important;
+  color: #374151 !important;
+}
+
+#admin-portal tr:nth-child(even) td,
+#owner-portal tr:nth-child(even) td {
+  background-color: #ffffff !important; /* Disable zebra styling for clean look */
+}
+
+#admin-portal tr:hover td,
+#owner-portal tr:hover td {
+  background-color: #fafafa !important; /* Light row hover */
+}
+
+/* Re-adjust Brand Blue accents on action items & buttons */
+#admin-portal button.bg-pink-500,
+#admin-portal button.bg-rose-500,
+#admin-portal .bg-\[\#0F3A8C\],
+#admin-portal .bg-\[\#f25f8a\],
+#admin-portal button[type="submit"],
+#owner-portal button.bg-pink-500,
+#owner-portal button.bg-rose-500,
+#owner-portal .bg-\[\#0F3A8C\],
+#owner-portal .bg-\[\#f25f8a\],
+#owner-portal button[type="submit"] {
+  background-color: #0F3A8C !important; /* Keep elegant royal blue for primary buttons */
+  color: #ffffff !important;
+}
+
+#admin-portal button[type="submit"]:hover,
+#owner-portal button[type="submit"]:hover {
+  background-color: #09265f !important;
+}
+
+#admin-portal .text-\[\#0F3A8C\],
+#admin-portal .text-\[\#bf3e67\],
+#owner-portal .text-\[\#0F3A8C\],
+#owner-portal .text-\[\#bf3e67\] {
+  color: #0F3A8C !important;
+}
+
+/* Dashboard summary blocks and grids (Excludes Footer Grid) */
+#admin-portal main .grid:not(.footer-grid) > button,
+#admin-portal main .grid:not(.footer-grid) > div,
+#owner-portal main .grid:not(.footer-grid) > button,
+#owner-portal main .grid:not(.footer-grid) > div {
+  border: 1px solid #f1f1f0 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.2s ease;
+}
+
+#admin-portal main .grid:not(.footer-grid) > button:hover,
+#owner-portal main .grid:not(.footer-grid) > button:hover {
+  background-color: #fafafa !important;
+  border-color: #d1d5db !important;
+  transform: translateY(-1px);
+}
+
+#admin-portal main .grid:not(.footer-grid) > button .bg-\[\#ffd3df\],
+#owner-portal main .grid:not(.footer-grid) > button .bg-\[\#ffd3df\] {
+  background-color: #fff9e6 !important;
+  color: #F5AC00 !important;
+}
+#admin-portal main .grid:not(.footer-grid) > button:hover .bg-\[\#ffd3df\],
+#owner-portal main .grid:not(.footer-grid) > button:hover .bg-\[\#ffd3df\] {
+  background-color: #F5AC00 !important;
+  color: #ffffff !important;
+}
+
+
+

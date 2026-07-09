@@ -34,6 +34,15 @@ export default function ProposalDeck() {
   const addInquiryMutation = useMutation(api.inquiries.add);
   const sendSmsAction = useAction(api.aligo.sendSms);
 
+  const formatPhoneNumber = (value: string) => {
+    const raw = value.replace(/[^\d]/g, "");
+    if (raw.length < 4) return raw;
+    if (raw.length < 8) {
+      return `${raw.slice(0, 3)}-${raw.slice(3)}`;
+    }
+    return `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
+  };
+
   const totalSlides = 12;
 
   // Autoplay function
@@ -898,7 +907,7 @@ export default function ProposalDeck() {
                             type="text"
                             placeholder="전화번호 입력"
                             value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, phone: formatPhoneNumber(e.target.value) })}
                             required
                             className="w-full bg-[#fbfaf7] border-2 border-[#1a1a1a] rounded-none px-3 py-2 text-xs text-[#1a1a1a] placeholder-slate-400 focus:outline-none focus:bg-white"
                           />

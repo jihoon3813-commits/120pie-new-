@@ -59,10 +59,10 @@ export default function Footer({ theme }: FooterProps) {
         ? "bg-[#f4f3f4] border-neutral-200 text-[#7c5d6c]" 
         : isYellowVariant 
           ? "bg-[#f5f5f4] border-neutral-200 text-[#576575]" 
-          : "bg-[#1f1f21] border-neutral-800 text-neutral-400"
+          : "bg-neutral-950 border-neutral-900 text-neutral-400"
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
-        <div className={`grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 pb-12 border-b ${
+        <div className={`footer-grid grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 pb-12 border-b ${
           isPinkVariant ? "border-neutral-200" : isYellowVariant ? "border-neutral-200" : "border-neutral-800"
         }`}>
           <div className="lg:col-span-7">

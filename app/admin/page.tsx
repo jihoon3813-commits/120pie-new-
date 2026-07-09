@@ -186,6 +186,7 @@ interface Order {
   storeId?: string;
   courier?: string;
   trackingNo?: string;
+  trackingList?: { courier: string; trackingNo: string }[];
   impUid?: string;
   payMethod?: string;
 }
@@ -1486,6 +1487,7 @@ export default function AdminPage() {
   const [showOrderModal, setShowOrderModal] = useState<boolean>(false);
   const [selectedCourier, setSelectedCourier] = useState<string>("CJ대한통운");
   const [inputTrackingNo, setInputTrackingNo] = useState<string>("");
+  const [modalTrackingList, setModalTrackingList] = useState<{ courier: string; trackingNo: string }[]>([]);
 
   // 발주 필터링 및 통합검색, 엑셀 내보내기 헬퍼 상태
   const [orderSearchKeyword, setOrderSearchKeyword] = useState<string>("");
@@ -3796,15 +3798,26 @@ export default function AdminPage() {
   const handleOpenOrderModal = (order: Order) => {
     setSelectedOrder(order);
     setSelectedCourier((order as any).courier || "CJ대한통운");
-    setInputTrackingNo((order as any).trackingNo || "");
+    setInputTrackingNo("");
+    
+    // Initialize tracking list
+    if (order.trackingList && order.trackingList.length > 0) {
+      setModalTrackingList(order.trackingList);
+    } else if (order.courier && order.trackingNo) {
+      setModalTrackingList([{ courier: order.courier, trackingNo: order.trackingNo }]);
+    } else {
+      setModalTrackingList([]);
+    }
+
     setShowOrderModal(true);
   };
 
   const handleUpdateOrderTracking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOrder) return;
-    if (!inputTrackingNo.trim()) {
-      alert("송장번호를 입력해 주세요.");
+    
+    if (modalTrackingList.length === 0) {
+      alert("송장번호를 최소 하나 이상 등록해 주세요.");
       return;
     }
 
@@ -3812,15 +3825,22 @@ export default function AdminPage() {
       // 1. Convex Cloud DB에 송장 정보 업데이트
       await updateTrackingMutation({
         id: selectedOrder.id,
-        courier: selectedCourier,
-        trackingNo: inputTrackingNo.trim(),
+        trackingList: modalTrackingList,
         status: "배송중", // 송장 등록 시 자동으로 배송중으로 상태 전이
       });
 
       // 2. React State 동기화 및 LocalStorage 갱신
+      const firstCourier = modalTrackingList[0]?.courier || "";
+      const firstTrackingNo = modalTrackingList[0]?.trackingNo || "";
       const updated = orders.map((o) => 
         o.id === selectedOrder.id 
-          ? { ...o, courier: selectedCourier, trackingNo: inputTrackingNo.trim(), status: "배송중" } 
+          ? { 
+              ...o, 
+              courier: firstCourier, 
+              trackingNo: firstTrackingNo, 
+              trackingList: modalTrackingList, 
+              status: "배송중" 
+            } 
           : o
       );
       setOrders(updated as any);
@@ -3829,8 +3849,9 @@ export default function AdminPage() {
       // 3. 현재 열려있는 모달 주문서 상태 동시 업데이트
       setSelectedOrder({
         ...selectedOrder,
-        courier: selectedCourier,
-        trackingNo: inputTrackingNo.trim(),
+        courier: firstCourier,
+        trackingNo: firstTrackingNo,
+        trackingList: modalTrackingList,
         status: "배송중"
       } as any);
 
@@ -3839,6 +3860,19 @@ export default function AdminPage() {
       console.error("Failed to update tracking info:", err);
       alert("송장 정보 갱신 중 오류가 발생했습니다.");
     }
+  };
+
+  const handleToAddTracking = () => {
+    if (!inputTrackingNo.trim()) {
+      alert("송장번호를 입력해 주세요.");
+      return;
+    }
+    if (modalTrackingList.some(item => item.trackingNo === inputTrackingNo.trim())) {
+      alert("이미 추가된 송장번호입니다.");
+      return;
+    }
+    setModalTrackingList([...modalTrackingList, { courier: selectedCourier, trackingNo: inputTrackingNo.trim() }]);
+    setInputTrackingNo("");
   };
 
   const updateOrderStatus = (orderId: string, newStatus: string) => {
@@ -3877,7 +3911,7 @@ export default function AdminPage() {
 
   if (!isLoggedIn) {
     return (
-      <div id="admin-portal" className="h-screen w-screen bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans antialiased justify-center items-center p-4">
+      <div id="admin-portal" className="h-screen w-screen text-[#0D233A] flex flex-col font-sans antialiased justify-center items-center p-4" style={{ backgroundColor: '#ffffff' }}>
         {toastMessage && (
           <div className="fixed bottom-6 right-6 z-[150] bg-[#f25f8a] text-white px-5 py-3.5 rounded-xl font-bold text-sm shadow-[0_8px_30px_rgba(242,95,138,0.25)] flex items-center gap-2.5 animate-bounce">
             <CheckCircle2 size={16} />
@@ -4065,7 +4099,7 @@ export default function AdminPage() {
   const paginatedIps = filteredIpsList.slice((ipListPage - 1) * ipItemsPerPage, ipListPage * ipItemsPerPage);
 
   return (
-    <div id="admin-portal" className="h-screen overflow-hidden bg-[#fff9fb] text-[#2d2026] flex flex-col font-sans antialiased">
+    <div id="admin-portal" className="h-screen overflow-hidden text-[#0D233A] flex flex-col font-sans antialiased" style={{ backgroundColor: '#ffffff' }}>
       
       {/* TOAST SYSTEM */}
       {toastMessage && (
@@ -4120,7 +4154,7 @@ export default function AdminPage() {
       <div className="flex-1 flex max-w-7xl w-full mx-auto relative items-stretch min-h-0">
         
         {/* SIDEBAR NAVIGATION (DESKTOP) */}
-        <aside className="w-64 border-r border-[#f2ccd7] p-6 flex flex-col justify-between hidden lg:flex bg-[#fff1f5] shrink-0">
+        <aside className="w-64 border-r border-[#D0CBB5] p-6 flex flex-col justify-between hidden lg:flex shrink-0" style={{ backgroundColor: '#F5AC00' }}>
           <div className="space-y-8">
             <div className="bg-white border border-[#f2ccd7] rounded-xl p-4 flex gap-3 items-center shadow-sm">
               <div className="w-10 h-10 rounded-lg bg-[#bf3e67] text-white flex items-center justify-center font-bold text-sm shrink-0">
@@ -4190,7 +4224,7 @@ export default function AdminPage() {
         {/* MOBILE SIDEBAR */}
         {mobileMenuOpen && (
           <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden flex" onClick={() => setMobileMenuOpen(false)}>
-            <div className="w-72 bg-white border-r border-[#f2ccd7] h-full p-6 flex flex-col justify-between" onClick={(e) => e.stopPropagation()}>
+            <div className="w-72 border-r border-[#D0CBB5] h-full p-6 flex flex-col justify-between" onClick={(e) => e.stopPropagation()} style={{ backgroundColor: '#F5AC00' }}>
               <div className="space-y-6">
                 <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
                   <div className="flex items-center gap-2">
@@ -8373,11 +8407,6 @@ export default function AdminPage() {
               </div>
             </div>
           )}
-
-          {/* Footer */}
-          <div className="mt-12 -mx-4 sm:-mx-6 lg:-mx-8">
-            <Footer theme="pink" />
-          </div>
         </main>
       </div>
 
@@ -9947,51 +9976,107 @@ export default function AdminPage() {
               </div>
 
               {/* 배송 및 송장 정보 관리 (신설) */}
-              <form onSubmit={handleUpdateOrderTracking} className="space-y-3 bg-[#fff1f5]/50 border border-[#f2ccd7]/60 p-4 rounded-xl">
+              <form onSubmit={handleUpdateOrderTracking} className="space-y-4 bg-[#fff1f5]/50 border border-[#f2ccd7]/60 p-5 rounded-2xl shadow-sm">
                 <h4 className="font-extrabold text-xs text-[#bf3e67] flex items-center gap-1.5 border-b border-[#f2ccd7]/40 pb-2">
-                  🚚 배송 물류 송장 정보 등록/수정
+                  🚚 배송 물류 송장 정보 등록/수정 (다중 송장 지원)
                 </h4>
                 
-                {/* 기존 송장 정보가 있으면 렌더링 */}
-                {(selectedOrder as any).courier && (selectedOrder as any).trackingNo && (
-                  <div className="bg-white border border-[#f2ccd7]/40 px-3 py-2 rounded-lg text-[10px] font-extrabold text-[#bf3e67] w-fit">
-                    현재 등록된 배송 정보: {(selectedOrder as any).courier} [{(selectedOrder as any).trackingNo}]
-                  </div>
-                )}
+                {/* 등록된 송장 리스트 */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-[#735965] block">등록된 송장 목록 ({modalTrackingList.length})</label>
+                  {modalTrackingList.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {modalTrackingList.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-white border border-[#f2ccd7]/40 px-3 py-2 rounded-xl text-xs font-semibold text-[#2d2026] shadow-sm hover:border-[#f25f8a] transition-all">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-lg bg-[#fff1f5] text-[9px] font-black text-[#bf3e67] border border-[#f2ccd7]/60">
+                              {item.courier}
+                            </span>
+                            <span className="font-mono text-[#bf3e67] font-bold text-xs">{item.trackingNo}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setModalTrackingList(modalTrackingList.filter((_, i) => i !== idx));
+                            }}
+                            className="p-1 hover:bg-[#fff1f5] rounded-full text-red-400 hover:text-red-600 transition-colors cursor-pointer"
+                            title="삭제"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 bg-white border border-dashed border-[#f2ccd7]/60 rounded-xl text-[11px] font-bold text-[#735965]/50 shadow-inner">
+                      등록된 송장 번호가 없습니다. 아래에서 송장을 등록해 주세요.
+                    </div>
+                  )}
+                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-[#735965] block">택배사 선택</label>
-                    <select
-                      value={selectedCourier}
-                      onChange={(e) => setSelectedCourier(e.target.value)}
-                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-2.5 py-2 text-xs text-[#2d2026] font-bold focus:outline-none cursor-pointer"
-                    >
-                      <option value="CJ대한통운">CJ대한통운</option>
-                      <option value="한진택배">한진택배</option>
-                      <option value="롯데택배">롯데택배</option>
-                      <option value="로젠택배">로젠택배</option>
-                      <option value="우체국택배">우체국택배</option>
-                      <option value="본사 직배송 차량">본사 직배송 차량</option>
-                    </select>
-                  </div>
+                {/* 송장 추가 입력 폼 */}
+                <div className="bg-white/80 border border-[#f2ccd7]/30 p-3 rounded-xl space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                    <div className="sm:col-span-4 space-y-1">
+                      <label className="text-[10px] font-bold text-[#735965] block">택배사 선택</label>
+                      <select
+                        value={selectedCourier}
+                        onChange={(e) => setSelectedCourier(e.target.value)}
+                        className="w-full bg-white border border-[#f2ccd7] rounded-lg px-2.5 py-2 text-xs text-[#2d2026] font-bold focus:outline-none cursor-pointer"
+                      >
+                        <option value="CJ대한통운">CJ대한통운</option>
+                        <option value="한진택배">한진택배</option>
+                        <option value="롯데택배">롯데택배</option>
+                        <option value="로젠택배">로젠택배</option>
+                        <option value="우체국택배">우체국택배</option>
+                        <option value="본사 직배송 차량">본사 직배송 차량</option>
+                      </select>
+                    </div>
 
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-[#735965] block">송장번호 입력</label>
-                    <input
-                      type="text"
-                      placeholder="하이픈(-) 없이 입력"
-                      value={inputTrackingNo}
-                      onChange={(e) => setInputTrackingNo(e.target.value)}
-                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-2.5 py-2 text-xs text-[#2d2026] focus:outline-none"
-                    />
-                  </div>
+                    <div className="sm:col-span-6 space-y-1">
+                      <label className="text-[10px] font-bold text-[#735965] block">송장번호 입력</label>
+                      <input
+                        type="text"
+                        placeholder="하이픈(-) 없이 입력"
+                        value={inputTrackingNo}
+                        onChange={(e) => setInputTrackingNo(e.target.value)}
+                        className="w-full bg-white border border-[#f2ccd7] rounded-lg px-2.5 py-2 text-xs text-[#2d2026] focus:outline-none font-medium"
+                      />
+                    </div>
 
+                    <div className="sm:col-span-2">
+                      <button
+                        type="button"
+                        onClick={handleToAddTracking}
+                        className="w-full py-2 bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-xs font-black rounded-lg transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1"
+                      >
+                        <Plus size={14} />
+                        추가
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-[#f2ccd7]/30">
+                  <style dangerouslySetInnerHTML={{ __html: `
+                    #admin-portal #admin-submit-tracking-btn,
+                    #admin-portal #admin-submit-tracking-btn *,
+                    #admin-portal .admin-submit-tracking-btn,
+                    #admin-portal .admin-submit-tracking-btn * {
+                      color: #ffffff !important;
+                      fill: #ffffff !important;
+                    }
+                  ` }} />
                   <button
+                    id="admin-submit-tracking-btn"
                     type="submit"
-                    className="w-full py-2 bg-[#bf3e67] hover:bg-[#a02c52] text-white text-xs font-black rounded-lg transition-all shadow-sm"
+                    className="admin-submit-tracking-btn w-full py-3 bg-[#bf3e67] hover:bg-[#a02c52] text-white !text-white text-xs font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
+                    style={{ color: '#ffffff' }}
                   >
-                    송장 등록 및 배송중 변경
+                    <span className="text-white !text-white flex items-center justify-center gap-1.5" style={{ color: '#ffffff' }}>
+                      <Truck size={14} className="text-white !text-white" style={{ color: '#ffffff' }} />
+                      송장 등록 및 배송중 변경
+                    </span>
                   </button>
                 </div>
               </form>
