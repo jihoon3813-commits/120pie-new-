@@ -19,7 +19,7 @@ export default function MenuPosterBanner() {
   const rollingImages = [...POSTER_IMAGES, ...POSTER_IMAGES];
 
   return (
-    <section className="bg-[#D98F00] pt-16 pb-24 sm:pt-24 sm:pb-36 overflow-hidden relative text-[#0D233A]">
+    <section className="bg-[#D98F00] pt-16 pb-20 sm:pt-24 sm:pb-28 overflow-hidden relative text-white border-none">
       {/* Decorative Brand Icon and Background */}
       <div className="absolute top-8 left-8 opacity-10 pointer-events-none hidden md:block">
         <svg width="48" height="48" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
@@ -28,22 +28,22 @@ export default function MenuPosterBanner() {
         </svg>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12 sm:mb-16 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-8 sm:mb-12 relative z-10">
         <div className="inline-flex items-center justify-center mb-3">
           <Sparkles className="text-white w-5 h-5 animate-pulse" />
         </div>
-        <span className="block text-xs sm:text-sm font-extrabold uppercase tracking-widest text-white/90 mb-2 font-mono">
+        <span className="block text-xs sm:text-sm font-extrabold uppercase tracking-widest text-white/80 mb-2 font-mono">
           Season Menu & New Menu
         </span>
-        <h3 className="text-3xl sm:text-5xl font-black text-[#0D233A] tracking-tight mb-4 leading-tight">
-          시즌메뉴 & 신메뉴<br />출시만 하면 <span className="text-[#bf3e67] relative inline-block mx-1">
+        <h3 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-4 leading-tight">
+          시즌메뉴 & 신메뉴<br />출시만 하면 <span className="text-[#FF4B91] relative inline-block mx-1">
             Hit!
-            <svg className="absolute -bottom-1.5 left-0 w-full h-2 text-[#bf3e67]/80" viewBox="0 0 100 10" preserveAspectRatio="none">
+            <svg className="absolute -bottom-1.5 left-0 w-full h-2 text-[#FF4B91]/80" viewBox="0 0 100 10" preserveAspectRatio="none">
               <path d="M0,5 Q50,10 100,5" stroke="currentColor" strokeWidth="3" fill="none" />
             </svg>
           </span>
         </h3>
-        <p className="text-xs sm:text-sm font-bold text-[#0D233A]/85 max-w-xl mx-auto leading-relaxed mt-4">
+        <p className="text-xs sm:text-sm font-bold text-white/90 max-w-xl mx-auto leading-relaxed mt-4">
           전문 R&D 시스템으로 시즌마다 트렌디한 신 메뉴 출시!
         </p>
       </div>
@@ -53,15 +53,15 @@ export default function MenuPosterBanner() {
         <div className="absolute inset-y-0 left-0 w-12 sm:w-32 bg-gradient-to-r from-[#D98F00] to-transparent z-10 pointer-events-none" />
         <div className="absolute inset-y-0 right-0 w-12 sm:w-32 bg-gradient-to-l from-[#D98F00] to-transparent z-10 pointer-events-none" />
 
-        {/* Rolling track */}
-        <div className="flex w-max animate-posterMarquee hover:[animation-play-state:paused] cursor-grab active:cursor-grabbing">
+        {/* Rolling track with increased vertical padding (py-12 sm:py-20) to prevent hover scale clipping */}
+        <div className="flex w-max animate-posterMarquee hover:[animation-play-state:paused] cursor-grab active:cursor-grabbing py-12 sm:py-20">
           {rollingImages.map((src, index) => (
             <div
               key={index}
-              className="w-[165px] sm:w-[240px] px-2 sm:px-3 shrink-0 py-6"
+              className="w-[165px] sm:w-[240px] px-2 sm:px-3 shrink-0"
             >
-              {/* Added premium hover micro-animations (scale 1.12, lift -16px, deep shadow, z-index elevation) */}
-              <div className="aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden shadow-lg border border-black/5 group relative transition-all duration-500 hover:scale-[1.12] hover:-translate-y-4 hover:shadow-2xl hover:z-20 cursor-pointer">
+              {/* Scale increased to 1.25 (25% size boost) and translateY increased to -translate-y-6 */}
+              <div className="aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden shadow-lg border border-white/10 group relative transition-all duration-500 hover:scale-[1.25] hover:-translate-y-6 hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)] hover:z-20 cursor-pointer">
                 <img
                   src={optimizeCloudinaryUrl(src)}
                   alt={`Menu Poster ${index + 1}`}
