@@ -62,7 +62,7 @@ export default function Footer({
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
           {/* Logo and Info */}
           <div className="md:col-span-5 space-y-6">
-            <img src={logoUrl} alt="120pie Logo" className="h-7 sm:h-10 w-auto object-contain" />
+            <img src={logoUrl} alt="120pie Logo" className="h-5 sm:h-7 w-auto object-contain" />
             <p className="text-xs leading-relaxed max-w-sm">
               120pie는 독창적인 120겹 페이스트리 노하우와 엄선된 원두의 스페셜티 커피를 통해 고객님들께 행복한 미식 경험을 전합니다.
             </p>
