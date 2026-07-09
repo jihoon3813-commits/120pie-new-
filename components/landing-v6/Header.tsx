@@ -25,7 +25,7 @@ export default function Header({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isSubpage = pathname !== "/landing-v6";
+  const isSubpage = pathname !== "/" && pathname !== "/landing-v6";
 
   const menuItems = [
     { label: "120메뉴", href: "/landing-v6/menu" },
@@ -48,7 +48,7 @@ export default function Header({
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/landing-v6" className="flex items-center">
+            <Link href="/" className="flex items-center">
               <img
                 src={logoUrl}
                 alt="120pie & coffee Logo"
