@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Coins, CheckCircle, Info, Layers, RefreshCw, ShoppingBag, Sparkles } from "lucide-react";
 
-type TabId = "franchise" | "hybrid" | "shop120" | "shopegg";
+type TabId = "franchise" | "hybrid" | "shop120" | "shopegg120" | "shopegg";
 
 export default function FranchiseCost() {
   const [activeTab, setActiveTab] = useState<TabId>("franchise");
@@ -47,14 +47,15 @@ export default function FranchiseCost() {
     { cat: "전용 조리 인프라", detail: "에그120 계란빵 전용 머신 1대", note: "10구 동시 생산이 가능한 에그120 전용 기기" },
     { cat: "초도 원재료 패키지", detail: "시그니처 전용 반죽 30kg + 토핑 식재료 4종 + 동물복지 유정란 120ea", note: "계란빵 약 720개 조리 가능한 반죽과 핵심 식재료 초도 지원" },
     { cat: "매장 홍보물 세트", detail: "공식 X배너 1ea + 테이블/카운터 POP 1ea + 홍보 포스터 3종", note: "매장 내외부에서 egg120 메뉴를 노출하기 위한 홍보물 구성" },
-    { cat: "판매 촉진 비주얼 세트", detail: "에그120 모형 4종 + 배달 플랫폼 실사 이미지", note: "오프라인 진열과 배달앱 등록에 활용 가능한 비주얼 자료" },
-    { cat: "운영 정착 지원", detail: "포장 부자재 세트 + 오븐 설치 및 1:1 조리 교육", note: "포장 운영, 장비 세팅, 현장 조리 교육까지 지원" }
+    { cat: "판매 촉진 비주얼 세트", detail: "계란빵 모형 4종 + 전용 미니 쇼케이스 + 동물복지 인증 매장 판넬", note: "카운터 진열, 신뢰도 강화, 주문 유도를 위한 시각 자료" },
+    { cat: "운영 정착 지원", detail: "배달 플랫폼 셋업 대행 + 포장/부자재 패키지 + 기기 설치 및 1:1 교육", note: "배달앱 등록, 포장 운영, 장비 설치, 현장 교육까지 지원" }
   ];
 
   const tabList = [
     { id: "franchise", label: "신규 가맹 창업", desc: "15평 기준 표준 가맹 개설 모델" },
     { id: "hybrid", label: "하이브리드 창업", desc: "기존 매장 활용 업종 전환 모델" },
     { id: "shop120", label: "샵인샵 (120pie)", desc: "디저트 단일 라인업 추가 패키지" },
+    { id: "shopegg120", label: "샵인샵 (egg120)", desc: "계란빵 단일 라인업 추가 패키지" },
     { id: "shopegg", label: "샵인샵 (pie & egg)", desc: "파이와 계란빵 듀얼 패키지" }
   ];
 
@@ -382,6 +383,71 @@ export default function FranchiseCost() {
                       </thead>
                       <tbody>
                         {shop120Costs.map((row, idx) => (
+                          <tr key={idx} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors font-semibold">
+                            <td className="py-3 px-3 sm:py-4.5 sm:px-4 text-xs sm:text-base md:text-lg font-black border border-neutral-200 !text-neutral-900">{row.cat}</td>
+                            <td className="py-3 px-3 sm:py-4.5 sm:px-4 text-[11px] sm:text-sm md:text-base !text-neutral-700 font-medium leading-relaxed border border-neutral-200">{row.detail}</td>
+                            <td className="py-3 px-3 sm:py-4.5 sm:px-4 text-[10px] sm:text-xs md:text-base !text-neutral-500 font-medium leading-relaxed border border-neutral-200">{row.note}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* 3.5. 샵인샵 (egg120) 탭 */}
+            {activeTab === "shopegg120" && (
+              <motion.div
+                key="shopegg120"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-12 max-w-5xl mx-auto"
+              >
+                {/* Total Cost Highlight Card */}
+                <div className="max-w-4xl mx-auto bg-gradient-to-br from-white via-neutral-50 to-neutral-100 border-2 border-white rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl text-neutral-900">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-[#0F3587] text-white rounded-2xl shadow-md">
+                      <ShoppingBag className="w-6 h-6" />
+                    </div>
+                    <div className="text-left">
+                      <span className="text-sm font-black text-neutral-500 uppercase tracking-widest block">Shop-in-Shop Package</span>
+                      <h3 className="text-xl sm:text-3xl font-black text-neutral-900 mt-0.5">에그120 프리미엄 패키지 도입 비용</h3>
+                    </div>
+                  </div>
+                  <div className="text-center sm:text-right shrink-0">
+                    <span className="text-sm font-bold text-neutral-400 block line-through mb-0.5">정가 4,400,000원</span>
+                    <div className="flex items-baseline justify-center sm:justify-end gap-1.5">
+                      <span className="text-sm font-bold text-neutral-500">도입 할인가</span>
+                      <strong className="text-4xl sm:text-5xl md:text-6xl font-black text-rose-600 tracking-tight">330</strong>
+                      <span className="text-2xl font-black text-neutral-900">만원</span>
+                      <span className="text-xs text-neutral-500 ml-0.5">VAT별도</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Table */}
+                <div className="p-4 sm:p-8 rounded-[2rem] border-2 border-white bg-gradient-to-br from-white to-neutral-100 shadow-2xl text-neutral-900">
+                  <div className="flex justify-between items-center mb-6">
+                    <span className="text-base sm:text-xl md:text-2xl font-black text-[#0F3587] tracking-tight flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-[#0F3587]" /> 에그120 프리미엄 패키지 상세 구성
+                    </span>
+                    <span className="text-xs sm:text-sm text-neutral-500 font-bold">도입가 330만원 (VAT별도)</span>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-2xl border border-neutral-250 bg-white">
+                    <table className="w-full text-left border-collapse border border-neutral-200 min-w-[420px] lg:min-w-0">
+                      <thead>
+                        <tr className="bg-neutral-100">
+                          <th className="py-3 px-3 sm:py-4 sm:px-4 font-black w-[25%] text-xs sm:text-base md:text-lg !text-neutral-800 border border-neutral-200">구분</th>
+                          <th className="py-3 px-3 sm:py-4 sm:px-4 font-black w-[40%] text-[11px] sm:text-base md:text-lg !text-neutral-800 border border-neutral-200">세부 내용</th>
+                          <th className="py-3 px-3 sm:py-4 sm:px-4 font-black w-[35%] text-[11px] sm:text-base md:text-lg !text-neutral-800 border border-neutral-200">비고</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {shopeggCosts.map((row, idx) => (
                           <tr key={idx} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors font-semibold">
                             <td className="py-3 px-3 sm:py-4.5 sm:px-4 text-xs sm:text-base md:text-lg font-black border border-neutral-200 !text-neutral-900">{row.cat}</td>
                             <td className="py-3 px-3 sm:py-4.5 sm:px-4 text-[11px] sm:text-sm md:text-base !text-neutral-700 font-medium leading-relaxed border border-neutral-200">{row.detail}</td>
