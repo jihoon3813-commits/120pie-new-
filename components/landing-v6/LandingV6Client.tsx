@@ -4,6 +4,7 @@ import { useState } from "react";
 import Header from "./Header";
 import Hero from "./Hero";
 import RollingBanner from "./RollingBanner";
+import YouTubeVideoSection from "./YouTubeVideoSection";
 import PieBrandConcept from "./PieBrandConcept";
 import GrowthSection from "./GrowthSection";
 import DailySales from "./DailySales";
@@ -39,6 +40,9 @@ export default function LandingV6Client() {
 
         {/* Rolling Banner with Deep Green Background */}
         <RollingBanner />
+
+        {/* YouTube Video Section */}
+        <YouTubeVideoSection />
 
         {/* Brand Core Philosophy Section */}
         <PieBrandConcept />
