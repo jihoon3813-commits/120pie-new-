@@ -2,7 +2,7 @@
 
 export default function YouTubeVideoSection() {
   return (
-    <section className="relative w-full h-[50vh] sm:h-[65vh] lg:h-[80vh] overflow-hidden bg-black z-0 border-none">
+    <section className="relative w-full h-[50vh] sm:h-[65vh] lg:h-[80vh] overflow-hidden bg-black z-0 border-none -mt-6 sm:-mt-10 lg:-mt-14">
       {/* Top and Bottom soft shading overlays to blend smoothly with adjacent white sections */}
       <div className="absolute top-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-b from-white/15 to-transparent dark:from-neutral-950/25 pointer-events-none z-10" />
       <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-t from-white/15 to-transparent dark:from-neutral-950/25 pointer-events-none z-10" />
