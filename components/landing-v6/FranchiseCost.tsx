@@ -4,10 +4,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Coins, CheckCircle, Info, Layers, RefreshCw, ShoppingBag, Sparkles } from "lucide-react";
 
-type TabId = "franchise" | "hybrid" | "shop120" | "shopegg120" | "shopegg";
+type TabId = "shop120" | "shopegg120" | "shopegg" | "hybrid" | "franchise";
 
 export default function FranchiseCost() {
-  const [activeTab, setActiveTab] = useState<TabId>("franchise");
+  const [activeTab, setActiveTab] = useState<TabId>("shop120");
 
   // 1. 신규 가맹 창업 데이터
   const franchiseBasic = [
@@ -52,11 +52,11 @@ export default function FranchiseCost() {
   ];
 
   const tabList = [
-    { id: "franchise", label: "신규 가맹 창업", desc: "15평 기준 표준 가맹 개설 모델" },
-    { id: "hybrid", label: "하이브리드 창업", desc: "기존 매장 활용 업종 전환 모델" },
     { id: "shop120", label: "샵인샵 (120pie)", desc: "디저트 단일 라인업 추가 패키지" },
     { id: "shopegg120", label: "샵인샵 (egg120)", desc: "계란빵 단일 라인업 추가 패키지" },
-    { id: "shopegg", label: "샵인샵 (pie & egg)", desc: "파이와 계란빵 듀얼 패키지" }
+    { id: "shopegg", label: "샵인샵 (pie & egg)", desc: "파이와 계란빵 듀얼 패키지" },
+    { id: "hybrid", label: "하이브리드 창업", desc: "기존 매장 활용 업종 전환 모델" },
+    { id: "franchise", label: "신규 가맹 창업", desc: "15평 기준 표준 가맹 개설 모델" }
   ];
 
   return (
@@ -109,22 +109,22 @@ export default function FranchiseCost() {
           </motion.p>
         </div>
 
-        {/* 🌟 Tab Navigation (Grid on mobile, flex on desktop) */}
-        <div className="grid grid-cols-2 lg:flex lg:flex-wrap items-center justify-center gap-2 sm:gap-4 max-w-5xl mx-auto mb-5 sm:mb-20 w-full px-1 sm:px-0">
+        {/* 🌟 Tab Navigation (Grid on mobile, flex/grid on desktop to fit in 1 line) */}
+        <div className="grid grid-cols-2 md:grid-cols-5 items-stretch justify-center gap-2 sm:gap-4 max-w-5xl mx-auto mb-5 sm:mb-20 w-full px-1 sm:px-0">
           {tabList.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabId)}
-                className={`px-3 py-3 sm:px-8 sm:py-5 rounded-2xl text-left flex flex-col justify-center w-full lg:w-auto lg:min-w-[210px] border shrink-0 transition-all duration-300 ${
+                className={`px-3 py-3 sm:px-4 sm:py-5 rounded-2xl text-left flex flex-col justify-center w-full border shrink-0 transition-all duration-300 ${
                   isActive
                     ? "bg-amber-400 border-amber-400 text-neutral-950 shadow-lg shadow-amber-400/30"
                     : "bg-[#0b1d44] border-white/10 hover:bg-[#122e6b] hover:border-white/20 text-white"
                 }`}
               >
-                <span className="text-xs sm:text-base md:text-xl font-black block">{tab.label}</span>
-                <span className={`text-[9px] sm:text-xs md:text-sm font-bold block mt-1 ${
+                <span className="text-xs sm:text-base md:text-[17px] font-black block">{tab.label}</span>
+                <span className={`text-[9px] sm:text-xs md:text-xs font-bold block mt-1 leading-snug ${
                   isActive ? "text-neutral-850" : "text-white/60"
                 }`}>
                   {tab.desc}
@@ -160,7 +160,7 @@ export default function FranchiseCost() {
                     </div>
                   </div>
                   <div className="text-center sm:text-right shrink-0">
-                    <span className="text-sm font-bold text-neutral-500 block">VAT 별도</span>
+                    <span className="text-sm font-bold text-neutral-500 block">VAT 포함</span>
                     <div className="flex items-baseline justify-center sm:justify-end gap-1.5 mt-0.5">
                       <strong className="text-4xl sm:text-5xl md:text-6xl font-black text-rose-600 tracking-tight">6,518</strong>
                       <span className="text-2xl font-black text-neutral-900">만원</span>
@@ -177,7 +177,7 @@ export default function FranchiseCost() {
                         <span className="text-base sm:text-xl md:text-2xl font-black text-[#0F3587] tracking-tight flex items-center gap-2">
                           <CheckCircle className="w-5 h-5 text-[#0F3587]" /> 기본 비용 (1,040만원)
                         </span>
-                        <span className="text-xs sm:text-sm text-neutral-500 font-bold">VAT 별도</span>
+                        <span className="text-xs sm:text-sm text-neutral-500 font-bold">VAT 포함</span>
                       </div>
                       <div className="overflow-x-auto rounded-2xl border border-neutral-250 bg-white">
                         <table className="w-full text-left border-collapse border border-neutral-200 min-w-[420px] lg:min-w-0">
@@ -211,7 +211,7 @@ export default function FranchiseCost() {
                         <span className="text-base sm:text-xl md:text-2xl font-black text-[#0F3587] tracking-tight flex items-center gap-2">
                           <CheckCircle className="w-5 h-5 text-[#0F3587]" /> 기타 비용 (5,478만원)
                         </span>
-                        <span className="text-xs sm:text-sm text-neutral-500 font-bold">VAT 별도</span>
+                        <span className="text-xs sm:text-sm text-neutral-500 font-bold">VAT 포함</span>
                       </div>
                       <div className="overflow-x-auto rounded-2xl border border-neutral-250 bg-white">
                         <table className="w-full text-left border-collapse border border-neutral-200 min-w-[420px] lg:min-w-0">
@@ -263,7 +263,7 @@ export default function FranchiseCost() {
                     </div>
                   </div>
                   <div className="text-center sm:text-right shrink-0">
-                    <span className="text-sm font-bold text-neutral-500 block">VAT 별도</span>
+                    <span className="text-sm font-bold text-neutral-500 block">VAT 포함</span>
                     <div className="flex items-baseline justify-center sm:justify-end gap-1.5 mt-0.5">
                       <strong className="text-4xl sm:text-5xl md:text-6xl font-black text-rose-600 tracking-tight">980</strong>
                       <span className="text-2xl font-black text-neutral-900">만원</span>
@@ -301,7 +301,7 @@ export default function FranchiseCost() {
                       <span className="text-base sm:text-xl md:text-2xl font-black text-[#0F3587] tracking-tight flex items-center gap-2">
                         <CheckCircle className="w-5 h-5 text-[#0F3587]" /> 하이브리드 개설 비용 명세
                       </span>
-                      <span className="text-xs sm:text-sm text-neutral-500 font-bold">VAT 별도</span>
+                      <span className="text-xs sm:text-sm text-neutral-500 font-bold">VAT 포함</span>
                     </div>
 
                     <div className="overflow-x-auto rounded-2xl border border-neutral-250 bg-white">
@@ -358,7 +358,7 @@ export default function FranchiseCost() {
                       <span className="text-sm font-bold text-neutral-500">도입 할인가</span>
                       <strong className="text-4xl sm:text-5xl md:text-6xl font-black text-rose-600 tracking-tight">440</strong>
                       <span className="text-2xl font-black text-neutral-900">만원</span>
-                      <span className="text-xs text-neutral-500 ml-0.5">VAT별도</span>
+                      <span className="text-xs text-neutral-500 ml-0.5">VAT 포함</span>
                     </div>
                   </div>
                 </div>
@@ -369,7 +369,7 @@ export default function FranchiseCost() {
                     <span className="text-base sm:text-xl md:text-2xl font-black text-[#0F3587] tracking-tight flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-[#0F3587]" /> 120겹파이 올인원 패키지 상세 구성
                     </span>
-                    <span className="text-xs sm:text-sm text-neutral-500 font-bold">도입가 440만원 (VAT별도)</span>
+                    <span className="text-xs sm:text-sm text-neutral-500 font-bold">도입가 440만원 (VAT 포함)</span>
                   </div>
 
                   <div className="overflow-x-auto rounded-2xl border border-neutral-250 bg-white">
@@ -423,7 +423,7 @@ export default function FranchiseCost() {
                       <span className="text-sm font-bold text-neutral-500">도입 할인가</span>
                       <strong className="text-4xl sm:text-5xl md:text-6xl font-black text-rose-600 tracking-tight">330</strong>
                       <span className="text-2xl font-black text-neutral-900">만원</span>
-                      <span className="text-xs text-neutral-500 ml-0.5">VAT별도</span>
+                      <span className="text-xs text-neutral-500 ml-0.5">VAT 포함</span>
                     </div>
                   </div>
                 </div>
@@ -434,7 +434,7 @@ export default function FranchiseCost() {
                     <span className="text-base sm:text-xl md:text-2xl font-black text-[#0F3587] tracking-tight flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-[#0F3587]" /> 에그120 프리미엄 패키지 상세 구성
                     </span>
-                    <span className="text-xs sm:text-sm text-neutral-500 font-bold">도입가 330만원 (VAT별도)</span>
+                    <span className="text-xs sm:text-sm text-neutral-500 font-bold">도입가 330만원 (VAT 포함)</span>
                   </div>
 
                   <div className="overflow-x-auto rounded-2xl border border-neutral-250 bg-white">
@@ -483,12 +483,12 @@ export default function FranchiseCost() {
                     </div>
                   </div>
                   <div className="text-center sm:text-right shrink-0">
-                    <span className="text-sm font-bold text-neutral-450 block mb-0.5">파이 440만원 + 에그 330만원 결합</span>
+                    <span className="text-sm font-bold text-neutral-450 block mb-0.5">파이 440만원 + 에그 330만원 결합 (결합 할인 적용)</span>
                     <div className="flex items-baseline justify-center sm:justify-end gap-1.5">
                       <span className="text-sm font-bold text-neutral-500">총 결합 도입가</span>
-                      <strong className="text-4xl sm:text-5xl md:text-6xl font-black text-rose-600 tracking-tight">770</strong>
+                      <strong className="text-4xl sm:text-5xl md:text-6xl font-black text-rose-600 tracking-tight">690</strong>
                       <span className="text-2xl font-black text-neutral-900">만원</span>
-                      <span className="text-xs text-neutral-500 ml-0.5">VAT별도</span>
+                      <span className="text-xs text-neutral-500 ml-0.5">VAT 포함</span>
                     </div>
                   </div>
                 </div>
