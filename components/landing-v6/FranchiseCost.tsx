@@ -383,7 +383,7 @@ export default function FranchiseCost() {
                       <tbody>
                         {shop120Costs.map((row, idx) => (
                           <tr key={idx} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors font-semibold">
-                            <td className="py-3 px-3 sm:py-4.5 sm:px-4 text-xs sm:text-base md:text-lg !text-white font-black border border-neutral-200 !text-neutral-900">{row.cat}</td>
+                            <td className="py-3 px-3 sm:py-4.5 sm:px-4 text-xs sm:text-base md:text-lg font-black border border-neutral-200 !text-neutral-900">{row.cat}</td>
                             <td className="py-3 px-3 sm:py-4.5 sm:px-4 text-[11px] sm:text-sm md:text-base !text-neutral-700 font-medium leading-relaxed border border-neutral-200">{row.detail}</td>
                             <td className="py-3 px-3 sm:py-4.5 sm:px-4 text-[10px] sm:text-xs md:text-base !text-neutral-500 font-medium leading-relaxed border border-neutral-200">{row.note}</td>
                           </tr>
@@ -449,7 +449,7 @@ export default function FranchiseCost() {
                           <tbody>
                             {shop120Costs.map((row, idx) => (
                               <tr key={idx} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors font-semibold">
-                                <td className="py-3 px-3 text-xs sm:text-base !text-white font-black leading-snug border border-neutral-200 !text-neutral-900">{row.cat}</td>
+                                <td className="py-3 px-3 text-xs sm:text-base font-black leading-snug border border-neutral-200 !text-neutral-900">{row.cat}</td>
                                 <td className="py-3 px-3 text-[11px] sm:text-sm md:text-base text-neutral-750 font-medium leading-relaxed border border-neutral-200">{row.detail}</td>
                                 <td className="py-3 px-3 text-[10px] sm:text-xs md:text-base text-neutral-500 font-medium leading-relaxed border border-neutral-200">{row.note}</td>
                               </tr>
@@ -481,7 +481,7 @@ export default function FranchiseCost() {
                           <tbody>
                             {shopeggCosts.map((row, idx) => (
                               <tr key={idx} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors font-semibold">
-                                <td className="py-3 px-3 text-xs sm:text-base !text-white font-black leading-snug border border-neutral-200 !text-neutral-900">{row.cat}</td>
+                                <td className="py-3 px-3 text-xs sm:text-base font-black leading-snug border border-neutral-200 !text-neutral-900">{row.cat}</td>
                                 <td className="py-3 px-3 text-[11px] sm:text-sm md:text-base text-neutral-750 font-medium leading-relaxed border border-neutral-200">{row.detail}</td>
                                 <td className="py-3 px-3 text-[10px] sm:text-xs md:text-base text-neutral-500 font-medium leading-relaxed border border-neutral-200">{row.note}</td>
                               </tr>
