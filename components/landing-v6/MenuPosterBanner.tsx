@@ -36,9 +36,9 @@ export default function MenuPosterBanner() {
           Season Menu & New Menu
         </span>
         <h3 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-4 leading-tight">
-          시즌메뉴 & 신메뉴<br />출시만 하면 <span className="text-[#FF4B91] relative inline-block mx-1">
+          시즌메뉴 & 신메뉴<br />출시만 하면 <span className="text-[#E14578] relative inline-block mx-1">
             Hit!
-            <svg className="absolute -bottom-1.5 left-0 w-full h-2 text-[#FF4B91]/80" viewBox="0 0 100 10" preserveAspectRatio="none">
+            <svg className="absolute -bottom-1.5 left-0 w-full h-2 text-[#E14578]/80" viewBox="0 0 100 10" preserveAspectRatio="none">
               <path d="M0,5 Q50,10 100,5" stroke="currentColor" strokeWidth="3" fill="none" />
             </svg>
           </span>
