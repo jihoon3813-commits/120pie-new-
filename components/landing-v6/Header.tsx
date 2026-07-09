@@ -30,7 +30,6 @@ export default function Header({
   const menuItems = [
     { label: "120메뉴", href: "/landing-v6/menu" },
     { label: "가맹점 현황", href: "/landing-v6/stores" },
-    { label: "비용안내", href: "/landing-v6/costs" },
     { label: "창업 안내", href: "/landing-v6/franchise" },
     { label: "FAQ", href: "/landing-v6/faq" },
   ];
