@@ -16,13 +16,12 @@ const POSTER_IMAGES = [
 ];
 
 export default function MenuPosterBanner() {
-  // Double the images array for infinite marquee effect
   const rollingImages = [...POSTER_IMAGES, ...POSTER_IMAGES];
 
   return (
-    <section className="bg-[#004e26] py-16 sm:py-24 overflow-hidden relative text-white border-b border-emerald-900/30">
+    <section className="bg-[#D98F00] pt-16 pb-24 sm:pt-24 sm:pb-36 overflow-hidden relative text-[#0D233A]">
       {/* Decorative Brand Icon and Background */}
-      <div className="absolute top-8 left-8 opacity-20 pointer-events-none hidden md:block">
+      <div className="absolute top-8 left-8 opacity-10 pointer-events-none hidden md:block">
         <svg width="48" height="48" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="50" cy="50" r="40" strokeDasharray="5 5" />
           <path d="M50 30 L50 70 M30 50 L70 50" />
@@ -31,48 +30,59 @@ export default function MenuPosterBanner() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12 sm:mb-16 relative z-10">
         <div className="inline-flex items-center justify-center mb-3">
-          <Sparkles className="text-amber-400 w-5 h-5 animate-pulse" />
+          <Sparkles className="text-white w-5 h-5 animate-pulse" />
         </div>
-        <span className="block text-xs sm:text-sm font-extrabold uppercase tracking-widest text-amber-300/90 mb-2 font-mono">
+        <span className="block text-xs sm:text-sm font-extrabold uppercase tracking-widest text-white/90 mb-2 font-mono">
           Season Menu & New Menu
         </span>
-        <h3 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-4 leading-tight">
-          시즌메뉴 & 신메뉴<br />출시만 하면 <span className="text-amber-300 relative inline-block mx-1">
+        <h3 className="text-3xl sm:text-5xl font-black text-[#0D233A] tracking-tight mb-4 leading-tight">
+          시즌메뉴 & 신메뉴<br />출시만 하면 <span className="text-[#bf3e67] relative inline-block mx-1">
             Hit!
-            <svg className="absolute -bottom-1.5 left-0 w-full h-2 text-amber-300/80" viewBox="0 0 100 10" preserveAspectRatio="none">
+            <svg className="absolute -bottom-1.5 left-0 w-full h-2 text-[#bf3e67]/80" viewBox="0 0 100 10" preserveAspectRatio="none">
               <path d="M0,5 Q50,10 100,5" stroke="currentColor" strokeWidth="3" fill="none" />
             </svg>
           </span>
         </h3>
-        <p className="text-xs sm:text-sm font-bold text-white/80 max-w-xl mx-auto leading-relaxed mt-4">
+        <p className="text-xs sm:text-sm font-bold text-[#0D233A]/85 max-w-xl mx-auto leading-relaxed mt-4">
           전문 R&D 시스템으로 시즌마다 트렌디한 신 메뉴 출시!
         </p>
       </div>
 
       <div className="relative w-full overflow-hidden">
         {/* Soft edge masking for premium look */}
-        <div className="absolute inset-y-0 left-0 w-12 sm:w-32 bg-gradient-to-r from-[#004e26] to-transparent z-10 pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-12 sm:w-32 bg-gradient-to-l from-[#004e26] to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-12 sm:w-32 bg-gradient-to-r from-[#D98F00] to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-12 sm:w-32 bg-gradient-to-l from-[#D98F00] to-transparent z-10 pointer-events-none" />
 
         {/* Rolling track */}
         <div className="flex w-max animate-posterMarquee hover:[animation-play-state:paused] cursor-grab active:cursor-grabbing">
           {rollingImages.map((src, index) => (
             <div
               key={index}
-              className="w-[165px] sm:w-[240px] px-2 sm:px-3 shrink-0"
+              className="w-[165px] sm:w-[240px] px-2 sm:px-3 shrink-0 py-6"
             >
-              <div className="aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden shadow-lg border border-white/10 group relative transition-all duration-300 hover:shadow-xl hover:border-white/20">
+              {/* Added premium hover micro-animations (scale 1.12, lift -16px, deep shadow, z-index elevation) */}
+              <div className="aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden shadow-lg border border-black/5 group relative transition-all duration-500 hover:scale-[1.12] hover:-translate-y-4 hover:shadow-2xl hover:z-20 cursor-pointer">
                 <img
                   src={optimizeCloudinaryUrl(src)}
                   alt={`Menu Poster ${index + 1}`}
-                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
+                  className="w-full h-full object-cover group-hover:brightness-105 transition-all duration-500 ease-out"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
+                <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-300" />
               </div>
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Bottom Wavy transition to MenuGallery (Matching #FFB800) */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10 translate-y-[2px]">
+        <svg viewBox="0 0 1200 100" preserveAspectRatio="none" className="relative block w-full h-[24px] sm:h-[40px] lg:h-[55px] text-[#FFB800]">
+          <path
+            d="M 0 50 Q 25 10, 50 50 Q 75 90, 100 50 Q 125 10, 150 50 Q 175 90, 200 50 Q 225 10, 250 50 Q 275 90, 300 50 Q 325 10, 350 50 Q 375 90, 400 50 Q 425 10, 450 50 Q 475 90, 500 50 Q 525 10, 550 50 Q 575 90, 600 50 Q 625 10, 650 50 Q 675 90, 700 50 Q 725 10, 750 50 Q 775 90, 800 50 Q 825 10, 850 50 Q 875 90, 900 50 Q 925 10, 950 50 Q 975 90, 1000 50 Q 1025 10, 1050 50 Q 1075 90, 1100 50 Q 1125 10, 1150 50 Q 1175 90, 1200 50 L 1200 100 L 0 100 Z"
+            fill="currentColor"
+          />
+        </svg>
       </div>
 
       {/* Local marquee animation style */}
