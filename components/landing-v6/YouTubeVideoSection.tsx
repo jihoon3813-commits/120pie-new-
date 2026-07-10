@@ -99,6 +99,9 @@ export default function YouTubeVideoSection() {
         </div>
       </div>
 
+      {/* Transparent overlay to block all click/touch interactions with the YouTube player */}
+      <div className="absolute inset-0 w-full h-full bg-transparent z-10 pointer-events-auto" />
+
       {/* Subtle brand watermark or overlay in the corner for premium feel (Optional) */}
       <div className="absolute bottom-16 right-6 z-10 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 hidden sm:block">
         <span className="text-[10px] font-black uppercase tracking-widest text-white/80 font-mono">
