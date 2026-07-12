@@ -45,10 +45,17 @@ export default function LandingV6Client() {
 
         {/* New Promotional Image Banner below YouTube Video Section */}
         <section className="relative w-full h-auto overflow-hidden bg-white">
+          {/* 💻 Desktop Banner Image */}
           <img
             src={optimizeCloudinaryUrl("https://res.cloudinary.com/dfkntvpmv/image/upload/f_auto,q_auto/v1783846475/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_12%EC%9D%BC_%EC%98%A4%ED%9B%84_05_54_25_esvngp.png")}
-            alt="120겹 파이 프로모션 배너"
-            className="w-full h-auto block"
+            alt="120겹 파이 프로모션 배너 (데스크톱)"
+            className="hidden sm:block w-full h-auto object-cover"
+          />
+          {/* 📱 Mobile Banner Image */}
+          <img
+            src={optimizeCloudinaryUrl("https://res.cloudinary.com/dfkntvpmv/image/upload/f_auto,q_auto/v1783847298/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_12%EC%9D%BC_%EC%98%A4%ED%9B%84_06_08_04_kllhan.png")}
+            alt="120겹 파이 프로모션 배너 (모바일)"
+            className="block sm:hidden w-full h-auto object-cover"
           />
           {/* Bottom Wavy transition boundary to PieBrandConcept (Matching white background) */}
           <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10 translate-y-[2px]">
