@@ -188,12 +188,6 @@ export default function RootLayout({
           <Script
             src="https://karrot-pixel.business.daangn.com/karrot-pixel.js"
             strategy="afterInteractive"
-            onLoad={() => {
-              if (typeof window !== "undefined" && (window as any).karrotPixel) {
-                (window as any).karrotPixel.init('1783905652701768001');
-                (window as any).karrotPixel.track('ViewPage');
-              }
-            }}
           />
           <TrackPageView />
           {children}

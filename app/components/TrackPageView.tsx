@@ -9,7 +9,6 @@ export default function TrackPageView() {
 
   useEffect(() => {
     // Prevent double-tracking on strict mode mounts
-    const isFirstLoad = lastTrackedPath.current === null;
     if (lastTrackedPath.current === pathname) return;
     lastTrackedPath.current = pathname;
 
@@ -39,12 +38,30 @@ export default function TrackPageView() {
       }
     }
 
-    // Karrot Pixel tracking for subsequent page transitions
-    if (!isFirstLoad && typeof window !== "undefined" && (window as any).karrotPixel) {
-      try {
-        (window as any).karrotPixel.track('ViewPage');
-      } catch (err) {
-        console.error("Karrot pageview tracking failed:", err);
+    // Karrot Pixel tracking (handles both initial page load and route transitions)
+    if (typeof window !== "undefined") {
+      const runKarrot = () => {
+        const pixel = (window as any).karrotPixel;
+        if (pixel) {
+          if (!(window as any).karrotPixelInitialized) {
+            pixel.init('1783905652701768001');
+            (window as any).karrotPixelInitialized = true;
+          }
+          pixel.track('ViewPage');
+        }
+      };
+
+      if ((window as any).karrotPixel) {
+        runKarrot();
+      } else {
+        const script = document.querySelector('script[src*="karrot-pixel.js"]');
+        if (script) {
+          const onLoadHandler = () => {
+            runKarrot();
+            script.removeEventListener('load', onLoadHandler);
+          };
+          script.addEventListener('load', onLoadHandler);
+        }
       }
     }
   }, [pathname]);
