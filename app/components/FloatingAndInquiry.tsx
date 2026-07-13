@@ -226,6 +226,15 @@ export default function FloatingAndInquiry({
           console.error("Naver inquiry conversion tracking failed:", err);
         }
       }
+
+      // Karrot Pixel conversion tracking
+      if (typeof window !== "undefined" && (window as any).karrotPixel) {
+        try {
+          (window as any).karrotPixel.track('SubmitApplication');
+        } catch (err) {
+          console.error("Karrot SubmitApplication tracking failed:", err);
+        }
+      }
     } catch (err) {
       console.error("Failed to submit inquiry to Convex", err);
       // fallback
@@ -264,6 +273,15 @@ export default function FloatingAndInquiry({
           (window as any).wcs_do(_nasa);
         } catch (err) {
           console.error("Naver inquiry conversion tracking failed:", err);
+        }
+      }
+
+      // Karrot Pixel conversion tracking (fallback path)
+      if (typeof window !== "undefined" && (window as any).karrotPixel) {
+        try {
+          (window as any).karrotPixel.track('SubmitApplication');
+        } catch (err) {
+          console.error("Karrot SubmitApplication tracking failed:", err);
         }
       }
     }

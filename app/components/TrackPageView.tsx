@@ -9,6 +9,7 @@ export default function TrackPageView() {
 
   useEffect(() => {
     // Prevent double-tracking on strict mode mounts
+    const isFirstLoad = lastTrackedPath.current === null;
     if (lastTrackedPath.current === pathname) return;
     lastTrackedPath.current = pathname;
 
@@ -35,6 +36,15 @@ export default function TrackPageView() {
         (window as any).wcs_do();
       } catch (err) {
         console.error("Naver pageview tracking failed:", err);
+      }
+    }
+
+    // Karrot Pixel tracking for subsequent page transitions
+    if (!isFirstLoad && typeof window !== "undefined" && (window as any).karrotPixel) {
+      try {
+        (window as any).karrotPixel.track('ViewPage');
+      } catch (err) {
+        console.error("Karrot pageview tracking failed:", err);
       }
     }
   }, [pathname]);
@@ -65,6 +75,15 @@ export default function TrackPageView() {
             (window as any).wcs_do(_nasa);
           } catch (err) {
             console.error("Naver call conversion tracking failed:", err);
+          }
+        }
+
+        // Karrot Pixel conversion tracking for call click
+        if (typeof window !== "undefined" && (window as any).karrotPixel) {
+          try {
+            (window as any).karrotPixel.track('Lead');
+          } catch (err) {
+            console.error("Karrot call conversion tracking failed:", err);
           }
         }
       }

@@ -131,6 +131,40 @@ export default function ContactForm({
       }
     }
 
+    // Tracking and Conversions
+    const referrer = typeof document !== "undefined" ? document.referrer : "";
+    fetch("/api/track", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: "inquiry_submit",
+        path: window.location.pathname,
+        referrer: referrer || "direct"
+      })
+    }).catch(err => console.error("InquirySubmit tracking failed", err));
+
+    if (typeof window !== "undefined" && (window as any).wcs) {
+      try {
+        if (!(window as any).wcs_add) (window as any).wcs_add = {};
+        (window as any).wcs_add["wa"] = process.env.NEXT_PUBLIC_NAVER_AD_ACCOUNT_ID || "s_15663594120p";
+        const _nasa = {} as any;
+        _nasa["cnv"] = (window as any).wcs.cnv("4", "10");
+        (window as any).wcs_do(_nasa);
+      } catch (err) {
+        console.error("Naver inquiry conversion tracking failed:", err);
+      }
+    }
+
+    if (typeof window !== "undefined" && (window as any).karrotPixel) {
+      try {
+        (window as any).karrotPixel.track('SubmitApplication');
+      } catch (err) {
+        console.error("Karrot SubmitApplication tracking failed:", err);
+      }
+    }
+
     setSuccess("성공적으로 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.");
     setForm(initialForm);
   };
