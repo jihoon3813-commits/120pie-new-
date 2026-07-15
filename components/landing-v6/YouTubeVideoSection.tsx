@@ -1,6 +1,23 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 export default function YouTubeVideoSection() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = true;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.log("Autoplay prevented:", error);
+        });
+      }
+    }
+  }, []);
+
   return (
     <section className="relative w-full h-[50vh] sm:h-[65vh] lg:h-[80vh] overflow-hidden bg-black z-0 border-none">
       {/* Top Wavy transition from RollingBanner (Blue #0F3587) */}
@@ -14,6 +31,7 @@ export default function YouTubeVideoSection() {
       {/* Video Container cropped to cover the full width/height (16:9 ratio preservation) */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none bg-black">
         <video
+          ref={videoRef}
           src="https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4"
           autoPlay
           muted

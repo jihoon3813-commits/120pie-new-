@@ -21,6 +21,7 @@ import SuccessSupport from "./SuccessSupport";
 import FranchiseProcess from "./FranchiseProcess";
 import ContactForm from "./ContactForm";
 import Footer from "./Footer";
+import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 
 export default function LandingV6Client() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -116,6 +117,9 @@ export default function LandingV6Client() {
 
       {/* Footer Details */}
       <Footer />
+
+      {/* Floating Buttons & Inquiry Modal */}
+      <FloatingAndInquiry />
 
       {/* 팝업 모달 창업 문의 폼 */}
       <ContactForm isModal isOpen={isContactModalOpen} onClose={closeContactModal} />
