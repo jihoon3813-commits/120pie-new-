@@ -344,7 +344,7 @@ export default function FloatingAndInquiry({
       {floatingSettings?.isActive && (
         <>
           {/* PC View: Always visible vertically */}
-          <div className={`hidden md:flex fixed bottom-6 right-6 z-[90] flex-col items-center gap-2.5 p-2 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.12)] border transition-all duration-300 select-none text-white ${
+          <div className={`hidden md:flex fixed bottom-6 md:bottom-[88px] right-6 z-[90] flex-col items-center gap-2.5 p-2 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.12)] border transition-all duration-300 select-none text-white ${
             isPink 
               ? "bg-[#140e11]/90 border-[#f25f8a]/20 shadow-rose-950/20" 
               : "bg-white/95 border-[#ffd500]/30 shadow-[#0d233a]/[0.05]"
