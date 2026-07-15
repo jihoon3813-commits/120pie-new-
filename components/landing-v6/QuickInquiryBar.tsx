@@ -153,22 +153,22 @@ export default function QuickInquiryBar() {
 
   return (
     <div className="hidden md:block fixed bottom-0 left-0 right-0 z-[95] bg-[#ffd500] border-t border-[#e6bd00] shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 relative flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 relative flex items-center justify-between">
         
         {/* Left Section: Model Photo & Call Text */}
-        <div className="flex items-center pl-36">
+        <div className="flex items-center pl-48">
           {/* Pop-out model photo bottom-aligned to the bar */}
           <img
-            src="https://res.cloudinary.com/lyjyvy54/image/upload/v1784085670/edited-photo_-_2026-07-06T213458.881_kz4yn6.png"
+            src="https://res.cloudinary.com/lyjyvy54/image/upload/v1784086225/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_6%EC%9D%BC_%EC%98%A4%ED%9B%84_08_25_50_1_yw77w3.png"
             alt="전속모델 박은영"
-            className="absolute bottom-0 left-4 h-32 w-auto object-contain z-10 pointer-events-none select-none"
+            className="absolute bottom-0 left-4 h-24 w-auto object-contain z-10 pointer-events-none select-none"
           />
           <div className="flex flex-col justify-center">
-            <span className="text-[9px] font-bold text-neutral-800/80 leading-none mb-1 block">
+            <span className="text-[8px] font-bold text-neutral-800/80 leading-none mb-0.5 block">
               120겹의 마법, 120PIE
             </span>
-            <h3 className="font-extrabold text-[#0d233a] text-lg sm:text-xl tracking-tight flex items-center gap-1.5 leading-none">
-              빠른 창업문의 <span className="font-black text-[22px] tracking-tighter ml-1">1566-3594</span>
+            <h3 className="font-extrabold text-[#0d233a] text-base tracking-tight flex items-center gap-1.5 leading-none">
+              빠른 창업문의 <span className="font-black text-lg tracking-tighter ml-1">1566-3594</span>
             </h3>
           </div>
         </div>
@@ -178,7 +178,7 @@ export default function QuickInquiryBar() {
           <select
             value={storeType}
             onChange={(e) => setStoreType(e.target.value)}
-            className="h-11 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-sm focus:outline-none transition-all cursor-pointer hover:border-[#bf3e67]/30"
+            className="h-10 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-xs focus:outline-none transition-all cursor-pointer hover:border-[#bf3e67]/30"
           >
             <option value="샵인샵 도입">샵인샵 도입</option>
             <option value="브랜드 병기 도입">브랜드 병기 도입</option>
@@ -193,7 +193,7 @@ export default function QuickInquiryBar() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="h-11 w-28 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-sm placeholder:text-[#7d8c9e] focus:outline-none focus:border-[#bf3e67]/30 transition-all"
+            className="h-10 w-28 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-xs placeholder:text-[#7d8c9e] focus:outline-none focus:border-[#bf3e67]/30 transition-all"
           />
 
           <input
@@ -203,13 +203,13 @@ export default function QuickInquiryBar() {
             onChange={(e) => handlePhoneChange(e.target.value)}
             required
             maxLength={13}
-            className="h-11 w-36 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-sm placeholder:text-[#7d8c9e] focus:outline-none focus:border-[#bf3e67]/30 transition-all"
+            className="h-10 w-36 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-xs placeholder:text-[#7d8c9e] focus:outline-none focus:border-[#bf3e67]/30 transition-all"
           />
 
           <button
             type="submit"
             disabled={submitting}
-            className="h-11 bg-[#1c1b1c] hover:bg-black text-[#ffd500] font-black rounded-xl px-6 text-sm transition-all cursor-pointer border-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center hover:scale-[1.02] active:scale-95 disabled:opacity-55"
+            className="h-10 bg-[#1c1b1c] hover:bg-black text-[#ffd500] font-black rounded-xl px-5 text-xs transition-all cursor-pointer border-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center hover:scale-[1.02] active:scale-95 disabled:opacity-55"
           >
             {submitting ? "신청 중..." : "빠른 창업 문의"}
           </button>
