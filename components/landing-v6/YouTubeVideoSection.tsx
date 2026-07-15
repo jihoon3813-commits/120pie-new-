@@ -1,44 +1,23 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
 export default function YouTubeVideoSection() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = true;
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.log("Autoplay prevented:", error);
-        });
-      }
-    }
-  }, []);
-
   return (
     <section className="relative w-full h-[50vh] sm:h-[65vh] lg:h-[80vh] overflow-hidden bg-black z-0 border-none">
-      {/* Top Wavy transition from RollingBanner (Blue #0F3587) */}
-      {/* The path is inverted (L 1200 0 L 0 0 Z) so the top half is solid blue and the bottom half is transparent, letting the video show through the curve naturally */}
-
-
       {/* Top and Bottom soft shading overlays to blend smoothly with adjacent sections */}
       <div className="absolute top-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-b from-black/20 to-transparent pointer-events-none z-10" />
       <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-t from-white/15 to-transparent dark:from-neutral-950/25 pointer-events-none z-10" />
 
       {/* Video Container cropped to cover the full width/height (16:9 ratio preservation) */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none bg-black">
-        <video
-          ref={videoRef}
-          src="https://res.cloudinary.com/dfarfqx7e/video/upload/f_auto,q_auto/v1781183434/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C_%EC%96%91%EC%86%A1%EC%9D%B4_%EC%88%98%EC%A0%952_gw0tvv.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.77vh] min-w-full h-[56.25vw] min-h-full object-cover"
+        <iframe
+          src="https://www.youtube.com/embed/9tTSo_q21qk?autoplay=1&mute=1&loop=1&playlist=9tTSo_q21qk&playsinline=1&controls=0&showinfo=0&rel=0&enablejsapi=1"
+          title="120pie YouTube Video"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.77vh] min-w-full h-[56.25vw] min-h-full object-cover pointer-events-none scale-[1.15]"
         />
+        {/* 투명한 오버레이 레이어로 터치 및 클릭 이벤트를 차단하여 정지 버튼 등 유튜브 컨트롤러가 노출되는 것을 완전히 막음 */}
+        <div className="absolute inset-0 w-full h-full bg-transparent z-20 pointer-events-auto" />
       </div>
 
       {/* Subtle brand watermark or overlay in the corner for premium feel (Optional) */}
@@ -47,8 +26,6 @@ export default function YouTubeVideoSection() {
           120PIE & COFFEE
         </span>
       </div>
-
-
     </section>
   );
 }
