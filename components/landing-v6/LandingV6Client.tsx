@@ -22,6 +22,7 @@ import FranchiseProcess from "./FranchiseProcess";
 import ContactForm from "./ContactForm";
 import Footer from "./Footer";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
+import QuickInquiryBar from "./QuickInquiryBar";
 
 export default function LandingV6Client() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -120,6 +121,9 @@ export default function LandingV6Client() {
 
       {/* Floating Buttons & Inquiry Modal */}
       <FloatingAndInquiry />
+
+      {/* PC 전용 하단 고정 빠른상담바 */}
+      <QuickInquiryBar />
 
       {/* 팝업 모달 창업 문의 폼 */}
       <ContactForm isModal isOpen={isContactModalOpen} onClose={closeContactModal} />

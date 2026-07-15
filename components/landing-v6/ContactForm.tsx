@@ -197,7 +197,7 @@ export default function ContactForm({
             </div>
             <div>
               <p className="text-xs text-neutral-450 font-bold">창업 문의 핫라인</p>
-              <p className={`text-base font-bold ${isModal ? "text-neutral-900 dark:text-white" : "text-white"}`}>1644-xxxx</p>
+              <p className={`text-base font-bold ${isModal ? "text-neutral-900 dark:text-white" : "text-white"}`}>1566-3594</p>
             </div>
           </div>
         </div>
