@@ -156,12 +156,12 @@ export default function QuickInquiryBar() {
       <div className="max-w-6xl mx-auto px-8 sm:px-12 lg:px-16 h-16 relative flex items-center justify-between">
         
         {/* Left Section: Model Photo & Call Text */}
-        <div className="flex items-center pl-44">
+        <div className="flex items-center pl-28">
           {/* Pop-out model photo bottom-aligned to the bar */}
           <img
-            src="https://res.cloudinary.com/lyjyvy54/image/upload/v1784086225/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_6%EC%9D%BC_%EC%98%A4%ED%9B%84_08_25_50_1_yw77w3.png"
+            src="https://res.cloudinary.com/lyjyvy54/image/upload/v1784085670/edited-photo_-_2026-07-06T213458.881_kz4yn6.png"
             alt="전속모델 박은영"
-            className="absolute bottom-0 left-4 h-19 w-auto object-contain z-10 pointer-events-none select-none"
+            className="absolute bottom-0 left-4 h-22 w-auto object-contain z-10 pointer-events-none select-none"
           />
           <div className="flex flex-col justify-center">
             <span className="text-[8px] font-bold text-neutral-800/80 leading-none mb-0.5 block">
