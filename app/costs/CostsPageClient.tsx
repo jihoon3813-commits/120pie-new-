@@ -15,7 +15,7 @@ const getCloudinaryResizedUrl = (url: string, width = 300, height = 300) => {
   return url;
 };
 
-const logoUrlBlack = "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
+const logoUrlBlack = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076160/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_ovgxnz.png";
 const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png";
 
 // Inline Item Detail Interface with Qty
@@ -231,7 +231,7 @@ const FRIENDS_MENUS: FriendsMenuInfo[] = [
     sub: "바삭함 and 풍성한 육즙의 조화",
     desc: "카페 음료 및 가벼운 든든한 식사 대용으로 아주 훌륭한 핫도그입니다. 주문 즉시 오븐에 굽거나 데워 설탕만 솔솔 뿌려 건넵니다.",
     highlight: "육즙 팡팡 터지는 소시지가 들어간 120 전용 프리미엄 반제품 핫도그 공급",
-    imageUrl: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185539/A4_07054_2_er4md2.jpg",
+    imageUrl: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784078299/%EC%A7%81%ED%99%94%EB%B6%88%EA%B3%A0%EA%B8%B0_1_cuyrzn.png",
     badgeColor: "bg-red-500/10 text-red-600 border border-red-500/20",
     supplyType: "완제품"
   },

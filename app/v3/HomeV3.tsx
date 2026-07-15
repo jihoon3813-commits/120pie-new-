@@ -375,8 +375,8 @@ const MARQUEE_IMAGES = [
   { name: "불고기파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184700/%EB%B6%88%EA%B3%A0%EA%B8%B0%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_ss1t8y.jpg" },
   { name: "두바이쫀득파이", src: "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760051/%EB%91%90%EB%B0%94%EC%9D%B4%EC%AA%BD%EB%93%9D%ED%8C%8C%EC%9D%B4_vjl5zb.jpg" },
   { name: "애플시나몬파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184723/%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_kxykcu.jpg" },
-  { name: "오리지널 계란빵", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184985/edited-photo_4_y98ytv.jpg" },
-  { name: "오리지널 츄러스", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781185404/%EC%98%A4%EB%A6%AC%EC%A7%80%EB%84%90_izqnfl.jpg" }
+  { name: "오리지널 계란빵", src: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076432/edited-photo_4_h8zxni.png" },
+  { name: "오리지널 츄러스", src: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076878/Image_1_ffcbk0.png" }
 ];
 
 // V3 StoresPreviewSection
@@ -966,7 +966,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
     ? "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png"
     : isYellowVariant
       ? "/logo_yellow_blue.png"
-      : "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781183166/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_cnfrik.png";
+      : "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076160/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_ovgxnz.png";
 
   const logoTargetUrl = isPinkVariant ? "/pink" : isYellowVariant ? "/" : "/v3";
 
@@ -1202,14 +1202,35 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
   useEffect(() => {
     if (convexFloating) {
-      setFloatingSettings(convexFloating);
+      setFloatingSettings({ ...convexFloating, isActive: true });
     } else {
       if (typeof window !== "undefined") {
         const storedFloat = localStorage.getItem("120_floatings");
         if (storedFloat) {
           try {
-            setFloatingSettings(JSON.parse(storedFloat));
-          } catch (e) {}
+            const parsed = JSON.parse(storedFloat);
+            setFloatingSettings({ ...parsed, isActive: true });
+          } catch (e) {
+            setFloatingSettings({
+              isActive: true,
+              instaUrl: "https://www.instagram.com/120pie77/",
+              youtubeUrl: "https://youtube.com",
+              chatUrl: "https://kakao.com",
+              phoneNo: "1566-3594",
+              kakaoUrl: "https://kakao.com",
+              blogUrl: "https://blog.naver.com/120pie_coffee"
+            });
+          }
+        } else {
+          setFloatingSettings({
+            isActive: true,
+            instaUrl: "https://www.instagram.com/120pie77/",
+            youtubeUrl: "https://youtube.com",
+            chatUrl: "https://kakao.com",
+            phoneNo: "1566-3594",
+            kakaoUrl: "https://kakao.com",
+            blogUrl: "https://blog.naver.com/120pie_coffee"
+          });
         }
       }
     }
@@ -3796,16 +3817,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               </button>
             )}
 
-            {/* View Proposal Link */}
-            <a
-              href="/120pie-가맹-제안서.pdf"
-              download="120pie-가맹-제안서.pdf"
-              className="p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
-              style={{ backgroundColor: isPinkVariant ? "#f25f8a" : "#ffd500" }}
-            >
-              <FileText size={16} style={{ color: isPinkVariant ? "#ffffff" : "#0d233a" }} className={`w-[16px] h-[16px] ${isPinkVariant ? "text-white" : "text-[#0d233a]"}`} />
-              <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>제안서 다운로드</span>
-            </a>
+
           </div>
 
           {/* Mobile View: Collapsible list under "+" Button */}
@@ -3903,16 +3915,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   </button>
                 )}
 
-                {/* View Proposal Link */}
-                <a
-                  href="/120pie-가맹-제안서.pdf"
-                  download="120pie-가맹-제안서.pdf"
-                  className="p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-115 active:scale-90 cursor-pointer relative group border-0"
-                  style={{ backgroundColor: isPinkVariant ? "#f25f8a" : "#ffd500" }}
-                >
-                  <FileText size={16} style={{ color: isPinkVariant ? "#ffffff" : "#0d233a" }} className={`w-[16px] h-[16px] ${isPinkVariant ? "text-white" : "text-[#0d233a]"}`} />
-                  <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200" style={{ backgroundColor: "#1e1b1c", color: "#ffffff" }}>제안서 다운로드</span>
-                </a>
+
               </div>
             )}
 

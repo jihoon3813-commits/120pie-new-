@@ -163,16 +163,36 @@ export default function FloatingAndInquiry({
   // Load floating settings from Convex
   useEffect(() => {
     if (convexFloating) {
-      setFloatingSettings(convexFloating);
+      setFloatingSettings({ ...convexFloating, isActive: true });
     } else {
       if (typeof window !== "undefined") {
         const storedFloat = localStorage.getItem("120_floatings");
         if (storedFloat) {
           try {
-            setFloatingSettings(JSON.parse(storedFloat));
+            const parsed = JSON.parse(storedFloat);
+            setFloatingSettings({ ...parsed, isActive: true });
           } catch (e) {
             console.error(e);
+            setFloatingSettings({
+              isActive: true,
+              instaUrl: "https://www.instagram.com/120pie77/",
+              youtubeUrl: "https://youtube.com",
+              chatUrl: "https://kakao.com",
+              phoneNo: "1566-3594",
+              kakaoUrl: "https://kakao.com",
+              blogUrl: "https://blog.naver.com/120pie_coffee"
+            });
           }
+        } else {
+          setFloatingSettings({
+            isActive: true,
+            instaUrl: "https://www.instagram.com/120pie77/",
+            youtubeUrl: "https://youtube.com",
+            chatUrl: "https://kakao.com",
+            phoneNo: "1566-3594",
+            kakaoUrl: "https://kakao.com",
+            blogUrl: "https://blog.naver.com/120pie_coffee"
+          });
         }
       }
     }
