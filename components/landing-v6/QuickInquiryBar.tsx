@@ -156,7 +156,7 @@ export default function QuickInquiryBar() {
       <div className="max-w-6xl mx-auto px-8 sm:px-12 lg:px-16 h-16 relative flex items-center justify-between">
         
         {/* Left Section: Model Photo & Call Text */}
-        <div className="flex items-center pl-46">
+        <div className="flex items-center pl-32">
           {/* Pop-out model photo bottom-aligned to the bar */}
           <img
             src="https://res.cloudinary.com/lyjyvy54/image/upload/v1784086225/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_6%EC%9D%BC_%EC%98%A4%ED%9B%84_08_25_50_1_yw77w3.png"
