@@ -84,6 +84,8 @@ interface Product {
   labels?: string[];
   shippingType?: "free" | "A" | "B" | "C" | "BOX";
   options?: string[]; // 추가된 제품 선택 옵션 필드
+  status?: string;
+  isActive?: boolean;
 }
 
 interface CartItem {
@@ -588,8 +590,12 @@ export default function PortalPage() {
         orderIndex: p.orderIndex || 99,
         labels: p.labels || [],
         shippingType: p.shippingType || "A",
-        options: p.options || []
-      })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+        options: p.options || [],
+        isActive: p.isActive !== false,
+        status: p.status || (p.isActive !== false ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종")
+      }))
+      .filter((p: any) => p.status !== "단종" && p.isActive !== false)
+      .sort((a: any, b: any) => a.orderIndex - b.orderIndex);
       setProducts(mapped);
 
       // Extract unique categories from actual active products dynamically
@@ -3219,7 +3225,9 @@ export default function PortalPage() {
                               <strong className="text-xs text-[#bf3e67] font-black">{p.price.toLocaleString()}원</strong>
                               
                               <div onClick={(e) => e.stopPropagation()} className="shrink-0">
-                                {p.options && p.options.length > 0 ? (
+                                {p.stock === "out_of_stock" ? (
+                                  <span className="bg-red-50 text-red-500 font-extrabold text-[10px] px-2.5 py-1 rounded-md border border-red-200 shadow-sm whitespace-nowrap">일시품절</span>
+                                ) : p.options && p.options.length > 0 ? (
                                   <button
                                     onClick={() => setSelectedProductDetail(p)}
                                     className="px-2.5 py-1 rounded bg-[#f25f8a] text-white text-[10px] font-black shadow-sm"
@@ -3303,7 +3311,9 @@ export default function PortalPage() {
                             <div className="flex items-center justify-between mt-1 border-t border-[#f2ccd7]/40 pt-2 shrink-0">
                               <strong className="text-xs text-[#2d2026] font-black whitespace-nowrap">{p.price.toLocaleString()}원</strong>
                               
-                              {p.options && p.options.length > 0 ? (
+                              {p.stock === "out_of_stock" ? (
+                                <span className="bg-red-50 text-red-500 font-extrabold text-[9px] px-2.5 py-1.5 rounded-lg border border-red-200 shadow-sm whitespace-nowrap shrink-0">일시품절</span>
+                              ) : p.options && p.options.length > 0 ? (
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -5237,28 +5247,38 @@ export default function PortalPage() {
                   발주 규격을 다시 한 번 정밀 확인 후 신중히 진행해 주세요.
                 </span>
                 <div className="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      const hasOpts = selectedProductDetail.options && selectedProductDetail.options.length > 0;
-                      if (hasOpts) {
-                        if (localSelectedOptions.length === 0) {
-                          showCustomAlert("옵션 선택", "옵션을 최소 하나 이상 목록에 추가해 주세요.");
-                          return;
+                  {selectedProductDetail.stock === "out_of_stock" ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-neutral-200 text-neutral-400 text-xs font-extrabold transition-all cursor-not-allowed flex items-center justify-center gap-1.5"
+                    >
+                      일시품절 (주문 불가)
+                    </button>
+                  ) : (
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const hasOpts = selectedProductDetail.options && selectedProductDetail.options.length > 0;
+                        if (hasOpts) {
+                          if (localSelectedOptions.length === 0) {
+                            showCustomAlert("옵션 선택", "옵션을 최소 하나 이상 목록에 추가해 주세요.");
+                            return;
+                          }
+                          localSelectedOptions.forEach((item) => {
+                            addToCart(selectedProductDetail.id, item.optionName, item.quantity);
+                          });
+                        } else {
+                          addToCart(selectedProductDetail.id, undefined, localSingleQty);
                         }
-                        localSelectedOptions.forEach((item) => {
-                          addToCart(selectedProductDetail.id, item.optionName, item.quantity);
-                        });
-                      } else {
-                        addToCart(selectedProductDetail.id, undefined, localSingleQty);
-                      }
-                      closeModal(() => setSelectedProductDetail(null));
-                    }}
-                    className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-extrabold transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
-                  >
-                    <ShoppingBag size={14} />
-                    장바구니 담기
-                  </button>
+                        closeModal(() => setSelectedProductDetail(null));
+                      }}
+                      className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-extrabold transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                    >
+                      <ShoppingBag size={14} />
+                      장바구니 담기
+                    </button>
+                  )}
                   <button 
                     type="button"
                     onClick={() => closeModal(() => setSelectedProductDetail(null))}

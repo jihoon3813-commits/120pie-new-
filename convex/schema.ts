@@ -82,6 +82,7 @@ export default defineSchema({
     isActive: v.boolean(),
     desc: v.string(),
     stock: v.string(), // "in_stock" | "low_stock" | "out_of_stock"
+    status: v.optional(v.string()), // "판매중" | "품절" | "단종"
     labels: v.optional(v.array(v.string())),
     shippingType: v.optional(v.string()), // "free" | "A" | "B" | "C"
     options: v.optional(v.array(v.string())),

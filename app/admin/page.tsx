@@ -106,6 +106,7 @@ interface Product {
   isActive: boolean; // 판매 활성화여부
   desc: string; // 설명
   stock: "in_stock" | "low_stock" | "out_of_stock"; // 재고상태 호환용
+  status?: "판매중" | "품절" | "단종";
   labels?: string[]; // 라벨 (e.g. ["BEST", "추천", "신제품"])
   shippingType?: "free" | "A" | "B" | "C" | "BOX"; // 배송 정책 구분 (무료, A, B, C, BOX)
   options?: string[]; // 제품 선택 옵션 (홍보물 등)
@@ -1412,6 +1413,7 @@ export default function AdminPage() {
   const [productDetailImg, setProductDetailImg] = useState<string>("");
   const [productDetailText, setProductDetailText] = useState<string>("");
   const [productIsActive, setProductIsActive] = useState<boolean>(true);
+  const [productStatus, setProductStatus] = useState<"판매중" | "품절" | "단종">("판매중");
   const [productShippingType, setProductShippingType] = useState<"free" | "A" | "B" | "C" | "BOX">("A");
 
   // Product Search & Filter States
@@ -1809,6 +1811,7 @@ export default function AdminPage() {
         isActive: typeof p.isActive === "boolean" ? p.isActive : true,
         desc: p.desc || "",
         stock: p.stock || "in_stock",
+        status: p.status || (p.isActive !== false ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종"),
         labels: Array.isArray(p.labels) ? p.labels : [],
         shippingType: p.shippingType || "A",
         options: p.options || undefined
@@ -2727,6 +2730,7 @@ export default function AdminPage() {
       setProductDetailImg(prod.detailImg || "");
       setProductDetailText(prod.detailText || "");
       setProductIsActive(prod.isActive);
+      setProductStatus(prod.status || (prod.isActive ? (prod.stock === "out_of_stock" ? "품절" : "판매중") : "단종"));
       setProductLabels(prod.labels || []);
       setProductShippingType(prod.shippingType || "A");
       setProductOptions(prod.options || []);
@@ -2753,6 +2757,7 @@ export default function AdminPage() {
       setProductDetailImg("");
       setProductDetailText("");
       setProductIsActive(true);
+      setProductStatus("판매중");
       setProductLabels([]);
       setProductShippingType("A");
       setProductOptions([]);
@@ -2797,9 +2802,10 @@ export default function AdminPage() {
       img: productImg,
       detailImg: productDetailImg || undefined,
       detailText: productDetailText || undefined,
-      isActive: productIsActive,
+      isActive: productStatus !== "단종",
       desc: `${productModelName} - ${productCategory} 표준 규격`,
-      stock: "in_stock",
+      stock: productStatus === "품절" ? "out_of_stock" : "in_stock",
+      status: productStatus,
       labels: productLabels,
       shippingType: productShippingType,
       options: productOptions.length > 0 ? productOptions : undefined
@@ -2837,6 +2843,7 @@ export default function AdminPage() {
       isActive: productData.isActive,
       desc: productData.desc,
       stock: productData.stock,
+      status: productData.status,
       labels: productData.labels,
       shippingType: productData.shippingType,
       options: productData.options
@@ -5760,13 +5767,20 @@ export default function AdminPage() {
                               <div className="text-[#f25f8a] font-black text-xs">{(p.discountedPrice || 0).toLocaleString()} 원</div>
                             </td>
                             <td className="p-4 sm:p-5">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                p.isActive 
-                                  ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
-                                  : "bg-neutral-100 text-neutral-500 border border-neutral-200"
-                              }`}>
-                                {p.isActive ? "판매중" : "판매중지"}
-                              </span>
+                              {(() => {
+                                const status = p.status || (p.isActive ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종");
+                                let badgeClass = "bg-emerald-50 text-emerald-600 border border-emerald-200";
+                                if (status === "품절") {
+                                  badgeClass = "bg-orange-50 text-orange-500 border border-orange-200";
+                                } else if (status === "단종") {
+                                  badgeClass = "bg-neutral-100 text-neutral-500 border border-neutral-200";
+                                }
+                                return (
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}`}>
+                                    {status}
+                                  </span>
+                                );
+                              })()}
                             </td>
                             <td className="p-4 sm:p-5 text-center">
                               <div className="flex items-center justify-center gap-1">
@@ -9269,17 +9283,17 @@ export default function AdminPage() {
                     className="w-full bg-neutral-100 border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#bf3e67] font-black text-right"
                   />
                 </div>
-                <div className="flex items-center gap-2 pt-6 pl-4 select-none">
-                  <input 
-                    type="checkbox"
-                    id="productIsActive"
-                    checked={productIsActive}
-                    onChange={(e) => setProductIsActive(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#f25f8a] border-[#f2ccd7] focus:ring-[#f25f8a]"
-                  />
-                  <label htmlFor="productIsActive" className="text-xs font-bold text-[#2d2026] cursor-pointer">
-                    해당 품목 가맹점 즉시 주문 가능 여부 활성화
-                  </label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-bold text-[#2d2026]">제품 상태 *</label>
+                  <select
+                    value={productStatus}
+                    onChange={(e) => setProductStatus(e.target.value as "판매중" | "품절" | "단종")}
+                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] font-bold focus:outline-none cursor-pointer"
+                  >
+                    <option value="판매중">판매중</option>
+                    <option value="품절">품절 (가맹점 주문불가)</option>
+                    <option value="단종">단종 (가맹점 노출안됨)</option>
+                  </select>
                 </div>
               </div>
 

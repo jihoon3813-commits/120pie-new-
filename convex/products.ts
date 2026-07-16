@@ -30,6 +30,7 @@ export const createOrUpdate = mutation({
     isActive: v.boolean(),
     desc: v.string(),
     stock: v.string(),
+    status: v.optional(v.string()),
     labels: v.optional(v.array(v.string())),
     shippingType: v.optional(v.string()),
     options: v.optional(v.array(v.string())),
@@ -92,6 +93,7 @@ export const syncProducts = mutation({
         isActive: v.boolean(),
         desc: v.string(),
         stock: v.string(),
+        status: v.optional(v.string()),
         labels: v.optional(v.array(v.string())),
         shippingType: v.optional(v.string()),
         options: v.optional(v.array(v.string())),
@@ -123,6 +125,7 @@ export const syncProducts = mutation({
         isActive: p.isActive,
         desc: p.desc,
         stock: p.stock,
+        status: p.status,
         labels: p.labels,
         shippingType: p.shippingType,
         options: p.options,
@@ -190,7 +193,8 @@ const SEED_PRODUCTS = [
     detailImg: "",
     isActive: true,
     desc: "육즙 가득 미트소스와 로제 크림이 가미된 시그니처 대표 생지",
-    stock: "in_stock"
+    stock: "in_stock",
+    status: "판매중"
   },
   {
     id: "prod-2",
@@ -208,7 +212,8 @@ const SEED_PRODUCTS = [
     detailImg: "",
     isActive: true,
     desc: "달콤 상큼한 사과 과육과 시나몬 아로마가 어우러진 스테디셀러 디저트 생지",
-    stock: "in_stock"
+    stock: "in_stock",
+    status: "판매중"
   },
   {
     id: "prod-3",
@@ -226,7 +231,8 @@ const SEED_PRODUCTS = [
     detailImg: "",
     isActive: true,
     desc: "고소한 스위트콘 and 부드러운 치즈가 조합된 남녀노소 취향저격 생지",
-    stock: "low_stock"
+    stock: "low_stock",
+    status: "판매중"
   },
   {
     id: "prod-4",
@@ -244,7 +250,8 @@ const SEED_PRODUCTS = [
     detailImg: "",
     isActive: true,
     desc: "에그120 전용 100% 국산 쌀가루 계란빵 전용 반죽 파우더 믹스",
-    stock: "in_stock"
+    stock: "in_stock",
+    status: "판매중"
   },
   {
     id: "prod-5",
@@ -262,7 +269,8 @@ const SEED_PRODUCTS = [
     detailImg: "",
     isActive: true,
     desc: "기름 없이 오븐 조리가 가능한 바삭하고 쫀득한 츄러스 전용 냉동 생지",
-    stock: "in_stock"
+    stock: "in_stock",
+    status: "판매중"
   },
   {
     id: "prod-6",
@@ -281,6 +289,7 @@ const SEED_PRODUCTS = [
     isActive: true,
     desc: "120pie 브랜드 컬러의 매장 유리창 부착용 홍보 포스터 세트",
     stock: "in_stock",
+    status: "판매중",
     options: ["A4 사이즈 포스터", "A3 사이즈 포스터", "카운터용 미니 스티커 5매"]
   }
 ];
