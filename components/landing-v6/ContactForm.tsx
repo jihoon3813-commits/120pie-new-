@@ -310,8 +310,77 @@ export default function ContactForm({
             />
           </div>
 
-          {error && <p className="text-xs font-semibold text-rose-500">{error}</p>}
-          {success && <p className="text-xs font-semibold text-emerald-500">{success}</p>}
+          {error && (
+            <div className="flex items-center gap-2.5 p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold rounded-xl">
+              <svg className="w-4 h-4 flex-shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>{error}</span>
+            </div>
+          )}
+
+          {success && (
+            <div 
+              className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+              style={{ animation: 'backdropFadeIn 0.25s ease-out forwards' }}
+            >
+              <style dangerouslySetInnerHTML={{ __html: `
+                @keyframes drawCheck {
+                  to {
+                    stroke-dashoffset: 0;
+                  }
+                }
+                @keyframes modalScaleUp {
+                  from { transform: scale(0.95); opacity: 0; }
+                  to { transform: scale(1); opacity: 1; }
+                }
+                @keyframes backdropFadeIn {
+                  from { opacity: 0; }
+                  to { opacity: 1; }
+                }
+              `}} />
+              <div 
+                className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden backdrop-blur-xl"
+                style={{ animation: 'modalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' }}
+              >
+                {/* Top Glowing bar */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600" />
+                
+                {/* Success Icon */}
+                <div className="w-16 h-16 mx-auto mb-5 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center border border-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+                  <svg className="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      d="M5 13l4 4L19 7" 
+                      strokeDasharray="50" 
+                      strokeDashoffset="50" 
+                      style={{ animation: 'drawCheck 0.4s ease-out 0.15s forwards' }}
+                    />
+                  </svg>
+                </div>
+
+                {/* Title */}
+                <h3 className="text-lg font-black text-white mb-2 tracking-tight">
+                  신청 완료
+                </h3>
+
+                {/* Message */}
+                <p className="text-sm text-neutral-450 leading-relaxed mb-6 font-semibold whitespace-pre-line">
+                  {success}
+                </p>
+
+                {/* OK Button */}
+                <button
+                  type="button"
+                  onClick={() => setSuccess("")}
+                  className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-neutral-950 text-sm font-black rounded-xl transition-all shadow-lg hover:shadow-amber-500/20"
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          )}
 
           <button
             type="submit"
