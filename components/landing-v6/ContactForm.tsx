@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useAction } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { X } from "lucide-react";
 
@@ -33,6 +33,7 @@ export default function ContactForm({
   onClose?: () => void;
 }) {
   const sendSmsAction = useAction(api.aligo.sendSms);
+  const addInquiry = useMutation(api.inquiries.add);
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -56,7 +57,7 @@ export default function ContactForm({
     setSuccess("");
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const required = [form.name, form.phone, form.region, form.storeStatus];
     if (required.some((value) => !value.trim())) {
@@ -65,6 +66,32 @@ export default function ContactForm({
     }
     if (!/^[0-9+\-\s]{8,15}$/.test(form.phone)) {
       setError("연락처 형식을 확인해주세요. 숫자와 하이픈만 입력할 수 있습니다.");
+      return;
+    }
+
+    // DB 저장 연동
+    try {
+      const formattedMessage = [
+        form.region ? `[희망지역] ${form.region}` : null,
+        form.storeSize ? `[매장평수] ${form.storeSize}` : null,
+        form.goal ? `[도입목적] ${form.goal}` : null,
+        form.interestedMenu ? `[희망메뉴] ${form.interestedMenu}` : null,
+        form.message ? `[추가문의] ${form.message}` : null,
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      await addInquiry({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        storeType: form.storeStatus,
+        existingStoreName: form.storeName.trim() || "",
+        message: formattedMessage || "상담 신청",
+        regDate: new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" }),
+      });
+    } catch (dbErr) {
+      console.error("Failed to save inquiry to Convex DB:", dbErr);
+      setError("상담 신청 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
 
