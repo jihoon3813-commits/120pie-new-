@@ -57,7 +57,7 @@ export default function Hero() {
     <section className="relative w-full aspect-[9/16] sm:aspect-[1902/1000] overflow-hidden bg-neutral-900 pt-16 sm:pt-20 select-none">
       
       {/* 💻 Desktop Banner Slider Track */}
-      <div className="hidden sm:block absolute inset-0 w-full h-full z-0 overflow-hidden">
+      <div className="hidden sm:block absolute top-20 bottom-0 left-0 right-0 z-0 overflow-hidden">
         <motion.div
           drag="x"
           dragConstraints={{
@@ -84,7 +84,7 @@ export default function Hero() {
       </div>
 
       {/* 📱 Mobile Banner Slider Track */}
-      <div className="block sm:hidden absolute inset-0 w-full h-full z-0 overflow-hidden">
+      <div className="block sm:hidden absolute top-16 bottom-0 left-0 right-0 z-0 overflow-hidden">
         <motion.div
           drag="x"
           dragConstraints={{
@@ -103,7 +103,7 @@ export default function Hero() {
               <img
                 src={optimizeCloudinaryUrl(slide)}
                 alt={`120pie premium mobile background banner ${idx + 1}`}
-                className="w-full h-full object-cover object-center pointer-events-none"
+                className="w-full h-full object-cover object-top pointer-events-none"
               />
             </div>
           ))}
