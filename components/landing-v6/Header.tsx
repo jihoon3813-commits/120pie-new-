@@ -36,13 +36,7 @@ export default function Header({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isSubpage
-          ? "bg-[#FFFDF4] dark:bg-neutral-950 border-b border-neutral-200/50 dark:border-neutral-800/50 shadow-sm py-3"
-          : isScrolled
-            ? "bg-[#FFFDF4] dark:bg-neutral-950 border-b border-neutral-200/50 dark:border-neutral-800/50 shadow-sm py-3"
-            : "bg-transparent py-5"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white dark:bg-neutral-950 border-b border-neutral-200/50 dark:border-neutral-800/50 shadow-sm py-3"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">

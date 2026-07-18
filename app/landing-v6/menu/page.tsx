@@ -257,11 +257,13 @@ export default function MenuSubpage() {
                   key={item.name}
                   className="bg-white dark:bg-neutral-900 rounded-[2rem] border border-[#e6dfc3]/40 dark:border-neutral-900/60 shadow-[0_4px_20px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col group hover:shadow-lg hover:border-amber-500/30 transition-all duration-300"
                 >
-                  <div className="aspect-[1.1] w-full overflow-hidden bg-neutral-50 dark:bg-neutral-950 relative">
+                  <div className={`aspect-[1.1] w-full overflow-hidden bg-white relative transition-all ${
+                    item.name.includes("컵팥빙수") ? "p-6 sm:p-8" : "p-3 sm:p-5"
+                  }`}>
                     <img
                       src={optimizeCloudinaryUrl(item.img)}
                       alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 select-none pointer-events-none"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 select-none pointer-events-none"
                     />
                     {item.badge && (
                       <span className={`absolute top-4 left-4 px-2.5 py-1 text-[10px] font-black tracking-wide rounded-lg shadow-sm ${getBadgeClasses(item.badge)}`}>

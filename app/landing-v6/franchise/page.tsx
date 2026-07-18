@@ -7,6 +7,7 @@ import Header from "../../../components/landing-v6/Header";
 import Footer from "../../../components/landing-v6/Footer";
 import ContactForm from "../../../components/landing-v6/ContactForm";
 import FranchiseCost from "../../../components/landing-v6/FranchiseCost";
+import PaymentPromo from "../../../components/landing-v6/PaymentPromo";
 
 interface SuccessCase {
   title: string;
@@ -185,7 +186,10 @@ export default function FranchiseSubpage() {
       </section>
 
       {/* 창업 모델 및 개설 비용 안내 */}
-      <FranchiseCost />
+      <FranchiseCost bottomWaveColor="text-[#F5F7FA] dark:text-[#111625]" />
+
+      {/* 결제 지원 프로모션 안내 */}
+      <PaymentPromo bottomWaveColor="text-[#FFFDF4] dark:text-[#0A0A0A]" />
 
       {/* CTA Box */}
       <section className="py-16 max-w-5xl mx-auto px-4">
