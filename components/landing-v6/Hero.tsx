@@ -15,7 +15,7 @@ export default function Hero() {
 
   const mobileSlides = [
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784391594/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_23_1_3_ttym6e.png",
-    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784391794/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_00_1_hyrttb.png"
+    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784391854/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_00_1_1_ogdsxg.png"
   ];
 
   useEffect(() => {
