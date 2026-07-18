@@ -6077,6 +6077,106 @@ export default function PortalPage() {
         </div>
       )}
 
+      {/* 도로명 주소 실시간 검색 모달 */}
+      {showAddressPopup && (
+        <div 
+          className="fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setShowAddressPopup(false)}
+        >
+          <div 
+            className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-5 border-b border-[#f2ccd7]/60 flex flex-col gap-3 bg-[#fff1f5]/80">
+              <div className="flex justify-between items-center">
+                <h4 className="text-sm font-bold text-[#2d2026]">도로명 주소 실시간 검색</h4>
+                <button onClick={() => setShowAddressPopup(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer">
+                  <X size={13} />
+                </button>
+              </div>
+              
+              {/* Tabs */}
+              <div className="flex bg-[#ffd3df]/50 p-1 rounded-xl border border-[#f2ccd7]/60">
+                <button
+                  type="button"
+                  onClick={() => setAddressTab("kakao")}
+                  className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer ${
+                    addressTab === "kakao" 
+                      ? "bg-white text-[#bf3e67] shadow-sm border border-[#f2ccd7]/40" 
+                      : "text-[#735965] hover:text-[#bf3e67]"
+                  }`}
+                >
+                  카카오 우편번호 API
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAddressTab("simulated")}
+                  className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer ${
+                    addressTab === "simulated" 
+                      ? "bg-white text-[#bf3e67] shadow-sm border border-[#f2ccd7]/40" 
+                      : "text-[#735965] hover:text-[#bf3e67]"
+                  }`}
+                >
+                  모의 간편 검색 (대안)
+                </button>
+              </div>
+            </div>
+
+            {/* Content Body */}
+            {addressTab === "kakao" ? (
+              <div className="flex-1 w-full bg-[#fff9fb] overflow-hidden relative">
+                <div 
+                  id="daum-postcode-container" 
+                  className="w-full h-full"
+                ></div>
+              </div>
+            ) : (
+              <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-[#fff9fb]">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-[#735965] block">지번/도로명 검색어 입력</label>
+                  <input
+                    type="text"
+                    placeholder="예: 테헤란로, 엘에스로, 당동"
+                    value={addressSearchKeyword}
+                    onChange={(e) => handleRegAddressSearch(e.target.value)}
+                    className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 font-semibold focus:outline-none focus:border-[#f25f8a]"
+                  />
+                </div>
+                
+                {addressSearchResults.length > 0 ? (
+                  <div className="border border-[#f2ccd7]/60 rounded-xl overflow-hidden divide-y divide-[#f2ccd7]/40 bg-white">
+                    {addressSearchResults.map((addr, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          if (addressSearchTarget === "profile") {
+                            setProfileRoadAddress(addr);
+                          } else if (addressSearchTarget === "delivery") {
+                            setDeliveryAddress(addr);
+                          } else {
+                            setRegRoadAddress(addr);
+                          }
+                          setShowAddressPopup(false);
+                          triggerToast("도로명 주소가 자동 선택되었습니다.");
+                        }}
+                        className="w-full px-4 py-3 text-left text-xs font-semibold text-[#735965] hover:bg-[#fff1f5] hover:text-[#bf3e67] transition-all block cursor-pointer border-0 bg-transparent"
+                      >
+                        {addr}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  addressSearchKeyword.trim() !== "" && (
+                    <p className="text-center text-xs text-[#735965] font-bold py-6">검색 결과가 존재하지 않습니다.</p>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
