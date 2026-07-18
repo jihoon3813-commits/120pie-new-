@@ -14,7 +14,7 @@ export default function Hero() {
   ];
 
   const mobileSlides = [
-    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784391264/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_23_1_1_wssrl0.png",
+    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784391423/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_23_1_2_b9bhoz.png",
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784389828/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_00_eujahg.png"
   ];
 
