@@ -26,11 +26,15 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
+    if (width > 0 && width < 640) {
+      // Disable auto-slide on mobile
+      return;
+    }
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % desktopSlides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [desktopSlides.length]);
+  }, [desktopSlides.length, width]);
 
   const handlePrev = () => {
     setCurrentSlide((prev) => (prev === 0 ? desktopSlides.length - 1 : prev - 1));
