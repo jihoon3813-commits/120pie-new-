@@ -5736,7 +5736,28 @@ export default function AdminPage() {
                           <tr key={p.id} className="hover:bg-[#fff9fb] transition-colors">
                             <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{p.orderIndex}</td>
                             <td className="p-4 sm:p-5">
-                              <img src={p.img} alt="" className="w-10 h-10 rounded-lg object-cover bg-[#fff1f5]" />
+                              {(() => {
+                                const status = p.status || (p.isActive ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종");
+                                const isUnavailable = status === "품절" || status === "단종";
+                                return (
+                                  <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-[#f2ccd7]/60 shadow-sm shrink-0">
+                                    <img 
+                                      src={p.img} 
+                                      alt="" 
+                                      className={`w-full h-full object-cover bg-[#fff1f5] transition-all duration-300 ${
+                                        isUnavailable ? "brightness-50 grayscale" : ""
+                                      }`} 
+                                    />
+                                    {isUnavailable && (
+                                      <div className={`absolute inset-0 flex items-center justify-center text-[9px] font-black tracking-wider text-white select-none ${
+                                        status === "품절" ? "bg-orange-950/40" : "bg-neutral-950/50"
+                                      }`}>
+                                        {status}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })()}
                             </td>
                             <td className="p-4 sm:p-5">
                               <span className="bg-[#ffd3df] text-[#bf3e67] font-bold px-2 py-0.5 rounded text-[10px] border border-[#f2ccd7]">

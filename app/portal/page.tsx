@@ -3270,13 +3270,23 @@ export default function PortalPage() {
                         >
                           {/* Thumbnail image & stock state badge (Strictly 52% height) */}
                           <div className="h-[52%] w-full relative bg-[#fff1f5] overflow-hidden shrink-0 border-b border-[#f2ccd7]/40">
-                            <img src={optimizeCloudinaryUrl(p.img)} alt={p.name} className="w-full h-full object-cover" />
+                            <img 
+                              src={optimizeCloudinaryUrl(p.img)} 
+                              alt={p.name} 
+                              className={`w-full h-full object-cover transition-all duration-300 ${
+                                p.stock === "out_of_stock" ? "brightness-50 grayscale" : ""
+                              }`} 
+                            />
+                            {p.stock === "out_of_stock" && (
+                              <div className="absolute inset-0 bg-red-950/40 flex items-center justify-center backdrop-blur-[1px]">
+                                <span className="text-white font-black text-xs px-2.5 py-1.5 rounded-lg bg-red-600/90 shadow-md tracking-wider">
+                                  일시품절
+                                </span>
+                              </div>
+                            )}
                             <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1 max-w-[80%]">
                               {p.stock === "low_stock" && (
                                 <span className="bg-orange-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">품절임박</span>
-                              )}
-                              {p.stock === "out_of_stock" && (
-                                <span className="bg-red-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">일시품절</span>
                               )}
                             </div>
                             <span className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm text-[9px] text-[#bf3e67] font-extrabold px-1.5 py-0.5 rounded border border-[#f2ccd7] whitespace-nowrap">
@@ -3476,6 +3486,44 @@ export default function PortalPage() {
                           <CheckCircle2 size={16} />
                           결제 진행하기
                         </button>
+
+                        {/* 이달의 카드 무이자 혜택 안내 */}
+                        <div className="mt-3 bg-gradient-to-br from-[#fff6f8] to-white border border-[#f2ccd7] rounded-2xl p-3.5 shadow-sm text-left">
+                          <div className="flex items-center gap-1.5 text-[#bf3e67] font-black text-xs mb-2">
+                            <CreditCard size={14} className="shrink-0" />
+                            <span>7월 카드사 무이자 혜택 (5만원 이상)</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[10px] font-semibold text-[#735965]/90 border-b border-[#f2ccd7]/30 pb-2 mb-2">
+                            <div className="flex justify-between items-center">
+                              <span>• 현대 / 신한</span>
+                              <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span>• 삼성 / 국민</span>
+                              <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span>• 롯데 / 전북</span>
+                              <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span>• BC / 우리</span>
+                              <span className="font-extrabold text-[#bf3e67]">2~5개월</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span>• 하나 / 광주</span>
+                              <span className="font-extrabold text-[#bf3e67]">2~5개월</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span>• NH농협</span>
+                              <span className="font-extrabold text-[#bf3e67]">2~6개월</span>
+                            </div>
+                          </div>
+                          <div className="text-[8px] text-[#735965]/70 font-medium leading-normal">
+                            * 법인/체크/선불/기프트/하이브리드 카드는 제외됩니다.<br />
+                            * 자세한 사항은 PG사(KG이니시스) 결제창에서 확인 가능합니다.
+                          </div>
+                        </div>
                       </div>
                     </>
                   )}
@@ -6008,6 +6056,44 @@ export default function PortalPage() {
                   <CheckCircle2 size={16} />
                   결제 진행하기
                 </button>
+
+                {/* 이달의 카드 무이자 혜택 안내 */}
+                <div className="mt-3 bg-gradient-to-br from-[#fff6f8] to-white border border-[#f2ccd7] rounded-2xl p-3.5 shadow-sm text-left">
+                  <div className="flex items-center gap-1.5 text-[#bf3e67] font-black text-xs mb-2">
+                    <CreditCard size={14} className="shrink-0" />
+                    <span>7월 카드사 무이자 혜택 (5만원 이상)</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[10px] font-semibold text-[#735965]/90 border-b border-[#f2ccd7]/30 pb-2 mb-2">
+                    <div className="flex justify-between items-center">
+                      <span>• 현대 / 신한</span>
+                      <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>• 삼성 / 국민</span>
+                      <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>• 롯데 / 전북</span>
+                      <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>• BC / 우리</span>
+                      <span className="font-extrabold text-[#bf3e67]">2~5개월</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>• 하나 / 광주</span>
+                      <span className="font-extrabold text-[#bf3e67]">2~5개월</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>• NH농협</span>
+                      <span className="font-extrabold text-[#bf3e67]">2~6개월</span>
+                    </div>
+                  </div>
+                  <div className="text-[8px] text-[#735965]/70 font-medium leading-normal">
+                    * 법인/체크/선불/기프트/하이버리드 카드는 제외됩니다.<br />
+                    * 자세한 사항은 PG사(KG이니시스) 결제창에서 확인 가능합니다.
+                  </div>
+                </div>
               </div>
             )}
           </div>
