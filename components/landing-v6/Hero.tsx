@@ -17,7 +17,7 @@ export default function Hero() {
   const mobileSlides = [
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784392182/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_23_1_4_adkmto.png",
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784392071/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_00_1_3_igjpyk.png",
-    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784446300/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%ED%9B%84_04_29_55_m9k7xo.png"
+    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784446686/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%ED%9B%84_04_37_35_hsnqch.png"
   ];
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function Hero() {
   const slideWidth = width || 1920;
 
   return (
-    <section className="relative w-full aspect-[9/16] sm:aspect-[1902/1000] overflow-hidden bg-neutral-900 select-none">
+    <section className="relative w-full aspect-[9/16] sm:aspect-[1902/1000] overflow-hidden bg-neutral-900 pt-16 sm:pt-0 select-none">
       
       {/* 💻 Desktop Banner Slider Track */}
       <div className="hidden sm:block absolute top-0 bottom-0 left-0 right-0 z-0 overflow-hidden">
@@ -90,7 +90,7 @@ export default function Hero() {
       </div>
 
       {/* 📱 Mobile Banner Slider Track */}
-      <div className="block sm:hidden absolute top-0 bottom-0 left-0 right-0 z-0 overflow-hidden">
+      <div className="block sm:hidden absolute top-16 bottom-0 left-0 right-0 z-0 overflow-hidden">
         <motion.div
           drag="x"
           dragConstraints={{
