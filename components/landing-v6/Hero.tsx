@@ -58,10 +58,10 @@ export default function Hero() {
   const slideWidth = width || 1920;
 
   return (
-    <section className="relative w-full aspect-[9/16] sm:aspect-[1902/1000] overflow-hidden bg-neutral-900 pt-16 sm:pt-20 select-none">
+    <section className="relative w-full aspect-[9/16] sm:aspect-[1902/1000] overflow-hidden bg-neutral-900 select-none">
       
       {/* 💻 Desktop Banner Slider Track */}
-      <div className="hidden sm:block absolute top-20 bottom-0 left-0 right-0 z-0 overflow-hidden">
+      <div className="hidden sm:block absolute top-0 bottom-0 left-0 right-0 z-0 overflow-hidden">
         <motion.div
           drag="x"
           dragConstraints={{
@@ -88,7 +88,7 @@ export default function Hero() {
       </div>
 
       {/* 📱 Mobile Banner Slider Track */}
-      <div className="block sm:hidden absolute top-16 bottom-0 left-0 right-0 z-0 overflow-hidden">
+      <div className="block sm:hidden absolute top-0 bottom-0 left-0 right-0 z-0 overflow-hidden">
         <motion.div
           drag="x"
           dragConstraints={{
