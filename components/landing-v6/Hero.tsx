@@ -10,12 +10,14 @@ export default function Hero() {
 
   const desktopSlides = [
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784389829/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_35_16_1_lqzaue.png",
-    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784390648/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_01_00_36_1_zvi0sz.png"
+    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784390648/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_01_00_36_1_zvi0sz.png",
+    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784446300/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%ED%9B%84_04_29_55_m9k7xo.png"
   ];
 
   const mobileSlides = [
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784392182/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_23_1_4_adkmto.png",
-    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784392071/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_00_1_3_igjpyk.png"
+    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784392071/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_00_1_3_igjpyk.png",
+    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784446300/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%ED%9B%84_04_29_55_m9k7xo.png"
   ];
 
   useEffect(() => {
