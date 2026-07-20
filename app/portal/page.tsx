@@ -2486,7 +2486,8 @@ export default function PortalPage() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full py-4 bg-amber-400 hover:bg-amber-500 text-stone-900 text-sm font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-6 hover:scale-[1.01]"
+                  className="w-full py-4 bg-amber-400 hover:bg-amber-500 text-white text-sm font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-6 hover:scale-[1.01]"
+                  style={{ color: '#ffffff' }}
                 >
                   신규 가맹 계약 지점 공식 등록
                 </button>

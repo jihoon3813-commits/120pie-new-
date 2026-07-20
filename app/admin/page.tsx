@@ -9052,6 +9052,7 @@ export default function AdminPage() {
               <button 
                 type="submit"
                 className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-sm mt-3"
+                style={{ color: '#ffffff' }}
               >
                 {selectedStore ? "가맹점 상세 정보 수정 저장" : "신규 가맹 계약 지점 공식 등록"}
               </button>

@@ -2044,5 +2044,11 @@ td:first-child,
   color: #ffffff !important;
 }
 
+/* Ensure submit button text color is white on admin and owner portals */
+#admin-portal button[type="submit"],
+#owner-portal button[type="submit"] {
+  color: #ffffff !important;
+}
+
 
 
