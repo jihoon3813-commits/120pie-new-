@@ -72,7 +72,7 @@ export default function PaymentPromo({ bottomWaveColor }: PaymentPromoProps) {
   ];
 
   return (
-    <section id="payment-promo" className="relative bg-gradient-to-b from-[#F5F7FA] to-[#E4E8F0] dark:from-[#111625] dark:to-[#0B0E17] text-neutral-900 dark:text-neutral-100 pt-20 pb-28 sm:pt-28 sm:pb-36 overflow-hidden transition-colors duration-300">
+    <section id="payment-promo" className="relative bg-gradient-to-b from-[#F5F7FA] to-[#E4E8F0] dark:from-[#111625] dark:to-[#0B0E17] text-neutral-900 dark:text-neutral-100 pt-20 pb-12 sm:pt-28 sm:pb-16 overflow-hidden transition-colors duration-300">
       
       {/* Background visual decorative glows */}
       <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
@@ -272,16 +272,7 @@ export default function PaymentPromo({ bottomWaveColor }: PaymentPromoProps) {
             <span>신규가맹 계약을 통한 오프라인 표준 매장 신규 창업에는 본 슬림할부 프로모션이 적용되지 않으며, 샵인샵 및 하이브리드 창업 전환 시에만 제한적으로 특별 적용됩니다.</span>
           </p>
         </motion.div>
-
       </div>
-
-      {/* Bottom Wavy transition to next light background section */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10 translate-y-[2px]">
-        <svg viewBox="0 0 1200 100" preserveAspectRatio="none" className={`relative block w-full h-[24px] sm:h-[40px] lg:h-[55px] fill-current ${bottomWaveColor || "text-white"}`}>
-          <path d="M 0 50 Q 25 10, 50 50 Q 75 90, 100 50 Q 125 10, 150 50 Q 175 90, 200 50 Q 225 10, 250 50 Q 275 90, 300 50 Q 325 10, 350 50 Q 375 90, 400 50 Q 425 10, 450 50 Q 475 90, 500 50 Q 525 10, 550 50 Q 575 90, 600 50 Q 625 10, 650 50 Q 775 90, 800 50 Q 825 10, 850 50 Q 875 90, 900 50 Q 925 10, 950 50 Q 975 90, 1000 50 Q 1025 10, 1050 50 Q 1075 90, 1100 50 Q 1125 10, 1150 50 Q 1175 90, 1200 50 L 1200 100 L 0 100 Z" />
-        </svg>
-      </div>
-
     </section>
   );
 }

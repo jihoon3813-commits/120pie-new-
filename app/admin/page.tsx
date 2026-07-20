@@ -4236,7 +4236,7 @@ export default function AdminPage() {
                 <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
                   <div className="flex items-center gap-2">
                     <img
-                      src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076160/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_ovgxnz.png"
+                      src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
                       alt="로고"
                       className="w-7 h-7"
                     />

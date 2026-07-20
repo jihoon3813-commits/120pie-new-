@@ -18,6 +18,7 @@ import MenuGallery from "./MenuGallery";
 import CustomerReviews from "./CustomerReviews";
 import FranchiseCost from "./FranchiseCost";
 import PaymentPromo from "./PaymentPromo";
+import InteriorConcept from "./InteriorConcept";
 import SuccessSupport from "./SuccessSupport";
 import FranchiseProcess from "./FranchiseProcess";
 import ContactForm from "./ContactForm";
@@ -85,7 +86,10 @@ export default function LandingV6Client() {
         <FranchiseCost bottomWaveColor="text-[#F5F7FA] dark:text-[#111625]" />
 
         {/* 결제 지원 프로모션 안내 */}
-        <PaymentPromo bottomWaveColor="text-neutral-50 dark:text-neutral-900" />
+        <PaymentPromo bottomWaveColor="text-white dark:text-neutral-950" />
+
+        {/* 매장 인테리어 안내 섹션 */}
+        <InteriorConcept />
 
         {/* Exclusive Lock-In Urgency & Success Support Section */}
         <SuccessSupport onContactClick={openContactModal} />

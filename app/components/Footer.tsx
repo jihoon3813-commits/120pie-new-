@@ -68,7 +68,7 @@ export default function Footer({ theme }: FooterProps) {
           <div className="lg:col-span-7">
             <div className="mb-7">
               <img
-                src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076160/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_ovgxnz.png"
+                src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
                 alt="120pie 로고"
                 className="h-7 sm:h-8 w-auto object-contain opacity-40 hover:opacity-75 transition-opacity duration-200 grayscale"
               />
