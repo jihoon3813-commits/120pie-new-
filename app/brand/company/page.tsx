@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Menu, X, Sparkles, Palette, Home, CheckCircle2 } from "lucide-react";
+import { ChevronRight, Menu, X, Building, MapPin } from "lucide-react";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 import CursorFollower from "@/components/CursorFollower";
 import ConsultationForm from "@/components/ConsultationForm";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 
-export default function BiInteriorPage() {
+export default function CompanyIntroPage() {
   const [isConsulting, setIsConsulting] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -116,14 +116,14 @@ export default function BiInteriorPage() {
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
           <div className="space-y-1">
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-              BI & 인테리어
+              기업소개
             </h1>
             <p className="text-xs sm:text-sm font-semibold tracking-widest text-[#FBC400] uppercase">
-              Brand Identity & Interior Space Design
+              120PIE F&B Corp.
             </p>
           </div>
           <p className="text-lg sm:text-2xl font-bold text-neutral-200">
-            따뜻함과 세련됨이 교차하는 프리미엄 공간 디자인
+            대한민국 프랜차이즈 디저트를 이끄는 선두주자
           </p>
         </div>
       </section>
@@ -137,7 +137,7 @@ export default function BiInteriorPage() {
                 key={tab.id}
                 href={tab.href}
                 className={`px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-black transition-all duration-300 border ${
-                  tab.id === "bi"
+                  tab.id === "company"
                     ? "bg-[#FBC400] text-neutral-950 border-[#FBC400] shadow-sm scale-102"
                     : "bg-neutral-100 text-neutral-600 border-neutral-200 hover:bg-neutral-200 hover:text-neutral-900"
                 }`}
@@ -149,209 +149,178 @@ export default function BiInteriorPage() {
         </div>
       </div>
 
-      {/* MAIN BI & INTERIOR CONTENT */}
+      {/* MAIN COMPANY INTRO CONTENT (Images 1, 2, 3) */}
       <section className="py-16 sm:py-24 bg-[#FAF9F5] border-t border-neutral-200 text-left">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24">
 
-          {/* BI BRAND IDENTITY SECTION (Image 1 & Image 2 Layout) */}
-          <div className="space-y-12">
-            
-            {/* 1. TOP LARGE LOGO BOX */}
-            <div className="bg-white p-8 sm:p-16 rounded-3xl border border-neutral-300 shadow-sm flex items-center justify-center min-h-[260px] sm:min-h-[320px]">
+          {/* IMAGE 1-A: Corporate Manifesto Block (Left Building Image, Right Slogan) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
+            {/* Left Building Exterior */}
+            <div className="lg:col-span-5 h-72 sm:h-96 rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-200 shadow-xl relative group">
               <img
-                src={optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/v1784642722/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_j3kejm.png")}
-                alt="120PIE & COFFEE 공식 시그니처 로고"
-                className="max-h-24 sm:max-h-32 w-auto object-contain"
+                src={optimizeCloudinaryUrl(
+                  "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705753/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_21_1_vvaugb.png"
+                )}
+                alt="120PIE F&B 신사옥 전경"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              <div className="absolute bottom-6 left-6 text-white font-extrabold text-sm tracking-wider">
+                120PIE F&B HQ BUILDING
+              </div>
             </div>
 
-            {/* 2. BASIC SYSTEM TEXT SECTION */}
-            <div className="space-y-4 text-left">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-1 bg-[#78A739] rounded-full" />
-                <h2 className="text-xl sm:text-2xl font-black tracking-tight text-neutral-900 uppercase">
-                  BASIC SYSTEM
+            {/* Right Slogan & Text */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="space-y-2">
+                <span className="text-xs font-black text-amber-600 tracking-widest uppercase block">
+                  120PIE F&B Corp.
+                </span>
+                <h2 className="text-3xl sm:text-5xl font-black text-neutral-900 leading-tight">
+                  내 가족이 먹지 못하는<br />음식은 팔지 않겠습니다.
                 </h2>
               </div>
-              <p className="text-sm sm:text-base text-neutral-700 font-medium leading-relaxed max-w-5xl">
-                120PIE의 BI(brand identity)는 120겹의 정성이 깃든 수제 파이와 깊은 풍미의 로스팅 커피의 조화, 맛과 가격, 품질 등 모든 면에서 고집스럽게 더 솔직한 120PIE의 정신을 나타냅니다. 대한민국 No.1 디저트 카페 120PIE & COFFEE와 함께해 주세요!
+              <p className="text-sm sm:text-base text-neutral-600 font-medium leading-relaxed">
+                (주)120PIE F&B는 우리의 입맛에 맞는 정통 120겹 수제 파이와 디저트 시트를 자체 생산 제조하여 가맹점에 공급하는 선진 프랜차이즈 시스템이 완비된 기업으로 대한민국 디저트 프랜차이즈 업계를 이끌고 있는 선두주자로 그 역할을 다 하고 있습니다.
               </p>
-              <p className="text-[11px] sm:text-xs text-neutral-400 font-medium leading-normal">
-                * BI(brand identity)는 브랜드의 개성, 핵심가치, 경쟁력 등을 문자, 도형, 색상 등을 사용하여 시각적으로 표현한 것입니다. 규정에 정해진대로 사용하며, 비율이나 색상을 임의로 바꿀 수 없습니다.
-              </p>
-            </div>
-
-            {/* 3. LOGO VARIATIONS GRID & COLOR SYSTEM */}
-            <div className="bg-neutral-100/80 p-6 sm:p-10 rounded-3xl border border-neutral-200/80 space-y-10">
-              
-              {/* 4 Logo Variations Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Variant 1: 기본형 */}
-                <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm flex flex-col items-center justify-between min-h-[220px] text-center">
-                  <div className="flex-1 flex items-center justify-center p-2">
-                    <img
-                      src={optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/v1784642722/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_j3kejm.png")}
-                      alt="기본형 로고"
-                      className="max-h-12 w-auto object-contain"
-                    />
-                  </div>
-                  <div className="pt-3 border-t border-neutral-100 w-full space-y-0.5">
-                    <h3 className="font-extrabold text-sm text-neutral-900">기본형</h3>
-                    <p className="text-[10px] text-neutral-400 font-medium">상표등록번호 제 40-1770877호</p>
-                  </div>
-                </div>
-
-                {/* Variant 2: 두줄 가로형 */}
-                <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm flex flex-col items-center justify-between min-h-[220px] text-center">
-                  <div className="flex-1 flex items-center justify-center p-2">
-                    <img
-                      src={optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/v1784730823/Group_1_6_cm1oeu.png")}
-                      alt="두줄 가로형 로고"
-                      className="max-h-14 w-auto object-contain"
-                    />
-                  </div>
-                  <div className="pt-3 border-t border-neutral-100 w-full space-y-0.5">
-                    <h3 className="font-extrabold text-sm text-neutral-900">두줄 가로형</h3>
-                  </div>
-                </div>
-
-                {/* Variant 3: 심볼형 */}
-                <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm flex flex-col items-center justify-between min-h-[220px] text-center">
-                  <div className="flex-1 flex items-center justify-center p-2">
-                    <img
-                      src={optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/v1784730823/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_5_eadptv.png")}
-                      alt="심볼형 심볼"
-                      className="max-h-16 w-auto object-contain"
-                    />
-                  </div>
-                  <div className="pt-3 border-t border-neutral-100 w-full space-y-0.5">
-                    <h3 className="font-extrabold text-sm text-neutral-900">심볼형</h3>
-                  </div>
-                </div>
-
-                {/* Variant 4: 두줄 심볼형 */}
-                <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm flex flex-col items-center justify-between min-h-[220px] text-center">
-                  <div className="flex-1 flex items-center justify-center p-2">
-                    <img
-                      src={optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/v1784730823/Group_2_2_atzhmu.png")}
-                      alt="두줄 심볼형 로고"
-                      className="max-h-16 w-auto object-contain"
-                    />
-                  </div>
-                  <div className="pt-3 border-t border-neutral-100 w-full space-y-0.5">
-                    <h3 className="font-extrabold text-sm text-neutral-900">두줄 심볼형</h3>
-                  </div>
-                </div>
-              </div>
-
-              {/* COLOR SYSTEM */}
-              <div className="space-y-4 pt-4 border-t border-neutral-200">
-                <h3 className="text-lg font-black text-neutral-900 uppercase tracking-tight text-left">
-                  COLOR SYSTEM
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  {/* Swatch 1 */}
-                  <div className="bg-white p-4 rounded-2xl border border-neutral-200 shadow-sm space-y-3">
-                    <div className="h-20 rounded-xl bg-[#FBC400] shadow-inner" />
-                    <div className="space-y-0.5 text-left text-xs">
-                      <p className="font-extrabold text-neutral-900 text-sm">#fbc400</p>
-                      <p className="text-neutral-500 font-medium text-[11px]">CMYK : C0 / M22 / Y100 / K0</p>
-                    </div>
-                  </div>
-
-                  {/* Swatch 2 */}
-                  <div className="bg-white p-4 rounded-2xl border border-neutral-200 shadow-sm space-y-3">
-                    <div className="h-20 rounded-xl bg-white border border-neutral-200 shadow-inner" />
-                    <div className="space-y-0.5 text-left text-xs">
-                      <p className="font-extrabold text-neutral-900 text-sm">#ffffff</p>
-                      <p className="text-neutral-500 font-medium text-[11px]">CMYK : C0 / M0 / Y0 / K0</p>
-                    </div>
-                  </div>
-
-                  {/* Swatch 3 */}
-                  <div className="bg-white p-4 rounded-2xl border border-neutral-200 shadow-sm space-y-3">
-                    <div className="h-20 rounded-xl bg-[#0D233A] shadow-inner" />
-                    <div className="space-y-0.5 text-left text-xs">
-                      <p className="font-extrabold text-neutral-900 text-sm">#0d233a</p>
-                      <p className="text-neutral-500 font-medium text-[11px]">CMYK : C90 / M75 / Y30 / K40</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
 
-          {/* INTERIOR CONCEPT SECTION */}
+          {/* IMAGE 1-B: Teal/Dark Blue Factory Background Banner */}
+          <div className="relative rounded-3xl overflow-hidden bg-teal-900 py-12 px-6 sm:px-14 text-white text-center shadow-xl">
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay"
+              style={{
+                backgroundImage: `url('${optimizeCloudinaryUrl(
+                  "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
+                )}')`,
+              }}
+            />
+            <div className="relative z-10 max-w-4xl mx-auto space-y-3">
+              <p className="text-base sm:text-xl font-bold leading-relaxed text-teal-50">
+                소비자와의 약속을 위해 철저한 위생관리 및 계절별 신선한 재료만을 엄선하여 가맹본사에서 자체 생산 및 유통을 원칙으로 브랜드 보호 및 가맹점 관리를 우선으로 하는 프랜차이즈 가맹본사입니다.
+              </p>
+            </div>
+          </div>
+
+          {/* IMAGE 2: Value Proposition & Overlapping Card Block */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-4">
+            {/* Left Food Visual */}
+            <div className="lg:col-span-6 h-80 sm:h-[420px] rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-200 shadow-xl relative">
+              <img
+                src={optimizeCloudinaryUrl(
+                  "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
+                )}
+                alt="120PIE 시그니처 메뉴 이미지"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-4 left-6 right-6 flex items-center justify-between text-white text-xs font-bold">
+                <div className="h-1 bg-[#78A739] w-28 rounded-full" />
+                <span>03 / 03</span>
+              </div>
+            </div>
+
+            {/* Right Overlapping White Card */}
+            <div className="lg:col-span-6 bg-white p-8 sm:p-12 rounded-3xl border border-neutral-200/80 shadow-lg space-y-6 lg:-ml-12 lg:z-10">
+              <h3 className="text-2xl sm:text-4xl font-black text-neutral-900 leading-tight">
+                성공 창업은 가성비가<br />높아야 합니다
+              </h3>
+              <div className="space-y-4 text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed">
+                <p>
+                  120PIE는 메뉴 그 자체가 홍보 마케팅입니다. 그러므로 별도의 비용을 들여서 홍보를 하지 않아도 됩니다. 120PIE만의 특화된 경쟁력으로 임대료가 저렴한 상권 등에서도 점주님의 성공 창업 실현을 도와드립니다.
+                </p>
+                <p>
+                  특화되고 엄선된 메뉴로 미각과 시각 모두를 만족시켜 소비자에게 기억되는 브랜드입니다. 120PIE의 경쟁력은 오피스, 주거, 일반 상권에서도 대박 매출이 가능한 브랜드입니다.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* IMAGE 3: Automation System Introduction */}
           <div className="space-y-10 pt-8 border-t border-neutral-200">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-black text-amber-600 tracking-widest uppercase block">
-                INTERIOR SPACE CONCEPT
-              </span>
-              <h2 className="text-2xl sm:text-4xl font-black text-neutral-900 tracking-tight">
-                수제 느낌을 강조한 카페형 인테리어
-              </h2>
-              <p className="text-xs sm:text-sm text-neutral-500 font-semibold">
-                편안하고 깨끗한 이미지, 힐링 먹거리 공간을 제공하는 120PIE 인테리어
+            {/* Top Intro (Left Text, Right Factory Image) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-6 space-y-4">
+                <span className="text-xs font-black text-amber-600 tracking-widest uppercase block">
+                  120PIE F&B Corp.
+                </span>
+                <h3 className="text-2xl sm:text-4xl font-black text-neutral-900 leading-tight">
+                  (주)120PIE F&B 자동화 시스템 소개
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed">
+                  (주)120PIE F&B는 대대적인 자금을 투자하여 대지 2,000평, 건평 5,000평의 단일규모로는 국내 프랜차이즈 업계 최대 규모의 신사옥을 건립하였으며, 이를 통해 가맹점에 더욱 체계적이고 위생적인 양질의 물류를 지원하고 있습니다.
+                </p>
+              </div>
+
+              <div className="lg:col-span-6 h-64 sm:h-80 rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-200 shadow-md">
+                <img
+                  src={optimizeCloudinaryUrl(
+                    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png"
+                  )}
+                  alt="자동화 시스템 라인"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Center Green Banner Box */}
+            <div className="p-8 sm:p-10 bg-[#78A739] text-white rounded-3xl shadow-md text-center space-y-3">
+              <p className="text-xs sm:text-base font-bold leading-relaxed max-w-4xl mx-auto">
+                (주)120PIE F&B는 하루 생산량 총 100톤을 소화할 수 있는 규모와 가공장비를 도입하여, 업계 최초이자 유일하게 파이 시트뿐만 아니라 빵, 소스를 직접 생산하고 공급할 수 있는 최신 시설과 장비를 갖추고 있습니다.
+              </p>
+              <p className="text-xs sm:text-base font-bold leading-relaxed max-w-4xl mx-auto text-white/90">
+                또한, 최첨단 본사 자체 물류센터 시스템을 통해 정통 120겹 파이 본연의 맛을 소비자들에게 100% 제공하고 있습니다.
               </p>
             </div>
 
-            {/* Interior Gallery Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-3xl overflow-hidden border border-neutral-200 shadow-md group">
-                <div className="h-64 sm:h-72 bg-neutral-900 overflow-hidden relative">
-                  <img
-                    src={optimizeCloudinaryUrl(
-                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png"
-                    )}
-                    alt="카페 메인 홀 인테리어"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                </div>
-                <div className="p-6 space-y-2">
-                  <h3 className="font-extrabold text-neutral-900 text-lg">메인 카페 홀 (Cafe Hall)</h3>
-                  <p className="text-xs text-neutral-600 font-medium leading-relaxed">
-                    따뜻한 원목 감성과 아늑한 조명으로 편안하게 디저트와 커피를 즐길 수 있는 공간 디자인
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-3xl overflow-hidden border border-neutral-200 shadow-md group">
-                <div className="h-64 sm:h-72 bg-neutral-900 overflow-hidden relative">
-                  <img
-                    src={optimizeCloudinaryUrl(
-                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705753/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_21_1_vvaugb.png"
-                    )}
-                    alt="스마트 키오스크 & 주문 픽업 존"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                </div>
-                <div className="p-6 space-y-2">
-                  <h3 className="font-extrabold text-neutral-900 text-lg">키오스크 & 픽업 존 (Pickup Zone)</h3>
-                  <p className="text-xs text-neutral-600 font-medium leading-relaxed">
-                    동선 최소화 및 무인 키오스크 도입으로 테이크아웃 및 포장 고객의 동선 편의성을 극대화
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-3xl overflow-hidden border border-neutral-200 shadow-md group">
-                <div className="h-64 sm:h-72 bg-neutral-900 overflow-hidden relative">
+            {/* Bottom 3-Card Automation Line Gallery */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+              <div className="rounded-3xl overflow-hidden border border-neutral-200 bg-white shadow-sm flex flex-col group">
+                <div className="h-48 bg-neutral-900 overflow-hidden">
                   <img
                     src={optimizeCloudinaryUrl(
                       "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
                     )}
-                    alt="베이커리 오븐 쇼케이스"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    alt="자동 파이 시트 성형"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <div className="p-6 space-y-2">
-                  <h3 className="font-extrabold text-neutral-900 text-lg">오픈 베이킹 쇼케이스 (Baking Showcase)</h3>
-                  <p className="text-xs text-neutral-600 font-medium leading-relaxed">
-                    갓 구워낸 120겹 파이의 고소한 향과 시각적 즐거움을 소비자에게 직접 전달하는 매장 레이아웃
-                  </p>
+                <div className="py-3 px-4 bg-[#78A739] text-white font-extrabold text-xs text-center">
+                  자동 파이 시트 성형
+                </div>
+              </div>
+
+              <div className="rounded-3xl overflow-hidden border border-neutral-200 bg-white shadow-sm flex flex-col group">
+                <div className="h-48 bg-neutral-900 overflow-hidden">
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705753/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_21_1_vvaugb.png"
+                    )}
+                    alt="자동 급냉 시스템"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="py-3 px-4 bg-[#78A739] text-white font-extrabold text-xs text-center">
+                  자동 급냉 시스템
+                </div>
+              </div>
+
+              <div className="rounded-3xl overflow-hidden border border-neutral-200 bg-white shadow-sm flex flex-col group">
+                <div className="h-48 bg-neutral-900 overflow-hidden">
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png"
+                    )}
+                    alt="자동 진공 포장"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="py-3 px-4 bg-[#78A739] text-white font-extrabold text-xs text-center">
+                  자동 진공 포장
                 </div>
               </div>
             </div>
+
           </div>
 
         </div>
