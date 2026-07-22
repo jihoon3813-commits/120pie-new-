@@ -104,14 +104,14 @@ export default function BrandStoryPage() {
       {/* SUB VISUAL HERO BANNER */}
       <section className="relative w-full bg-neutral-950 py-20 sm:py-28 text-white overflow-hidden text-left select-none">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-60 scale-105"
+          className="absolute inset-0 bg-cover bg-center opacity-75 scale-105"
           style={{
             backgroundImage: `url('${optimizeCloudinaryUrl(
-              "https://res.cloudinary.com/lyjyvy54/image/upload/v1784732578/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_02_58_udtq5s.png"
+              "https://res.cloudinary.com/lyjyvy54/image/upload/v1784732847/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_02_58_1_qvxy5y.png"
             )}')`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent z-10" />
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
           <div className="space-y-1">
