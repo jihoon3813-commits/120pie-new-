@@ -37,7 +37,7 @@ export default function RightFloatingQuickBar({
         {/* Top Brand Logo Circular Emblem */}
         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden flex items-center justify-center shadow-md my-0.5 shrink-0 border border-amber-400/40 bg-neutral-900">
           <img
-            src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784730823/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_5_eadptv.png"
+            src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784785714/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_5_1_x8faxl.png"
             alt="120PIE 심볼 로고"
             className="w-full h-full object-cover"
           />
