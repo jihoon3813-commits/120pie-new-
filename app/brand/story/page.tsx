@@ -7,6 +7,7 @@ import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 import CursorFollower from "@/components/CursorFollower";
 import ConsultationForm from "@/components/ConsultationForm";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
+import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 
 export default function BrandStoryPage() {
   const [isConsulting, setIsConsulting] = useState(false);
@@ -557,6 +558,9 @@ export default function BrandStoryPage() {
           </div>
         </div>
       </footer>
+
+      {/* Right Floating Quick Docking Bar */}
+      <RightFloatingQuickBar onOpenConsultation={() => setIsConsulting(true)} />
     </div>
   );
 }

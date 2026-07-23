@@ -10,6 +10,7 @@ import { api } from "@/convex/_generated/api";
 import Script from "next/script";
 import ConsultationForm from "@/components/ConsultationForm";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
+import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 
 const logoUrlBlack = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png";
 const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png";
@@ -968,6 +969,9 @@ export default function StoresPageClient() {
           </div>
         </div>
       </footer>
+
+      {/* Right Floating Quick Docking Bar */}
+      <RightFloatingQuickBar onOpenConsultation={() => setInquiryForcedOpen(true)} />
     </div>
   );
 }

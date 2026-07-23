@@ -9,6 +9,7 @@ import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 import CursorFollower from "@/components/CursorFollower";
 import ConsultationForm from "@/components/ConsultationForm";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
+import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 
 const toEnglishSub = (name: string): string => {
   const map: Record<string, string> = {
@@ -625,6 +626,9 @@ export default function BrandMenuPage() {
           </div>
         </div>
       </footer>
+
+      {/* Right Floating Quick Docking Bar */}
+      <RightFloatingQuickBar onOpenConsultation={() => setIsConsulting(true)} />
     </div>
   );
 }

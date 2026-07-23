@@ -11,6 +11,7 @@ import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 import { triggerConsultationSms } from "@/app/utils/sms";
 import ConsultationForm from "@/components/ConsultationForm";
 import Footer from "@/app/components/Footer";
+import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 
 // Cloudinary assets with f_auto,q_auto
 const LOGO_URL = optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/v1784533894/Group_1_4_jl4rlr.png");
@@ -1109,6 +1110,9 @@ export default function BrandFranchisePage() {
           </div>
         </div>
       )}
+
+      {/* Right Floating Quick Docking Bar */}
+      <RightFloatingQuickBar onOpenConsultation={() => setIsConsulting(true)} />
     </div>
   );
 }

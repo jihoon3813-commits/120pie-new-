@@ -14,6 +14,7 @@ import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 import InteriorConcept from "@/components/landing-v6/InteriorConcept";
 import ConsultationForm from "@/components/ConsultationForm";
+import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 
 const SIGNATURE_MENUS = [
   {
@@ -1815,6 +1816,9 @@ export default function BrandHome() {
           style={{ animationDuration: "2s" }}
         />
       </div>
+
+      {/* Right Floating Quick Docking Bar */}
+      <RightFloatingQuickBar onOpenConsultation={() => setIsConsulting(true)} />
     </div>
   );
 }
