@@ -124,9 +124,23 @@ export default function RightSideInquiryBanner() {
   if (isClosed) return null;
 
   return (
-    <div className="hidden lg:block fixed right-2.5 sm:right-6 bottom-[460px] sm:bottom-[490px] z-[85] select-none animate-in fade-in slide-in-from-bottom-4 duration-300">
-      {/* Banner Container - Width 250px, 4px White Border, Positioned Vertically Above Floating Quick Bar */}
-      <div className="w-[250px] bg-white border-4 border-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.35)] overflow-hidden transition-all duration-300 hover:shadow-[0_25px_60px_rgba(251,196,0,0.4)] ring-1 ring-neutral-300">
+    <>
+      <style jsx global>{`
+        @keyframes gentleFloatBanner {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-9px);
+          }
+        }
+        .animate-gentle-float-banner {
+          animation: gentleFloatBanner 3.2s ease-in-out infinite;
+        }
+      `}</style>
+      <div className="hidden lg:block fixed right-2.5 sm:right-6 bottom-[460px] sm:bottom-[490px] z-[85] select-none animate-gentle-float-banner">
+        {/* Banner Container - Width 250px, 4px White Border, Positioned Vertically Above Floating Quick Bar */}
+        <div className="w-[250px] bg-white border-4 border-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.35)] overflow-hidden transition-all duration-300 hover:shadow-[0_25px_60px_rgba(251,196,0,0.4)] ring-1 ring-neutral-300 hover:translate-y-0">
         
         {/* Header Bar - Black */}
         <div className="bg-neutral-950 px-3.5 py-2.5 flex items-center justify-between">
@@ -261,5 +275,6 @@ export default function RightSideInquiryBanner() {
         </div>
       </div>
     </div>
-  );
+  </>
+);
 }
