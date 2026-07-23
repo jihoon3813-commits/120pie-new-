@@ -30,9 +30,9 @@ export default function RightFloatingQuickBar({
   };
 
   return (
-    <div className="fixed right-3 sm:right-5 top-1/2 -translate-y-1/2 z-[90] flex flex-col items-end select-none">
-      {/* Main Floating Container */}
-      <div className="bg-neutral-950/95 backdrop-blur-md border border-neutral-800 text-white rounded-3xl p-2 sm:p-2.5 flex flex-col items-center gap-1.5 sm:gap-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-300 w-16 sm:w-20">
+    <div className="fixed right-2.5 bottom-3 sm:right-6 sm:bottom-6 z-[90] flex flex-col items-end select-none">
+      {/* Main Floating Container (Semi-transparent & Bottom Right) */}
+      <div className="bg-neutral-950/85 backdrop-blur-md opacity-90 hover:opacity-100 border border-neutral-800/80 text-white rounded-3xl p-2 sm:p-2.5 flex flex-col items-center gap-1.5 sm:gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.4)] transition-all duration-300 w-15 sm:w-20">
         
         {/* Top Brand Logo Circular Emblem */}
         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FBC400] flex items-center justify-center shadow-md my-0.5 shrink-0 border border-[#FBC400]/50">

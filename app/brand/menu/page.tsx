@@ -292,6 +292,14 @@ export default function BrandMenuPage() {
             >
               창업홈페이지 바로가기 &rarr;
             </Link>
+            <Link
+              href="/portal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-white text-neutral-800 hover:text-neutral-950 font-bold text-xs rounded-full transition-all border border-neutral-200 hover:border-neutral-400 cursor-pointer whitespace-nowrap"
+            >
+              점주 전용
+            </Link>
 
             {/* Mobile Menu Button */}
             <button

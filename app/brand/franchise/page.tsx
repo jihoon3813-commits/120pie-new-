@@ -326,10 +326,18 @@ export default function BrandFranchisePage() {
           {/* Right Header Buttons */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
-              href="/brand"
-              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#fbc400] text-neutral-950 font-black text-xs rounded-full transition-all duration-300 shadow-xs hover:bg-amber-400 cursor-pointer whitespace-nowrap"
+              href="/franchise"
+              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-neutral-950 text-[#fbc400] font-black text-xs rounded-full transition-all duration-300 shadow-xs hover:bg-black border border-neutral-800 cursor-pointer whitespace-nowrap"
             >
-              브랜드홈페이지 바로가기 &rarr;
+              창업홈페이지 바로가기 &rarr;
+            </Link>
+            <Link
+              href="/portal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-white text-neutral-800 hover:text-neutral-950 font-bold text-xs rounded-full transition-all border border-neutral-200 hover:border-neutral-400 cursor-pointer whitespace-nowrap"
+            >
+              점주 전용
             </Link>
 
             {/* Mobile Menu Button */}
