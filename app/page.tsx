@@ -1,5 +1,6 @@
-import LandingV6Client from "../components/landing-v6/LandingV6Client";
+import GatePageClient from "@/components/GatePageClient";
 
 export default function Home() {
-  return <LandingV6Client />;
+  return <GatePageClient />;
 }
+

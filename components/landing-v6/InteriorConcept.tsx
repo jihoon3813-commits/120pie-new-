@@ -87,9 +87,9 @@ export default function InteriorConcept() {
       {/* 1. TOP WIDE SLIDER AREA */}
       <div className="w-full relative h-[550px] sm:h-[500px] lg:h-[520px] bg-neutral-900 overflow-hidden isolate" style={{ transform: "translateZ(0)" }}>
         
-        {/* Top Wavy Overlay from PaymentPromo (renders PaymentPromo's bottom color #E4E8F0) */}
+        {/* Top Wavy Overlay (renders preceding Instagram section background color #fafafa) */}
         <div className="absolute top-[-2px] left-0 w-full overflow-hidden leading-none z-30 pointer-events-none">
-          <svg viewBox="0 0 1200 100" preserveAspectRatio="none" className="relative block w-full h-[24px] sm:h-[40px] lg:h-[55px] fill-[#E4E8F0] dark:fill-[#0B0E17]">
+          <svg viewBox="0 0 1200 100" preserveAspectRatio="none" className="relative block w-full h-[24px] sm:h-[40px] lg:h-[55px] fill-[#fafafa] dark:fill-neutral-950">
             <path d="M 0 50 Q 25 10, 50 50 Q 75 90, 100 50 Q 125 10, 150 50 Q 175 90, 200 50 Q 225 10, 250 50 Q 275 90, 300 50 Q 325 10, 350 50 Q 375 90, 400 50 Q 425 10, 450 50 Q 475 90, 500 50 Q 525 10, 550 50 Q 575 90, 600 50 Q 625 10, 650 50 Q 675 90, 700 50 Q 725 10, 750 50 Q 775 90, 800 50 Q 825 10, 850 50 Q 875 90, 900 50 Q 925 10, 950 50 Q 975 90, 1000 50 Q 1025 10, 1050 50 Q 1075 90, 1100 50 Q 1125 10, 1150 50 Q 1175 90, 1200 50 L 1200 0 L 0 0 Z" />
           </svg>
         </div>
@@ -187,8 +187,62 @@ export default function InteriorConcept() {
       </div>
 
       {/* 3. BOTTOM COLLAGE IMAGE GRID (1300px Max-Width) */}
-      <div className="max-w-[1300px] mx-auto w-full px-4 mt-16">
-        <div className="flex flex-col md:flex-row gap-4 w-full items-stretch">
+      <div className="max-w-[1300px] mx-auto w-full px-4 mt-12 sm:mt-16">
+        {/* MOBILE GRID (인테리어 2열, 간판 1열) */}
+        <div className="grid grid-cols-2 gap-3 md:hidden">
+          {/* 인테리어 사진 1 & 2 (2열) */}
+          <div className="aspect-square overflow-hidden shadow-sm relative bg-neutral-900">
+            <img
+              src={optimizeCloudinaryUrl(COLLAGE_IMAGES[0].url)}
+              alt="120겹파이 내부 인테리어 테이블"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="aspect-square overflow-hidden shadow-sm relative bg-neutral-900">
+            <img
+              src={optimizeCloudinaryUrl(COLLAGE_IMAGES[1].url)}
+              alt="120겹파이 주방 쇼케이스 카운터"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* 건물 매장 정면 파사드 간판 (1열 - col-span-2) */}
+          <div className="col-span-2 aspect-[4/3] overflow-hidden shadow-sm relative bg-neutral-900">
+            <img
+              src={optimizeCloudinaryUrl(COLLAGE_IMAGES[2].url)}
+              alt="120겹파이 매장 정면 파사드 간판 전경"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* 돌출 채널 간판 (1열 - col-span-2) */}
+          <div className="col-span-2 aspect-[2/1] overflow-hidden shadow-sm relative bg-neutral-900">
+            <img
+              src={optimizeCloudinaryUrl(COLLAGE_IMAGES[3].url)}
+              alt="120겹파이 돌출 채널간판"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* 인테리어 사진 3 & 4 (2열) */}
+          <div className="aspect-square overflow-hidden shadow-sm relative bg-neutral-900">
+            <img
+              src={optimizeCloudinaryUrl(COLLAGE_IMAGES[4].url)}
+              alt="120겹파이 홀 안락한 손님 테이블존"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="aspect-square overflow-hidden shadow-sm relative bg-neutral-900">
+            <img
+              src={optimizeCloudinaryUrl(COLLAGE_IMAGES[5].url)}
+              alt="120겹파이 모던 주방 및 퇴식대 전경"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        {/* DESKTOP COLLAGE GRID (hidden md:flex) */}
+        <div className="hidden md:flex flex-col md:flex-row gap-4 w-full items-stretch">
           
           {/* Column 1: Two vertically stacked square images */}
           <div className="w-full md:w-1/4 flex flex-col gap-4">

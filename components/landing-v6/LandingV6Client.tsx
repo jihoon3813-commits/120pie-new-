@@ -26,6 +26,8 @@ import Footer from "./Footer";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import QuickInquiryBar from "./QuickInquiryBar";
 
+import CursorFollower from "@/components/CursorFollower";
+
 export default function LandingV6Client() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
@@ -34,6 +36,9 @@ export default function LandingV6Client() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950 font-sans antialiased selection:bg-amber-500 selection:text-neutral-950 transition-colors duration-300">
+      {/* Dynamic Cursor Follower */}
+      <CursorFollower />
+
       {/* Navigation Header */}
       <Header onContactClick={openContactModal} />
 

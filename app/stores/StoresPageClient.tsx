@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, MapPin, Store, ExternalLink, Menu, X, ArrowRight, Search } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, MapPin, Store, ExternalLink, Menu, X, ArrowRight, Search, ChevronRight } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Script from "next/script";
+import ConsultationForm from "@/components/ConsultationForm";
+import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 
 const logoUrlBlack = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png";
 const logoUrlPink = "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png";
@@ -61,12 +63,12 @@ const DEFAULT_STORES: StoreInfo[] = [
 ];
 
 const MENU_MAP: Record<string, { label: string; colorClass: string }> = {
-  "120pie": { label: "120겹파이", colorClass: "bg-rose-500/10 text-rose-500 border border-rose-500/20" },
-  "egg120": { label: "에그120", colorClass: "bg-amber-500/10 text-amber-600 border border-amber-500/20" },
-  "츄러스120": { label: "츄러스120", colorClass: "bg-orange-500/10 text-orange-600 border border-orange-500/20" },
-  "핫도그120": { label: "핫도그120", colorClass: "bg-red-500/10 text-red-600 border border-red-500/20" },
-  "떡볶이120": { label: "떡볶이120", colorClass: "bg-purple-500/10 text-purple-600 border border-purple-500/20" },
-  "120coffee": { label: "120커피", colorClass: "bg-cyan-500/10 text-cyan-600 border border-cyan-500/20" }
+  "120pie": { label: "120겹파이", colorClass: "bg-[#FBC400]/20 text-amber-900 border border-[#FBC400]/40" },
+  "egg120": { label: "에그120", colorClass: "bg-[#FBC400]/20 text-amber-900 border border-[#FBC400]/40" },
+  "츄러스120": { label: "츄러스120", colorClass: "bg-orange-50 text-orange-600 border border-orange-200" },
+  "핫도그120": { label: "핫도그120", colorClass: "bg-rose-50 text-rose-600 border border-rose-200" },
+  "떡볶이120": { label: "떡볶이120", colorClass: "bg-purple-50 text-purple-600 border border-purple-200" },
+  "120coffee": { label: "120커피", colorClass: "bg-sky-50 text-sky-600 border border-sky-200" }
 };
 
 const cleanStoreName = (name: string) => {
@@ -229,31 +231,32 @@ function NaverMap({
         content: `
           <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
             <div style="
-              background: ${isPink ? '#f25f8a' : '#ffd500'}; 
-              border: 2px solid ${isPink ? '#f25f8a' : '#ffd500'}; 
+              background: #FBC400; 
+              border: 2px solid #0D233A; 
               border-radius: 50%; 
-              width: 44px; 
-              height: 44px; 
+              width: 48px; 
+              height: 48px; 
               display: flex; 
               align-items: center; 
               justify-content: center; 
-              box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+              box-shadow: 0 4px 12px rgba(0,0,0,0.3);
               overflow: hidden;
+              padding: 2px;
             ">
-              <img src="${isPink ? 'https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779846449/logo_120pie_coffee3_jzgtyi.png' : 'https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png'}" style="width: 32px; height: 32px; object-fit: contain;" />
+              <img src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784730823/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_5_eadptv.png" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />
             </div>
             <div style="
               width: 0; 
               height: 0; 
               border-left: 6px solid transparent; 
               border-right: 6px solid transparent; 
-              border-top: 8px solid ${isPink ? '#f25f8a' : '#ffd500'};
+              border-top: 8px solid #0D233A;
               margin-top: -1px;
             "></div>
           </div>
         `,
-        size: new naver.maps.Size(44, 51),
-        anchor: new naver.maps.Point(22, 51),
+        size: new naver.maps.Size(48, 55),
+        anchor: new naver.maps.Point(24, 55),
       };
 
       const marker = new naver.maps.Marker({
@@ -566,181 +569,160 @@ export default function StoresPageClient() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans antialiased transition-colors duration-300 ${pageBg}`}>
-      {/* Dynamic Header */}
-      <header className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 ${headerBg}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between min-h-[60px] sm:min-h-[80px] lg:min-h-[94px] gap-2.5 sm:gap-4">
-          <div className="shrink-0 py-2">
-            <Link className="flex items-center group shrink-0" href={backUrl} aria-label="120pie 홈으로 이동">
-              <img
-                src={logoUrl}
-                alt="120pie & coffee"
-                className="h-5 sm:h-7 lg:h-8 w-auto object-contain group-hover:scale-102 transition-all duration-200"
-              />
-            </Link>
-          </div>
+    <div className="min-h-screen bg-white text-neutral-900 font-sans selection:bg-[#FBC400] selection:text-neutral-950 flex flex-col">
+      {/* HEADER / NAVIGATION BAR */}
+      <header className="sticky top-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/95 py-3 border-b border-neutral-100 shadow-sm isolate">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+          {/* Logo */}
+          <Link href="/brand" className="flex items-center gap-2 group shrink-0">
+            <img
+              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
+              alt="120pie 로고"
+              className="h-[22px] md:h-[26px] w-auto object-contain transition-transform duration-300 group-hover:scale-102"
+            />
+          </Link>
 
-          <nav className={`hidden lg:flex items-center justify-center gap-2.5 xl:gap-4 text-[10px] xl:text-[13px] font-bold shrink-0 ${isPink ? "text-neutral-400 hover:text-rose-400" : "text-[#576575] hover:text-[#0d233a]"}`}>
-            <Link href={`/menu?theme=${theme}`} className="hover:text-amber-400 transition-colors">메뉴</Link>
-            <Link href={`/stores?theme=${theme}`} className={`hover:scale-105 transition-transform shrink-0 ${
-              isPink 
-                ? "text-rose-500 hover:text-rose-600 font-extrabold" 
-                : "text-[#ffd500] hover:text-[#e6bd00] font-extrabold"
-            }`}>
-              가맹점 현황
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 lg:gap-10 font-medium text-[16px] text-neutral-700">
+            <Link href="/brand/story" className="hover:text-amber-600 transition-colors whitespace-nowrap">
+              브랜드 소개
             </Link>
-            <Link href={`/costs?theme=${theme}`} className="hover:text-amber-400 transition-colors">비용 안내</Link>
-            <Link href={`/franchise?theme=${theme}`} className="hover:text-amber-400 transition-colors">창업 안내</Link>
-            <Link href={`/faq?theme=${theme}`} className="hover:text-amber-400 transition-colors">FAQ</Link>
+            <Link href="/brand/menu" className="hover:text-amber-600 transition-colors whitespace-nowrap">
+              메뉴 소개
+            </Link>
+            <Link href="/stores" className="hover:text-amber-600 transition-colors whitespace-nowrap">
+              매장 찾기
+            </Link>
+            <Link href="/brand/franchise" className="hover:text-amber-600 transition-colors whitespace-nowrap">
+              창업 안내
+            </Link>
           </nav>
 
-          <div className="flex items-center gap-2.5">
-            <div className={`flex items-center rounded-full border p-0.5 text-[10px] font-black ${isPink ? "border-[#f2ccd7]/20 bg-neutral-900/60" : "border-[#e6dfc3] bg-neutral-900/5"}`}>
-              <button
-                type="button"
-                onClick={() => handleThemeChange("yellow")}
-                className={`rounded-full px-2.5 py-1 transition-colors cursor-pointer border-0 ${
-                  isYellow 
-                    ? "landing-theme-active bg-amber-400 text-neutral-950 font-extrabold shadow-sm" 
-                    : isPink ? "text-neutral-400 hover:text-white" : "text-neutral-500 hover:text-[#0d233a]"
-                }`}
-              >
-                옐로
-              </button>
-              <button
-                type="button"
-                onClick={() => handleThemeChange("pink")}
-                className={`rounded-full px-2.5 py-1 transition-colors cursor-pointer border-0 ${
-                  isPink 
-                    ? "landing-theme-active bg-amber-400 text-neutral-950 font-extrabold shadow-sm" 
-                    : "text-neutral-500 hover:text-[#0d233a]"
-                }`}
-              >
-                블랙
-              </button>
-            </div>
-            <Link className={`hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-lg border text-xs font-bold ${
-              isYellow
-                ? "border-[#e6dfc3] bg-white text-[#576575] hover:bg-[#fffcf0] hover:text-[#0d233a] transition-all"
-                : "border-neutral-800 bg-neutral-900 text-neutral-350 hover:bg-neutral-800 hover:text-white transition-all"
-            }`} href="/portal" target="_blank" rel="noopener noreferrer">
-              점주전용
-            </Link>
+          {/* Quick Consultation CTA */}
+          <div className="hidden md:flex items-center gap-3 shrink-0">
             <button
-              type="button"
               onClick={() => setInquiryForcedOpen(true)}
-              className={`pink-primary-button hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-xs sm:text-sm font-black hover:scale-[1.02] transition-all border-0 cursor-pointer ${
-                isPink 
-                  ? "bg-rose-500 hover:bg-rose-600 text-white shadow-[0_4px_16px_rgba(244,63,94,0.2)]" 
-                  : "bg-amber-400 hover:bg-amber-300 text-neutral-950 shadow-[0_4px_16px_rgba(251,191,36,0.2)]"
-              }`}
+              className="px-5 py-2.5 bg-[#fbc400] hover:bg-[#e0a800] text-[#0D233A] font-extrabold text-xs rounded-full transition-all duration-300 shadow-sm shadow-[#fbc400]/20 hover:scale-103 border-0 cursor-pointer whitespace-nowrap"
             >
-              상담 신청 <ArrowRight size={14} className="ml-1.5 shrink-0" />
+              창업 상담 문의
             </button>
-            <button
-              type="button"
-              className={`pink-primary-button lg:hidden inline-flex items-center justify-center rounded-lg p-2.5 text-xs font-black border-0 cursor-pointer ${
-                isPink 
-                  ? "bg-rose-500 text-white hover:bg-rose-600" 
-                  : "bg-amber-400 text-neutral-950 hover:bg-amber-300"
-              }`}
-              aria-expanded={mobileNavOpen}
-              aria-controls="mobile-landing-nav"
-              onClick={() => setMobileNavOpen(open => !open)}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            className="md:hidden p-2 text-neutral-700 hover:text-amber-600 transition-colors"
+          >
+            {mobileNavOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </header>
+
+      {/* MOBILE NAVIGATION OVERLAY */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 top-[57px] z-[9999] bg-white text-neutral-900 flex flex-col justify-between p-6 sm:p-8 md:hidden animate-fadeIn h-[calc(100vh-57px)] overflow-y-auto shadow-2xl border-t border-neutral-100">
+          <nav className="flex flex-col space-y-1 font-bold text-lg text-neutral-900 text-left">
+            <Link 
+              href="/brand/story" 
+              onClick={() => setMobileNavOpen(false)}
+              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
             >
-              {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
+              <span>브랜드 소개</span>
+              <ChevronRight size={18} className="text-neutral-400" />
+            </Link>
+            <Link 
+              href="/brand/menu" 
+              onClick={() => setMobileNavOpen(false)}
+              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
+            >
+              <span>메뉴 소개</span>
+              <ChevronRight size={18} className="text-neutral-400" />
+            </Link>
+            <Link 
+              href="/stores" 
+              onClick={() => setMobileNavOpen(false)}
+              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
+            >
+              <span>매장 찾기</span>
+              <ChevronRight size={18} className="text-neutral-400" />
+            </Link>
+            <Link
+              href="/brand/franchise"
+              onClick={() => setMobileNavOpen(false)}
+              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
+            >
+              <span>창업 안내</span>
+              <ChevronRight size={18} className="text-neutral-400" />
+            </Link>
+          </nav>
+          <div className="pt-6 border-t border-neutral-100">
+            <button
+              onClick={() => {
+                setMobileNavOpen(false);
+                setInquiryForcedOpen(true);
+              }}
+              className="w-full py-4 bg-[#fbc400] hover:bg-[#e0a800] text-[#0D233A] font-extrabold text-center rounded-2xl text-base transition-colors shadow-md block border-0 cursor-pointer"
+            >
+              창업 상담 문의하기
             </button>
           </div>
         </div>
-        {mobileNavOpen && (
-          <nav id="mobile-landing-nav" className={`lg:hidden border-t px-4 pb-5 pt-3.5 transition-all duration-300 ${isYellow ? "bg-[#fffdf2]/98 border-t border-[#e6dfc3]/60" : "bg-[#0f0a0c]/98 border-t border-[#f2ccd7]/15"}`}>
-            <div className="grid grid-cols-2 gap-2 text-sm font-bold">
-              <Link href={`/menu?theme=${theme}`} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${isYellow ? "bg-white border border-[#e6dfc3]/60 text-[#576575]" : "bg-[#181114] border border-[#f2ccd7]/10 text-neutral-400"}`}>
-                메뉴
-              </Link>
-              <Link href={`/stores?theme=${theme}`} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors font-extrabold ${
-                isPink 
-                  ? "text-rose-500 bg-rose-500/10 border border-rose-500/20" 
-                  : "text-[#ffd500] bg-[#ffd500]/10 border border-[#ffd500]/20"
-              }`}>
-                가맹점 현황
-              </Link>
-              <Link href={`/costs?theme=${theme}`} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${isYellow ? "bg-white border border-[#e6dfc3]/60 text-[#576575]" : "bg-[#181114] border border-[#f2ccd7]/10 text-neutral-400"}`}>
-                비용 안내
-              </Link>
-              <Link href={`/franchise?theme=${theme}`} onClick={() => setMobileNavOpen(false)} className={`rounded-xl px-4 py-3 transition-colors ${isYellow ? "bg-white border border-[#e6dfc3]/60 text-[#576575]" : "bg-[#181114] border border-[#f2ccd7]/10 text-neutral-400"}`}>
-                창업 안내
-              </Link>
-              <Link href={`/faq?theme=${theme}`} onClick={() => setMobileNavOpen(false)} className={`col-span-2 rounded-xl px-4 py-3 transition-colors text-center ${isYellow ? "bg-white border border-[#e6dfc3]/60 text-[#576575]" : "bg-[#181114] border border-[#f2ccd7]/10 text-neutral-400"}`}>
-                FAQ
-              </Link>
-            </div>
-            <div className="flex gap-2 mt-3 w-full">
-              <Link
-                href="/portal"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMobileNavOpen(false)}
-                className={`flex-1 flex items-center justify-center rounded-xl px-4 py-3.5 text-xs sm:text-sm font-black border transition-all focus:outline-none focus:ring-0 outline-none ${
-                  isYellow
-                    ? "border-[#e6dfc3] bg-white text-[#576575] hover:bg-[#fffcf0] hover:text-[#0d233a]"
-                    : "border-neutral-800 bg-neutral-900 text-neutral-350 hover:bg-neutral-800 hover:text-white"
-                }`}
-              >
-                점주전용
-              </Link>
-              <button
-                type="button"
-                onClick={() => { setMobileNavOpen(false); setInquiryForcedOpen(true); }}
-                className={`pink-primary-button flex-1 flex items-center justify-center rounded-xl px-4 py-3.5 text-xs sm:text-sm font-black border-0 cursor-pointer ${
-                  isPink 
-                    ? "bg-rose-500 text-white hover:bg-rose-600 shadow-[0_4px_16px_rgba(244,63,94,0.25)]" 
-                    : "bg-amber-400 text-neutral-950 hover:bg-amber-300 shadow-[0_4px_16px_rgba(251,191,36,0.25)]"
-                }`}
-              >
-                상담 신청 <ArrowRight size={14} className="ml-1.5 shrink-0" />
-              </button>
-            </div>
-          </nav>
-        )}
-      </header>
+      )}
+
+      {/* SUB VISUAL HERO BANNER */}
+      <section className="relative w-full bg-neutral-950 py-20 sm:py-28 text-white overflow-hidden text-left select-none">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-75 scale-105"
+          style={{
+            backgroundImage: `url('https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784776062/Image_3_fz9h0w.png')`,
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent z-10" />
+
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
+          <div className="space-y-1">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+              매장 안내
+            </h1>
+            <p className="text-xs sm:text-sm font-semibold tracking-widest text-[#FBC400] uppercase">
+              Store Locator &amp; Map Search
+            </p>
+            <div className="w-10 h-[3px] bg-[#FBC400] mt-2 rounded-full" />
+          </div>
+          <p className="text-lg sm:text-2xl font-bold text-neutral-200 pt-1">
+            가까운 120PIE &amp; COFFEE 매장의 위치를 확인하세요
+          </p>
+        </div>
+      </section>
 
       {/* Main content wrapper with margin alignment matching header & footer */}
-      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 flex flex-col items-center">
+      <main className="px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-28 sm:pb-36 flex-1 flex flex-col items-center bg-white">
         <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
           {/* Main Title Section */}
-          <div className="max-w-2xl">
-            <span className={`font-bold tracking-widest text-xs uppercase mb-2 block font-mono ${labelAccent}`}>FRANCHISE PARTNERS</span>
-            <h1 className={`text-3xl sm:text-4xl font-black tracking-tight leading-tight mb-2 ${textTitle}`}>
-              120pie 매장 현황
-            </h1>
-            <p className={`text-xs sm:text-sm font-medium leading-relaxed ${textDesc}`}>
+          <div className="max-w-2xl text-left">
+            <span className="font-bold tracking-widest text-xs uppercase mb-2 block font-mono text-amber-600">FRANCHISE STORES</span>
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight mb-2 text-neutral-900">
+              120PIE 가맹점 현황
+            </h2>
+            <p className="text-xs sm:text-sm font-medium leading-relaxed text-neutral-600">
               지도로 확인하고 상세 위치를 실시간 지도로 조회할 수 있습니다.
             </p>
           </div>
 
           {/* Map & List Split Box (Explicit height and border matching the header margins) */}
-          <div className={`w-full h-[550px] sm:h-[650px] lg:h-[700px] flex flex-col lg:flex-row rounded-3xl overflow-hidden shadow-xl border transition-colors duration-300 ${
-            isPink ? "bg-[#140e11] border-neutral-850" : "bg-white border-[#e6dfc3]"
-          }`}>
+          <div className="w-full h-[550px] sm:h-[650px] lg:h-[700px] flex flex-col lg:flex-row rounded-3xl overflow-hidden shadow-md border border-neutral-200 bg-white mb-12 sm:mb-16">
             
             {/* Left Side Panel: Search & Store List */}
-            <div className={`w-full lg:w-[380px] h-[45%] lg:h-full shrink-0 flex flex-col relative lg:border-r transition-colors ${
-              isPink ? "bg-[#140e11] border-neutral-850" : "bg-white border-[#e6dfc3]/80"
-            }`}>
+            <div className="w-full lg:w-[380px] h-[45%] lg:h-full shrink-0 flex flex-col relative lg:border-r border-neutral-200 bg-white">
               {/* A. Search Panel Header */}
-              <div className={`p-4 border-b space-y-3.5 transition-colors ${
-                isPink ? "border-neutral-850" : "border-[#e6dfc3]/60 bg-[#fffdf9]/50"
-              }`}>
+              <div className="p-4 border-b border-neutral-200 bg-white space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className={`text-[9px] tracking-widest font-black uppercase font-mono ${labelAccent}`}>STORE LOCATOR</span>
-                  <h2 className={`text-sm font-black ${textTitle}`}>120pie 매장 찾기</h2>
+                  <span className="text-[10px] tracking-widest font-black uppercase font-mono text-amber-600">STORE LOCATOR</span>
+                  <h2 className="text-sm font-black text-neutral-900">120PIE 매장 찾기</h2>
                 </div>
                 
                 {/* Search Type Tabs */}
-                <div className={`flex p-1 rounded-xl border ${
-                  isPink ? "bg-neutral-950 border-neutral-850" : "bg-[#fff9e6] border-[#ffd500]/15"
-                }`}>
+                <div className="flex p-1 rounded-xl bg-neutral-100 border border-neutral-200">
                   <button
                     type="button"
                     onClick={() => {
@@ -749,10 +731,8 @@ export default function StoresPageClient() {
                     }}
                     className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all border-0 cursor-pointer ${
                       searchType === "direct"
-                        ? isPink
-                          ? "bg-rose-500 text-white shadow-sm font-extrabold"
-                          : "bg-[#ffd500] text-[#0d233a] shadow-sm font-extrabold"
-                        : isPink ? "text-neutral-400 hover:text-white" : "text-[#735965] hover:text-[#bf3e67]"
+                        ? "bg-[#FBC400] text-neutral-950 shadow-xs font-extrabold"
+                        : "text-neutral-600 hover:text-neutral-900 font-semibold"
                     }`}
                   >
                     직접 검색
@@ -765,10 +745,8 @@ export default function StoresPageClient() {
                     }}
                     className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all border-0 cursor-pointer ${
                       searchType === "region"
-                        ? isPink
-                          ? "bg-rose-500 text-white shadow-sm font-extrabold"
-                          : "bg-[#ffd500] text-[#0d233a] shadow-sm font-extrabold"
-                        : isPink ? "text-neutral-400 hover:text-white" : "text-[#735965] hover:text-[#bf3e67]"
+                        ? "bg-[#FBC400] text-neutral-950 shadow-xs font-extrabold"
+                        : "text-neutral-600 hover:text-neutral-900 font-semibold"
                     }`}
                   >
                     지역 검색
@@ -783,13 +761,9 @@ export default function StoresPageClient() {
                       placeholder="매장명 또는 주소를 입력하세요"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className={`w-full border rounded-xl pl-3 pr-10 py-2 text-xs transition-colors ${
-                        isPink
-                          ? "bg-neutral-950 border-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:border-rose-500"
-                          : "bg-white border-[#e6dfc3] text-[#0d233a] placeholder-[#735965]/40 font-semibold focus:outline-none focus:border-[#ffd500]"
-                      }`}
+                      className="w-full border border-neutral-200 rounded-xl pl-3 pr-10 py-2 text-xs text-neutral-900 bg-neutral-50 placeholder-neutral-400 font-semibold focus:outline-none focus:border-[#FBC400] focus:bg-white transition-all"
                     />
-                    <Search size={14} className={`absolute right-3 top-2.5 ${isPink ? "text-neutral-500" : "text-[#735965]/50"}`} />
+                    <Search size={14} className="absolute right-3 top-2.5 text-neutral-400" />
                   </div>
                 ) : (
                   <div className="flex flex-wrap gap-1">
@@ -800,14 +774,10 @@ export default function StoresPageClient() {
                           key={region}
                           type="button"
                           onClick={() => setSelectedRegion(region)}
-                          className={`px-2 py-1.5 rounded-lg text-[9px] font-extrabold transition-all border cursor-pointer ${
+                          className={`px-2 py-1.5 rounded-lg text-[10px] font-extrabold transition-all border cursor-pointer ${
                             isActive
-                              ? isPink
-                                ? "bg-rose-500 border-rose-500 text-white"
-                                : "bg-[#ffd500] border-[#ffd500] text-[#0d233a]"
-                              : isPink
-                                ? "bg-neutral-950 border-neutral-850 text-neutral-400 hover:bg-neutral-800"
-                                : "bg-white border-[#e6dfc3] text-[#735965] hover:bg-[#fff9e6]"
+                              ? "bg-[#FBC400] border-[#FBC400] text-neutral-950"
+                              : "bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100"
                           }`}
                         >
                           {region} ({getRegionCount(region)})
@@ -821,22 +791,16 @@ export default function StoresPageClient() {
                 <button
                   type="button"
                   onClick={handleCurrentLocationSearch}
-                  className={`w-full py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 border-0 cursor-pointer ${
-                    isPink
-                      ? "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
-                      : "bg-[#ffd500]/10 text-[#0d233a] hover:bg-[#ffd500]/20"
-                  }`}
+                  className="w-full py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 border border-amber-400/40 bg-[#FBC400]/20 text-amber-950 hover:bg-[#FBC400]/30 cursor-pointer"
                 >
                   <MapPin size={12} /> 현 위치로 매장 검색하기
                 </button>
               </div>
 
               {/* B. Scrollable Store Cards List */}
-              <div className={`flex-1 overflow-y-auto divide-y transition-colors ${
-                isPink ? "divide-neutral-850 bg-neutral-950" : "divide-[#e6dfc3]/40 bg-[#fffdfa]/50"
-              }`}>
+              <div className="flex-1 overflow-y-auto divide-y divide-neutral-100 bg-white">
                 {finalFilteredStores.length === 0 ? (
-                  <div className={`py-12 text-center text-xs font-bold ${isPink ? "text-neutral-500" : "text-[#735965]"}`}>
+                  <div className="py-12 text-center text-xs font-bold text-neutral-400">
                     검색 조건에 맞는 매장이 없습니다.
                   </div>
                 ) : (
@@ -848,37 +812,31 @@ export default function StoresPageClient() {
                         onClick={() => setSelectedStoreId(store.id)}
                         className={`p-4 text-left cursor-pointer transition-all border-l-4 ${
                           isSelected
-                            ? isPink
-                              ? "border-rose-500 bg-rose-500/5"
-                              : "border-[#ffd500] bg-[#fff9e6]"
-                            : isPink
-                              ? "border-transparent hover:bg-neutral-900/60"
-                              : "border-transparent hover:bg-[#fffdf4]"
+                            ? "border-[#FBC400] bg-amber-50/50"
+                            : "border-transparent hover:bg-neutral-50"
                         }`}
                       >
                         <div className="flex flex-col gap-1">
-                          <span className={`text-[8px] font-black tracking-widest uppercase font-mono ${
-                            isPink ? "text-rose-500/80" : "text-amber-600/80"
-                          }`}>
-                            120pie & coffee
+                          <span className="text-[9px] font-black tracking-widest uppercase font-mono text-amber-600">
+                            120PIE &amp; COFFEE
                           </span>
-                          <h3 className={`font-black text-xs sm:text-sm ${isPink ? "text-white" : "text-[#0d233a]"}`}>
+                          <h3 className="font-black text-sm text-neutral-900">
                             {store.name}
                           </h3>
-                          <p className={`text-[11px] leading-relaxed font-semibold ${isPink ? "text-neutral-400" : "text-[#576575]"}`}>
+                          <p className="text-[11px] leading-relaxed font-medium text-neutral-600">
                             {store.roadAddress} {store.detailAddress}
                           </p>
                           {store.phone && (
-                            <p className={`text-[10px] font-bold flex items-center gap-1 mt-0.5 ${isPink ? "text-rose-400" : "text-[#bf3e67]"}`}>
+                            <p className="text-[10px] font-bold text-amber-700 flex items-center gap-1 mt-0.5">
                               연락처: {formatPhoneNumber(store.phone)}
                             </p>
                           )}
                           
                           <div className="flex flex-wrap gap-1 mt-1.5">
                             {store.adoptionMenu && store.adoptionMenu.map(menu => {
-                              const config = MENU_MAP[menu] || { label: menu, colorClass: isPink ? "bg-neutral-850 text-neutral-500" : "bg-neutral-100 text-neutral-600" };
+                              const config = MENU_MAP[menu] || { label: menu, colorClass: "bg-neutral-100 text-neutral-600 border border-neutral-200" };
                               return (
-                                <span key={menu} className={`px-1.5 py-0.5 rounded text-[8px] font-black ${config.colorClass}`}>
+                                <span key={menu} className={`px-2 py-0.5 rounded-full text-[9px] font-black ${config.colorClass}`}>
                                   {config.label}
                                 </span>
                               );
@@ -887,12 +845,12 @@ export default function StoresPageClient() {
 
                           {/* Expand to show Naver/Kakao map buttons if selected */}
                           {isSelected && (
-                            <div className={`flex gap-2 mt-3 pt-3 border-t ${isPink ? "border-neutral-800" : "border-[#e6dfc3]/40"}`}>
+                            <div className="flex gap-2 mt-3 pt-3 border-t border-neutral-200/80">
                               <a
                                 href={naverMapUrl(store.roadAddress)}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex-1 py-1.5 rounded-lg bg-[#03C75A] text-white text-[10px] font-black text-center hover:bg-[#02b350] transition-colors decoration-none"
+                                className="flex-1 py-2 rounded-xl bg-[#03C75A] text-white text-[11px] font-extrabold text-center hover:bg-[#02b350] transition-colors decoration-none shadow-xs"
                               >
                                 네이버 지도 ↗
                               </a>
@@ -900,7 +858,7 @@ export default function StoresPageClient() {
                                 href={kakaoMapUrl(store.roadAddress)}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex-1 py-1.5 rounded-lg bg-[#FEE500] text-[#191919] text-[10px] font-black text-center hover:bg-[#ebd300] transition-colors decoration-none"
+                                className="flex-1 py-2 rounded-xl bg-[#FEE500] text-neutral-900 text-[11px] font-extrabold text-center hover:bg-[#ebd300] transition-colors decoration-none shadow-xs"
                               >
                                 카카오맵 ↗
                               </a>
@@ -934,13 +892,76 @@ export default function StoresPageClient() {
           </div>
         </div>
 
-        <FloatingAndInquiry
-          forceOpenModal={inquiryForcedOpen}
-          onModalClose={() => setInquiryForcedOpen(false)}
-          isPink={isPink}
-        />
+        {/* QUICK INQUIRY BAR */}
+        <QuickInquiryBar isFixed={true} />
+
+        {/* POPUP CONSULTATION MODAL */}
+        {inquiryForcedOpen && (
+          <div
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fadeIn"
+            onClick={() => setInquiryForcedOpen(false)}
+          >
+            <div
+              className="w-full max-w-3xl bg-neutral-950 border border-[#FBC400]/30 rounded-3xl sm:rounded-[2.5rem] p-6 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative my-auto overflow-hidden text-left"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-[#FBC400] to-amber-500" />
+
+              <button
+                onClick={() => setInquiryForcedOpen(false)}
+                className="absolute top-5 right-5 sm:top-6 sm:right-6 p-2.5 text-neutral-400 hover:text-white bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-full cursor-pointer transition-colors z-50"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="mb-6 select-none space-y-1.5 pr-8">
+                <span className="inline-block px-3 py-1 bg-[#FBC400]/10 border border-[#FBC400]/30 text-[#FBC400] text-[11px] font-black tracking-widest rounded-full uppercase">
+                  120PIE FRANCHISE CONSULTING
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                  창업 상담 문의
+                </h2>
+                <p className="text-xs sm:text-sm text-neutral-400 font-semibold">
+                  기본 정보를 작성해 주시면 전문 컨설턴트가 1:1 맞춤 상담을 안내해 드립니다.
+                </p>
+              </div>
+
+              <div className="max-h-[75vh] overflow-y-auto pr-1">
+                <ConsultationForm onSuccessClose={() => setInquiryForcedOpen(false)} />
+              </div>
+            </div>
+          </div>
+        )}
       </main>
-      <Footer theme={isPink ? "black" : "yellow"} />
+
+      {/* FOOTER */}
+      <footer className="bg-white border-t border-neutral-200 py-12 sm:py-16 text-neutral-400">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-left">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-8 border-b border-neutral-200">
+            <img
+              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
+              alt="120pie 로고"
+              className="h-8 w-auto object-contain brightness-75 grayscale"
+            />
+            <div className="flex flex-wrap gap-4 text-xs font-bold text-neutral-400">
+              <Link href="/brand/story" className="hover:text-neutral-600 transition-colors">회사소개</Link>
+              <a href="#" className="hover:text-neutral-600 transition-colors">이용약관</a>
+              <a href="#" className="hover:text-neutral-600 transition-colors">개인정보처리방침</a>
+              <button onClick={() => setInquiryForcedOpen(true)} className="hover:text-neutral-600 transition-colors text-amber-600 font-extrabold bg-transparent border-0 cursor-pointer">가맹문의</button>
+            </div>
+          </div>
+
+          <div className="space-y-2 text-xs font-semibold leading-relaxed">
+            <p className="text-neutral-500 font-bold">(주) 120파이 프랜차이즈 본사</p>
+            <p>대표자: 홍길동 | 사업자등록번호: 000-00-00000 | 통신판매업신고: 제2026-서울강남-0000호</p>
+            <p>주소: 서울특별시 강남구 테헤란로 120 | 고객센터: 1566-3594 | 이메일: contact@120pie.com</p>
+          </div>
+
+          <div className="pt-4 border-t border-neutral-200/60 flex flex-col sm:flex-row justify-between items-center text-[11px] font-bold text-neutral-400 gap-2">
+            <p>© 120PIE &amp; COFFEE Corp. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

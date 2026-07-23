@@ -18,6 +18,7 @@ import type * as discord from "../discord.js";
 import type * as floatings from "../floatings.js";
 import type * as gallery from "../gallery.js";
 import type * as inquiries from "../inquiries.js";
+import type * as instagram from "../instagram.js";
 import type * as materials from "../materials.js";
 import type * as notices from "../notices.js";
 import type * as orders from "../orders.js";
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   floatings: typeof floatings;
   gallery: typeof gallery;
   inquiries: typeof inquiries;
+  instagram: typeof instagram;
   materials: typeof materials;
   notices: typeof notices;
   orders: typeof orders;

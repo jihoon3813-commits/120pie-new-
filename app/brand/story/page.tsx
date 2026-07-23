@@ -24,41 +24,38 @@ export default function BrandStoryPage() {
       <CursorFollower />
 
       {/* HEADER / NAVIGATION BAR */}
-      <header className="sticky top-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/90 border-b border-neutral-200/60 py-3.5">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <header className="sticky top-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/95 py-3 border-b border-neutral-100 shadow-sm isolate">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/brand" className="flex items-center gap-2 group">
+          <Link href="/brand" className="flex items-center gap-2 group shrink-0">
             <img
               src={optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png")}
               alt="120pie 로고"
-              className="h-[24px] md:h-[28px] w-auto object-contain transition-transform duration-300 group-hover:scale-102"
+              className="h-[22px] md:h-[26px] w-auto object-contain transition-transform duration-300 group-hover:scale-102"
             />
           </Link>
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 lg:gap-10 font-medium text-[16px] text-neutral-700">
-            <Link href="/brand/story" className="text-amber-600 font-bold border-b-2 border-amber-500 pb-0.5">
+            <Link href="/brand/story" className="hover:text-amber-600 transition-colors whitespace-nowrap">
               브랜드 소개
             </Link>
-            <Link href="/brand/menu" className="hover:text-amber-600 transition-colors">
+            <Link href="/brand/menu" className="hover:text-amber-600 transition-colors whitespace-nowrap">
               메뉴 소개
             </Link>
-            <Link href="/stores" className="hover:text-amber-600 transition-colors">
+            <Link href="/stores" className="hover:text-amber-600 transition-colors whitespace-nowrap">
               매장 찾기
             </Link>
-            <Link href="/brand#news" className="hover:text-amber-600 transition-colors">
-              뉴스 & 이벤트
-            </Link>
-            <Link href="/franchise" className="text-amber-600 hover:text-amber-700 transition-colors flex items-center gap-0.5 font-medium">
-              창업안내 <ChevronRight size={14} />
+            <Link href="/brand/franchise" className="hover:text-amber-600 transition-colors whitespace-nowrap">
+              창업 안내
             </Link>
           </nav>
 
           {/* Quick Consultation CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3 shrink-0">
             <button
               onClick={() => setIsConsulting(true)}
-              className="px-5 py-2.5 bg-[#fbc400] hover:bg-[#e0a800] text-[#0D233A] font-extrabold text-xs rounded-full transition-all duration-300 shadow-sm shadow-[#fbc400]/20 hover:scale-103 border-0 cursor-pointer"
+              className="px-5 py-2.5 bg-[#fbc400] hover:bg-[#e0a800] text-[#0D233A] font-extrabold text-xs rounded-full transition-all duration-300 shadow-sm shadow-[#fbc400]/20 hover:scale-103 border-0 cursor-pointer whitespace-nowrap"
             >
               창업 상담 문의
             </button>
@@ -76,28 +73,52 @@ export default function BrandStoryPage() {
 
       {/* MOBILE NAVIGATION OVERLAY */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 top-16 z-40 bg-neutral-900/98 flex flex-col p-6 space-y-6 md:hidden animate-fadeIn">
-          <nav className="flex flex-col space-y-4 font-medium text-lg text-neutral-200 text-left">
-            <Link href="/brand/story" className="py-2 border-b border-neutral-800 text-[#fbc400] font-bold text-left block">
-              브랜드 소개
+        <div className="fixed inset-0 top-[57px] z-[9999] bg-white text-neutral-900 flex flex-col justify-between p-6 sm:p-8 md:hidden animate-fadeIn h-[calc(100vh-57px)] overflow-y-auto shadow-2xl border-t border-neutral-100">
+          <nav className="flex flex-col space-y-1 font-bold text-lg text-neutral-900 text-left">
+            <Link 
+              href="/brand/story" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
+            >
+              <span>브랜드 소개</span>
+              <ChevronRight size={18} className="text-neutral-400" />
             </Link>
-            <Link href="/brand/menu" className="py-2 border-b border-neutral-800 hover:text-[#fbc400] transition-colors text-left block">
-              메뉴 소개
+            <Link 
+              href="/brand/menu" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
+            >
+              <span>메뉴 소개</span>
+              <ChevronRight size={18} className="text-neutral-400" />
             </Link>
-            <Link href="/stores" className="py-2 border-b border-neutral-800 hover:text-[#fbc400] transition-colors text-left block">
-              매장 찾기
-            </Link>
-            <Link href="/brand#news" className="py-2 border-b border-neutral-800 hover:text-[#fbc400] transition-colors text-left block">
-              뉴스 & 이벤트
+            <Link 
+              href="/stores" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
+            >
+              <span>매장 찾기</span>
+              <ChevronRight size={18} className="text-neutral-400" />
             </Link>
             <Link
-              href="/franchise"
-              className="py-2 border-b border-neutral-800 text-amber-500 hover:text-[#fbc400] transition-colors text-left flex items-center justify-between w-full font-medium"
+              href="/brand/franchise"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
             >
-              <span>창업안내</span>
-              <ChevronRight size={18} />
+              <span>창업 안내</span>
+              <ChevronRight size={18} className="text-neutral-400" />
             </Link>
           </nav>
+          <div className="pt-6 border-t border-neutral-100">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setIsConsulting(true);
+              }}
+              className="w-full py-4 bg-[#fbc400] hover:bg-[#e0a800] text-[#0D233A] font-extrabold text-center rounded-2xl text-base transition-colors shadow-md block border-0 cursor-pointer"
+            >
+              창업 상담 문의하기
+            </button>
+          </div>
         </div>
       )}
 
@@ -128,15 +149,15 @@ export default function BrandStoryPage() {
         </div>
       </section>
 
-      {/* SUB-PAGE SUB-MENU TABS BAR (Page Link Tabs) */}
-      <div className="sticky top-[58px] z-30 bg-white border-b border-neutral-200 shadow-sm py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+      {/* SUB-PAGE SUB-MENU TABS BAR (Page Link Tabs - Single row 1-line on mobile) */}
+      <div className="sticky top-[58px] z-30 bg-white border-b border-neutral-200 shadow-sm py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-3 flex-nowrap overflow-x-auto no-scrollbar whitespace-nowrap">
             {SUB_MENU_TABS.map((tab) => (
               <Link
                 key={tab.id}
                 href={tab.href}
-                className={`px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-black transition-all duration-300 border ${
+                className={`px-3.5 py-2 sm:px-6 sm:py-2.5 rounded-full text-[12px] sm:text-sm font-black transition-all duration-300 border shrink-0 ${
                   tab.id === "story"
                     ? "bg-[#FBC400] text-neutral-950 border-[#FBC400] shadow-sm scale-102"
                     : "bg-neutral-100 text-neutral-600 border-neutral-200 hover:bg-neutral-200 hover:text-neutral-900"
@@ -156,135 +177,123 @@ export default function BrandStoryPage() {
             정직함과 특별함이 깃든 120겹 파이 <span className="text-amber-600">120PIE!</span>
           </h2>
 
-          {/* VIDEO CONTAINER PLACEHOLDER */}
-          <div className="relative w-full aspect-video rounded-3xl overflow-hidden bg-neutral-900 border-4 border-[#FBC400] shadow-2xl group flex items-center justify-center">
-            <div
-              className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:scale-102 transition-transform duration-700"
-              style={{
-                backgroundImage: `url('${optimizeCloudinaryUrl(
-                  "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
-                )}')`,
-              }}
+          {/* VIDEO CONTAINER PLAYER */}
+          <div className="relative w-full aspect-video rounded-3xl overflow-hidden bg-neutral-900 border-4 border-[#FBC400] shadow-2xl flex items-center justify-center">
+            <video
+              src="https://github.com/jihoon3813-commits/imgs_cafe120/raw/refs/heads/main/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C,%EC%96%91%EC%86%A1%EC%9D%B4%20%EC%88%98%EC%A0%952.mp4"
+              className="w-full h-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls
             />
-            <div className="absolute inset-0 bg-black/40" />
-
-            <div className="relative z-10 flex flex-col items-center gap-3 text-white">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#FBC400] text-neutral-950 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
-                <Play size={32} className="ml-1 fill-neutral-950" />
-              </div>
-              <p className="text-sm sm:text-base font-extrabold tracking-tight">
-                120PIE 공식 브랜드 스토리 영상
-              </p>
-              <span className="text-xs text-neutral-300 font-medium">
-                (동영상 파일 추후 업데이트 예정)
-              </span>
-            </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-100 border border-neutral-200 rounded-2xl text-xs sm:text-sm text-neutral-600 font-semibold max-w-2xl mx-auto">
-            <span className="text-red-500 font-black">※</span>
-            <span>동영상 재생에 어려움이 있으신 경우 브라우저의 새로고침 키(F5)를 누르시면 동영상을 보실 수 있습니다.</span>
+          {/* VIDEO REFRESH NOTICE (Compact 2 lines on mobile) */}
+          <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-neutral-100 border border-neutral-200 rounded-2xl text-[10px] sm:text-xs text-neutral-700 font-semibold max-w-xl mx-auto text-center leading-snug">
+            <span className="text-red-500 font-black shrink-0 text-[11px]">※</span>
+            <p className="text-center text-[10px] sm:text-xs">
+              동영상 재생에 어려움이 있으신 경우<br className="sm:hidden" />
+              브라우저의 새로고침 키(F5)를 누르시면 동영상을 보실 수 있습니다.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* 2. BLUE OCEAN ITEM & 3-CARD GRID */}
+      {/* 2. BLUE OCEAN ITEM & 3-CARD GRID (Yellow Theme Cards) */}
       <section className="py-16 sm:py-24 bg-[#FAF9F5] border-t border-neutral-200 text-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <div className="max-w-4xl mx-auto space-y-6">
             <h2 className="text-2xl sm:text-4xl font-black text-neutral-900 leading-tight">
-              기존의 디저트, 카페 전문점과 확실하게 차별화한
+              익숙한 디저트 카페를 넘어,
               <br />
-              <span className="text-amber-600">'블루오션 창업 아이템'</span>입니다.
+              차별화된 경쟁력을 갖춘 <span className="text-amber-600">‘블루오션 창업 브랜드’</span>입니다.
             </h2>
             <div className="space-y-3 text-xs sm:text-base text-neutral-600 font-medium leading-relaxed">
               <p>
-                모방불가, 비교불가 정통 120겹 수제 파이와 프리미엄 커피의 조화를 실현하기 위해
-                <strong> (주)120PIE 가맹본사</strong>에서 오랜 기간 연구·개발하여 런칭한 자체 시그니처 브랜드입니다.
-              </p>
-              <p>
-                그 밖에 <strong>자체 제조, 생산의 노하우</strong>로 맛의 경쟁력을 두어 가맹점 운영의 경쟁력을 더욱 극대화하였습니다.
-                내 가족이 먹는 음식처럼 더 깨끗하고, 더 맛있는 120겹 파이를 제공하기 위하여 언제나 정성을 담아내겠습니다.
+                120PIE는 기존 저가 커피 시장의 출혈 경쟁에서 벗어나, 고부가가치 디저트를 주력으로 결합하여 
+                사계절 내내 흔들림 없는 독보적인 매출 안정성을 자랑합니다.
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-            {/* Card 1 */}
+            {/* Card 1 (Yellow Box) */}
             <div className="bg-white rounded-3xl overflow-hidden border border-neutral-200/80 shadow-md flex flex-col group">
               <div className="h-64 sm:h-72 bg-neutral-900 relative overflow-hidden">
                 <img
                   src={optimizeCloudinaryUrl(
-                    "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
+                    "https://res.cloudinary.com/lyjyvy54/image/upload/v1784769078/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_12%EC%9D%BC_%EC%98%A4%ED%9B%84_06_08_04_1_zqvwn4.png"
                   )}
                   alt="120겹 파이 이미지"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
-              <div className="bg-[#78A739] text-white p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div className="bg-[#FBC400] text-neutral-950 p-6 flex-1 flex flex-col justify-between space-y-4">
                 <div className="space-y-1">
-                  <p className="text-xs text-white/80 font-bold">깊은 맛과 풍미가 일품인</p>
-                  <h3 className="text-xl sm:text-2xl font-black">120겹 수제 파이</h3>
+                  <p className="text-xs text-neutral-900/80 font-extrabold">깊은 맛과 풍미가 일품인</p>
+                  <h3 className="text-xl sm:text-2xl font-black text-neutral-950">120겹 수제 파이</h3>
                 </div>
                 <Link
                   href="/brand/menu"
-                  className="inline-flex items-center text-xs font-black text-white hover:underline gap-1"
+                  className="inline-flex items-center text-xs font-black text-neutral-950 hover:underline gap-1"
                 >
                   전체 메뉴 보기 &gt;
                 </Link>
               </div>
             </div>
 
-            {/* Card 2 */}
+            {/* Card 2 (Yellow Box) */}
             <div className="bg-white rounded-3xl overflow-hidden border border-neutral-200/80 shadow-md flex flex-col group">
               <div className="h-64 sm:h-72 bg-neutral-900 relative overflow-hidden">
                 <img
                   src={optimizeCloudinaryUrl(
-                    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705753/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_21_1_vvaugb.png"
+                    "https://res.cloudinary.com/lyjyvy54/image/upload/v1784769095/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_20%EC%9D%BC_%EC%98%A4%ED%9B%84_04_06_57_rxj8k3.png"
                   )}
                   alt="120PIE 매장 파사드 이미지"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
-              <div className="bg-[#78A739] text-white p-6 flex-1 flex flex-col justify-between space-y-4">
-                <div className="flex flex-wrap gap-1.5 text-[10px] font-extrabold text-white/90">
-                  <span className="px-2 py-0.5 bg-white/20 rounded-md">#홀매출</span>
-                  <span className="px-2 py-0.5 bg-white/20 rounded-md">#테이크아웃</span>
-                  <span className="px-2 py-0.5 bg-white/20 rounded-md">#배달</span>
-                  <span className="px-2 py-0.5 bg-white/20 rounded-md">#높은수익률</span>
-                  <span className="px-2 py-0.5 bg-white/20 rounded-md">#키오스크</span>
-                  <span className="px-2 py-0.5 bg-white/20 rounded-md">#조리간소화</span>
-                  <span className="px-2 py-0.5 bg-white/20 rounded-md">#고회전율</span>
+              <div className="bg-[#FBC400] text-neutral-950 p-6 flex-1 flex flex-col justify-between space-y-4">
+                <div className="flex flex-wrap gap-1.5 text-[10px] font-black text-neutral-950">
+                  <span className="px-2 py-0.5 bg-black/10 rounded-md">#홀매출</span>
+                  <span className="px-2 py-0.5 bg-black/10 rounded-md">#테이크아웃</span>
+                  <span className="px-2 py-0.5 bg-black/10 rounded-md">#배달</span>
+                  <span className="px-2 py-0.5 bg-black/10 rounded-md">#높은수익률</span>
+                  <span className="px-2 py-0.5 bg-black/10 rounded-md">#키오스크</span>
+                  <span className="px-2 py-0.5 bg-black/10 rounded-md">#조리간소화</span>
+                  <span className="px-2 py-0.5 bg-black/10 rounded-md">#고회전율</span>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-white/80 font-bold">차별화된 성공 창업 시스템</p>
-                  <h3 className="text-xl sm:text-2xl font-black">120PIE & COFFEE</h3>
+                  <p className="text-xs text-neutral-900/80 font-extrabold">차별화된 성공 창업 시스템</p>
+                  <h3 className="text-xl sm:text-2xl font-black text-neutral-950">120PIE & COFFEE</h3>
                 </div>
               </div>
             </div>
 
-            {/* Card 3 */}
+            {/* Card 3 (Yellow Box) */}
             <div className="bg-white rounded-3xl overflow-hidden border border-neutral-200/80 shadow-md flex flex-col group">
               <div className="h-64 sm:h-72 bg-neutral-900 relative overflow-hidden">
                 <img
                   src={optimizeCloudinaryUrl(
-                    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png"
+                    "https://res.cloudinary.com/lyjyvy54/image/upload/v1784531905/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_20%EC%9D%BC_%EC%98%A4%ED%9B%84_03_50_21_1_ehld8g.png"
                   )}
                   alt="인테리어 컨셉 이미지"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
-              <div className="bg-[#78A739] text-white p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div className="bg-[#FBC400] text-neutral-950 p-6 flex-1 flex flex-col justify-between space-y-4">
                 <div className="space-y-1">
-                  <p className="text-xs text-white/80 font-bold">편안하고 깨끗한 이미지, 힐링 공간</p>
-                  <h3 className="text-lg sm:text-xl font-black leading-snug">
+                  <p className="text-xs text-neutral-900/80 font-extrabold">편안하고 깨끗한 이미지, 힐링 공간</p>
+                  <h3 className="text-lg sm:text-xl font-black leading-snug text-neutral-950">
                     수제 느낌을 강조한 카페형 인테리어 컨셉
                   </h3>
                 </div>
                 <Link
                   href="/brand/bi"
-                  className="inline-flex items-center text-xs font-black text-white hover:underline gap-1"
+                  className="inline-flex items-center text-xs font-black text-neutral-950 hover:underline gap-1"
                 >
                   인테리어 더보기 &gt;
                 </Link>
@@ -300,7 +309,7 @@ export default function BrandStoryPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center space-y-2">
             <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
-              브랜드 파워 No.1! <span className="text-[#FBC400]">120PIE</span>
+              브랜드 파워<br className="sm:hidden" /> No.1! <span className="text-[#FBC400]">120PIE</span>
             </h2>
             <p className="text-sm sm:text-lg text-neutral-300 font-semibold">
               디저트 카페 시장점유율 1위! 1등의 이유는 확실합니다!
@@ -308,47 +317,52 @@ export default function BrandStoryPage() {
           </div>
 
           <div className="space-y-16 sm:space-y-24 pt-8">
-            {/* Block 1 */}
+            {/* Block 1 (Center aligned & Number on top line for mobile) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-5 h-64 sm:h-80 rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-800 relative">
                 <img
                   src={optimizeCloudinaryUrl(
-                    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705753/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_21_1_vvaugb.png"
+                    "https://res.cloudinary.com/lyjyvy54/image/upload/v1784773255/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_23%EC%9D%BC_%EC%98%A4%EC%A0%84_11_19_35_1_cjxhld.png"
                   )}
-                  alt="트렌드 분석 이미지"
+                  alt="유행을 넘어 지속 가능한 경쟁력"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="lg:col-span-7 space-y-4 text-left">
+              <div className="lg:col-span-7 space-y-3 text-center lg:text-left">
                 <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-                  성공 창업의 첫째 조건은 <span className="text-[#FBC400]">정확한 트렌드 분석</span>
+                  <span className="text-[#FBC400] block sm:inline mb-1 sm:mb-0">01.</span>
+                  <span className="block sm:inline">
+                    유행을 넘어<br className="sm:hidden" /> 지속 가능한 경쟁력
+                  </span>
                 </h3>
-                <p className="text-sm sm:text-base text-neutral-300 font-medium leading-relaxed">
-                  무조건 싸게 파는 저가형 브랜드는 단명하기 쉬운 아이템이므로 절대 조심해야 합니다.
-                  나와 내 가족이 안심하고 먹지 못하는 아이템은 소비자에게 절대로 인정받을 수 없습니다.
-                </p>
-                <p className="text-sm sm:text-base text-neutral-300 font-medium leading-relaxed">
-                  120PIE는 현 트렌드의 흐름을 정확하게 캐치하여 대중적인 것을 특화 시킨 차별화된 성공 창업 아이템입니다.
+                <p className="text-xs sm:text-base text-neutral-300 font-medium leading-relaxed text-center lg:text-left">
+                  성공 창업은 시장의 흐름을 읽는 것에서 시작됩니다.<br />
+                  단순히 가격만 낮춘 브랜드는 쉽게 모방되고 빠르게 소비될 수 있습니다.<br className="hidden sm:inline" />
+                  120PIE는 대중적인 디저트에 ‘120겹 수제 파이’라는 독창성을 더해, 트렌드와 지속 가능성을 모두 갖춘 차별화된 창업 모델을 제안합니다.
                 </p>
               </div>
             </div>
 
             {/* Block 2 */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-7 space-y-4 text-left order-2 lg:order-1">
+              <div className="lg:col-span-7 space-y-3 text-center lg:text-left order-2 lg:order-1">
                 <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-                  주머니가 가벼운 불경기에 맞는 <span className="text-[#FBC400]">저렴한 메뉴 구성</span>
+                  <span className="text-[#FBC400] block sm:inline mb-1 sm:mb-0">02.</span>
+                  <span className="block sm:inline">
+                    부담 없이 즐기는<br className="sm:hidden" /> 높은 상품 가치
+                  </span>
                 </h3>
-                <p className="text-sm sm:text-base text-neutral-300 font-medium leading-relaxed">
-                  120PIE는 학생, 직장인, 다수의 서민층의 눈높이에 맞추어 가격은 더 저렴하면서 중독성 있는 맛과 비주얼로 고객만족도를 우선하였습니다.
+                <p className="text-xs sm:text-base text-neutral-300 font-medium leading-relaxed text-center lg:text-left">
+                  불황기에도 고객이 기꺼이 선택하는 합리적인 메뉴를 만듭니다.<br />
+                  120PIE는 학생부터 직장인과 가족 고객까지 누구나 부담 없이 즐길 수 있는 가격대를 바탕으로, 중독성 있는 맛과 시선을 사로잡는 비주얼을 함께 갖췄습니다. 가격 이상의 만족을 제공해 자연스러운 재구매로 이어집니다.
                 </p>
               </div>
               <div className="lg:col-span-5 h-64 sm:h-80 rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-800 relative order-1 lg:order-2">
                 <img
                   src={optimizeCloudinaryUrl(
-                    "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
+                    "https://res.cloudinary.com/lyjyvy54/image/upload/v1784773255/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_23%EC%9D%BC_%EC%98%A4%EC%A0%84_11_19_35_2_larhcp.png"
                   )}
-                  alt="메뉴 구성 이미지"
+                  alt="부담 없이 즐기는 높은 상품 가치"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -359,21 +373,22 @@ export default function BrandStoryPage() {
               <div className="lg:col-span-5 h-64 sm:h-80 rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-800 relative">
                 <img
                   src={optimizeCloudinaryUrl(
-                    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png"
+                    "https://res.cloudinary.com/lyjyvy54/image/upload/v1784773254/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_23%EC%9D%BC_%EC%98%A4%EC%A0%84_11_12_23_3_owoiyx.png"
                   )}
-                  alt="가맹 본사 이미지"
+                  alt="체계적인 시스템을 갖춘 가맹본사"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="lg:col-span-7 space-y-4 text-left">
+              <div className="lg:col-span-7 space-y-3 text-center lg:text-left">
                 <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-                  검증된 프랜차이즈 <span className="text-[#FBC400]">가맹 본사 (주)120PIE</span>
+                  <span className="text-[#FBC400] block sm:inline mb-1 sm:mb-0">03.</span>
+                  <span className="block sm:inline">
+                    체계적인 시스템을<br className="sm:hidden" /> 갖춘 가맹본사
+                  </span>
                 </h3>
-                <p className="text-sm sm:text-base text-neutral-300 font-medium leading-relaxed">
-                  아무리 좋은 아이템도 가맹본사의 운영 능력이나 프랜차이즈 인프라가 구축되지 않은 부실한 가맹본사는 브랜드 성공의 한계가 드러날 수밖에 없습니다.
-                </p>
-                <p className="text-sm sm:text-base text-neutral-300 font-medium leading-relaxed">
-                  120PIE 가맹본사는 150여개의 협력사와 우수한 인재를 보유한 검증된 가맹본사입니다.
+                <p className="text-xs sm:text-base text-neutral-300 font-medium leading-relaxed text-center lg:text-left">
+                  좋은 아이템의 성공은 본사의 운영 역량이 완성합니다.<br />
+                  ㈜120PIE는 약 150개 협력사와 분야별 전문 인력을 기반으로 상품 개발부터 생산·물류·교육·매장 운영까지 체계적인 가맹 지원 시스템을 구축했습니다. 축적된 경험과 안정적인 인프라로 가맹점의 시작과 성장을 함께합니다.
                 </p>
               </div>
             </div>
@@ -382,7 +397,7 @@ export default function BrandStoryPage() {
         </div>
       </section>
 
-      {/* 4. SYSTEM COMPETITIVENESS & GREEN BORDER BOX */}
+      {/* 4. SYSTEM COMPETITIVENESS & YELLOW BORDER BOX */}
       <section className="py-16 sm:py-24 bg-white text-left">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
@@ -390,7 +405,7 @@ export default function BrandStoryPage() {
             <div className="h-56 rounded-3xl overflow-hidden bg-neutral-100 border border-neutral-200">
               <img
                 src={optimizeCloudinaryUrl(
-                  "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
+                  "https://res.cloudinary.com/lyjyvy54/image/upload/v1784770503/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_23%EC%9D%BC_%EC%98%A4%EC%A0%84_10_34_47_1_lpahhw.png"
                 )}
                 alt="갤러리 이미지 1"
                 className="w-full h-full object-cover"
@@ -399,7 +414,7 @@ export default function BrandStoryPage() {
             <div className="h-56 rounded-3xl overflow-hidden bg-neutral-100 border border-neutral-200">
               <img
                 src={optimizeCloudinaryUrl(
-                  "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705753/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_21_1_vvaugb.png"
+                  "https://res.cloudinary.com/lyjyvy54/image/upload/v1784770503/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_23%EC%9D%BC_%EC%98%A4%EC%A0%84_10_34_47_2_hiicbe.png"
                 )}
                 alt="갤러리 이미지 2"
                 className="w-full h-full object-cover"
@@ -408,7 +423,7 @@ export default function BrandStoryPage() {
             <div className="h-56 rounded-3xl overflow-hidden bg-neutral-100 border border-neutral-200">
               <img
                 src={optimizeCloudinaryUrl(
-                  "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png"
+                  "https://res.cloudinary.com/lyjyvy54/image/upload/v1784770501/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_23%EC%9D%BC_%EC%98%A4%EC%A0%84_10_34_48_3_o2ok5m.png"
                 )}
                 alt="갤러리 이미지 3"
                 className="w-full h-full object-cover"
@@ -416,41 +431,50 @@ export default function BrandStoryPage() {
             </div>
           </div>
 
-          <div className="p-8 sm:p-12 border-4 border-[#78A739] rounded-3xl bg-[#FAF9F5] space-y-10">
+          <div className="p-8 sm:p-12 border-4 border-[#FBC400] rounded-3xl bg-[#FAF9F5] space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="space-y-3">
+              <div className="space-y-3 text-center md:text-left">
                 <h3 className="text-lg sm:text-xl font-black text-neutral-900 leading-tight">
-                  전 가맹점에 철저한 본사 인력파견 도입으로 <span className="text-[#78A739]">인건비 절감</span>
+                  <span className="text-amber-600 block md:inline mb-1 md:mb-0">01.</span>
+                  <span className="block md:inline">
+                    효율적인 매장 운영으로<br className="sm:hidden" /> 인건비 부담 완화
+                  </span>
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed">
-                  120PIE는 각 가맹점의 효율적 인력 운영 시스템으로 매장 인력 운영 효율을 우선하여 가맹점의 안정적 운영을 극대화시켰습니다.
+                  120PIE는 간편한 조리 과정과 표준화된 운영 시스템을 통해 적은 인원으로도 효율적인 매장 운영이 가능합니다. 인건비 부담은 낮추고 매장 운영의 안정성은 높였습니다.
                 </p>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3 text-center md:text-left">
                 <h3 className="text-lg sm:text-xl font-black text-neutral-900 leading-tight">
-                  아낌없는 가맹 본사의 <span className="text-[#78A739]">홍보 광고 지원과 최고의 시스템</span>
+                  <span className="text-amber-600 block md:inline mb-1 md:mb-0">02.</span>
+                  <span className="block md:inline">
+                    매출 성장을 돕는<br className="sm:hidden" /> 체계적인 홍보 지원
+                  </span>
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed">
-                  120PIE 가맹 본사는 홍보 광고 지원과 본사 운영 시스템, 1일 10만명의 소비자 구매력을 이끌어가는 우수 기업입니다.
+                  120PIE는 브랜드 콘텐츠와 온·오프라인 광고를 통해 가맹점의 홍보 활동을 지원합니다. 본사의 운영 노하우와 마케팅 시스템으로 고객 유입과 지속적인 매출 성장을 돕습니다.
                 </p>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3 text-center md:text-left">
                 <h3 className="text-lg sm:text-xl font-black text-neutral-900 leading-tight">
-                  가맹점 우선의 <span className="text-[#78A739]">합리적인 가맹본사</span>
+                  <span className="text-amber-600 block md:inline mb-1 md:mb-0">03.</span>
+                  <span className="block md:inline">
+                    가맹점과 함께<br className="sm:hidden" /> 성장하는 상생 시스템
+                  </span>
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed">
-                  120PIE 가맹본사는 전국 책임제 관리 시스템을 정착하여 가맹점과 소통하고 상생하는 선진 프랜차이즈 시스템으로 인정받고 있는 합리적인 가맹본사입니다.
+                  120PIE는 체계적인 매장 관리와 지속적인 소통을 바탕으로 가맹점의 안정적인 운영을 지원합니다. 본사와 가맹점이 함께 성장하는 건강한 파트너십을 지향합니다.
                 </p>
               </div>
             </div>
 
             <div className="pt-6 border-t border-neutral-300 text-center max-w-4xl mx-auto space-y-2">
               <p className="text-xs sm:text-sm text-neutral-700 font-bold leading-relaxed">
-                120PIE 브랜드는 대한민국 대표 디저트 No.1의 명예와 자부심으로 런칭된 브랜드입니다.
+                120PIE는 차별화된 제품과 체계적인 운영 시스템을 바탕으로 성장해 온 디저트 브랜드입니다.
                 <br className="hidden sm:inline" />
-                그러므로 돈을 벌기 위한 브랜드이기보다 소비자에게 더 좋은 문화와 건강, 그리고 더 안심할 수 있는 먹거리를 제공하는 것이 120PIE의 가치와 목표입니다.
+                단기적인 이익보다 고객에게 좋은 맛과 즐거운 경험을 제공하고, 가맹점과 오래 함께 성장하는 것을 가장 중요한 가치로 생각합니다.
               </p>
             </div>
           </div>

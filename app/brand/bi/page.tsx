@@ -46,11 +46,8 @@ export default function BiInteriorPage() {
             <Link href="/stores" className="hover:text-amber-600 transition-colors">
               매장 찾기
             </Link>
-            <Link href="/brand#news" className="hover:text-amber-600 transition-colors">
-              뉴스 & 이벤트
-            </Link>
-            <Link href="/franchise" className="text-amber-600 hover:text-amber-700 transition-colors flex items-center gap-0.5 font-medium">
-              창업안내 <ChevronRight size={14} />
+            <Link href="/brand/franchise" className="hover:text-amber-600 transition-colors">
+              창업 안내
             </Link>
           </nav>
 
@@ -87,15 +84,8 @@ export default function BiInteriorPage() {
             <Link href="/stores" className="py-2 border-b border-neutral-800 hover:text-[#fbc400] transition-colors text-left block">
               매장 찾기
             </Link>
-            <Link href="/brand#news" className="py-2 border-b border-neutral-800 hover:text-[#fbc400] transition-colors text-left block">
-              뉴스 & 이벤트
-            </Link>
-            <Link
-              href="/franchise"
-              className="py-2 border-b border-neutral-800 text-amber-500 hover:text-[#fbc400] transition-colors text-left flex items-center justify-between w-full font-medium"
-            >
-              <span>창업안내</span>
-              <ChevronRight size={18} />
+            <Link href="/brand/franchise" className="py-2 border-b border-neutral-800 hover:text-[#fbc400] transition-colors text-left block">
+              창업 안내
             </Link>
           </nav>
         </div>
@@ -129,14 +119,14 @@ export default function BiInteriorPage() {
       </section>
 
       {/* SUB-PAGE SUB-MENU TABS BAR (Page Link Tabs) */}
-      <div className="sticky top-[58px] z-30 bg-white border-b border-neutral-200 shadow-sm py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+      <div className="sticky top-[58px] z-30 bg-white border-b border-neutral-200 shadow-sm py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-3 flex-nowrap overflow-x-auto no-scrollbar whitespace-nowrap">
             {SUB_MENU_TABS.map((tab) => (
               <Link
                 key={tab.id}
                 href={tab.href}
-                className={`px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-black transition-all duration-300 border ${
+                className={`px-3.5 py-2 sm:px-6 sm:py-2.5 rounded-full text-[12px] sm:text-sm font-black transition-all duration-300 border shrink-0 ${
                   tab.id === "bi"
                     ? "bg-[#FBC400] text-neutral-950 border-[#FBC400] shadow-sm scale-102"
                     : "bg-neutral-100 text-neutral-600 border-neutral-200 hover:bg-neutral-200 hover:text-neutral-900"
@@ -168,7 +158,7 @@ export default function BiInteriorPage() {
             {/* 2. BASIC SYSTEM TEXT SECTION */}
             <div className="space-y-4 text-left">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-1 bg-[#78A739] rounded-full" />
+                <div className="w-12 h-1 bg-[#FBC400] rounded-full" />
                 <h2 className="text-xl sm:text-2xl font-black tracking-tight text-neutral-900 uppercase">
                   BASIC SYSTEM
                 </h2>
@@ -302,7 +292,7 @@ export default function BiInteriorPage() {
                 <div className="h-64 sm:h-72 bg-neutral-900 overflow-hidden relative">
                   <img
                     src={optimizeCloudinaryUrl(
-                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png"
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/v1784774102/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_20%EC%9D%BC_%EC%98%A4%ED%9B%84_04_18_15_zpyxn2.png"
                     )}
                     alt="카페 메인 홀 인테리어"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -320,7 +310,7 @@ export default function BiInteriorPage() {
                 <div className="h-64 sm:h-72 bg-neutral-900 overflow-hidden relative">
                   <img
                     src={optimizeCloudinaryUrl(
-                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705753/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_21_1_vvaugb.png"
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/v1784774149/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_21%EC%9D%BC_%EC%98%A4%ED%9B%84_02_11_53_t8xp5w.png"
                     )}
                     alt="스마트 키오스크 & 주문 픽업 존"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -338,9 +328,9 @@ export default function BiInteriorPage() {
                 <div className="h-64 sm:h-72 bg-neutral-900 overflow-hidden relative">
                   <img
                     src={optimizeCloudinaryUrl(
-                      "https://res.cloudinary.com/dfarfqx7e/image/upload/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg"
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/v1784774163/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_21%EC%9D%BC_%EC%98%A4%ED%9B%84_02_11_48_q8rcat.png"
                     )}
-                    alt="베이커리 오븐 쇼케이스"
+                    alt="오픈 베이킹 쇼케이스"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                 </div>

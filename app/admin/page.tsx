@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -627,6 +628,20 @@ export default function AdminPage() {
   const saveStoreMutation = useMutation(api.stores.createOrUpdate);
   const deleteStoreMutation = useMutation(api.stores.deleteStore);
   const seedStoresMutation = useMutation(api.stores.seedStores);
+
+  // Instagram Convex Hooks
+  const convexInstagram = useQuery(api.instagram.list);
+  const saveInstagramMutation = useMutation(api.instagram.createOrUpdate);
+  const deleteInstagramMutation = useMutation(api.instagram.deleteInstagram);
+  const seedInstagramMutation = useMutation(api.instagram.seedInstagram);
+
+  useEffect(() => {
+    if (convexInstagram && convexInstagram.length === 0) {
+      seedInstagramMutation().then(() => {
+        console.log("[Convex] Seed instagram completed.");
+      });
+    }
+  }, [convexInstagram, seedInstagramMutation]);
 
   useEffect(() => {
     if (convexStores) {
@@ -1452,7 +1467,17 @@ export default function AdminPage() {
   const [bannerSideLink, setBannerSideLink] = useState<string>("training");
 
   // SUB MENU & REAL-TIME POPUP & FLOATING STATES
-  const [bannerSubMenu, setBannerSubMenu] = useState<"banner" | "popup" | "floating">("banner");
+  const [bannerSubMenu, setBannerSubMenu] = useState<"banner" | "popup" | "floating" | "instagram">("banner");
+
+  // Instagram Management States
+  const [instaId, setInstaId] = useState<string | null>(null);
+  const [instaImg, setInstaImg] = useState("");
+  const [instaText, setInstaText] = useState("");
+  const [instaLink, setInstaLink] = useState("");
+  const [instaDate, setInstaDate] = useState("");
+  const [instaOrder, setInstaOrder] = useState(1);
+  const [instaIsMain, setInstaIsMain] = useState(false);
+  const [isInstaModalOpen, setIsInstaModalOpen] = useState(false);
   
   // Popup States
   const [showPopupModal, setShowPopupModal] = useState<boolean>(false);
@@ -3207,6 +3232,77 @@ export default function AdminPage() {
       setPopupTargetPage("all");
     }
     setShowPopupModal(true);
+  };
+
+  const handleSaveInstagram = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!instaImg || !instaText || !instaLink || !instaDate) {
+      alert("필수 항목(이미지 경로, 내용, 링크, 날짜)을 모두 기입해주세요.");
+      return;
+    }
+    
+    // Validate maximum feed counts (10 feeds total)
+    if (!instaId) {
+      if (convexInstagram && convexInstagram.length >= 10) {
+        alert("인스타그램 게시물은 최대 10개까지만 등록할 수 있습니다. 기존 게시물을 삭제한 뒤 추가해 주세요.");
+        return;
+      }
+    }
+
+    // Validate maximum main feed designations (4 feeds max)
+    if (instaIsMain) {
+      const activeMains = convexInstagram?.filter(item => item.isMain && item._id !== instaId) || [];
+      if (activeMains.length >= 4) {
+        alert("메인 노출은 최대 4개까지만 지정할 수 있습니다. 기존에 지정된 다른 메인 포스트의 노출 체크를 해제해 주세요.");
+        return;
+      }
+    }
+
+    try {
+      await saveInstagramMutation({
+        id: instaId ? (instaId as any) : undefined,
+        img: instaImg,
+        text: instaText,
+        link: instaLink,
+        date: instaDate,
+        orderIndex: Number(instaOrder),
+        isMain: instaIsMain,
+      });
+      alert("인스타그램 게시물이 성공적으로 저장되었습니다.");
+      setIsInstaModalOpen(false);
+      setInstaId(null);
+      setInstaImg("");
+      setInstaText("");
+      setInstaLink("");
+      setInstaDate("");
+      setInstaOrder(1);
+      setInstaIsMain(false);
+    } catch (err) {
+      console.error(err);
+      alert("저장 중 에러가 발생했습니다.");
+    }
+  };
+
+  const handleDeleteInstagram = async (id: any) => {
+    if (!confirm("정말 이 게시물을 삭제하시겠습니까?")) return;
+    try {
+      await deleteInstagramMutation({ id });
+      alert("성공적으로 삭제되었습니다.");
+    } catch (err) {
+      console.error(err);
+      alert("삭제 중 에러가 발생했습니다.");
+    }
+  };
+
+  const handleOpenInstaEdit = (item: any) => {
+    setInstaId(item._id);
+    setInstaImg(item.img);
+    setInstaText(item.text);
+    setInstaLink(item.link);
+    setInstaDate(item.date);
+    setInstaOrder(item.orderIndex);
+    setInstaIsMain(item.isMain ?? false);
+    setIsInstaModalOpen(true);
   };
 
   const handleSavePopup = async (e: React.FormEvent) => {
@@ -6740,7 +6836,8 @@ export default function AdminPage() {
                 {[
                   { id: "popup", label: "📢 실시간 점주 팝업", color: "bg-[#f25f8a]" },
                   { id: "banner", label: "🖼️ 홈 대시보드 배너", color: "bg-[#bf3e67]" },
-                  { id: "floating", label: "📱 우측 플로팅 연동", color: "bg-[#735965]" }
+                  { id: "floating", label: "📱 우측 플로팅 연동", color: "bg-[#735965]" },
+                  { id: "instagram", label: "📸 인스타 피드 연동", color: "bg-[#7c3aed]" }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -7595,6 +7692,231 @@ export default function AdminPage() {
                     홈페이지 플로팅 채널 연동 정보 반영 및 저장
                   </button>
                 </form>
+              )}
+
+              {/* 4. INSTAGRAM FEED MANAGEMENT */}
+              {bannerSubMenu === "instagram" && (
+                <div className="space-y-6 animate-fadeIn">
+                  
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-[#f2ccd7] rounded-3xl p-6 shadow-sm">
+                    <div className="space-y-1">
+                      <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#7c3aed] animate-pulse"></span>
+                        인스타그램 연동 피드 리스트
+                      </h3>
+                      <p className="text-[10px] text-[#735965]">
+                        브랜드 홈페이지 하단 인스타그램 섹션에 노출될 게시물 데이터 목록입니다. 클릭 시 상세 팝업 및 인스타 아웃링크가 연동됩니다.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setInstaId(null);
+                        setInstaImg("");
+                        setInstaText("");
+                        setInstaLink("");
+                        setInstaDate(new Date().toISOString().split("T")[0]);
+                        setInstaOrder((convexInstagram?.length || 0) + 1);
+                        setIsInstaModalOpen(true);
+                      }}
+                      className="px-4 py-2 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-[11px] font-black rounded-xl transition-all shadow-[0_4px_12px_rgba(124,58,237,0.2)] hover:scale-[1.02] cursor-pointer"
+                    >
+                      + 신규 인스타 게시물 연동
+                    </button>
+                  </div>
+
+                  {/* List Table */}
+                  <div className="bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse min-w-[700px]">
+                        <thead>
+                          <tr className="bg-[#fff1f5]/70 border-b border-[#f2ccd7] text-[10px] font-black text-[#735965] uppercase tracking-wider">
+                            <th className="py-4 px-6 w-16 text-center">순서</th>
+                            <th className="py-4 px-6 w-24">이미지</th>
+                            <th className="py-4 px-6">게시글 본문 요약</th>
+                            <th className="py-4 px-6 w-28 text-center">메인 노출</th>
+                            <th className="py-4 px-6 w-44">링크 주소</th>
+                            <th className="py-4 px-6 w-28">게시일</th>
+                            <th className="py-4 px-6 w-28 text-center">관리</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#f2ccd7]/40 text-xs">
+                          {!convexInstagram || convexInstagram.length === 0 ? (
+                            <tr>
+                              <td colSpan={7} className="py-12 text-center font-bold text-neutral-400">
+                                등록된 인스타그램 게시물이 없습니다.
+                              </td>
+                            </tr>
+                          ) : (
+                            convexInstagram.map((item) => (
+                              <tr key={item._id} className="hover:bg-[#fff9fb]/40 transition-colors">
+                                <td className="py-4 px-6 font-bold text-center text-[#7c3aed]">{item.orderIndex}</td>
+                                <td className="py-4 px-6">
+                                  <div className="w-14 h-14 rounded-lg overflow-hidden border border-[#f2ccd7]/60 bg-neutral-50 flex items-center justify-center">
+                                    <img src={optimizeCloudinaryUrl(item.img)} alt="Insta" className="w-full h-full object-cover" />
+                                  </div>
+                                </td>
+                                <td className="py-4 px-6">
+                                  <p className="font-semibold text-[#2d2026] line-clamp-2 leading-relaxed max-w-md">
+                                    {item.text}
+                                  </p>
+                                </td>
+                                <td className="py-4 px-6 text-center">
+                                  {item.isMain ? (
+                                    <span className="bg-amber-100 text-amber-700 font-extrabold text-[9px] px-2.5 py-1 rounded-full border border-amber-200">
+                                      ★ 메인 노출
+                                    </span>
+                                  ) : (
+                                    <span className="text-neutral-400 font-bold text-[9px]">-</span>
+                                  )}
+                                </td>
+                                <td className="py-4 px-6">
+                                  <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-[#7c3aed] hover:underline font-semibold break-all">
+                                    {item.link}
+                                  </a>
+                                </td>
+                                <td className="py-4 px-6 text-[#735965] font-bold">{item.date}</td>
+                                <td className="py-4 px-6 text-center">
+                                  <div className="flex items-center justify-center gap-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenInstaEdit(item)}
+                                      className="px-2.5 py-1 bg-white border border-[#f2ccd7] text-[#735965] hover:bg-[#fff1f5] rounded-lg transition-all font-bold text-[10px] cursor-pointer"
+                                    >
+                                      수정
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteInstagram(item._id)}
+                                      className="px-2.5 py-1 bg-white border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-all font-bold text-[10px] cursor-pointer"
+                                    >
+                                      삭제
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Form Modal for Creating/Editing Instagram Feed */}
+                  {isInstaModalOpen && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                      <div className="bg-white border border-[#f2ccd7] rounded-3xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-5 animate-fadeIn">
+                        <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-3">
+                          <h3 className="font-extrabold text-base text-[#2d2026]">
+                            {instaId ? "📸 인스타 연동 피드 수정" : "📸 신규 인스타 피드 등록"}
+                          </h3>
+                          <button
+                            type="button"
+                            onClick={() => setIsInstaModalOpen(false)}
+                            className="text-neutral-400 hover:text-black font-extrabold text-sm"
+                          >
+                            ✕
+                          </button>
+                        </div>
+
+                        <form onSubmit={handleSaveInstagram} className="space-y-4 text-left">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-[#735965]">이미지 URL <span className="text-red-500">*</span></label>
+                            <input
+                              type="text"
+                              required
+                              value={instaImg}
+                              onChange={(e) => setInstaImg(e.target.value)}
+                              placeholder="https://res.cloudinary.com/... 또는 일반 이미지 주소"
+                              className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
+                            />
+                            <p className="text-[10px] text-neutral-400 font-bold">*Cloudinary 혹은 외부 인스타그램 이미지 URL을 넣어주세요.</p>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-[#735965]">게시물 실제 링크 URL <span className="text-red-500">*</span></label>
+                            <input
+                              type="text"
+                              required
+                              value={instaLink}
+                              onChange={(e) => setInstaLink(e.target.value)}
+                              placeholder="https://www.instagram.com/p/..."
+                              className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-[#735965]">게시 일자 <span className="text-red-500">*</span></label>
+                              <input
+                                type="date"
+                                required
+                                value={instaDate}
+                                onChange={(e) => setInstaDate(e.target.value)}
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-[#735965]">노출 순서 <span className="text-red-500">*</span></label>
+                              <input
+                                type="number"
+                                required
+                                min={1}
+                                value={instaOrder}
+                                onChange={(e) => setInstaOrder(Number(e.target.value))}
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-[#735965]">게시물 설명/본문 내용 <span className="text-red-500">*</span></label>
+                            <textarea
+                              required
+                              rows={5}
+                              value={instaText}
+                              onChange={(e) => setInstaText(e.target.value)}
+                              placeholder="상세 팝업에 표출될 피드 상세 내용을 입력하세요."
+                              className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed] resize-none leading-relaxed"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5 bg-amber-50/40 border border-amber-200/50 rounded-xl p-4 flex items-center justify-between">
+                            <div className="space-y-0.5">
+                              <label className="text-xs font-black text-[#735965] flex items-center gap-1.5">
+                                ★ 처음 보이는 4개 피드 지정
+                              </label>
+                              <p className="text-[10px] text-neutral-400 font-bold">체크 시, 브랜드 소개 페이지 최상단 슬라이드 첫 화면(1~4번 칸)에 우선 고정 노출됩니다. (최대 4개)</p>
+                            </div>
+                            <input
+                              type="checkbox"
+                              checked={instaIsMain}
+                              onChange={(e) => setInstaIsMain(e.target.checked)}
+                              className="w-5 h-5 accent-amber-500 cursor-pointer rounded focus:ring-amber-500"
+                            />
+                          </div>
+
+                          <div className="pt-2 flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setIsInstaModalOpen(false)}
+                              className="flex-1 py-3 border border-neutral-200 hover:bg-neutral-50 font-bold text-xs rounded-xl text-neutral-500 transition-all cursor-pointer"
+                            >
+                              취소
+                            </button>
+                            <button
+                              type="submit"
+                              className="flex-1 py-3 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
+                            >
+                              저장하기
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  )}
+
+                </div>
               )}
 
             </div>

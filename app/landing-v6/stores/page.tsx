@@ -221,31 +221,32 @@ export default function StoresSubpage() {
         content: `
           <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
             <div style="
-              background: #ffd500; 
-              border: 2px solid #ffd500; 
+              background: #FBC400; 
+              border: 2px solid #0D233A; 
               border-radius: 50%; 
-              width: 44px; 
-              height: 44px; 
+              width: 48px; 
+              height: 48px; 
               display: flex; 
               align-items: center; 
               justify-content: center; 
-              box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+              box-shadow: 0 4px 12px rgba(0,0,0,0.3);
               overflow: hidden;
+              padding: 2px;
             ">
-              <img src="https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781186180/logo_120pie_coffee_nu2_c7tiiy_zi1pjo.png" style="width: 32px; height: 32px; object-fit: contain;" />
+              <img src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784730823/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_5_eadptv.png" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />
             </div>
             <div style="
               width: 0; 
               height: 0; 
               border-left: 6px solid transparent; 
               border-right: 6px solid transparent; 
-              border-top: 8px solid #ffd500;
+              border-top: 8px solid #0D233A;
               margin-top: -1px;
             "></div>
           </div>
         `,
-        size: new naver.maps.Size(44, 51),
-        anchor: new naver.maps.Point(22, 51),
+        size: new naver.maps.Size(48, 55),
+        anchor: new naver.maps.Point(24, 55),
       };
 
       const marker = new naver.maps.Marker({

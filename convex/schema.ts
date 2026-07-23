@@ -222,4 +222,12 @@ export default defineSchema({
     submittedAt: v.string(), // YYYY-MM-DD HH:mm:ss
   }).index("by_noticeId", ["noticeId"])
     .index("by_storeId_and_noticeId", ["storeId", "noticeId"]),
+  instagram: defineTable({
+    img: v.string(),
+    text: v.string(),
+    link: v.string(),
+    date: v.string(),
+    orderIndex: v.number(),
+    isMain: v.optional(v.boolean()),
+  }),
 });

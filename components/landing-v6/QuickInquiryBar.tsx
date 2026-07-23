@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect, useRef } from "react";
 import { useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-export default function QuickInquiryBar() {
+interface QuickInquiryBarProps {
+  isFixed?: boolean;
+}
+
+export default function QuickInquiryBar({ isFixed = true }: QuickInquiryBarProps) {
   const addInquiry = useMutation(api.inquiries.add);
   const sendSmsAction = useAction(api.aligo.sendSms);
 
@@ -12,6 +16,28 @@ export default function QuickInquiryBar() {
   const [phone, setPhone] = useState("");
   const [storeType, setStoreType] = useState("샵인샵 도입");
   const [submitting, setSubmitting] = useState(false);
+
+  const [isAtFooter, setIsAtFooter] = useState(false);
+  const placeholderRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isFixed) return;
+    if (!placeholderRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // 플레이스홀더가 화면에 감지되면(푸터 상단 경계 도달) fixed를 해제하고 absolute로 멈춤
+        setIsAtFooter(entry.isIntersecting);
+      },
+      {
+        rootMargin: "0px 0px 0px 0px",
+        threshold: 0.01,
+      }
+    );
+
+    observer.observe(placeholderRef.current);
+    return () => observer.disconnect();
+  }, [isFixed]);
 
   const formatPhoneNumber = (value: string) => {
     const raw = value.replace(/[^\d]/g, "");
@@ -123,14 +149,14 @@ export default function QuickInquiryBar() {
         })
       }).catch(err => console.error("InquirySubmit tracking failed", err));
 
+      // 3. 픽셀 광고 전환 이벤트 트래킹 (Meta / Karrot)
       if (typeof window !== "undefined") {
-        if ((window as any).wcs) {
+        if ((window as any).fbq) {
           try {
-            if (!(window as any).wcs_add) (window as any).wcs_add = {};
-            (window as any).wcs_add["wa"] = process.env.NEXT_PUBLIC_NAVER_AD_ACCOUNT_ID || "s_15663594120p";
-            const _nasa = {} as any;
-            _nasa["cnv"] = (window as any).wcs.cnv("4", "10");
-            (window as any).wcs_do(_nasa);
+            (window as any).fbq('track', 'Lead', {
+              content_name: 'QuickFranchiseInquiry',
+              content_category: storeType
+            });
           } catch (e) {}
         }
         if ((window as any).karrotPixel) {
@@ -151,70 +177,94 @@ export default function QuickInquiryBar() {
     }
   };
 
-  return (
-    <div className="hidden md:block fixed bottom-0 left-0 right-0 z-[95] bg-[#ffd500] border-t border-[#e6bd00] shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
-      <div className="max-w-6xl mx-auto px-8 sm:px-12 lg:px-16 h-16 relative flex items-center justify-between">
-        
-        {/* Left Section: Model Photo & Call Text */}
-        <div className="flex items-center pl-32">
-          {/* Pop-out model photo bottom-aligned to the bar */}
-          <img
-            src="https://res.cloudinary.com/lyjyvy54/image/upload/v1784086225/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_6%EC%9D%BC_%EC%98%A4%ED%9B%84_08_25_50_1_yw77w3.png"
-            alt="120PIE 매장 전경"
-            className="absolute bottom-0 left-4 h-[108px] w-auto object-contain z-10 pointer-events-none select-none"
-          />
-          <div className="flex flex-col justify-center">
-            <span className="text-[8px] font-bold text-neutral-800/80 leading-none mb-0.5 block">
-              120겹의 마법, 120PIE
-            </span>
-            <h3 className="font-extrabold text-[#0d233a] text-base tracking-tight flex items-center gap-1.5 leading-none">
-              빠른 창업문의 <span className="font-black text-lg tracking-tighter ml-1">1566-3594</span>
-            </h3>
-          </div>
+  const renderContent = () => (
+    <div className="max-w-6xl mx-auto px-8 sm:px-12 lg:px-16 h-16 relative flex items-center justify-between">
+      
+      {/* Left Section: Model Photo & Call Text */}
+      <div className="flex items-center pl-32">
+        {/* Pop-out model photo bottom-aligned to the bar */}
+        <img
+          src="https://res.cloudinary.com/lyjyvy54/image/upload/v1784086225/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_6%EC%9D%BC_%EC%98%A4%ED%9B%84_08_25_50_1_yw77w3.png"
+          alt="120PIE 매장 전경"
+          className="absolute bottom-0 left-4 h-[108px] w-auto object-contain z-10 pointer-events-none select-none"
+        />
+        <div className="flex flex-col text-left">
+          <span className="text-[10px] text-neutral-800 font-extrabold uppercase tracking-widest leading-none mb-1">120PIE Premium franchise</span>
+          <span className="text-sm font-black text-black tracking-tight leading-none">가맹문의 1688-0000</span>
+        </div>
+      </div>
+
+      {/* Right Section: Form Inputs */}
+      <form onSubmit={handleSubmit} className="flex items-center gap-2">
+        {/* Store Type Toggle */}
+        <div className="flex bg-[#e6bd00]/50 p-0.5 rounded-xl border border-[#e6bd00]/60 mr-2">
+          {["샵인샵 도입", "신규 가맹개설"].map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setStoreType(type)}
+              className={`px-3 py-1.5 rounded-lg text-[10px] font-black tracking-tight transition-all cursor-pointer border-0 ${
+                storeType === type
+                  ? "bg-[#1c1b1c] text-[#ffd500] shadow-sm"
+                  : "text-neutral-800 hover:text-black hover:bg-white/10"
+              }`}
+            >
+              {type}
+            </button>
+          ))}
         </div>
 
-        {/* Right Section: Form inputs */}
-        <form onSubmit={handleSubmit} className="flex items-center gap-3">
-          <select
-            value={storeType}
-            onChange={(e) => setStoreType(e.target.value)}
-            className="h-10 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-xs focus:outline-none transition-all cursor-pointer hover:border-[#bf3e67]/30"
-          >
-            <option value="샵인샵 도입">샵인샵 도입</option>
-            <option value="브랜드 병기 도입">브랜드 병기 도입</option>
-            <option value="공동간판 제휴">공동간판 제휴</option>
-            <option value="단독 매장 전환">단독 매장 전환</option>
-            <option value="신규 무점포/창업">신규 무점포/창업</option>
-          </select>
+        <input
+          type="text"
+          placeholder="이름"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          className="h-10 w-28 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-xs placeholder:text-[#7d8c9e] focus:outline-none focus:border-[#bf3e67]/30 transition-all"
+        />
 
-          <input
-            type="text"
-            placeholder="이름"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="h-10 w-28 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-xs placeholder:text-[#7d8c9e] focus:outline-none focus:border-[#bf3e67]/30 transition-all"
-          />
+        <input
+          type="tel"
+          placeholder="연락처"
+          value={phone}
+          onChange={(e) => handlePhoneChange(e.target.value)}
+          required
+          maxLength={13}
+          className="h-10 w-36 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-xs placeholder:text-[#7d8c9e] focus:outline-none focus:border-[#bf3e67]/30 transition-all"
+        />
 
-          <input
-            type="tel"
-            placeholder="연락처"
-            value={phone}
-            onChange={(e) => handlePhoneChange(e.target.value)}
-            required
-            maxLength={13}
-            className="h-10 w-36 bg-white border border-[#e6dfc3] text-[#0d233a] font-bold rounded-xl px-3 text-xs placeholder:text-[#7d8c9e] focus:outline-none focus:border-[#bf3e67]/30 transition-all"
-          />
+        <button
+          type="submit"
+          disabled={submitting}
+          className="h-10 bg-[#1c1b1c] hover:bg-black text-[#ffd500] font-black rounded-xl px-5 text-xs transition-all cursor-pointer border-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center hover:scale-[1.02] active:scale-95 disabled:opacity-55"
+        >
+          {submitting ? "신청 중..." : "빠른 창업 문의"}
+        </button>
+      </form>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="h-10 bg-[#1c1b1c] hover:bg-black text-[#ffd500] font-black rounded-xl px-5 text-xs transition-all cursor-pointer border-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center hover:scale-[1.02] active:scale-95 disabled:opacity-55"
-          >
-            {submitting ? "신청 중..." : "빠른 창업 문의"}
-          </button>
-        </form>
+    </div>
+  );
 
+  if (!isFixed) {
+    return (
+      <div className="hidden md:block bg-[#ffd500] border-t border-[#e6bd00] shadow-[0_-8px_30px_rgba(0,0,0,0.12)] relative z-[30] w-full">
+        {renderContent()}
+      </div>
+    );
+  }
+
+  return (
+    <div className="hidden md:block relative w-full h-16 pointer-events-none select-none">
+      {/* Target marker that floats relatively in the flow above footer */}
+      <div ref={placeholderRef} className="absolute inset-0 pointer-events-none" />
+      
+      {/* Actual moving bar */}
+      <div className={`bg-[#ffd500] border-t border-[#e6bd00] shadow-[0_-8px_30px_rgba(0,0,0,0.12)] pointer-events-auto select-text transition-all duration-300 ${
+        isAtFooter 
+          ? "absolute bottom-0 left-0 right-0 z-[95]" 
+          : "fixed bottom-0 left-0 right-0 z-[95]"
+      }`}>
+        {renderContent()}
       </div>
     </div>
   );
