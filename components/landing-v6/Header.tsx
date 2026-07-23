@@ -42,8 +42,7 @@ export default function Header({
           : "bg-neutral-900/95"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
@@ -145,7 +144,6 @@ export default function Header({
             </button>
           </div>
         </div>
-      </div>
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
