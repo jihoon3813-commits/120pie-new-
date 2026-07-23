@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { MENU_DATA } from "@/app/constants/menu";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
+import { getInstagramThumbnailUrl } from "@/app/utils/instagram";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 import InteriorConcept from "@/components/landing-v6/InteriorConcept";
 import ConsultationForm from "@/components/ConsultationForm";
@@ -1506,7 +1507,7 @@ export default function BrandHome() {
                         {/* Feed Image Container (Aspect 4:5) */}
                         <div className="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100 flex items-center justify-center">
                           <img 
-                            src={optimizeCloudinaryUrl(item.img)}
+                            src={optimizeCloudinaryUrl(getInstagramThumbnailUrl(item.img || item.link))}
                             alt="Instagram Post"
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
                           />
@@ -1574,7 +1575,7 @@ export default function BrandHome() {
               {/* Left Column: Big Image (Strict 4:5 Aspect Ratio) */}
               <div className="w-full md:w-auto md:h-full aspect-[4/5] bg-neutral-100 flex items-center justify-center overflow-hidden shrink-0 relative">
                 <img 
-                  src={optimizeCloudinaryUrl(selectedInsta.img)} 
+                  src={optimizeCloudinaryUrl(getInstagramThumbnailUrl(selectedInsta.img || selectedInsta.link))} 
                   alt="Post Detail" 
                   className="w-full h-full object-cover"
                 />

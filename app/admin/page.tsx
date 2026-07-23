@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
+import { getInstagramThumbnailUrl } from "@/app/utils/instagram";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -3236,8 +3237,15 @@ export default function AdminPage() {
 
   const handleSaveInstagram = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!instaImg || !instaText || !instaLink || !instaDate) {
-      alert("필수 항목(이미지 경로, 내용, 링크, 날짜)을 모두 기입해주세요.");
+    if (!instaText || !instaLink || !instaDate) {
+      alert("필수 항목(게시물 링크, 내용, 날짜)을 모두 기입해주세요.");
+      return;
+    }
+
+    // 게시물 링크만 입력된 경우 썸네일 이미지 자동 추출
+    const finalImg = instaImg.trim() || getInstagramThumbnailUrl(instaLink.trim());
+    if (!finalImg) {
+      alert("올바른 인스타그램 게시물 링크를 입력해 주세요.");
       return;
     }
     
@@ -3261,7 +3269,7 @@ export default function AdminPage() {
     try {
       await saveInstagramMutation({
         id: instaId ? (instaId as any) : undefined,
-        img: instaImg,
+        img: finalImg,
         text: instaText,
         link: instaLink,
         date: instaDate,
@@ -7821,26 +7829,51 @@ export default function AdminPage() {
 
                         <form onSubmit={handleSaveInstagram} className="space-y-4 text-left">
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#735965]">이미지 URL <span className="text-red-500">*</span></label>
-                            <input
-                              type="text"
-                              required
-                              value={instaImg}
-                              onChange={(e) => setInstaImg(e.target.value)}
-                              placeholder="https://res.cloudinary.com/... 또는 일반 이미지 주소"
-                              className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
-                            />
-                            <p className="text-[10px] text-neutral-400 font-bold">*Cloudinary 혹은 외부 인스타그램 이미지 URL을 넣어주세요.</p>
+                            <label className="text-xs font-bold text-[#735965]">게시물 실제 링크 URL <span className="text-red-500">*</span></label>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                required
+                                value={instaLink}
+                                onChange={(e) => {
+                                  const url = e.target.value;
+                                  setInstaLink(url);
+                                  const autoThumb = getInstagramThumbnailUrl(url);
+                                  if (autoThumb && autoThumb !== url) {
+                                    setInstaImg(autoThumb);
+                                  }
+                                }}
+                                placeholder="https://www.instagram.com/p/..."
+                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const autoThumb = getInstagramThumbnailUrl(instaLink);
+                                  if (autoThumb && autoThumb !== instaLink) {
+                                    setInstaImg(autoThumb);
+                                    alert("인스타그램 대표 썸네일 이미지가 자동으로 추출되어 설정되었습니다!");
+                                  } else {
+                                    alert("올바른 인스타그램 게시물 링크(https://www.instagram.com/p/...)를 입력해 주세요.");
+                                  }
+                                }}
+                                className="shrink-0 px-3.5 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 font-extrabold text-[11px] rounded-xl transition-all whitespace-nowrap cursor-pointer border border-purple-200"
+                              >
+                                ✨ 썸네일 자동 추출
+                              </button>
+                            </div>
+                            <p className="text-[10px] text-purple-600 font-bold">
+                              * 인스타그램 게시물 링크만 입력하시면 대표 썸네일 이미지를 자동으로 추출하여 표출합니다.
+                            </p>
                           </div>
 
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#735965]">게시물 실제 링크 URL <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-[#735965]">이미지 URL <span className="text-neutral-400 font-normal">(선택사항 - 비워둘 경우 게시물 링크에서 자동 추출)</span></label>
                             <input
                               type="text"
-                              required
-                              value={instaLink}
-                              onChange={(e) => setInstaLink(e.target.value)}
-                              placeholder="https://www.instagram.com/p/..."
+                              value={instaImg}
+                              onChange={(e) => setInstaImg(e.target.value)}
+                              placeholder="비워두시면 게시물 링크에서 대표 썸네일을 자동으로 도출합니다."
                               className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
                             />
                           </div>
