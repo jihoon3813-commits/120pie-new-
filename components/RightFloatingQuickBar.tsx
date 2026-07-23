@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Phone, FileText, MessageSquare, Handshake, ChevronUp } from "lucide-react";
+import React from "react";
+import { Phone, MessageCircle, ChevronUp } from "lucide-react";
 
 interface RightFloatingQuickBarProps {
   onOpenConsultation?: () => void;
@@ -10,8 +10,6 @@ interface RightFloatingQuickBarProps {
 export default function RightFloatingQuickBar({
   onOpenConsultation,
 }: RightFloatingQuickBarProps) {
-  const [isMinimized, setIsMinimized] = useState(false);
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -31,8 +29,8 @@ export default function RightFloatingQuickBar({
 
   return (
     <div className="fixed right-2.5 bottom-20 sm:right-6 sm:bottom-24 z-[90] flex flex-col items-end select-none">
-      {/* Main Floating Container (Semi-transparent & Positioned Above Bottom Bar) */}
-      <div className="bg-neutral-950/85 backdrop-blur-md opacity-90 hover:opacity-100 border border-neutral-800/80 text-white rounded-3xl p-2 sm:p-2.5 flex flex-col items-center gap-1.5 sm:gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.4)] transition-all duration-300 w-15 sm:w-20">
+      {/* Main Floating Container */}
+      <div className="bg-neutral-950/90 backdrop-blur-md opacity-95 hover:opacity-100 border border-neutral-800 text-white rounded-3xl p-2 sm:p-2.5 flex flex-col items-center gap-1.5 sm:gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.5)] transition-all duration-300 w-15 sm:w-20">
         
         {/* Top Brand Logo Circular Emblem */}
         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden flex items-center justify-center shadow-md my-0.5 shrink-0 border border-amber-400/40 bg-neutral-900">
@@ -43,69 +41,67 @@ export default function RightFloatingQuickBar({
           />
         </div>
 
-        {/* Item 1: 창업문의 */}
+        {/* Item 1: 인스타 */}
+        <a
+          href="https://www.instagram.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
+          title="공식 인스타그램"
+        >
+          <svg className="w-4 h-4 mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">인스타</span>
+        </a>
+
+        {/* Item 2: 유튜브 */}
+        <a
+          href="https://www.youtube.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
+          title="공식 유튜브"
+        >
+          <svg className="w-4 h-4 mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+            <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+          </svg>
+          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">유튜브</span>
+        </a>
+
+        {/* Item 3: 전화문의 */}
         <a
           href="tel:1899-5685"
-          className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group decoration-none text-neutral-200 cursor-pointer"
-          title="창업문의 전화걸기"
+          className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
+          title="전화문의 (1899-5685)"
         >
-          <Phone size={15} className="mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
-          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">창업문의</span>
-          <span className="text-[8px] sm:text-[9px] font-black text-neutral-400 group-hover:text-neutral-900 leading-tight block mt-0.5">
-            1899-5685
-          </span>
+          <Phone size={16} className="mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
+          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">전화문의</span>
         </a>
 
-        {/* Item 2: 고객상담 */}
-        <a
-          href="tel:1899-5003"
-          className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group decoration-none text-neutral-200 cursor-pointer"
-          title="고객상담 전화걸기"
-        >
-          <Phone size={15} className="mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
-          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">고객상담</span>
-          <span className="text-[8px] sm:text-[9px] font-black text-neutral-400 group-hover:text-neutral-900 leading-tight block mt-0.5">
-            1899-5003
-          </span>
-        </a>
-
-        {/* Item 3: 창업상담 신청 */}
+        {/* Item 4: 카톡문의 */}
         <button
           type="button"
           onClick={handleConsultationClick}
           className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
-          title="창업상담 신청하기"
+          title="카톡 문의"
         >
-          <FileText size={15} className="mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
-          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">창업상담</span>
-          <span className="text-[8px] sm:text-[9px] font-semibold text-neutral-400 group-hover:text-neutral-900 leading-tight block mt-0.5">
-            신청
-          </span>
+          <MessageCircle size={16} className="mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
+          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">카톡문의</span>
         </button>
 
-        {/* Item 4: 모바일 상담 */}
-        <button
-          type="button"
-          onClick={handleConsultationClick}
-          className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
-          title="모바일 상담"
-        >
-          <MessageSquare size={15} className="mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
-          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">모바일</span>
-          <span className="text-[8px] sm:text-[9px] font-semibold text-neutral-400 group-hover:text-neutral-900 leading-tight block mt-0.5">
-            상담
-          </span>
-        </button>
-
-        {/* Item 5: 제휴 및 제안 / TOP */}
+        {/* Item 5: TOP */}
         <button
           type="button"
           onClick={scrollToTop}
-          className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
+          className="w-full py-1.5 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
           title="맨 위로 이동"
         >
-          <ChevronUp size={15} className="mb-0.5 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
-          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">TOP</span>
+          <ChevronUp size={15} className="text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
+          <span className="text-[9px] sm:text-[10px] font-black leading-tight block">TOP</span>
         </button>
 
       </div>
