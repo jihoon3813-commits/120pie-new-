@@ -296,9 +296,9 @@ export default function BrandFranchisePage() {
     <div className="min-h-screen bg-[#faf8f5] text-neutral-900 font-sans">
       {/* 1. BRAND NAVIGATION HEADER */}
       <header className="sticky top-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/95 py-3 border-b border-neutral-100 shadow-sm isolate">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
           {/* Logo */}
-          <Link href="/brand" className="flex items-center gap-2 group shrink-0">
+          <Link href="/" title="게이트 페이지로 이동" className="flex items-center gap-2 group shrink-0">
             <img
               src={LOGO_URL}
               alt="120pie 로고"
@@ -322,23 +322,29 @@ export default function BrandFranchisePage() {
             </Link>
           </nav>
 
-          {/* Quick Consultation CTA */}
-          <div className="hidden md:flex items-center gap-3 shrink-0">
+          {/* Right Header Buttons (Brand Site Direct Button & Quick Consultation) */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <Link
+              href="/brand"
+              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#fbc400] text-neutral-950 font-black text-xs rounded-full transition-all duration-300 shadow-xs hover:bg-amber-400 cursor-pointer whitespace-nowrap"
+            >
+              브랜드홈페이지 바로가기 &rarr;
+            </Link>
             <button
               onClick={() => setIsConsulting(true)}
-              className="px-5 py-2.5 bg-[#fbc400] hover:bg-[#e0a800] text-[#0D233A] font-extrabold text-xs rounded-full transition-all duration-300 shadow-sm shadow-[#fbc400]/20 hover:scale-103 border-0 cursor-pointer whitespace-nowrap"
+              className="hidden md:block px-4 py-2 bg-neutral-950 text-white font-extrabold text-xs rounded-full transition-all duration-300 shadow-sm hover:bg-black border-0 cursor-pointer whitespace-nowrap"
             >
               창업 상담 문의
             </button>
-          </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-neutral-700 hover:text-amber-600 transition-colors"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-1.5 text-neutral-700 hover:text-amber-600 transition-colors"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </header>
 
