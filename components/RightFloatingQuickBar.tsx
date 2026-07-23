@@ -85,9 +85,12 @@ export default function RightFloatingQuickBar({
         {/* Item 4: 카톡문의 */}
         <button
           type="button"
-          onClick={handleConsultationClick}
+          onClick={() => {
+            if (onOpenConsultation) onOpenConsultation();
+            window.open("https://pf.kakao.com", "_blank");
+          }}
           className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
-          title="카톡 문의"
+          title="카톡 1:1 상담 문의"
         >
           <MessageCircle size={16} className="mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
           <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">카톡문의</span>
