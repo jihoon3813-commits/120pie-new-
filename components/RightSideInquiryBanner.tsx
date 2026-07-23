@@ -124,8 +124,8 @@ export default function RightSideInquiryBanner() {
   if (isClosed) return null;
 
   return (
-    <div className="hidden lg:block fixed right-[80px] sm:right-[95px] bottom-20 sm:bottom-24 z-[85] select-none animate-in fade-in slide-in-from-right-4 duration-300">
-      {/* Banner Container - Width 250px, White Background */}
+    <div className="hidden lg:block fixed right-2.5 sm:right-6 bottom-[310px] sm:bottom-[330px] z-[85] select-none animate-in fade-in slide-in-from-bottom-4 duration-300">
+      {/* Banner Container - Width 250px, Positioned Vertically Above Floating Quick Bar */}
       <div className="w-[250px] bg-white border border-neutral-200/90 rounded-2xl shadow-[0_15px_45px_rgba(0,0,0,0.18)] overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(251,196,0,0.25)]">
         
         {/* Header Bar - Black */}
