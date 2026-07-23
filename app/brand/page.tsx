@@ -15,6 +15,7 @@ import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 import InteriorConcept from "@/components/landing-v6/InteriorConcept";
 import ConsultationForm from "@/components/ConsultationForm";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
+import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 
 const SIGNATURE_MENUS = [
   {
@@ -1821,6 +1822,9 @@ export default function BrandHome() {
 
       {/* Right Floating Quick Docking Bar */}
       <RightFloatingQuickBar onOpenConsultation={() => setIsConsulting(true)} />
+
+      {/* Right Side Inquiry Banner (300px width) */}
+      <RightSideInquiryBanner />
     </div>
   );
 }

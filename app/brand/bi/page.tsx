@@ -8,6 +8,7 @@ import CursorFollower from "@/components/CursorFollower";
 import ConsultationForm from "@/components/ConsultationForm";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
+import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 
 export default function BiInteriorPage() {
   const [isConsulting, setIsConsulting] = useState(false);
@@ -428,6 +429,9 @@ export default function BiInteriorPage() {
 
       {/* Right Floating Quick Docking Bar */}
       <RightFloatingQuickBar onOpenConsultation={() => setIsConsulting(true)} />
+
+      {/* Right Side Inquiry Banner (300px width) */}
+      <RightSideInquiryBanner />
     </div>
   );
 }

@@ -26,6 +26,7 @@ import Footer from "./Footer";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import QuickInquiryBar from "./QuickInquiryBar";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
+import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 
 import CursorFollower from "@/components/CursorFollower";
 
@@ -121,6 +122,9 @@ export default function LandingV6Client() {
 
       {/* Right Floating Quick Docking Bar (Matching Brand Page) */}
       <RightFloatingQuickBar onOpenConsultation={openContactModal} />
+
+      {/* Right Side Inquiry Banner (300px width) */}
+      <RightSideInquiryBanner />
     </div>
   );
 }
