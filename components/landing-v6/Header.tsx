@@ -77,12 +77,18 @@ export default function Header({
           </nav>
 
           {/* Action Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            <Link
+              href="/brand"
+              className="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-[#fbc400] text-neutral-950 font-black text-xs rounded-full transition-all duration-300 shadow-xs hover:bg-amber-400 cursor-pointer whitespace-nowrap"
+            >
+              브랜드홈페이지 바로가기 &rarr;
+            </Link>
             <Link
               href="/portal"
               target="_blank"
               rel="noopener noreferrer"
-              className={`text-xs font-bold transition-colors duration-200 px-3 py-1.5 border rounded-md ${
+              className={`hidden sm:inline-block text-xs font-bold transition-colors duration-200 px-3 py-1.5 border rounded-full ${
                 isScrolled
                   ? "text-neutral-600 hover:text-neutral-950 border-neutral-300"
                   : "text-neutral-300 hover:text-white border-neutral-700"
@@ -90,12 +96,6 @@ export default function Header({
             >
               점주 전용
             </Link>
-            <button
-              onClick={onContactClick}
-              className="text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 transition-all duration-200 px-4 py-2 rounded-md shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-            >
-              창업 문의
-            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -171,15 +171,6 @@ export default function Header({
               >
                 점주 전용
               </Link>
-              <button
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  if (onContactClick) onContactClick();
-                }}
-                className="w-full text-center py-2 text-sm font-semibold text-white bg-amber-500 rounded-md"
-              >
-                창업 문의
-              </button>
             </div>
           </div>
         </div>

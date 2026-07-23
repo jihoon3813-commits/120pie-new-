@@ -323,7 +323,7 @@ export default function BrandFranchisePage() {
             </Link>
           </nav>
 
-          {/* Right Header Buttons (Brand Site Direct Button & Quick Consultation) */}
+          {/* Right Header Buttons */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="/brand"
@@ -331,12 +331,6 @@ export default function BrandFranchisePage() {
             >
               브랜드홈페이지 바로가기 &rarr;
             </Link>
-            <button
-              onClick={() => setIsConsulting(true)}
-              className="hidden md:block px-4 py-2 bg-neutral-950 text-white font-extrabold text-xs rounded-full transition-all duration-300 shadow-sm hover:bg-black border-0 cursor-pointer whitespace-nowrap"
-            >
-              창업 상담 문의
-            </button>
 
             {/* Mobile Menu Button */}
             <button

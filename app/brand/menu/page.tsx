@@ -287,17 +287,11 @@ export default function BrandMenuPage() {
           {/* Right Header Buttons */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
-              href="/brand/franchise"
+              href="/franchise"
               className="px-3 py-1.5 sm:px-4 sm:py-2 bg-neutral-950 text-[#fbc400] font-black text-xs rounded-full transition-all duration-300 shadow-xs hover:bg-black border border-neutral-800 cursor-pointer whitespace-nowrap"
             >
               창업홈페이지 바로가기 &rarr;
             </Link>
-            <button
-              onClick={() => setIsConsulting(true)}
-              className="hidden md:block px-4 py-2 bg-[#fbc400] hover:bg-[#e0a800] text-[#0D233A] font-extrabold text-xs rounded-full transition-all duration-300 shadow-sm shadow-[#fbc400]/20 hover:scale-103 border-0 cursor-pointer whitespace-nowrap"
-            >
-              창업 상담 문의
-            </button>
 
             {/* Mobile Menu Button */}
             <button
