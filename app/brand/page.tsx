@@ -796,7 +796,7 @@ export default function BrandHome() {
           <div className="w-full lg:flex-1 lg:max-w-[1000px] h-[350px] sm:h-[450px] lg:h-[563px] rounded-2xl overflow-hidden isolate shadow-md relative bg-neutral-900 border-0 group" style={{ transform: "translateZ(0)" }}>
             <video
               ref={videoRef}
-              src="https://github.com/jihoon3813-commits/imgs_cafe120/raw/refs/heads/main/KakaoTalk_20260724_095707302.mp4"
+              src="https://github.com/jihoon3813-commits/imgs_cafe120/raw/refs/heads/main/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C,%EC%96%91%EC%86%A1%EC%9D%B4%20%EC%88%98%EC%A0%952.mp4"
               className="w-full h-full object-cover pointer-events-none"
               autoPlay
               loop
