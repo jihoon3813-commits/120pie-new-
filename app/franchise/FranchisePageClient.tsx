@@ -38,6 +38,8 @@ import { useState, useEffect } from "react";
 import { useMutation, useAction } from "convex/react";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
+import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
+import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 import { api } from "@/convex/_generated/api";
 import { triggerConsultationSms } from "@/app/utils/sms";
 
@@ -2359,6 +2361,8 @@ export default function FranchisePageClient() {
 
       <FloatingAndInquiry isPink={isPink} />
       <Footer theme={isPink ? "black" : "yellow"} />
+      <RightFloatingQuickBar />
+      <RightSideInquiryBanner />
     </div>
   );
 }

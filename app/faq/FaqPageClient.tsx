@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
+import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
+import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 
 const logoUrlBlack = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png";
 
@@ -267,6 +269,8 @@ export default function FaqPageClient() {
         onModalClose={() => setInquiryForcedOpen(false)}
         isPink={isPink}
       />
+      <RightFloatingQuickBar />
+      <RightSideInquiryBanner />
     </div>
   );
 }

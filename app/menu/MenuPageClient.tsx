@@ -6,6 +6,8 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
+import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
+import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 import { MENU_DATA, MenuItem, MenuCategory } from "@/app/constants/menu";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 
@@ -599,6 +601,8 @@ export default function MenuPageClient() {
         onModalClose={() => setInquiryForcedOpen(false)}
         isPink={isPink}
       />
+      <RightFloatingQuickBar />
+      <RightSideInquiryBanner />
     </div>
   );
 }
