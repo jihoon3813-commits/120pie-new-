@@ -190,7 +190,7 @@ export default function BrandStoryPage() {
           {/* VIDEO CONTAINER PLAYER */}
           <div className="relative w-full aspect-video rounded-3xl overflow-hidden bg-neutral-900 border-4 border-[#FBC400] shadow-2xl flex items-center justify-center">
             <video
-              src="https://github.com/jihoon3813-commits/imgs_cafe120/raw/refs/heads/main/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EB%A1%9C%EC%A0%9C,%EC%96%91%EC%86%A1%EC%9D%B4%20%EC%88%98%EC%A0%952.mp4"
+              src="https://github.com/jihoon3813-commits/imgs_cafe120/raw/refs/heads/main/KakaoTalk_20260724_095707302.mp4"
               className="w-full h-full object-cover"
               autoPlay
               loop
