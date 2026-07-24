@@ -207,26 +207,31 @@ const CONCEPT_SLIDES = [
 const VIRAL_CARDS = [
   {
     id: 1,
+    img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784860823/image_1_1_rnmure.png",
+    title: "가수 강*경(브이로그 방송분)",
+  },
+  {
+    id: 2,
     img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784601503/Group_1_5_aychtd.png",
     title: "가수 송*호 (나혼자산다 방송분)",
   },
   {
-    id: 2,
+    id: 3,
     img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784601504/Group_3_1_ndlggk.png",
     title: "유튜버 [입*은*님] 구독자 165만명",
   },
   {
-    id: 3,
+    id: 4,
     img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784601504/Group_2_1_wppg4d.png",
     title: "유튜버 [코*트] 구독자 55만명",
   },
   {
-    id: 4,
+    id: 5,
     img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784601504/Group_4_j8jvr2.png",
     title: "유튜버 [효*] 구독자 44만명",
   },
   {
-    id: 5,
+    id: 6,
     img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784601504/Group_5_zzmzbr.png",
     title: "유튜버 [주*커플] 구독자 16만명",
   }
