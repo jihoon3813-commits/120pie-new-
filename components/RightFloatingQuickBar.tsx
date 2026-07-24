@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Phone, MessageCircle, ChevronUp } from "lucide-react";
 
 interface RightFloatingQuickBarProps {
@@ -10,6 +10,32 @@ interface RightFloatingQuickBarProps {
 export default function RightFloatingQuickBar({
   onOpenConsultation,
 }: RightFloatingQuickBarProps) {
+  const [isBannerClosed, setIsBannerClosed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hideBanner = sessionStorage.getItem("hide_right_inquiry_banner");
+      if (hideBanner === "true") {
+        setIsBannerClosed(true);
+      }
+
+      const handleBannerChange = (e: Event) => {
+        const customEvent = e as CustomEvent<{ isClosed: boolean }>;
+        if (customEvent.detail && typeof customEvent.detail.isClosed === "boolean") {
+          setIsBannerClosed(customEvent.detail.isClosed);
+        } else {
+          const stored = sessionStorage.getItem("hide_right_inquiry_banner");
+          setIsBannerClosed(stored === "true");
+        }
+      };
+
+      window.addEventListener("right-inquiry-banner-change", handleBannerChange);
+      return () => {
+        window.removeEventListener("right-inquiry-banner-change", handleBannerChange);
+      };
+    }
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -28,7 +54,9 @@ export default function RightFloatingQuickBar({
   };
 
   return (
-    <div className="fixed right-2.5 bottom-20 sm:right-6 sm:bottom-24 z-[90] flex flex-col items-end select-none">
+    <div className={`fixed right-2.5 bottom-20 sm:right-6 sm:bottom-24 z-[90] flex-col items-end select-none transition-all duration-300 ${
+      isBannerClosed ? "flex" : "flex lg:hidden"
+    }`}>
       {/* Main Floating Container */}
       <div className="bg-neutral-950/90 backdrop-blur-md opacity-95 hover:opacity-100 border border-neutral-800 text-white rounded-3xl p-2 sm:p-2.5 flex flex-col items-center gap-1.5 sm:gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.5)] transition-all duration-300 w-15 sm:w-20">
         

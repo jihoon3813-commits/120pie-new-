@@ -48,10 +48,21 @@ export default function RightSideInquiryBanner() {
     const hideBanner = sessionStorage.getItem("hide_right_inquiry_banner");
     if (hideBanner === "true") {
       setIsClosed(true);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("right-inquiry-banner-change", { detail: { isClosed: true } }));
+      }
+    } else {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("right-inquiry-banner-change", { detail: { isClosed: false } }));
+      }
     }
   }, []);
 
   const handleClose = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("hide_right_inquiry_banner", "true");
+      window.dispatchEvent(new CustomEvent("right-inquiry-banner-change", { detail: { isClosed: true } }));
+    }
     setIsClosed(true);
   };
 
@@ -138,7 +149,7 @@ export default function RightSideInquiryBanner() {
           animation: gentleFloatBanner 3.2s ease-in-out infinite;
         }
       `}</style>
-      <div className="hidden lg:block fixed right-2.5 sm:right-6 bottom-[460px] sm:bottom-[490px] z-[85] select-none animate-gentle-float-banner">
+      <div className="hidden lg:block fixed right-2.5 sm:right-6 top-[85px] z-[85] select-none animate-gentle-float-banner max-h-[calc(100vh-95px)] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden rounded-2xl">
         {/* Banner Container - Width 250px, 4px White Border, Positioned Vertically Above Floating Quick Bar */}
         <div className="w-[250px] bg-white border-4 border-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.35)] overflow-hidden transition-all duration-300 hover:shadow-[0_25px_60px_rgba(251,196,0,0.4)] ring-1 ring-neutral-300 hover:translate-y-0">
         
