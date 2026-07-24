@@ -108,6 +108,7 @@ const CONCEPT_SLIDES = [
     rightDesc: "봄, 여름, 가을, 겨울 사계절 인기 디저트 & 미트 파이",
     rightTitle: "120겹 파이",
     rightHash: "#버거보다 간편하다.",
+    categoryUrl: "/brand/menu?category=120겹파이",
     centerImg: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784557545/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._12_1_qui5uq.png",
     centerAlt: "불고기 피자파이 시그니처",
     textColorClass: "text-[#0D233A]",
@@ -128,6 +129,7 @@ const CONCEPT_SLIDES = [
     rightDesc: "아침 식사 대용으로도 든든한 고소함",
     rightTitle: "리얼 계란빵",
     rightHash: "#특허 기술로 겉바속촉 완성.",
+    categoryUrl: "/brand/menu?category=에그120",
     centerImg: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784594966/2_1_vrp1nm.png",
     centerAlt: "특허받은 리얼 계란빵",
     textColorClass: "text-white",
@@ -148,6 +150,7 @@ const CONCEPT_SLIDES = [
     rightDesc: "시나몬 슈가의 깊은 풍미와 쫄깃한 식감",
     rightTitle: "정통 츄러스",
     rightHash: "#바삭하고 깃털처럼 가벼운 달콤함.",
+    categoryUrl: "/brand/menu?category=기타",
     centerImg: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784595523/3_1_1_rvgru7.png",
     centerAlt: "스페인 정통 츄러스",
     textColorClass: "text-white",
@@ -168,6 +171,7 @@ const CONCEPT_SLIDES = [
     rightDesc: "풍성한 소스와 직화 불고기 토핑",
     rightTitle: "불고기 핫도그",
     rightHash: "#소시지와 직화 불고기의 강력한 한 방.",
+    categoryUrl: "/brand/menu?category=기타",
     centerImg: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784594967/4_1_zdxbzj.png",
     centerAlt: "직화로 맛을 낸 불고기 핫도그",
     textColorClass: "text-white",
@@ -188,6 +192,7 @@ const CONCEPT_SLIDES = [
     rightDesc: "풍부한 바디감과 화사한 산미의 예술",
     rightTitle: "케냐 바링고 커피",
     rightHash: "#마지막 한 모금까지 선명한 아로마.",
+    categoryUrl: "/brand/menu?category=coffee120",
     centerImg: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784594967/5_1_pvj7nw.png",
     centerAlt: "향이 끝까지 살아있는 케냐 바링고 커피",
     textColorClass: "text-white",
@@ -1266,7 +1271,7 @@ export default function BrandHome() {
 
                   <div className="pt-1.5">
                     <Link
-                      href="/menu"
+                      href={slide.categoryUrl || "/brand/menu"}
                       className={`inline-flex items-center gap-1.5 px-6 py-2 sm:px-8 sm:py-3 border ${slide.buttonBorderClass} ${slide.buttonTextClass} ${slide.buttonHoverClass} font-extrabold text-xs sm:text-sm rounded-full transition-all duration-300 shadow-md group/btn`}
                     >
                       <span>자세히 보기</span>
@@ -1643,7 +1648,7 @@ export default function BrandHome() {
             something beyond coffee
           </p>
           <div className="pt-2">
-            <Link href="/menu" className="border border-black/60 text-black rounded-full px-6 py-2 text-xs font-bold hover:bg-black hover:text-[#ffd500] transition-all">
+            <Link href="/franchise" className="border border-black/60 text-black rounded-full px-6 py-2 text-xs font-bold hover:bg-black hover:text-[#ffd500] transition-all">
               더 알아보기 →
             </Link>
           </div>

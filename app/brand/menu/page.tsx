@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, ChevronRight, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -127,6 +127,17 @@ export default function BrandMenuPage() {
   const [subFilter, setSubFilter] = useState<string>("all");
   const [isConsulting, setIsConsulting] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Sync category from URL search parameter
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get("category");
+      if (cat && MENU_DATA[cat]) {
+        setActiveTab(cat);
+      }
+    }
+  }, []);
 
   // Tab change
   const handleTabChange = (tabId: string) => {
