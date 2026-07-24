@@ -45,22 +45,32 @@ export default function RightSideInquiryBanner() {
   const sendSmsAction = useAction(api.aligo.sendSms);
 
   useEffect(() => {
-    const hideBanner = sessionStorage.getItem("hide_right_inquiry_banner");
-    if (hideBanner === "true") {
-      setIsClosed(true);
-      if (typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
+      const todayStr = new Date().toISOString().split("T")[0];
+      const hideDate = localStorage.getItem("hide_right_inquiry_banner_date");
+      if (hideDate === todayStr) {
+        setIsClosed(true);
         window.dispatchEvent(new CustomEvent("right-inquiry-banner-change", { detail: { isClosed: true } }));
-      }
-    } else {
-      if (typeof window !== "undefined") {
+      } else {
+        setIsClosed(false);
         window.dispatchEvent(new CustomEvent("right-inquiry-banner-change", { detail: { isClosed: false } }));
       }
     }
   }, []);
 
+  // 그냥 닫기 (새로고침 시 다시 표시)
   const handleClose = () => {
+    setIsClosed(true);
     if (typeof window !== "undefined") {
-      sessionStorage.setItem("hide_right_inquiry_banner", "true");
+      window.dispatchEvent(new CustomEvent("right-inquiry-banner-change", { detail: { isClosed: true } }));
+    }
+  };
+
+  // 오늘 하루 안보기 (오늘 동안 새로고침 해도 숨김)
+  const handleHideToday = () => {
+    if (typeof window !== "undefined") {
+      const todayStr = new Date().toISOString().split("T")[0];
+      localStorage.setItem("hide_right_inquiry_banner_date", todayStr);
       window.dispatchEvent(new CustomEvent("right-inquiry-banner-change", { detail: { isClosed: true } }));
     }
     setIsClosed(true);
@@ -159,14 +169,25 @@ export default function RightSideInquiryBanner() {
             <Sparkles size={14} className="text-[#FBC400] animate-pulse" />
             <span className="text-xs font-black text-white tracking-tight">120PIE 창업 문의</span>
           </div>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="text-neutral-400 hover:text-white transition-colors p-1 rounded-full hover:bg-neutral-800 cursor-pointer"
-            title="닫기"
-          >
-            <X size={15} />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handleHideToday}
+              className="text-[10px] text-neutral-400 hover:text-[#FBC400] transition-colors font-bold cursor-pointer whitespace-nowrap bg-transparent border-0 p-0"
+              title="오늘 하루 동안 배너 숨기기"
+            >
+              오늘 하루 안보기
+            </button>
+            <span className="text-neutral-700 text-[10px] select-none">|</span>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="text-neutral-400 hover:text-white transition-colors p-1 rounded-full hover:bg-neutral-800 cursor-pointer bg-transparent border-0"
+              title="닫기 (새로고침 시 다시 표시)"
+            >
+              <X size={15} />
+            </button>
+          </div>
         </div>
 
         {/* Promo Image - Aspect Ratio 3:4 */}

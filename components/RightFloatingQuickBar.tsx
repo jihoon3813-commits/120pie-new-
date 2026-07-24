@@ -14,18 +14,18 @@ export default function RightFloatingQuickBar({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const hideBanner = sessionStorage.getItem("hide_right_inquiry_banner");
-      if (hideBanner === "true") {
+      const todayStr = new Date().toISOString().split("T")[0];
+      const hideDate = localStorage.getItem("hide_right_inquiry_banner_date");
+      if (hideDate === todayStr) {
         setIsBannerClosed(true);
+      } else {
+        setIsBannerClosed(false);
       }
 
       const handleBannerChange = (e: Event) => {
         const customEvent = e as CustomEvent<{ isClosed: boolean }>;
         if (customEvent.detail && typeof customEvent.detail.isClosed === "boolean") {
           setIsBannerClosed(customEvent.detail.isClosed);
-        } else {
-          const stored = sessionStorage.getItem("hide_right_inquiry_banner");
-          setIsBannerClosed(stored === "true");
         }
       };
 
