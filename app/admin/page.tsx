@@ -46,7 +46,10 @@ import {
   Palette,
   Upload,
   Paperclip,
-  Edit
+  Edit,
+  GripVertical,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
@@ -635,6 +638,7 @@ export default function AdminPage() {
   const saveInstagramMutation = useMutation(api.instagram.createOrUpdate);
   const deleteInstagramMutation = useMutation(api.instagram.deleteInstagram);
   const seedInstagramMutation = useMutation(api.instagram.seedInstagram);
+  const reorderInstagramMutation = useMutation(api.instagram.reorder);
 
   useEffect(() => {
     if (convexInstagram && convexInstagram.length === 0) {
@@ -1479,6 +1483,18 @@ export default function AdminPage() {
   const [instaOrder, setInstaOrder] = useState(1);
   const [instaIsMain, setInstaIsMain] = useState(false);
   const [isInstaModalOpen, setIsInstaModalOpen] = useState(false);
+  
+  // Instagram Drag & Drop Reorder States
+  const [draggedInstaIndex, setDraggedInstaIndex] = useState<number | null>(null);
+  const [dragOverInstaIndex, setDragOverInstaIndex] = useState<number | null>(null);
+  const [localInstaList, setLocalInstaList] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (convexInstagram) {
+      const sorted = [...convexInstagram].sort((a, b) => a.orderIndex - b.orderIndex);
+      setLocalInstaList(sorted);
+    }
+  }, [convexInstagram]);
   
   // Popup States
   const [showPopupModal, setShowPopupModal] = useState<boolean>(false);
@@ -3299,6 +3315,77 @@ export default function AdminPage() {
     } catch (err) {
       console.error(err);
       alert("삭제 중 에러가 발생했습니다.");
+    }
+  };
+
+  const handleInstaDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedInstaIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleInstaDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedInstaIndex === null || draggedInstaIndex === index) return;
+    setDragOverInstaIndex(index);
+  };
+
+  const handleInstaDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedInstaIndex === null || draggedInstaIndex === dropIndex) {
+      setDraggedInstaIndex(null);
+      setDragOverInstaIndex(null);
+      return;
+    }
+
+    const updatedList = [...localInstaList];
+    const [movedItem] = updatedList.splice(draggedInstaIndex, 1);
+    updatedList.splice(dropIndex, 0, movedItem);
+
+    const reorderedItems = updatedList.map((item, idx) => ({
+      ...item,
+      orderIndex: idx + 1,
+    }));
+
+    setLocalInstaList(reorderedItems);
+    setDraggedInstaIndex(null);
+    setDragOverInstaIndex(null);
+
+    try {
+      await reorderInstagramMutation({
+        items: reorderedItems.map((item) => ({
+          id: item._id,
+          orderIndex: item.orderIndex,
+        })),
+      });
+    } catch (err) {
+      console.error("인스타 피드 순서 변경 실패:", err);
+    }
+  };
+
+  const handleInstaMove = async (currentIndex: number, direction: "up" | "down") => {
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= localInstaList.length) return;
+
+    const updatedList = [...localInstaList];
+    const [movedItem] = updatedList.splice(currentIndex, 1);
+    updatedList.splice(targetIndex, 0, movedItem);
+
+    const reorderedItems = updatedList.map((item, idx) => ({
+      ...item,
+      orderIndex: idx + 1,
+    }));
+
+    setLocalInstaList(reorderedItems);
+
+    try {
+      await reorderInstagramMutation({
+        items: reorderedItems.map((item) => ({
+          id: item._id,
+          orderIndex: item.orderIndex,
+        })),
+      });
+    } catch (err) {
+      console.error("인스타 피드 순서 변경 실패:", err);
     }
   };
 
@@ -7735,11 +7822,17 @@ export default function AdminPage() {
 
                   {/* List Table */}
                   <div className="bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm">
+                    <div className="bg-[#fff9fb] px-6 py-3 border-b border-[#f2ccd7]/60 flex items-center justify-between text-[11px] font-bold text-[#735965]">
+                      <span className="flex items-center gap-1.5">
+                        🖐️ <strong>순서 변경 팁:</strong> 마우스로 ☰ 핸들을 잡고 위아래로 끌어다 놓거나(Drag & Drop), ▲/▼ 버튼을 눌러 인스타 피드 순서를 자유롭게 조절할 수 있습니다.
+                      </span>
+                    </div>
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse min-w-[700px]">
+                      <table className="w-full text-left border-collapse min-w-[750px]">
                         <thead>
                           <tr className="bg-[#fff1f5]/70 border-b border-[#f2ccd7] text-[10px] font-black text-[#735965] uppercase tracking-wider">
-                            <th className="py-4 px-6 w-16 text-center">순서</th>
+                            <th className="py-4 px-4 w-12 text-center">드래그</th>
+                            <th className="py-4 px-4 w-24 text-center">순서</th>
                             <th className="py-4 px-6 w-24">이미지</th>
                             <th className="py-4 px-6">게시글 본문 요약</th>
                             <th className="py-4 px-6 w-28 text-center">메인 노출</th>
@@ -7749,61 +7842,128 @@ export default function AdminPage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[#f2ccd7]/40 text-xs">
-                          {!convexInstagram || convexInstagram.length === 0 ? (
+                          {localInstaList.length === 0 ? (
                             <tr>
-                              <td colSpan={7} className="py-12 text-center font-bold text-neutral-400">
+                              <td colSpan={8} className="py-12 text-center font-bold text-neutral-400">
                                 등록된 인스타그램 게시물이 없습니다.
                               </td>
                             </tr>
                           ) : (
-                            convexInstagram.map((item) => (
-                              <tr key={item._id} className="hover:bg-[#fff9fb]/40 transition-colors">
-                                <td className="py-4 px-6 font-bold text-center text-[#7c3aed]">{item.orderIndex}</td>
-                                <td className="py-4 px-6">
-                                  <div className="w-14 h-14 rounded-lg overflow-hidden border border-[#f2ccd7]/60 bg-neutral-50 flex items-center justify-center">
-                                    <img src={optimizeCloudinaryUrl(item.img)} alt="Insta" className="w-full h-full object-cover" />
-                                  </div>
-                                </td>
-                                <td className="py-4 px-6">
-                                  <p className="font-semibold text-[#2d2026] line-clamp-2 leading-relaxed max-w-md">
-                                    {item.text}
-                                  </p>
-                                </td>
-                                <td className="py-4 px-6 text-center">
-                                  {item.isMain ? (
-                                    <span className="bg-amber-100 text-amber-700 font-extrabold text-[9px] px-2.5 py-1 rounded-full border border-amber-200">
-                                      ★ 메인 노출
-                                    </span>
-                                  ) : (
-                                    <span className="text-neutral-400 font-bold text-[9px]">-</span>
-                                  )}
-                                </td>
-                                <td className="py-4 px-6">
-                                  <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-[#7c3aed] hover:underline font-semibold break-all">
-                                    {item.link}
-                                  </a>
-                                </td>
-                                <td className="py-4 px-6 text-[#735965] font-bold">{item.date}</td>
-                                <td className="py-4 px-6 text-center">
-                                  <div className="flex items-center justify-center gap-1.5">
-                                    <button
-                                      type="button"
-                                      onClick={() => handleOpenInstaEdit(item)}
-                                      className="px-2.5 py-1 bg-white border border-[#f2ccd7] text-[#735965] hover:bg-[#fff1f5] rounded-lg transition-all font-bold text-[10px] cursor-pointer"
-                                    >
-                                      수정
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDeleteInstagram(item._id)}
-                                      className="px-2.5 py-1 bg-white border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-all font-bold text-[10px] cursor-pointer"
-                                    >
-                                      삭제
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))
+                            localInstaList.map((item, index) => {
+                              const isDragging = draggedInstaIndex === index;
+                              const isDragOver = dragOverInstaIndex === index;
+                              return (
+                                <tr
+                                  key={item._id}
+                                  draggable
+                                  onDragStart={(e) => handleInstaDragStart(e, index)}
+                                  onDragOver={(e) => handleInstaDragOver(e, index)}
+                                  onDrop={(e) => handleInstaDrop(e, index)}
+                                  onDragEnd={() => {
+                                    setDraggedInstaIndex(null);
+                                    setDragOverInstaIndex(null);
+                                  }}
+                                  className={`transition-all select-none ${
+                                    isDragging
+                                      ? "opacity-30 bg-purple-100/80 border-y-2 border-dashed border-[#7c3aed]"
+                                      : isDragOver
+                                      ? "bg-purple-50 border-y-2 border-[#7c3aed]"
+                                      : "hover:bg-[#fff9fb]/60"
+                                  }`}
+                                >
+                                  {/* Drag Handle */}
+                                  <td className="py-4 px-4 text-center">
+                                    <div className="inline-flex items-center justify-center p-1.5 text-neutral-400 hover:text-[#7c3aed] hover:bg-purple-100/50 rounded-lg cursor-grab active:cursor-grabbing transition-colors" title="드래그하여 순서 변경">
+                                      <GripVertical size={18} />
+                                    </div>
+                                  </td>
+
+                                  {/* Order with Move Buttons */}
+                                  <td className="py-4 px-4 text-center">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <span className="font-extrabold text-[#7c3aed] text-xs min-w-[1.25rem]">
+                                        {item.orderIndex || index + 1}
+                                      </span>
+                                      <div className="flex flex-col gap-0.5">
+                                        <button
+                                          type="button"
+                                          disabled={index === 0}
+                                          onClick={() => handleInstaMove(index, "up")}
+                                          className="p-0.5 text-neutral-400 hover:text-[#7c3aed] disabled:opacity-20 disabled:hover:text-neutral-400 cursor-pointer"
+                                          title="위로 이동"
+                                        >
+                                          <ArrowUp size={11} />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          disabled={index === localInstaList.length - 1}
+                                          onClick={() => handleInstaMove(index, "down")}
+                                          className="p-0.5 text-neutral-400 hover:text-[#7c3aed] disabled:opacity-20 disabled:hover:text-neutral-400 cursor-pointer"
+                                          title="아래로 이동"
+                                        >
+                                          <ArrowDown size={11} />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </td>
+
+                                  {/* Image */}
+                                  <td className="py-4 px-6">
+                                    <div className="w-14 h-14 rounded-lg overflow-hidden border border-[#f2ccd7]/60 bg-neutral-50 flex items-center justify-center">
+                                      <img src={optimizeCloudinaryUrl(item.img)} alt="Insta" className="w-full h-full object-cover" />
+                                    </div>
+                                  </td>
+
+                                  {/* Text Summary */}
+                                  <td className="py-4 px-6">
+                                    <p className="font-semibold text-[#2d2026] line-clamp-2 leading-relaxed max-w-md">
+                                      {item.text}
+                                    </p>
+                                  </td>
+
+                                  {/* Main Flag */}
+                                  <td className="py-4 px-6 text-center">
+                                    {item.isMain ? (
+                                      <span className="bg-amber-100 text-amber-700 font-extrabold text-[9px] px-2.5 py-1 rounded-full border border-amber-200">
+                                        ★ 메인 노출
+                                      </span>
+                                    ) : (
+                                      <span className="text-neutral-400 font-bold text-[9px]">-</span>
+                                    )}
+                                  </td>
+
+                                  {/* Link */}
+                                  <td className="py-4 px-6">
+                                    <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-[#7c3aed] hover:underline font-semibold break-all">
+                                      {item.link}
+                                    </a>
+                                  </td>
+
+                                  {/* Date */}
+                                  <td className="py-4 px-6 text-[#735965] font-bold">{item.date}</td>
+
+                                  {/* Actions */}
+                                  <td className="py-4 px-6 text-center">
+                                    <div className="flex items-center justify-center gap-1.5">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleOpenInstaEdit(item)}
+                                        className="px-2.5 py-1 bg-white border border-[#f2ccd7] text-[#735965] hover:bg-[#fff1f5] rounded-lg transition-all font-bold text-[10px] cursor-pointer"
+                                      >
+                                        수정
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteInstagram(item._id)}
+                                        className="px-2.5 py-1 bg-white border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-all font-bold text-[10px] cursor-pointer"
+                                      >
+                                        삭제
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
                           )}
                         </tbody>
                       </table>

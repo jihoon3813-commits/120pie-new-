@@ -56,6 +56,23 @@ export const deleteInstagram = mutation({
   },
 });
 
+// 3.5. 게시물 순서 일괄 변경 (Reorder)
+export const reorder = mutation({
+  args: {
+    items: v.array(
+      v.object({
+        id: v.id("instagram"),
+        orderIndex: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    for (const item of args.items) {
+      await ctx.db.patch(item.id, { orderIndex: item.orderIndex });
+    }
+  },
+});
+
 // 4. 시드(초기) 데이터 로드
 export const seedInstagram = mutation({
   args: {},
