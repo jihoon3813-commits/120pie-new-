@@ -8,12 +8,12 @@ export const get = query({
     if (!floating) {
       return {
         isActive: true,
-        instaUrl: "https://www.instagram.com/120pie77/",
-        youtubeUrl: "https://youtube.com",
-        chatUrl: "https://kakao.com",
+        instaUrl: "https://www.instagram.com/120piecoffee",
+        youtubeUrl: "https://youtube.com/@120pie?si=L4ZTx7rz9hUBotmC",
+        chatUrl: "http://pf.kakao.com/_zkVTn/chat",
         phoneNo: "1566-3594",
-        kakaoUrl: "https://kakao.com",
-        blogUrl: "https://blog.naver.com/120pie_coffee"
+        kakaoUrl: "http://pf.kakao.com/_zkVTn/chat",
+        blogUrl: "https://blog.naver.com/120piecoffee"
       };
     }
     return floating;

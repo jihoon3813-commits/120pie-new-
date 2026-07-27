@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Phone, MessageCircle, ChevronUp } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
 
 interface RightFloatingQuickBarProps {
   onOpenConsultation?: () => void;
@@ -11,6 +13,7 @@ export default function RightFloatingQuickBar({
   onOpenConsultation,
 }: RightFloatingQuickBarProps) {
   const [isBannerClosed, setIsBannerClosed] = useState(false);
+  const convexFloating = useQuery(api.floatings.get);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -40,18 +43,20 @@ export default function RightFloatingQuickBar({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleConsultationClick = () => {
-    if (onOpenConsultation) {
-      onOpenConsultation();
-    } else {
-      const el = document.getElementById("inquiry");
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      } else {
-        window.location.href = "/brand/franchise#inquiry";
-      }
+  const handleKakaoClick = () => {
+    // 카톡문의 클릭 시 사이트 팝업(onOpenConsultation)을 부르지 않고, 카카오톡 채널 URL로 이동합니다.
+    let kakaoTarget = "http://pf.kakao.com/_zkVTn/chat";
+    if (convexFloating?.kakaoUrl && convexFloating.kakaoUrl.trim() !== "" && convexFloating.kakaoUrl !== "https://kakao.com") {
+      kakaoTarget = convexFloating.kakaoUrl;
+    } else if (convexFloating?.chatUrl && convexFloating.chatUrl.trim() !== "" && convexFloating.chatUrl !== "https://kakao.com") {
+      kakaoTarget = convexFloating.chatUrl;
     }
+    window.open(kakaoTarget, "_blank", "noopener,noreferrer");
   };
+
+  const instaTarget = convexFloating?.instaUrl || "https://www.instagram.com/120pie77/";
+  const youtubeTarget = convexFloating?.youtubeUrl || "https://www.youtube.com";
+  const phoneTarget = convexFloating?.phoneNo ? `tel:${convexFloating.phoneNo}` : "tel:1899-5685";
 
   return (
     <div className={`fixed right-2.5 bottom-20 sm:right-6 sm:bottom-24 z-[90] flex-col items-end select-none transition-all duration-300 ${
@@ -71,7 +76,7 @@ export default function RightFloatingQuickBar({
 
         {/* Item 1: 인스타 */}
         <a
-          href="https://www.instagram.com"
+          href={instaTarget}
           target="_blank"
           rel="noopener noreferrer"
           className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
@@ -87,7 +92,7 @@ export default function RightFloatingQuickBar({
 
         {/* Item 2: 유튜브 */}
         <a
-          href="https://www.youtube.com"
+          href={youtubeTarget}
           target="_blank"
           rel="noopener noreferrer"
           className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
@@ -102,9 +107,9 @@ export default function RightFloatingQuickBar({
 
         {/* Item 3: 전화문의 */}
         <a
-          href="tel:1899-5685"
+          href={phoneTarget}
           className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
-          title="전화문의 (1899-5685)"
+          title={`전화문의 (${convexFloating?.phoneNo || "1899-5685"})`}
         >
           <Phone size={16} className="mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
           <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">전화문의</span>
@@ -113,10 +118,7 @@ export default function RightFloatingQuickBar({
         {/* Item 4: 카톡문의 */}
         <button
           type="button"
-          onClick={() => {
-            if (onOpenConsultation) onOpenConsultation();
-            window.open("https://pf.kakao.com", "_blank");
-          }}
+          onClick={handleKakaoClick}
           className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
           title="카톡 1:1 상담 문의"
         >
