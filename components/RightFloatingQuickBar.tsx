@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Phone, MessageCircle, ChevronUp } from "lucide-react";
+import { Phone, ChevronUp } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 
@@ -41,17 +41,6 @@ export default function RightFloatingQuickBar({
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleKakaoClick = () => {
-    // 카톡문의 클릭 시 사이트 팝업(onOpenConsultation)을 부르지 않고, 카카오톡 채널 URL로 이동합니다.
-    let kakaoTarget = "http://pf.kakao.com/_zkVTn/chat";
-    if (convexFloating?.kakaoUrl && convexFloating.kakaoUrl.trim() !== "" && convexFloating.kakaoUrl !== "https://kakao.com") {
-      kakaoTarget = convexFloating.kakaoUrl;
-    } else if (convexFloating?.chatUrl && convexFloating.chatUrl.trim() !== "" && convexFloating.chatUrl !== "https://kakao.com") {
-      kakaoTarget = convexFloating.chatUrl;
-    }
-    window.open(kakaoTarget, "_blank", "noopener,noreferrer");
   };
 
   const instaTarget = convexFloating?.instaUrl || "https://www.instagram.com/120pie77/";
@@ -115,18 +104,7 @@ export default function RightFloatingQuickBar({
           <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">전화문의</span>
         </a>
 
-        {/* Item 4: 카톡문의 */}
-        <button
-          type="button"
-          onClick={handleKakaoClick}
-          className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
-          title="카톡 1:1 상담 문의"
-        >
-          <MessageCircle size={16} className="mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
-          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">카톡문의</span>
-        </button>
-
-        {/* Item 5: TOP */}
+        {/* Item 4: TOP */}
         <button
           type="button"
           onClick={scrollToTop}
