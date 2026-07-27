@@ -3389,6 +3389,32 @@ export default function AdminPage() {
     }
   };
 
+  const handleToggleInstaMain = async (item: any) => {
+    const nextIsMain = !item.isMain;
+    if (nextIsMain) {
+      const activeMains = convexInstagram?.filter((i) => i.isMain && i._id !== item._id) || [];
+      if (activeMains.length >= 4) {
+        alert("메인 노출은 최대 4개까지만 지정할 수 있습니다. 기존에 지정된 다른 메인 포스트의 노출 체크를 해제해 주세요.");
+        return;
+      }
+    }
+
+    try {
+      await saveInstagramMutation({
+        id: item._id,
+        img: item.img,
+        text: item.text,
+        link: item.link,
+        date: item.date,
+        orderIndex: item.orderIndex,
+        isMain: nextIsMain,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("메인 노출 상태 변경 중 에러가 발생했습니다.");
+    }
+  };
+
   const handleOpenInstaEdit = (item: any) => {
     setInstaId(item._id);
     setInstaImg(item.img);
@@ -7921,15 +7947,20 @@ export default function AdminPage() {
                                     </p>
                                   </td>
 
-                                  {/* Main Flag */}
+                                  {/* Main Flag Toggle */}
                                   <td className="py-4 px-6 text-center">
-                                    {item.isMain ? (
-                                      <span className="bg-amber-100 text-amber-700 font-extrabold text-[9px] px-2.5 py-1 rounded-full border border-amber-200">
-                                        ★ 메인 노출
-                                      </span>
-                                    ) : (
-                                      <span className="text-neutral-400 font-bold text-[9px]">-</span>
-                                    )}
+                                    <button
+                                      type="button"
+                                      onClick={() => handleToggleInstaMain(item)}
+                                      className={`px-3 py-1.5 rounded-full font-extrabold text-[10px] transition-all cursor-pointer shadow-sm hover:scale-105 inline-flex items-center justify-center gap-1 ${
+                                        item.isMain
+                                          ? "bg-amber-400 text-neutral-950 border border-amber-500 hover:bg-amber-300"
+                                          : "bg-neutral-100 text-neutral-400 border border-neutral-200 hover:bg-neutral-200 hover:text-neutral-700"
+                                      }`}
+                                      title={item.isMain ? "클릭 시 메인 노출 해제" : "클릭 시 메인 노출로 지정 (최대 4개)"}
+                                    >
+                                      {item.isMain ? "★ 메인 노출" : "☆ 미노출"}
+                                    </button>
                                   </td>
 
                                   {/* Link */}
