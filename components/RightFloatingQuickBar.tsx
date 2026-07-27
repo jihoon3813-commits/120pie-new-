@@ -44,6 +44,7 @@ export default function RightFloatingQuickBar({
   };
 
   const instaTarget = convexFloating?.instaUrl || "https://www.instagram.com/120pie77/";
+  const blogTarget = convexFloating?.blogUrl || "https://blog.naver.com/120pie_coffee";
   const youtubeTarget = convexFloating?.youtubeUrl || "https://www.youtube.com";
   const phoneTarget = convexFloating?.phoneNo ? `tel:${convexFloating.phoneNo}` : "tel:1899-5685";
 
@@ -79,7 +80,21 @@ export default function RightFloatingQuickBar({
           <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">인스타</span>
         </a>
 
-        {/* Item 2: 유튜브 */}
+        {/* Item 2: 네이버 블로그 */}
+        <a
+          href={blogTarget}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
+          title="공식 네이버 블로그"
+        >
+          <svg className="w-4 h-4 mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16.273 19.143L8.538 9.385V19.143H4.425V4.857h4.088l7.653 9.637V4.857h4.088v14.286h-3.981z" />
+          </svg>
+          <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">블로그</span>
+        </a>
+
+        {/* Item 3: 유튜브 */}
         <a
           href={youtubeTarget}
           target="_blank"
@@ -94,7 +109,7 @@ export default function RightFloatingQuickBar({
           <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">유튜브</span>
         </a>
 
-        {/* Item 3: 전화문의 */}
+        {/* Item 4: 전화문의 */}
         <a
           href={phoneTarget}
           className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
@@ -104,7 +119,7 @@ export default function RightFloatingQuickBar({
           <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">전화문의</span>
         </a>
 
-        {/* Item 4: TOP */}
+        {/* Item 5: TOP */}
         <button
           type="button"
           onClick={scrollToTop}
