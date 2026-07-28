@@ -4455,7 +4455,7 @@ export default function AdminPage() {
 
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <div className="hidden md:flex flex-col items-end text-right">
-            <span className="font-black text-xs text-[#0F172A]">120PIE&COFFEE 본사 가맹사업지원센터</span>
+            <span className="font-black text-xs text-[#0F172A]">본사 가맹사업지원센터</span>
             <span className="text-[10px] text-slate-400 font-bold">마스터 최고 관리자 (HQ-ADMIN)</span>
           </div>
           
