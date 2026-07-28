@@ -3593,7 +3593,7 @@ export default function PortalPage() {
                     
                     {cart.length > 0 && (
                       <div className="flex items-center gap-2">
-                        <span className="bg-amber-100 text-[#0F172A] text-[10px] font-black px-2.5 py-1 rounded-full border border-amber-200">
+                        <span className="bg-[#FED422] text-[#0F172A] text-[10px] font-black px-2.5 py-1 rounded-full shadow-2xs">
                           총 {cart.reduce((acc, item) => acc + item.quantity, 0)}개
                         </span>
                         <button 
@@ -4344,7 +4344,7 @@ export default function PortalPage() {
                     type="button"
                     onClick={handleUpdateProfile}
                     disabled={isUpdatingProfile}
-                    className="px-6 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-black rounded-xl transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-50 cursor-pointer border-0 animate-pulse-once"
+                    className="px-6 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-xl transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50 cursor-pointer border-0"
                   >
                     {isUpdatingProfile ? "저장 중..." : "정보 변경 내용 저장"}
                   </button>
@@ -4445,7 +4445,7 @@ export default function PortalPage() {
                     className={`w-full py-3 text-xs sm:text-sm font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 ${
                       savedCredentials 
                         ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
-                        : "bg-[#0F172A] hover:bg-slate-800 text-white"
+                        : "bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A]"
                     }`}
                   >
                     <span>
@@ -4466,7 +4466,7 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => setSelectedNotice(null)}
-                  className="px-6 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
+                  className="px-6 py-2.5 rounded-full bg-[#FED422] hover:bg-[#e5be1f] text-xs font-black text-[#0F172A] transition-colors border-0 cursor-pointer shadow-xs"
                 >
                   닫기
                 </button>
@@ -5183,7 +5183,7 @@ export default function PortalPage() {
                                     selectedOrder.date
                                   );
                                 }}
-                                className="w-full py-3 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-md active:scale-95"
+                                className="w-full py-3 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-md active:scale-95"
                               >
                                 배송 위치 실시간 조회하기 <ChevronRight size={14} />
                               </button>
@@ -5217,7 +5217,7 @@ export default function PortalPage() {
                                       selectedOrder.date
                                     );
                                   }}
-                                  className="w-full py-2.5 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black transition-all flex items-center justify-center gap-1 cursor-pointer border-0 shadow-xs active:scale-95"
+                                  className="w-full py-2.5 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1 cursor-pointer border-0 shadow-xs active:scale-95"
                                 >
                                   배송 위치 실시간 조회하기 <ChevronRight size={14} />
                                 </button>
@@ -5255,7 +5255,7 @@ export default function PortalPage() {
                   <button 
                     type="button"
                     onClick={() => closeModal(() => setSelectedOrder(null))}
-                    className="px-6 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-all cursor-pointer border-0 shadow-xs"
+                    className="px-6 py-2.5 rounded-full bg-[#FED422] hover:bg-[#e5be1f] text-xs font-black text-[#0F172A] transition-all cursor-pointer border-0 shadow-xs"
                   >
                     상세내역 창 닫기
                   </button>
@@ -5531,7 +5531,7 @@ export default function PortalPage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Yellow Header */}
-            <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shadow-xs">
+            <div className="p-6 bg-[#FED422] text-[#0F172A] flex justify-between items-center shadow-xs">
               <div className="flex-1">
                 <h3 className="text-base sm:text-lg font-black text-[#0F172A] flex items-center gap-2">
                   <span className="bg-[#0F172A] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full">
@@ -5892,7 +5892,7 @@ export default function PortalPage() {
                         }
                         closeModal(() => setSelectedProductDetail(null));
                       }}
-                      className="flex-1 sm:flex-none px-8 py-3 rounded-full bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5 border-0"
+                      className="flex-1 sm:flex-none px-8 py-3 rounded-full bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5 border-0"
                     >
                       <ShoppingBag size={16} />
                       장바구니 담기
@@ -5923,7 +5923,7 @@ export default function PortalPage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Yellow Header */}
-            <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex items-center justify-between shadow-xs">
+            <div className="p-6 bg-[#FED422] text-[#0F172A] flex items-center justify-between shadow-xs">
               <div className="flex items-center gap-2.5">
                 <ShoppingBag size={20} className="text-[#0F172A]" />
                 <h4 className="text-base sm:text-lg font-black text-[#0F172A]">
@@ -5970,7 +5970,7 @@ export default function PortalPage() {
                     {/* 1. 발주 품목 확인 */}
                     <div className="space-y-3">
                       <span className="font-black text-xs text-[#0F172A] flex items-center gap-1.5 border-b border-slate-100 pb-2">
-                        <CheckCircle2 size={16} className="text-[#F5AC00]" /> 발주 품목 확인
+                        <CheckCircle2 size={16} className="text-[#FED422]" /> 발주 품목 확인
                       </span>
                       
                       <div className="space-y-3 max-h-[240px] overflow-y-auto pr-1">
@@ -6040,7 +6040,7 @@ export default function PortalPage() {
                     {/* 2. 배송지 정보 입력 */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5 border-b border-slate-100 pb-2">
-                        <MapPin size={16} className="text-[#F5AC00] shrink-0" />
+                        <MapPin size={16} className="text-[#FED422] shrink-0" />
                         <span className="font-black text-xs text-[#0F172A]">배송지 정보 입력</span>
                         <span className="text-[10px] text-slate-400 font-bold ml-auto bg-[#F8FAFC] px-2.5 py-0.5 rounded-full select-none">
                           기본 주소지 정보 자동 입력됨
@@ -6056,12 +6056,12 @@ export default function PortalPage() {
                               value={deliveryAddress}
                               onChange={(e) => setDeliveryAddress(e.target.value)}
                               placeholder="도로명 주소를 검색 또는 직접 입력하세요"
-                              className="flex-1 px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
+                              className="flex-1 px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
                             />
                             <button
                               type="button"
                               onClick={() => openDaumPostcode("delivery")}
-                              className="px-5 py-3 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black rounded-full transition-all cursor-pointer border-0 shrink-0 shadow-md"
+                              className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-full transition-all cursor-pointer border-0 shrink-0 shadow-md"
                             >
                               주소 검색
                             </button>
@@ -6074,7 +6074,7 @@ export default function PortalPage() {
                             value={deliveryDetailAddress}
                             onChange={(e) => setDeliveryDetailAddress(e.target.value)}
                             placeholder="상세 주소 (동/호수/층 등)"
-                            className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
+                            className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
@@ -6085,7 +6085,7 @@ export default function PortalPage() {
                               value={recipientName}
                               onChange={(e) => setRecipientName(e.target.value)}
                               placeholder="수령인 이름"
-                              className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
+                              className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
                             />
                           </div>
                           <div>
@@ -6095,7 +6095,7 @@ export default function PortalPage() {
                               value={recipientPhone}
                               onChange={(e) => setRecipientPhone(formatPhoneNumber(e.target.value))}
                               placeholder="010-0000-0000"
-                              className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
+                              className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
                             />
                           </div>
                         </div>
@@ -6110,7 +6110,7 @@ export default function PortalPage() {
                     {/* 3. 결제 수단 선택 */}
                     <div className="space-y-3">
                       <span className="font-black text-xs text-[#0F172A] flex items-center gap-1.5 border-b border-slate-100 pb-2">
-                        <CreditCard size={16} className="text-[#F5AC00]" /> 결제 수단 선택
+                        <CreditCard size={16} className="text-[#FED422]" /> 결제 수단 선택
                       </span>
                       
                       <div className="grid grid-cols-2 gap-3">
@@ -6119,7 +6119,7 @@ export default function PortalPage() {
                           onClick={() => setOrderPayMethod("card")}
                           className={`flex items-center justify-center gap-2 py-3.5 rounded-2xl border-0 text-xs font-black transition-all cursor-pointer ${
                             orderPayMethod === "card"
-                              ? "bg-[#F5AC00] text-[#0F172A] shadow-md"
+                              ? "bg-[#FED422] text-[#0F172A] shadow-md"
                               : "bg-[#F8FAFC] text-slate-600 hover:bg-slate-200"
                           }`}
                         >
@@ -6131,7 +6131,7 @@ export default function PortalPage() {
                           onClick={() => setOrderPayMethod("bank")}
                           className={`flex items-center justify-center gap-2 py-3.5 rounded-2xl border-0 text-xs font-black transition-all cursor-pointer ${
                             orderPayMethod === "bank"
-                              ? "bg-[#F5AC00] text-[#0F172A] shadow-md"
+                              ? "bg-[#FED422] text-[#0F172A] shadow-md"
                               : "bg-[#F8FAFC] text-slate-600 hover:bg-slate-200"
                           }`}
                         >
@@ -6145,12 +6145,12 @@ export default function PortalPage() {
                         <div className="bg-[#F8FAFC] border-0 p-5 rounded-2xl space-y-3 animate-fadeIn text-xs">
                           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                             <span className="font-black text-[#0F172A] flex items-center gap-1">
-                              <Landmark size={14} className="text-[#F5AC00]" /> 입금 계좌 정보
+                              <Landmark size={14} className="text-[#FED422]" /> 입금 계좌 정보
                             </span>
                             <button
                               type="button"
                               onClick={() => handleCopyToClipboard(`K뱅크 700-120-270001 (주)고우웰라이프 ${cartTotal.toLocaleString()}원`, "전체 계좌 정보")}
-                              className="text-[10px] text-[#0F172A] font-black flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1 rounded-full border-0 shadow-2xs hover:bg-[#F5AC00]"
+                              className="text-[10px] text-[#0F172A] font-black flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1 rounded-full border-0 shadow-2xs hover:bg-[#FED422]"
                             >
                               <Copy size={11} /> 전체 복사
                             </button>
@@ -6198,7 +6198,7 @@ export default function PortalPage() {
                     {/* 4. 최종 결제 내역 확인 */}
                     <div className="bg-[#F8FAFC] border-0 rounded-2xl p-6 space-y-5">
                       <span className="font-black text-xs text-[#0F172A] flex items-center gap-1.5 border-b border-slate-200 pb-2 select-none">
-                        <CheckCircle2 size={16} className="text-[#F5AC00]" /> 최종 금액 확인
+                        <CheckCircle2 size={16} className="text-[#FED422]" /> 최종 금액 확인
                       </span>
                       
                       <div className="space-y-3 text-xs">
@@ -6241,7 +6241,7 @@ export default function PortalPage() {
                           placeOrder();
                           setShowCheckoutModal(false);
                         }}
-                        className="w-full py-4 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-sm font-black rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-2"
+                        className="w-full py-4 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-sm font-black rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-2"
                       >
                         <CheckCircle2 size={18} />
                         {orderPayMethod === "card" ? "최종 결제 진행" : "발주 신청 완료 (무통장입금)"}
