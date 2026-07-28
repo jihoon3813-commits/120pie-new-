@@ -2179,16 +2179,15 @@ export default function PortalPage() {
     adoptionMenu: ["120pie", "egg120", "츄러스120", "핫도그120", "120coffee"]
   };
 
-  const adoptionMenu = activeStore?.adoptionMenu || ["120pie", "egg120", "츄러스120", "핫도그120", "120coffee"];
+  const adoptionMenu = activeStore?.adoptionMenu || ["120pie"];
 
   const PACKAGES = [
-    { name: "120pie", active: adoptionMenu.includes("120pie"), desc: adoptionMenu.includes("120pie") ? "시그니처 파이 가동중" : "가맹점 도입 대기" },
-    { name: "egg120", active: adoptionMenu.includes("egg120"), desc: adoptionMenu.includes("egg120") ? "프리미엄 쌀 계란빵 가동중" : "가맹점 도입 대기" },
-    { name: "츄러스120", active: adoptionMenu.includes("츄러스120"), desc: adoptionMenu.includes("츄러스120") ? "스페인 정통 스낵 가동중" : "가맹점 도입 대기" },
-    { name: "떡볶이120", active: adoptionMenu.includes("떡볶이120"), desc: adoptionMenu.includes("떡볶이120") ? "쫀득한 국물 떡볶이 가동중" : "가맹점 도입 대기" },
-    { name: "핫도그120", active: adoptionMenu.includes("핫도그120"), desc: adoptionMenu.includes("핫도그120") ? "직화 수제 핫도그 가동중" : "가맹점 도입 대기" },
-    { name: "120coffee", active: adoptionMenu.includes("120coffee"), desc: adoptionMenu.includes("120coffee") ? "스페셜티 가성비 음료 가동중" : "가맹점 도입 대기" },
-    { name: "추가 패키지", active: false, desc: "신규 모듈 준비중" }
+    { name: "120pie", label: "120pie", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_4_1_zptjbn.png", active: adoptionMenu.includes("120pie"), desc: adoptionMenu.includes("120pie") ? "시그니처 파이 가동중" : "가맹 도입 대기" },
+    { name: "egg120", label: "egg120", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158865/Group_5_1_cdwr4y.png", active: adoptionMenu.includes("egg120"), desc: adoptionMenu.includes("egg120") ? "프리미엄 쌀 계란빵 가동중" : "가맹 도입 대기" },
+    { name: "츄러스120", label: "츄러스120", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_7_iowfzq.png", active: adoptionMenu.includes("츄러스120"), desc: adoptionMenu.includes("츄러스120") ? "스페인 정통 스낵 가동중" : "가맹 도입 대기" },
+    { name: "떡볶이120", label: "떡볶이120", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_6_io2ejc.png", active: adoptionMenu.includes("떡볶이120"), desc: adoptionMenu.includes("떡볶이120") ? "쫀득한 국물 떡볶이 가동중" : "가맹 도입 대기" },
+    { name: "핫도그120", label: "핫도그120", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_8_d8kfzr.png", active: adoptionMenu.includes("핫도그120"), desc: adoptionMenu.includes("핫도그120") ? "직화 수제 핫도그 가동중" : "가맹 도입 대기" },
+    { name: "120coffee", label: "120coffee", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_9_iskk3b.png", active: adoptionMenu.includes("120coffee"), desc: adoptionMenu.includes("120coffee") ? "스페셜티 가성비 음료 가동중" : "가맹 도입 대기" },
   ];
 
   // Filtering Products
@@ -3068,107 +3067,36 @@ export default function PortalPage() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
-                  {/* Module 1: 120pie */}
-                  <div className="bg-[#F8FAFC] hover:bg-emerald-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-emerald-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <img
-                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_4_1_zptjbn.png"
-                        alt="120pie"
-                        className="w-full h-full object-contain"
-                      />
+                  {PACKAGES.map((pkg) => (
+                    <div 
+                      key={pkg.name}
+                      className={`rounded-2xl p-3.5 text-center border space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer ${
+                        pkg.active 
+                          ? "bg-[#F8FAFC] hover:bg-emerald-50/50 border-slate-100 hover:border-emerald-200" 
+                          : "bg-[#F8FAFC] border-slate-100 opacity-50"
+                      }`}
+                    >
+                      <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <img
+                          src={pkg.img}
+                          alt={pkg.label}
+                          className={`w-full h-full object-contain ${pkg.active ? "" : "grayscale-[40%]"}`}
+                        />
+                      </div>
+                      <div className="space-y-1 w-full">
+                        <strong className={`text-xs font-black block ${pkg.active ? "text-[#0F172A]" : "text-slate-500"}`}>
+                          {pkg.label}
+                        </strong>
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded block w-full truncate ${
+                          pkg.active 
+                            ? "text-emerald-700 bg-emerald-100/90 font-black shadow-2xs" 
+                            : "text-slate-400 bg-slate-100"
+                        }`}>
+                          {pkg.desc}
+                        </span>
+                      </div>
                     </div>
-                    <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-[#0F172A] block">120pie</strong>
-                      <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
-                        시그니처 파이 가동중
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Module 2: egg120 */}
-                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-slate-100 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <img
-                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158865/Group_5_1_cdwr4y.png"
-                        alt="egg120"
-                        className="w-full h-full object-contain grayscale-[40%]"
-                      />
-                    </div>
-                    <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-slate-500 block">egg120</strong>
-                      <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
-                        가맹 도입 대기
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Module 3: 츄러스120 */}
-                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-slate-100 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <img
-                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_7_iowfzq.png"
-                        alt="츄러스120"
-                        className="w-full h-full object-contain grayscale-[40%]"
-                      />
-                    </div>
-                    <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-slate-500 block">츄러스120</strong>
-                      <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
-                        가맹 도입 대기
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Module 4: 떡볶이120 */}
-                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-slate-100 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <img
-                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_6_io2ejc.png"
-                        alt="떡볶이120"
-                        className="w-full h-full object-contain grayscale-[40%]"
-                      />
-                    </div>
-                    <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-slate-500 block">떡볶이120</strong>
-                      <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
-                        가맹 도입 대기
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Module 5: 핫도그120 */}
-                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-slate-100 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <img
-                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_8_d8kfzr.png"
-                        alt="핫도그120"
-                        className="w-full h-full object-contain grayscale-[40%]"
-                      />
-                    </div>
-                    <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-slate-500 block">핫도그120</strong>
-                      <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
-                        가맹 도입 대기
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Module 6: 120coffee */}
-                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-slate-100 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <img
-                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_9_iskk3b.png"
-                        alt="120coffee"
-                        className="w-full h-full object-contain grayscale-[40%]"
-                      />
-                    </div>
-                    <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-slate-500 block">120coffee</strong>
-                      <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
-                        가맹 도입 대기
-                      </span>
-                    </div>
-                  </div>
+                  ))}
 
                   {/* Module 7: Add Module */}
                   <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 opacity-60">
