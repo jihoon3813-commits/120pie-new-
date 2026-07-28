@@ -4390,22 +4390,22 @@ export default function PortalPage() {
             className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div className="flex items-center gap-2.5">
-                <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-1 rounded-full">
+                <span className="bg-[#0F172A] text-white text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-1 rounded-full">
                   {selectedNotice.tag}
                 </span>
-                <span className="text-xs text-neutral-400 font-medium">{selectedNotice.date} · 조회수 {selectedNotice.views}</span>
+                <span className="text-xs text-[#0F172A]/80 font-bold">{selectedNotice.date} · 조회수 {selectedNotice.views}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
                   공지사항
                 </span>
                 <button 
                   type="button"
                   onClick={() => setSelectedNotice(null)} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -4486,20 +4486,20 @@ export default function PortalPage() {
             className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div>
                 <h3 className="text-base font-black text-[#0F172A] tracking-tight">배민/쿠팡이츠 정보 입력</h3>
-                <p className="text-xs text-neutral-400 font-medium mt-0.5">배달앱 메뉴 리뉴얼 작업을 위한 사장님 계정을 제출합니다.</p>
+                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">배달앱 메뉴 리뉴얼 작업을 위한 사장님 계정을 제출합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
                   연동 계정
                 </span>
                 <button 
                   type="button"
                   onClick={() => setShowCredentialModal(false)} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -4735,22 +4735,22 @@ export default function PortalPage() {
             className="w-full max-w-2xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div className="flex items-center gap-2.5">
-                <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full">
+                <span className="bg-[#0F172A] text-white text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full">
                   {selectedMaterial.format}
                 </span>
-                <span className="text-xs text-neutral-400 font-medium">{selectedMaterial.date} · 크기 {selectedMaterial.size}</span>
+                <span className="text-xs text-[#0F172A]/80 font-bold">{selectedMaterial.date} · 크기 {selectedMaterial.size}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
                   교육/홍보 자료
                 </span>
                 <button 
                   type="button"
                   onClick={() => setSelectedMaterial(null)} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -4816,20 +4816,20 @@ export default function PortalPage() {
             className="w-full max-w-xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div>
                 <h3 className="text-base font-black text-[#0F172A] tracking-tight">신규 1:1 가맹상담 문의 접수</h3>
-                <p className="text-xs text-neutral-400 font-medium mt-0.5">매장 운영 중 발생하는 물류, 기기 AS, 정산 문의를 접수합니다.</p>
+                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">매장 운영 중 발생하는 물류, 기기 AS, 정산 문의를 접수합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
                   문의 서식
                 </span>
                 <button 
                   type="button"
                   onClick={() => closeModal(() => setShowInquiryModal(false))} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -4943,30 +4943,30 @@ export default function PortalPage() {
             className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-black/10 text-[#0F172A] flex items-center justify-center font-bold">
                   <Package size={20} />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                     <span>발주 상세 내역</span>
-                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-neutral-100 border border-neutral-200/80 text-neutral-600 font-mono font-bold">
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-black/10 text-[#0F172A] font-mono font-bold">
                       {selectedOrder.id}
                     </span>
                   </h3>
-                  <p className="text-xs text-neutral-400 font-medium mt-0.5">{activeStore?.name || "가맹점"} 발주 품목 및 물류 현황</p>
+                  <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">{activeStore?.name || "가맹점"} 발주 품목 및 물류 현황</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-neutral-400 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
                   ORDER DETAILS
                 </span>
                 <button 
                   type="button"
                   onClick={() => closeModal(() => setSelectedOrder(null))} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>

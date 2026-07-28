@@ -56,7 +56,8 @@ import {
   GripVertical,
   ArrowUp,
   ArrowDown,
-  MapPin
+  MapPin,
+  ExternalLink
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
@@ -6248,15 +6249,29 @@ export default function AdminPage() {
                       {/* Actions */}
                       <div className="col-span-1 flex items-center lg:justify-end gap-1.5 w-full lg:w-auto pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100">
                         <button
+                          onClick={() => {
+                            if (typeof window !== "undefined") {
+                              localStorage.setItem("120_owner_logged_in", "true");
+                              localStorage.setItem("120_active_store_id", store.id);
+                              window.open("/portal", "_blank");
+                            }
+                          }}
+                          className="px-2.5 py-1.5 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1 font-black text-xs shrink-0"
+                          title={`${store.name} 점주포털 자동로그인 이동 (새 탭)`}
+                        >
+                          <ExternalLink size={13} />
+                          <span>점주포털</span>
+                        </button>
+                        <button
                           onClick={() => handleOpenStoreModal(store)}
-                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border-0 shadow-2xs"
+                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border-0 shadow-2xs shrink-0"
                           title="상세 수정"
                         >
                           <Edit size={14} />
                         </button>
                         <button
                           onClick={() => handleDeleteStore(store.id)}
-                          className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all cursor-pointer border-0 shadow-2xs"
+                          className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all cursor-pointer border-0 shadow-2xs shrink-0"
                           title="삭제"
                         >
                           <Trash2 size={14} />
@@ -7877,21 +7892,21 @@ export default function AdminPage() {
                   {showPopupModal && (
                     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-md animate-fadeIn overflow-x-hidden">
                       <div className="bg-white border-0 rounded-[28px] sm:rounded-[32px] w-full max-w-5xl max-w-[calc(100vw-24px)] max-h-[90vh] overflow-hidden shadow-2xl flex flex-col font-sans">
-                        <div className="px-7 py-5 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+                        <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
                           <div>
                             <h3 className="font-black text-base sm:text-lg text-[#0F172A] flex items-center gap-2">
                               <span>📢 {selectedPopupForEdit ? "공지 팝업 설정 수정" : "신규 공지 팝업 등록 및 발행"}</span>
                             </h3>
-                            <p className="text-xs text-slate-400 font-medium mt-0.5">홈페이지 및 점주 포털에 팝업을 게시합니다.</p>
+                            <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">홈페이지 및 점주 포털에 팝업을 게시합니다.</p>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                            <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
                               팝업 설정
                             </span>
                             <button
                               type="button"
                               onClick={() => setShowPopupModal(false)}
-                              className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                              className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                             >
                               <X size={16} />
                             </button>
@@ -8758,21 +8773,21 @@ export default function AdminPage() {
                   {isInstaModalOpen && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn">
                       <div className="w-full max-w-xl bg-white border-0 rounded-[32px] overflow-hidden shadow-2xl max-h-[90vh] flex flex-col font-sans">
-                        <div className="px-7 py-5 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+                        <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
                           <div>
                             <h3 className="font-black text-base sm:text-lg text-[#0F172A]">
                               {instaId ? "📸 인스타 연동 피드 수정" : "📸 신규 인스타 피드 등록"}
                             </h3>
-                            <p className="text-xs text-slate-400 font-medium mt-0.5">브랜드 페이지에 연동할 인스타그램 게시물을 관리합니다.</p>
+                            <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">브랜드 페이지에 연동할 인스타그램 게시물을 관리합니다.</p>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                            <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
                               인스타그램 피드
                             </span>
                             <button
                               type="button"
                               onClick={() => setIsInstaModalOpen(false)}
-                              className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                              className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                             >
                               <X size={16} />
                             </button>
@@ -9796,22 +9811,22 @@ export default function AdminPage() {
             className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col max-h-[90vh] font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div>
                 <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight">
                   {selectedGalleryItem ? "갤러리 이미지 정보 수정" : "본사 공식 이미지 신규 등록"}
                 </h3>
-                <p className="text-xs text-neutral-400 font-medium mt-0.5">가맹 매장에 공유할 갤러리 이미지를 등록합니다.</p>
+                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">가맹 매장에 공유할 갤러리 이미지를 등록합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
                   갤러리 설정
                 </span>
                 <button
                   type="button"
                   onClick={() => setShowGalleryModal(false)}
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -9931,20 +9946,20 @@ export default function AdminPage() {
             className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div>
                 <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight">📞 창업 상담문의 상세 내역</h3>
-                <p className="text-xs text-neutral-400 font-medium mt-0.5">신청자가 제출한 창업 상담 문의 정보를 확인합니다.</p>
+                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">신청자가 제출한 창업 상담 문의 정보를 확인합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-neutral-400 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
                   CONSULTATION
                 </span>
                 <button 
                   type="button"
                   onClick={() => setSelectedConsultation(null)} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -10040,20 +10055,20 @@ export default function AdminPage() {
             className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div>
                 <h3 className="text-base sm:text-lg font-black tracking-tight text-[#0F172A]">💬 가맹점 1:1 문의 답변 작성</h3>
-                <p className="text-xs text-neutral-400 font-medium mt-0.5">가맹점주 문의건에 대해 본사 공식 답변을 작성합니다.</p>
+                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">가맹점주 문의건에 대해 본사 공식 답변을 작성합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-neutral-400 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
                   INQUIRY REPLY
                 </span>
                 <button 
                   type="button"
                   onClick={() => setSelectedInquiry(null)} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -10120,22 +10135,22 @@ export default function AdminPage() {
             className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div>
                 <h3 className="text-base sm:text-lg font-black tracking-tight text-[#0F172A]">
                   {selectedNotice ? "가맹 공지사항 상세조회 및 수정" : "신규 가맹 공지사항 정식 작성"}
                 </h3>
-                <p className="text-xs text-neutral-400 font-medium mt-0.5">전체 가맹점에 공지할 주요 가이드라인을 작성합니다.</p>
+                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">전체 가맹점에 공지할 주요 가이드라인을 작성합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
                   공지사항 작성 양식
                 </span>
                 <button 
                   type="button"
                   onClick={handleCloseNoticeModal} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -10292,18 +10307,18 @@ export default function AdminPage() {
             className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div>
                 <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                   <span>🏢 {selectedStore ? `가맹점 상세 정보 및 편집 [${selectedStore.name}]` : "가맹점 신규 등록 대장 작성"}</span>
                 </h3>
-                <p className="text-xs text-neutral-400 font-medium mt-0.5">
+                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">
                   가맹점 기본 계정 및 가동 모듈을 관리합니다.
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
                   가맹점 관리
                 </span>
                 <button 
@@ -10696,24 +10711,24 @@ export default function AdminPage() {
             className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div>
                 <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                   <span>📦 {selectedProduct ? `원/부자재 품목 명세 수정 [${selectedProduct.name}]` : "신규 식재료/부자재 물류 품목 추가"}</span>
                 </h3>
-                <p className="text-xs text-neutral-400 font-medium mt-0.5">
+                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">
                   점주 발주몰에 노출할 제품 정보 및 가격을 설정합니다.
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
                   제품 등록 양식
                 </span>
                 <button 
                   type="button"
                   onClick={() => setShowProductModal(false)} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -11083,20 +11098,20 @@ export default function AdminPage() {
             className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div>
                 <h3 className="text-base sm:text-lg font-black tracking-tight text-[#0F172A]">신규 가맹 지원 자료 등록</h3>
-                <p className="text-xs text-neutral-400 font-medium mt-0.5">점주 포털에 등록할 교육 및 홍보 자료를 추가합니다.</p>
+                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">점주 포털에 등록할 교육 및 홍보 자료를 추가합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
                   자료 등록 양식
                 </span>
                 <button 
                   type="button"
                   onClick={() => setShowMaterialModal(false)} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -11302,24 +11317,24 @@ export default function AdminPage() {
             className="w-full max-w-3xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow White Header */}
-            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+            {/* Stage Flow Yellow Header */}
+            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-black/10 text-[#0F172A] flex items-center justify-center font-bold">
                   <Package size={20} />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                     <span>발주 주문 상세 내역</span>
-                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-neutral-100 border border-neutral-200/80 text-neutral-600 font-mono font-bold">
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-black/10 text-[#0F172A] font-mono font-bold">
                       {selectedOrder.id}
                     </span>
                   </h3>
-                  <p className="text-xs text-neutral-400 font-medium mt-0.5">가맹점 발주 품목 및 물류 배송 송장을 관리합니다.</p>
+                  <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">가맹점 발주 품목 및 물류 배송 송장을 관리합니다.</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
                   발주 상세
                 </span>
                 <button 
