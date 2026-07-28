@@ -1804,148 +1804,61 @@ td:first-child,
 }
 
 /* ==========================================================================
-   GOWELL-LIFE Portal Dashboards Styles (Modern SaaS Dashboard Overrides)
+   120PIE Premium Dashboard Styles (Inspired by Modern Educational SaaS Dashboard UI)
+   ========================================================================== */
+/* ==========================================================================
+   120PIE Premium Dashboard Styles (Inspired by J.Health Modern Dark & Pure White UI)
    ========================================================================== */
 #admin-portal,
 #owner-portal {
-  background-color: #ffffff !important; /* Pure white background */
+  background-color: #F4F6F8 !important; /* Soft light gray canvas */
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
 }
 
-/* Modest rounded corners for a modern, clean look */
-#admin-portal .rounded-3xl,
-#admin-portal .rounded-2xl,
-#owner-portal .rounded-3xl,
-#owner-portal .rounded-2xl {
-  border-radius: 8px !important;
-}
-#admin-portal .rounded-xl,
-#admin-portal .rounded-lg,
-#admin-portal .rounded-md,
-#owner-portal .rounded-xl,
-#owner-portal .rounded-lg,
-#owner-portal .rounded-md {
-  border-radius: 6px !important;
-}
-
-/* Sidebar Custom Restyling (Vibrant Brand Yellow & Deep Slate Blue Contrast) */
+/* Sidebar Custom Restyling (Clean J.Health 1:1 Dark Navy & Curved Integration) */
 #admin-portal aside,
 #owner-portal aside {
-  background-color: #F5AC00 !important; /* Rich brand yellow from the user's reference image */
-  border-right: 1px solid #E6B533 !important;
+  background: #0B0F17 !important; /* Deep Dark Charcoal Sidebar */
+  border-right: none !important;
 }
 
-/* Sidebar user block */
-#admin-portal aside .bg-white\/10,
-#owner-portal aside .bg-white\/10,
-#owner-portal aside .bg-white {
-  background-color: rgba(13, 35, 58, 0.08) !important;
-  border-color: rgba(13, 35, 58, 0.12) !important;
-}
-#admin-portal aside h4,
-#owner-portal aside h4 {
-  color: #0D233A !important;
-}
-#admin-portal aside p,
-#owner-portal aside p {
-  color: rgba(13, 35, 58, 0.7) !important;
-}
-#admin-portal aside .bg-white\/10 .bg-\[\#F5AC00\],
-#owner-portal aside .bg-white\/10 .bg-\[\#f25f8a\],
-#owner-portal aside .bg-white .bg-white,
-#owner-portal aside .bg-white .bg-\[\#f25f8a\] {
-  background-color: #0D233A !important;
-  color: #ffffff !important;
-}
-
-/* Sidebar nav buttons */
-#admin-portal aside nav button,
-#owner-portal aside nav button {
-  color: #3b2c00 !important;
-  background-color: transparent !important;
-  border: 0 !important;
-  cursor: pointer;
-  font-weight: 700 !important;
-  font-size: 13px !important;
-}
-
-#admin-portal aside nav button:hover,
-#owner-portal aside nav button:hover {
-  background-color: rgba(13, 35, 58, 0.06) !important;
-  color: #0D233A !important;
-}
-
-/* Selected menu tab (Deep Navy & White text) */
-#admin-portal aside nav button.bg-\[\#f25f8a\],
-#admin-portal aside nav button.bg-pink-500,
-#admin-portal aside nav button.bg-rose-500,
-#owner-portal aside nav button.bg-\[\#f25f8a\],
-#owner-portal aside nav button.bg-pink-500,
-#owner-portal aside nav button.bg-rose-500 {
-  background-color: #0D233A !important; 
-  color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(13, 35, 58, 0.15) !important;
-}
-
-#admin-portal aside nav button.bg-\[\#f25f8a\] svg,
-#owner-portal aside nav button.bg-\[\#f25f8a\] svg {
-  color: #ffffff !important;
-}
-
-#admin-portal aside nav button.bg-\[\#f25f8a\] span,
-#owner-portal aside nav button.bg-\[\#f25f8a\] span {
-  color: #ffffff !important;
-  font-weight: 800 !important;
-}
-
-#admin-portal aside nav button.bg-\[\#f25f8a\] span.bg-white,
-#owner-portal aside nav button.bg-\[\#f25f8a\] span.bg-white {
-  background-color: #F5AC00 !important;
-  color: #0D233A !important;
-}
-
-/* Logout button */
-#admin-portal aside .border-white\/10 button,
-#owner-portal aside .border-t button {
-  color: #5A4300 !important;
-}
-#admin-portal aside .border-white\/10 button:hover,
-#owner-portal aside .border-t button:hover {
-  color: #a30000 !important;
-  background-color: rgba(239, 68, 68, 0.08) !important;
-}
-
-/* Header customization */
+/* Header Restyling - Pure White Background & No Divider Line */
 #admin-portal header,
 #owner-portal header {
-  background-color: #ffffff !important;
-  border-bottom: 1px solid #f1f1f0 !important;
+  background-color: #ffffff !important; /* Pure White Header Background */
+  border-bottom: none !important; /* No divider line between header & main */
   box-shadow: none !important;
 }
+
 #admin-portal header .text-white,
 #owner-portal header .text-white {
-  background-color: #0F3A8C !important; /* brand blue */
+  background-color: #F5AC00 !important;
+  color: #1E1B18 !important;
+  font-weight: 800 !important;
 }
 #admin-portal header a.border-\[\#D0CBB5\],
 #owner-portal header a.border-\[\#D0CBB5\],
 #owner-portal header a.border-\[\#f2ccd7\] {
-  border-color: #e5e5e5 !important;
-  background-color: #ffffff !important;
-  color: #404040 !important;
+  border-color: #E2E8F0 !important;
+  background-color: #F4F6F8 !important;
+  color: #334155 !important;
+  border-radius: 9999px !important;
 }
 #admin-portal header a.border-\[\#D0CBB5\]:hover,
 #owner-portal header a.border-\[\#f2ccd7\]:hover {
-  background-color: #fafafa !important;
+  background-color: #E2E8F0 !important;
+  color: #0F172A !important;
 }
 
-/* Main workspace backgrounds */
+/* Main workspace backgrounds - Soft Light Gray Canvas & Borderless Rounded White Data Cards */
 #admin-portal main,
 #owner-portal main {
-  background-color: #ffffff !important;
+  background-color: #F4F6F8 !important; /* Soft Light Gray Background */
 }
 #admin-portal main .bg-white,
 #owner-portal main .bg-white {
-  background-color: #ffffff !important;
-  border-color: #f1f1f0 !important;
+  background-color: #ffffff !important; /* Pure White Rounded Cards */
+  border: none !important; /* No rectangular border boxes */
 }
 
 /* SaaS styled Tables (Clean, Borderless-side, Soft hover) */
@@ -1988,67 +1901,116 @@ td:first-child,
   background-color: #fafafa !important; /* Light row hover */
 }
 
-/* Re-adjust Brand Blue accents on action items & buttons */
-#admin-portal button.bg-pink-500,
-#admin-portal button.bg-rose-500,
-#admin-portal .bg-\[\#0F3A8C\],
-#admin-portal .bg-\[\#f25f8a\],
-#admin-portal button[type="submit"],
-#owner-portal button.bg-pink-500,
-#owner-portal button.bg-rose-500,
-#owner-portal .bg-\[\#0F3A8C\],
-#owner-portal .bg-\[\#f25f8a\],
-#owner-portal button[type="submit"] {
-  background-color: #0F3A8C !important; /* Keep elegant royal blue for primary buttons */
-  color: #ffffff !important;
+/* Re-adjust Brand Yellow (#FED422) accents on primary action buttons & submit buttons */
+#admin-portal button.btn-primary-yellow,
+#owner-portal button.btn-primary-yellow,
+#admin-portal button[type="submit"]:not([class*="bg-neutral"]):not([class*="bg-slate"]),
+#owner-portal button[type="submit"]:not([class*="bg-neutral"]):not([class*="bg-slate"]) {
+  background-color: #FED422 !important;
+  color: #0F172A !important;
+  font-weight: 900 !important;
 }
 
-#admin-portal button[type="submit"]:hover,
-#owner-portal button[type="submit"]:hover {
-  background-color: #09265f !important;
+#admin-portal button.btn-primary-yellow:hover,
+#owner-portal button.btn-primary-yellow:hover,
+#admin-portal button[type="submit"]:hover:not([class*="bg-neutral"]):not([class*="bg-slate"]),
+#owner-portal button[type="submit"]:hover:not([class*="bg-neutral"]):not([class*="bg-slate"]) {
+  background-color: #e5be1f !important;
+  color: #0F172A !important;
 }
 
-#admin-portal .text-\[\#0F3A8C\],
-#admin-portal .text-\[\#bf3e67\],
-#owner-portal .text-\[\#0F3A8C\],
-#owner-portal .text-\[\#bf3e67\] {
-  color: #0F3A8C !important;
+
+/* Sidebar Nav Button Reset — Completely remove outlines, borders, and rings on click/focus */
+aside button,
+nav button,
+.sidebar-nav-btn {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-color: transparent !important;
 }
 
-/* Dashboard summary blocks and grids (Excludes Footer Grid) */
-#admin-portal main .grid:not(.footer-grid) > button,
-#admin-portal main .grid:not(.footer-grid) > div,
-#owner-portal main .grid:not(.footer-grid) > button,
-#owner-portal main .grid:not(.footer-grid) > div {
-  border: 1px solid #f1f1f0 !important;
-  background-color: #ffffff !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
-  transition: all 0.2s ease;
+aside button:focus,
+nav button:focus,
+aside button:active,
+nav button:active,
+.sidebar-nav-btn:focus,
+.sidebar-nav-btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-color: transparent !important;
 }
 
-#admin-portal main .grid:not(.footer-grid) > button:hover,
-#owner-portal main .grid:not(.footer-grid) > button:hover {
-  background-color: #fafafa !important;
-  border-color: #d1d5db !important;
-  transform: translateY(-1px);
-}
-
-#admin-portal main .grid:not(.footer-grid) > button .bg-\[\#ffd3df\],
-#owner-portal main .grid:not(.footer-grid) > button .bg-\[\#ffd3df\] {
-  background-color: #fff9e6 !important;
-  color: #F5AC00 !important;
-}
-#admin-portal main .grid:not(.footer-grid) > button:hover .bg-\[\#ffd3df\],
-#owner-portal main .grid:not(.footer-grid) > button:hover .bg-\[\#ffd3df\] {
-  background-color: #F5AC00 !important;
-  color: #ffffff !important;
-}
-
-/* Ensure submit button text color is white on admin and owner portals */
+/* Ensure submit button text color is dark slate on admin and owner portals for high contrast on yellow */
 #admin-portal button[type="submit"],
 #owner-portal button[type="submit"] {
-  color: #ffffff !important;
+  color: #0F172A !important;
 }
+
+
+
+
+/* ========================================================================
+   Admin & Owner Portals Input Fields — Borderless Light Gray Background
+   Forces all input, select, textarea across all admin & portal pages and popups
+   to display a clean borderless light gray (#F8F9FA) background.
+   ========================================================================= */
+#admin-portal input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="color"]),
+#admin-portal select,
+#admin-portal textarea,
+#owner-portal input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="color"]),
+#owner-portal select,
+#owner-portal textarea,
+body input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="color"]),
+body select,
+body textarea {
+  background-color: #F8F9FA !important;
+  background: #F8F9FA !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  border-radius: 12px !important;
+  color: #0F172A !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove all orange / yellow focus rings and black borders on focus */
+#admin-portal input:focus,
+#admin-portal select:focus,
+#admin-portal textarea:focus,
+#owner-portal input:focus,
+#owner-portal select:focus,
+#owner-portal textarea:focus,
+body input:focus,
+body select:focus,
+body textarea:focus {
+  background-color: #F8F9FA !important;
+  background: #F8F9FA !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-color: transparent !important;
+}
+
+#admin-portal input:disabled,
+#admin-portal input[readOnly],
+#admin-portal select:disabled,
+#admin-portal textarea:disabled,
+#owner-portal input:disabled,
+#owner-portal input[readOnly],
+#owner-portal select:disabled,
+#owner-portal textarea:disabled,
+body input:disabled,
+body input[readOnly],
+body select:disabled,
+body textarea:disabled {
+  background-color: #F8F9FA !important;
+  background: #F8F9FA !important;
+  opacity: 0.85 !important;
+  border: 0 !important;
+}
+
 
 
 

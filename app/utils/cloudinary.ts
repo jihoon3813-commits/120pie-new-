@@ -11,12 +11,16 @@ export function optimizeCloudinaryUrl(url: string | undefined | null): string {
   // Only process Cloudinary URLs
   if (!url.includes("res.cloudinary.com")) return url;
   
-  // If it already has f_auto or q_auto, don't add it again
-  if (url.includes("f_auto") || url.includes("q_auto")) return url;
-  
-  // Insert f_auto,q_auto after /upload/
+  // Ensure b_white is always present for transparent/dark background images (누끼)
   if (url.includes("/upload/")) {
-    return url.replace("/upload/", "/upload/f_auto,q_auto/");
+    // If already has optimization params but missing b_white, inject b_white
+    if ((url.includes("f_auto") || url.includes("q_auto")) && !url.includes("b_white")) {
+      return url.replace("/upload/", "/upload/b_white,");
+    }
+    // If no optimization params at all, add all three
+    if (!url.includes("f_auto") && !url.includes("q_auto")) {
+      return url.replace("/upload/", "/upload/b_white,f_auto,q_auto/");
+    }
   }
   
   return url;

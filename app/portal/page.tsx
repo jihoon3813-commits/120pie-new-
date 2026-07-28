@@ -11,6 +11,7 @@ import {
   BookOpen,
   Image as ImageIcon,
   ArrowLeft,
+  ArrowRight,
   Package,
   Headphones,
   Monitor,
@@ -41,7 +42,9 @@ import {
   Copy,
   CreditCard,
   Landmark,
-  User
+  User,
+  PanelLeftOpen,
+  PanelLeftClose
 } from "lucide-react";
 
 import { useQuery, useMutation, useAction } from "convex/react";
@@ -321,6 +324,7 @@ export default function PortalPage() {
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const [currentMenu, setCurrentMenu] = useState<string>("dashboard");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
@@ -352,8 +356,8 @@ export default function PortalPage() {
   const [trainings, setTrainings] = useState<Material[]>([]);
   const [prs, setPrs] = useState<Material[]>([]);
 
-  // Selected Detail Modals
   const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
+  const [selectedNoticeCategory, setSelectedNoticeCategory] = useState<string>("");
   const [showCredentialModal, setShowCredentialModal] = useState<boolean>(false);
   const [baeminId, setBaeminId] = useState<string>("");
   const [baeminPw, setBaeminPw] = useState<string>("");
@@ -2297,135 +2301,135 @@ export default function PortalPage() {
 
         {/* 가맹점 신규 등록 대장 작성 모달 */}
         {showRegisterModal && (
-          <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
+          <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
             <div 
-              className="w-full max-w-2xl bg-[#fffdf9] border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col my-8"
+              className="w-full max-w-2xl bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col my-8"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
-              <div className="p-5 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/60">
-                <h3 className="font-extrabold text-stone-900 text-sm sm:text-base flex items-center gap-2">
+              {/* Yellow Header */}
+              <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shadow-xs">
+                <h3 className="font-black text-[#0F172A] text-sm sm:text-base flex items-center gap-2">
                   🏢 가맹점 신규 등록 대장 작성
                 </h3>
                 <button 
                   type="button"
                   onClick={() => setShowRegisterModal(false)}
-                  className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer"
+                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer"
                 >
-                  <X size={15} />
+                  <X size={18} />
                 </button>
               </div>
 
               {/* Form */}
-              <form onSubmit={handleRegisterStoreSubmit} className="p-6 overflow-y-auto max-h-[75vh] space-y-5 text-xs sm:text-sm text-left">
+              <form onSubmit={handleRegisterStoreSubmit} className="p-6 sm:p-8 overflow-y-auto max-h-[75vh] space-y-5 text-xs sm:text-sm text-left">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">로그인 계정 ID *</label>
+                    <label className="font-extrabold text-[#0F172A]">로그인 계정 ID *</label>
                     <input 
                       type="text"
                       placeholder="계정 아이디를 입력해 주세요 (영문/숫자)"
                       value={regId}
                       onChange={(e) => setRegId(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
                       required
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">가맹점명 *</label>
+                    <label className="font-extrabold text-[#0F172A]">가맹점명 *</label>
                     <input 
                       type="text"
                       placeholder="예시) 120겹파이 강남역삼점"
                       value={regName}
                       onChange={(e) => setRegName(e.target.value)}
                       required
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">비밀번호 *</label>
+                    <label className="font-extrabold text-[#0F172A]">비밀번호 *</label>
                     <input 
                       type="password"
                       placeholder="비밀번호 설정"
                       value={regPw}
                       onChange={(e) => setRegPw(e.target.value)}
                       required
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">비밀번호 확인 *</label>
+                    <label className="font-extrabold text-[#0F172A]">비밀번호 확인 *</label>
                     <input 
                       type="password"
                       placeholder="동일 비밀번호 재입력"
                       value={regPwConfirm}
                       onChange={(e) => setRegPwConfirm(e.target.value)}
                       required
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">점주 실명 *</label>
+                    <label className="font-extrabold text-[#0F172A]">점주 실명 *</label>
                     <input 
                       type="text"
                       placeholder="점주 대표자 성함"
                       value={regOwner}
                       onChange={(e) => setRegOwner(e.target.value)}
                       required
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">연락처 (하이픈 자동입력) *</label>
+                    <label className="font-extrabold text-[#0F172A]">연락처 (하이픈 자동입력) *</label>
                     <input 
                       type="text"
                       placeholder="휴대폰 혹은 대표번호"
                       value={regPhone}
                       onChange={handleRegPhoneChange}
                       required
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">가맹 거래 상태 구분 *</label>
+                    <label className="font-extrabold text-[#0F172A]">가맹 거래 상태 구분 *</label>
                     <select 
                       disabled
                       value="대기"
-                      className="w-full bg-stone-100 border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none cursor-not-allowed font-bold"
+                      className="w-full bg-slate-100 border-0 rounded-2xl px-4 py-3 text-xs text-slate-500 focus:outline-none cursor-not-allowed font-bold"
                     >
                       <option value="대기">대기 (서류 검토 / 가맹 보류)</option>
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">가맹 등록일</label>
+                    <label className="font-extrabold text-[#0F172A]">가맹 등록일</label>
                     <input 
                       type="date"
                       value={regDate}
                       onChange={(e) => setRegDate(e.target.value)}
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-3 text-xs text-[#2d2026] font-semibold"
+                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-3 py-3 text-xs text-[#0F172A] font-semibold"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">가맹 해지일</label>
+                    <label className="font-extrabold text-[#0F172A]">가맹 해지일</label>
                     <input 
                       type="text"
                       disabled
                       placeholder="연도-월-일"
-                      className="w-full bg-stone-50 border border-[#f2ccd7]/60 rounded-xl px-3 py-3 text-xs text-[#735965]/40 cursor-not-allowed"
+                      className="w-full bg-slate-100 border-0 rounded-2xl px-3 py-3 text-xs text-slate-400 cursor-not-allowed"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="font-bold text-[#2d2026] block">가맹 매장 도로명 주소 *</label>
+                  <label className="font-extrabold text-[#0F172A] block">가맹 매장 도로명 주소 *</label>
                   <div className="flex gap-2">
                     <input 
                       type="text"
@@ -2433,12 +2437,12 @@ export default function PortalPage() {
                       value={regRoadAddress}
                       onChange={(e) => setRegRoadAddress(e.target.value)}
                       required
-                      className="flex-1 bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a]"
+                      className="flex-1 bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                     />
                     <button
                       type="button"
                       onClick={() => openDaumPostcode("register")}
-                      className="px-4 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-stone-900 text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer border-0"
+                      className="px-5 py-3 rounded-full bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black transition-all shadow-md shrink-0 cursor-pointer border-0"
                     >
                       주소 검색
                     </button>
@@ -2448,14 +2452,14 @@ export default function PortalPage() {
                     placeholder="매장 상세 주소 (e.g. 1층 101호, 2층 전부)"
                     value={regDetailAddress}
                     onChange={(e) => setRegDetailAddress(e.target.value)}
-                    className="w-full bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#c4a0ae] focus:outline-none focus:border-[#f25f8a] mt-2"
+                    className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50 mt-2"
                   />
                 </div>
 
                 {/* 도입 적용 패키지 브랜드 선택 */}
                 <div className="space-y-3">
-                  <label className="font-bold text-[#2d2026] block">도입 적용 패키지 브랜드 선택 (중복 체크 가능)</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-amber-50/30 border border-[#f2ccd7]/60 rounded-2xl p-4">
+                  <label className="font-extrabold text-[#0F172A] block">도입 적용 패키지 브랜드 선택 (중복 체크 가능)</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#F8FAFC] border-0 rounded-2xl p-4">
                     {[
                       { key: "120pie", label: "120pie" },
                       { key: "egg120", label: "egg120" },
@@ -2464,7 +2468,7 @@ export default function PortalPage() {
                       { key: "핫도그120", label: "핫도그120" },
                       { key: "120coffee", label: "120coffee" },
                     ].map((menu) => (
-                      <label key={menu.key} className="flex items-center gap-2 cursor-pointer select-none py-1 text-xs text-[#735965] font-semibold">
+                      <label key={menu.key} className="flex items-center gap-2 cursor-pointer select-none py-1 text-xs text-slate-700 font-extrabold">
                         <input 
                           type="checkbox"
                           checked={regAdoptionMenu.includes(menu.key)}
@@ -2475,7 +2479,7 @@ export default function PortalPage() {
                               setRegAdoptionMenu([...regAdoptionMenu, menu.key]);
                             }
                           }}
-                          className="w-4 h-4 accent-[#f25f8a] rounded border-stone-300 cursor-pointer"
+                          className="w-4 h-4 accent-[#F5AC00] rounded border-slate-300 cursor-pointer"
                         />
                         <span>{menu.label}</span>
                       </label>
@@ -2486,8 +2490,7 @@ export default function PortalPage() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full py-4 bg-amber-400 hover:bg-amber-500 text-white text-sm font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-6 hover:scale-[1.01]"
-                  style={{ color: '#ffffff' }}
+                  className="w-full py-3.5 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs sm:text-sm font-black rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-6"
                 >
                   신규 가맹 계약 지점 공식 등록
                 </button>
@@ -2496,33 +2499,38 @@ export default function PortalPage() {
           </div>
         )}
 
-        {/* 도로명 주소 실시간 검색 모달 */}
+        {/* 도로명 주소 실시간 검색 모달 (Yellow Header, border-0, Clean Style) */}
         {showAddressPopup && (
           <div 
-            className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+            className="fixed inset-0 z-[120] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
             onClick={() => setShowAddressPopup(false)}
           >
             <div 
-              className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
+              className="w-full max-w-lg bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-5 border-b border-[#f2ccd7]/60 flex flex-col gap-3 bg-[#fff1f5]/80">
+              {/* Yellow Header */}
+              <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex flex-col gap-3 shadow-xs">
                 <div className="flex justify-between items-center">
-                  <h4 className="text-sm font-bold text-[#2d2026]">도로명 주소 실시간 검색</h4>
-                  <button onClick={() => setShowAddressPopup(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer">
-                    <X size={13} />
+                  <h4 className="text-base font-black text-[#0F172A]">도로명 주소 실시간 검색</h4>
+                  <button 
+                    type="button"
+                    onClick={() => setShowAddressPopup(false)} 
+                    className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer"
+                  >
+                    <X size={18} />
                   </button>
                 </div>
                 
                 {/* Tabs */}
-                <div className="flex bg-[#ffd3df]/50 p-1 rounded-xl border border-[#f2ccd7]/60">
+                <div className="flex bg-black/10 p-1 rounded-full border-0">
                   <button
                     type="button"
                     onClick={() => setAddressTab("kakao")}
-                    className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer ${
+                    className={`flex-1 py-2 text-xs font-black rounded-full transition-all cursor-pointer border-0 ${
                       addressTab === "kakao" 
-                        ? "bg-white text-[#bf3e67] shadow-sm border border-[#f2ccd7]/40" 
-                        : "text-[#735965] hover:text-[#bf3e67]"
+                        ? "bg-white text-[#0F172A] shadow-xs" 
+                        : "text-[#0F172A]/70 hover:text-[#0F172A]"
                     }`}
                   >
                     카카오 우편번호 API
@@ -2530,10 +2538,10 @@ export default function PortalPage() {
                   <button
                     type="button"
                     onClick={() => setAddressTab("simulated")}
-                    className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer ${
+                    className={`flex-1 py-2 text-xs font-black rounded-full transition-all cursor-pointer border-0 ${
                       addressTab === "simulated" 
-                        ? "bg-white text-[#bf3e67] shadow-sm border border-[#f2ccd7]/40" 
-                        : "text-[#735965] hover:text-[#bf3e67]"
+                        ? "bg-white text-[#0F172A] shadow-xs" 
+                        : "text-[#0F172A]/70 hover:text-[#0F172A]"
                     }`}
                   >
                     모의 간편 검색 (대안)
@@ -2543,27 +2551,27 @@ export default function PortalPage() {
 
               {/* Content Body */}
               {addressTab === "kakao" ? (
-                <div className="flex-1 w-full bg-[#fff9fb] overflow-hidden relative">
+                <div className="flex-1 w-full bg-[#F8FAFC] overflow-hidden relative">
                   <div 
                     id="daum-postcode-container" 
                     className="w-full h-full"
                   ></div>
                 </div>
               ) : (
-                <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-[#fff9fb]">
+                <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-[#F8FAFC]">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-[#735965] block">지번/도로명 검색어 입력</label>
+                    <label className="text-xs font-extrabold text-[#0F172A] block">지번/도로명 검색어 입력</label>
                     <input
                       type="text"
                       placeholder="예: 테헤란로, 엘에스로, 당동"
                       value={addressSearchKeyword}
                       onChange={(e) => handleRegAddressSearch(e.target.value)}
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 font-semibold focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                     />
                   </div>
                   
                   {addressSearchResults.length > 0 ? (
-                    <div className="border border-[#f2ccd7]/60 rounded-xl overflow-hidden divide-y divide-[#f2ccd7]/40 bg-white">
+                    <div className="border-0 rounded-2xl overflow-hidden divide-y divide-slate-100 bg-white shadow-2xs">
                       {addressSearchResults.map((addr, idx) => (
                         <button
                           key={idx}
@@ -2579,7 +2587,7 @@ export default function PortalPage() {
                             setShowAddressPopup(false);
                             triggerToast("도로명 주소가 자동 선택되었습니다.");
                           }}
-                          className="w-full px-4 py-3 text-left text-xs font-semibold text-[#735965] hover:bg-[#fff1f5] hover:text-[#bf3e67] transition-all block cursor-pointer border-0 bg-transparent"
+                          className="w-full px-5 py-3.5 text-left text-xs font-bold text-slate-700 hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all block cursor-pointer border-0 bg-transparent"
                         >
                           {addr}
                         </button>
@@ -2587,7 +2595,7 @@ export default function PortalPage() {
                     </div>
                   ) : (
                     addressSearchKeyword.trim() !== "" && (
-                      <p className="text-center text-xs text-[#735965] font-bold py-6">검색 결과가 존재하지 않습니다.</p>
+                      <p className="text-center text-xs text-slate-400 font-bold py-6">검색 결과가 존재하지 않습니다.</p>
                     )
                   )}
                 </div>
@@ -2600,73 +2608,146 @@ export default function PortalPage() {
   }
 
   return (
-    <div id="owner-portal" className="h-screen overflow-hidden text-[#0D233A] flex flex-col font-sans select-none antialiased" style={{ backgroundColor: '#ffffff' }}>
+    <div id="owner-portal" className="h-screen overflow-hidden text-[#0F172A] flex flex-col font-sans select-none antialiased bg-[#F8FAFC]">
       
       {/* TOAST SYSTEM */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-[150] bg-[#f25f8a] text-white px-5 py-3.5 rounded-xl font-bold text-sm shadow-[0_8px_30px_rgba(242,95,138,0.25)] flex items-center gap-2.5 animate-bounce">
-          <CheckCircle2 size={16} />
+        <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-6 py-4 rounded-full font-black text-sm shadow-xl flex items-center gap-2.5 animate-bounce border-0">
+          <CheckCircle2 size={18} />
           {toastMessage}
         </div>
       )}
 
-      {/* HEADER BANNER PANEL */}
-      <header className="bg-white border-b border-[#f2ccd7] sticky top-0 z-40 shrink-0 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[76px] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-[#735965] hover:text-[#f25f8a] transition-colors"
-              aria-label="메뉴 열기"
-            >
-              <Menu size={22} />
-            </button>
-            <Link href="/" className="flex items-center gap-2 group shrink-0">
-              <img
-                src="/logo_yellow_blue.png"
-                alt="120pie & coffee"
-                className="h-6 w-auto object-contain group-hover:scale-102 transition-transform"
-              />
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] font-bold ml-1">점주전용</span>
-            </Link>
-          </div>
+      {/* HEADER BAR PANEL (Clean Light Gray Header - Admin 100% Identical 64px Height) */}
+      <header className="bg-[#F4F6F8] border-b border-slate-200/50 sticky top-0 z-40 shrink-0 h-[64px] px-3 sm:px-6 lg:px-8 flex items-center justify-between overflow-hidden">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-1.5 text-slate-600 hover:text-[#0F172A] transition-colors border-0 bg-transparent cursor-pointer shrink-0"
+            aria-label="메뉴 열기"
+          >
+            <Menu size={20} />
+          </button>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex flex-col items-end text-right">
-              <span className="font-extrabold text-sm text-[#2d2026]">{activeStore.name}</span>
-              <span className="text-[10px] text-[#735965] font-bold">{activeStore.owner} 사장님 (정상 파트너)</span>
-            </div>
-            
-            <div className="h-8 w-px bg-[#f2ccd7] hidden md:block"></div>
+          {/* Sidebar Collapse Toggle Button (Desktop - Admin 100% Identical) */}
+          <button
+            type="button"
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            className="hidden lg:flex p-1.5 text-slate-500 hover:text-[#0F141C] hover:bg-white rounded-xl transition-colors cursor-pointer border border-slate-200/80 bg-white shadow-2xs"
+            title={isSidebarCollapsed ? "사이드바 펼치기" : "사이드바 접기"}
+          >
+            {isSidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          </button>
 
-            <Link
-              href="/"
-              className="px-3.5 py-2.5 rounded-lg border border-[#f2ccd7] bg-[#fff1f5] hover:bg-[#ffd3df] text-xs font-bold text-[#735965] hover:text-[#bf3e67] transition-colors inline-flex items-center gap-1.5"
-            >
-              <ArrowLeft size={13} />
-              <span className="hidden sm:inline">메인 사이트</span>
-            </Link>
+          <button 
+            type="button"
+            onClick={() => setCurrentMenu("dashboard")}
+            className="flex items-center gap-1.5 sm:gap-2 group shrink-0 min-w-0 bg-transparent border-0 cursor-pointer p-0 text-left"
+          >
+            <img
+              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
+              alt="120pie & coffee"
+              className="h-5 sm:h-7 w-auto object-contain group-hover:scale-102 transition-transform shrink-0"
+            />
+            <span className="hidden sm:inline-block text-[11px] px-3 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs whitespace-nowrap shrink-0">
+              점주포털
+            </span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <div className="hidden md:flex flex-col items-end text-right">
+            <span className="font-black text-xs text-[#0F172A]">{activeStore.name}</span>
+            <span className="text-[10px] text-slate-400 font-bold">{activeStore.owner} 사장님 (정상 파트너)</span>
           </div>
+          
+          <div className="h-6 w-px bg-slate-200 hidden md:block"></div>
+
+          <Link
+            href="/"
+            className="hidden sm:inline-flex px-3.5 py-1.5 rounded-full border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-black text-slate-700 transition-all items-center gap-1.5 shadow-2xs shrink-0 whitespace-nowrap"
+          >
+            <ArrowLeft size={13} className="text-[#FED422] shrink-0" />
+            <span>메인 사이트</span>
+          </Link>
         </div>
       </header>
 
-      {/* CORE WORKSPACE */}
-      <div className="flex-1 flex max-w-7xl w-full mx-auto relative items-stretch min-h-0">
+      {/* CORE WORKSPACE (Full Width 100% - Soft Light Gray Canvas #F4F6F8) */}
+      <div className="flex-1 flex w-full max-w-full relative items-stretch min-h-0 overflow-hidden bg-[#F4F6F8]">
         
-        {/* SIDEBAR NAVIGATION (DESKTOP) */}
-        <aside className="w-64 border-r border-[#D0CBB5] p-6 flex flex-col justify-between hidden lg:flex shrink-0" style={{ backgroundColor: '#F5AC00' }}>
-          <div className="space-y-8">
-            <div className="bg-white border border-[#f2ccd7] rounded-xl p-4 flex gap-3 items-center shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-[#f25f8a] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+        {/* SIDEBAR NAVIGATION (DESKTOP - Admin 100% Identical rounded-tr-[40px] Style) */}
+        <aside 
+          className={`bg-[#0B0F17] py-5 px-0 flex flex-col justify-between hidden lg:flex shrink-0 transition-all duration-300 relative z-30 shadow-2xl rounded-tr-[40px] overflow-hidden ${
+            isSidebarCollapsed ? "w-[80px]" : "w-[260px]"
+          }`}
+        >
+          {/* Authentic Bottom Deep Blue Aurora Gradient Panel */}
+          <div 
+            className="absolute bottom-[-5%] left-[-15%] right-[-15%] h-[260px] pointer-events-none rounded-t-[50%]"
+            style={{
+              background: 'radial-gradient(circle at 30% 80%, rgba(56, 189, 248, 0.35) 0%, rgba(99, 102, 241, 0.25) 50%, rgba(139, 92, 246, 0.15) 80%, transparent 100%)',
+              filter: 'blur(30px)'
+            }}
+          ></div>
+
+          <div className="space-y-5 overflow-y-auto overflow-x-hidden relative z-10 w-full">
+            
+            {/* Header Brand Logo (지정 로고 아이콘 적용 - 클릭 시 대시보드 이동) */}
+            <button
+              type="button"
+              onClick={() => setCurrentMenu("dashboard")}
+              className="flex items-center gap-3 px-5 pt-1 w-full text-left bg-transparent border-0 cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-md border border-slate-700 bg-black group-hover:scale-105 transition-transform">
+                <img
+                  src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784730823/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_5_eadptv.png"
+                  alt="120PIE Logo Icon"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {!isSidebarCollapsed && (
+                <div className="min-w-0">
+                  <h3 className="font-black text-sm text-white tracking-tight truncate group-hover:text-[#FED422] transition-colors">120PIE Partner</h3>
+                  <p className="text-[10px] text-slate-400 font-bold truncate">점주 전용 파트너십</p>
+                </div>
+              )}
+            </button>
+
+            {/* 1:1 Authentic HQ Profile Section (어드민 100% 동일 1:1 정사각형 풀 배경 적용) */}
+            {!isSidebarCollapsed ? (
+              <div className="relative w-full aspect-square my-2 border-0 rounded-none overflow-hidden group bg-[#0B0F17] flex flex-col justify-end">
+                {/* 전체 프로필 정사각형 배경 이미지 */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center opacity-85 group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                  style={{
+                    backgroundImage: `url('https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png')`
+                  }}
+                ></div>
+                
+                {/* 시네마틱 그라데이션 페이드 오버레이 */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17] via-[#0B0F17]/50 to-[#0B0F17]/10 pointer-events-none"></div>
+
+                {/* 매장 및 점주 정보 텍스트 & 노란색 #STORE-ID 뱃지 */}
+                <div className="relative z-10 flex flex-col items-center text-center gap-2 p-5 pb-6">
+                  <div className="w-full truncate space-y-0.5 drop-shadow-md">
+                    <h4 className="font-black text-xl text-white truncate tracking-tight">{activeStore.name}</h4>
+                    <p className="text-xs text-[#FED422] font-bold truncate drop-shadow-xs">{activeStore.owner} 사장님</p>
+                  </div>
+                  <span className="mt-1 bg-[#FED422] text-[#0F172A] text-[11px] font-black px-4 py-1 rounded-full shadow-lg tracking-wider font-mono">
+                    #{activeStore.id}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="w-12 h-12 mx-auto my-3 rounded-2xl border border-slate-700/80 overflow-hidden shadow-md bg-slate-900 flex items-center justify-center text-[#F5AC00] font-black text-xs">
                 가맹
               </div>
-              <div className="overflow-hidden">
-                <h4 className="font-extrabold text-xs text-[#2d2026] truncate">{activeStore.name}</h4>
-                <p className="text-[10px] text-[#735965] font-semibold truncate mt-0.5">점주 코드: {activeStore.id}</p>
-              </div>
-            </div>
+            )}
 
-            <nav className="flex flex-col gap-1.5">
+            {/* Navigation Menu Links (Admin 100% Identical py-3.5 행 높이, 18px 아이콘, px-5 패딩) */}
+            <nav className="flex flex-col gap-2 px-5">
               {[
                 { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
                 { key: "order", label: "자재 주문", icon: ShoppingBag, badge: cart.length > 0 ? cart.length : undefined },
@@ -2676,76 +2757,108 @@ export default function PortalPage() {
                 { key: "training", label: "교육 자료", icon: BookOpen },
                 { key: "pr", label: "홍보 자재", icon: ImageIcon },
                 { key: "profile", label: "정보변경", icon: User }
-              ].map(({ key, label, icon: Icon, badge }) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setCurrentMenu(key);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full px-4 py-3 rounded-xl flex items-center justify-between text-sm font-bold transition-all ${
-                    currentMenu === key
-                      ? "bg-[#f25f8a] text-white shadow-sm font-extrabold"
-                      : "text-[#735965] hover:text-[#bf3e67] hover:bg-[#ffd3df]/50"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon size={18} className={currentMenu === key ? "text-white" : "text-[#735965]"} />
-                    <span>{label}</span>
+              ].map(({ key, label, icon: Icon, badge }) => {
+                const isActive = currentMenu === key;
+                return (
+                  <div key={key} className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentMenu(key);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`w-full ${
+                        isSidebarCollapsed ? "px-2.5 py-3.5 justify-center" : "px-4 py-3.5 justify-between"
+                      } rounded-2xl flex items-center text-xs font-bold transition-all border-0 outline-none focus:outline-none focus:ring-0 cursor-pointer ${
+                        isActive
+                          ? "bg-[#FED422] text-[#0F172A] shadow-md font-black"
+                          : "text-[#94A3B8] hover:text-white hover:bg-white/5 bg-transparent"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <Icon size={18} className={isActive ? "text-[#F5AC00]" : "text-[#94A3B8] shrink-0"} />
+                        {!isSidebarCollapsed && <span className="truncate">{label}</span>}
+                      </div>
+
+                      {!isSidebarCollapsed && badge !== undefined && (
+                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full shrink-0 ${
+                          isActive ? "bg-[#F5AC00] text-[#0F172A]" : "bg-[#232B3B] text-[#94A3B8]"
+                        }`}>
+                          {badge}
+                        </span>
+                      )}
+
+                      {/* Collapsed Mode Notification Dot */}
+                      {isSidebarCollapsed && badge !== undefined && (
+                        <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-[#F5AC00]"></span>
+                      )}
+                    </button>
+
+                    {/* Tooltip for Collapsed Sidebar */}
+                    {isSidebarCollapsed && (
+                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3.5 py-2 bg-[#0F141C] text-white text-xs font-bold rounded-xl shadow-2xl whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-slate-700">
+                        {label} {badge !== undefined ? `(${badge})` : ""}
+                      </div>
+                    )}
                   </div>
-                  {badge && (
-                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                      currentMenu === key ? "bg-white text-[#bf3e67]" : "bg-[#f25f8a] text-white"
-                    }`}>
-                      {badge}
-                    </span>
-                  )}
-                </button>
-              ))}
+                );
+              })}
             </nav>
           </div>
 
-          <div className="border-t border-[#f2ccd7] pt-6 space-y-2">
+          <div className="border-t border-slate-800/80 pt-4 pb-2 px-5 space-y-2 relative z-10">
             <button
+              type="button"
               onClick={handleLogout}
-              className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#735965] hover:text-red-500 hover:bg-red-50 transition-colors text-left"
+              className={`w-full ${isSidebarCollapsed ? "px-2 py-2.5 justify-center" : "px-4 py-2.5 justify-start"} rounded-2xl flex items-center gap-3.5 text-xs font-bold text-[#94A3B8] hover:text-rose-400 hover:bg-rose-500/10 transition-colors text-left border-0 cursor-pointer`}
+              title={isSidebarCollapsed ? "시스템 로그아웃" : undefined}
             >
-              <LogOut size={17} />
-              <span>시스템 로그아웃</span>
+              <LogOut size={18} className="shrink-0" />
+              {!isSidebarCollapsed && <span>시스템 로그아웃</span>}
             </button>
           </div>
         </aside>
 
         {/* MOBILE SIDEBAR */}
         {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden flex" onClick={() => setMobileMenuOpen(false)}>
-            <div className="w-72 border-r border-[#D0CBB5] h-full p-6 flex flex-col justify-between" onClick={(e) => e.stopPropagation()} style={{ backgroundColor: '#F5AC00' }}>
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm lg:hidden flex animate-fadeIn" onClick={() => setMobileMenuOpen(false)}>
+            <div className="w-72 bg-[#0F172A] text-white h-full p-6 flex flex-col justify-between shadow-2xl border-r border-slate-800" onClick={(e) => e.stopPropagation()}>
               <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentMenu("dashboard");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 bg-transparent border-0 cursor-pointer p-0 text-left"
+                  >
                     <img
                       src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
-                      alt="로고"
-                      className="w-7 h-7"
+                      alt="120pie & coffee"
+                      className="h-5 w-auto object-contain hover:opacity-80 transition-opacity"
                     />
-                    <span className="font-extrabold text-sm text-[#2d2026]">점주전용 포털</span>
-                  </div>
-                  <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-[#735965] hover:text-[#f25f8a] bg-[#fff1f5] border border-[#f2ccd7] rounded-lg">
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => setMobileMenuOpen(false)} 
+                    className="p-2 text-slate-400 hover:text-white bg-slate-800 rounded-full border-0 cursor-pointer"
+                  >
                     <X size={16} />
                   </button>
                 </div>
 
-                <div className="bg-[#fff1f5] border border-[#f2ccd7] rounded-xl p-4 flex gap-3 items-center">
-                  <div className="w-10 h-10 rounded-lg bg-[#f25f8a] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                <div className="bg-slate-800/80 border-0 rounded-2xl p-4 flex gap-3 items-center">
+                  <div className="w-10 h-10 rounded-xl bg-[#F5AC00] text-[#0F172A] flex items-center justify-center font-black text-sm shrink-0">
                     가맹
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-xs text-[#2d2026]">{activeStore.name}</h4>
-                    <p className="text-[9px] text-[#735965] font-semibold mt-0.5">{activeStore.id} / {activeStore.owner} 점주님</p>
+                    <h4 className="font-black text-xs text-white">{activeStore.name}</h4>
+                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">{activeStore.id} / {activeStore.owner} 점주님</p>
                   </div>
                 </div>
 
-                <nav className="flex flex-col gap-1">
+                <nav className="flex flex-col gap-1.5">
                   {[
                     { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
                     { key: "order", label: "자재 주문", icon: ShoppingBag, badge: cart.length > 0 ? cart.length : undefined },
@@ -2758,23 +2871,24 @@ export default function PortalPage() {
                   ].map(({ key, label, icon: Icon, badge }) => (
                     <button
                       key={key}
+                      type="button"
                       onClick={() => {
                         setCurrentMenu(key);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full px-4 py-3 rounded-xl flex items-center justify-between text-sm font-bold transition-all ${
+                      className={`w-full px-4 py-3 rounded-2xl flex items-center justify-between text-sm font-black transition-all border-0 cursor-pointer ${
                         currentMenu === key
-                          ? "bg-[#f25f8a] text-white shadow-sm"
-                          : "text-[#735965] hover:text-[#bf3e67] hover:bg-[#ffd3df]/50"
+                          ? "bg-[#F5AC00] text-[#0F172A] shadow-md"
+                          : "text-slate-400 hover:text-white hover:bg-slate-800/60"
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon size={18} className={currentMenu === key ? "text-white" : "text-[#735965]"} />
+                        <Icon size={18} className={currentMenu === key ? "text-[#0F172A]" : "text-slate-400"} />
                         <span>{label}</span>
                       </div>
                       {badge && (
-                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                          currentMenu === key ? "bg-white text-[#bf3e67]" : "bg-[#f25f8a] text-white"
+                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                          currentMenu === key ? "bg-[#0F172A] text-white" : "bg-[#F5AC00] text-[#0F172A]"
                         }`}>
                           {badge}
                         </span>
@@ -2784,12 +2898,23 @@ export default function PortalPage() {
                 </nav>
               </div>
 
-              <div className="border-t border-[#f2ccd7] pt-6 space-y-2">
-                <button
-                  onClick={handleLogout}
-                  className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#735965] hover:text-red-500 hover:bg-red-50 transition-colors text-left"
+              <div className="border-t border-slate-800 pt-5 space-y-2">
+                <Link
+                  href="/"
+                  className="w-full px-4 py-3 rounded-2xl flex items-center justify-between text-xs font-black bg-slate-800/90 text-white hover:bg-slate-700 transition-colors border-0"
                 >
-                  <LogOut size={17} />
+                  <div className="flex items-center gap-2.5">
+                    <ArrowLeft size={15} className="text-[#FED422]" />
+                    <span>메인 사이트 바로가기</span>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-bold">OUTLINK →</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full px-4 py-3 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-400 hover:text-rose-400 hover:bg-slate-800/60 transition-colors text-left border-0 cursor-pointer"
+                >
+                  <LogOut size={16} />
                   <span>시스템 로그아웃</span>
                 </button>
               </div>
@@ -2797,281 +2922,334 @@ export default function PortalPage() {
           </div>
         )}
 
-        {/* MAIN CONTENT AREA */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-full">
+        {/* MAIN CONTENT AREA (100% Full Width Screen Layout like Admin) */}
+        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto w-full max-w-full">
+          <div className="w-full max-w-full space-y-6">
           
           {/* MENU CONTENT: 1. DASHBOARD */}
           {currentMenu === "dashboard" && (
-            <div className="space-y-6">
+            <div className="space-y-6 animate-fadeIn">
               
-              {/* 1. Hero Welcome Hub (가맹점주 파트너십 데스크 히어로) */}
-              <div className="relative overflow-hidden bg-gradient-to-r from-[#0F3A8C] via-[#1E40AF] to-[#1D4ED8] text-white p-6 sm:p-8 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="absolute top-[-20%] right-[-5%] w-[350px] h-[350px] bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
-                <div className="relative z-10 space-y-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#F5AC00] text-[#0D233A] text-[10px] font-black uppercase tracking-wider">
-                    Partnership Portal
+              {/* 1. 상단 파트너십/어드민 환영 배너 (본사 어드민과 100% 동일한 매장 배경 이미지) */}
+              <div className="w-full bg-[#0B0F17] text-white rounded-[28px] p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 group border-0">
+                {/* 배경 이미지 커버 */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center opacity-75 group-hover:scale-103 transition-transform duration-700 pointer-events-none"
+                  style={{
+                    backgroundImage: `url('https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784732847/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_02_58_1_qvxy5y.png')`
+                  }}
+                ></div>
+
+                {/* 가독성 100% 확보를 위한 어두운 시네마틱 그라데이션 오버레이 */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/40 pointer-events-none"></div>
+
+                <div className="space-y-2.5 max-w-3xl relative z-10">
+                  <span className="bg-[#F5A623] text-slate-950 text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                    PARTNERSHIP PORTAL
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-                    {activeStore.name} <span className="font-medium text-blue-200">|</span> {activeStore.owner} 사장님 환영합니다!
-                  </h2>
-                  <p className="text-xs sm:text-sm text-blue-100 font-medium leading-relaxed max-w-xl">
-                    120겹 파이&커피의 소중한 비즈니스 동반자이신 점주님을 위한 가맹 전산 서비스입니다. 
-                    본사 물류 및 공지 사항이 실시간으로 동기화되고 있습니다.
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-snug text-white drop-shadow-md">
+                    {activeStore.name} | {activeStore.owner} 사장님 환영합니다!
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-200 font-medium leading-relaxed drop-shadow-xs">
+                    안녕하세요, 사장님! 120겹 파이&커피 가맹 지원 전산 서비스입니다. 본사 물류 및 공지 사항이 실시간으로 본사 어드민과 연동되고 있습니다.
                   </p>
                 </div>
-                <div className="relative z-10 flex flex-wrap gap-3 shrink-0">
-                  <div className="bg-white/10 backdrop-blur-md border border-white/15 px-4 py-3 min-w-[110px]">
-                    <span className="text-[10px] text-blue-200 font-bold block mb-0.5">매장 고유 코드</span>
-                    <strong className="text-sm font-bold block tracking-wider font-mono">{activeStore.id}</strong>
+
+                {/* 우측 시네마틱 글래스모피즘 토글 박스 2개 */}
+                <div className="flex items-center gap-3 shrink-0 relative z-10">
+                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-2xl text-center min-w-[120px] shadow-xl">
+                    <span className="text-[10px] text-slate-400 font-extrabold block mb-0.5">매장 고유 코드</span>
+                    <strong className="text-xs font-mono font-black text-[#F5A623] tracking-wider">#{activeStore.id}</strong>
                   </div>
-                  <div className="bg-white/10 backdrop-blur-md border border-white/15 px-4 py-3 min-w-[110px]">
-                    <span className="text-[10px] text-blue-200 font-bold block mb-0.5">실시간 물류 상태</span>
-                    <strong className="text-sm font-bold block text-[#F5AC00] animate-pulse">정상 작동 중</strong>
+                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-2xl text-center min-w-[120px] shadow-xl">
+                    <span className="text-[10px] text-slate-400 font-extrabold block mb-0.5">실시간 물류 상태</span>
+                    <strong className="text-xs font-black text-emerald-400 animate-pulse">정상 작동 중</strong>
                   </div>
                 </div>
               </div>
 
-              {/* 2. Top Summary Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* 4 SUMMARY STAT CARDS GRID (Admin Standard Style) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {/* Card 1: Operating Packages */}
                 <button 
+                  type="button"
                   onClick={() => document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" })}
-                  className="bg-white border border-[#f1f1f0] hover:border-neutral-300 hover:shadow-sm transition-all p-4 sm:p-5 flex items-center gap-4 text-left group cursor-pointer"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
                 >
-                  <div className="bg-[#fff9e6] text-[#F5AC00] group-hover:bg-[#F5AC00] group-hover:text-white p-3 rounded-lg shrink-0 hidden sm:block transition-all">
-                    <LayoutDashboard size={20} />
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-neutral-500 tracking-tight">운영 중 패키지 모듈</span>
+                    <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#F5AC00] group-hover:bg-[#F5AC00] group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                      <LayoutDashboard size={22} />
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[10px] sm:text-xs text-neutral-500 font-bold block mb-1">운영 중 패키지</span>
-                    <strong className="text-xl sm:text-2xl font-black text-neutral-800">{activePackageCount} <span className="text-xs text-neutral-500 font-normal">/ 7개</span></strong>
+                  <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
+                    {activePackageCount} <span className="text-sm font-bold text-neutral-400">/ 6개 가동</span>
+                  </strong>
+                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+12.5%</span>
+                    <span className="text-neutral-400 font-semibold">정상 라이선스 가동</span>
                   </div>
                 </button>
 
+                {/* Card 2: Shipping Orders */}
                 <button 
-                  onClick={() => setCurrentMenu("notice")}
-                  className="bg-white border border-[#f1f1f0] hover:border-neutral-300 hover:shadow-sm transition-all p-4 sm:p-5 flex items-center gap-4 text-left group cursor-pointer"
-                >
-                  <div className="bg-blue-50 text-[#0F3A8C] group-hover:bg-[#0F3A8C] group-hover:text-white p-3 rounded-lg shrink-0 hidden sm:block transition-all">
-                    <Megaphone size={20} />
-                  </div>
-                  <div>
-                    <span className="text-[10px] sm:text-xs text-neutral-500 font-bold block mb-1">신규 공지사항</span>
-                    <strong className="text-xl sm:text-2xl font-black text-[#0F3A8C]">{newNoticesCount} <span className="text-xs text-neutral-500 font-normal">건</span></strong>
-                  </div>
-                </button>
-
-                <button 
+                  type="button"
                   onClick={() => setCurrentMenu("history")}
-                  className="bg-white border border-[#f1f1f0] hover:border-neutral-300 hover:shadow-sm transition-all p-4 sm:p-5 flex items-center gap-4 text-left group cursor-pointer"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
                 >
-                  <div className="bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white p-3 rounded-lg shrink-0 hidden sm:block transition-all">
-                    <Truck size={20} />
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-neutral-500 tracking-tight">진행 중 배송/발주</span>
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                      <Truck size={22} />
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[10px] sm:text-xs text-neutral-500 font-bold block mb-1">배송 중인 자재</span>
-                    <strong className="text-xl sm:text-2xl font-black text-neutral-800">{shippingCount} <span className="text-xs text-neutral-500 font-normal">건</span></strong>
+                  <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
+                    {shippingCount} <span className="text-sm font-bold text-neutral-400">건 배송중</span>
+                  </strong>
+                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+8.3%</span>
+                    <span className="text-neutral-400 font-semibold">전월 대비</span>
                   </div>
                 </button>
 
+                {/* Card 3: Answered Inquiries */}
                 <button 
+                  type="button"
                   onClick={() => setCurrentMenu("inquiry")}
-                  className="bg-white border border-[#f1f1f0] hover:border-neutral-300 hover:shadow-sm transition-all p-4 sm:p-5 flex items-center gap-4 text-left group cursor-pointer"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
                 >
-                  <div className="bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white p-3 rounded-lg shrink-0 hidden sm:block transition-all">
-                    <MessageSquare size={20} />
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-neutral-500 tracking-tight">1:1 문의 / 답변 현황</span>
+                    <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                      <MessageSquare size={22} />
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[10px] sm:text-xs text-neutral-500 font-bold block mb-1">답변 완료 문의</span>
-                    <strong className="text-xl sm:text-2xl font-black text-neutral-800">{answeredInqCount} <span className="text-xs text-neutral-500 font-normal">건</span></strong>
+                  <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
+                    {answeredInqCount} <span className="text-sm font-bold text-neutral-400">건 완료</span>
+                  </strong>
+                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
+                    <span className="px-2 py-0.5 rounded-full bg-purple-50 border border-purple-100">답변완료</span>
+                    <span className="text-neutral-400 font-semibold">신속 소통 지원</span>
+                  </div>
+                </button>
+
+                {/* Card 4: New Notices */}
+                <button 
+                  type="button"
+                  onClick={() => setCurrentMenu("notice")}
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-neutral-500 tracking-tight">본사 공지사항</span>
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                      <Megaphone size={22} />
+                    </div>
+                  </div>
+                  <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
+                    {newNoticesCount} <span className="text-sm font-bold text-neutral-400">건 신규</span>
+                  </strong>
+                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+15.2%</span>
+                    <span className="text-neutral-400 font-semibold">필독 공지 수신</span>
                   </div>
                 </button>
               </div>
 
-              {/* 3. Banners Block */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div 
-                  className={`lg:col-span-8 border border-[#f1f1f0] relative overflow-hidden flex flex-col justify-end p-6 min-h-[220px] sm:min-h-[260px] lg:h-[300px] shadow-sm w-full ${
-                    banner?.mainImage ? "" : "bg-neutral-50"
-                  }`}
-                  style={{
-                    backgroundImage: banner?.mainImage ? `url(${optimizeCloudinaryUrl(banner.mainImage)})` : undefined,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center"
-                  }}
-                >
-                  <div className={`absolute inset-0 z-0 ${banner?.mainImage ? "bg-black/45" : "bg-gradient-to-r from-transparent to-neutral-100/25"}`}></div>
-                  <div className="relative z-10 space-y-2.5 max-w-lg">
-                    <span className="bg-[#0F3A8C] text-white text-[10px] font-black uppercase px-2.5 py-1 rounded tracking-wider w-fit">
-                      {banner?.mainTag || "Seasonal Spec"}
-                    </span>
-                    <h2 className={`text-xl sm:text-2xl font-black tracking-tight leading-tight whitespace-pre-line ${
-                      banner?.mainImage ? "text-white" : "text-neutral-800"
-                    }`}>
-                      {banner?.mainTitle || "여름 대비 스페셜 신메뉴\n'망고파이' 물류 정식 공급!"}
-                    </h2>
-                    <p className={`text-xs font-bold leading-relaxed whitespace-pre-line ${
-                      banner?.mainImage ? "text-neutral-200" : "text-neutral-500"
-                    }`}>
-                      {banner?.mainDesc || "지금 바로 냉동생지를 주문하고, 홍보 자료실에서 매장 포스터 및 아크릴 테이블 텐트 시안을 무상으로 다운로드하여 매출을 강화해 보세요!"}
-                    </p>
-                  </div>
-                </div>
-
-                <div 
-                  className={`lg:col-span-4 border border-[#f1f1f0] hover:border-neutral-300 transition-all p-6 flex flex-col justify-between min-h-[220px] sm:min-h-[260px] lg:h-[300px] shadow-sm group relative overflow-hidden w-full ${
-                    banner?.sideImage ? "" : "bg-white"
-                  }`}
-                  style={{
-                    backgroundImage: banner?.sideImage ? `url(${optimizeCloudinaryUrl(banner.sideImage)})` : undefined,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center"
-                  }}
-                >
-                  {banner?.sideImage && <div className="absolute inset-0 bg-black/55 z-0"></div>}
-                  <div className="relative z-10">
-                    <span className={`text-[10px] font-extrabold tracking-widest uppercase block mb-1.5 ${
-                      banner?.sideImage ? "text-[#ffd3df]" : "text-[#0F3A8C]"
-                    }`}>
-                      {banner?.sideTag || "Standard Edu"}
-                    </span>
-                    <h3 className={`text-base sm:text-lg font-bold tracking-tight leading-tight whitespace-pre-line ${
-                      banner?.sideImage ? "text-white" : "text-neutral-800"
-                    }`}>
-                      {banner?.sideTitle || "점주 전용\n하절기 식품 안전 &\n위생 자가 점검표"}
-                    </h3>
-                  </div>
-                  <div className="space-y-4 relative z-10">
-                    <p className={`text-xs font-medium leading-relaxed whitespace-pre-line ${
-                      banner?.sideImage ? "text-neutral-200" : "text-neutral-500"
-                    }`}>
-                      {banner?.sideDesc || "하절기 위해 해충 및 냉동 식자재 보관 온도를 사전에 정밀 점검하여 위생 과태료 처분을 방지하세요."}
-                    </p>
-                    <button 
-                      onClick={() => {
-                        const link = banner?.sideLink || "training";
-                        if (link.startsWith("http")) {
-                          window.open(link, "_blank");
-                        } else {
-                          const menuMapping: Record<string, string> = {
-                            training: "교육자료실로 이동했습니다.",
-                            material: "홍보자료실로 이동했습니다.",
-                            order: "발주 및 주문 메뉴로 이동했습니다.",
-                            inquiry: "1:1 문의게시판으로 이동했습니다."
-                          };
-                          if (link === "order") {
-                            setCurrentMenu("orders");
-                          } else {
-                            setCurrentMenu(link);
-                          }
-                          triggerToast(menuMapping[link] || "해당 메뉴로 이동했습니다.");
-                        }
-                      }}
-                      className="px-4 py-2 bg-neutral-100 hover:bg-[#F5AC00]/10 hover:text-[#0F3A8C] text-xs font-bold text-neutral-600 transition-all w-fit flex items-center gap-1.5 cursor-pointer shadow-sm border border-neutral-200"
-                    >
-                      {banner?.sideBtnText || "교육자료 다운로드"} <ChevronRight size={14} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. Operating Packages Visual System (브랜드 가동 엔진 현황판) */}
-              <div id="packages-section" className="bg-white border border-[#f1f1f0] p-6 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-[#f1f1f0] pb-4">
+              {/* 2. 가동 중인 120 패키지 운영 모듈 (본사 어드민과 100% 동일한 3D 아이콘 7종 동기화) */}
+              <div id="packages-section" className="bg-white rounded-[28px] p-6 sm:p-7 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0 space-y-5">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                   <div>
-                    <h3 className="text-base font-bold text-neutral-800">가동 중인 120 패키지 운영 모듈</h3>
-                    <p className="text-xs text-neutral-500 font-semibold mt-1">점포에서 라이선스를 취득해 작동 중인 브랜드 패키지 현황입니다.</p>
+                    <h2 className="text-lg font-black text-[#0F172A] tracking-tight">전국 가동 중인 120 패키지 운영 모듈</h2>
+                    <p className="text-xs text-slate-400 font-medium mt-0.5">점포에서 라이선스를 취득해 작동 중인 브랜드 패키지 총 현황입니다.</p>
                   </div>
-                  <div className="flex items-center gap-4 text-xs font-bold shrink-0">
-                    <span className="flex items-center gap-1.5 text-emerald-500">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> 운영중 ({activePackageCount})
-                    </span>
-                    <span className="flex items-center gap-1.5 text-neutral-400">
-                      <span className="w-2.5 h-2.5 rounded-full bg-neutral-100 border border-neutral-300"></span> 미도입 (2)
-                    </span>
-                  </div>
+                  <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 shrink-0">
+                    가동 라이선스 승인 완료
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-                  {PACKAGES.map((pkg) => (
-                    <div 
-                      key={pkg.name}
-                      className={`border p-4 flex flex-col justify-between min-h-[96px] transition-all ${
-                        pkg.active 
-                          ? "bg-gradient-to-br from-white to-neutral-50/50 border-[#F5AC00]/50 shadow-sm" 
-                          : "bg-white border-neutral-100 opacity-40"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className={`text-xs font-extrabold ${pkg.active ? "text-neutral-800" : "text-neutral-500"}`}>
-                          {pkg.name}
-                        </span>
-                        {pkg.active ? (
-                          <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                          </span>
-                        ) : (
-                          <span className="w-2 h-2 rounded-full bg-neutral-200"></span>
-                        )}
-                      </div>
-                      <span className={`text-[10px] font-bold ${pkg.active ? "text-[#0F3A8C]" : "text-neutral-400"}`}>
-                        {pkg.desc}
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+                  {/* Module 1: 120pie */}
+                  <div className="bg-[#F8FAFC] hover:bg-emerald-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-emerald-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <img
+                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_4_1_zptjbn.png"
+                        alt="120pie"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="space-y-1 w-full">
+                      <strong className="text-xs font-black text-[#0F172A] block">120pie</strong>
+                      <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                        시그니처 파이 가동중
                       </span>
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Module 2: egg120 */}
+                  <div className="bg-[#F8FAFC] hover:bg-amber-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-amber-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <img
+                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158865/Group_5_1_cdwr4y.png"
+                        alt="egg120"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="space-y-1 w-full">
+                      <strong className="text-xs font-black text-[#0F172A] block">egg120</strong>
+                      <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                        계란빵 가동중
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Module 3: 츄러스120 */}
+                  <div className="bg-[#F8FAFC] hover:bg-amber-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-amber-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <img
+                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_7_iowfzq.png"
+                        alt="츄러스120"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="space-y-1 w-full">
+                      <strong className="text-xs font-black text-[#0F172A] block">츄러스120</strong>
+                      <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                        스페인 츄러스 가동중
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Module 4: 떡볶이120 */}
+                  <div className="bg-[#F8FAFC] hover:bg-rose-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-rose-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <img
+                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_6_io2ejc.png"
+                        alt="떡볶이120"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="space-y-1 w-full">
+                      <strong className="text-xs font-black text-[#0F172A] block">떡볶이120</strong>
+                      <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                        가맹 도입 대기
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Module 5: 핫도그120 */}
+                  <div className="bg-[#F8FAFC] hover:bg-emerald-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-emerald-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <img
+                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_8_d8kfzr.png"
+                        alt="핫도그120"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="space-y-1 w-full">
+                      <strong className="text-xs font-black text-[#0F172A] block">핫도그120</strong>
+                      <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                        수제 핫도그 가동중
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Module 6: 120coffee */}
+                  <div className="bg-[#F8FAFC] hover:bg-emerald-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-emerald-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <img
+                        src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_9_iskk3b.png"
+                        alt="120coffee"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="space-y-1 w-full">
+                      <strong className="text-xs font-black text-[#0F172A] block">120coffee</strong>
+                      <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                        가성비 음료 가동중
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Module 7: Add Module */}
+                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 opacity-60">
+                    <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-black text-sm">
+                      +
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-400">신규 모듈 준비중</span>
+                  </div>
                 </div>
               </div>
 
-              {/* 5. Grid: Recent Lists & Menu Shortcuts (위젯 윈도우) */}
+              {/* 5. Grid: Recent Lists & Menu Shortcuts (Admin Layout Widgets) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
                 <div className="lg:col-span-8 space-y-6">
                   
-                  {/* Recent Notices Widget */}
-                  <div className="bg-white border border-[#f1f1f0] p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-4 border-b border-[#f1f1f0] pb-4">
-                      <h4 className="font-extrabold text-base text-neutral-800">최근 본사 공지사항</h4>
-                      <button onClick={() => setCurrentMenu("notice")} className="text-xs font-bold text-neutral-500 hover:text-[#0F3A8C] transition-colors">전체보기</button>
+                  {/* 120PIE 시즌 스페셜 메인 가로 배너 (본사 어드민 연동 배너) */}
+                  <div className="w-full bg-[#0F172A] text-white rounded-[28px] p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col justify-between gap-6 group border-0 min-h-[220px]">
+                    {/* 배경 시네마틱 이미지 커버 (본사 어드민 설정 이미지 최우선 연동) */}
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center opacity-65 group-hover:scale-103 transition-transform duration-700 pointer-events-none"
+                      style={{
+                        backgroundImage: `url('${
+                          banner?.mainImage 
+                            ? optimizeCloudinaryUrl(banner.mainImage) 
+                            : 'https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184019/120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88_%EC%97%B0%EC%B6%9C_ebuddm.jpg'
+                        }')`
+                      }}
+                    ></div>
+
+                    {/* 가독성 시네마틱 오버레이 */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A] via-[#0F172A]/85 to-transparent pointer-events-none"></div>
+
+                    <div className="space-y-3 max-w-2xl relative z-10">
+                      <span className="bg-[#F5AC00] text-[#0F172A] text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md inline-block">
+                        {banner?.mainTag || "Seasonal Spec"}
+                      </span>
+                      <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white drop-shadow-md whitespace-pre-line">
+                        {banner?.mainTitle || "여름 대비 스페셜 신메뉴\n'망고파이' 물류 정식 공급!"}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed drop-shadow-xs max-w-xl">
+                        {banner?.mainDesc || "지금 바로 냉동생지를 주문하고, 홍보 자료실에서 매장 포스터 및 아크릴 테이블 텐트 시안을 무상으로 다운로드하여 매출을 강화해 보세요!"}
+                      </p>
                     </div>
-                    <div className="divide-y divide-neutral-100">
-                      {notices.slice(0, 3).map((notice) => (
-                        <button
-                          key={notice.id}
-                          onClick={() => setSelectedNotice(notice)}
-                          className="w-full py-3 text-left flex items-center justify-between gap-4 group hover:bg-[#fafafa] px-2 rounded transition-colors"
-                        >
-                          <div className="min-w-0 flex-1 space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
-                                notice.tag === "필독" ? "bg-red-50 text-red-500 border border-red-200" : "bg-neutral-100 text-neutral-500 border border-neutral-200"
-                              }`}>
-                                {notice.tag}
-                              </span>
-                              <span className="text-xs font-bold text-neutral-800 group-hover:text-[#0F3A8C] truncate block">{notice.title}</span>
-                            </div>
-                            <span className="text-[10px] text-neutral-400 font-semibold block">{notice.date} · 조회수 {notice.views}</span>
-                          </div>
-                          <ChevronRight size={14} className="text-neutral-400 group-hover:text-[#0F3A8C] shrink-0" />
-                        </button>
-                      ))}
+
+                    <div className="relative z-10 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const target = banner?.mainLink || "order";
+                          if (target.startsWith("http")) {
+                            window.open(target, "_blank");
+                          } else {
+                            setCurrentMenu(target);
+                          }
+                        }}
+                        className="px-5 py-2.5 rounded-xl bg-[#F5AC00] hover:bg-[#e09d00] text-[#0F172A] text-xs font-black transition-all inline-flex items-center gap-2 shadow-lg cursor-pointer border-0 active:scale-98"
+                      >
+                        <span>{banner?.mainBtnText || "신메뉴 자재 발주하러 가기"}</span>
+                        <ChevronRight size={15} />
+                      </button>
                     </div>
                   </div>
 
                   {/* Menu Shortcuts */}
                   <div className="grid grid-cols-3 gap-4">
                     {[
-                      { key: "order", label: "자재 주문", icon: ShoppingBag, desc: "원자재 발주", color: "bg-[#0F3A8C] text-white hover:bg-[#0B2C6F]" },
-                      { key: "inquiry", label: "1:1 문의", icon: MessageSquare, desc: "신속한 가맹 소통", color: "bg-white text-[#0F3A8C] border border-neutral-200 hover:bg-[#fafafa]" },
-                      { key: "pr", label: "홍보 자재", icon: ImageIcon, desc: "시즌 디자인 다운", color: "bg-white text-[#0F3A8C] border border-neutral-200 hover:bg-[#fafafa]" }
+                      { key: "order", label: "자재 주문", icon: ShoppingBag, desc: "원자재 발주", color: "bg-[#FED422] text-[#0F172A] hover:bg-[#e5be1f]" },
+                      { key: "inquiry", label: "1:1 문의", icon: MessageSquare, desc: "신속한 가맹 소통", color: "bg-white text-[#0F172A] border border-slate-100 hover:bg-[#F8FAFC]" },
+                      { key: "pr", label: "홍보 자재", icon: ImageIcon, desc: "시즌 디자인 다운", color: "bg-white text-[#0F172A] border border-slate-100 hover:bg-[#F8FAFC]" }
                     ].map((btn) => (
                       <button
                         key={btn.key}
+                        type="button"
                         onClick={() => setCurrentMenu(btn.key)}
-                        className={`p-4 flex flex-col justify-between min-h-[120px] text-left transition-all shadow-sm rounded-lg ${btn.color}`}
+                        className={`p-5 flex flex-col justify-between min-h-[120px] text-left transition-all shadow-2xs rounded-2xl border-0 cursor-pointer ${btn.color}`}
                       >
-                        <btn.icon size={20} />
+                        <btn.icon size={22} className={btn.key === "order" ? "text-[#0F172A]" : "text-[#0F172A]"} />
                         <div>
-                          <strong className="text-sm font-bold block">{btn.label}</strong>
-                          <span className="text-[9px] font-semibold block opacity-85 mt-1">{btn.desc}</span>
+                          <strong className="text-sm font-black block">{btn.label}</strong>
+                          <span className={`text-[10px] font-bold block opacity-80 mt-1 ${btn.key === "order" ? "text-[#0F172A]" : "text-slate-500"}`}>{btn.desc}</span>
                         </div>
                       </button>
                     ))}
@@ -3081,25 +3259,67 @@ export default function PortalPage() {
 
                 <div className="lg:col-span-4 space-y-6">
                   
+                  {/* Recent Notices Widget */}
+                  <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0">
+                    <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
+                      <h4 className="font-black text-base text-[#0F172A]">최근 본사 공지사항</h4>
+                      <button 
+                        type="button"
+                        onClick={() => setCurrentMenu("notice")} 
+                        className="text-xs font-bold text-slate-400 hover:text-[#0F172A] transition-colors border-0 bg-transparent cursor-pointer"
+                      >
+                        전체보기
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      {notices.slice(0, 3).map((notice) => (
+                        <button
+                          key={notice.id}
+                          type="button"
+                          onClick={() => setSelectedNotice(notice)}
+                          className="w-full py-3 text-left flex items-center justify-between gap-3 group hover:bg-[#F8FAFC] px-3 rounded-xl transition-colors border-0 cursor-pointer"
+                        >
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
+                                notice.tag === "필독" ? "bg-rose-100 text-rose-600" : "bg-slate-100 text-slate-600"
+                              }`}>
+                                {notice.tag}
+                              </span>
+                              <span className="text-xs font-black text-[#0F172A] group-hover:text-amber-600 truncate block">{notice.title}</span>
+                            </div>
+                          </div>
+                          <ChevronRight size={14} className="text-slate-300 group-hover:text-[#0F172A] shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Recent Orders Widget */}
-                  <div className="bg-white border border-[#f1f1f0] p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-4 border-b border-[#f1f1f0] pb-4">
-                      <h4 className="font-extrabold text-base text-neutral-800">최근 발주 내역</h4>
-                      <button onClick={() => setCurrentMenu("history")} className="text-xs font-bold text-neutral-500 hover:text-[#0F3A8C] transition-colors">전체보기</button>
+                  <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0">
+                    <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
+                      <h4 className="font-black text-base text-[#0F172A]">최근 발주 내역</h4>
+                      <button 
+                        type="button"
+                        onClick={() => setCurrentMenu("history")} 
+                        className="text-xs font-bold text-slate-400 hover:text-[#0F172A] transition-colors border-0 bg-transparent cursor-pointer"
+                      >
+                        전체보기
+                      </button>
                     </div>
                     <div className="space-y-3">
                       {orders.length === 0 ? (
-                        <p className="text-xs text-neutral-400 text-center py-6">주문 내역이 없습니다.</p>
+                        <p className="text-xs text-slate-400 text-center py-6 font-bold">주문 내역이 없습니다.</p>
                       ) : (
                         orders.slice(0, 2).map((order) => (
                           <div 
                             key={order.id} 
                             onClick={() => setSelectedOrder(order)}
-                            className="bg-white border border-neutral-150 hover:border-[#0F3A8C] p-4 rounded cursor-pointer transition-all hover:bg-neutral-50/50 group"
+                            className="bg-[#F8FAFC] border-0 hover:bg-slate-100/80 p-4 rounded-2xl cursor-pointer transition-all group"
                           >
                             <div className="flex justify-between items-center text-[10px] mb-2">
-                              <span className="text-neutral-400 font-bold">{order.date}</span>
-                              <span className={`px-2 py-0.5 rounded font-bold ${
+                              <span className="text-slate-400 font-extrabold">{order.date}</span>
+                              <span className={`px-2.5 py-0.5 rounded-full font-black ${
                                 (() => {
                                   const colorKey = statusColors[order.status] || DEFAULT_STATUS_COLORS[order.status] || "pink";
                                   const preset = COLOR_PRESETS[colorKey as keyof typeof COLOR_PRESETS] || COLOR_PRESETS.pink;
@@ -3111,46 +3331,15 @@ export default function PortalPage() {
                               </span>
                             </div>
                             <div>
-                              <span className="font-bold text-xs text-neutral-800 group-hover:text-[#0F3A8C] transition-colors truncate block">
+                              <span className="font-black text-xs text-[#0F172A] group-hover:text-amber-600 transition-colors truncate block">
                                 {order.items[0].productName} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ""}
                               </span>
                               <div className="flex justify-between items-center mt-2.5">
-                                <strong className="text-xs text-[#0F3A8C] font-black">{order.totalPrice.toLocaleString()} 원</strong>
-                                <span className="text-[9px] text-[#0F3A8C] font-bold opacity-0 group-hover:opacity-100 transition-opacity">상세보기 &gt;</span>
+                                <strong className="text-xs text-[#0F172A] font-black">{order.totalPrice.toLocaleString()} 원</strong>
+                                <span className="text-[10px] text-slate-400 font-black opacity-0 group-hover:opacity-100 transition-opacity">상세보기 &gt;</span>
                               </div>
                             </div>
                           </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Recent Inquiries Widget */}
-                  <div className="bg-white border border-[#f1f1f0] p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-4 border-b border-[#f1f1f0] pb-4">
-                      <h4 className="font-extrabold text-base text-neutral-800">최근 1:1 문의</h4>
-                      <button onClick={() => setCurrentMenu("inquiry")} className="text-xs font-bold text-neutral-500 hover:text-[#0F3A8C] transition-colors">전체보기</button>
-                    </div>
-                    <div className="space-y-3">
-                      {inquiries.length === 0 ? (
-                        <p className="text-xs text-neutral-400 text-center py-6">접수된 문의가 없습니다.</p>
-                      ) : (
-                        inquiries.slice(0, 2).map((inq) => (
-                          <button
-                            key={inq.id}
-                            onClick={() => setSelectedInquiry(inq)}
-                            className="w-full text-left bg-white border border-neutral-150 p-4 rounded hover:border-[#0F3A8C] transition-colors space-y-2 block"
-                          >
-                            <div className="flex justify-between items-center text-[10px] mb-1.5">
-                              <span className="text-neutral-400 font-bold">{inq.category} · {inq.date}</span>
-                              <span className={`px-2 py-0.5 rounded font-bold ${
-                                inq.status === "답변완료" ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-blue-50 text-[#0F3A8C] border border-blue-200"
-                              }`}>
-                                {inq.status}
-                              </span>
-                            </div>
-                            <span className="font-bold text-xs text-neutral-800 block truncate">{inq.title}</span>
-                          </button>
                         ))
                       )}
                     </div>
@@ -3169,19 +3358,20 @@ export default function PortalPage() {
           {currentMenu === "order" && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               
-              {/* Left Side: Category tabs & Product Box grid */}
+              {/* Left Side: Category tabs & Product Box grid (3 Columns) */}
               <div className="lg:col-span-8 space-y-6">
                 
-                {/* Category selector */}
-                <div className="flex sm:flex-wrap overflow-x-auto sm:overflow-x-visible flex-nowrap whitespace-nowrap gap-1.5 sm:gap-2 bg-white border border-[#f2ccd7] p-1.5 sm:p-2 rounded-xl sm:rounded-2xl shadow-sm scrollbar-none">
+                {/* Category selector (Stage Flow Card Style) */}
+                <div className="flex sm:flex-wrap overflow-x-auto sm:overflow-x-visible flex-nowrap whitespace-nowrap gap-1.5 sm:gap-2 bg-white border border-neutral-200/80 p-2 sm:p-2.5 rounded-2xl shadow-2xs scrollbar-none">
                   {["전체", ...categories].map((cat) => (
                     <button
                       key={cat}
+                      type="button"
                       onClick={() => setActiveCategory(cat)}
-                      className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl font-bold text-[11px] sm:text-xs transition-all shrink-0 ${
+                      className={`px-3.5 sm:px-4 py-2 rounded-xl font-extrabold text-[11px] sm:text-xs transition-all shrink-0 cursor-pointer border-0 ${
                         activeCategory === cat
-                          ? "bg-[#f25f8a] text-white shadow-sm"
-                          : "text-[#735965] hover:text-[#bf3e67] hover:bg-[#fff1f5]"
+                          ? "bg-[#FED422] text-[#0F172A] shadow-2xs"
+                          : "text-slate-500 hover:text-[#0F172A] hover:bg-slate-100"
                       }`}
                     >
                       {cat}
@@ -3189,8 +3379,8 @@ export default function PortalPage() {
                   ))}
                 </div>
 
-                {/* Product Box Grid (Responsive: Left thumbnail row for mobile, Grid card for desktop) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                {/* Product Box Grid (3 Columns on Desktop: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredProducts.map((p) => {
                     const cartQty = cart.find((item) => item.productId === p.id)?.quantity || 0;
                     return (
@@ -3198,11 +3388,11 @@ export default function PortalPage() {
                         {/* 1. Mobile Row View (Compact Left Thumbnail Layout) */}
                         <div 
                           onClick={() => setSelectedProductDetail(p)}
-                          className="sm:hidden bg-white border border-[#f2ccd7] hover:border-[#f25f8a] active:scale-[0.99] transition-all rounded-xl p-3 flex gap-3 items-center shadow-sm cursor-pointer relative"
+                          className="sm:hidden bg-white border border-neutral-200/80 hover:border-[#FED422] active:scale-[0.99] transition-all rounded-2xl p-3 flex gap-3 items-center shadow-2xs cursor-pointer relative"
                         >
                           {/* Left: Thumbnail & Stock State */}
-                          <div className="w-16 h-16 rounded-lg bg-[#fff1f5] overflow-hidden shrink-0 border border-[#f2ccd7]/60 relative">
-                            <img src={optimizeCloudinaryUrl(p.img)} alt={p.name} className="w-full h-full object-cover" />
+                          <div className="w-16 h-16 rounded-xl bg-white overflow-hidden shrink-0 border border-neutral-200/60 relative">
+                            <img src={optimizeCloudinaryUrl(p.img)} alt={p.name} className="w-full h-full object-contain p-1" />
                             {p.stock === "out_of_stock" && (
                               <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
                                 <span className="text-white font-black text-[9px] px-1 py-0.5 rounded bg-red-500 shadow-sm">품절</span>
@@ -3214,47 +3404,51 @@ export default function PortalPage() {
                           <div className="flex-1 min-w-0 flex flex-col justify-between h-16">
                             <div className="space-y-0.5">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[9px] text-[#bf3e67] font-extrabold bg-[#ffd3df] px-1.5 py-0.5 rounded-md border border-[#f2ccd7]/60">
+                                <span className="text-[9px] text-[#0F172A] font-extrabold bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200/80">
                                   {p.category}
                                 </span>
-                                <span className="text-[9px] text-[#735965] font-bold">{p.packSize}</span>
+                                <span className="text-[9px] text-slate-400 font-bold">{p.packSize}</span>
                               </div>
-                              <h4 className="font-extrabold text-xs text-[#2d2026] truncate leading-tight">{p.name}</h4>
+                              <h4 className="font-extrabold text-xs text-[#0F172A] truncate leading-tight">{p.name}</h4>
                             </div>
 
                             <div className="flex items-center justify-between mt-1">
-                              <strong className="text-xs text-[#bf3e67] font-black">{p.price.toLocaleString()}원</strong>
+                              <strong className="text-xs text-[#0F172A] font-black">{p.price.toLocaleString()}원</strong>
                               
                               <div onClick={(e) => e.stopPropagation()} className="shrink-0">
                                 {p.stock === "out_of_stock" ? (
-                                  <span className="bg-red-50 text-red-500 font-extrabold text-[10px] px-2.5 py-1 rounded-md border border-red-200 shadow-sm whitespace-nowrap">일시품절</span>
+                                  <span className="bg-red-50 text-red-500 font-extrabold text-[10px] px-2.5 py-1 rounded-md border border-red-200 shadow-2xs whitespace-nowrap">일시품절</span>
                                 ) : p.options && p.options.length > 0 ? (
                                   <button
+                                    type="button"
                                     onClick={() => setSelectedProductDetail(p)}
-                                    className="px-2.5 py-1 rounded bg-[#f25f8a] text-white text-[10px] font-black shadow-sm"
+                                    className="px-2.5 py-1 rounded-xl bg-[#FED422] text-[#0F172A] text-[10px] font-black shadow-2xs border-0 cursor-pointer"
                                   >
                                     옵션선택
                                   </button>
                                 ) : cartQty > 0 ? (
-                                  <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-md p-0.5">
+                                  <div className="flex items-center border border-slate-200 bg-slate-50 rounded-lg p-0.5">
                                     <button 
+                                      type="button"
                                       onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
-                                      className="p-0.5 hover:text-[#bf3e67] text-[#735965]"
+                                      className="p-0.5 hover:text-[#0F172A] text-slate-500 border-0 cursor-pointer"
                                     >
                                       <Minus size={11} />
                                     </button>
-                                    <span className="px-2 text-[10px] font-bold text-[#2d2026] w-4 text-center">{cartQty}</span>
+                                    <span className="px-2 text-[10px] font-bold text-[#0F172A] w-4 text-center">{cartQty}</span>
                                     <button 
+                                      type="button"
                                       onClick={() => updateCartQty(p.id, undefined, cartQty + 1)}
-                                      className="p-0.5 hover:text-[#bf3e67] text-[#735965]"
+                                      className="p-0.5 hover:text-[#0F172A] text-slate-500 border-0 cursor-pointer"
                                     >
                                       <Plus size={11} />
                                     </button>
                                   </div>
                                 ) : (
                                   <button
+                                    type="button"
                                     onClick={() => addToCart(p.id)}
-                                    className="px-2.5 py-1 rounded bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-[10px] font-black text-[#bf3e67]"
+                                    className="px-2.5 py-1 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] border-0 text-[10px] font-black text-[#0F172A] transition-all cursor-pointer shadow-2xs"
                                   >
                                     담기
                                   </button>
@@ -3264,17 +3458,17 @@ export default function PortalPage() {
                           </div>
                         </div>
 
-                        {/* 2. Desktop Grid Card View */}
+                        {/* 2. Desktop 3-Column Grid Card View */}
                         <div 
                           onClick={() => setSelectedProductDetail(p)}
-                          className="hidden sm:flex bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl overflow-hidden flex-col justify-between shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 aspect-square w-full relative min-h-0"
+                          className="hidden sm:flex bg-white border border-neutral-200/90 hover:border-[#FED422] transition-all rounded-2xl overflow-hidden flex-col justify-between shadow-2xs cursor-pointer hover:shadow-md hover:-translate-y-0.5 aspect-[4/5] w-full relative min-h-0"
                         >
-                          {/* Thumbnail image & stock state badge (Strictly 52% height) */}
-                          <div className="h-[52%] w-full relative bg-[#fff1f5] overflow-hidden shrink-0 border-b border-[#f2ccd7]/40">
+                          {/* Thumbnail image & stock state badge (Generous 64% height for clean white backdrop) */}
+                          <div className="h-[64%] w-full relative bg-white overflow-hidden shrink-0 border-b border-neutral-100 flex items-center justify-center p-3">
                             <img 
                               src={optimizeCloudinaryUrl(p.img)} 
                               alt={p.name} 
-                              className={`w-full h-full object-cover transition-all duration-300 ${
+                              className={`w-full h-full object-contain transition-all duration-300 ${
                                 p.stock === "out_of_stock" ? "brightness-50 grayscale" : ""
                               }`} 
                             />
@@ -3285,27 +3479,27 @@ export default function PortalPage() {
                                 </span>
                               </div>
                             )}
-                            <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1 max-w-[80%]">
+                            <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1 max-w-[80%] z-10">
                               {p.stock === "low_stock" && (
-                                <span className="bg-orange-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">품절임박</span>
+                                <span className="bg-orange-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-2xs whitespace-nowrap">품절임박</span>
                               )}
                             </div>
-                            <span className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm text-[9px] text-[#bf3e67] font-extrabold px-1.5 py-0.5 rounded border border-[#f2ccd7] whitespace-nowrap">
+                            <span className="absolute bottom-2 right-2 bg-white/95 backdrop-blur-sm text-[9px] text-slate-700 font-extrabold px-2 py-0.5 rounded-full border border-slate-200/80 whitespace-nowrap shadow-2xs">
                               {p.category}
                             </span>
                           </div>
 
-                          {/* Product Info Block (Strictly 48% height) */}
-                          <div className="h-[48%] w-full shrink-0 flex flex-col justify-between p-3.5 min-h-0 relative overflow-hidden bg-white">
+                          {/* Compact Product Info Block */}
+                          <div className="h-[36%] w-full shrink-0 flex flex-col justify-between p-3.5 min-h-0 relative overflow-hidden bg-white">
                             {p.labels && p.labels.length > 0 && (
-                              <div className="absolute top-3.5 right-3.5 flex flex-wrap gap-1 w-fit justify-end z-10">
+                              <div className="absolute top-2.5 right-2.5 flex flex-wrap gap-1 w-fit justify-end z-10">
                                 {p.labels.map((l) => {
-                                  let bgStyle = "bg-neutral-500/90 text-white";
-                                  if (l === "BEST") bgStyle = "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm font-black";
-                                  else if (l === "추천") bgStyle = "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm font-black";
-                                  else if (l === "신제품") bgStyle = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-black";
+                                  let bgStyle = "bg-slate-700 text-white";
+                                  if (l === "BEST") bgStyle = "bg-[#FED422] text-[#0F172A] font-black";
+                                  else if (l === "추천") bgStyle = "bg-indigo-600 text-white font-black";
+                                  else if (l === "신제품") bgStyle = "bg-emerald-600 text-white font-black";
                                   return (
-                                    <span key={l} className={`font-bold text-[7px] px-1.5 py-0.5 rounded shadow-sm ${bgStyle} whitespace-nowrap`}>
+                                    <span key={l} className={`font-bold text-[8px] px-2 py-0.5 rounded-full shadow-2xs ${bgStyle} whitespace-nowrap`}>
                                       {l}
                                     </span>
                                   );
@@ -3313,51 +3507,61 @@ export default function PortalPage() {
                               </div>
                             )}
                             
-                            <div className="space-y-0.5 pr-12 min-h-0 overflow-hidden text-left">
-                              <span className="text-[8px] text-[#735965] font-bold block whitespace-nowrap truncate">{p.packSize}</span>
-                              <h3 className="font-extrabold text-xs text-[#2d2026] leading-tight truncate">{p.name}</h3>
-                              <p className="text-[9px] text-[#735965] font-medium leading-relaxed truncate mt-0.5">{p.desc}</p>
+                            {/* Product Info Area */}
+                            <div className="space-y-0.5 pr-8 min-h-0 overflow-hidden text-left">
+                              <span className="text-[9px] text-slate-400 font-bold block whitespace-nowrap truncate">{p.packSize}</span>
+                              <h3 className="font-extrabold text-xs sm:text-sm text-[#0F172A] leading-snug truncate">{p.name}</h3>
+                              <p className="text-[10px] text-slate-500 font-medium leading-tight truncate mt-0.5">{p.desc}</p>
                             </div>
 
-                            <div className="flex items-center justify-between mt-1 border-t border-[#f2ccd7]/40 pt-2 shrink-0">
-                              <strong className="text-xs text-[#2d2026] font-black whitespace-nowrap">{p.price.toLocaleString()}원</strong>
+                            {/* Price & Action Area - NO horizontal border line, clean gap layout */}
+                            <div className="flex items-center justify-between mt-2 pt-1 shrink-0">
+                              <div className="flex flex-col">
+                                <span className="text-[9px] text-slate-400 font-bold -mb-0.5">공급가</span>
+                                <strong className="text-sm sm:text-base text-[#0F172A] font-black whitespace-nowrap">{p.price.toLocaleString()}<span className="text-xs font-bold ml-0.5">원</span></strong>
+                              </div>
                               
                               {p.stock === "out_of_stock" ? (
-                                <span className="bg-red-50 text-red-500 font-extrabold text-[9px] px-2.5 py-1.5 rounded-lg border border-red-200 shadow-sm whitespace-nowrap shrink-0">일시품절</span>
+                                <span className="bg-slate-100 text-slate-400 font-extrabold text-xs px-3 py-1.5 rounded-xl whitespace-nowrap shrink-0">일시품절</span>
                               ) : p.options && p.options.length > 0 ? (
                                 <button
+                                  type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedProductDetail(p);
                                   }}
-                                  className="px-2.5 py-1.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-[9px] font-black transition-all shadow-sm shrink-0 whitespace-nowrap"
+                                  className="px-4 py-2 rounded-xl bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all shadow-xs hover:shadow-md shrink-0 whitespace-nowrap border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
                                 >
                                   옵션 선택
                                 </button>
                               ) : cartQty > 0 ? (
-                                <div className="flex items-center border border-[#f2ccd7] bg-[#fff1f5] rounded-lg p-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                                <div className="flex items-center border border-slate-200 bg-slate-50 rounded-xl p-1 shrink-0 shadow-2xs" onClick={(e) => e.stopPropagation()}>
                                   <button 
+                                    type="button"
                                     onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
-                                    className="p-0.5 hover:text-[#bf3e67] text-[#735965] transition-colors"
+                                    className="w-6 h-6 rounded-lg bg-white hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center transition-colors border-0 cursor-pointer shadow-2xs"
                                   >
-                                    <Minus size={10} />
+                                    <Minus size={12} />
                                   </button>
-                                  <span className="px-1.5 text-[9px] font-bold text-[#2d2026] w-4 text-center">{cartQty}</span>
+                                  <span className="px-2.5 text-xs font-black text-[#0F172A] min-w-[20px] text-center">{cartQty}</span>
                                   <button 
+                                    type="button"
                                     onClick={() => updateCartQty(p.id, undefined, cartQty + 1)}
-                                    className="p-0.5 hover:text-[#bf3e67] text-[#735965] transition-colors"
+                                    className="w-6 h-6 rounded-lg bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] font-bold flex items-center justify-center transition-colors border-0 cursor-pointer shadow-2xs"
                                   >
-                                    <Plus size={10} />
+                                    <Plus size={12} />
                                   </button>
                                 </div>
                               ) : (
                                 <button
+                                  type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     addToCart(p.id);
                                   }}
-                                  className="px-2.5 py-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-[9px] font-black text-[#bf3e67] transition-all shrink-0 whitespace-nowrap"
+                                  className="px-4 py-2 rounded-xl bg-[#FED422] hover:bg-[#f5c800] border-0 text-xs font-black text-[#0F172A] transition-all shrink-0 whitespace-nowrap cursor-pointer shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5"
                                 >
+                                  <ShoppingBag size={13} />
                                   담기
                                 </button>
                               )}
@@ -3371,39 +3575,65 @@ export default function PortalPage() {
 
               </div>
 
-              {/* Right Side: Interactive Shopping Cart */}
+              {/* Right Side: High-End Interactive Franchisee Shopping Cart */}
               <div className="lg:col-span-4 h-fit lg:self-start lg:sticky lg:top-[96px]">
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-6 shadow-sm space-y-6">
-                  <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
-                    <div className="flex items-center gap-2">
-                      <ShoppingBag size={18} className="text-[#f25f8a]" />
-                      <h3 className="font-extrabold text-base text-[#2d2026]">발주 장바구니</h3>
+                <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-md space-y-5">
+                  
+                  {/* Cart Header */}
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-2xl bg-[#FED422] flex items-center justify-center text-[#0F172A] shadow-xs">
+                        <ShoppingBag size={18} />
+                      </div>
+                      <div>
+                        <h3 className="font-black text-base text-[#0F172A] tracking-tight">발주 장바구니</h3>
+                        <span className="text-[10px] text-slate-400 font-bold block -mt-0.5">실시간 물품 주문 수량 확인</span>
+                      </div>
                     </div>
+                    
                     {cart.length > 0 && (
-                      <button onClick={clearCart} className="text-[10px] font-bold text-[#735965] hover:text-red-500 transition-colors flex items-center gap-1 cursor-pointer">
-                        <Trash2 size={12} /> 비우기
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <span className="bg-amber-100 text-[#0F172A] text-[10px] font-black px-2.5 py-1 rounded-full border border-amber-200">
+                          총 {cart.reduce((acc, item) => acc + item.quantity, 0)}개
+                        </span>
+                        <button 
+                          type="button" 
+                          onClick={clearCart} 
+                          className="text-[10px] font-extrabold text-slate-400 hover:text-red-500 transition-colors flex items-center gap-0.5 cursor-pointer border-0 bg-transparent p-1"
+                          title="장바구니 비우기"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
                     )}
                   </div>
 
                   {cart.length === 0 ? (
-                    <div className="py-16 text-center space-y-3">
-                      <ShoppingBag size={36} className="text-[#f2ccd7] mx-auto" />
-                      <p className="text-xs text-[#735965] font-bold leading-relaxed max-w-[180px] mx-auto">
-                        발주할 물품의 '담기' 버튼을 클릭해 장바구니를 채워주세요.
-                      </p>
+                    <div className="py-14 text-center space-y-3 bg-slate-50/60 rounded-2xl border border-dashed border-slate-200">
+                      <div className="w-12 h-12 rounded-2xl bg-white text-slate-300 flex items-center justify-center mx-auto shadow-2xs">
+                        <ShoppingBag size={24} />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs font-black text-slate-700">장바구니가 비어 있습니다.</p>
+                        <p className="text-[11px] text-slate-400 font-medium leading-relaxed max-w-[200px] mx-auto">
+                          원하시는 상품의 <strong className="text-[#0F172A] font-extrabold">[담기]</strong> 버튼을 누르면 이 곳에 바로 추가됩니다.
+                        </p>
+                      </div>
                     </div>
                   ) : (
                     <>
                       {/* Cart Items list (Grouped by Shipping Type) */}
-                      <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
+                      <div className="space-y-4 max-h-[340px] overflow-y-auto pr-1">
                         {groupedCartItems.map(([typeKey, group]) => (
                           <div key={typeKey} className="space-y-2">
-                            <div className="flex justify-between items-center border-b border-[#f2ccd7]/60 pb-1.5 px-1 select-none">
-                              <span className="font-extrabold text-[10px] text-[#bf3e67]">{group.title}</span>
+                            <div className="flex justify-between items-center bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100 select-none">
+                              <span className="font-extrabold text-[11px] text-[#0F172A] flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#FED422]"></span>
+                                {group.title}
+                              </span>
                               {group.feeLabel && (
-                                <span className="text-[9px] text-[#735965] font-black bg-[#fff1f5] border border-[#f2ccd7] px-2 py-0.5 rounded-full">
-                                  배송비: {group.feeLabel}
+                                <span className="text-[10px] text-slate-600 font-extrabold bg-white border border-slate-200/80 px-2 py-0.5 rounded-md shadow-2xs">
+                                  배송비 {group.feeLabel}
                                 </span>
                               )}
                             </div>
@@ -3413,28 +3643,36 @@ export default function PortalPage() {
                                 const p = (products || []).find((prod) => prod.id === item.productId);
                                 if (!p) return null;
                                 return (
-                                  <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7]/60 p-2.5 rounded-xl">
-                                    <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
-                                    <div className="flex-1 min-w-0">
-                                      <h4 className="font-bold text-[11px] text-[#2d2026] truncate">{p.name}</h4>
+                                  <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border border-slate-200/80 hover:border-slate-300 p-3 rounded-2xl shadow-2xs transition-all">
+                                    <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-200/60 p-1 shrink-0 flex items-center justify-center overflow-hidden">
+                                      <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-full h-full object-contain" />
+                                    </div>
+                                    
+                                    <div className="flex-1 min-w-0 text-left">
+                                      <h4 className="font-extrabold text-xs text-[#0F172A] truncate">{p.name}</h4>
                                       {item.selectedOption && (
-                                        <span className="text-[9px] text-[#bf3e67] font-black block mt-0.5 select-none">
-                                          [옵션: {item.selectedOption}]
+                                        <span className="text-[10px] text-amber-700 font-black block mt-0.5 bg-amber-50 px-1.5 py-0.5 rounded w-fit select-none">
+                                          옵션: {item.selectedOption}
                                         </span>
                                       )}
-                                      <span className="text-[9px] text-[#735965] font-semibold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
+                                      <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-400 font-bold">
+                                        <strong className="text-slate-800 font-black text-xs">{(p.price * item.quantity).toLocaleString()}원</strong>
+                                        <span>·</span>
+                                        <span>{p.packSize}</span>
+                                      </div>
                                     </div>
-                                    <div className="flex flex-col items-end gap-1.5 shrink-0">
-                                      <button onClick={() => removeCartItem(p.id, item.selectedOption)} className="text-[#735965]/60 hover:text-red-500 transition-colors p-0.5 cursor-pointer" aria-label="삭제">
-                                        <X size={12} />
+
+                                    <div className="flex flex-col items-end gap-2 shrink-0">
+                                      <button type="button" onClick={() => removeCartItem(p.id, item.selectedOption)} className="text-slate-300 hover:text-red-500 transition-colors p-0.5 cursor-pointer border-0 bg-transparent" aria-label="삭제">
+                                        <X size={14} />
                                       </button>
-                                      <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
-                                        <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
-                                          <Minus size={9} />
+                                      <div className="flex items-center border border-slate-200 bg-slate-50 rounded-lg p-0.5 shadow-2xs">
+                                        <button type="button" onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} className="w-5 h-5 rounded bg-white text-slate-600 hover:text-[#0F172A] hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer border-0 shadow-2xs">
+                                          <Minus size={10} />
                                         </button>
-                                        <span className="px-1.5 text-[9px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
-                                        <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
-                                          <Plus size={9} />
+                                        <span className="px-2 text-xs font-black text-[#0F172A] min-w-[18px] text-center">{item.quantity}</span>
+                                        <button type="button" onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} className="w-5 h-5 rounded bg-[#FED422] text-[#0F172A] font-bold flex items-center justify-center transition-colors cursor-pointer border-0 shadow-2xs">
+                                          <Plus size={10} />
                                         </button>
                                       </div>
                                     </div>
@@ -3446,32 +3684,34 @@ export default function PortalPage() {
                         ))}
                       </div>
 
-                      {/* Cart Bill Details */}
-                      <div className="border-t border-[#f2ccd7] pt-4 space-y-2.5 text-xs">
-                        <div className="flex justify-between text-[#735965] font-bold">
+                      {/* Cart Bill Details Panel */}
+                      <div className="bg-[#0F172A] text-white rounded-2xl p-4 space-y-3 shadow-sm text-xs">
+                        <div className="flex justify-between text-slate-300 font-bold">
                           <span>상품 합계</span>
-                          <span>{cartSubtotal.toLocaleString()} 원</span>
+                          <span className="font-extrabold text-white">{cartSubtotal.toLocaleString()} 원</span>
                         </div>
-                        <div className="flex justify-between text-[#735965] font-bold">
-                          <div className="flex flex-col">
+                        <div className="flex justify-between text-slate-300 font-bold items-center">
+                          <div className="flex items-center gap-1.5">
                             <span>배송비</span>
                             {shippingFee > 0 && (
-                              <span className="text-[10px] text-[#bf3e67] font-bold">({shippingTypeLabel} 적용)</span>
+                              <span className="text-[9px] bg-slate-800 text-amber-300 font-bold px-1.5 py-0.5 rounded">
+                                {shippingTypeLabel}
+                              </span>
                             )}
                           </div>
-                          <span>{shippingFee === 0 ? "무료" : `${shippingFee.toLocaleString()} 원`}</span>
+                          <span className="font-extrabold text-white">{shippingFee === 0 ? "무료배송" : `+ ${shippingFee.toLocaleString()} 원`}</span>
                         </div>
-                        <div className="flex justify-between text-[#2d2026] font-black text-sm border-t border-[#f2ccd7] pt-3">
-                          <span>최종 발주 금액</span>
-                          <span className="text-[#f25f8a]">{cartTotal.toLocaleString()} 원</span>
+                        <div className="border-t border-slate-700/80 pt-3 flex justify-between items-center">
+                          <span className="font-extrabold text-sm text-slate-200">최종 결제 금액</span>
+                          <span className="font-black text-lg text-[#FED422]">{cartTotal.toLocaleString()}<span className="text-xs font-bold text-white ml-0.5">원</span></span>
                         </div>
                       </div>
 
                       {/* Order action button */}
-                      <div className="border-t border-[#f2ccd7] pt-4">
+                      <div>
                         <button 
+                          type="button"
                           onClick={() => {
-                            // Automatically initialize recipient if blank
                             if (!recipientName) {
                               const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
                               setRecipientName(activeStore?.owner || "");
@@ -3482,19 +3722,19 @@ export default function PortalPage() {
                             }
                             setShowCheckoutModal(true);
                           }}
-                          className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-0"
+                          className="w-full py-4 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-sm font-black rounded-2xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.98] hover:-translate-y-0.5"
                         >
-                          <CheckCircle2 size={16} />
-                          결제 진행하기
+                          <CheckCircle2 size={18} />
+                          발주 결제 진행하기
                         </button>
 
                         {/* 이달의 카드 무이자 혜택 안내 */}
-                        <div className="mt-3 bg-gradient-to-br from-[#fff6f8] to-white border border-[#f2ccd7] rounded-2xl p-3.5 shadow-sm text-left">
-                          <div className="flex items-center gap-1.5 text-[#bf3e67] font-black text-xs mb-2">
-                            <CreditCard size={14} className="shrink-0" />
+                        <div className="mt-3 bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 shadow-2xs text-left">
+                          <div className="flex items-center gap-1.5 text-[#0F172A] font-extrabold text-xs mb-2">
+                            <CreditCard size={14} className="shrink-0 text-[#0F172A]" />
                             <span>7월 카드사 무이자 혜택 (5만원 이상)</span>
                           </div>
-                          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[10px] font-semibold text-[#735965]/90 border-b border-[#f2ccd7]/30 pb-2 mb-2">
+                          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[10px] font-semibold text-slate-500 border-b border-neutral-200/60 pb-2 mb-2">
                             <div className="flex justify-between items-center">
                               <span>• 현대 / 신한</span>
                               <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
@@ -3540,17 +3780,51 @@ export default function PortalPage() {
           {currentMenu === "history" && (
             <div className="space-y-6">
               
-              <div>
-                <h2 className="text-xl font-bold text-[#2d2026]">정기 자재 발주 내역</h2>
-                <p className="text-xs text-[#735965] font-bold mt-1">{activeStore?.name || "가맹점"}에서 신청한 역대 자재 발주 히스토리와 배송 현황입니다.</p>
+              {/* Header & Description */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                    <span>정기 자재 발주 내역</span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                      {orders.length}건
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium mt-1">{activeStore?.name || "가맹점"}에서 신청한 역대 자재 발주 히스토리와 배송 현황입니다.</p>
+                </div>
               </div>
 
-              {/* Order List Table */}
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
+              {/* Order Status Summary Counter Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold block">전체 발주</span>
+                  <strong className="text-lg font-black text-[#0F172A]">{orders.length}건</strong>
+                </div>
+                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-1">
+                  <span className="text-[10px] text-amber-600 font-bold block">주문완료 / 접수</span>
+                  <strong className="text-lg font-black text-amber-600">
+                    {orders.filter(o => o.status === "주문완료" || o.status === "배송준비중" || o.status === "입금대기").length}건
+                  </strong>
+                </div>
+                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-1">
+                  <span className="text-[10px] text-blue-600 font-bold block">배송 진행중</span>
+                  <strong className="text-lg font-black text-blue-600">
+                    {orders.filter(o => o.status === "배송중").length}건
+                  </strong>
+                </div>
+                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-1">
+                  <span className="text-[10px] text-emerald-600 font-bold block">배송 완료</span>
+                  <strong className="text-lg font-black text-emerald-600">
+                    {orders.filter(o => o.status === "배송완료").length}건
+                  </strong>
+                </div>
+              </div>
+
+              {/* Order List Table Card (Stage Flow Premium Style) */}
+              <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm">
+                <div className="overflow-x-auto [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
+                      <tr className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-black text-[#0F172A] uppercase tracking-wider">
                         <th className="p-4 sm:p-5 whitespace-nowrap">신청 일자</th>
                         <th className="p-4 sm:p-5">주문 품목 요약</th>
                         <th className="p-4 sm:p-5 whitespace-nowrap">총 결제 대금</th>
@@ -3558,49 +3832,53 @@ export default function PortalPage() {
                         <th className="p-4 sm:p-5 text-center">상세 정보</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                    <tbody className="divide-y divide-slate-100 text-xs">
                       {orders.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="p-8 text-center text-[#735965]">발주 내역이 존재하지 않습니다.</td>
+                          <td colSpan={5} className="p-12 text-center text-slate-400 font-bold">
+                            발주 내역이 존재하지 않습니다.
+                          </td>
                         </tr>
                       ) : (
                         orders.map((order) => (
                           <tr 
                             key={order.id} 
                             onClick={() => setSelectedOrder(order)}
-                            className="hover:bg-[#fff9fb] transition-colors cursor-pointer group"
+                            className="hover:bg-amber-50/40 transition-colors cursor-pointer group"
                           >
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{order.date}</td>
+                            <td className="p-4 sm:p-5 text-slate-600 font-bold whitespace-nowrap">{order.date}</td>
                             <td className="p-4 sm:p-5">
-                              <span className="font-bold text-[#2d2026]">
+                              <span className="font-extrabold text-[#0F172A] block text-xs sm:text-sm">
                                 {order.items[0].productName} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ""}
                               </span>
-                              <span className="text-[10px] text-[#735965] block font-semibold mt-0.5">
+                              <span className="text-[10px] text-slate-400 font-medium block truncate mt-0.5 max-w-[280px]">
                                 {order.items.map(item => `${item.productName} ${item.quantity}개`).join(", ")}
                               </span>
                             </td>
-                            <td className="p-4 sm:p-5 font-black text-[#bf3e67] whitespace-nowrap">{order.totalPrice.toLocaleString()} 원</td>
+                            <td className="p-4 sm:p-5 font-black text-[#0F172A] text-sm whitespace-nowrap">
+                              {order.totalPrice.toLocaleString()} 원
+                            </td>
                             <td className="p-4 sm:p-5">
-                              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
+                              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black border shadow-2xs ${
                                 (() => {
-                                  const colorKey = statusColors[order.status] || DEFAULT_STATUS_COLORS[order.status] || "pink";
-                                  const preset = COLOR_PRESETS[colorKey as keyof typeof COLOR_PRESETS] || COLOR_PRESETS.pink;
-                                  const pulse = order.status === "배송중" ? " animate-pulse" : "";
-                                  return `${preset.bg} ${preset.text} ${preset.border}${pulse}`;
+                                  if (order.status === "배송완료") return "bg-emerald-50 text-emerald-700 border-emerald-200";
+                                  if (order.status === "배송중") return "bg-blue-50 text-blue-700 border-blue-200 animate-pulse";
+                                  if (order.status === "배송준비중") return "bg-amber-50 text-amber-800 border-amber-200";
+                                  return "bg-slate-100 text-slate-700 border-slate-200";
                                 })()
                               }`}>
-                                {order.status === "배송중" && <Truck size={12} />}
-                                {order.status === "배송완료" && <Check size={12} />}
-                                {order.status === "배송준비중" && <Clock size={12} />}
-                                {order.status === "주문완료" && <Clock size={12} />}
-                                {!["배송중", "배송완료", "배송준비중", "주문완료"].includes(order.status) && <Clock size={12} />}
+                                {order.status === "배송중" && <Truck size={13} />}
+                                {order.status === "배송완료" && <Check size={13} />}
+                                {order.status === "배송준비중" && <Clock size={13} />}
+                                {order.status === "주문완료" && <Clock size={13} />}
+                                {!["배송중", "배송완료", "배송준비중", "주문완료"].includes(order.status) && <Clock size={13} />}
                                 {order.status}
                               </span>
                             </td>
                             <td className="p-4 sm:p-5 text-center" onClick={(e) => e.stopPropagation()}>
                               <button 
                                 onClick={() => setSelectedOrder(order)}
-                                className="px-2.5 py-1.5 rounded-lg bg-[#fff1f5] border border-[#f2ccd7] group-hover:bg-[#f25f8a] group-hover:border-[#f25f8a] group-hover:text-white text-[10px] font-bold text-[#bf3e67] transition-all cursor-pointer shadow-sm"
+                                className="px-3 py-1.5 rounded-xl bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all cursor-pointer shadow-2xs hover:shadow-xs border-0"
                               >
                                 상세보기
                               </button>
@@ -3622,47 +3900,95 @@ export default function PortalPage() {
           {currentMenu === "notice" && (
             <div className="space-y-6">
               
-              <div>
-                <h2 className="text-xl font-bold text-[#2d2026]">가맹점 공지사항</h2>
-                <p className="text-xs text-[#735965] font-bold mt-1">본사 가맹지원본부에서 사장님들께 드리는 정기 물류, 조리 가이드, 마케팅 공지입니다.</p>
+              {/* Header & Category Filter Tabs */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                    <span>가맹점 공지사항</span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                      총 {notices.length}개
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium mt-1">본사 가맹지원본부에서 사장님들께 드리는 정기 물류, 조리 가이드, 마케팅 공지입니다.</p>
+                </div>
+
+                {/* Tag Filter Tabs */}
+                <div className="flex items-center gap-1.5 overflow-x-auto [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] pb-1 sm:pb-0 shrink-0">
+                  {["전체", "필독", "신메뉴", "일반"].map((filterTag) => {
+                    const isActive = selectedNoticeCategory === filterTag || (!selectedNoticeCategory && filterTag === "전체");
+                    return (
+                      <button
+                        key={filterTag}
+                        type="button"
+                        onClick={() => setSelectedNoticeCategory(filterTag === "전체" ? "" : filterTag)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer border-0 whitespace-nowrap shadow-2xs ${
+                          isActive 
+                            ? "bg-[#FED422] text-[#0F172A] shadow-xs" 
+                            : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200/80"
+                        }`}
+                      >
+                        {filterTag}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Notice List Cards */}
-              <div className="grid grid-cols-1 gap-4">
-                {notices.length === 0 ? (
-                  <div className="bg-white border border-[#f2ccd7] rounded-2xl p-8 text-center text-[#735965]">등록된 공지사항이 없습니다.</div>
-                ) : (
-                  notices.map((n) => (
+              <div className="grid grid-cols-1 gap-3.5">
+                {(() => {
+                  const filteredNotices = selectedNoticeCategory 
+                    ? notices.filter(n => (n.tag as string) === selectedNoticeCategory) 
+                    : notices;
+
+                  if (filteredNotices.length === 0) {
+                    return (
+                      <div className="bg-white border border-slate-200/90 rounded-3xl p-12 text-center text-slate-400 font-bold space-y-2">
+                        <p className="text-sm font-black text-slate-600">등록된 공지사항이 없습니다.</p>
+                        <p className="text-xs text-slate-400 font-medium">선택하신 카테고리의 공지 내역이 존재하지 않습니다.</p>
+                      </div>
+                    );
+                  }
+
+                  return filteredNotices.map((n) => (
                     <button
                       key={n.id}
+                      type="button"
                       onClick={() => handleNoticeClick(n)}
-                      className="w-full text-left bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm group"
+                      className="w-full text-left bg-white border border-slate-200/90 hover:border-[#FED422] transition-all duration-200 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-md cursor-pointer hover:-translate-y-0.5 group"
                     >
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[9px] font-black px-2 py-0.5 rounded ${
-                            n.tag === "필독" 
-                              ? "bg-red-50 text-red-500 border border-red-200" 
-                              : n.tag === "신메뉴"
-                              ? "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
-                              : "bg-[#fff1f5] text-[#735965] border border-[#f2ccd7]"
+                      <div className="space-y-2 flex-1 min-w-0">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-2xs border ${
+                            (n.tag as string) === "필독" 
+                              ? "bg-rose-50 text-rose-600 border-rose-200/80" 
+                              : (n.tag as string) === "신메뉴" || (n.tag as string) === "이벤트" || (n.tag as string) === "프로모션"
+                              ? "bg-[#FED422] text-[#0F172A] border-amber-300"
+                              : "bg-slate-100 text-slate-700 border-slate-200/80"
                           }`}>
                             {n.tag}
                           </span>
-                          <h3 className="font-bold text-base text-[#2d2026] group-hover:text-[#f25f8a] leading-tight">
+                          <h3 className="font-extrabold text-sm sm:text-base text-[#0F172A] group-hover:text-amber-600 transition-colors leading-snug truncate">
                             {n.title}
                           </h3>
                         </div>
-                        <p className="text-xs text-[#735965] font-semibold">
-                          {n.date} · 본사 가맹사업지원팀 · 조회수 {n.views}
-                        </p>
+                        <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                          <span>{n.date}</span>
+                          <span>·</span>
+                          <span>본사 가맹사업지원팀</span>
+                          <span>·</span>
+                          <span>조회수 {n.views}회</span>
+                        </div>
                       </div>
-                      <span className="text-xs font-bold text-[#735965] group-hover:text-[#f25f8a] transition-colors shrink-0 flex items-center gap-1.5 self-end sm:self-center">
-                        상세 읽기 <ChevronRight size={14} />
-                      </span>
+
+                      <div className="shrink-0 flex items-center gap-2 self-end sm:self-center">
+                        <span className="px-3 py-1.5 rounded-xl bg-slate-50 group-hover:bg-[#FED422] text-[#0F172A] text-xs font-black transition-all border border-slate-200/60 group-hover:border-amber-300 shadow-2xs flex items-center gap-1">
+                          상세 읽기 <ChevronRight size={14} />
+                        </span>
+                      </div>
                     </button>
-                  ))
-                )}
+                  ));
+                })()}
               </div>
 
             </div>
@@ -3674,52 +4000,64 @@ export default function PortalPage() {
           {currentMenu === "inquiry" && (
             <div className="space-y-6">
               
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
-                  <h2 className="text-xl font-bold text-[#2d2026]">가맹점 1:1 전용 문의</h2>
-                  <p className="text-xs text-[#735965] font-bold mt-1">물류 파손 오배송, 장비 고장 AS 접수, 매장 홍보 추가 지원 신청 등 빠른 해결을 돕습니다.</p>
+                  <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                    <span>가맹점 1:1 전용 문의</span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                      {inquiries.length}건
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium mt-1">물류 파손 오배송, 장비 고장 AS 접수, 매장 홍보 추가 지원 신청 등 빠른 해결을 돕습니다.</p>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setShowInquiryModal(true)}
-                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold rounded-lg transition-all shadow-sm shrink-0 self-start sm:self-center"
+                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black rounded-xl transition-all shadow-xs hover:shadow-md shrink-0 self-start sm:self-center cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
                 >
-                  <Send size={13} />
+                  <Send size={14} />
                   신규 1:1 문의 접수
                 </button>
               </div>
 
               {/* Inquiry List Cards */}
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-3.5">
                 {inquiries.length === 0 ? (
-                  <div className="bg-white border border-[#f2ccd7] rounded-2xl p-8 text-center text-[#735965]">등록된 문의 내역이 없습니다.</div>
+                  <div className="bg-white border border-slate-200/90 rounded-3xl p-12 text-center text-slate-400 font-bold space-y-2">
+                    <p className="text-sm font-black text-slate-600">등록된 문의 내역이 없습니다.</p>
+                    <p className="text-xs text-slate-400 font-medium">상단의 [신규 1:1 문의 접수] 버튼을 눌러 본사 지원팀에 문의를 남겨주세요.</p>
+                  </div>
                 ) : (
                   inquiries.map((inq) => (
                     <button
                       key={inq.id}
+                      type="button"
                       onClick={() => setSelectedInquiry(inq)}
-                      className="w-full text-left bg-white border border-[#f2ccd7] hover:border-[#f25f8a] transition-all rounded-2xl p-5 flex flex-col justify-between gap-3 group shadow-sm"
+                      className="w-full text-left bg-white border border-slate-200/90 hover:border-[#FED422] transition-all duration-200 rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-3 group shadow-2xs hover:shadow-md cursor-pointer hover:-translate-y-0.5"
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold text-[#bf3e67] tracking-wider uppercase bg-[#ffd3df] px-2 py-0.5 rounded border border-[#f2ccd7]">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <span className="text-[10px] font-black text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200/80">
                             {inq.category}
                           </span>
-                          <h3 className="font-bold text-base text-[#2d2026] group-hover:text-[#f25f8a] leading-tight">
+                          <h3 className="font-extrabold text-sm sm:text-base text-[#0F172A] group-hover:text-amber-600 transition-colors leading-snug truncate">
                             {inq.title}
                           </h3>
                         </div>
-                        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ${
+                        <span className={`text-[10px] font-black px-3 py-1 rounded-full shrink-0 border shadow-2xs ${
                           inq.status === "답변완료" 
-                            ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
-                            : "bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
+                            : "bg-amber-50 text-amber-800 border-amber-200"
                         }`}>
                           {inq.status}
                         </span>
                       </div>
                       
-                      <div className="flex items-center justify-between text-[11px] text-[#735965] font-semibold border-t border-[#f2ccd7]/60 pt-3 mt-1 w-full">
-                        <span>접수번호: {inq.id} · 접수일자: {inq.date}</span>
-                        <span className="text-[#735965] group-hover:text-[#f25f8a] transition-colors flex items-center gap-1">상세 대화 보기 <ChevronRight size={13} /></span>
+                      <div className="flex items-center justify-between text-xs text-slate-400 font-medium border-t border-slate-100 pt-3 mt-1 w-full">
+                        <span>접수번호: <strong className="font-mono text-slate-600">{inq.id}</strong> · 접수일자: {inq.date}</span>
+                        <span className="px-3 py-1 rounded-xl bg-slate-50 group-hover:bg-[#FED422] text-[#0F172A] font-black transition-all border border-slate-200/60 group-hover:border-amber-300 shadow-2xs flex items-center gap-1 text-xs">
+                          상세 대화 보기 <ChevronRight size={13} />
+                        </span>
                       </div>
                     </button>
                   ))
@@ -3735,54 +4073,65 @@ export default function PortalPage() {
           {currentMenu === "training" && (
             <div className="space-y-6">
               
-              <div>
-                <h2 className="text-xl font-bold text-[#2d2026]">가맹점 교육/매뉴얼 자료실</h2>
-                <p className="text-xs text-[#735965] font-bold mt-1">안정적이고 표준화된 파이 및 에그빵 제조 오퍼레이션을 돕기 위한 필수 지침서 및 교안 영상입니다.</p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                    <span>가맹점 교육/매뉴얼 자료실</span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                      {trainings.length}개 자료
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium mt-1">안정적이고 표준화된 파이 및 에그빵 제조 오퍼레이션을 돕기 위한 필수 지침서 및 교안 영상입니다.</p>
+                </div>
               </div>
 
               {/* Materials Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {trainings.length === 0 ? (
-                  <div className="col-span-2 bg-white border border-[#f2ccd7] rounded-2xl p-8 text-center text-[#735965]">등록된 교육 자료가 없습니다.</div>
+                  <div className="col-span-2 bg-white border border-slate-200/90 rounded-3xl p-12 text-center text-slate-400 font-bold space-y-2">
+                    <p className="text-sm font-black text-slate-600">등록된 교육 자료가 없습니다.</p>
+                  </div>
                 ) : (
                   trainings.map((t) => (
                     <div 
                       key={t.id}
-                      className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden flex flex-col justify-between shadow-sm"
+                      className="bg-white border border-slate-200/90 hover:border-[#FED422] rounded-3xl overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-200 group"
                     >
                       {t.img ? (
-                        <div className="h-44 bg-[#fff1f5] overflow-hidden relative shrink-0">
-                          <img src={optimizeCloudinaryUrl(t.img)} alt="" className="w-full h-full object-cover" />
-                          <span className="absolute bottom-3 right-3 bg-white/95 text-[10px] text-[#bf3e67] font-bold px-2.5 py-1 rounded border border-[#f2ccd7]">
+                        <div className="h-44 bg-slate-100 overflow-hidden relative shrink-0">
+                          <img src={optimizeCloudinaryUrl(t.img)} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
                             {t.format}
                           </span>
                         </div>
                       ) : (
-                        <div className="h-44 bg-[#fff1f5] flex items-center justify-center shrink-0 border-b border-[#f2ccd7] relative">
-                          <BookOpen size={48} className="text-[#f2ccd7]" />
-                          <span className="absolute bottom-3 right-3 bg-white/95 text-[10px] text-[#bf3e67] font-bold px-2.5 py-1 rounded border border-[#f2ccd7]">
+                        <div className="h-44 bg-slate-50 flex items-center justify-center shrink-0 border-b border-slate-100 relative">
+                          <BookOpen size={48} className="text-slate-300" />
+                          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
                             {t.format}
                           </span>
                         </div>
                       )}
 
-                      <div className="p-5 flex-1 flex flex-col justify-between gap-5">
+                      <div className="p-5 flex-1 flex flex-col justify-between gap-4">
                         <div className="space-y-2">
-                          <span className="text-[10px] text-[#735965] font-bold block">{t.date} · 크기 {t.size}</span>
-                          <h3 className="font-bold text-base text-[#2d2026] leading-tight">{t.title}</h3>
-                          <p className="text-xs text-[#735965] font-medium leading-relaxed">{t.desc}</p>
+                          <span className="text-[10px] text-slate-400 font-bold block">{t.date} · 파일 크기 {t.size}</span>
+                          <h3 className="font-extrabold text-base text-[#0F172A] leading-snug group-hover:text-amber-600 transition-colors">{t.title}</h3>
+                          <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-2">{t.desc}</p>
                         </div>
 
                         <div className="flex items-center gap-2 mt-2 w-full">
                           <button
+                            type="button"
                             onClick={() => setSelectedMaterial(t)}
-                            className="flex-1 px-4 py-2.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-xs font-bold text-[#bf3e67] transition-all"
+                            className="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200/60 text-xs font-extrabold text-[#0F172A] transition-all cursor-pointer"
                           >
                             상세보기
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleDownload(t.title, t.fileUrl, t.fileName)}
-                            className="px-4 py-2.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shrink-0"
+                            className="px-4 py-2.5 rounded-xl bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-2xs border-0 cursor-pointer hover:shadow-xs"
                           >
                             <Download size={13} /> 다운로드
                           </button>
@@ -3802,54 +4151,65 @@ export default function PortalPage() {
           {currentMenu === "pr" && (
             <div className="space-y-6">
               
-              <div>
-                <h2 className="text-xl font-bold text-[#2d2026]">가맹점 홍보/마케팅 자재실</h2>
-                <p className="text-xs text-[#735965] font-bold mt-1">매장 윈도우 스티커, 테이블용 배너, 배달 플랫폼 등록용 캐릭터 썸네일 고화질 원본 그래픽 패키지입니다.</p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                    <span>가맹점 홍보/마케팅 자재실</span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                      {prs.length}개 자재
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium mt-1">매장 윈도우 스티커, 테이블용 배너, 배달 플랫폼 등록용 캐릭터 썸네일 고화질 원본 그래픽 패키지입니다.</p>
+                </div>
               </div>
 
               {/* PR Materials Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {prs.length === 0 ? (
-                  <div className="col-span-2 bg-white border border-[#f2ccd7] rounded-2xl p-8 text-center text-[#735965]">등록된 홍보 자료가 없습니다.</div>
+                  <div className="col-span-2 bg-white border border-slate-200/90 rounded-3xl p-12 text-center text-slate-400 font-bold space-y-2">
+                    <p className="text-sm font-black text-slate-600">등록된 홍보 자료가 없습니다.</p>
+                  </div>
                 ) : (
                   prs.map((p) => (
                     <div 
                       key={p.id}
-                      className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden flex flex-col justify-between shadow-sm"
+                      className="bg-white border border-slate-200/90 hover:border-[#FED422] rounded-3xl overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-200 group"
                     >
                       {p.img ? (
-                        <div className="h-44 bg-[#fff1f5] overflow-hidden relative shrink-0">
-                          <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-full h-full object-cover" />
-                          <span className="absolute bottom-3 right-3 bg-white/95 text-[10px] text-[#bf3e67] font-bold px-2.5 py-1 rounded border border-[#f2ccd7]">
+                        <div className="h-44 bg-slate-100 overflow-hidden relative shrink-0">
+                          <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
                             {p.format}
                           </span>
                         </div>
                       ) : (
-                        <div className="h-44 bg-[#fff1f5] flex items-center justify-center shrink-0 border-b border-[#f2ccd7] relative">
-                          <ImageIcon size={48} className="text-[#f2ccd7]" />
-                          <span className="absolute bottom-3 right-3 bg-white/95 text-[10px] text-[#bf3e67] font-bold px-2.5 py-1 rounded border border-[#f2ccd7]">
+                        <div className="h-44 bg-slate-50 flex items-center justify-center shrink-0 border-b border-slate-100 relative">
+                          <ImageIcon size={48} className="text-slate-300" />
+                          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
                             {p.format}
                           </span>
                         </div>
                       )}
 
-                      <div className="p-5 flex-1 flex flex-col justify-between gap-5">
+                      <div className="p-5 flex-1 flex flex-col justify-between gap-4">
                         <div className="space-y-2">
-                          <span className="text-[10px] text-[#735965] font-bold block">{p.date} · 크기 {p.size}</span>
-                          <h3 className="font-bold text-base text-[#2d2026] leading-tight">{p.title}</h3>
-                          <p className="text-xs text-[#735965] font-medium leading-relaxed">{p.desc}</p>
+                          <span className="text-[10px] text-slate-400 font-bold block">{p.date} · 파일 크기 {p.size}</span>
+                          <h3 className="font-extrabold text-base text-[#0F172A] leading-snug group-hover:text-amber-600 transition-colors">{p.title}</h3>
+                          <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-2">{p.desc}</p>
                         </div>
 
                         <div className="flex items-center gap-2 mt-2 w-full">
                           <button
+                            type="button"
                             onClick={() => setSelectedMaterial(p)}
-                            className="flex-1 px-4 py-2.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-xs font-bold text-[#bf3e67] transition-all"
+                            className="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200/60 text-xs font-extrabold text-[#0F172A] transition-all cursor-pointer"
                           >
                             상세보기
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleDownload(p.title, p.fileUrl, p.fileName)}
-                            className="px-4 py-2.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shrink-0"
+                            className="px-4 py-2.5 rounded-xl bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-2xs border-0 cursor-pointer hover:shadow-xs"
                           >
                             <Download size={13} /> 다운로드
                           </button>
@@ -3992,6 +4352,7 @@ export default function PortalPage() {
               </div>
             </div>
           )}
+          </div>
         </main>
       </div>
 
@@ -4019,59 +4380,72 @@ export default function PortalPage() {
 
       {/* MODALS */}
       
-      {/* 1. Notice Reading Modal */}
+      {/* 1. Notice Reading Modal (Stage Flow Tech Card Style) */}
       {selectedNotice && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setSelectedNotice(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
+            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <div className="flex items-center gap-2">
-                <span className="bg-red-50 text-red-500 text-[10px] font-black px-2 py-0.5 rounded border border-red-200">
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-2.5">
+                <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-1 rounded-full">
                   {selectedNotice.tag}
                 </span>
-                <span className="text-xs text-[#735965] font-bold">{selectedNotice.date} · 조회수 {selectedNotice.views}</span>
+                <span className="text-xs text-neutral-400 font-medium">{selectedNotice.date} · 조회수 {selectedNotice.views}</span>
               </div>
-              <button onClick={() => setSelectedNotice(null)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
-                <X size={15} />
-              </button>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                  공지사항
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedNotice(null)} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-4 flex-1">
-              <h3 className="text-xl font-bold text-[#2d2026] leading-tight">{selectedNotice.title}</h3>
-              <div className="h-px bg-[#f2ccd7]/50 w-full my-4"></div>
-              <p className="text-xs sm:text-sm text-[#2d2026] leading-relaxed font-medium whitespace-pre-wrap">
-                {selectedNotice.content}
-              </p>
+            <div className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 bg-[#f9fafb]">
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                <h3 className="text-lg sm:text-xl font-black text-[#0F172A] leading-tight">{selectedNotice.title}</h3>
+                <div className="h-px bg-neutral-100 w-full my-3"></div>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold whitespace-pre-wrap">
+                  {selectedNotice.content}
+                </p>
+              </div>
               
               {selectedNotice.title.includes("배달앱 메뉴 리뉴얼") && (
-                <div className="mt-6 p-5 bg-[#fff1f5] border border-[#f2ccd7] rounded-2xl flex flex-col items-center gap-3 relative">
-                  {/* 제출 상태 배지 */}
-                  <div className="absolute top-4 right-4">
+                <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3 relative">
+                  <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">배달앱 메뉴 리뉴얼 신청</span>
                     {savedCredentials ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-200">
+                      <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
                         ● 제출 완료
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-red-50 text-red-500 border border-red-200">
+                      <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[10px] font-black bg-rose-50 text-rose-700 border border-rose-200">
                         ● 제출 전
                       </span>
                     )}
                   </div>
 
-                  <p className="text-xs sm:text-sm text-[#735965] font-extrabold text-center mt-3">
+                  <p className="text-xs sm:text-sm text-slate-600 font-bold leading-relaxed">
                     📢 배달앱 메뉴 리뉴얼 무료 작업을 위한 배민/쿠팡이츠 계정을 입력해 주세요.
                   </p>
                   <button
+                    type="button"
                     onClick={() => setShowCredentialModal(true)}
-                    className={`w-full sm:w-auto px-6 py-3.5 text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                    className={`w-full py-3 text-xs sm:text-sm font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 ${
                       savedCredentials 
-                        ? "bg-emerald-600 hover:bg-emerald-700" 
-                        : "bg-[#f25f8a] hover:bg-[#df4977]"
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
+                        : "bg-[#0F172A] hover:bg-slate-800 text-white"
                     }`}
                   >
                     <span>
@@ -4082,43 +4456,64 @@ export default function PortalPage() {
                   </button>
                 </div>
               )}
-            </div>
 
-            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 text-center">
-              <button 
-                onClick={() => setSelectedNotice(null)}
-                className="px-6 py-2.5 rounded-lg bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-bold text-[#735965] transition-all"
-              >
-                닫기
-              </button>
+              {/* Stage Flow Footer */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-3">
+                <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>공지사항 정상 조회 중</span>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedNotice(null)}
+                  className="px-6 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
+                >
+                  닫기
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* 1.5. Delivery App Credentials Popup Modal */}
+      {/* 1.5. Delivery App Credentials Popup Modal (Stage Flow Tech Card Style) */}
       {showCredentialModal && (
         <div 
-          className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[110] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowCredentialModal(false)}
         >
           <div 
-            className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <h3 className="text-base font-bold text-[#2d2026]">배민/쿠팡이츠 정보 입력</h3>
-              <button 
-                onClick={() => setShowCredentialModal(false)} 
-                className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg"
-              >
-                <X size={15} />
-              </button>
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-base font-black text-[#0F172A] tracking-tight">배민/쿠팡이츠 정보 입력</h3>
+                <p className="text-xs text-neutral-400 font-medium mt-0.5">배달앱 메뉴 리뉴얼 작업을 위한 사장님 계정을 제출합니다.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                  연동 계정
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => setShowCredentialModal(false)} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmitCredentials} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-bold text-[#2d2026]">가맹점명</label>
+            <form onSubmit={handleSubmitCredentials} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                  <span className="text-xs font-black text-[#0F172A]">가맹점 정보</span>
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    가맹점
+                  </span>
+                </div>
                 <input 
                   type="text"
                   value={(() => {
@@ -4126,320 +4521,482 @@ export default function PortalPage() {
                     return storeData?.name || "강남역삼점";
                   })()}
                   disabled
-                  className="w-full bg-[#fff1f5]/50 border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] font-bold focus:outline-none opacity-80"
+                  style={{ backgroundColor: '#e2e8f0' }}
+                  className="w-full disabled:opacity-80 border-0 rounded-xl px-4 py-3 text-xs text-[#0F172A] font-bold outline-none"
                 />
               </div>
 
-              {/* 배민 정보 */}
-              <div className="p-4 bg-[#fff1f5]/30 border border-[#f2ccd7]/60 rounded-2xl space-y-3">
-                <h4 className="font-extrabold text-xs text-[#bf3e67]">배달의민족 사장님 계정</h4>
+              {/* 배민 정보 (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                  <h4 className="font-black text-xs text-[#0F172A]">배달의민족 사장님 계정</h4>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    배달의민족
+                  </span>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-[#735965]">아이디(ID)</span>
+                    <span className="text-[10px] font-extrabold text-neutral-400">아이디(ID)</span>
                     <input 
                       type="text"
                       placeholder="배민 사장님 ID"
                       value={baeminId}
                       onChange={(e) => setBaeminId(e.target.value)}
                       required
-                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-[#735965]">비밀번호(PW)</span>
+                    <span className="text-[10px] font-extrabold text-neutral-400">비밀번호(PW)</span>
                     <input 
                       type="password"
                       placeholder="배민 사장님 PW"
                       value={baeminPw}
                       onChange={(e) => setBaeminPw(e.target.value)}
                       required
-                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* 쿠팡 정보 */}
-              <div className="p-4 bg-[#fff1f5]/30 border border-[#f2ccd7]/60 rounded-2xl space-y-3">
-                <h4 className="font-extrabold text-xs text-[#bf3e67]">쿠팡이츠 사장님 계정</h4>
+              {/* 쿠팡 정보 (Emerald Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                  <h4 className="font-black text-xs text-[#0F172A]">쿠팡이츠 사장님 계정</h4>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    쿠팡이츠
+                  </span>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-[#735965]">아이디(ID)</span>
+                    <span className="text-[10px] font-extrabold text-neutral-400">아이디(ID)</span>
                     <input 
                       type="text"
                       placeholder="쿠팡 사장님 ID"
                       value={coupangId}
                       onChange={(e) => setCoupangId(e.target.value)}
                       required
-                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-[#735965]">비밀번호(PW)</span>
+                    <span className="text-[10px] font-extrabold text-neutral-400">비밀번호(PW)</span>
                     <input 
                       type="password"
                       placeholder="쿠팡 사장님 PW"
                       value={coupangPw}
                       onChange={(e) => setCoupangPw(e.target.value)}
                       required
-                      className="w-full bg-white border border-[#f2ccd7] rounded-lg px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 안내 문구 */}
-              <div className="text-[11px] text-[#735965] font-semibold space-y-1.5 leading-relaxed bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-2xl">
-                <p className="text-[#bf3e67] font-black">* 전달해주신 계정 정보는 메뉴 리뉴얼 작업 목적으로만 사용되며, 작업 완료 후 즉시 폐기하거나 사장님께서 비밀번호를 변경하셔도 무방합니다.</p>
+              <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 text-xs text-neutral-500 font-bold space-y-1.5 leading-relaxed">
+                <p className="text-[#0F172A] font-black">* 전달해주신 계정 정보는 메뉴 리뉴얼 작업 목적으로만 사용되며, 작업 완료 후 즉시 폐기하거나 사장님께서 비밀번호를 변경하셔도 무방합니다.</p>
                 <p>※ 계정 정보는 외부에 공유되지 않으며 안전하게 관리됩니다.</p>
               </div>
 
-              <button 
-                type="submit"
-                className="w-full py-3.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm cursor-pointer"
-              >
-                정보 제출하기 📢
-              </button>
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>안전 보안 전송</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowCredentialModal(false)}
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-full transition-all cursor-pointer border-0"
+                  >
+                    취소
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-7 py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white font-black text-xs rounded-full transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                  >
+                    <span>정보 제출하기</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* 2. Inquiry Reading Modal */}
+      {/* 2. Inquiry Reading Modal (Stage Flow Tech Card Style) */}
       {selectedInquiry && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-x-hidden"
           onClick={() => setSelectedInquiry(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
+            className="w-full max-w-2xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <span className="bg-[#ffd3df] text-[#bf3e67] text-[10px] font-bold px-2 py-0.5 rounded border border-[#f2ccd7]">
-                {selectedInquiry.category}
-              </span>
-              <button onClick={() => setSelectedInquiry(null)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
-                <X size={15} />
-              </button>
+            {/* Stage Flow White Header */}
+            <div className="px-5 sm:px-7 py-4 sm:py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-1 rounded-full shrink-0">
+                  {selectedInquiry.category}
+                </span>
+                <span className="text-xs text-neutral-400 font-medium truncate">접수일: {selectedInquiry.date}</span>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                  문의 내역
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedInquiry(null)} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-5 flex-1">
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-[10px] text-[#735965] font-bold">
-                  <span>접수 일자: {selectedInquiry.date}</span>
-                  <span>상태: {selectedInquiry.status}</span>
+            <div className="p-5 sm:p-7 overflow-y-auto space-y-4 flex-1 bg-[#f9fafb] [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+                <div className="flex justify-between items-center border-b border-neutral-100 pb-2">
+                  <span className="text-xs font-black text-[#0F172A]">문의 내역</span>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                    {selectedInquiry.status}
+                  </span>
                 </div>
-                <h3 className="text-base font-bold text-[#2d2026] leading-tight">{selectedInquiry.title}</h3>
-                <div className="bg-[#fff1f5] border border-[#f2ccd7]/60 p-4 rounded-xl">
-                  <p className="text-xs sm:text-sm text-[#2d2026] leading-relaxed font-semibold whitespace-pre-wrap">{selectedInquiry.content}</p>
+                <h3 className="text-base sm:text-lg font-black text-[#0F172A] leading-tight">{selectedInquiry.title}</h3>
+                <div className="bg-[#F8F9FA] border-0 p-4 rounded-xl">
+                  <p className="text-xs sm:text-sm text-[#0F172A] leading-relaxed font-semibold whitespace-pre-wrap">{selectedInquiry.content}</p>
                 </div>
               </div>
 
               {selectedInquiry.status === "답변완료" && selectedInquiry.answer ? (
-                <div className="space-y-2 border-t border-[#f2ccd7]/60 pt-5">
-                  <span className="text-[10px] font-bold text-[#bf3e67] tracking-wider uppercase bg-[#ffd3df] px-2 py-0.5 rounded border border-[#f2ccd7] w-fit block">
-                    본사 가맹사업관리팀 공식 답변
-                  </span>
-                  <div className="bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl">
-                    <p className="text-xs sm:text-sm text-[#2d2026] leading-relaxed font-medium whitespace-pre-wrap">
+                <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-3">
+                  <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                    <span className="text-xs font-black text-[#0F172A]">본사 가맹사업관리팀 공식 답변</span>
+                    <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                      답변 완료
+                    </span>
+                  </div>
+                  <div className="bg-[#F8F9FA] border-0 p-4 rounded-xl">
+                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold whitespace-pre-wrap">
                       {selectedInquiry.answer}
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-3 border-t border-[#f2ccd7]/60 pt-6">
-                  <h4 className="text-sm font-bold text-[#bf3e67] flex items-center gap-1.5">
-                    <Clock size={16} /> 본사 답변 대기중
-                  </h4>
-                  <div className="bg-[#fff1f5] border border-[#f2ccd7]/60 p-4 rounded-2xl">
-                    <p className="text-xs sm:text-sm text-[#735965] leading-relaxed font-medium">
+                <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3">
+                  <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                    <h4 className="text-xs font-black text-[#0F172A] flex items-center gap-1.5">
+                      <Clock size={14} className="text-amber-500" /> 본사 답변 대기중
+                    </h4>
+                    <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                      답변 대기중
+                    </span>
+                  </div>
+                  <div className="bg-[#F8F9FA] border-0 p-4 rounded-xl">
+                    <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-semibold">
                       점주님께서 올려주신 소중한 문의 사항이 본사 고객케어팀 및 기술 오퍼레이션 본부로 긴급 전달되었습니다. 최대한 상세하게 검토 후 12시간 이내에 정확하게 피드백 및 기기 AS 상담을 지원하겠습니다.
                     </p>
                   </div>
                 </div>
               )}
-            </div>
 
-            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 text-center">
-              <button 
-                onClick={() => setSelectedInquiry(null)}
-                className="px-6 py-2.5 rounded-lg bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-bold text-[#735965] transition-all"
-              >
-                확인 완료
-              </button>
+              {/* Stage Flow Footer */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-3">
+                <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>기록 정상 상태</span>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedInquiry(null)}
+                  className="px-6 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
+                >
+                  확인 완료
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* 3. Training & PR Material Reading Modal */}
+      {/* 3. Training & PR Material Reading Modal (Stage Flow Tech Card Style) */}
       {selectedMaterial && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-x-hidden"
           onClick={() => setSelectedMaterial(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
+            className="w-full max-w-2xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <div className="flex items-center gap-2">
-                <span className="bg-[#ffd3df] text-[#bf3e67] text-[10px] font-bold px-2 py-0.5 rounded border border-[#f2ccd7]">
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-2.5">
+                <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full">
                   {selectedMaterial.format}
                 </span>
-                <span className="text-xs text-[#735965] font-bold">{selectedMaterial.date} · 크기 {selectedMaterial.size}</span>
+                <span className="text-xs text-neutral-400 font-medium">{selectedMaterial.date} · 크기 {selectedMaterial.size}</span>
               </div>
-              <button onClick={() => setSelectedMaterial(null)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
-                <X size={15} />
-              </button>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                  교육/홍보 자료
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedMaterial(null)} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-5 flex-1">
-              {selectedMaterial.img && (
-                <div className="w-full h-48 rounded-xl overflow-hidden bg-[#fff1f5]">
-                  <img src={optimizeCloudinaryUrl(selectedMaterial.img)} alt="" className="w-full h-full object-cover" />
+            <div className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 bg-[#f9fafb] [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              {/* Material Detail Card */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                {selectedMaterial.img && (
+                  <div className="w-full h-48 rounded-xl overflow-hidden bg-neutral-100 border border-neutral-200/80">
+                    <img src={optimizeCloudinaryUrl(selectedMaterial.img)} alt="" className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <h3 className="text-base sm:text-lg font-black text-[#0F172A] leading-tight">{selectedMaterial.title}</h3>
+                <div className="bg-[#F8F9FA] border-0 p-4 rounded-xl">
+                  <span className="text-[10px] text-neutral-400 font-black uppercase tracking-wider block mb-1">상세 설명</span>
+                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold">
+                    {selectedMaterial.desc}
+                  </p>
                 </div>
-              )}
-              <h3 className="text-lg font-bold text-[#2d2026] leading-tight">{selectedMaterial.title}</h3>
-              <div className="bg-[#fff1f5] border border-[#f2ccd7]/60 p-4 rounded-2xl">
-                <span className="text-[10px] text-[#735965] font-bold block mb-1">자료 세부 요약 설명:</span>
-                <p className="text-xs sm:text-sm text-[#2d2026] leading-relaxed font-semibold">
-                  {selectedMaterial.desc}
-                </p>
               </div>
-            </div>
 
-            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 flex items-center justify-center gap-2.5">
-              <button 
-                onClick={() => setSelectedMaterial(null)}
-                className="px-6 py-2.5 rounded-lg bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-bold text-[#735965] transition-all"
-              >
-                닫기
-              </button>
-              <button 
-                onClick={() => {
-                  setSelectedMaterial(null);
-                  handleDownload(selectedMaterial.title, selectedMaterial.fileUrl, selectedMaterial.fileName);
-                }}
-                className="px-6 py-2.5 rounded-lg bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold transition-all flex items-center gap-1.5"
-              >
-                <Download size={13} /> 다운로드
-              </button>
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-3">
+                <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>다운로드 준비 완료</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button 
+                    type="button"
+                    onClick={() => setSelectedMaterial(null)}
+                    className="px-5 py-2.5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-xs font-bold text-slate-700 transition-all border-0 cursor-pointer"
+                  >
+                    닫기
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setSelectedMaterial(null);
+                      handleDownload(selectedMaterial.title, selectedMaterial.fileUrl, selectedMaterial.fileName);
+                    }}
+                    className="px-7 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black transition-all flex items-center gap-2 border-0 shadow-md active:scale-95 cursor-pointer"
+                  >
+                    <Download size={14} />
+                    <span>다운로드</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* 4. Write New 1:1 Inquiry Modal */}
+      {/* 4. Write New 1:1 Inquiry Modal (Stage Flow Tech Card Style) */}
       {showInquiryModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-x-hidden"
           onClick={() => setShowInquiryModal(false)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            className="w-full max-w-xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <h3 className="text-base font-bold text-[#2d2026]">신규 1:1 가맹상담 문의 접수</h3>
-              <button onClick={() => closeModal(() => setShowInquiryModal(false))} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
-                <X size={15} />
-              </button>
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-base font-black text-[#0F172A] tracking-tight">신규 1:1 가맹상담 문의 접수</h3>
+                <p className="text-xs text-neutral-400 font-medium mt-0.5">매장 운영 중 발생하는 물류, 기기 AS, 정산 문의를 접수합니다.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                  문의 서식
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => closeModal(() => setShowInquiryModal(false))} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={submitInquiry} className="p-6 overflow-y-auto space-y-5 flex-1 text-xs sm:text-sm">
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">문의 유형 선택</label>
-                <select 
-                  value={inquiryCategory}
-                  onChange={(e) => setInquiryCategory(e.target.value)}
-                  className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] focus:outline-none focus:border-[#f25f8a] cursor-pointer"
-                >
-                  <option value="물류">물류 배송 / 자재 훼손 오배송 건</option>
-                  <option value="기술/AS">조리 타이머 및 집기 AS 수리 접수</option>
-                  <option value="마케팅">매장 POP / 캐릭터 시각 홍보 추가 지원</option>
-                  <option value="대금/정산">물류 대금 결제 / 가맹 정산 문의</option>
-                  <option value="기타">기타 매장 운영 애로사항 접수</option>
-                </select>
+            <form onSubmit={submitInquiry} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb] [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              {/* Card 1: Category & Title (Amber Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                      💬
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">문의 유형 및 제목</span>
+                  </div>
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    문의 유형
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-extrabold text-[#0F172A]">문의 유형 선택 *</label>
+                  <select 
+                    value={inquiryCategory}
+                    onChange={(e) => setInquiryCategory(e.target.value)}
+                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs sm:text-sm font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                  >
+                    <option value="물류">물류 배송 / 자재 훼손 오배송 건</option>
+                    <option value="기술/AS">조리 타이머 및 집기 AS 수리 접수</option>
+                    <option value="마케팅">매장 POP / 캐릭터 시각 홍보 추가 지원</option>
+                    <option value="대금/정산">물류 대금 결제 / 가맹 정산 문의</option>
+                    <option value="기타">기타 매장 운영 애로사항 접수</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-extrabold text-[#0F172A]">문의 제목 *</label>
+                  <input 
+                    type="text"
+                    placeholder="예시) 로제 생지 오배송 건 확인 요청"
+                    value={inquiryTitle}
+                    onChange={(e) => setInquiryTitle(e.target.value)}
+                    required
+                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs sm:text-sm font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">문의 제목</label>
-                <input 
-                  type="text"
-                  placeholder="예시) 로제 생지 오배송 건 확인 요청"
-                  value={inquiryTitle}
-                  onChange={(e) => setInquiryTitle(e.target.value)}
-                  required
-                  className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] placeholder-[#735965]/50 focus:outline-none focus:border-[#f25f8a]"
-                />
-              </div>
+              {/* Card 2: Details Content (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+                      📜
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">문의 세부 내용</span>
+                  </div>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    문의 내용
+                  </span>
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">문의 세부 내용</label>
                 <textarea 
                   rows={5}
                   placeholder="발생 일시, 품목명, 상황 등을 최대한 상세히 기입해주시면 한층 정밀하고 신속한 AS 및 지원 처리가 가능합니다."
                   value={inquiryContent}
                   onChange={(e) => setInquiryContent(e.target.value)}
                   required
-                  className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] placeholder-[#735965]/50 focus:outline-none focus:border-[#f25f8a] resize-none"
+                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs sm:text-sm font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 resize-none outline-none transition-all shadow-2xs"
                 />
               </div>
 
-              <button 
-                type="submit"
-                className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-sm mt-2"
-              >
-                본사 AS 문의 접수하기
-              </button>
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>지원 접수 준비 완료</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => closeModal(() => setShowInquiryModal(false))}
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-full transition-all cursor-pointer border-0"
+                  >
+                    취소
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-full transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                  >
+                    <span>AS 문의 접수</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* 5. Order Details Modal */}
+
+
+      {/* 5. Order Details Modal (Stage Flow Tech Card Style) */}
       {selectedOrder && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setSelectedOrder(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col"
+            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
-            <div className="p-5 sm:p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <div className="flex-1">
-                <h3 className="text-sm sm:text-base font-black text-[#2d2026] flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                  <span>발주 상세 내역</span>
-                  <span className="text-[10px] sm:text-xs text-[#735965] font-bold block">{activeStore?.name || "가맹점"} · 발주 코드: <span className="font-mono text-[#bf3e67] font-black">{selectedOrder.id}</span></span>
-                </h3>
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                  <Package size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                    <span>발주 상세 내역</span>
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-neutral-100 border border-neutral-200/80 text-neutral-600 font-mono font-bold">
+                      {selectedOrder.id}
+                    </span>
+                  </h3>
+                  <p className="text-xs text-neutral-400 font-medium mt-0.5">{activeStore?.name || "가맹점"} 발주 품목 및 물류 현황</p>
+                </div>
               </div>
-              <button onClick={() => closeModal(() => setSelectedOrder(null))} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 ml-4">
-                <X size={15} />
-              </button>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-neutral-400 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                  ORDER DETAILS
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => closeModal(() => setSelectedOrder(null))} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+            <div className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs bg-[#f9fafb] [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               
-              {/* Status Timeline */}
-              <div className="bg-[#fffdf9] border border-[#f2ccd7] p-5 rounded-2xl">
-                <span className="text-[10px] text-[#735965] font-extrabold block mb-3 uppercase tracking-wider">물류 배송 진행 현황</span>
+              {/* Status Timeline Card (Amber Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <span className="text-xs font-black text-[#0F172A] tracking-tight">물류 배송 진행 현황</span>
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    TIMELINE
+                  </span>
+                </div>
                 
                 <div className="relative flex items-center justify-between mt-6 px-4">
-                  {/* Progress Line */}
-                  <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-[3px] bg-[#f2ccd7]/40 z-0"></div>
-                  <div 
-                    className="absolute left-6 top-1/2 -translate-y-1/2 h-[3px] bg-[#f25f8a] transition-all duration-500 z-0"
-                    style={{
-                      width: selectedOrder.status === "주문완료" ? "0%" 
-                           : selectedOrder.status === "배송준비중" ? "33%" 
-                           : selectedOrder.status === "배송중" ? "66%" 
-                           : "100%"
-                    }}
-                  ></div>
+                  {/* Bounded Progress Line Track (Prevents right-side line overflow) */}
+                  <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-[3px] bg-neutral-200 z-0 overflow-hidden rounded-full">
+                    <div 
+                      className="h-full bg-amber-500 transition-all duration-500 rounded-full"
+                      style={{
+                        width: selectedOrder.status === "주문완료" ? "0%" 
+                             : selectedOrder.status === "배송준비중" ? "33%" 
+                             : selectedOrder.status === "배송중" ? "66%" 
+                             : "100%"
+                      }}
+                    ></div>
+                  </div>
 
                   {/* Stage Dots */}
                   {[
@@ -4463,105 +5020,113 @@ export default function PortalPage() {
                       <div key={stage.label} className="relative z-10 flex flex-col items-center">
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all ${
                           isCurrent 
-                            ? "bg-[#f25f8a] border-[#f25f8a] text-white scale-110 shadow-sm"
+                            ? "bg-[#FED422] border-[#FED422] text-[#0F172A] scale-110 shadow-xs font-black"
                             : isPassed 
-                            ? "bg-[#ffd3df] border-[#f25f8a] text-[#bf3e67]"
-                            : "bg-white border-[#f2ccd7] text-[#735965]"
+                            ? "bg-amber-100 border-amber-500 text-amber-900"
+                            : "bg-white border-neutral-300 text-neutral-400"
                         }`}>
-                          {isPassed && !isCurrent ? <Check size={10} /> : <span className="text-[9px] font-bold">{idx + 1}</span>}
+                          {isPassed && !isCurrent ? <Check size={12} /> : <span className="text-[10px] font-black">{idx + 1}</span>}
                         </div>
-                        <span className={`text-[10px] font-black mt-2 ${isCurrent ? "text-[#f25f8a]" : "text-[#2d2026]"}`}>{stage.label}</span>
-                        <span className="text-[8px] text-[#735965] font-semibold mt-0.5">{stage.desc}</span>
+                        <span className={`text-[10px] font-black mt-2 ${isCurrent ? "text-[#0F172A]" : "text-neutral-500"}`}>{stage.label}</span>
+                        <span className="text-[8px] text-neutral-400 font-bold mt-0.5">{stage.desc}</span>
                       </div>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Order Items Table */}
-              <div className="bg-white border border-[#f2ccd7]/70 rounded-2xl overflow-hidden shadow-sm">
-                <div className="px-4 py-3 bg-[#fff1f5]/30 border-b border-[#f2ccd7]/50 flex justify-between items-center">
-                  <span className="font-extrabold text-[#2d2026]">발주 자재 명세표</span>
-                  <span className="text-[10px] text-[#735965] font-bold">신청 일자: {selectedOrder.date}</span>
+              {/* Order Items Table Card (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <span className="text-xs font-black text-[#0F172A]">발주 자재 명세표</span>
+                  <span className="text-[10px] font-mono font-bold text-neutral-400">신청 일자: {selectedOrder.date}</span>
                 </div>
-                <div className="overflow-x-auto w-full">
-                  <table className="w-full text-left border-collapse min-w-[480px] sm:min-w-0" style={{ tableLayout: 'fixed' }}>
-                    <colgroup>
-                      <col style={{ width: 'auto' }} />
-                      <col style={{ width: '50px' }} />
-                      <col style={{ width: '72px' }} />
-                      <col style={{ width: '82px' }} />
-                    </colgroup>
-                    <thead>
-                      <tr className="bg-[#fff9fb]/60 border-b border-[#f2ccd7]/50 text-[10px] font-bold text-[#735965]">
-                        <th className="px-3 py-2.5">품목명</th>
-                        <th className="px-2 py-2.5 text-center whitespace-nowrap">수량</th>
-                        <th className="px-2 py-2.5 text-right whitespace-nowrap">단가</th>
-                        <th className="px-3 py-2.5 text-right whitespace-nowrap">금액</th>
-                      </tr>
-                    </thead>
-                  <tbody className="divide-y divide-[#f2ccd7]/40 text-[11px] font-medium text-[#2d2026]">
-                    {selectedOrder.items.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-[#fffdf9]/50 transition-colors">
-                        <td className="px-3 py-2.5 font-bold text-neutral-800 leading-tight break-words text-[11px] sm:text-xs" style={{ wordBreak: 'break-word' }}>
-                          {item.productName}
-                        </td>
-                        <td className="px-2 py-2.5 text-center font-semibold text-[#2d2026] text-[11px]">{item.quantity}</td>
-                        <td className="px-2 py-2.5 text-right font-semibold text-[#735965] text-[11px]">{(item.price).toLocaleString()}</td>
-                        <td className="px-3 py-2.5 text-right font-black text-[#bf3e67] text-[11px]">{(item.price * item.quantity).toLocaleString()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="border border-neutral-200/90 rounded-xl overflow-hidden bg-white shadow-2xs">
+                  <div className="overflow-x-auto w-full [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    <table className="w-full text-left border-collapse min-w-[480px] sm:min-w-0" style={{ tableLayout: 'fixed' }}>
+                      <colgroup>
+                        <col style={{ width: 'auto' }} />
+                        <col style={{ width: '50px' }} />
+                        <col style={{ width: '72px' }} />
+                        <col style={{ width: '82px' }} />
+                      </colgroup>
+                      <thead>
+                        <tr className="bg-[#f8f9fa] border-b border-neutral-200/80 text-[10px] font-black text-neutral-400">
+                          <th className="px-4 py-3">품목명</th>
+                          <th className="px-2 py-3 text-center whitespace-nowrap">수량</th>
+                          <th className="px-2 py-3 text-right whitespace-nowrap">단가</th>
+                          <th className="px-4 py-3 text-right whitespace-nowrap">금액</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-neutral-100 text-xs font-bold text-[#0F172A]">
+                        {selectedOrder.items.map((item, idx) => (
+                          <tr key={idx} className="hover:bg-neutral-50 transition-colors">
+                            <td className="px-4 py-3 font-extrabold text-[#0F172A] leading-tight break-words text-xs" style={{ wordBreak: 'break-word' }}>
+                              {item.productName}
+                            </td>
+                            <td className="px-2 py-3 text-center font-bold text-slate-600 text-xs">{item.quantity}</td>
+                            <td className="px-2 py-3 text-right font-bold text-slate-400 text-xs">{(item.price).toLocaleString()}</td>
+                            <td className="px-4 py-3 text-right font-black text-[#0F172A] text-xs">{(item.price * item.quantity).toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
+                </div>
               </div>
 
-              {/* Payment Summary */}
-              <div className="bg-[#fff1f5]/20 border border-[#f2ccd7] rounded-2xl p-5 flex flex-col justify-between gap-4">
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+              {/* Payment Summary Card (Emerald Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <span className="text-xs font-black text-[#0F172A]">결제 및 정산 요약</span>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    PAYMENT
+                  </span>
+                </div>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-[#f8f9fa] p-4 rounded-xl border border-neutral-200/80">
                   <div className="space-y-1">
-                    <span className="text-[10px] text-[#735965] font-extrabold block">결제 수단 정보</span>
-                    <strong className="text-xs text-[#2d2026] block font-bold">
+                    <span className="text-xs text-neutral-400 font-extrabold block">결제 수단 정보</span>
+                    <strong className="text-xs text-[#0F172A] block font-black">
                       {(selectedOrder as any).payMethod === "bank" ? "무통장입금" : "신용카드 결제"}
                     </strong>
                   </div>
-                  <div className="text-left sm:text-right border-t sm:border-t-0 border-[#f2ccd7]/60 pt-3 sm:pt-0">
-                    <span className="text-[10px] text-[#735965] font-bold block">총 결제 금액 (VAT 포함)</span>
-                    <strong className="text-base font-black text-[#bf3e67]">{selectedOrder.totalPrice.toLocaleString()} 원</strong>
+                  <div className="text-left sm:text-right border-t sm:border-t-0 border-neutral-200 pt-3 sm:pt-0">
+                    <span className="text-xs text-neutral-400 font-bold block">총 결제 금액 (VAT 포함)</span>
+                    <strong className="text-lg font-black text-amber-500">{selectedOrder.totalPrice.toLocaleString()} 원</strong>
                   </div>
                 </div>
 
                 {/* 무통장입금 선택 시 계좌 입금 안내 추가 */}
                 {((selectedOrder as any).payMethod === "bank" || selectedOrder.status === "입금대기") && (
-                  <div className="bg-white border border-[#f2ccd7] p-3.5 rounded-xl space-y-2.5 text-xs mt-2">
-                    <div className="flex justify-between items-center border-b border-[#f2ccd7]/60 pb-1.5">
-                      <span className="font-extrabold text-[#bf3e67] flex items-center gap-1">
-                        <Landmark size={12} /> 무통장 입금 안내
+                  <div className="bg-[#f8f9fa] border border-neutral-200/80 p-4 rounded-xl space-y-2.5 text-xs">
+                    <div className="flex justify-between items-center border-b border-neutral-200/80 pb-2">
+                      <span className="font-black text-[#0F172A] flex items-center gap-1.5">
+                        <Landmark size={14} className="text-amber-500" /> 무통장 입금 안내
                       </span>
                       <button
                         type="button"
                         onClick={() => handleCopyToClipboard(`K뱅크 700-120-270001 (주)고우웰라이프 ${selectedOrder.totalPrice.toLocaleString()}원`, "전체 계좌 정보")}
-                        className="text-[9px] text-[#f25f8a] hover:text-[#df4977] font-bold flex items-center gap-0.5 cursor-pointer bg-[#fff9fb] px-2 py-0.5 rounded border border-[#f2ccd7]"
+                        className="text-[10px] text-[#0F172A] hover:bg-neutral-200 font-black flex items-center gap-1 cursor-pointer bg-white px-3 py-1 rounded-full transition-all border border-neutral-200"
                       >
-                        <Copy size={9} /> 전체 복사
+                        <Copy size={10} /> 전체 복사
                       </button>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[#735965] font-semibold text-[11px]">
-                      <div className="flex justify-between items-center bg-[#fff9fb] px-2.5 py-1.5 rounded-lg border border-[#f2ccd7]/30">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600 font-bold text-xs">
+                      <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-neutral-200/60">
                         <span>은행 / 예금주</span>
-                        <strong className="text-[#2d2026]">K뱅크 / (주)고우웰라이프</strong>
+                        <strong className="text-[#0F172A]">K뱅크 / (주)고우웰라이프</strong>
                       </div>
-                      <div className="flex justify-between items-center bg-[#fff9fb] px-2.5 py-1.5 rounded-lg border border-[#f2ccd7]/30">
+                      <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-neutral-200/60">
                         <span>계좌번호</span>
                         <div className="flex items-center gap-1.5">
-                          <strong className="text-[#2d2026] font-mono">700-120-270001</strong>
+                          <strong className="text-[#0F172A] font-mono">700-120-270001</strong>
                           <button
                             type="button"
                             onClick={() => handleCopyToClipboard("700-120-270001", "계좌번호")}
-                            className="p-1 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/50 rounded shrink-0 cursor-pointer"
+                            className="p-1 hover:text-[#0F172A] text-slate-400 bg-neutral-100 rounded cursor-pointer border-0"
                             title="계좌 복사"
                           >
-                            <Copy size={9} />
+                            <Copy size={11} />
                           </button>
                         </div>
                       </div>
@@ -4570,19 +5135,19 @@ export default function PortalPage() {
                 )}
               </div>
 
-              {/* Delivery Carrier Info */}
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 space-y-4">
-                <div className="flex items-center justify-between border-b border-[#f2ccd7]/50 pb-3">
-                  <span className="font-extrabold text-[#2d2026] flex items-center gap-1.5"><Truck size={14} className="text-[#f25f8a]" /> 배송 및 송장 정보</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                    selectedOrder.status === "배송완료" ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                    : selectedOrder.status === "배송중" ? "bg-blue-50 text-blue-500 border border-blue-100"
-                    : "bg-orange-50 text-orange-500 border border-orange-100"
+              {/* Delivery Carrier Info Card (Slate Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-slate-400 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <span className="font-black text-[#0F172A] flex items-center gap-1.5"><Truck size={16} className="text-slate-600" /> 배송 및 송장 정보</span>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-mono font-black ${
+                    selectedOrder.status === "배송완료" ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    : selectedOrder.status === "배송중" ? "bg-blue-50 text-blue-700 border border-blue-200"
+                    : "bg-amber-50 text-amber-700 border border-amber-200"
                   }`}>{selectedOrder.status}</span>
                 </div>
 
                 {["배송중", "배송완료"].includes(selectedOrder.status) ? (
-                  <div className="space-y-4 text-xs font-semibold">
+                  <div className="space-y-4 text-xs font-bold">
                     {/* 다중 송장 출력 */}
                     {(() => {
                       const trackingItems = selectedOrder.trackingList && selectedOrder.trackingList.length > 0
@@ -4595,18 +5160,18 @@ export default function PortalPage() {
                         return (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                              <span className="text-[10px] text-[#735965] font-extrabold block">배송 수단 / 물류 방식</span>
-                              <p className="text-[#2d2026]">
+                              <span className="text-[10px] text-neutral-400 font-extrabold block">배송 수단 / 물류 방식</span>
+                              <p className="text-[#0F172A] font-bold">
                                 120 물류 전용 냉동 저온탑차 (한진택배 위탁)
                               </p>
                             </div>
                             <div className="space-y-1">
-                              <span className="text-[10px] text-[#735965] font-extrabold block">실시간 송장 번호</span>
-                              <p className="font-mono text-[#bf3e67]">
+                              <span className="text-[10px] text-neutral-400 font-extrabold block">실시간 송장 번호</span>
+                              <p className="font-mono text-[#0F172A] font-black">
                                 {`HNJ-120-${selectedOrder.id.replace("ORD-", "")}`}
                               </p>
                             </div>
-                            <div className="sm:col-span-2 pt-2 border-t border-[#f2ccd7]/40">
+                            <div className="sm:col-span-2 pt-2 border-t border-neutral-100">
                               <button 
                                 type="button"
                                 onClick={() => {
@@ -4618,9 +5183,9 @@ export default function PortalPage() {
                                     selectedOrder.date
                                   );
                                 }}
-                                className="w-full py-2.5 rounded-xl bg-[#fff1f5] border border-[#f2ccd7] hover:bg-[#ffd3df] hover:border-[#f25f8a] text-xs font-bold text-[#bf3e67] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                                className="w-full py-3 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-md active:scale-95"
                               >
-                                배송 위치 실시간 조회하기 <ChevronRight size={13} />
+                                배송 위치 실시간 조회하기 <ChevronRight size={14} />
                               </button>
                             </div>
                           </div>
@@ -4629,16 +5194,16 @@ export default function PortalPage() {
 
                       return (
                         <div className="space-y-3">
-                          <span className="text-[10px] text-[#735965] font-extrabold block mb-1">등록된 배송 송장 ({trackingItems.length}개)</span>
+                          <span className="text-xs text-neutral-400 font-black block mb-1">등록된 배송 송장 ({trackingItems.length}개)</span>
                           <div className="grid grid-cols-1 gap-3">
                             {trackingItems.map((item, idx) => (
-                              <div key={idx} className="bg-[#fff9fb] border border-[#f2ccd7]/40 rounded-xl p-3.5 space-y-2.5 shadow-sm hover:border-[#f25f8a] transition-all">
+                              <div key={idx} className="bg-[#f8f9fa] border border-neutral-200/80 rounded-xl p-4 space-y-3 shadow-2xs">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-2">
-                                    <span className="px-2 py-0.5 rounded bg-[#fff1f5] text-[9px] font-black text-[#bf3e67] border border-[#f2ccd7]/60">
+                                    <span className="px-2.5 py-0.5 rounded-full bg-[#0F172A] text-[9px] font-black text-white">
                                       {item.courier}
                                     </span>
-                                    <span className="font-mono text-[#bf3e67] font-bold text-xs">{item.trackingNo}</span>
+                                    <span className="font-mono text-[#0F172A] font-black text-xs">{item.trackingNo}</span>
                                   </div>
                                 </div>
                                 <button 
@@ -4652,9 +5217,9 @@ export default function PortalPage() {
                                       selectedOrder.date
                                     );
                                   }}
-                                  className="w-full py-2 rounded-lg bg-white border border-[#f2ccd7]/60 hover:bg-[#fff1f5] hover:border-[#f25f8a] text-[11px] font-bold text-[#bf3e67] transition-all flex items-center justify-center gap-1 cursor-pointer"
+                                  className="w-full py-2.5 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black transition-all flex items-center justify-center gap-1 cursor-pointer border-0 shadow-xs active:scale-95"
                                 >
-                                  배송 위치 실시간 조회하기 <ChevronRight size={12} />
+                                  배송 위치 실시간 조회하기 <ChevronRight size={14} />
                                 </button>
                               </div>
                             ))}
@@ -4664,35 +5229,38 @@ export default function PortalPage() {
                     })()}
                   </div>
                 ) : (
-                  <p className="text-xs font-bold text-[#735965] leading-relaxed">
+                  <p className="text-xs font-bold text-slate-500 leading-relaxed">
                     본사 발주 접수가 정상 처리되었습니다. 현재 물류 창고에서 파이 생지 신선도 보존용 드라이아이스 및 패키징 포장 작업 중입니다. 24시간 이내 저온 정기 배송 차량으로 안전하게 출고 및 발송 조치 예정입니다.
                   </p>
                 )}
               </div>
 
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 flex justify-between items-center gap-4">
-              {["주문완료", "배송준비중", "대기"].includes(selectedOrder.status) ? (
-                <button 
-                  type="button"
-                  onClick={() => cancelOrder(selectedOrder.id)}
-                  className="px-5 py-3 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-xs font-extrabold text-red-500 transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
-                >
-                  <Trash2 size={13} />
-                  주문 취소
-                </button>
-              ) : (
-                <div />
-              )}
-              <button 
-                type="button"
-                onClick={() => closeModal(() => setSelectedOrder(null))}
-                className="px-8 py-3 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
-              >
-                상세내역 창 닫기
-              </button>
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-mono font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>ORDER RECORD</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  {["주문완료", "배송준비중", "대기"].includes(selectedOrder.status) && (
+                    <button 
+                      type="button"
+                      onClick={() => cancelOrder(selectedOrder.id)}
+                      className="px-5 py-2.5 rounded-full bg-rose-50 hover:bg-rose-100 text-xs font-black text-rose-600 transition-all cursor-pointer border border-rose-200 flex items-center gap-1.5"
+                    >
+                      <Trash2 size={14} />
+                      주문 취소
+                    </button>
+                  )}
+                  <button 
+                    type="button"
+                    onClick={() => closeModal(() => setSelectedOrder(null))}
+                    className="px-6 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-all cursor-pointer border-0 shadow-xs"
+                  >
+                    상세내역 창 닫기
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -4758,47 +5326,48 @@ export default function PortalPage() {
             }}
           >
             <div 
-              className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-2xl flex flex-col animate-scaleUp max-h-[85vh]"
+              className="w-full max-w-2xl bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col animate-scaleUp max-h-[85vh]"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
-              <div className="p-5 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-gradient-to-r from-[#fff1f5] to-white">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-[#ffd3df] rounded-xl border border-[#f2ccd7]">
-                    <Truck size={18} className="text-[#bf3e67]" />
+              {/* Yellow Header */}
+              <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shadow-xs">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-[#0F172A] rounded-full text-white">
+                    <Truck size={20} />
                   </div>
                   <div>
-                    <h3 className="text-sm sm:text-base font-black text-[#2d2026]">실시간 물류 배송 추적</h3>
-                    <p className="text-[10px] text-[#735965] font-semibold mt-0.5">
+                    <h3 className="text-base sm:text-lg font-black text-[#0F172A]">실시간 물류 배송 추적</h3>
+                    <p className="text-xs text-[#0F172A]/70 font-bold mt-0.5">
                       콜드체인 신선 배송 시스템 연동 · {trackingInfo.courier}
                     </p>
                   </div>
                 </div>
                 <button 
+                  type="button"
                   onClick={() => {
                     closeModal(() => {
                       setTrackingModalOpen(false);
                       setTrackingInfo(null);
                     });
                   }}
-                  className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 cursor-pointer transition-all"
+                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer shrink-0"
                 >
-                  <X size={15} />
+                  <X size={18} />
                 </button>
               </div>
 
               {/* Body */}
-              <div className="p-6 overflow-y-auto space-y-6 flex flex-col flex-1 text-xs sm:text-sm min-h-[300px]">
+              <div className="p-6 sm:p-8 overflow-y-auto space-y-6 flex flex-col flex-1 text-xs sm:text-sm min-h-[300px]">
                 {apiTrackingLoading ? (
                   <div className="flex flex-col items-center justify-center space-y-4 text-center my-auto py-12 animate-fadeIn flex-1">
                     <div className="relative">
                       {/* Loading Spinner Ring */}
-                      <div className="w-16 h-16 rounded-full border-4 border-[#fff1f5] border-t-[#f25f8a] animate-spin"></div>
-                      <Truck size={24} className="text-[#bf3e67] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-bounce" />
+                      <div className="w-16 h-16 rounded-full border-4 border-slate-100 border-t-[#F5AC00] animate-spin"></div>
+                      <Truck size={24} className="text-[#0F172A] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-bounce" />
                     </div>
                     <div>
-                      <h4 className="font-extrabold text-[#2d2026] text-sm">실시간 택배 전산망 연결 중</h4>
-                      <p className="text-[10px] text-[#735965] font-bold mt-1.5 max-w-[320px] leading-relaxed">
+                      <h4 className="font-black text-[#0F172A] text-sm">실시간 택배 전산망 연결 중</h4>
+                      <p className="text-xs text-slate-500 font-bold mt-1.5 max-w-[320px] leading-relaxed">
                         {trackingInfo.courier} 서버에 다이렉트로 접속하여 기사님 위치 및 상세 이동 정보를 실시간으로 가져오는 중입니다. 잠시만 기다려주세요!
                       </p>
                     </div>
@@ -4806,41 +5375,41 @@ export default function PortalPage() {
                 ) : (
                   <>
                     {/* Delivery Basic Specs */}
-                    <div className="bg-[#fff9fb] border border-[#f2ccd7] rounded-xl p-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-semibold">
+                    <div className="bg-[#F8FAFC] border-0 rounded-2xl p-5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-bold">
                       <div>
-                        <span className="text-[10px] text-[#735965] font-extrabold block">발주 코드</span>
-                        <span className="font-mono text-[#2d2026]">{trackingInfo.orderId}</span>
+                        <span className="text-[10px] text-slate-400 font-extrabold block">발주 코드</span>
+                        <span className="font-mono text-[#0F172A] font-bold">{trackingInfo.orderId}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-[#735965] font-extrabold block">운송장 번호</span>
-                        <span className="font-mono text-[#bf3e67] font-black">{trackingInfo.trackingNo}</span>
+                        <span className="text-[10px] text-slate-400 font-extrabold block">운송장 번호</span>
+                        <span className="font-mono text-[#0F172A] font-black">{trackingInfo.trackingNo}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-[#735965] font-extrabold block">배송 수단</span>
-                        <span className="text-[#2d2026]">{trackingInfo.courier}</span>
+                        <span className="text-[10px] text-slate-400 font-extrabold block">배송 수단</span>
+                        <span className="text-[#0F172A]">{trackingInfo.courier}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-[#735965] font-extrabold block">현재 상태</span>
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-black ${
-                          trackingInfo.status === "배송완료" ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                          : trackingInfo.status === "배송중" ? "bg-blue-50 text-blue-500 border border-blue-100"
-                          : "bg-orange-50 text-orange-500 border border-orange-100"
+                        <span className="text-[10px] text-slate-400 font-extrabold block">현재 상태</span>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${
+                          trackingInfo.status === "배송완료" ? "bg-emerald-100 text-emerald-700"
+                          : trackingInfo.status === "배송중" ? "bg-blue-100 text-blue-700"
+                          : "bg-amber-100 text-amber-700"
                         }`}>{apiTrackingData ? apiTrackingData.state.text : trackingInfo.status}</span>
                       </div>
                     </div>
 
                     {/* Progress bar */}
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between text-xs font-black text-[#2d2026]">
+                      <div className="flex items-center justify-between text-xs font-black text-[#0F172A]">
                         <span>배송 진행 상태</span>
-                        <span className="text-[#bf3e67]">{Math.round((trackingData.currentStep / 4) * 100)}% 진행</span>
+                        <span className="text-[#0F172A]">{Math.round((trackingData.currentStep / 4) * 100)}% 진행</span>
                       </div>
 
                       {/* Horizontal visual line */}
                       <div className="relative pt-4 pb-2">
-                        <div className="absolute left-6 right-6 top-[28px] h-1 bg-[#f2ccd7]/40 rounded-full z-0">
+                        <div className="absolute left-6 right-6 top-[28px] h-1.5 bg-slate-200 rounded-full z-0">
                           <div 
-                            className="h-full bg-[#f25f8a] rounded-full transition-all duration-1000"
+                            className="h-full bg-[#F5AC00] rounded-full transition-all duration-1000"
                             style={{ width: `${(trackingData.currentStep / 4) * 100}%` }}
                           ></div>
                         </div>
@@ -4852,14 +5421,14 @@ export default function PortalPage() {
                             return (
                               <div key={idx} className="flex flex-col items-center text-center space-y-1.5 flex-1">
                                 <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${
-                                  isCompleted ? "bg-[#f25f8a] border-[#f25f8a] text-white shadow-sm"
-                                  : isCurrent ? "bg-white border-[#f25f8a] text-[#f25f8a] scale-110 ring-4 ring-[#fff1f5]"
-                                  : "bg-white border-[#f2ccd7] text-[#735965]"
+                                  isCompleted ? "bg-[#F5AC00] border-[#F5AC00] text-[#0F172A] font-black shadow-xs"
+                                  : isCurrent ? "bg-white border-[#F5AC00] text-[#0F172A] scale-110 ring-4 ring-amber-100 font-black"
+                                  : "bg-white border-slate-300 text-slate-400"
                                 }`}>
                                   {isCompleted ? <Check size={12} className="stroke-[3]" /> : <span className="text-[10px] font-black">{idx + 1}</span>}
                                 </div>
                                 <span className={`text-[10px] font-black ${
-                                  isCompleted || isCurrent ? "text-[#bf3e67]" : "text-[#735965]"
+                                  isCompleted || isCurrent ? "text-[#0F172A]" : "text-slate-400"
                                 }`}>{step.title}</span>
                               </div>
                             );
@@ -4869,39 +5438,39 @@ export default function PortalPage() {
                     </div>
 
                     {/* Friendly Notice Box */}
-                    <div className="p-3.5 bg-[#fff1f5]/40 border border-[#f2ccd7]/60 rounded-xl text-[11px] font-semibold text-[#735965] leading-relaxed flex gap-2">
+                    <div className="p-4 bg-[#F8FAFC] border-0 rounded-2xl text-xs font-bold text-slate-600 leading-relaxed flex gap-2.5">
                       <div className="text-base shrink-0">📢</div>
                       <p>
-                        본 물류 정보는 {apiTrackingData ? <strong>{trackingInfo.courier} 공식 서버망</strong> : <strong>에그120 콜드체인 실시간 관제 시스템</strong>}과 100% 연동된 신뢰할 수 있는 실시간 데이터입니다. 신선 파이 생지 및 원재료의 최상 신선도를 위해 <strong>영하 18도의 친환경 초저온 차량</strong>으로 안전하게 이송되고 있으니 편히 안심하셔도 좋습니다.
+                        본 물류 정보는 {apiTrackingData ? <strong>{trackingInfo.courier} 공식 서버망</strong> : <strong>120콜드체인 실시간 관제 시스템</strong>}과 100% 연동된 신뢰할 수 있는 실시간 데이터입니다. 신선 파이 생지 및 원재료의 최상 신선도를 위해 <strong>영하 18도의 친환경 초저온 차량</strong>으로 안전하게 이송되고 있으니 편히 안심하셔도 좋습니다.
                       </p>
                     </div>
 
                     {/* Checkpoints */}
                     <div className="space-y-3">
-                      <h4 className="font-extrabold text-[#2d2026] flex items-center gap-1.5"><ClipboardList size={14} className="text-[#f25f8a]" /> 시간대별 배송 현황</h4>
-                      <div className="relative border-l border-[#f2ccd7] ml-2 pl-4 space-y-5 py-1">
+                      <h4 className="font-black text-[#0F172A] flex items-center gap-1.5"><ClipboardList size={16} className="text-[#F5AC00]" /> 시간대별 배송 현황</h4>
+                      <div className="relative border-l-2 border-slate-200 ml-2.5 pl-4 space-y-5 py-1">
                         {trackingData.checkpoints.map((cp, idx) => {
                           const isFirst = idx === 0;
                           return (
                             <div key={idx} className="relative">
                               {/* Dot on line */}
-                              <div className={`absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full border-2 ${
-                                isFirst ? "bg-[#f25f8a] border-white ring-4 ring-[#fff1f5]" : "bg-white border-[#f2ccd7]"
+                              <div className={`absolute -left-[21px] top-1.5 w-3 h-3 rounded-full border-2 ${
+                                isFirst ? "bg-[#F5AC00] border-white ring-4 ring-amber-100" : "bg-white border-slate-300"
                               }`} />
                               
                               <div className="space-y-1">
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <span className="text-[10px] font-mono text-[#735965] font-bold">{cp.time}</span>
-                                  <span className="text-[10px] text-[#bf3e67] font-black bg-[#fff1f5] border border-[#f2ccd7] px-1.5 py-0.5 rounded">
+                                  <span className="text-[10px] font-mono text-slate-400 font-bold">{cp.time}</span>
+                                  <span className="text-[10px] text-[#0F172A] font-black bg-[#F8FAFC] px-2 py-0.5 rounded-full">
                                     {cp.location}
                                   </span>
-                                  <span className={`text-[9px] font-black px-1 rounded ${
+                                  <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
                                     cp.status === "배송완료" || cp.status === "배달완료" ? "bg-emerald-100 text-emerald-700"
                                     : cp.status === "배송출발" || cp.status === "배송출고" ? "bg-blue-100 text-blue-700"
-                                    : "bg-[#f2ccd7]/40 text-[#735965]"
+                                    : "bg-slate-100 text-slate-600"
                                   }`}>{cp.status}</span>
                                 </div>
-                                <p className="text-xs font-bold text-[#2d2026] leading-relaxed pl-0.5">
+                                <p className="text-xs font-bold text-[#0F172A] leading-relaxed pl-0.5">
                                   {cp.desc}
                                 </p>
                               </div>
@@ -4915,7 +5484,7 @@ export default function PortalPage() {
               </div>
 
               {/* Footer */}
-              <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 flex gap-3">
+              <div className="p-4 border-t border-slate-100 bg-[#F8FAFC] flex gap-3">
                 <button 
                   type="button"
                   onClick={() => {
@@ -4929,9 +5498,9 @@ export default function PortalPage() {
                     const url = urlMap[trackingInfo.courier] || `https://www.hanjin.com/ko/delivery/delivery/tracking.do?wblnum=${trackingInfo.trackingNo}`;
                     window.open(url, "_blank");
                   }}
-                  className="flex-1 py-3 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 rounded-full bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 transition-all cursor-pointer border-0 flex items-center justify-center gap-1.5 shadow-2xs"
                 >
-                  <ExternalLink size={13} /> 공식 택배사에서 확인하기
+                  <ExternalLink size={14} /> 공식 택배사에서 확인하기
                 </button>
                 <button 
                   type="button"
@@ -4941,7 +5510,7 @@ export default function PortalPage() {
                       setTrackingInfo(null);
                     });
                   }}
-                  className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#f25f8a] to-[#bf3e67] text-white text-xs font-extrabold shadow-md hover:opacity-90 transition-all cursor-pointer"
+                  className="px-8 py-2.5 rounded-full bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black shadow-md transition-all cursor-pointer border-0"
                 >
                   닫기
                 </button>
@@ -4951,54 +5520,55 @@ export default function PortalPage() {
         );
       })()}
 
-      {/* 6. Product Details Modal */}
+      {/* 6. Product Details Modal (Yellow Header, border-0, Clean Style) */}
       {selectedProductDetail && (
         <div 
           className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setSelectedProductDetail(null)}
         >
           <div 
-            className="w-full max-w-3xl bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-lg max-h-[85vh] flex flex-col animate-scaleUp"
+            className="w-full max-w-3xl bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl max-h-[85vh] flex flex-col animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
-            <div className="p-5 sm:p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
+            {/* Yellow Header */}
+            <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shadow-xs">
               <div className="flex-1">
-                <h3 className="text-sm sm:text-base font-black text-[#2d2026] flex items-center gap-2">
-                  <span className="bg-[#ffd3df] text-[#bf3e67] text-[10px] font-black px-2 py-0.5 rounded border border-[#f2ccd7]">
+                <h3 className="text-base sm:text-lg font-black text-[#0F172A] flex items-center gap-2">
+                  <span className="bg-[#0F172A] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full">
                     {selectedProductDetail.category}
                   </span>
                   <span>{selectedProductDetail.name} 상세 정보</span>
                 </h3>
               </div>
               <button 
+                type="button"
                 onClick={() => closeModal(() => setSelectedProductDetail(null))} 
-                className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0"
+                className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer shrink-0 ml-4"
               >
-                <X size={15} />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
               
               {/* Product Core Info: Thumbnail & Spec Table */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 {/* 1. Thumbnail Image */}
-                <div className="md:col-span-5 border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm bg-[#fff1f5]/30 aspect-square flex items-center justify-center relative w-full">
+                <div className="md:col-span-5 border border-[#EEF0F5] rounded-2xl overflow-hidden shadow-2xs bg-white aspect-square flex items-center justify-center relative w-full">
                   <img 
                     src={optimizeCloudinaryUrl(selectedProductDetail.img)} 
                     alt={selectedProductDetail.name} 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain p-4"
                   />
                   {selectedProductDetail.labels && selectedProductDetail.labels.length > 0 && (
                     <div className="absolute top-4 right-4 flex flex-wrap gap-1 w-fit justify-end">
                       {selectedProductDetail.labels.map((l: string) => {
-                        let bgStyle = "bg-neutral-500/90 text-white";
-                        if (l === "BEST") bgStyle = "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm font-black";
-                        else if (l === "추천") bgStyle = "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm font-black";
-                        else if (l === "신제품") bgStyle = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-black";
+                        let bgStyle = "bg-slate-700 text-white";
+                        if (l === "BEST") bgStyle = "bg-[#F5AC00] text-[#0F172A] font-black";
+                        else if (l === "추천") bgStyle = "bg-indigo-600 text-white font-black";
+                        else if (l === "신제품") bgStyle = "bg-emerald-600 text-white font-black";
                         return (
-                          <span key={l} className={`font-bold text-[9px] px-2 py-0.5 rounded shadow-sm ${bgStyle}`}>
+                          <span key={l} className={`font-bold text-[9px] px-2.5 py-0.5 rounded-full shadow-2xs ${bgStyle}`}>
                             {l}
                           </span>
                         );
@@ -5008,67 +5578,67 @@ export default function PortalPage() {
                 </div>
 
                 {/* 2. Spec Table */}
-                <div className="md:col-span-7 bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm flex flex-col w-full">
-                  <div className="px-4 py-2.5 bg-[#fff1f5]/30 border-b border-[#f2ccd7]/50 shrink-0">
-                    <span className="font-extrabold text-[#2d2026]">품목 기본 명세 규격표</span>
+                <div className="md:col-span-7 bg-white border-0 rounded-2xl overflow-hidden shadow-2xs flex flex-col w-full">
+                  <div className="px-5 py-3.5 bg-[#F8FAFC] border-b border-slate-100 shrink-0">
+                    <span className="font-black text-[#0F172A] text-xs">품목 기본 명세 규격표</span>
                   </div>
                   <table className="w-full text-left border-collapse table-fixed">
-                    <tbody className="divide-y divide-[#f2ccd7]/40 text-xs text-[#2d2026]">
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965] w-[100px]">제품명</td>
-                        <td className="px-4 py-2 font-bold text-neutral-800 break-all">{selectedProductDetail.name}</td>
+                    <tbody className="divide-y divide-slate-100 text-xs text-[#0F172A] font-bold">
+                      <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
+                        <td className="px-4 py-3 bg-[#F8FAFC] font-extrabold text-slate-400 w-[100px]">제품명</td>
+                        <td className="px-4 py-3 font-extrabold text-[#0F172A] break-all">{selectedProductDetail.name}</td>
                       </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">카테고리</td>
-                        <td className="px-4 py-2">
-                          <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-bold px-2 py-0.5 rounded border border-[#f2ccd7]">
+                      <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
+                        <td className="px-4 py-3 bg-[#F8FAFC] font-extrabold text-slate-400">카테고리</td>
+                        <td className="px-4 py-3">
+                          <span className="bg-[#0F172A] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full">
                             {selectedProductDetail.category}
                           </span>
                         </td>
                       </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">발주 규격</td>
-                        <td className="px-4 py-2 font-semibold text-[#f25f8a]">{selectedProductDetail.packSize}</td>
+                      <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
+                        <td className="px-4 py-3 bg-[#F8FAFC] font-extrabold text-slate-400">발주 규격</td>
+                        <td className="px-4 py-3 font-black text-[#0F172A]">{selectedProductDetail.packSize}</td>
                       </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">제품 식별코드</td>
-                        <td className="px-4 py-2 font-mono font-bold text-[#735965]">{selectedProductDetail.id}</td>
+                      <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
+                        <td className="px-4 py-3 bg-[#F8FAFC] font-extrabold text-slate-400">제품 식별코드</td>
+                        <td className="px-4 py-3 font-mono font-bold text-slate-500">{selectedProductDetail.id}</td>
                       </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">공급 단가</td>
-                        <td className="px-4 py-2 font-black text-[#bf3e67]">{selectedProductDetail.price.toLocaleString()} 원</td>
+                      <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
+                        <td className="px-4 py-3 bg-[#F8FAFC] font-extrabold text-slate-400">공급 단가</td>
+                        <td className="px-4 py-3 font-black text-[#0F172A]">{selectedProductDetail.price.toLocaleString()} 원</td>
                       </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">배송 정책</td>
-                        <td className="px-4 py-2">
+                      <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
+                        <td className="px-4 py-3 bg-[#F8FAFC] font-extrabold text-slate-400">배송 정책</td>
+                        <td className="px-4 py-3">
                           {(() => {
                             const type = selectedProductDetail.shippingType || "A";
                             if (type === "free") {
                               return (
-                                <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2.5 py-1 rounded-full border border-emerald-200">
+                                <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2.5 py-0.5 rounded-full">
                                   무료 배송
                                 </span>
                               );
                             }
                             if (type === "BOX") {
                               return (
-                                <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-black px-2.5 py-1 rounded-full border border-[#f2ccd7]">
+                                <span className="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-0.5 rounded-full">
                                   BOX타입 (10개당 {shippingFeeBox?.toLocaleString()}원)
                                 </span>
                               );
                             }
                             const feeMap: Record<string, number> = { A: shippingFeeA, B: shippingFeeB, C: shippingFeeC };
                             return (
-                              <span className="bg-[#fff1f5] text-[#bf3e67] text-[10px] font-black px-2.5 py-1 rounded-full border border-[#f2ccd7]">
+                              <span className="bg-slate-100 text-slate-700 text-[10px] font-black px-2.5 py-0.5 rounded-full">
                                 {type}타입 ({feeMap[type]?.toLocaleString()}원)
                               </span>
                             );
                           })()}
                         </td>
                       </tr>
-                      <tr className="hover:bg-[#fff9fb]/40 transition-colors">
-                        <td className="px-4 py-2 bg-[#fff1f5]/20 font-bold text-[#735965]">품목 정보 설명</td>
-                        <td className="px-4 py-2 font-medium text-[#735965] leading-relaxed break-words">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
+                      <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
+                        <td className="px-4 py-3 bg-[#F8FAFC] font-extrabold text-slate-400">품목 정보 설명</td>
+                        <td className="px-4 py-3 font-bold text-slate-600 leading-relaxed break-words">{selectedProductDetail.desc || "등록된 상세 설명이 없습니다."}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -5078,9 +5648,9 @@ export default function PortalPage() {
               {/* 3. Detailed Page (If available) */}
               {(selectedProductDetail.detailImg || selectedProductDetail.detailText) && (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-[#f2ccd7]/60 pb-2">
-                    <span className="w-1.5 h-3.5 rounded-full bg-[#f25f8a]"></span>
-                    <span className="font-extrabold text-[#2d2026] text-xs sm:text-sm">🔍 제품 상세 정보 안내</span>
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                    <span className="w-2 h-4 rounded-full bg-[#F5AC00]"></span>
+                    <span className="font-black text-[#0F172A] text-xs sm:text-sm">🔍 제품 상세 정보 안내</span>
                   </div>
                   
                   {/* Rich Text / HTML Description */}
@@ -5105,7 +5675,7 @@ export default function PortalPage() {
                         .rich-content-view font[size="6"] { font-size: 24px !important; }
                       `}</style>
                       <div 
-                        className="border border-[#f2ccd7] rounded-xl p-5 bg-[#fff9fb]/10 shadow-sm text-xs sm:text-sm text-[#2d2026] leading-relaxed whitespace-normal break-words overflow-x-auto min-h-[80px] rich-content-view"
+                        className="border-0 rounded-2xl p-6 bg-[#F8FAFC] shadow-2xs text-xs sm:text-sm text-[#0F172A] leading-relaxed whitespace-normal break-words overflow-x-auto min-h-[80px] rich-content-view"
                         dangerouslySetInnerHTML={{ __html: selectedProductDetail.detailText }}
                       />
                     </div>
@@ -5113,11 +5683,11 @@ export default function PortalPage() {
 
                   {/* Detail Image */}
                   {selectedProductDetail.detailImg && (
-                    <div className="border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm bg-neutral-50 flex items-center justify-center p-2 min-h-[200px]">
+                    <div className="border-0 rounded-2xl overflow-hidden shadow-2xs bg-[#F8FAFC] flex items-center justify-center p-3 min-h-[200px]">
                       <img 
                         src={optimizeCloudinaryUrl(selectedProductDetail.detailImg)} 
                         alt={`${selectedProductDetail.name} 상세페이지`} 
-                        className="w-full h-auto object-contain rounded-lg"
+                        className="w-full h-auto object-contain rounded-xl"
                       />
                     </div>
                   )}
@@ -5125,19 +5695,19 @@ export default function PortalPage() {
               )}
 
               {/* Delivery and Return Policy Pastels Cards */}
-              <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-4">
                 
                 {/* Delivery policy card */}
-                <div className="bg-[#fff9fb] border border-[#f2ccd7] rounded-xl p-6 sm:p-7 space-y-3.5 shadow-sm">
-                  <div className="flex items-center gap-2 border-b border-[#f2ccd7]/60 pb-2.5">
-                    <Truck size={16} className="text-[#f25f8a]" />
-                    <span className="font-extrabold text-[#2d2026] text-sm">🚚 본사 물류 배송 정책</span>
+                <div className="bg-[#F8FAFC] border-0 rounded-2xl p-6 space-y-3.5 shadow-2xs">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                    <Truck size={18} className="text-[#F5AC00]" />
+                    <span className="font-black text-[#0F172A] text-sm">🚚 본사 물류 배송 정책</span>
                   </div>
-                  <div className="text-xs text-[#735965] font-semibold leading-relaxed space-y-3">
+                  <div className="text-xs text-slate-600 font-bold leading-relaxed space-y-3">
                     <p className="whitespace-pre-line">{shippingPolicy || "본사 물류 전용 저온 냉동 탑차로 안전하게 직배송됩니다."}</p>
                     
-                    <div className="pt-3 border-t border-[#f2ccd7]/40">
-                      <div className="text-[11px] text-[#bf3e67] font-black flex items-center gap-1.5">
+                    <div className="pt-3 border-t border-slate-200">
+                      <div className="text-xs text-[#0F172A] font-black flex items-center gap-1.5">
                         <span>💡</span>
                         <span>배송비 안내: 일반 품목(A/B/C)은 품목별 최고가가 1회 부과되며, BOX 품목은 10개당 설정된 요금이 합산 부과됩니다.</span>
                       </div>
@@ -5146,12 +5716,12 @@ export default function PortalPage() {
                 </div>
 
                 {/* Return policy card */}
-                <div className="bg-[#fffdf9] border border-amber-200 rounded-xl p-6 sm:p-7 space-y-3.5 shadow-sm">
-                  <div className="flex items-center gap-2 border-b border-amber-200/60 pb-2.5">
-                    <ArrowRightLeft size={16} className="text-amber-500" />
-                    <span className="font-extrabold text-[#2d2026] text-sm">🔄 교환 및 반품 규정 안내</span>
+                <div className="bg-[#F8FAFC] border-0 rounded-2xl p-6 space-y-3.5 shadow-2xs">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                    <ArrowRightLeft size={18} className="text-[#F5AC00]" />
+                    <span className="font-black text-[#0F172A] text-sm">🔄 교환 및 반품 규정 안내</span>
                   </div>
-                  <div className="text-xs text-[#735965] font-semibold leading-relaxed whitespace-pre-line">
+                  <div className="text-xs text-slate-600 font-bold leading-relaxed whitespace-pre-line">
                     {returnPolicy || "식재료 특성상 단순 변심으로 인한 반품은 불가하며, 오배송 건은 수령 즉시 본사 접수 바랍니다."}
                   </div>
                 </div>
@@ -5161,18 +5731,18 @@ export default function PortalPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 flex flex-col gap-4">
+            <div className="p-6 border-t border-slate-100 bg-[#F8FAFC] flex flex-col gap-4">
               {/* Option / Quantity Control Area */}
               <div className="flex flex-col gap-3">
                 {selectedProductDetail.options && selectedProductDetail.options.length > 0 ? (
                   <div className="space-y-3">
                     {/* Option Select Dropdown & Add Button */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-[#2d2026] text-xs shrink-0">옵션 선택 *</span>
+                      <span className="font-extrabold text-[#0F172A] text-xs shrink-0">옵션 선택 *</span>
                       <select
                         value={selectedProductOption}
                         onChange={(e) => setSelectedProductOption(e.target.value)}
-                        className="flex-1 max-w-xs bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs font-bold text-[#2d2026] focus:outline-none cursor-pointer"
+                        className="flex-1 max-w-xs bg-[#F1F5F9] border-0 rounded-2xl px-4 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50 cursor-pointer"
                       >
                         <option value="">-- 필수 옵션을 선택하세요 --</option>
                         {selectedProductDetail.options.map((opt: string) => (
@@ -5200,7 +5770,7 @@ export default function PortalPage() {
                           }
                           setSelectedProductOption(""); // Reset select choice
                         }}
-                        className="px-4 py-2.5 rounded-xl bg-[#ffd3df] hover:bg-[#ffd3df]/80 text-[#bf3e67] text-xs font-extrabold transition-all shadow-sm"
+                        className="px-5 py-2.5 rounded-full bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black transition-all shadow-md border-0 cursor-pointer"
                       >
                         옵션 추가
                       </button>
@@ -5208,14 +5778,14 @@ export default function PortalPage() {
 
                     {/* Selected Options List */}
                     {localSelectedOptions.length > 0 && (
-                      <div className="bg-white border border-[#f2ccd7] rounded-xl p-3 space-y-2.5 max-h-[160px] overflow-y-auto shadow-inner">
-                        <span className="text-[10px] text-[#bf3e67] font-black block">선택된 옵션 목록</span>
+                      <div className="bg-white border-0 rounded-2xl p-4 space-y-2.5 max-h-[160px] overflow-y-auto shadow-2xs">
+                        <span className="text-[10px] text-slate-400 font-black block uppercase tracking-wider">선택된 옵션 목록</span>
                         {localSelectedOptions.map((item, idx) => (
-                          <div key={idx} className="flex items-center justify-between gap-3 bg-[#fff9fb] border border-[#f2ccd7]/60 p-2.5 rounded-lg text-xs font-bold text-[#2d2026]">
+                          <div key={idx} className="flex items-center justify-between gap-3 bg-[#F8FAFC] border-0 p-3 rounded-xl text-xs font-bold text-[#0F172A]">
                             <span className="truncate flex-1 pr-2">{item.optionName}</span>
                             <div className="flex items-center gap-3 shrink-0">
                               {/* Option Qty Controller */}
-                              <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
+                              <div className="flex items-center bg-white rounded-full p-1 border-0 shadow-2xs">
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -5226,11 +5796,11 @@ export default function PortalPage() {
                                       )
                                     );
                                   }}
-                                  className="p-1 hover:text-[#bf3e67] text-[#735965]/70 transition-colors"
+                                  className="p-1 hover:text-[#0F172A] text-slate-400 transition-colors border-0"
                                 >
                                   <Minus size={12} />
                                 </button>
-                                <span className="px-2 text-[10px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
+                                <span className="px-2 text-xs font-black text-[#0F172A] w-5 text-center">{item.quantity}</span>
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -5240,7 +5810,7 @@ export default function PortalPage() {
                                       )
                                     );
                                   }}
-                                  className="p-1 hover:text-[#bf3e67] text-[#735965]/70 transition-colors"
+                                  className="p-1 hover:text-[#0F172A] text-slate-400 transition-colors border-0"
                                 >
                                   <Plus size={12} />
                                 </button>
@@ -5252,9 +5822,9 @@ export default function PortalPage() {
                                   setLocalSelectedOptions(localSelectedOptions.filter((o) => o.optionName !== item.optionName));
                                   triggerToast(`'${item.optionName}' 옵션을 목록에서 제거했습니다.`);
                                 }}
-                                className="text-[#735965]/60 hover:text-red-500 transition-colors p-1"
+                                className="text-slate-400 hover:text-rose-600 transition-colors p-1 border-0"
                               >
-                                <X size={14} />
+                                <X size={16} />
                               </button>
                             </div>
                           </div>
@@ -5265,23 +5835,23 @@ export default function PortalPage() {
                 ) : (
                   /* Optionless Qty Controller */
                   <div className="flex items-center gap-3">
-                    <span className="font-bold text-[#2d2026] text-xs shrink-0">발주 수량 설정</span>
-                    <div className="flex items-center border border-[#f2ccd7] bg-white rounded-xl p-1">
+                    <span className="font-extrabold text-[#0F172A] text-xs shrink-0">발주 수량 설정</span>
+                    <div className="flex items-center bg-white rounded-full p-1.5 border-0 shadow-2xs">
                       <button
                         type="button"
                         onClick={() => {
                           if (localSingleQty <= 1) return;
                           setLocalSingleQty(localSingleQty - 1);
                         }}
-                        className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
+                        className="p-1 hover:text-[#0F172A] text-slate-400 transition-colors border-0"
                       >
                         <Minus size={14} />
                       </button>
-                      <span className="px-4 text-xs font-bold text-[#2d2026] w-8 text-center">{localSingleQty}</span>
+                      <span className="px-4 text-xs font-black text-[#0F172A] w-8 text-center">{localSingleQty}</span>
                       <button
                         type="button"
                         onClick={() => setLocalSingleQty(localSingleQty + 1)}
-                        className="p-1 hover:text-[#bf3e67] text-[#735965] transition-colors"
+                        className="p-1 hover:text-[#0F172A] text-slate-400 transition-colors border-0"
                       >
                         <Plus size={14} />
                       </button>
@@ -5291,8 +5861,8 @@ export default function PortalPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-[#f2ccd7]/60">
-                <span className="text-[11px] font-bold text-[#735965] hidden sm:inline">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-slate-200">
+                <span className="text-xs font-bold text-slate-400 hidden sm:inline">
                   발주 규격을 다시 한 번 정밀 확인 후 신중히 진행해 주세요.
                 </span>
                 <div className="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
@@ -5300,7 +5870,7 @@ export default function PortalPage() {
                     <button
                       type="button"
                       disabled
-                      className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-neutral-200 text-neutral-400 text-xs font-extrabold transition-all cursor-not-allowed flex items-center justify-center gap-1.5"
+                      className="flex-1 sm:flex-none px-7 py-3 rounded-full bg-slate-200 text-slate-400 text-xs font-black transition-all cursor-not-allowed flex items-center justify-center gap-1.5 border-0"
                     >
                       일시품절 (주문 불가)
                     </button>
@@ -5322,16 +5892,16 @@ export default function PortalPage() {
                         }
                         closeModal(() => setSelectedProductDetail(null));
                       }}
-                      className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-extrabold transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                      className="flex-1 sm:flex-none px-8 py-3 rounded-full bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5 border-0"
                     >
-                      <ShoppingBag size={14} />
+                      <ShoppingBag size={16} />
                       장바구니 담기
                     </button>
                   )}
                   <button 
                     type="button"
                     onClick={() => closeModal(() => setSelectedProductDetail(null))}
-                    className="px-6 py-3 rounded-xl bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] text-xs font-extrabold text-[#735965] transition-all cursor-pointer shadow-sm"
+                    className="px-7 py-3 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-all cursor-pointer border-0"
                   >
                     닫기
                   </button>
@@ -5342,104 +5912,119 @@ export default function PortalPage() {
         </div>
       )}
 
-      {/* 발주 장바구니 상세 및 결제 모달 (Side Cart -> Checkout Modal Flow) */}
+      {/* 발주 장바구니 상세 및 결제 모달 (Yellow Header, border-0, Clean Style) */}
       {showCheckoutModal && (
         <div 
-          className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowCheckoutModal(false)}
         >
           <div 
-            className="w-full max-w-4xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-scaleIn"
+            className="w-full max-w-4xl bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
-            <div className="p-5 border-b border-[#f2ccd7]/60 flex items-center justify-between bg-[#fff1f5]/80">
-              <div className="flex items-center gap-2">
-                <ShoppingBag size={18} className="text-[#f25f8a]" />
-                <h4 className="text-base font-black text-[#2d2026]">
+            {/* Yellow Header */}
+            <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex items-center justify-between shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <ShoppingBag size={20} className="text-[#0F172A]" />
+                <h4 className="text-base sm:text-lg font-black text-[#0F172A]">
                   발주 장바구니 및 결제 ({cart.reduce((sum, item) => sum + item.quantity, 0)}개)
                 </h4>
               </div>
               <div className="flex items-center gap-2">
                 {cart.length > 0 && (
                   <button 
+                    type="button"
                     onClick={() => {
                       clearCart();
                       setShowCheckoutModal(false);
                     }} 
-                    className="text-[11px] font-bold text-[#735965] hover:text-red-500 transition-colors flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-[#f2ccd7]"
+                    className="text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer bg-white px-3 py-1.5 rounded-full border-0 shadow-2xs"
                   >
-                    <Trash2 size={12} /> 비우기
+                    <Trash2 size={13} /> 비우기
                   </button>
                 )}
                 <button 
+                  type="button"
                   onClick={() => setShowCheckoutModal(false)} 
-                  className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer"
+                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer"
                 >
-                  <X size={15} />
+                  <X size={18} />
                 </button>
               </div>
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 sm:p-8">
               {cart.length === 0 ? (
                 <div className="py-20 text-center space-y-3">
-                  <ShoppingBag size={48} className="text-[#f2ccd7] mx-auto" />
-                  <p className="text-sm text-[#735965] font-bold">
+                  <ShoppingBag size={48} className="text-slate-300 mx-auto" />
+                  <p className="text-sm text-slate-500 font-black">
                     장바구니가 비어 있습니다.
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                   {/* Left Column: Items List & Address & Payment */}
                   <div className="lg:col-span-7 space-y-6">
                     
                     {/* 1. 발주 품목 확인 */}
                     <div className="space-y-3">
-                      <span className="font-extrabold text-xs text-[#2d2026] flex items-center gap-1.5 border-b border-[#f2ccd7]/60 pb-1.5">
-                        <CheckCircle2 size={14} className="text-[#f25f8a]" /> 발주 품목 확인
+                      <span className="font-black text-xs text-[#0F172A] flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                        <CheckCircle2 size={16} className="text-[#F5AC00]" /> 발주 품목 확인
                       </span>
                       
-                      <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+                      <div className="space-y-3 max-h-[240px] overflow-y-auto pr-1">
                         {groupedCartItems.map(([typeKey, group]) => (
                           <div key={typeKey} className="space-y-2">
-                            <div className="flex justify-between items-center bg-[#ffd3df]/30 px-2 py-1 rounded-md border border-[#f2ccd7]/40 select-none">
-                              <span className="font-extrabold text-[10px] text-[#bf3e67]">{group.title}</span>
+                            <div className="flex justify-between items-center bg-[#F8FAFC] px-3 py-1.5 rounded-xl border-0 select-none">
+                              <span className="font-black text-xs text-[#0F172A]">{group.title}</span>
                               {group.feeLabel && (
-                                <span className="text-[9px] text-[#735965] font-black">
+                                <span className="text-[10px] text-slate-500 font-bold">
                                   배송비: {group.feeLabel}
                                 </span>
                               )}
                             </div>
                             
-                            <div className="space-y-1.5">
+                            <div className="space-y-2">
                               {group.items.map((item) => {
                                 const p = (products || []).find((prod) => prod.id === item.productId);
                                 if (!p) return null;
                                 return (
-                                  <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7]/40 p-2.5 rounded-xl">
-                                    <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                                  <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border-0 shadow-2xs p-3 rounded-2xl">
+                                    <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
                                     <div className="flex-1 min-w-0">
-                                      <h4 className="font-bold text-[11px] text-[#2d2026] truncate">{p.name}</h4>
+                                      <h4 className="font-black text-xs text-[#0F172A] truncate">{p.name}</h4>
                                       {item.selectedOption && (
-                                        <span className="text-[9px] text-[#bf3e67] font-black block mt-0.5 select-none">
+                                        <span className="text-[10px] text-slate-500 font-bold block mt-0.5 select-none">
                                           [옵션: {item.selectedOption}]
                                         </span>
                                       )}
-                                      <span className="text-[9px] text-[#735965] font-semibold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
+                                      <span className="text-[10px] text-slate-400 font-bold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
                                     </div>
-                                    <div className="flex flex-col items-end gap-1.5 shrink-0">
-                                      <button onClick={() => removeCartItem(p.id, item.selectedOption)} className="text-[#735965]/60 hover:text-red-500 transition-colors p-0.5 cursor-pointer" aria-label="삭제">
-                                        <X size={12} />
+                                    <div className="flex flex-col items-end gap-2 shrink-0">
+                                      <button 
+                                        type="button"
+                                        onClick={() => removeCartItem(p.id, item.selectedOption)} 
+                                        className="text-slate-400 hover:text-rose-600 transition-colors p-0.5 cursor-pointer border-0" 
+                                        aria-label="삭제"
+                                      >
+                                        <X size={14} />
                                       </button>
-                                      <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
-                                        <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
-                                          <Minus size={9} />
+                                      <div className="flex items-center bg-[#F8FAFC] rounded-full p-1 border-0">
+                                        <button 
+                                          type="button"
+                                          onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} 
+                                          className="p-1 hover:text-[#0F172A] text-slate-400 transition-colors cursor-pointer border-0"
+                                        >
+                                          <Minus size={10} />
                                         </button>
-                                        <span className="px-1.5 text-[9px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
-                                        <button onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer">
-                                          <Plus size={9} />
+                                        <span className="px-2 text-xs font-black text-[#0F172A] w-5 text-center">{item.quantity}</span>
+                                        <button 
+                                          type="button"
+                                          onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} 
+                                          className="p-1 hover:text-[#0F172A] text-slate-400 transition-colors cursor-pointer border-0"
+                                        >
+                                          <Plus size={10} />
                                         </button>
                                       </div>
                                     </div>
@@ -5454,63 +6039,63 @@ export default function PortalPage() {
 
                     {/* 2. 배송지 정보 입력 */}
                     <div className="space-y-3">
-                      <div className="flex items-center gap-1.5 border-b border-[#f2ccd7]/60 pb-1.5">
-                        <MapPin size={14} className="text-[#f25f8a] shrink-0" />
-                        <span className="font-extrabold text-xs text-[#2d2026]">배송지 정보 입력</span>
-                        <span className="text-[9px] text-[#735965] font-bold ml-auto bg-[#fff1f5] border border-[#f2ccd7]/40 px-2 py-0.5 rounded-md select-none">
+                      <div className="flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                        <MapPin size={16} className="text-[#F5AC00] shrink-0" />
+                        <span className="font-black text-xs text-[#0F172A]">배송지 정보 입력</span>
+                        <span className="text-[10px] text-slate-400 font-bold ml-auto bg-[#F8FAFC] px-2.5 py-0.5 rounded-full select-none">
                           기본 주소지 정보 자동 입력됨
                         </span>
                       </div>
                       
-                      <div className="space-y-2.5">
+                      <div className="space-y-3">
                         <div>
-                          <label className="text-[10px] font-bold text-[#735965] block mb-1">배송지 주소 (도로명)</label>
+                          <label className="text-xs font-extrabold text-[#0F172A] block mb-1">배송지 주소 (도로명)</label>
                           <div className="flex gap-2">
                             <input
                               type="text"
                               value={deliveryAddress}
                               onChange={(e) => setDeliveryAddress(e.target.value)}
                               placeholder="도로명 주소를 검색 또는 직접 입력하세요"
-                              className="flex-1 px-3.5 py-2.5 text-xs border border-[#f2ccd7] rounded-xl bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                              className="flex-1 px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                             />
                             <button
                               type="button"
                               onClick={() => openDaumPostcode("delivery")}
-                              className="px-4 py-2.5 bg-[#735965] hover:bg-[#5a444f] text-white text-xs font-bold rounded-xl transition-all cursor-pointer border-0 shrink-0"
+                              className="px-5 py-3 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black rounded-full transition-all cursor-pointer border-0 shrink-0 shadow-md"
                             >
                               주소 검색
                             </button>
                           </div>
                         </div>
                         <div>
-                          <label className="text-[10px] font-bold text-[#735965] block mb-1">상세 주소</label>
+                          <label className="text-xs font-extrabold text-[#0F172A] block mb-1">상세 주소</label>
                           <input
                             type="text"
                             value={deliveryDetailAddress}
                             onChange={(e) => setDeliveryDetailAddress(e.target.value)}
                             placeholder="상세 주소 (동/호수/층 등)"
-                            className="w-full px-3.5 py-2 text-xs border border-[#f2ccd7] rounded-xl bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                            className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="text-[10px] font-bold text-[#735965] block mb-1">받는 사람</label>
+                            <label className="text-xs font-extrabold text-[#0F172A] block mb-1">받는 사람</label>
                             <input
                               type="text"
                               value={recipientName}
                               onChange={(e) => setRecipientName(e.target.value)}
                               placeholder="수령인 이름"
-                              className="w-full px-3.5 py-2 text-xs border border-[#f2ccd7] rounded-xl bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                              className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                             />
                           </div>
                           <div>
-                            <label className="text-[10px] font-bold text-[#735965] block mb-1">연락처</label>
+                            <label className="text-xs font-extrabold text-[#0F172A] block mb-1">연락처</label>
                             <input
                               type="tel"
                               value={recipientPhone}
                               onChange={(e) => setRecipientPhone(formatPhoneNumber(e.target.value))}
                               placeholder="010-0000-0000"
-                              className="w-full px-3.5 py-2 text-xs border border-[#f2ccd7] rounded-xl bg-[#fff9fb] focus:outline-none focus:ring-1 focus:ring-[#f25f8a] focus:border-[#f25f8a] placeholder:text-[#c4a0ae]"
+                              className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
                             />
                           </div>
                         </div>
@@ -5524,85 +6109,85 @@ export default function PortalPage() {
                     
                     {/* 3. 결제 수단 선택 */}
                     <div className="space-y-3">
-                      <span className="font-extrabold text-xs text-[#2d2026] flex items-center gap-1.5 border-b border-[#f2ccd7]/60 pb-1.5">
-                        <CreditCard size={14} className="text-[#f25f8a]" /> 결제 수단 선택
+                      <span className="font-black text-xs text-[#0F172A] flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                        <CreditCard size={16} className="text-[#F5AC00]" /> 결제 수단 선택
                       </span>
                       
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         <button
                           type="button"
                           onClick={() => setOrderPayMethod("card")}
-                          className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                          className={`flex items-center justify-center gap-2 py-3.5 rounded-2xl border-0 text-xs font-black transition-all cursor-pointer ${
                             orderPayMethod === "card"
-                              ? "bg-[#fff1f5] border-[#f25f8a] text-[#bf3e67] shadow-sm font-black"
-                              : "bg-white border-[#f2ccd7] text-[#735965] hover:bg-[#fff9fb]"
+                              ? "bg-[#F5AC00] text-[#0F172A] shadow-md"
+                              : "bg-[#F8FAFC] text-slate-600 hover:bg-slate-200"
                           }`}
                         >
-                          <CreditCard size={14} />
+                          <CreditCard size={16} />
                           신용카드
                         </button>
                         <button
                           type="button"
                           onClick={() => setOrderPayMethod("bank")}
-                          className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                          className={`flex items-center justify-center gap-2 py-3.5 rounded-2xl border-0 text-xs font-black transition-all cursor-pointer ${
                             orderPayMethod === "bank"
-                              ? "bg-[#fff1f5] border-[#f25f8a] text-[#bf3e67] shadow-sm font-black"
-                              : "bg-white border-[#f2ccd7] text-[#735965] hover:bg-[#fff9fb]"
+                              ? "bg-[#F5AC00] text-[#0F172A] shadow-md"
+                              : "bg-[#F8FAFC] text-slate-600 hover:bg-slate-200"
                           }`}
                         >
-                          <Landmark size={14} />
+                          <Landmark size={16} />
                           무통장입금
                         </button>
                       </div>
 
                       {/* 무통장입금 정보 박스 */}
                       {orderPayMethod === "bank" && (
-                        <div className="bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl space-y-3 animate-fadeIn text-xs">
-                          <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-2">
-                            <span className="font-extrabold text-[#bf3e67] flex items-center gap-1">
-                              <Landmark size={12} /> 입금 계좌 정보
+                        <div className="bg-[#F8FAFC] border-0 p-5 rounded-2xl space-y-3 animate-fadeIn text-xs">
+                          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <span className="font-black text-[#0F172A] flex items-center gap-1">
+                              <Landmark size={14} className="text-[#F5AC00]" /> 입금 계좌 정보
                             </span>
                             <button
                               type="button"
                               onClick={() => handleCopyToClipboard(`K뱅크 700-120-270001 (주)고우웰라이프 ${cartTotal.toLocaleString()}원`, "전체 계좌 정보")}
-                              className="text-[10px] text-[#f25f8a] hover:text-[#df4977] font-bold flex items-center gap-0.5 cursor-pointer bg-white px-2 py-1 rounded border border-[#f2ccd7] transition-all hover:shadow-sm"
+                              className="text-[10px] text-[#0F172A] font-black flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1 rounded-full border-0 shadow-2xs hover:bg-[#F5AC00]"
                             >
-                              <Copy size={10} /> 전체 복사
+                              <Copy size={11} /> 전체 복사
                             </button>
                           </div>
-                          <div className="space-y-2 text-[#735965] font-semibold">
-                            <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
+                          <div className="space-y-2 text-slate-600 font-bold">
+                            <div className="flex justify-between items-center bg-white px-3.5 py-2.5 rounded-xl border-0 shadow-2xs">
                               <div>
-                                <span className="block text-[8px] text-[#735965]/60 font-bold">은행 / 예금주</span>
-                                <span className="text-xs font-bold text-[#2d2026]">K뱅크 / (주)고우웰라이프</span>
+                                <span className="block text-[9px] text-slate-400 font-extrabold">은행 / 예금주</span>
+                                <span className="text-xs font-black text-[#0F172A]">K뱅크 / (주)고우웰라이프</span>
                               </div>
                             </div>
-                            <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
+                            <div className="flex justify-between items-center bg-white px-3.5 py-2.5 rounded-xl border-0 shadow-2xs">
                               <div>
-                                <span className="block text-[8px] text-[#735965]/60 font-bold">계좌번호</span>
-                                <span className="text-xs font-mono font-bold text-[#2d2026]">700-120-270001</span>
+                                <span className="block text-[9px] text-slate-400 font-extrabold">계좌번호</span>
+                                <span className="text-xs font-mono font-black text-[#0F172A]">700-120-270001</span>
                               </div>
                               <button
                                 type="button"
                                 onClick={() => handleCopyToClipboard("700-120-270001", "계좌번호")}
-                                className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/60 rounded-md shrink-0 cursor-pointer transition-all hover:shadow-sm"
+                                className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-[#F8FAFC] rounded-lg shrink-0 cursor-pointer transition-all border-0"
                                 title="계좌번호 복사"
                               >
-                                <Copy size={11} />
+                                <Copy size={12} />
                               </button>
                             </div>
-                            <div className="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-[#f2ccd7]/40">
+                            <div className="flex justify-between items-center bg-white px-3.5 py-2.5 rounded-xl border-0 shadow-2xs">
                               <div>
-                                <span className="block text-[8px] text-[#735965]/60 font-bold">입금 금액</span>
-                                <span className="text-xs font-bold text-[#f25f8a]">{cartTotal.toLocaleString()} 원</span>
+                                <span className="block text-[9px] text-slate-400 font-extrabold">입금 금액</span>
+                                <span className="text-xs font-black text-[#0F172A]">{cartTotal.toLocaleString()} 원</span>
                               </div>
                               <button
                                 type="button"
                                 onClick={() => handleCopyToClipboard(String(cartTotal), "입금 금액")}
-                                className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/60 rounded-md shrink-0 cursor-pointer transition-all hover:shadow-sm"
+                                className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-[#F8FAFC] rounded-lg shrink-0 cursor-pointer transition-all border-0"
                                 title="금액 복사"
                               >
-                                <Copy size={11} />
+                                <Copy size={12} />
                               </button>
                             </div>
                           </div>
@@ -5611,33 +6196,34 @@ export default function PortalPage() {
                     </div>
 
                     {/* 4. 최종 결제 내역 확인 */}
-                    <div className="bg-[#fff9fb] border border-[#f2ccd7] rounded-2xl p-5 space-y-4">
-                      <span className="font-extrabold text-xs text-[#2d2026] flex items-center gap-1.5 border-b border-[#f2ccd7]/60 pb-1.5 select-none">
-                        <CheckCircle2 size={14} className="text-[#f25f8a]" /> 최종 금액 확인
+                    <div className="bg-[#F8FAFC] border-0 rounded-2xl p-6 space-y-5">
+                      <span className="font-black text-xs text-[#0F172A] flex items-center gap-1.5 border-b border-slate-200 pb-2 select-none">
+                        <CheckCircle2 size={16} className="text-[#F5AC00]" /> 최종 금액 확인
                       </span>
                       
-                      <div className="space-y-2.5 text-xs">
-                        <div className="flex justify-between text-[#735965] font-bold">
+                      <div className="space-y-3 text-xs">
+                        <div className="flex justify-between text-slate-600 font-bold">
                           <span>상품 합계</span>
                           <span>{cartSubtotal.toLocaleString()} 원</span>
                         </div>
-                        <div className="flex justify-between text-[#735965] font-bold">
+                        <div className="flex justify-between text-slate-600 font-bold">
                           <div className="flex flex-col">
                             <span>배송비</span>
                             {shippingFee > 0 && (
-                              <span className="text-[10px] text-[#bf3e67] font-bold">({shippingTypeLabel} 적용)</span>
+                              <span className="text-[10px] text-slate-400 font-bold">({shippingTypeLabel} 적용)</span>
                             )}
                           </div>
                           <span>{shippingFee === 0 ? "무료" : `${shippingFee.toLocaleString()} 원`}</span>
                         </div>
-                        <div className="flex justify-between text-[#2d2026] font-black text-sm border-t border-[#f2ccd7] pt-3">
+                        <div className="flex justify-between text-[#0F172A] font-black text-base border-t border-slate-200 pt-3">
                           <span>최종 발주 금액</span>
-                          <span className="text-[#f25f8a]">{cartTotal.toLocaleString()} 원</span>
+                          <span>{cartTotal.toLocaleString()} 원</span>
                         </div>
                       </div>
 
                       {/* Pay Button */}
                       <button 
+                        type="button"
                         onClick={() => {
                           if (!deliveryAddress.trim()) {
                             showCustomAlert("발주 불가", "배송지 주소(도로명)를 입력해 주세요.");
@@ -5655,9 +6241,9 @@ export default function PortalPage() {
                           placeOrder();
                           setShowCheckoutModal(false);
                         }}
-                        className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-black rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-0"
+                        className="w-full py-4 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-sm font-black rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-2"
                       >
-                        <CheckCircle2 size={16} />
+                        <CheckCircle2 size={18} />
                         {orderPayMethod === "card" ? "최종 결제 진행" : "발주 신청 완료 (무통장입금)"}
                       </button>
                     </div>
@@ -5673,10 +6259,11 @@ export default function PortalPage() {
       {/* ==========================================
           REAL-TIME POPUP MODAL (ON-ENTRY)
          ========================================== */}
+      {/* 실시간 팝업 모달 (Yellow Header, border-0, Clean Style) */}
       {showPopup && popupSettings && (
-        <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-[120] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div 
-            className="w-full max-w-md bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp"
+            className="w-full max-w-md bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header / Background visual */}
@@ -5684,7 +6271,7 @@ export default function PortalPage() {
               className={`w-full relative flex flex-col justify-end p-6 text-white ${
                 popupSettings.image ? "aspect-[4/3]" : "min-h-[160px]"
               } ${
-                popupSettings.image ? "" : "bg-gradient-to-tr from-[#bf3e67] to-[#f25f8a]"
+                popupSettings.image ? "" : "bg-[#F5AC00]"
               }`}
               style={popupSettings.image ? {
                 backgroundImage: `url(${optimizeCloudinaryUrl(popupSettings.image)})`,
@@ -5692,12 +6279,12 @@ export default function PortalPage() {
                 backgroundPosition: "center"
               } : undefined}
             >
-              {popupSettings.image && <div className="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-black/95 via-black/60 to-transparent"></div>}
+              {popupSettings.image && <div className="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>}
               <div className="relative z-10 space-y-1">
                 <h4 
                   className="font-black leading-snug whitespace-pre-line"
                   style={{
-                    color: popupSettings.titleColor || "#ffffff",
+                    color: popupSettings.image ? (popupSettings.titleColor || "#ffffff") : "#0F172A",
                     fontSize: popupSettings.titleSize || "18px"
                   }}
                 >
@@ -5708,20 +6295,21 @@ export default function PortalPage() {
 
             {/* Body Description */}
             <div 
-              className="p-6 overflow-y-auto font-semibold leading-relaxed whitespace-pre-line"
+              className="p-6 overflow-y-auto font-bold leading-relaxed whitespace-pre-line text-slate-700"
               style={{
-                color: popupSettings.descColor || "#735965",
-                fontSize: popupSettings.descSize || "12px"
+                color: popupSettings.descColor || "#334155",
+                fontSize: popupSettings.descSize || "13px"
               }}
             >
               {popupSettings.desc}
             </div>
 
             {/* Action buttons & 'Today close' bar */}
-            <div className="border-t border-[#f2ccd7]/60">
+            <div className="border-t border-slate-100">
               {popupSettings.link && (
-                <div className="p-4 border-b border-[#f2ccd7]/40 bg-[#fff1f5]/20 text-center">
+                <div className="p-4 border-b border-slate-100 bg-[#F8FAFC] text-center">
                   <button
+                    type="button"
                     onClick={() => {
                       const link = popupSettings.link;
                       if (link.startsWith("http")) {
@@ -5738,11 +6326,11 @@ export default function PortalPage() {
                         setShowPopup(false);
                       }
                     }}
-                    className="w-full py-3 font-extrabold rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
+                    className="w-full py-3.5 font-black rounded-full shadow-md transition-all cursor-pointer border-0"
                     style={{
-                      backgroundColor: popupSettings.btnBgColor || "#f25f8a",
-                      color: popupSettings.btnTextColor || "#ffffff",
-                      fontSize: popupSettings.btnTextSize || "12px"
+                      backgroundColor: popupSettings.btnBgColor || "#F5AC00",
+                      color: popupSettings.btnTextColor || "#0F172A",
+                      fontSize: popupSettings.btnTextSize || "13px"
                     }}
                   >
                     {popupSettings.btnText || "자세히 보기"}
@@ -5751,20 +6339,22 @@ export default function PortalPage() {
               )}
 
               {/* Close Footer bar */}
-              <div className="bg-[#fff9fb] p-3 flex justify-between items-center px-5 text-[11px] font-bold text-[#735965] select-none">
+              <div className="bg-[#F8FAFC] p-4 flex justify-between items-center px-6 text-xs font-bold text-slate-600 select-none">
                 <button
+                  type="button"
                   onClick={() => {
                     const sevenDaysLater = Date.now() + 7 * 24 * 60 * 60 * 1000;
                     localStorage.setItem("120_popup_closed_until", sevenDaysLater.toString());
                     setShowPopup(false);
                   }}
-                  className="hover:text-[#bf3e67] transition-colors flex items-center gap-1 cursor-pointer"
+                  className="hover:text-[#0F172A] transition-colors flex items-center gap-1 cursor-pointer border-0 bg-transparent font-bold"
                 >
-                  <Check size={13} className="text-[#f25f8a]" /> 7일 동안 보지 않기
+                  <Check size={14} className="text-[#F5AC00]" /> 7일 동안 보지 않기
                 </button>
                 <button
+                  type="button"
                   onClick={() => setShowPopup(false)}
-                  className="hover:text-red-500 font-extrabold transition-colors cursor-pointer"
+                  className="hover:text-rose-600 font-black transition-colors cursor-pointer border-0 bg-transparent"
                 >
                   닫기
                 </button>
@@ -5898,51 +6488,53 @@ export default function PortalPage() {
         </div>
       )}
 
-      {/* 7. Mobile Cart Modal */}
+      {/* 7. Mobile Cart Modal (Yellow Header, border-0, Clean Style) */}
       {mobileCartOpen && (
         <div 
           className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none animate-custom-fade"
           onClick={() => closeModal(() => setMobileCartOpen(false))}
         >
           <div 
-            className="w-full sm:max-w-md bg-white border-t sm:border border-[#f2ccd7] rounded-t-3xl sm:rounded-2xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
+            className="w-full sm:max-w-md bg-white border-0 rounded-t-[28px] sm:rounded-[28px] overflow-hidden shadow-2xl max-h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
-            <div className="p-5 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50 shrink-0">
-              <div className="flex items-center gap-2">
-                <ShoppingBag size={18} className="text-[#f25f8a]" />
-                <h3 className="font-extrabold text-base text-[#2d2026]">발주 장바구니 ({cart.reduce((sum, item) => sum + item.quantity, 0)}개)</h3>
+            {/* Yellow Header */}
+            <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shrink-0 shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <ShoppingBag size={20} className="text-[#0F172A]" />
+                <h3 className="font-black text-base sm:text-lg text-[#0F172A]">발주 장바구니 ({cart.reduce((sum, item) => sum + item.quantity, 0)}개)</h3>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 {cart.length > 0 && (
                   <button 
+                    type="button"
                     onClick={() => {
                       showCustomConfirm("장바구니 비우기", "장바구니의 모든 품목을 삭제하시겠습니까?", () => {
                         clearCart();
                         setMobileCartOpen(false);
                       });
                     }} 
-                    className="text-[10px] font-bold text-[#735965] hover:text-red-500 transition-colors flex items-center gap-1 cursor-pointer border-0 bg-transparent"
+                    className="text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer border-0 bg-white px-3 py-1.5 rounded-full shadow-2xs"
                   >
-                    <Trash2 size={12} /> 비우기
+                    <Trash2 size={13} /> 비우기
                   </button>
                 )}
                 <button 
+                  type="button"
                   onClick={() => closeModal(() => setMobileCartOpen(false))} 
-                  className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer"
+                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer"
                 >
-                  <X size={15} />
+                  <X size={18} />
                 </button>
               </div>
             </div>
 
             {/* Modal Content */}
-            <div className="p-5 overflow-y-auto space-y-6 flex-1 max-h-[50vh]">
+            <div className="p-6 overflow-y-auto space-y-6 flex-1 max-h-[50vh]">
               {cart.length === 0 ? (
                 <div className="py-16 text-center space-y-3">
-                  <ShoppingBag size={36} className="text-[#f2ccd7] mx-auto" />
-                  <p className="text-xs text-[#735965] font-bold leading-relaxed max-w-[180px] mx-auto">
+                  <ShoppingBag size={40} className="text-slate-300 mx-auto" />
+                  <p className="text-xs text-slate-500 font-bold leading-relaxed max-w-[180px] mx-auto">
                     발주할 물품의 '담기' 버튼을 클릭해 장바구니를 채워주세요.
                   </p>
                 </div>
@@ -5952,10 +6544,10 @@ export default function PortalPage() {
                   <div className="space-y-4 pr-1">
                     {groupedCartItems.map(([typeKey, group]) => (
                       <div key={typeKey} className="space-y-2 text-left">
-                        <div className="flex justify-between items-center border-b border-[#f2ccd7]/60 pb-1.5 px-1 select-none">
-                          <span className="font-extrabold text-[10px] text-[#bf3e67]">{group.title}</span>
+                        <div className="flex justify-between items-center bg-[#F8FAFC] px-3 py-1.5 rounded-xl border-0 select-none">
+                          <span className="font-black text-xs text-[#0F172A]">{group.title}</span>
                           {group.feeLabel && (
-                            <span className="text-[9px] text-[#735965] font-black bg-[#fff1f5] border border-[#f2ccd7] px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] text-slate-500 font-bold">
                               배송비: {group.feeLabel}
                             </span>
                           )}
@@ -5966,48 +6558,51 @@ export default function PortalPage() {
                             const p = (products || []).find((prod) => prod.id === item.productId);
                             if (!p) return null;
                             return (
-                              <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-[#fff9fb] border border-[#f2ccd7]/60 p-2.5 rounded-xl">
-                                <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                              <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border-0 shadow-2xs p-3 rounded-2xl">
+                                <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
                                 <div className="flex-1 min-w-0 text-left">
-                                  <h4 className="font-bold text-[11px] text-[#2d2026] truncate">{p.name}</h4>
+                                  <h4 className="font-black text-xs text-[#0F172A] truncate">{p.name}</h4>
                                   {item.selectedOption && (
-                                    <span className="text-[9px] text-[#bf3e67] font-black block mt-0.5 select-none">
+                                    <span className="text-[10px] text-slate-500 font-bold block mt-0.5 select-none">
                                       [옵션: {item.selectedOption}]
                                     </span>
                                   )}
-                                  <span className="text-[9px] text-[#735965] font-semibold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
+                                  <span className="text-[10px] text-slate-400 font-bold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
                                 </div>
                                 <div className="flex flex-col items-end gap-1.5 shrink-0">
                                   <button 
+                                    type="button"
                                     onClick={() => {
                                       removeCartItem(p.id, item.selectedOption);
                                       if (cart.length <= 1) {
                                         setMobileCartOpen(false);
                                       }
                                     }} 
-                                    className="text-[#735965]/60 hover:text-red-500 transition-colors p-0.5 cursor-pointer bg-transparent border-0" 
+                                    className="text-slate-400 hover:text-rose-600 transition-colors p-0.5 cursor-pointer bg-transparent border-0" 
                                     aria-label="삭제"
                                   >
-                                    <X size={12} />
+                                    <X size={14} />
                                   </button>
-                                  <div className="flex items-center border border-[#f2ccd7] bg-white rounded-lg p-0.5">
+                                  <div className="flex items-center bg-[#F8FAFC] rounded-full p-1 border-0">
                                     <button 
+                                      type="button"
                                       onClick={() => {
                                         updateCartQty(p.id, item.selectedOption, item.quantity - 1);
                                         if (item.quantity === 1 && cart.length <= 1) {
                                           setMobileCartOpen(false);
                                         }
                                       }} 
-                                      className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer bg-transparent border-0"
+                                      className="p-1 hover:text-[#0F172A] text-slate-400 transition-colors cursor-pointer bg-transparent border-0"
                                     >
-                                      <Minus size={9} />
+                                      <Minus size={10} />
                                     </button>
-                                    <span className="px-1.5 text-[9px] font-bold text-[#2d2026] w-4 text-center">{item.quantity}</span>
+                                    <span className="px-2 text-xs font-black text-[#0F172A] w-5 text-center">{item.quantity}</span>
                                     <button 
+                                      type="button"
                                       onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} 
-                                      className="p-0.5 hover:text-[#bf3e67] text-[#735965]/60 transition-colors cursor-pointer bg-transparent border-0"
+                                      className="p-1 hover:text-[#0F172A] text-slate-400 transition-colors cursor-pointer bg-transparent border-0"
                                     >
-                                      <Plus size={9} />
+                                      <Plus size={10} />
                                     </button>
                                   </div>
                                 </div>
@@ -6024,44 +6619,45 @@ export default function PortalPage() {
 
             {/* Modal Footer */}
             {cart.length > 0 && (
-              <div className="p-5 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 shrink-0 space-y-4">
+              <div className="p-6 border-t border-slate-100 bg-[#F8FAFC] shrink-0 space-y-4">
                 {/* Cart Bill Details */}
                 <div className="space-y-2.5 text-xs">
-                  <div className="flex justify-between text-[#735965] font-bold">
+                  <div className="flex justify-between text-slate-600 font-bold">
                     <span>상품 합계</span>
                     <span>{cartSubtotal.toLocaleString()} 원</span>
                   </div>
-                  <div className="flex justify-between text-[#735965] font-bold">
+                  <div className="flex justify-between text-slate-600 font-bold">
                     <div className="flex flex-col text-left">
                       <span>배송비</span>
                       {shippingFee > 0 && (
-                        <span className="text-[10px] text-[#bf3e67] font-bold">({shippingTypeLabel} 적용)</span>
+                        <span className="text-[10px] text-slate-400 font-bold">({shippingTypeLabel} 적용)</span>
                       )}
                     </div>
                     <span>{shippingFee === 0 ? "무료" : `${shippingFee.toLocaleString()} 원`}</span>
                   </div>
-                  <div className="flex justify-between text-[#2d2026] font-black text-sm border-t border-[#f2ccd7] pt-3">
+                  <div className="flex justify-between text-[#0F172A] font-black text-sm border-t border-slate-200 pt-3">
                     <span>최종 결제 금액</span>
-                    <span className="text-[#f25f8a]">{cartTotal.toLocaleString()} 원</span>
+                    <span>{cartTotal.toLocaleString()} 원</span>
                   </div>
                 </div>
 
                 {/* Order action button */}
                 <button 
+                  type="button"
                   onClick={() => {
                     closeModal(() => setMobileCartOpen(false));
                     placeOrder();
                   }}
-                  className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-0"
+                  className="w-full py-3.5 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs sm:text-sm font-black rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0"
                 >
                   <CheckCircle2 size={16} />
                   결제 진행하기
                 </button>
 
                 {/* 이달의 카드 무이자 혜택 안내 */}
-                <div className="mt-3 bg-gradient-to-br from-[#fff6f8] to-white border border-[#f2ccd7] rounded-2xl p-3.5 shadow-sm text-left">
-                  <div className="flex items-center gap-1.5 text-[#bf3e67] font-black text-xs mb-2">
-                    <CreditCard size={14} className="shrink-0" />
+                <div className="mt-3 bg-white border-0 rounded-2xl p-4 shadow-2xs text-left">
+                  <div className="flex items-center gap-1.5 text-[#0F172A] font-black text-xs mb-2">
+                    <CreditCard size={16} className="shrink-0 text-[#F5AC00]" />
                     <span>7월 카드사 무이자 혜택 (5만원 이상)</span>
                   </div>
                   <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[10px] font-semibold text-[#735965]/90 border-b border-[#f2ccd7]/30 pb-2 mb-2">

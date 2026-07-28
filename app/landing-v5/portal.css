@@ -6,71 +6,37 @@
 
 #owner-portal,
 #admin-portal {
-  --yellow-page: #fffdf4;
-  --yellow-soft: #fff9e6;
-  --yellow-section: #fff4cc;
-  --yellow-card: #ffffff;
-  --yellow-line: #e6dfc3;
-  --yellow-accent: #ffd500;
-  --yellow-accent-hover: #e6bd00;
-  --yellow-accent-soft: #fff2b3;
-  --yellow-accent-deep: #0d233a;
-  --yellow-ink: #0d233a;
-  --yellow-muted: #576575;
+  --dark-bg: #0B0F17;
+  --gray-bg: #F4F6F8;
 
-  background-color: var(--yellow-page) !important;
-  color: var(--yellow-ink) !important;
+  background-color: var(--dark-bg) !important; /* Initial load dark charcoal background */
   font-family: "Pretendard Variable", Pretendard, ui-sans-serif, system-ui, sans-serif !important;
 }
 
-/* Base Page Backgrounds */
+/* Base Page Backgrounds - Dark Charcoal on Initial Load */
 #owner-portal.bg-\[\#fff9fb\],
 #admin-portal.bg-\[\#fff9fb\],
 #owner-portal .bg-\[\#fff9fb\],
 #admin-portal .bg-\[\#fff9fb\],
 #owner-portal .bg-\[\#fffdf9\],
 #admin-portal .bg-\[\#fffdf9\] {
-  background-color: var(--yellow-page) !important;
+  background-color: #0B0F17 !important;
 }
 
 /* Card & Content Container Backgrounds */
 #owner-portal .bg-white,
-#admin-portal .bg-white,
-#owner-portal .bg-white\/90,
-#admin-portal .bg-white\/90,
-#owner-portal .bg-white\/95,
-#admin-portal .bg-white\/95 {
-  background-color: var(--yellow-card) !important;
+#admin-portal .bg-white {
+  background-color: #ffffff !important;
 }
 
 /* Sidebar and Soft Background Elements */
-#owner-portal .bg-\[\#fff1f5\],
-#admin-portal .bg-\[\#fff1f5\],
-#owner-portal .bg-\[\#ffd3df\],
-#admin-portal .bg-\[\#ffd3df\],
-#owner-portal .bg-\[\#f2ccd7\]\/40,
-#admin-portal .bg-\[\#f2ccd7\]\/40,
-#owner-portal .bg-\[\#f2ccd7\]\/50,
-#admin-portal .bg-\[\#f2ccd7\]\/50,
-#owner-portal .bg-\[\#fff1f5\]\/20,
-#admin-portal .bg-\[\#fff1f5\]\/20,
-#owner-portal .bg-\[\#fff1f5\]\/30,
-#admin-portal .bg-\[\#fff1f5\]\/30,
-#owner-portal .bg-\[\#fff1f5\]\/50,
-#admin-portal .bg-\[\#fff1f5\]\/50,
-#owner-portal .bg-\[\#fff1f5\]\/60,
-#admin-portal .bg-\[\#fff1f5\]\/60,
-#owner-portal .bg-\[\#fff1f5\]\/80,
-#admin-portal .bg-\[\#fff1f5\]\/80,
-#owner-portal .bg-\[\#fff9fb\]\/60,
-#admin-portal .bg-\[\#fff9fb\]\/60,
 #owner-portal .bg-neutral-50,
 #admin-portal .bg-neutral-50,
 #owner-portal .bg-neutral-100,
 #admin-portal .bg-neutral-100,
 #owner-portal .bg-neutral-200,
 #admin-portal .bg-neutral-200 {
-  background-color: var(--yellow-soft) !important;
+  background-color: #F4F6F8 !important;
 }
 
 /* Red / Danger Backgrounds - Keep red but make it elegant */
@@ -268,23 +234,10 @@
 }
 
 /* Sidebar active navigation styling */
-#owner-portal aside button.bg-white,
-#admin-portal aside button.bg-white {
-  background-color: var(--yellow-accent) !important;
-  color: var(--yellow-accent-deep) !important;
-  border: 1px solid var(--yellow-accent) !important;
-}
-
-#owner-portal aside button.bg-white *,
-#admin-portal aside button.bg-white * {
-  color: var(--yellow-accent-deep) !important;
-}
-
-/* Sidebar hover transitions */
-#owner-portal aside button:hover:not(.bg-white),
-#admin-portal aside button:hover:not(.bg-white) {
-  background-color: var(--yellow-soft) !important;
-  color: var(--yellow-ink) !important;
+#owner-portal aside button.bg-[#202736],
+#admin-portal aside button.bg-[#202736] {
+  background-color: #202736 !important;
+  color: #ffffff !important;
 }
 
 /* Table Header Styles */

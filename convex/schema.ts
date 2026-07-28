@@ -164,6 +164,8 @@ export default defineSchema({
     mainTag: v.string(),
     mainTitle: v.string(),
     mainDesc: v.string(),
+    mainBtnText: v.optional(v.string()),
+    mainLink: v.optional(v.string()),
     sideTag: v.string(),
     sideTitle: v.string(),
     sideDesc: v.string(),

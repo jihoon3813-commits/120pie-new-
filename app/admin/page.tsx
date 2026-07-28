@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
@@ -15,6 +15,7 @@ import {
   BookOpen,
   ImageIcon,
   ArrowLeft,
+  ArrowRight,
   Package,
   Headphones,
   Monitor,
@@ -28,12 +29,17 @@ import {
   CheckCircle2,
   Truck,
   Bell,
+  Calendar,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Filter,
   LogOut,
   Menu,
   X,
   AlertCircle,
   Check,
   Send,
+  PlusCircle,
   ArrowRightLeft,
   Store,
   FileText,
@@ -49,7 +55,8 @@ import {
   Edit,
   GripVertical,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  MapPin
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
@@ -121,6 +128,8 @@ interface BannerSettings {
   mainTag: string;
   mainTitle: string;
   mainDesc: string;
+  mainBtnText?: string;
+  mainLink?: string;
   sideTag: string;
   sideTitle: string;
   sideDesc: string;
@@ -843,6 +852,17 @@ export default function AdminPage() {
   };
 
   const [currentMenu, setCurrentMenu] = useState<string>("dashboard");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
   
   // Dynamic collections synced via localStorage
   const [stores, setStores] = useState<StoreInfo[]>([]);
@@ -1231,11 +1251,11 @@ export default function AdminPage() {
     return (
       <div key={field} className="space-y-1.5 min-w-0 w-full">
         <div className="flex items-center justify-between">
-          <label className="block text-xs font-black text-[#bf3e67] border-l-2 border-[#bf3e67] pl-1.5 mb-0.5">{label}</label>
+          <label className="block text-xs font-black text-[#0F172A] border-l-2 border-slate-400 pl-1.5 mb-0.5">{label}</label>
           <button
             type="button"
             onClick={() => handleApplyIndividualDefault(field, defaultVal)}
-            className="text-[10px] text-[#bf3e67] font-black border border-[#f2ccd7] bg-[#fff9fb]/40 hover:bg-[#ffd3df]/30 px-2 py-0.5 rounded transition-all cursor-pointer"
+            className="text-[10px] text-slate-700 font-bold border-0 bg-slate-100 hover:bg-slate-200 px-2.5 py-0.5 rounded-lg transition-all cursor-pointer shadow-2xs"
           >
             기본적용
           </button>
@@ -1245,20 +1265,18 @@ export default function AdminPage() {
             type="text"
             value={formatPriceInput(value)}
             onChange={(e) => handlePriceChange(field, e.target.value)}
-            className={`w-full px-3.5 py-2 pr-8 border rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] font-bold text-[#2d2026] ${
-              !hasValue ? "border-rose-400 bg-rose-50/10" : "border-[#f2ccd7]"
-            }`}
+            className="w-full px-3.5 py-2.5 pr-8 border-0 rounded-xl text-xs focus:outline-none font-bold text-[#0F172A] bg-[#F8F9FA] shadow-2xs placeholder-slate-400"
             placeholder={formatPriceInput(defaultVal)}
           />
-          <span className="absolute right-3.5 top-2.5 text-xs text-[#735965] font-bold">원</span>
+          <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold">원</span>
         </div>
         <div className="flex flex-col gap-1">
-          <div className="text-[11px] text-[#bf3e67] font-semibold bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg p-2 mt-0.5">
+          <div className="text-[11px] text-[#0F172A] font-semibold bg-[#F8F9FA] border-0 rounded-xl p-2.5 mt-0.5 shadow-2xs">
             {getFormattedKoreanAmount(value, placeholderStr)}
           </div>
           {!hasValue && (
-            <span className="text-[10px] text-rose-500 font-bold flex items-center gap-1 pl-1">
-              ⚠️ 기본적용을 원하시면 우측의 '기본적용' 버튼을 누르거나 직접 숫자를 기입해주세요. (미입력시 저장시 기본값 적용)
+            <span className="text-[10px] text-amber-600 font-bold flex items-center gap-1 pl-1">
+              ⚠️ 기본적용을 원하시면 우측의 '기본적용' 버튼을 누르거나 직접 숫자를 기입해주세요.
             </span>
           )}
         </div>
@@ -1272,26 +1290,6 @@ export default function AdminPage() {
     return (
       <div key={field} className="space-y-1 min-w-0 w-full">
         <div className="flex items-center justify-between">
-          <span className="font-bold text-[#735965] border-l border-[#bf3e67] pl-1">{label}</span>
-          <button
-            type="button"
-            onClick={() => handleApplyIndividualDefault(field, defaultVal)}
-            className="text-[9px] text-[#bf3e67] font-black border border-[#f2ccd7] bg-white hover:bg-[#ffd3df]/20 px-1.5 py-0.5 rounded transition-all cursor-pointer"
-          >
-            기본적용
-          </button>
-        </div>
-        <div className="relative">
-          <input
-            type="text"
-            value={formatPriceInput(value)}
-            onChange={(e) => handlePriceChange(field, e.target.value)}
-            className={`w-full px-3 py-1.5 pr-8 border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] font-bold text-[#2d2026] ${
-              !hasValue ? "border-rose-400 bg-rose-50/10" : "border-[#f2ccd7]"
-            }`}
-            placeholder={formatPriceInput(defaultVal)}
-          />
-          <span className="absolute right-3 top-2 text-[10px] text-[#735965] font-bold">원</span>
         </div>
         {!hasValue && (
           <span className="text-[9px] text-rose-500 font-bold block pl-1">
@@ -1304,13 +1302,13 @@ export default function AdminPage() {
 
   const renderDetailRow = (label: string, val: string) => {
     return (
-      <div className="flex items-center justify-between py-2 border-b border-[#ffd3df]/20 last:border-b-0 min-w-0 w-full gap-2">
-        <span className="font-bold text-[#735965] w-32 sm:w-40 lg:w-48 shrink-0 text-left truncate" title={label}>{label}</span>
-        <span className="font-extrabold text-[#2d2026] text-right flex-1 break-all min-w-0 mr-1 sm:mr-3">{val}</span>
+      <div className="flex items-center justify-between py-2 border-b border-slate-100 last:border-b-0 min-w-0 w-full gap-2">
+        <span className="font-bold text-slate-500 w-32 sm:w-40 lg:w-48 shrink-0 text-left truncate" title={label}>{label}</span>
+        <span className="font-extrabold text-[#0F172A] text-right flex-1 break-all min-w-0 mr-1 sm:mr-3">{val}</span>
         <button
           type="button"
           onClick={() => handleCopyText(val, label)}
-          className="text-[10px] text-[#bf3e67] font-black border border-[#f2ccd7] bg-[#fff9fb] hover:bg-[#ffd3df]/20 px-2 py-0.5 rounded transition-all shrink-0 cursor-pointer"
+          className="text-[10px] text-slate-700 font-extrabold border-0 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-md transition-all shrink-0 cursor-pointer shadow-2xs"
         >
           복사
         </button>
@@ -1321,15 +1319,15 @@ export default function AdminPage() {
   const renderTableDetailRow = (label: string, val: number) => {
     const formattedVal = val.toLocaleString();
     return (
-      <tr className="border-b border-[#f2ccd7] hover:bg-[#fff9fb]/45 transition-colors text-xs">
-        <td className="p-2 border-r border-[#f2ccd7] font-bold text-[#735965]">{label}</td>
-        <td className="p-2 font-extrabold text-[#2d2026]">
+      <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs">
+        <td className="p-2 border-r border-slate-100 font-bold text-slate-600">{label}</td>
+        <td className="p-2 font-extrabold text-[#0F172A]">
           <div className="flex items-center justify-between gap-2">
             <span>{formattedVal}</span>
             <button
               type="button"
               onClick={() => handleCopyText(formattedVal, label)}
-              className="text-[10px] text-[#bf3e67] border border-[#f2ccd7] bg-white hover:bg-[#ffd3df]/20 px-1.5 py-0.5 rounded transition-all cursor-pointer font-bold shrink-0"
+              className="text-[10px] text-slate-700 font-extrabold border-0 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded-md transition-all cursor-pointer shrink-0 shadow-2xs"
             >
               복사
             </button>
@@ -1408,6 +1406,44 @@ export default function AdminPage() {
   const [storeCancelDate, setStoreCancelDate] = useState<string>("");
   const [storeAdoptionMenu, setStoreAdoptionMenu] = useState<string[]>([]);
 
+  // Store management filter and sort states
+  const [storeSearchQuery, setStoreSearchQuery] = useState<string>("");
+  const [storeStatusFilter, setStoreStatusFilter] = useState<string>("전체");
+  const [storeSortOrder, setStoreSortOrder] = useState<"latest" | "oldest">("latest");
+
+  // Computed filtered and sorted stores (Default: Latest registration date on top)
+  const filteredAndSortedStores = useMemo(() => {
+    return stores
+      .filter((store) => {
+        // Status filter
+        if (storeStatusFilter !== "전체" && store.status !== storeStatusFilter) {
+          return false;
+        }
+        // Search query filter
+        if (storeSearchQuery.trim()) {
+          const q = storeSearchQuery.trim().toLowerCase();
+          const matchName = store.name?.toLowerCase().includes(q);
+          const matchId = store.id?.toLowerCase().includes(q);
+          const matchOwner = store.owner?.toLowerCase().includes(q);
+          const matchPhone = store.phone?.toLowerCase().includes(q);
+          const matchAddress = `${store.roadAddress || ""} ${store.detailAddress || ""}`.toLowerCase().includes(q);
+          if (!matchName && !matchId && !matchOwner && !matchPhone && !matchAddress) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const dateA = a.regDate || "0000-00-00";
+        const dateB = b.regDate || "0000-00-00";
+        if (storeSortOrder === "latest") {
+          return dateB.localeCompare(dateA);
+        } else {
+          return dateA.localeCompare(dateB);
+        }
+      });
+  }, [stores, storeStatusFilter, storeSearchQuery, storeSortOrder]);
+
   // Road Address Search Simulation
   const [showAddressPopup, setShowAddressPopup] = useState<boolean>(false);
   const [addressTab, setAddressTab] = useState<"kakao" | "simulated">("kakao");
@@ -1463,6 +1499,8 @@ export default function AdminPage() {
   const [bannerMainTag, setBannerMainTag] = useState<string>("");
   const [bannerMainTitle, setBannerMainTitle] = useState<string>("");
   const [bannerMainDesc, setBannerMainDesc] = useState<string>("");
+  const [bannerMainBtnText, setBannerMainBtnText] = useState<string>("신메뉴 자재 발주하러 가기");
+  const [bannerMainLink, setBannerMainLink] = useState<string>("order");
   const [bannerSideTag, setBannerSideTag] = useState<string>("");
   const [bannerSideTitle, setBannerSideTitle] = useState<string>("");
   const [bannerSideDesc, setBannerSideDesc] = useState<string>("");
@@ -1937,6 +1975,8 @@ export default function AdminPage() {
       setBannerMainTag(convexBanners.mainTag);
       setBannerMainTitle(convexBanners.mainTitle);
       setBannerMainDesc(convexBanners.mainDesc);
+      setBannerMainBtnText(convexBanners.mainBtnText || "신메뉴 자재 발주하러 가기");
+      setBannerMainLink(convexBanners.mainLink || "order");
       setBannerSideTag(convexBanners.sideTag);
       setBannerSideTitle(convexBanners.sideTitle);
       setBannerSideDesc(convexBanners.sideDesc);
@@ -2407,8 +2447,8 @@ export default function AdminPage() {
 
   const handleCreateMaterial = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMaterialTitle || !newMaterialDesc) {
-      alert("제목과 설명을 입력해 주세요.");
+    if (!newMaterialTitle) {
+      alert("자료 제목을 입력해 주세요.");
       return;
     }
 
@@ -2417,9 +2457,9 @@ export default function AdminPage() {
     const payload: any = {
       title: newMaterialTitle,
       date: todayStr,
-      size: newMaterialSize,
-      format: newMaterialFormat,
-      desc: newMaterialDesc,
+      size: newMaterialSize || "미정",
+      format: newMaterialFormat || "PDF",
+      desc: newMaterialDesc || newMaterialTitle,
       img: newMaterialImg || undefined,
       fileUrl: newMaterialFileUrl || undefined,
       fileName: newMaterialFileName || undefined,
@@ -3073,7 +3113,6 @@ export default function AdminPage() {
   const compressImage = (base64Str: string, maxWidth = 800, maxHeight = 800, quality = 0.7): Promise<string> => {
     return new Promise((resolve) => {
       const img = new Image();
-      img.src = base64Str;
       img.onload = () => {
         const canvas = document.createElement("canvas");
         let width = img.width;
@@ -3095,6 +3134,9 @@ export default function AdminPage() {
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         if (ctx) {
+          // Fill pure white background first so transparent PNGs (누끼) never turn black when converted
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
           resolve(canvas.toDataURL("image/jpeg", quality));
         } else {
@@ -3104,6 +3146,43 @@ export default function AdminPage() {
       img.onerror = () => {
         resolve(base64Str);
       };
+      img.src = base64Str;
+    });
+  };
+
+  // Compress image as PNG to preserve transparency (alpha channel) for product thumbnails (누끼)
+  const compressImageAsPng = (base64Str: string, maxWidth = 800, maxHeight = 800): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        let ratio = 1;
+        if (width > maxWidth) ratio = maxWidth / width;
+        if (height * ratio > maxHeight) ratio = maxHeight / height;
+        if (ratio < 1) {
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          // Keep canvas transparent (no fillRect) so PNG alpha channel is preserved
+          ctx.clearRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/png"));
+        } else {
+          resolve(base64Str);
+        }
+      };
+      img.onerror = () => {
+        resolve(base64Str);
+      };
+      img.src = base64Str;
     });
   };
 
@@ -3149,6 +3228,8 @@ export default function AdminPage() {
       mainTag: bannerMainTag,
       mainTitle: bannerMainTitle,
       mainDesc: bannerMainDesc,
+      mainBtnText: bannerMainBtnText,
+      mainLink: bannerMainLink,
       sideTag: bannerSideTag,
       sideTitle: bannerSideTitle,
       sideDesc: bannerSideDesc,
@@ -3162,6 +3243,8 @@ export default function AdminPage() {
       mainTag: updatedBanner.mainTag,
       mainTitle: updatedBanner.mainTitle,
       mainDesc: updatedBanner.mainDesc,
+      mainBtnText: updatedBanner.mainBtnText,
+      mainLink: updatedBanner.mainLink,
       sideTag: updatedBanner.sideTag,
       sideTitle: updatedBanner.sideTitle,
       sideDesc: updatedBanner.sideDesc,
@@ -3947,7 +4030,7 @@ export default function AdminPage() {
     reader.onloadend = async () => {
       if (typeof reader.result === "string") {
         try {
-          const compressed = await compressImage(reader.result, 800, 800, 0.7);
+          const compressed = await compressImageAsPng(reader.result, 800, 800);
           setProductImg(compressed);
         } catch (err) {
           console.error("Product image compression error:", err);
@@ -4127,24 +4210,25 @@ export default function AdminPage() {
 
   if (checkingAuth) {
     return (
-      <div id="admin-portal" className="h-screen bg-[#fff9fb] flex items-center justify-center font-bold text-[#bf3e67]">
-        인증 상태 확인 중...
+      <div id="admin-portal" className="h-screen bg-[#0B0F17] flex flex-col items-center justify-center font-bold text-white gap-4">
+        <div className="w-10 h-10 border-3 border-[#FF6B4A] border-t-transparent rounded-full animate-spin"></div>
+        <span className="text-xs font-black tracking-widest text-slate-300">인증 상태 확인 중...</span>
       </div>
     );
   }
 
   if (!isLoggedIn) {
     return (
-      <div id="admin-portal" className="h-screen w-screen text-[#0D233A] flex flex-col font-sans antialiased justify-center items-center p-4" style={{ backgroundColor: '#ffffff' }}>
+      <div id="admin-portal" className="h-screen w-screen bg-[#0B0F17] text-white flex flex-col font-sans antialiased justify-center items-center p-4">
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-[150] bg-[#f25f8a] text-white px-5 py-3.5 rounded-xl font-bold text-sm shadow-[0_8px_30px_rgba(242,95,138,0.25)] flex items-center gap-2.5 animate-bounce">
+          <div className="fixed bottom-6 right-6 z-[150] bg-[#FF6B4A] text-white px-5 py-3.5 rounded-xl font-bold text-sm shadow-[0_8px_30px_rgba(255,107,74,0.3)] flex items-center gap-2.5 animate-bounce">
             <CheckCircle2 size={16} />
             {toastMessage}
           </div>
         )}
         
-        <div className="max-w-md w-full bg-white border border-[#f2ccd7] rounded-3xl p-8 sm:p-10 shadow-[0_12px_40px_rgba(242,204,215,0.25)] space-y-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#ffd3df] via-[#f25f8a] to-[#bf3e67]"></div>
+        <div className="max-w-md w-full bg-[#161C26] border border-slate-700/80 rounded-3xl p-8 sm:p-10 shadow-2xl space-y-8 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#FF6B4A]"></div>
           
           <div className="text-center space-y-4">
             <div className="inline-flex w-16 h-16 rounded-2xl bg-[#fff1f5] border border-[#f2ccd7] p-2 items-center justify-center shadow-sm">
@@ -4323,74 +4407,147 @@ export default function AdminPage() {
   const paginatedIps = filteredIpsList.slice((ipListPage - 1) * ipItemsPerPage, ipListPage * ipItemsPerPage);
 
   return (
-    <div id="admin-portal" className="h-screen overflow-hidden text-[#0D233A] flex flex-col font-sans antialiased" style={{ backgroundColor: '#ffffff' }}>
+    <div id="admin-portal" className="h-screen w-full overflow-hidden text-[#0F172A] flex flex-col font-sans select-none antialiased bg-white">
       
       {/* TOAST SYSTEM */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-[150] bg-[#f25f8a] text-white px-5 py-3.5 rounded-xl font-bold text-sm shadow-[0_8px_30px_rgba(242,95,138,0.25)] flex items-center gap-2.5 animate-bounce">
-          <CheckCircle2 size={16} />
+        <div className="fixed bottom-6 right-6 z-[150] bg-[#0B0F17] text-white px-5 py-3.5 rounded-2xl font-bold text-sm shadow-[0_12px_35px_rgba(11,15,23,0.4)] flex items-center gap-2.5 animate-bounce">
+          <CheckCircle2 size={16} className="text-[#FF6B4A]" />
           {toastMessage}
         </div>
       )}
 
-      {/* HEADER BAR */}
-      <header className="bg-white border-b border-[#f2ccd7] sticky top-0 z-40 shrink-0 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[76px] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-[#735965] hover:text-[#f25f8a] transition-colors"
-              aria-label="메뉴 열기"
-            >
-              <Menu size={22} />
-            </button>
-            <Link href="/admin" className="flex items-center gap-2 group shrink-0">
-              <img
-                src="/logo_yellow_blue.png"
-                alt="120pie & coffee"
-                className="h-6 w-auto object-contain group-hover:scale-102 transition-transform"
-              />
-              <span className="font-extrabold text-xs text-[#735965] ml-1.5 hidden sm:inline uppercase tracking-wider">Head Office</span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-bold ml-1">본사 어드민</span>
-            </Link>
-          </div>
+      {/* HEADER BAR PANEL (Clean Light Gray Header) */}
+      {/* HEADER BAR PANEL (Clean Light Gray Header - 64px Height) */}
+      <header className="bg-[#F4F6F8] border-b border-slate-200/50 sticky top-0 z-40 shrink-0 h-[64px] px-3 sm:px-6 lg:px-8 flex items-center justify-between overflow-hidden">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-1.5 text-slate-600 hover:text-[#FF6B4A] hover:bg-orange-50 rounded-xl transition-colors cursor-pointer shrink-0"
+            aria-label="메뉴 열기"
+          >
+            <Menu size={20} />
+          </button>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex flex-col items-end text-right">
-              <span className="font-extrabold text-sm text-[#2d2026]">가맹사업지원센터 본사</span>
-              <span className="text-[10px] text-[#735965] font-bold">마스터 최고 관리자</span>
-            </div>
-            
-            <div className="h-8 w-px bg-[#f2ccd7] hidden md:block"></div>
+          {/* Sidebar Collapse Toggle Button (Desktop) */}
+          <button
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            className="hidden lg:flex p-1.5 text-slate-500 hover:text-[#0F141C] hover:bg-slate-50 rounded-xl transition-colors cursor-pointer border border-slate-200/80 bg-white"
+            title={isSidebarCollapsed ? "사이드바 펼치기" : "사이드바 접기"}
+          >
+            {isSidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          </button>
 
-            <Link
-              href="/"
-              className="px-3.5 py-2.5 rounded-lg border border-[#f2ccd7] bg-[#fff1f5] hover:bg-[#ffd3df] text-xs font-bold text-[#735965] hover:text-[#bf3e67] transition-colors inline-flex items-center gap-1.5"
-            >
-              <ArrowLeft size={13} />
-              <span className="hidden sm:inline">메인 사이트</span>
-            </Link>
+          <button
+            onClick={() => setCurrentMenu("dashboard")}
+            className="flex items-center gap-1.5 sm:gap-2 group shrink-0 min-w-0 bg-transparent border-0 cursor-pointer p-0 text-left"
+          >
+            <img
+              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
+              alt="120pie & coffee"
+              className="h-5 sm:h-7 w-auto object-contain group-hover:scale-102 transition-transform shrink-0"
+            />
+            <span className="hidden sm:inline-block text-[11px] px-3.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs shrink-0 whitespace-nowrap border-0">
+              본사 어드민
+            </span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <div className="hidden md:flex flex-col items-end text-right">
+            <span className="font-black text-xs text-[#0F172A]">120PIE&COFFEE 본사 가맹사업지원센터</span>
+            <span className="text-[10px] text-slate-400 font-bold">마스터 최고 관리자 (HQ-ADMIN)</span>
           </div>
+          
+          <div className="h-6 w-px bg-slate-200 hidden md:block"></div>
+
+          <Link
+            href="/"
+            className="hidden sm:inline-flex px-3.5 py-1.5 rounded-full border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-black text-slate-700 transition-all items-center gap-1.5 shrink-0 whitespace-nowrap"
+          >
+            <ArrowLeft size={13} className="text-[#FF6B4A] shrink-0" />
+            <span>메인 사이트</span>
+          </Link>
         </div>
       </header>
 
-      {/* CORE WORKSPACE */}
-      <div className="flex-1 flex max-w-7xl w-full mx-auto relative items-stretch min-h-0">
+      {/* CORE WORKSPACE (Full Width Flex Container - Soft Light Gray Canvas #F4F6F8) */}
+      <div className="flex-1 flex w-full relative items-stretch min-h-0 overflow-hidden bg-[#F4F6F8]">
         
-        {/* SIDEBAR NAVIGATION (DESKTOP) */}
-        <aside className="w-64 border-r border-[#D0CBB5] p-6 flex flex-col justify-between hidden lg:flex shrink-0" style={{ backgroundColor: '#F5AC00' }}>
-          <div className="space-y-8">
-            <div className="bg-white border border-[#f2ccd7] rounded-xl p-4 flex gap-3 items-center shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-[#bf3e67] text-white flex items-center justify-center font-bold text-sm shrink-0">
-                HQ
-              </div>
-              <div className="overflow-hidden">
-                <h4 className="font-extrabold text-xs text-[#2d2026] truncate">120 가맹지원본부</h4>
-                <p className="text-[10px] text-[#735965] font-semibold truncate mt-0.5">Admin ID: HQ-ADMIN</p>
-              </div>
-            </div>
+        {/* SIDEBAR NAVIGATION (점주 포털과 동일한 1:1 정사각형 프로필 배경 적용) */}
+        <aside 
+          className={`bg-[#0B0F17] py-5 px-0 flex flex-col justify-between hidden lg:flex shrink-0 transition-all duration-300 relative z-30 shadow-2xl rounded-tr-[40px] overflow-hidden ${
+            isSidebarCollapsed ? "w-[80px]" : "w-[260px]"
+          }`} 
+        >
+          {/* Authentic Bottom Deep Blue Aurora Gradient Panel */}
+          <div 
+            className="absolute bottom-[-5%] left-[-15%] right-[-15%] h-[260px] pointer-events-none rounded-t-[50%]"
+            style={{
+              background: 'radial-gradient(circle at 30% 80%, rgba(56, 189, 248, 0.35) 0%, rgba(99, 102, 241, 0.25) 50%, rgba(139, 92, 246, 0.15) 80%, transparent 100%)',
+              filter: 'blur(30px)'
+            }}
+          ></div>
 
-            <nav className="flex flex-col gap-1.5">
+          <div className="space-y-6 overflow-y-auto overflow-x-hidden relative z-10 w-full">
+            
+            {/* Header Brand Logo (지정 로고 아이콘 적용 - 클릭 시 대시보드 이동) */}
+            <button
+              onClick={() => setCurrentMenu("dashboard")}
+              className="flex items-center gap-3 px-5 pt-1 w-full text-left bg-transparent border-0 cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-md border border-slate-700 bg-black group-hover:scale-105 transition-transform">
+                <img
+                  src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784730823/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_5_eadptv.png"
+                  alt="120HQ Logo Icon"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {!isSidebarCollapsed && (
+                <div className="min-w-0">
+                  <h3 className="font-black text-sm text-white tracking-tight truncate group-hover:text-[#FED422] transition-colors">120HQ Master</h3>
+                  <p className="text-[10px] text-slate-400 font-bold truncate">본사 마스터 어드민</p>
+                </div>
+              )}
+            </button>
+
+            {/* J.Health 1:1 Authentic HQ Profile Section (점주 포털과 동일한 1:1 정사각형 풀 배경 적용) */}
+            {!isSidebarCollapsed ? (
+              <div className="relative w-full aspect-square my-2 border-0 rounded-none overflow-hidden group bg-[#0B0F17] flex flex-col justify-end">
+                {/* 전체 프로필 정사각형 배경 이미지 */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center opacity-85 group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                  style={{
+                    backgroundImage: `url('https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png')`
+                  }}
+                ></div>
+                
+                {/* 시네마틱 그라데이션 페이드 오버레이 */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17] via-[#0B0F17]/50 to-[#0B0F17]/10 pointer-events-none"></div>
+
+                {/* 어드민 정보 텍스트 & 노란색 #HQ-MASTER 뱃지 */}
+                <div className="relative z-10 flex flex-col items-center text-center gap-2 p-5 pb-6">
+                  <div className="w-full truncate space-y-0.5 drop-shadow-md">
+                    <h4 className="font-black text-xl text-white truncate tracking-tight">가맹지원본부</h4>
+                    <p className="text-xs text-amber-300 font-bold truncate drop-shadow-xs">HQ-ADMIN</p>
+                  </div>
+                  <span className="mt-1 bg-[#FED422] text-[#0F172A] text-[11px] font-black px-4 py-1 rounded-full shadow-lg tracking-wider font-mono border-0">
+                    #HQ-MASTER
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="w-12 h-12 mx-auto rounded-none border-0 overflow-hidden shadow-md bg-slate-900">
+                <img
+                  src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png"
+                  alt="어드민 프로필 썸네일"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
+            {/* Navigation Menu Links (좌우 px-5 패딩 부여) */}
+            <nav className="flex flex-col gap-2 px-5">
               {[
                 { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
                 { key: "store", label: "가맹점 관리", icon: Store },
@@ -4405,76 +4562,111 @@ export default function AdminPage() {
                 { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
                 { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
                 { key: "setting", label: "설정 메뉴", icon: Settings }
-              ].map(({ key, label, icon: Icon, badge }) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setCurrentMenu(key);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full px-4 py-3 rounded-xl flex items-center justify-between text-sm font-bold transition-all ${
-                    currentMenu === key
-                      ? "bg-[#f25f8a] text-white shadow-sm font-extrabold"
-                      : "text-[#735965] hover:text-[#bf3e67] hover:bg-[#ffd3df]/50"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon size={18} className={currentMenu === key ? "text-white" : "text-[#735965]"} />
-                    <span>{label}</span>
+              ].map(({ key, label, icon: Icon, badge }) => {
+                const isActive = currentMenu === key;
+                return (
+                  <div key={key} className="relative group">
+                    <button
+                      onClick={() => {
+                        setCurrentMenu(key);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`w-full ${isSidebarCollapsed ? "px-2.5 py-3.5 justify-center" : "px-4 py-3.5 justify-between"} rounded-2xl flex items-center text-xs font-bold transition-all cursor-pointer border-0 outline-none focus:outline-none focus:ring-0 ${
+                        isActive
+                          ? "bg-[#FED422] text-[#0F172A] shadow-md font-black"
+                          : "text-[#94A3B8] hover:text-white hover:bg-white/5 bg-transparent"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <Icon size={18} className={isActive ? "text-[#FF6B4A]" : "text-[#94A3B8] shrink-0"} />
+                        {!isSidebarCollapsed && <span className="truncate">{label}</span>}
+                      </div>
+                      
+                      {!isSidebarCollapsed && badge !== undefined && (
+                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full shrink-0 ${
+                          isActive ? "bg-[#FF6B4A] text-white" : "bg-[#232B3B] text-[#94A3B8]"
+                        }`}>
+                          {badge}
+                        </span>
+                      )}
+
+                      {/* Collapsed Mode Notification Dot */}
+                      {isSidebarCollapsed && badge !== undefined && (
+                        <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-[#FF6B4A]"></span>
+                      )}
+                    </button>
+
+                    {/* Tooltip for Collapsed Sidebar */}
+                    {isSidebarCollapsed && (
+                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3.5 py-2 bg-[#0F141C] text-white text-xs font-bold rounded-xl shadow-2xl whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-slate-700">
+                        {label} {badge !== undefined ? `(${badge})` : ""}
+                      </div>
+                    )}
                   </div>
-                  {badge && (
-                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                      currentMenu === key ? "bg-white text-[#bf3e67]" : "bg-[#f25f8a] text-white"
-                    }`}>
-                      {badge}
-                    </span>
-                  )}
-                </button>
-              ))}
+                );
+              })}
             </nav>
           </div>
 
-          <div className="border-t border-[#f2ccd7] pt-6">
+          <div className="border-t border-slate-800/80 pt-4 space-y-1 relative z-10">
             <button
               onClick={handleLogout}
-              className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#735965] hover:text-red-500 hover:bg-red-50 transition-colors text-left"
+              className={`w-full ${isSidebarCollapsed ? "px-2 py-2.5 justify-center" : "px-4 py-2.5 justify-start"} rounded-2xl flex items-center gap-3 text-xs font-bold text-[#94A3B8] hover:text-white hover:bg-red-500/20 transition-colors text-left cursor-pointer`}
+              title={isSidebarCollapsed ? "로그아웃" : undefined}
             >
-              <LogOut size={17} />
-              <span>로그아웃</span>
+              <LogOut size={17} className="shrink-0" />
+              {!isSidebarCollapsed && <span>Log out</span>}
             </button>
           </div>
         </aside>
 
-        {/* MOBILE SIDEBAR */}
+        {/* MOBILE SIDEBAR DRAWER (Accessible Modal Overlay) */}
         {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden flex" onClick={() => setMobileMenuOpen(false)}>
-            <div className="w-72 border-r border-[#D0CBB5] h-full p-6 flex flex-col justify-between" onClick={(e) => e.stopPropagation()} style={{ backgroundColor: '#F5AC00' }}>
-              <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-4">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
-                      alt="로고"
-                      className="w-7 h-7"
-                    />
-                    <span className="font-extrabold text-sm text-[#2d2026]">본사 어드민</span>
-                  </div>
-                  <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-[#735965] hover:text-[#f25f8a] bg-[#fff1f5] border border-[#f2ccd7] rounded-lg">
-                    <X size={16} />
+          <div 
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs lg:hidden flex transition-opacity" 
+            onClick={() => setMobileMenuOpen(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-label="본사 어드민 메뉴"
+          >
+            <div 
+              className="w-72 bg-[#0F141C] text-white h-full p-6 flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-200 border-r border-slate-800" 
+              onClick={(e) => e.stopPropagation()} 
+            >
+              <div className="space-y-6 overflow-y-auto">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                  <button
+                    onClick={() => {
+                      setCurrentMenu("dashboard");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 bg-transparent border-0 cursor-pointer p-0 text-left hover:opacity-80 transition-opacity"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-[#FF6B4A] text-white flex items-center justify-center font-black text-xs">
+                      ✱
+                    </div>
+                    <span className="font-black text-xs text-white">120HQ Master</span>
+                  </button>
+                  <button 
+                    onClick={() => setMobileMenuOpen(false)} 
+                    className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors cursor-pointer border-0"
+                    aria-label="닫기"
+                  >
+                    <X size={20} />
                   </button>
                 </div>
 
-                <div className="bg-[#fff1f5] border border-[#f2ccd7] rounded-xl p-4 flex gap-3 items-center">
-                  <div className="w-10 h-10 rounded-lg bg-[#bf3e67] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 flex gap-3 items-center shadow-xs">
+                  <div className="w-10 h-10 rounded-lg bg-[#0D233A] text-white flex items-center justify-center font-black text-xs shrink-0">
                     HQ
                   </div>
-                  <div>
-                    <h4 className="font-extrabold text-xs text-[#2d2026]">120 가맹지원본부</h4>
-                    <p className="text-[10px] text-[#735965] font-semibold mt-0.5">Admin ID: HQ-ADMIN</p>
+                  <div className="min-w-0">
+                    <h4 className="font-extrabold text-xs text-[#1E1B18] truncate">가맹지원본부</h4>
+                    <p className="text-[10px] text-neutral-500 font-bold truncate mt-0.5">HQ-ADMIN 마스터</p>
                   </div>
                 </div>
 
-                <nav className="flex flex-col gap-1">
+                <nav className="flex flex-col gap-1.5">
                   {[
                     { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
                     { key: "store", label: "가맹점 관리", icon: Store },
@@ -4489,41 +4681,54 @@ export default function AdminPage() {
                     { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
                     { key: "gallery", label: "갤러리 관리", icon: ImageIcon },
                     { key: "setting", label: "설정 메뉴", icon: Settings }
-                  ].map(({ key, label, icon: Icon, badge }) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        setCurrentMenu(key);
-                        setMobileMenuOpen(false);
-                      }}
-                      className={`w-full px-4 py-3 rounded-xl flex items-center justify-between text-sm font-bold transition-all ${
-                        currentMenu === key
-                          ? "bg-[#f25f8a] text-white shadow-sm font-extrabold"
-                          : "text-[#735965] hover:text-[#bf3e67] hover:bg-[#ffd3df]/50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Icon size={18} className={currentMenu === key ? "text-white" : "text-[#735965]"} />
-                        <span>{label}</span>
-                      </div>
-                      {badge && (
-                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                          currentMenu === key ? "bg-white text-[#bf3e67]" : "bg-[#f25f8a] text-white"
-                        }`}>
-                          {badge}
-                        </span>
-                      )}
-                    </button>
-                  ))}
+                  ].map(({ key, label, icon: Icon, badge }) => {
+                    const isActive = currentMenu === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setCurrentMenu(key);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`w-full px-4 py-3 rounded-xl flex items-center justify-between text-xs font-extrabold transition-all border-0 outline-none focus:outline-none focus:ring-0 ${
+                          isActive
+                            ? "bg-[#FED422] text-[#0F172A] shadow-md font-black"
+                            : "text-slate-300 hover:bg-white/10 bg-transparent"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Icon size={18} className={isActive ? "text-[#F5AC00]" : "text-[#3D2E0A]"} />
+                          <span>{label}</span>
+                        </div>
+                        {badge !== undefined && (
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                            isActive ? "bg-[#F5AC00] text-[#0D233A]" : "bg-[#0D233A] text-white"
+                          }`}>
+                            {badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </nav>
               </div>
 
-              <div className="border-t border-[#f2ccd7] pt-6">
+              <div className="border-t border-slate-800 pt-4 space-y-2">
+                <Link
+                  href="/"
+                  className="w-full px-4 py-3 rounded-xl flex items-center justify-between text-xs font-black bg-slate-800/90 text-white hover:bg-slate-700 transition-colors border-0"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <ArrowLeft size={15} className="text-[#FF6B4A]" />
+                    <span>메인 사이트 바로가기</span>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-bold">OUTLINK →</span>
+                </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-bold text-[#735965] hover:text-red-500 hover:bg-red-50 transition-colors text-left"
+                  className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-xs font-extrabold text-slate-400 hover:text-red-400 hover:bg-slate-800/60 transition-colors text-left border-0 cursor-pointer"
                 >
-                  <LogOut size={17} />
+                  <LogOut size={16} />
                   <span>로그아웃</span>
                 </button>
               </div>
@@ -4531,82 +4736,543 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* MAIN CONTENT AREA */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-full">
+        {/* MAIN CONTENT AREA (100% Full Width Screen Layout) */}
+        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto w-full max-w-full">
+          <div className="w-full max-w-full space-y-6">
           
           {/* ==========================================
-              MENU: 1. DASHBOARD
+              MENU: 1. DASHBOARD (Edu-Center SaaS Dashboard Inspired)
              ========================================== */}
           {currentMenu === "dashboard" && (
-            <div className="space-y-6">
+            <div className="space-y-6 animate-fadeIn">
               
-              {/* Summary Stats */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* 1. 상단 파트너십/어드민 환영 배너 (점주 포털과 100% 동일한 배경 이미지) */}
+              <div className="w-full bg-[#0B0F17] text-white rounded-[28px] p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 group border-0">
+                {/* 배경 이미지 커버 */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center opacity-75 group-hover:scale-103 transition-transform duration-700 pointer-events-none"
+                  style={{
+                    backgroundImage: `url('https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784732847/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_9%EC%9D%BC_%EC%98%A4%ED%9B%84_09_02_58_1_qvxy5y.png')`
+                  }}
+                ></div>
+
+                {/* 가독성 100% 확보를 위한 어두운 시네마틱 그라데이션 오버레이 */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/40 pointer-events-none"></div>
+
+                <div className="space-y-2.5 max-w-3xl relative z-10">
+                  <span className="bg-[#F5A623] text-slate-950 text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                    HQ MASTER PORTAL
+                  </span>
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-snug text-white drop-shadow-md">
+                    120PIE 가맹지원본부 | 마스터 어드민 모니터링
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-200 font-medium leading-relaxed drop-shadow-xs">
+                    안녕하세요, 최고 관리자님! 전국 가맹점 현황 및 물류 자재 발주 시스템이 실시간으로 본사 어드민과 연동되고 있습니다.
+                  </p>
+                </div>
+
+                {/* 우측 시네마틱 글래스모피즘 토글 박스 2개 (점주 메뉴와 100% 동일) */}
+                <div className="flex items-center gap-3 shrink-0 relative z-10">
+                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-2xl text-center min-w-[120px] shadow-xl">
+                    <span className="text-[10px] text-slate-400 font-extrabold block mb-0.5">HQ 권한 랭크</span>
+                    <strong className="text-xs font-mono font-black text-[#F5A623] tracking-wider">#MASTER</strong>
+                  </div>
+                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-2xl text-center min-w-[120px] shadow-xl">
+                    <span className="text-[10px] text-slate-400 font-extrabold block mb-0.5">실시간 어드민 상태</span>
+                    <strong className="text-xs font-black text-emerald-400">정상 작동 중</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4 SUMMARY STAT CARDS GRID */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {/* Card 1: Total Stores */}
                 <button 
                   onClick={() => setCurrentMenu("store")}
-                  className="bg-white border border-[#f2ccd7] hover:border-[#f25f8a] hover:bg-[#fff9fb] transition-all rounded-2xl p-5 flex items-center justify-between shadow-sm text-left group cursor-pointer"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
                 >
-                  <div>
-                    <span className="text-xs text-[#735965] font-bold block mb-1">총 등록 가맹점</span>
-                    <strong className="text-2xl font-black text-[#2d2026]">{stores.length} <span className="text-xs text-[#735965] font-normal">개 매장</span></strong>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-neutral-500 tracking-tight">전체 매장 현황</span>
+                    <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#F5AC00] group-hover:bg-[#F5AC00] group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                      <Store size={22} />
+                    </div>
                   </div>
-                  <div className="bg-[#ffd3df] text-[#bf3e67] group-hover:bg-[#f25f8a] group-hover:text-white p-3 rounded-xl transition-all">
-                    <Store size={22} />
+                  <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
+                    {stores.length.toLocaleString()} <span className="text-sm font-bold text-neutral-400">개 매장</span>
+                  </strong>
+                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+12.5%</span>
+                    <span className="text-neutral-400 font-semibold">전월 대비</span>
                   </div>
                 </button>
 
+                {/* Card 2: Today Orders */}
                 <button 
                   onClick={() => setCurrentMenu("order")}
-                  className="bg-white border border-[#f2ccd7] hover:border-[#f25f8a] hover:bg-[#fff9fb] transition-all rounded-2xl p-5 flex items-center justify-between shadow-sm text-left group cursor-pointer"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
                 >
-                  <div>
-                    <span className="text-xs text-[#735965] font-bold block mb-1">오늘 접수된 주문</span>
-                    <strong className="text-2xl font-black text-[#f25f8a]">{orders.length} <span className="text-xs text-[#735965] font-normal">건</span></strong>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-neutral-500 tracking-tight">오늘 발주 건수</span>
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                      <ShoppingBag size={22} />
+                    </div>
                   </div>
-                  <div className="bg-[#ffd3df] text-[#bf3e67] group-hover:bg-[#f25f8a] group-hover:text-white p-3 rounded-xl transition-all">
-                    <ShoppingBag size={22} />
+                  <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
+                    {orders.length.toLocaleString()} <span className="text-sm font-bold text-neutral-400">건</span>
+                  </strong>
+                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+8.3%</span>
+                    <span className="text-neutral-400 font-semibold">전월 대비</span>
                   </div>
                 </button>
 
+                {/* Card 3: Pending Inquiries */}
                 <button 
                   onClick={() => setCurrentMenu("inquiry")}
-                  className="bg-white border border-[#f2ccd7] hover:border-[#f25f8a] hover:bg-[#fff9fb] transition-all rounded-2xl p-5 flex items-center justify-between shadow-sm text-left group cursor-pointer"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
                 >
-                  <div>
-                    <span className="text-xs text-[#735965] font-bold block mb-1">답변대기 1:1 문의</span>
-                    <strong className="text-2xl font-black text-[#2d2026]">{pendingInquiriesCount} <span className="text-xs text-[#735965] font-normal">건</span></strong>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-neutral-500 tracking-tight">미처리 AS / 문의</span>
+                    <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                      <MessageSquare size={22} />
+                    </div>
                   </div>
-                  <div className="bg-[#ffd3df] text-[#bf3e67] group-hover:bg-[#f25f8a] group-hover:text-white p-3 rounded-xl transition-all">
-                    <MessageSquare size={22} />
+                  <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
+                    {pendingInquiriesCount} <span className="text-sm font-bold text-neutral-400">건</span>
+                  </strong>
+                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-rose-500">
+                    <span className="px-2 py-0.5 rounded-full bg-rose-50 border border-rose-100">-3%</span>
+                    <span className="text-neutral-400 font-semibold">전월 대비</span>
                   </div>
                 </button>
 
+                {/* Card 4: Consultations */}
                 <button 
                   onClick={() => setCurrentMenu("consultation")}
-                  className="bg-white border border-[#f2ccd7] hover:border-[#f25f8a] hover:bg-[#fff9fb] transition-all rounded-2xl p-5 flex items-center justify-between shadow-sm text-left group cursor-pointer"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
                 >
-                  <div>
-                    <span className="text-xs text-[#735965] font-bold block mb-1">창업 상담문의</span>
-                    <strong className="text-2xl font-black text-[#2d2026]">{consultations.length} <span className="text-xs text-[#735965] font-normal">건</span></strong>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-neutral-500 tracking-tight">가맹 창업 상담 문의</span>
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                      <Headphones size={22} />
+                    </div>
                   </div>
-                  <div className="bg-[#ffd3df] text-[#bf3e67] group-hover:bg-[#f25f8a] group-hover:text-white p-3 rounded-xl transition-all">
-                    <Headphones size={22} />
+                  <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
+                    {consultations.length.toLocaleString()} <span className="text-sm font-bold text-neutral-400">건</span>
+                  </strong>
+                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+15.2%</span>
+                    <span className="text-neutral-400 font-semibold">전월 대비</span>
                   </div>
                 </button>
               </div>
 
-              {/* Store Management Table Summary */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-bold text-[#2d2026]">전국 가맹점 마스터 대장</h3>
-                  <p className="text-xs text-[#735965] font-bold mt-1">현재 정식 계약 체결 후 운영 중인 브랜드 매장 리스트와 월 예상 누적 매출입니다.</p>
+              {/* 2. 전국 가동 중인 120 패키지 브랜드 모듈 (점주 포털과 100% 동일한 6개 3D 지정 아이콘 동기화) */}
+              <div className="bg-white rounded-[28px] p-6 sm:p-7 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0 space-y-5">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div>
+                    <h2 className="text-lg font-black text-[#0F172A] tracking-tight">전국 가동 중인 120 패키지 운영 모듈</h2>
+                    <p className="text-xs text-slate-400 font-medium mt-0.5">전국 가맹점에서 라이선스를 취득해 작동 중인 브랜드 패키지 총 현황입니다.</p>
+                  </div>
+                  <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 shrink-0">
+                    전국 모듈 가동중 (HQ MASTER)
+                  </span>
                 </div>
 
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+                  {/* Helper for module active count calculation */}
+                  {(() => {
+                    const activeStores = stores.filter(s => s.status === "승인");
+                    const getCount = (key: string) => {
+                      if (key === "120pie") {
+                        return activeStores.filter(s => !s.adoptionMenu || s.adoptionMenu.length === 0 || s.adoptionMenu.includes("120pie")).length;
+                      }
+                      return activeStores.filter(s => s.adoptionMenu?.includes(key)).length;
+                    };
+
+                    const pieCount = getCount("120pie");
+                    const eggCount = getCount("egg120");
+                    const churrosCount = getCount("츄러스120");
+                    const ddeokCount = getCount("떡볶이120");
+                    const hotdogCount = getCount("핫도그120");
+                    const coffeeCount = getCount("120coffee");
+
+                    return (
+                      <>
+                        {/* Module 1: 120pie */}
+                        <div className="bg-[#F8FAFC] hover:bg-emerald-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-emerald-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <img
+                              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_4_1_zptjbn.png"
+                              alt="120pie"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <div className="space-y-1 w-full">
+                            <strong className="text-xs font-black text-[#0F172A] block">120pie</strong>
+                            <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                              {pieCount}개 매장 가동중
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Module 2: egg120 */}
+                        <div className="bg-[#F8FAFC] hover:bg-amber-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-amber-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <img
+                              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158865/Group_5_1_cdwr4y.png"
+                              alt="egg120"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <div className="space-y-1 w-full">
+                            <strong className="text-xs font-black text-slate-700 block">egg120</strong>
+                            {eggCount > 0 ? (
+                              <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                                {eggCount}개 매장 가동중
+                              </span>
+                            ) : (
+                              <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                                0개 매장 (대기)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Module 3: 츄러스120 */}
+                        <div className="bg-[#F8FAFC] hover:bg-orange-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-orange-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <img
+                              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_7_iowfzq.png"
+                              alt="츄러스120"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <div className="space-y-1 w-full">
+                            <strong className="text-xs font-black text-slate-700 block">츄러스120</strong>
+                            {churrosCount > 0 ? (
+                              <span className="text-[10px] font-black text-orange-700 bg-orange-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                                {churrosCount}개 매장 가동중
+                              </span>
+                            ) : (
+                              <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                                0개 매장 (대기)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Module 4: 떡볶이120 */}
+                        <div className="bg-[#F8FAFC] hover:bg-rose-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-rose-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <img
+                              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_6_io2ejc.png"
+                              alt="떡볶이120"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <div className="space-y-1 w-full">
+                            <strong className="text-xs font-black text-slate-700 block">떡볶이120</strong>
+                            {ddeokCount > 0 ? (
+                              <span className="text-[10px] font-black text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                                {ddeokCount}개 매장 가동중
+                              </span>
+                            ) : (
+                              <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                                0개 매장 (대기)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Module 5: 핫도그120 */}
+                        <div className="bg-[#F8FAFC] hover:bg-yellow-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-yellow-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <img
+                              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_8_d8kfzr.png"
+                              alt="핫도그120"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <div className="space-y-1 w-full">
+                            <strong className="text-xs font-black text-slate-700 block">핫도그120</strong>
+                            {hotdogCount > 0 ? (
+                              <span className="text-[10px] font-black text-yellow-800 bg-yellow-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                                {hotdogCount}개 매장 가동중
+                              </span>
+                            ) : (
+                              <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                                0개 매장 (대기)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Module 6: 120coffee */}
+                        <div className="bg-[#F8FAFC] hover:bg-amber-100/40 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-amber-300 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <img
+                              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_9_iskk3b.png"
+                              alt="120coffee"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <div className="space-y-1 w-full">
+                            <strong className="text-xs font-black text-slate-700 block">120coffee</strong>
+                            {coffeeCount > 0 ? (
+                              <span className="text-[10px] font-black text-amber-800 bg-amber-200/70 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                                {coffeeCount}개 매장 가동중
+                              </span>
+                            ) : (
+                              <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                                0개 매장 (대기)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Module 7: 추가 패키지 */}
+                        <div className="bg-[#F8FAFC] hover:bg-indigo-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-indigo-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
+                            <PlusCircle size={18} />
+                          </div>
+                          <div className="space-y-1 w-full">
+                            <strong className="text-xs font-black text-slate-500 block">추가 모듈</strong>
+                            <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                              준비중
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* MIDDLE SECTION: PERFORMANCE CHART & UPCOMING EVENTS */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* Left (2 Cols): Smooth Performance Chart */}
+                <div className="lg:col-span-2 bg-white border border-[#EEF0F5] rounded-[28px] p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                      <h3 className="text-lg font-black text-[#1E1B18]">가맹본부 성과 모니터링</h3>
+                      <p className="text-xs text-neutral-400 font-semibold mt-0.5">실시간 전국 매출액 및 자재 주문 트렌드 모니터링</p>
+                    </div>
+
+                    {/* Chart Legend Controls */}
+                    <div className="flex items-center gap-4 text-xs font-extrabold select-none">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#F5AC00]"></span>
+                        <span className="text-neutral-600">가맹점 주문량</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-emerald-400"></span>
+                        <span className="text-neutral-600">매출 성장률</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SVG Smooth Curve Line Chart */}
+                  <div className="relative w-full h-56 my-2">
+                    <svg className="w-full h-full overflow-visible" viewBox="0 0 500 180" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="chartGrad1" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#F5AC00" stopOpacity="0.35" />
+                          <stop offset="100%" stopColor="#F5AC00" stopOpacity="0.0" />
+                        </linearGradient>
+                        <linearGradient id="chartGrad2" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#34D399" stopOpacity="0.3" />
+                          <stop offset="100%" stopColor="#34D399" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+
+                      {/* Grid Lines */}
+                      <line x1="0" y1="30" x2="500" y2="30" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
+                      <line x1="0" y1="80" x2="500" y2="80" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
+                      <line x1="0" y1="130" x2="500" y2="130" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
+
+                      {/* Area Fill 1 */}
+                      <path
+                        d="M0,130 Q70,40 140,110 T280,50 T420,90 T500,30 L500,180 L0,180 Z"
+                        fill="url(#chartGrad1)"
+                      />
+                      {/* Line 1 */}
+                      <path
+                        d="M0,130 Q70,40 140,110 T280,50 T420,90 T500,30"
+                        fill="none"
+                        stroke="#F5AC00"
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                      />
+
+                      {/* Area Fill 2 */}
+                      <path
+                        d="M0,150 Q70,90 140,130 T280,100 T420,130 T500,80 L500,180 L0,180 Z"
+                        fill="url(#chartGrad2)"
+                      />
+                      {/* Line 2 */}
+                      <path
+                        d="M0,150 Q70,90 140,130 T280,100 T420,130 T500,80"
+                        fill="none"
+                        stroke="#34D399"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                      />
+
+                      {/* Interactive Data Point Highlight */}
+                      <circle cx="280" cy="50" r="6" fill="#F5AC00" stroke="#ffffff" strokeWidth="3" className="shadow-md" />
+                      <circle cx="280" cy="100" r="5" fill="#34D399" stroke="#ffffff" strokeWidth="2" />
+                    </svg>
+
+                    {/* Chart Tooltip Overlay */}
+                    <div className="absolute top-[22%] left-[52%] -translate-x-1/2 bg-[#1E1B18] text-white px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-lg flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#F5AC00]"></span>
+                      <span>7월 3주차: <strong>370건</strong></span>
+                    </div>
+                  </div>
+
+                  {/* X Axis Labels */}
+                  <div className="flex justify-between text-[11px] font-extrabold text-neutral-400 pt-2 border-t border-[#F1F5F9]">
+                    <span>1주차</span>
+                    <span>2주차</span>
+                    <span>3주차</span>
+                    <span>4주차</span>
+                    <span>5주차</span>
+                    <span>6주차</span>
+                  </div>
+                </div>
+
+                {/* Right (1 Col): 최신 공지사항(3개) & 최신 교육/홍보물(3개) */}
+                <div className="space-y-6 flex flex-col justify-between">
+                  {/* 1. 최신 공지사항 (3개) */}
+                  <div className="bg-white border border-[#EEF0F5] rounded-[28px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#F5AC00]"></div>
+                          <h4 className="text-base font-black text-[#1E1B18]">최신 공지사항</h4>
+                          <span className="text-[10px] font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">최신 3건</span>
+                        </div>
+                        <button 
+                          onClick={() => setCurrentMenu("notice")}
+                          className="text-[11px] text-[#F5AC00] font-extrabold cursor-pointer hover:underline border-0 bg-transparent"
+                        >
+                          전체보기 →
+                        </button>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {(() => {
+                          const list = (notices && notices.length > 0) 
+                            ? notices.slice(0, 3) 
+                            : [
+                                { id: "n1", title: "3분기 가맹점 정기 신메뉴 레시피 교육 안내", date: "2026.07.27", isImportant: true },
+                                { id: "n2", title: "여름 시즌 프로모션 홍보물 가맹점 배송 일정", date: "2026.07.20", isImportant: false },
+                                { id: "n3", title: "물류 시스템 정기 점검 및 서버 점검 안내", date: "2026.07.15", isImportant: false },
+                              ];
+                          
+                          return list.map((notice: any, idx: number) => (
+                            <div 
+                              key={notice.id || idx} 
+                              onClick={() => setCurrentMenu("notice")}
+                              className="flex items-center justify-between p-3 rounded-2xl bg-[#F8F9FD] hover:bg-amber-50/60 border border-[#EEF0F5] transition-all cursor-pointer group"
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${notice.isImportant ? 'bg-rose-100 text-rose-600' : 'bg-slate-200 text-slate-600'}`}>
+                                  {notice.isImportant ? '중요' : '공지'}
+                                </span>
+                                <h5 className="text-xs font-bold text-[#1E1B18] group-hover:text-[#F5AC00] truncate transition-colors">
+                                  {notice.title}
+                                </h5>
+                              </div>
+                              <span className="text-[10px] font-medium text-neutral-400 shrink-0 font-mono">
+                                {notice.date || notice.regDate || "2026.07.27"}
+                              </span>
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. 최신 교육 & 홍보물 (3개) */}
+                  <div className="bg-white border border-[#EEF0F5] rounded-[28px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                          <h4 className="text-base font-black text-[#1E1B18]">최신 교육 & 홍보물</h4>
+                          <span className="text-[10px] font-black text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">최신 3건</span>
+                        </div>
+                        <button 
+                          onClick={() => setCurrentMenu("material")}
+                          className="text-[11px] text-[#F5AC00] font-extrabold cursor-pointer hover:underline border-0 bg-transparent"
+                        >
+                          전체보기 →
+                        </button>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {(() => {
+                          const combined = [...(trainings || []), ...(prs || [])];
+                          const list = (combined && combined.length > 0)
+                            ? combined.slice(0, 3)
+                            : [
+                                { id: "m1", title: "120PIE 시그니처 파이 매뉴얼 가이드 V2", category: "교육자료", date: "2026.07.25" },
+                                { id: "m2", title: "2026 여름 시즌 매장 연출 X배너 포스터 POP", category: "홍보물", date: "2026.07.18" },
+                                { id: "m3", title: "가맹점 위생 점검 및 기기 유지보수 매뉴얼", category: "교육자료", date: "2026.07.10" },
+                              ];
+
+                          return list.map((mat: any, idx: number) => (
+                            <div 
+                              key={mat.id || idx} 
+                              onClick={() => setCurrentMenu("material")}
+                              className="flex items-center justify-between p-3 rounded-2xl bg-[#F8F9FD] hover:bg-blue-50/60 border border-[#EEF0F5] transition-all cursor-pointer group"
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${mat.category === '홍보물' ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-100 text-blue-600'}`}>
+                                  {mat.category || (idx % 2 === 0 ? "교육자료" : "홍보물")}
+                                </span>
+                                <h5 className="text-xs font-bold text-[#1E1B18] group-hover:text-blue-600 truncate transition-colors">
+                                  {mat.title}
+                                </h5>
+                              </div>
+                              <span className="text-[10px] font-medium text-neutral-400 shrink-0 font-mono">
+                                {mat.date || mat.regDate || "2026.07.25"}
+                              </span>
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+
+
+              {/* Store Management Table Summary */}
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-black text-[#1E1B18]">전국 가맹점 마스터 대장</h3>
+                    <p className="text-xs text-neutral-400 font-semibold mt-0.5">정식 계약 체결 후 운영 중인 브랜드 매장 리스트와 월 누적 매출 요약입니다.</p>
+                  </div>
+                  <button 
+                    onClick={() => setCurrentMenu("store")}
+                    className="text-xs font-extrabold text-[#F5AC00] hover:underline"
+                  >
+                    전체 가맹점 관리 →
+                  </button>
+                </div>
+
+                <div className="bg-white border border-[#EEF0F5] rounded-[24px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
+                        <tr className="bg-[#F8F9FD] border-b border-[#EEF0F5] text-[11px] font-extrabold text-neutral-400 uppercase tracking-wider">
                           <th className="p-4 sm:p-5">점포 코드</th>
                           <th className="p-4 sm:p-5">가맹점명</th>
                           <th className="p-4 sm:p-5">점주명</th>
@@ -4615,25 +5281,25 @@ export default function AdminPage() {
                           <th className="p-4 sm:p-5">상태</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                      <tbody className="divide-y divide-[#EEF0F5] text-xs font-bold text-[#1E1B18]">
                         {stores.map((store) => (
-                          <tr key={store.id} className="hover:bg-[#fff9fb] transition-colors">
-                            <td className="p-4 sm:p-5 font-bold text-[#bf3e67]">{store.id}</td>
-                            <td className="p-4 sm:p-5 text-[#2d2026] font-bold">{store.name}</td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold">
+                          <tr key={store.id} className="hover:bg-[#F8F9FD] transition-colors">
+                            <td className="p-4 sm:p-5 font-black text-[#F5AC00]">{store.id}</td>
+                            <td className="p-4 sm:p-5 font-black text-[#1E1B18]">{store.name}</td>
+                            <td className="p-4 sm:p-5 text-neutral-600">
                               <span>{store.owner}</span>
-                              <span className="text-[10px] block mt-0.5 opacity-60">{store.phone}</span>
+                              <span className="text-[10px] block text-neutral-400 font-semibold mt-0.5">{store.phone}</span>
                             </td>
                             <td className="p-4 sm:p-5">
-                              <span className="bg-[#ffd3df] text-[#bf3e67] font-bold px-2.5 py-0.5 rounded-full text-[10px] border border-[#f2ccd7]">
+                              <span className="bg-amber-50 text-[#3D2E0A] font-extrabold px-3 py-1 rounded-full text-[10px] border border-amber-200">
                                 {store.adoptionMenu ? store.adoptionMenu.length : 0}개 모듈 가동중
                               </span>
                             </td>
-                            <td className="p-4 sm:p-5 font-bold text-[#2d2026]">
+                            <td className="p-4 sm:p-5 font-black text-[#1E1B18]">
                               {store.monthlySales > 0 ? `${store.monthlySales.toLocaleString()} 원` : "정산 대기"}
                             </td>
                             <td className="p-4 sm:p-5">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
                                 store.status === "승인" 
                                   ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
                                   : store.status === "대기"
@@ -4688,24 +5354,25 @@ export default function AdminPage() {
                     onChange={(e) => {
                       setContractSearchQuery(e.target.value);
                     }}
-                    className="w-full pl-9 pr-4 py-2 border border-[#f2ccd7] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] bg-[#fff9fb] text-[#2d2026] font-bold"
+                    className="w-full pl-9 pr-4 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs placeholder-slate-400"
                   />
-                  <Search size={14} className="absolute left-3 top-3 text-[#735965]" />
+                  <Search size={14} className="absolute left-3 top-3.5 text-slate-400" />
                 </div>
                 
                 {/* Contractor List Scroll */}
-                <div className="flex-1 overflow-y-auto pr-1 space-y-2 max-h-[400px] lg:max-h-[600px]">
+                <div className="flex-1 space-y-2">
                   {filteredContracts.length === 0 ? (
-                    <div className="text-center py-8 text-xs text-[#735965] font-bold">
+                    <div className="text-center py-8 text-xs text-slate-400 font-bold">
                       등록된 계약자가 없습니다.
                     </div>
                   ) : (
                     filteredContracts.map((c) => {
-                      let statusBg = "bg-blue-50 text-blue-600 border border-blue-100";
-                      if (c.status === "계약서 발송완료") statusBg = "bg-amber-50 text-amber-600 border border-amber-100";
-                      else if (c.status === "계약서 서명완료") statusBg = "bg-emerald-50 text-emerald-600 border border-emerald-100";
-                      else if (c.status === "계약서 진행취소") statusBg = "bg-neutral-50 text-neutral-500 border border-neutral-200";
+                      let statusBg = "bg-blue-50 text-blue-600 border-0";
+                      if (c.status === "계약서 발송완료") statusBg = "bg-amber-50 text-amber-600 border-0";
+                      else if (c.status === "계약서 서명완료") statusBg = "bg-emerald-50 text-emerald-600 border-0";
+                      else if (c.status === "계약서 진행취소") statusBg = "bg-neutral-100 text-neutral-500 border-0";
                       
+                      const isSelected = selectedContract?._id === c._id;
                       return (
                         <button
                           key={c._id}
@@ -4714,19 +5381,19 @@ export default function AdminPage() {
                             setSelectedContract(c);
                             setIsContractFormOpen(false);
                           }}
-                          className={`w-full text-left p-3.5 rounded-xl border transition-all flex flex-col gap-1.5 ${
-                            selectedContract?._id === c._id
-                              ? "bg-[#ffd3df]/35 border-[#bf3e67] shadow-sm ring-1 ring-[#bf3e67]/30"
-                              : "bg-[#fff9fb]/40 border-[#f2ccd7] hover:border-[#f25f8a] hover:bg-[#ffd3df]/10"
+                          className={`w-full text-left p-3.5 rounded-xl border-0 transition-all flex flex-col gap-1.5 ${
+                            isSelected
+                              ? "bg-slate-200/90 text-[#0F172A] shadow-xs font-black"
+                              : "bg-[#F8F9FA] text-slate-700 hover:bg-slate-100"
                           }`}
                         >
                           <div className="flex items-center justify-between w-full">
-                            <span className="font-extrabold text-sm text-[#2d2026]">{c.ownerName}</span>
+                            <span className="font-extrabold text-sm text-[#0F172A]">{c.ownerName}</span>
                             <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${statusBg}`}>
                               {c.status}
                             </span>
                           </div>
-                          <div className="flex items-center justify-between text-[11px] text-[#735965] font-semibold">
+                          <div className="flex items-center justify-between text-[11px] text-slate-500 font-semibold">
                             <span>{c.storeName || "가맹점명 미정"}</span>
                             <span>{c.createdAt.split(" ")[0]}</span>
                           </div>
@@ -4738,386 +5405,375 @@ export default function AdminPage() {
               </div>
               
               {/* RIGHT CONTENT: DETAIL VIEW OR FORM */}
-              <div className="flex-1 bg-white border border-[#f2ccd7] rounded-2xl p-6 flex flex-col shadow-sm min-w-0 w-full">
+              <div className="flex-1 bg-white border-0 rounded-2xl p-6 flex flex-col shadow-xs min-w-0 w-full">
                 {isContractFormOpen ? (
                   /* REGISTRATION / EDIT FORM */
-                  <form onSubmit={handleContractSubmit} className="space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#f2ccd7]">
-                      <div>
-                        <h3 className="text-lg font-black text-[#2d2026]">
-                          {isContractEditMode ? "계약 정보 수정" : "계약 정보 등록"}
-                        </h3>
-                        <p className="text-xs text-[#735965] font-bold mt-0.5">가맹계약서 작성을 위한 기본 금액 및 계약자 인적 정보를 입력합니다.</p>
+                  <form onSubmit={handleContractSubmit} className="space-y-8">
+                    {/* Section 1: 인적 정보 */}
+                    <div>
+                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-xl border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
+                        <span>1. 계약자 및 가맹점 인적 정보</span>
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleApplyAllDefaults}
-                        className="px-4 py-2 bg-[#ffd3df] hover:bg-[#f2ccd7] text-[#bf3e67] text-xs font-bold rounded-lg transition-colors border border-[#f2ccd7] shrink-0 cursor-pointer"
-                      >
-                        기본금액 일괄적용
-                      </button>
-                    </div>
-                    
-                    {/* FORM FIELDS */}
-                    <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
-                      {/* Section 1: 인적 정보 */}
-                      <div>
-                        <h4 className="text-xs font-black text-[#bf3e67] uppercase tracking-wider mb-3 pb-1 border-b border-[#ffd3df]/20">1. 계약자 및 가맹점 인적 정보</h4>
-                        
-                        {/* 계약 구분 선택 */}
-                        <div className="mb-4 bg-[#fff9fb]/40 border border-[#f2ccd7] p-3 rounded-xl flex flex-col gap-2">
-                          <span className="text-xs font-black text-[#bf3e67]">계약 구분 <span className="text-red-500">*</span></span>
-                          <div className="flex items-center gap-6">
-                            {["신규", "갱신", "양수"].map((type) => (
-                              <label key={type} className="flex items-center gap-2 cursor-pointer font-bold text-xs text-[#2d2026] select-none">
-                                <input
-                                  type="radio"
-                                  name="contractType"
-                                  value={type}
-                                  checked={contractForm.contractType === type}
-                                  onChange={(e) => setContractForm(prev => ({ ...prev, contractType: e.target.value }))}
-                                  className="w-4 h-4 accent-[#bf3e67] cursor-pointer"
-                                />
-                                {type}
-                              </label>
-                            ))}
+                      
+                      {/* 계약 구분 선택 */}
+                      <div className="mb-4 bg-[#F8F9FA] border-0 p-4 rounded-2xl flex flex-col gap-2 shadow-2xs">
+                        <span className="text-xs font-black text-[#0F172A]">계약 구분 <span className="text-red-500">*</span></span>
+                        <div className="flex items-center gap-6">
+                          {["신규", "갱신", "양수"].map((type) => (
+                            <label key={type} className="flex items-center gap-2 cursor-pointer font-bold text-xs text-[#0F172A] select-none">
+                              <input
+                                type="radio"
+                                name="contractType"
+                                value={type}
+                                checked={contractForm.contractType === type}
+                                onChange={(e) => setContractForm(prev => ({ ...prev, contractType: e.target.value }))}
+                                className="w-4 h-4 accent-[#FED422] cursor-pointer"
+                              />
+                              {type}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-600 mb-1">가맹사업자명 <span className="text-red-500">*</span></label>
+                          <input
+                            type="text"
+                            required
+                            value={contractForm.ownerName}
+                            onChange={(e) => setContractForm({ ...contractForm, ownerName: e.target.value })}
+                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            placeholder="홍길동"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-600 mb-1">가맹사업자 생년월일 <span className="text-red-500">*</span></label>
+                          <input
+                            type="text"
+                            required
+                            value={contractForm.ownerBirth}
+                            onChange={(e) => setContractForm({ ...contractForm, ownerBirth: e.target.value })}
+                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            placeholder="YYYY-MM-DD 또는 900101"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-600 mb-1">가맹사업자 연락처 <span className="text-red-500">*</span></label>
+                          <input
+                            type="text"
+                            required
+                            value={contractForm.ownerPhone}
+                            onChange={(e) => setContractForm({ ...contractForm, ownerPhone: e.target.value })}
+                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            placeholder="010-1234-5678"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-600 mb-1">가맹점 명칭 <span className="text-red-500">*</span></label>
+                          <input
+                            type="text"
+                            required
+                            value={contractForm.storeName}
+                            onChange={(e) => setContractForm({ ...contractForm, storeName: e.target.value })}
+                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            placeholder="120겹파이 역삼역점"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-bold text-slate-600 mb-1">가맹점 주소 <span className="text-red-500">*</span></label>
+                          <div className="flex gap-2 mb-2">
+                            <input
+                              type="text"
+                              required
+                              readOnly
+                              value={contractRoadAddress}
+                              className="flex-1 px-3.5 py-2.5 border-0 rounded-xl text-xs bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                              placeholder="주소 검색 버튼을 눌러 도로명 주소를 입력하세요."
+                            />
+                            <button
+                              type="button"
+                              onClick={() => openDaumPostcode("contract")}
+                              className="px-4 py-2.5 bg-[#FED422] text-[#0F172A] text-xs font-bold rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
+                            >
+                              주소 검색
+                            </button>
+                          </div>
+                          <input
+                            type="text"
+                            value={contractDetailAddress}
+                            onChange={(e) => setContractDetailAddress(e.target.value)}
+                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            placeholder="가맹점 상세 주소 (e.g. 2층 202호)"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-600 mb-1">가맹점 규모 (㎡) <span className="text-red-500">*</span></label>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              required
+                              value={contractForm.storeSize || ""}
+                              onChange={(e) => setContractForm({ ...contractForm, storeSize: parseFloat(e.target.value) || 0 })}
+                              className="w-full px-3.5 py-2.5 pr-8 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                              placeholder="33"
+                            />
+                            <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold">㎡</span>
                           </div>
                         </div>
-
+                        <div>
+                          <label className="block text-xs font-bold text-slate-600 mb-1">영업 지역 <span className="text-red-500">*</span></label>
+                          <input
+                            type="text"
+                            required
+                            value={contractForm.businessArea}
+                            onChange={(e) => setContractForm({ ...contractForm, businessArea: e.target.value })}
+                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            placeholder="가맹점 반경 500m 내"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Section 2: 계약 기간 */}
+                    <div>
+                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-xl border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
+                        <span>2. 계약 기간</span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-600 mb-1">계약 시작일 <span className="text-red-500">*</span></label>
+                          <input
+                            type="date"
+                            required
+                            value={contractForm.contractStart}
+                            onChange={(e) => setContractForm({ ...contractForm, contractStart: e.target.value })}
+                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-600 mb-1">계약 종료일 <span className="text-red-500">*</span></label>
+                          <input
+                            type="date"
+                            required
+                            value={contractForm.contractEnd}
+                            onChange={(e) => setContractForm({ ...contractForm, contractEnd: e.target.value })}
+                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Section 3: 금액 정보 */}
+                    <div className="space-y-5">
+                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-xl border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
+                        <span>3. 금액 정보 설정</span>
+                      </div>
+                      
+                      {/* 3.1 가맹 및 감리 비용 */}
+                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                        <div className="border-b border-slate-200/60 pb-2">
+                          <span className="block text-xs font-black text-[#0F172A] uppercase tracking-wider">3-1. 가맹 및 감리 비용</span>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-xs font-bold text-[#735965] mb-1">가맹사업자명 <span className="text-red-500">*</span></label>
-                            <input
-                              type="text"
-                              required
-                              value={contractForm.ownerName}
-                              onChange={(e) => setContractForm({ ...contractForm, ownerName: e.target.value })}
-                              className="w-full px-3.5 py-2 border border-[#f2ccd7] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] text-[#2d2026] font-bold"
-                              placeholder="홍길동"
-                            />
+                          {renderAmountInput("supervisionFee", "공사감리비 (부가세 포함)", 3300000, "일금삼백삼십만원(￦3,300,000)")}
+                          {renderAmountInput("initialFranchiseFee", "최초가맹금 (부가세 포함)", 5000000, "일금오백만원(￦5,000,000)")}
+                        </div>
+                      </div>
+
+                      {/* 3.2 예치가맹금 설정 */}
+                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                          <span className="block text-xs font-black text-[#0F172A] uppercase tracking-wider">3-2. 예치가맹금 설정</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setContractForm((prev) => ({
+                                ...prev,
+                                depositMembershipFee: 1100000,
+                                depositEduFee: 2200000,
+                                depositSupportFee: 1700000,
+                                depositGuaranteeFee: 1000000,
+                                depositTotalFee: 6000000,
+                              }));
+                              triggerToast("예치가맹금 기본값들이 적용되었습니다.");
+                            }}
+                            className="text-[10px] text-slate-700 font-extrabold border-0 bg-slate-200 hover:bg-slate-300 px-2.5 py-1 rounded-lg transition-all cursor-pointer shadow-2xs"
+                          >
+                            예치금 전체 기본적용
+                          </button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                          {renderTableAmountInput("depositMembershipFee", "가입비", 1100000)}
+                          {renderTableAmountInput("depositEduFee", "오픈교육비", 2200000)}
+                          {renderTableAmountInput("depositSupportFee", "오픈지원비", 1700000)}
+                          {renderTableAmountInput("depositGuaranteeFee", "계약이행보증금", 1000000)}
+                          
+                          <div className="md:col-span-2 flex items-center justify-between border-t border-slate-200/60 pt-3 mt-1">
+                            <span className="font-extrabold text-[#0F172A]">예치가맹금 합계</span>
+                            <span className="font-black text-[#0F172A] text-sm">
+                              {contractForm.depositTotalFee ? Number(contractForm.depositTotalFee).toLocaleString() : 0} 원
+                            </span>
                           </div>
-                          <div>
-                            <label className="block text-xs font-bold text-[#735965] mb-1">가맹사업자 생년월일 <span className="text-red-500">*</span></label>
-                            <input
-                              type="text"
-                              required
-                              value={contractForm.ownerBirth}
-                              onChange={(e) => setContractForm({ ...contractForm, ownerBirth: e.target.value })}
-                              className="w-full px-3.5 py-2 border border-[#f2ccd7] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] text-[#2d2026] font-bold"
-                              placeholder="YYYY-MM-DD 또는 900101"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-[#735965] mb-1">가맹사업자 연락처 <span className="text-red-500">*</span></label>
-                            <input
-                              type="text"
-                              required
-                              value={contractForm.ownerPhone}
-                              onChange={(e) => setContractForm({ ...contractForm, ownerPhone: e.target.value })}
-                              className="w-full px-3.5 py-2 border border-[#f2ccd7] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] text-[#2d2026] font-bold"
-                              placeholder="010-1234-5678"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-[#735965] mb-1">가맹점 명칭 <span className="text-red-500">*</span></label>
-                            <input
-                              type="text"
-                              required
-                              value={contractForm.storeName}
-                              onChange={(e) => setContractForm({ ...contractForm, storeName: e.target.value })}
-                              className="w-full px-3.5 py-2 border border-[#f2ccd7] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] text-[#2d2026] font-bold"
-                              placeholder="120겹파이 역삼역점"
-                            />
-                          </div>
-                          <div className="md:col-span-2">
-                            <label className="block text-xs font-bold text-[#735965] mb-1">가맹점 주소 <span className="text-red-500">*</span></label>
-                            <div className="flex gap-2 mb-2">
-                              <input
-                                type="text"
-                                required
-                                readOnly
-                                value={contractRoadAddress}
-                                className="flex-1 px-3.5 py-2 border border-[#f2ccd7] rounded-xl text-xs bg-gray-50 text-[#2d2026] font-bold"
-                                placeholder="주소 검색 버튼을 눌러 도로명 주소를 입력하세요."
-                              />
+                        </div>
+                      </div>
+
+                      {/* 3.3 로열티 및 보증 비용 */}
+                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                        <div className="border-b border-slate-200/60 pb-2">
+                          <span className="block text-xs font-black text-[#0F172A] uppercase tracking-wider">3-3. 로열티 및 보증 비용</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {renderAmountInput("royaltyFee", "로열티 (부가세 포함)", 150000, "일금일십오만원(￦150,000)")}
+                          {renderAmountInput("guaranteeFee", "계약이행보증금 (부가세 없음)", 1000000, "일금일백만원(￦1,000,000)")}
+                        </div>
+                      </div>
+
+                      {/* 3.4 교육비 설정 */}
+                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                          <span className="block text-xs font-black text-[#0F172A] uppercase tracking-wider">3-4. 교육비 설정</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setContractForm((prev) => ({
+                                ...prev,
+                                eduOpenFee: 2200000,
+                                eduNewFee: 220000,
+                              }));
+                              triggerToast("교육비 기본값들이 적용되었습니다.");
+                            }}
+                            className="text-[10px] text-slate-700 font-extrabold border-0 bg-slate-200 hover:bg-slate-300 px-2.5 py-1 rounded-lg transition-all cursor-pointer shadow-2xs"
+                          >
+                            교육비 전체 기본적용
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                          {renderTableAmountInput("eduOpenFee", "오픈교육 (최초가맹금에 포함)", 2200000)}
+                          {renderTableAmountInput("eduNewFee", "신입교육 (1인 기준)", 220000)}
+                        </div>
+                      </div>
+
+                      {/* 3.5 초도 및 위약 비용 */}
+                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                        <div className="border-b border-slate-200/60 pb-2">
+                          <span className="block text-xs font-black text-[#0F172A] uppercase tracking-wider">3-5. 초도 및 위약 비용</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {renderAmountInput("initialSupplyFee", "초도물품 (부가세 포함)", 4400000, "일금사백사십만원(￦4,400,000)")}
+                          {renderAmountInput("reFranchiseFee", "재가맹비 (부가세 포함)", 1100000, "일금일백일십만원(￦1,100,000)")}
+                          {renderAmountInput("penaltyFee", "위약금", 1000000, "일금일백만원(￦1,000,000)")}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section 4: 최종 서명 계약서 첨부 */}
+                    <div>
+                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-xl border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
+                        <span>4. 최종 서명 계약서 첨부 (선택사항)</span>
+                      </div>
+                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="file"
+                            accept=".pdf"
+                            id="contract-pdf-upload"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              if (file.type !== "application/pdf") {
+                                alert("PDF 파일만 업로드 가능합니다.");
+                                return;
+                              }
+                              if (file.size > 20 * 1024 * 1024) {
+                                alert("파일 크기는 최대 20MB 이하여야 합니다.");
+                                return;
+                              }
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                const result = reader.result;
+                                if (typeof result === "string") {
+                                  setContractForm((prev) => ({
+                                    ...prev,
+                                    fileUrl: result,
+                                    fileName: file.name,
+                                    status: "계약서 서명완료"
+                                  }));
+                                  triggerToast("최종 계약서가 업로드되었습니다. 저장 시 적용됩니다.");
+                                }
+                              };
+                              reader.readAsDataURL(file);
+                            }}
+                          />
+                          <label
+                            htmlFor="contract-pdf-upload"
+                            className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer border-0 inline-flex items-center gap-2 shadow-2xs"
+                          >
+                            <Upload size={14} />
+                            {contractForm.fileName ? "최종 계약서 재등록" : "최종 계약서 등록"}
+                          </label>
+                          {contractForm.fileName && (
+                            <div className="flex items-center gap-2 text-xs text-[#0F172A] bg-white px-3 py-2 rounded-xl border-0 shadow-2xs">
+                              <FileText size={16} className="text-slate-600" />
+                              <span className="font-bold truncate max-w-[200px]">{contractForm.fileName}</span>
                               <button
                                 type="button"
-                                onClick={() => openDaumPostcode("contract")}
-                                className="px-4 py-2 bg-[#bf3e67] hover:bg-[#a63053] text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                                onClick={() => {
+                                  setContractForm((prev) => ({
+                                    ...prev,
+                                    fileUrl: "",
+                                    fileName: "",
+                                    status: "기본정보 등록"
+                                  }));
+                                }}
+                                className="text-red-500 hover:text-red-700 font-extrabold ml-1 cursor-pointer border-0"
                               >
-                                주소 검색
+                                삭제
                               </button>
                             </div>
-                            <input
-                              type="text"
-                              value={contractDetailAddress}
-                              onChange={(e) => setContractDetailAddress(e.target.value)}
-                              className="w-full px-3.5 py-2 border border-[#f2ccd7] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] text-[#2d2026] font-bold"
-                              placeholder="가맹점 상세 주소 (e.g. 2층 202호)"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-[#735965] mb-1">가맹점 규모 (㎡) <span className="text-red-500">*</span></label>
-                            <div className="relative">
-                              <input
-                                type="number"
-                                required
-                                value={contractForm.storeSize || ""}
-                                onChange={(e) => setContractForm({ ...contractForm, storeSize: parseFloat(e.target.value) || 0 })}
-                                className="w-full px-3.5 py-2 pr-8 border border-[#f2ccd7] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] text-[#2d2026] font-bold"
-                                placeholder="33"
-                              />
-                              <span className="absolute right-3.5 top-2 text-xs text-[#735965] font-bold">㎡</span>
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-[#735965] mb-1">영업 지역 <span className="text-red-500">*</span></label>
-                            <input
-                              type="text"
-                              required
-                              value={contractForm.businessArea}
-                              onChange={(e) => setContractForm({ ...contractForm, businessArea: e.target.value })}
-                              className="w-full px-3.5 py-2 border border-[#f2ccd7] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] text-[#2d2026] font-bold"
-                              placeholder="가맹점 반경 500m 내"
-                            />
-                          </div>
+                          )}
                         </div>
-                      </div>
-                      
-                      {/* Section 2: 계약 기간 */}
-                      <div>
-                        <h4 className="text-xs font-black text-[#bf3e67] uppercase tracking-wider mb-3 pb-1 border-b border-[#ffd3df]/20">2. 계약 기간</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-xs font-bold text-[#735965] mb-1">계약 시작일 <span className="text-red-500">*</span></label>
-                            <input
-                              type="date"
-                              required
-                              value={contractForm.contractStart}
-                              onChange={(e) => setContractForm({ ...contractForm, contractStart: e.target.value })}
-                              className="w-full px-3.5 py-2 border border-[#f2ccd7] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] text-[#2d2026] font-bold"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-[#735965] mb-1">계약 종료일 <span className="text-red-500">*</span></label>
-                            <input
-                              type="date"
-                              required
-                              value={contractForm.contractEnd}
-                              onChange={(e) => setContractForm({ ...contractForm, contractEnd: e.target.value })}
-                              className="w-full px-3.5 py-2 border border-[#f2ccd7] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#bf3e67] text-[#2d2026] font-bold"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Section 3: 금액 정보 */}
-                      <div className="space-y-5">
-                        <h4 className="text-xs font-black text-[#bf3e67] uppercase tracking-wider mb-1 pb-1 border-b border-[#ffd3df]/20">3. 금액 정보 설정</h4>
-                        
-                        {/* 3.1 가맹 및 감리 비용 */}
-                        <div className="border border-[#f2ccd7] rounded-xl p-4 bg-[#fff9fb]/10 space-y-4 shadow-sm">
-                          <div className="border-b border-[#f2ccd7]/60 pb-2">
-                            <span className="block text-xs font-black text-[#bf3e67] uppercase tracking-wider">3-1. 가맹 및 감리 비용</span>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {renderAmountInput("supervisionFee", "공사감리비 (부가세 포함)", 3300000, "일금삼백삼십만원(￦3,300,000)")}
-                            {renderAmountInput("initialFranchiseFee", "최초가맹금 (부가세 포함)", 5000000, "일금오백만원(￦5,000,000)")}
-                          </div>
-                        </div>
-
-                        {/* 3.2 예치가맹금 설정 */}
-                        <div className="border border-[#f2ccd7] rounded-xl p-4 bg-[#fff9fb]/10 space-y-4 shadow-sm">
-                          <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-2">
-                            <span className="block text-xs font-black text-[#bf3e67] uppercase tracking-wider">3-2. 예치가맹금 설정</span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setContractForm((prev) => ({
-                                  ...prev,
-                                  depositMembershipFee: 1100000,
-                                  depositEduFee: 2200000,
-                                  depositSupportFee: 1700000,
-                                  depositGuaranteeFee: 1000000,
-                                  depositTotalFee: 6000000,
-                                }));
-                                triggerToast("예치가맹금 기본값들이 적용되었습니다.");
-                              }}
-                              className="text-[9px] text-[#bf3e67] font-black border border-[#f2ccd7] bg-white hover:bg-[#ffd3df]/20 px-2 py-0.5 rounded transition-all cursor-pointer"
-                            >
-                              예치금 전체 기본적용
-                            </button>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                            {renderTableAmountInput("depositMembershipFee", "가입비", 1100000)}
-                            {renderTableAmountInput("depositEduFee", "오픈교육비", 2200000)}
-                            {renderTableAmountInput("depositSupportFee", "오픈지원비", 1700000)}
-                            {renderTableAmountInput("depositGuaranteeFee", "계약이행보증금", 1000000)}
-                            
-                            <div className="md:col-span-2 flex items-center justify-between border-t border-[#f2ccd7] pt-3 mt-1">
-                              <span className="font-extrabold text-[#bf3e67]">예치가맹금 합계</span>
-                              <span className="font-black text-[#bf3e67] text-sm">
-                                {contractForm.depositTotalFee ? Number(contractForm.depositTotalFee).toLocaleString() : 0} 원
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 3.3 로열티 및 보증 비용 */}
-                        <div className="border border-[#f2ccd7] rounded-xl p-4 bg-[#fff9fb]/10 space-y-4 shadow-sm">
-                          <div className="border-b border-[#f2ccd7]/60 pb-2">
-                            <span className="block text-xs font-black text-[#bf3e67] uppercase tracking-wider">3-3. 로열티 및 보증 비용</span>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {renderAmountInput("royaltyFee", "로열티 (부가세 포함)", 150000, "일금일십오만원(￦150,000)")}
-                            {renderAmountInput("guaranteeFee", "계약이행보증금 (부가세 없음)", 1000000, "일금일백만원(￦1,000,000)")}
-                          </div>
-                        </div>
-
-                        {/* 3.4 교육비 설정 */}
-                        <div className="border border-[#f2ccd7] rounded-xl p-4 bg-[#fff9fb]/10 space-y-4 shadow-sm">
-                          <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-2">
-                            <span className="block text-xs font-black text-[#bf3e67] uppercase tracking-wider">3-4. 교육비 설정</span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setContractForm((prev) => ({
-                                  ...prev,
-                                  eduOpenFee: 2200000,
-                                  eduNewFee: 220000,
-                                }));
-                                triggerToast("교육비 기본값들이 적용되었습니다.");
-                              }}
-                              className="text-[9px] text-[#bf3e67] font-black border border-[#f2ccd7] bg-white hover:bg-[#ffd3df]/20 px-2 py-0.5 rounded transition-all cursor-pointer"
-                            >
-                              교육비 전체 기본적용
-                            </button>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                            {renderTableAmountInput("eduOpenFee", "오픈교육 (최초가맹금에 포함)", 2200000)}
-                            {renderTableAmountInput("eduNewFee", "신입교육 (1인 기준)", 220000)}
-                          </div>
-                        </div>
-
-                        {/* 3.5 초도 및 위약 비용 */}
-                        <div className="border border-[#f2ccd7] rounded-xl p-4 bg-[#fff9fb]/10 space-y-4 shadow-sm">
-                          <div className="border-b border-[#f2ccd7]/60 pb-2">
-                            <span className="block text-xs font-black text-[#bf3e67] uppercase tracking-wider">3-5. 초도 및 위약 비용</span>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {renderAmountInput("initialSupplyFee", "초도물품 (부가세 포함)", 4400000, "일금사백사십만원(￦4,400,000)")}
-                            {renderAmountInput("reFranchiseFee", "재가맹비 (부가세 포함)", 1100000, "일금일백일십만원(￦1,100,000)")}
-                            {renderAmountInput("penaltyFee", "위약금", 1000000, "일금일백만원(￦1,000,000)")}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Section 4: 최종 서명 계약서 첨부 */}
-                      <div className="mt-6">
-                        <h4 className="text-xs font-black text-[#bf3e67] uppercase tracking-wider mb-3 pb-1 border-b border-[#ffd3df]/20">4. 최종 서명 계약서 첨부 (선택사항)</h4>
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <input
-                              type="file"
-                              accept=".pdf"
-                              id="contract-pdf-upload"
-                              className="hidden"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (!file) return;
-                                if (file.type !== "application/pdf") {
-                                  alert("PDF 파일만 업로드 가능합니다.");
-                                  return;
-                                }
-                                if (file.size > 20 * 1024 * 1024) {
-                                  alert("파일 크기는 최대 20MB 이하여야 합니다.");
-                                  return;
-                                }
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                  const result = reader.result;
-                                  if (typeof result === "string") {
-                                    setContractForm((prev) => ({
-                                      ...prev,
-                                      fileUrl: result,
-                                      fileName: file.name,
-                                      status: "계약서 서명완료"
-                                    }));
-                                    triggerToast("최종 계약서가 업로드되었습니다. 저장 시 적용됩니다.");
-                                  }
-                                };
-                                reader.readAsDataURL(file);
-                              }}
-                            />
-                            <label
-                              htmlFor="contract-pdf-upload"
-                              className="px-4 py-2.5 bg-white border border-[#f2ccd7] hover:border-[#bf3e67] hover:text-[#bf3e67] text-[#735965] text-xs font-bold rounded-xl transition-colors cursor-pointer inline-flex items-center gap-2"
-                            >
-                              <Upload size={14} />
-                              {contractForm.fileName ? "최종 계약서 재등록" : "최종 계약서 등록"}
-                            </label>
-                            {contractForm.fileName && (
-                              <div className="flex items-center gap-2 text-xs text-[#2d2026] bg-[#fff9fb] border border-[#f2ccd7] px-3 py-2 rounded-xl">
-                                <FileText size={16} className="text-[#bf3e67]" />
-                                <span className="font-bold truncate max-w-[200px]">{contractForm.fileName}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setContractForm((prev) => ({
-                                      ...prev,
-                                      fileUrl: "",
-                                      fileName: "",
-                                      status: "기본정보 등록"
-                                    }));
-                                  }}
-                                  className="text-red-500 hover:text-red-700 font-extrabold ml-1 cursor-pointer"
-                                >
-                                  삭제
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                          <p className="text-[10px] text-[#735965] font-bold">
-                            * 최종 서명된 계약서 PDF를 등록하면 계약서 상태가 '계약서 서명완료'로 자동 변경됩니다.
-                          </p>
-                        </div>
+                        <p className="text-[10px] text-slate-500 font-bold">
+                          * 최종 서명된 계약서 PDF를 등록하면 계약서 상태가 '계약서 서명완료'로 자동 변경됩니다.
+                        </p>
                       </div>
                     </div>
-                    
-                    {/* Save / Cancel buttons */}
-                    <div className="flex items-center gap-3 pt-6 border-t border-[#f2ccd7] shrink-0">
-                      <button
-                        type="submit"
-                        className="px-6 py-2.5 bg-[#bf3e67] hover:bg-[#a03153] text-white text-xs font-extrabold rounded-xl transition-colors shadow-sm cursor-pointer"
-                      >
-                        {isContractEditMode ? "수정 완료" : "등록 하기"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsContractFormOpen(false);
-                          if (contracts.length > 0 && !selectedContract) {
-                            setSelectedContract(contracts[0]);
-                          }
-                        }}
-                        className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-[#735965] text-xs font-bold rounded-xl transition-colors border border-gray-200 cursor-pointer"
-                      >
-                        취소
-                      </button>
-                    </div>
-                  </form>
+                  
+                  {/* Save / Cancel buttons */}
+                  <div className="flex items-center gap-3 pt-6 border-t border-slate-100 shrink-0">
+                    <button
+                      type="submit"
+                      className="px-6 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
+                    >
+                      {isContractEditMode ? "수정 완료" : "등록 하기"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsContractFormOpen(false);
+                        if (contracts.length > 0 && !selectedContract) {
+                          setSelectedContract(contracts[0]);
+                        }
+                      }}
+                      className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors border-0 cursor-pointer shadow-2xs"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </form>
                 ) : selectedContract ? (
                   /* DETAIL VIEW */
                   <div className="space-y-6 animate-fadeIn">
                     {/* Status selection and action header */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#f2ccd7]">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                       <div>
                         <div className="flex items-center gap-3">
-                          <h3 className="text-lg font-black text-[#2d2026]">{selectedContract.ownerName} 계약자</h3>
-                          <span className="text-xs text-[#735965] font-semibold">{selectedContract.storeName}</span>
+                          <h3 className="text-lg font-black text-[#0F172A]">{selectedContract.ownerName} 계약자</h3>
+                          <span className="text-xs text-slate-500 font-semibold">{selectedContract.storeName}</span>
                         </div>
-                        <p className="text-[11px] text-[#735965] font-bold mt-1">등록일시: {selectedContract.createdAt}</p>
+                        <p className="text-[11px] text-slate-400 font-bold mt-1">등록일시: {selectedContract.createdAt}</p>
                       </div>
                       
                       {/* Action buttons */}
@@ -5125,14 +5781,14 @@ export default function AdminPage() {
                         <button
                           type="button"
                           onClick={handleStartEditContract}
-                          className="px-3.5 py-1.5 bg-white border border-[#f2ccd7] hover:border-[#bf3e67] hover:text-[#bf3e67] text-[#735965] text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                          className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
                         >
                           수정
                         </button>
                         <button
                           type="button"
                           onClick={handleDeleteContractConfirm}
-                          className="px-3.5 py-1.5 bg-white border border-red-200 hover:border-red-500 hover:text-red-500 text-[#735965] text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                          className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
                         >
                           삭제
                         </button>
@@ -5140,13 +5796,13 @@ export default function AdminPage() {
                     </div>
                     
                     {/* CONTRACT STATUS BAR */}
-                    <div className="bg-[#fff9fb]/40 border border-[#f2ccd7] rounded-xl p-4 space-y-2.5">
-                      <span className="block text-xs font-black text-[#2d2026]">가맹계약 상태값 수정</span>
+                    <div className="bg-[#F8F9FA] border-0 rounded-2xl p-4 space-y-2.5 shadow-2xs">
+                      <span className="block text-xs font-black text-[#0F172A]">가맹계약 상태값 수정</span>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                         {[
-                          { status: "기본정보 등록", activeClass: "bg-blue-500 text-white font-extrabold border-blue-500", inactiveClass: "bg-white text-blue-600 border border-blue-200 hover:bg-blue-50/50" },
-                          { status: "계약서 발송완료", activeClass: "bg-amber-500 text-white font-extrabold border-amber-500", inactiveClass: "bg-white text-amber-600 border border-amber-200 hover:bg-amber-50/50" },
-                          { status: "계약서 서명완료", activeClass: "bg-emerald-500 text-white font-extrabold border-emerald-500", inactiveClass: "bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50/50" },
+                          { status: "기본정보 등록", activeClass: "bg-[#FED422] text-[#0F172A] font-extrabold border-[#FED422]", inactiveClass: "bg-white text-blue-600 border border-blue-200 hover:bg-blue-50/50" },
+                          { status: "계약서 발송완료", activeClass: "bg-[#FED422] text-[#0F172A] font-extrabold border-[#FED422]", inactiveClass: "bg-white text-amber-600 border border-amber-200 hover:bg-amber-50/50" },
+                          { status: "계약서 서명완료", activeClass: "bg-[#FED422] text-[#0F172A] font-extrabold border-[#FED422]", inactiveClass: "bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50/50" },
                           { status: "계약서 진행취소", activeClass: "bg-neutral-500 text-white font-extrabold border-neutral-500", inactiveClass: "bg-white text-neutral-600 border border-neutral-300 hover:bg-neutral-50" }
                         ].map((item) => {
                           const isActive = selectedContract.status === item.status;
@@ -5167,23 +5823,23 @@ export default function AdminPage() {
                     </div>
                     
                     {/* DETAILS GRID */}
-                    <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
+                    <div className="space-y-6">
                       {/* Section 1: 인적 정보 */}
-                      <div className="bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm">
-                        <div className="bg-[#fff1f5] border-b border-[#f2ccd7] px-4 py-3 flex items-center justify-between">
-                          <span className="text-xs font-black text-[#2d2026]">1. 계약자 및 가맹점 인적 정보</span>
+                      <div className="bg-white border-0 rounded-2xl overflow-hidden shadow-2xs">
+                        <div className="bg-[#F8F9FA] border-b border-slate-100 px-4 py-3 flex items-center justify-between">
+                          <span className="text-xs font-black text-[#0F172A]">1. 계약자 및 가맹점 인적 정보</span>
                           <button
                             type="button"
                             onClick={() => {
                               const summaryText = `계약구분: ${selectedContract.contractType || "신규"}\n가맹사업자명: ${selectedContract.ownerName}\n생년월일: ${selectedContract.ownerBirth}\n연락처: ${selectedContract.ownerPhone}\n가맹점명: ${selectedContract.storeName}\n주소: ${selectedContract.storeAddress}\n규모: ${selectedContract.storeSize}㎡\n영업지역: ${selectedContract.businessArea}`;
                               handleCopyText(summaryText, "인적 정보 일괄");
                             }}
-                            className="text-[10px] text-[#bf3e67] font-black border border-[#f2ccd7] bg-white hover:bg-[#ffd3df]/20 px-2 py-0.5 rounded transition-all cursor-pointer"
+                            className="text-[10px] text-slate-700 font-extrabold border-0 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg transition-all cursor-pointer shadow-2xs"
                           >
                             일괄 복사
                           </button>
                         </div>
-                        <div className="p-4 space-y-2 text-xs text-[#2d2026]">
+                        <div className="p-4 space-y-2 text-xs text-[#0F172A]">
                           {renderDetailRow("계약 구분", selectedContract.contractType || "신규")}
                           {renderDetailRow("계약 상태", selectedContract.status)}
                           {renderDetailRow("가맹사업자명", selectedContract.ownerName)}
@@ -5197,11 +5853,11 @@ export default function AdminPage() {
                       </div>
                       
                       {/* Section 2: 계약 기간 */}
-                      <div className="bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm">
-                        <div className="bg-[#fff1f5] border-b border-[#f2ccd7] px-4 py-3">
-                          <span className="text-xs font-black text-[#2d2026]">2. 계약 기간</span>
+                      <div className="bg-white border-0 rounded-2xl overflow-hidden shadow-2xs">
+                        <div className="bg-[#F8F9FA] border-b border-slate-100 px-4 py-3">
+                          <span className="text-xs font-black text-[#0F172A]">2. 계약 기간</span>
                         </div>
-                        <div className="p-4 space-y-2 text-xs text-[#2d2026]">
+                        <div className="p-4 space-y-2 text-xs text-[#0F172A]">
                           {renderDetailRow(
                             "계약 기간 전체", 
                             `${selectedContract.contractStart} 부터 ${selectedContract.contractEnd} 까지`
@@ -5212,11 +5868,11 @@ export default function AdminPage() {
                       </div>
                       
                       {/* Section 3: 금액 정보 */}
-                      <div className="bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm">
-                        <div className="bg-[#fff1f5] border-b border-[#f2ccd7] px-4 py-3">
-                          <span className="text-xs font-black text-[#2d2026]">3. 계약 금액 상세 정보</span>
+                      <div className="bg-white border-0 rounded-2xl overflow-hidden shadow-2xs">
+                        <div className="bg-[#F8F9FA] border-b border-slate-100 px-4 py-3">
+                          <span className="text-xs font-black text-[#0F172A]">3. 계약 금액 상세 정보</span>
                         </div>
-                        <div className="p-4 space-y-3.5 text-xs text-[#2d2026]">
+                        <div className="p-4 space-y-3.5 text-xs text-[#0F172A]">
                           {renderDetailRow(
                             "공사감리비 (부가세 포함)", 
                             getFormattedKoreanAmount(selectedContract.supervisionFee, "일금삼백삼십만원(￦3,300,000)")
@@ -5227,11 +5883,11 @@ export default function AdminPage() {
                           )}
                           
                           {/* 예치가맹금(표) */}
-                          <div className="border border-[#f2ccd7] rounded-lg overflow-hidden my-3">
+                          <div className="border-0 rounded-xl overflow-hidden my-3 bg-[#F8F9FA] p-1">
                             <table className="w-full text-left border-collapse text-xs table-fixed">
                               <thead>
-                                <tr className="bg-[#fff9fb] border-b border-[#f2ccd7] font-extrabold text-[#735965] text-[10px]">
-                                  <th className="p-2 border-r border-[#f2ccd7] w-[60%]">예치가맹금 항목</th>
+                                <tr className="bg-[#F8F9FA] border-b border-slate-200/60 font-extrabold text-slate-500 text-[10px]">
+                                  <th className="p-2 border-r border-slate-200/60 w-[60%]">예치가맹금 항목</th>
                                   <th className="p-2 w-[40%]">금액(원)</th>
                                 </tr>
                               </thead>
@@ -5240,15 +5896,15 @@ export default function AdminPage() {
                                 {renderTableDetailRow("오픈교육비", selectedContract.depositEduFee)}
                                 {renderTableDetailRow("오픈지원비", selectedContract.depositSupportFee)}
                                 {renderTableDetailRow("계약이행보증금", selectedContract.depositGuaranteeFee)}
-                                <tr className="font-extrabold bg-[#ffd3df]/20 text-xs">
-                                  <td className="p-2 border-t border-r border-[#f2ccd7] text-[#bf3e67]">합계</td>
-                                  <td className="p-2 border-t border-[#f2ccd7] text-[#bf3e67] font-black">
+                                <tr className="font-extrabold bg-slate-100 text-xs">
+                                  <td className="p-2 border-t border-r border-slate-200/60 text-[#0F172A]">합계</td>
+                                  <td className="p-2 border-t border-slate-200/60 text-[#0F172A] font-black">
                                     <div className="flex items-center justify-between gap-2">
                                       <span>{selectedContract.depositTotalFee.toLocaleString()}</span>
                                       <button
                                         type="button"
                                         onClick={() => handleCopyText(selectedContract.depositTotalFee.toLocaleString(), "예치가맹금 합계")}
-                                        className="text-[10px] text-[#bf3e67] border border-[#f2ccd7] bg-white hover:bg-[#ffd3df]/20 px-1.5 py-0.5 rounded transition-all cursor-pointer font-black shrink-0"
+                                        className="text-[10px] text-slate-700 font-extrabold border-0 bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded-lg transition-all cursor-pointer shrink-0 shadow-2xs"
                                       >
                                         복사
                                       </button>
@@ -5269,11 +5925,11 @@ export default function AdminPage() {
                           )}
                           
                           {/* 교육비(표) */}
-                          <div className="border border-[#f2ccd7] rounded-lg overflow-hidden my-3">
+                          <div className="border-0 rounded-xl overflow-hidden my-3 bg-[#F8F9FA] p-1">
                             <table className="w-full text-left border-collapse text-xs table-fixed">
                               <thead>
-                                <tr className="bg-[#fff9fb] border-b border-[#f2ccd7] font-extrabold text-[#735965] text-[10px]">
-                                  <th className="p-2 border-r border-[#f2ccd7] w-[60%]">교육비 구분</th>
+                                <tr className="bg-[#F8F9FA] border-b border-slate-200/60 font-extrabold text-slate-500 text-[10px]">
+                                  <th className="p-2 border-r border-slate-200/60 w-[60%]">교육비 구분</th>
                                   <th className="p-2 w-[40%]">금액(원)</th>
                                 </tr>
                               </thead>
@@ -5300,17 +5956,17 @@ export default function AdminPage() {
                       </div>
 
                       {/* Section 4: 최종 서명 계약서 첨부 */}
-                      <div className="bg-white border border-[#f2ccd7] rounded-xl overflow-hidden shadow-sm">
-                        <div className="bg-[#fff1f5] border-b border-[#f2ccd7] px-4 py-3">
-                          <span className="text-xs font-black text-[#2d2026]">4. 계약 서명 완료 파일</span>
+                      <div className="bg-white border-0 rounded-2xl overflow-hidden shadow-2xs">
+                        <div className="bg-[#F8F9FA] border-b border-slate-100 px-4 py-3">
+                          <span className="text-xs font-black text-[#0F172A]">4. 계약 서명 완료 파일</span>
                         </div>
                         <div className="p-4 space-y-3.5 text-xs text-[#2d2026]">
                           {selectedContract.fileName ? (
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#fff9fb]/40 border border-[#f2ccd7] p-3 rounded-lg">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F8F9FA] border-0 p-3.5 rounded-xl shadow-2xs">
                               <div className="flex items-center gap-2">
-                                <FileText size={20} className="text-[#bf3e67]" />
+                                <FileText size={20} className="text-slate-600" />
                                 <div className="flex flex-col">
-                                  <span className="font-extrabold text-[#2d2026] text-xs max-w-[200px] sm:max-w-[350px] truncate">
+                                  <span className="font-extrabold text-[#0F172A] text-xs max-w-[200px] sm:max-w-[350px] truncate">
                                     {selectedContract.fileName}
                                   </span>
                                 </div>
@@ -5319,7 +5975,7 @@ export default function AdminPage() {
                                 <a
                                   href={selectedContract.fileUrl}
                                   download={selectedContract.fileName}
-                                  className="px-3.5 py-2 bg-[#bf3e67] hover:bg-[#a03153] text-white text-xs font-extrabold rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                                  className="px-3.5 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
                                 >
                                   <Download size={14} />
                                   다운로드
@@ -5327,21 +5983,21 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleCopyText(selectedContract.fileUrl, "최종 서명 계약서 링크")}
-                                  className="px-3.5 py-2 bg-white border border-[#f2ccd7] hover:border-[#bf3e67] hover:text-[#bf3e67] text-[#735965] text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
                                 >
                                   링크 복사
                                 </button>
                               </div>
                             </div>
                           ) : (
-                            <div className="text-center py-4 bg-gray-50 rounded-lg text-gray-500 font-bold border border-dashed border-gray-200">
+                            <div className="text-center py-4 bg-slate-50 rounded-xl text-slate-400 font-bold border-0">
                               등록된 최종 서명 계약서가 없습니다.
                             </div>
                           )}
                           
                           {/* Allow uploading file directly */}
-                          <div className="mt-2 pt-2 border-t border-[#ffd3df]/20 flex flex-col gap-2">
-                            <span className="text-[11px] text-[#735965] font-black">계약 서명 파일 업로드/교체</span>
+                          <div className="mt-2 pt-2 border-t border-slate-100 flex flex-col gap-2">
+                            <span className="text-[11px] text-slate-500 font-black">계약 서명 파일 업로드/교체</span>
                             <div className="flex items-center gap-3">
                               <input
                                 type="file"
@@ -5382,7 +6038,7 @@ export default function AdminPage() {
                               />
                               <label
                                 htmlFor="direct-pdf-upload"
-                                className="px-3.5 py-1.5 bg-white border border-[#f2ccd7] hover:border-[#bf3e67] hover:text-[#bf3e67] text-[#735965] text-xs font-bold rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-2xs"
                               >
                                 <Upload size={14} />
                                 {selectedContract.fileName ? "계약서 재등록" : "최종 계약서 등록"}
@@ -5412,103 +6068,203 @@ export default function AdminPage() {
              ========================================== */}
           {currentMenu === "store" && (
             <div className="space-y-6 animate-fadeIn">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-bold text-[#2d2026]">가맹점 관리 및 상세 설정</h2>
-                  <p className="text-xs text-[#735965] font-bold mt-1">
-                    신규 가맹 계약 체결 매장을 시스템에 등록하고, 로그인 비밀번호, 연락처, 도입 패키지 모듈을 정밀 제어합니다.
-                  </p>
+              
+              {/* Header and Controls bar */}
+              <div className="flex flex-col gap-4 bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-[28px] border-0 shadow-md space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-black text-[#0F172A] tracking-tight">가맹점 관리 및 상세 설정</h2>
+                    <p className="text-xs text-slate-400 font-bold mt-1">
+                      신규 가맹 매장을 등록하고 계정, 연락처, 도로명 주소, 도입 패키지 모듈을 통합 관제합니다.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleOpenStoreModal()}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs cursor-pointer border-0 active:scale-95 shrink-0"
+                    >
+                      <Plus size={15} />
+                      + 가맹점 신규 등록
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => handleOpenStoreModal()}
-                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold rounded-lg transition-all shadow-sm shrink-0 self-start sm:self-center"
-                >
-                  <Plus size={15} />
-                  가맹점 신규 등록
-                </button>
+
+                {/* Search, Filter & Sort Bar */}
+                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                  {/* Search input box */}
+                  <div className="relative flex-1 max-w-md">
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="가맹점명, ID, 점주명, 연락처, 주소 검색..."
+                      value={storeSearchQuery}
+                      onChange={(e) => setStoreSearchQuery(e.target.value)}
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                    />
+                    {storeSearchQuery && (
+                      <button
+                        onClick={() => setStoreSearchQuery("")}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold border-0 bg-transparent cursor-pointer"
+                      >
+                        &times;
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Status Filter Tabs & Sort Dropdown */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Status Tabs */}
+                    <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl shadow-2xs border-0">
+                      {["전체", "승인", "대기", "보류", "중지"].map((st) => (
+                        <button
+                          key={st}
+                          onClick={() => setStoreStatusFilter(st)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                            storeStatusFilter === st
+                              ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
+                              : "text-slate-600 hover:text-[#0F172A]"
+                          }`}
+                        >
+                          {st}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Sort Order Dropdown (Default: Latest) */}
+                    <select
+                      value={storeSortOrder}
+                      onChange={(e) => setStoreSortOrder(e.target.value as "latest" | "oldest")}
+                      className="bg-[#F1F4F8] border-0 rounded-2xl px-3.5 py-2 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none shadow-2xs transition-all"
+                    >
+                      <option value="latest">최신 등록순 (기본)</option>
+                      <option value="oldest">오래된 등록순</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              {/* Stores Table */}
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[1050px] text-left border-collapse">
-                    <thead>
-                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
-                        <th className="p-4 sm:p-5">로그인 ID</th>
-                        <th className="p-4 sm:p-5">가맹점명</th>
-                        <th className="p-4 sm:p-5">점주명</th>
-                        <th className="p-4 sm:p-5">연락처</th>
-                        <th className="p-4 sm:p-5">도로명 주소</th>
-                        <th className="p-4 sm:p-5">도입 메뉴</th>
-                        <th className="p-4 sm:p-5">상태</th>
-                        <th className="p-4 sm:p-5 text-center">관리</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
-                      {stores.length === 0 ? (
-                        <tr>
-                          <td colSpan={8} className="p-8 text-center text-[#735965]">등록된 가맹점이 존재하지 않습니다.</td>
-                        </tr>
-                      ) : (
-                        stores.map((store) => (
-                          <tr key={store.id} className="hover:bg-[#fff9fb] transition-colors">
-                            <td className="p-4 sm:p-5 font-bold text-[#bf3e67] whitespace-nowrap">{store.id}</td>
-                            <td className="p-4 sm:p-5 font-bold text-[#2d2026] whitespace-nowrap">
-                              {store.name}
-                            </td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{store.owner}</td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{store.phone}</td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold max-w-[320px]" title={store.roadAddress}>
-                              <div className="line-clamp-2 whitespace-normal break-all">
-                                {store.roadAddress}
-                              </div>
-                            </td>
-                            <td className="p-4 sm:p-5">
-                              <div className="grid grid-cols-3 gap-1 w-[190px]">
-                                {store.adoptionMenu && store.adoptionMenu.map((m) => (
-                                  <span key={m} className="bg-[#ffd3df] text-[#bf3e67] text-[9px] font-bold px-1 py-0.5 rounded border border-[#f2ccd7] text-center truncate" title={m}>
-                                    {m}
-                                  </span>
-                                ))}
-                                {(!store.adoptionMenu || store.adoptionMenu.length === 0) && (
-                                  <span className="text-[10px] text-[#735965] opacity-50 col-span-3">없음</span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="p-4 sm:p-5 whitespace-nowrap">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                store.status === "승인" 
-                                  ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
-                                  : store.status === "대기"
-                                  ? "bg-orange-50 text-orange-500 border border-orange-200"
-                                  : "bg-neutral-100 text-neutral-500 border border-neutral-200"
-                              }`}>
-                                {store.status}
-                              </span>
-                            </td>
-                            <td className="p-4 sm:p-5 text-center whitespace-nowrap">
-                              <div className="flex items-center justify-center gap-1.5">
-                                <button
-                                  onClick={() => handleOpenStoreModal(store)}
-                                  className="px-2.5 py-1 rounded bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-[10px] font-bold transition-all"
-                                >
-                                  상세보기
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteStore(store.id)}
-                                  className="p-1 rounded bg-white text-red-500 hover:bg-red-50 border border-[#f2ccd7] transition-all"
-                                  title="삭제"
-                                >
-                                  <Trash2 size={13} />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+              {/* Stores Card Rows List */}
+              <div className="space-y-3">
+                {/* Column Table Header */}
+                <div className="hidden lg:grid grid-cols-12 gap-3 px-6 py-2 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider items-center">
+                  <div className="col-span-2">등록일</div>
+                  <div className="col-span-4">가맹점명 / ID / 주소</div>
+                  <div className="col-span-1.5">점주명</div>
+                  <div className="col-span-1.5">연락처</div>
+                  <div className="col-span-1.5">도입 메뉴</div>
+                  <div className="col-span-0.5 text-center">상태</div>
+                  <div className="col-span-1 text-right">관리</div>
                 </div>
+
+                {filteredAndSortedStores.length === 0 ? (
+                  <div className="bg-white rounded-[28px] border-0 p-16 text-center text-slate-400 font-extrabold shadow-md flex flex-col items-center justify-center space-y-2">
+                    <Search size={36} className="text-slate-300 animate-pulse" />
+                    <p className="text-xs">조건에 해당하는 가맹점 데이터가 없습니다.</p>
+                  </div>
+                ) : (
+                  filteredAndSortedStores.map((store) => (
+                    <div 
+                      key={store.id} 
+                      className="bg-white rounded-[24px] p-4 sm:p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-3 items-start lg:items-center"
+                    >
+                      {/* Registration Date */}
+                      <div className="col-span-2 flex items-center gap-2">
+                        <span className="lg:hidden text-xs text-slate-400 font-semibold">등록일:</span>
+                        <span className="text-xs font-extrabold text-slate-600 bg-[#F1F4F8] rounded-xl px-3 py-1.5 shadow-2xs border-0">
+                          {store.regDate || "2026-07-28"}
+                        </span>
+                      </div>
+
+                      {/* Store Name, ID & Address */}
+                      <div className="col-span-4 min-w-0 space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-black text-sm text-[#0F172A] truncate">{store.name}</h4>
+                          <span className="text-[11px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                            ID: {store.id}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 font-extrabold flex items-center gap-1.5 truncate">
+                          <MapPin size={13} className="text-amber-500 shrink-0" />
+                          <span className="truncate">
+                            {store.roadAddress ? `${store.roadAddress} ${store.detailAddress || ""}`.trim() : "주소 정보 미등록"}
+                          </span>
+                        </p>
+                      </div>
+
+                      {/* Owner */}
+                      <div className="col-span-1.5 text-xs font-extrabold text-[#0F172A]">
+                        <span className="lg:hidden text-slate-400 font-semibold mr-2">점주:</span>
+                        {store.owner}
+                      </div>
+
+                      {/* Phone */}
+                      <div className="col-span-1.5 text-xs font-extrabold text-slate-600 font-mono">
+                        <span className="lg:hidden text-slate-400 font-semibold mr-2">연락처:</span>
+                        {store.phone}
+                      </div>
+
+                      {/* Adoption Menu Badges */}
+                      <div className="col-span-1.5 flex flex-wrap gap-1">
+                        {store.adoptionMenu && store.adoptionMenu.map((m) => {
+                          const isPie = m === "120pie";
+                          const isEgg = m === "egg120";
+                          const isChurros = m === "츄러스120";
+                          const isCoffee = m === "120coffee";
+                          return (
+                            <span 
+                              key={m} 
+                              className={`text-[10px] font-extrabold px-2 py-0.5 rounded-lg border-0 shadow-2xs ${
+                                isPie 
+                                  ? "bg-amber-100 text-amber-800" 
+                                  : isEgg 
+                                  ? "bg-orange-100 text-orange-800" 
+                                  : isChurros 
+                                  ? "bg-yellow-100 text-yellow-800" 
+                                  : isCoffee 
+                                  ? "bg-slate-100 text-slate-700" 
+                                  : "bg-blue-100 text-blue-800"
+                              }`}
+                            >
+                              {m}
+                            </span>
+                          );
+                        })}
+                      </div>
+
+                      {/* Status Badge */}
+                      <div className="col-span-0.5 lg:text-center">
+                        <span className={`px-3 py-1 rounded-xl text-[11px] font-extrabold border-0 shadow-2xs inline-block ${
+                          store.status === "승인" 
+                            ? "bg-emerald-100 text-emerald-700" 
+                            : store.status === "대기"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-rose-100 text-rose-700"
+                        }`}>
+                          {store.status}
+                        </span>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="col-span-1 flex items-center lg:justify-end gap-1.5 w-full lg:w-auto pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+                        <button
+                          onClick={() => handleOpenStoreModal(store)}
+                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border-0 shadow-2xs"
+                          title="상세 수정"
+                        >
+                          <Edit size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteStore(store.id)}
+                          className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all cursor-pointer border-0 shadow-2xs"
+                          title="삭제"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -5522,19 +6278,19 @@ export default function AdminPage() {
               {/* Product and Category header block */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-bold text-[#2d2026]">식자재 및 부자재 카탈로그 관리</h2>
-                  <p className="text-xs text-[#735965] font-bold mt-1">
+                  <h2 className="text-xl font-black text-[#0F172A] tracking-tight">식자재 및 부자재 카탈로그 관리</h2>
+                  <p className="text-xs text-slate-400 font-semibold mt-1">
                     점주전용 발주몰에 노출할 제품 목록을 수정/삭제하고, 카테고리를 편집하며, ▲/▼ 노출 순서를 정교하게 변경합니다.
                   </p>
                 </div>
-                <div className="flex items-center gap-2 self-start sm:self-center">
+                <div className="flex items-center gap-2 self-start sm:self-center flex-wrap">
                   <button
                     onClick={() => {
                       setShowCategoryPanel(!showCategoryPanel);
                       setShowLabelPanel(false);
                       setShowPolicyPanel(false);
                     }}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-[#bf3e67] text-xs font-bold rounded-lg transition-all shadow-sm"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-2xl transition-all border-0 cursor-pointer shadow-2xs"
                   >
                     카테고리 관리
                   </button>
@@ -5544,7 +6300,7 @@ export default function AdminPage() {
                       setShowCategoryPanel(false);
                       setShowPolicyPanel(false);
                     }}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-[#bf3e67] text-xs font-bold rounded-lg transition-all shadow-sm"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-2xl transition-all border-0 cursor-pointer shadow-2xs"
                   >
                     라벨 관리
                   </button>
@@ -5554,32 +6310,32 @@ export default function AdminPage() {
                       setShowCategoryPanel(false);
                       setShowLabelPanel(false);
                     }}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-[#bf3e67] text-xs font-bold rounded-lg transition-all shadow-sm"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-2xl transition-all border-0 cursor-pointer shadow-2xs"
                   >
-                    <Truck size={14} />
+                    <Truck size={14} className="text-slate-600" />
                     배송/반품 설정
                   </button>
                   <button
                     onClick={() => handleOpenProductModal()}
-                    className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold rounded-lg transition-all shadow-sm"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs cursor-pointer border-0"
                   >
-                    <Plus size={15} />
-                    제품 신규 등록
+                    <Plus size={16} />
+                    + 제품 신규 등록
                   </button>
                 </div>
               </div>
 
               {/* Shipping and Return Policy Panel */}
               {showPolicyPanel && (
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 shadow-sm space-y-4 animate-fadeIn">
-                  <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-3">
-                    <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-1.5">
-                      <Truck size={16} className="text-[#f25f8a]" />
+                <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4 animate-fadeIn">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="font-black text-sm text-[#0F172A] flex items-center gap-2">
+                      <Truck size={17} className="text-slate-700" />
                       <span>🚚 배송비 정책 및 반품안내 설정</span>
                     </h3>
                     <button 
                       onClick={() => setShowPolicyPanel(false)}
-                      className="text-xs text-[#735965] hover:text-[#f25f8a] font-bold"
+                      className="text-xs text-slate-400 hover:text-slate-700 font-bold cursor-pointer"
                     >
                       닫기
                     </button>
@@ -5587,7 +6343,7 @@ export default function AdminPage() {
                   <form onSubmit={handleSaveShippingSettings} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965] block">A타입 기본 배송비 (원)</label>
+                        <label className="text-xs font-extrabold text-[#0F172A] block">A타입 기본 배송비 (원)</label>
                         <input 
                           type="text"
                           placeholder="e.g. 3,000"
@@ -5602,11 +6358,11 @@ export default function AdminPage() {
                             setShippingFeeA(val);
                           }}
                           required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965] block">B타입 기본 배송비 (원)</label>
+                        <label className="text-xs font-extrabold text-[#0F172A] block">B타입 기본 배송비 (원)</label>
                         <input 
                           type="text"
                           placeholder="e.g. 4,000"
@@ -5621,11 +6377,11 @@ export default function AdminPage() {
                             setShippingFeeB(val);
                           }}
                           required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965] block">C타입 기본 배송비 (원)</label>
+                        <label className="text-xs font-extrabold text-[#0F172A] block">C타입 기본 배송비 (원)</label>
                         <input 
                           type="text"
                           placeholder="e.g. 5,000"
@@ -5640,11 +6396,11 @@ export default function AdminPage() {
                             setShippingFeeC(val);
                           }}
                           required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965] block">BOX타입 기본 배송비 (10개당) (원)</label>
+                        <label className="text-xs font-extrabold text-[#0F172A] block">BOX타입 기본 배송비 (10개당) (원)</label>
                         <input 
                           type="text"
                           placeholder="e.g. 6,000"
@@ -5659,46 +6415,46 @@ export default function AdminPage() {
                             setShippingFeeBox(val);
                           }}
                           required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965] block">배송비 정책 안내 설명 문구</label>
+                      <label className="text-xs font-extrabold text-[#0F172A] block">배송비 정책 안내 설명 문구</label>
                       <textarea
                         rows={3}
                         placeholder="가맹 발주몰에 노출될 배송비 정책을 친절하게 입력해 주세요."
                         value={shippingPolicy}
                         onChange={(e) => setShippingPolicy(e.target.value)}
                         required
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] resize-none"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl p-4 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none resize-none shadow-2xs"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965] block">반품 및 교환 안내 설명 문구</label>
+                      <label className="text-xs font-extrabold text-[#0F172A] block">반품 및 교환 안내 설명 문구</label>
                       <textarea
                         rows={3}
                         placeholder="반품 접수 기한, 파손 보상 등 반품 및 교환 규정을 자세히 명시해 주세요."
                         value={returnPolicy}
                         onChange={(e) => setReturnPolicy(e.target.value)}
                         required
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] resize-none"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl p-4 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none resize-none shadow-2xs"
                       />
                     </div>
 
-                    <div className="flex justify-end gap-2 pt-2 border-t border-[#f2ccd7]/30">
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                       <button
                         type="button"
                         onClick={() => setShowPolicyPanel(false)}
-                        className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-[#735965] font-bold text-xs rounded-xl transition-all"
+                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
                       >
                         취소
                       </button>
                       <button
                         type="submit"
-                        className="px-5 py-2 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm"
+                        className="px-5 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-xl transition-all shadow-2xs cursor-pointer border-0"
                       >
                         설정 저장하기
                       </button>
@@ -5709,14 +6465,14 @@ export default function AdminPage() {
 
               {/* Real-time Label Panel */}
               {showLabelPanel && (
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-3">
-                    <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-1.5">
+                <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4 animate-fadeIn">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="font-black text-sm text-[#0F172A] flex items-center gap-1.5">
                       <span>🏷 라벨 실시간 관리 대장</span>
                     </h3>
                     <button 
                       onClick={() => setShowLabelPanel(false)}
-                      className="text-xs text-[#735965] hover:text-[#f25f8a] font-bold"
+                      className="text-xs text-slate-400 hover:text-slate-700 font-bold cursor-pointer"
                     >
                       닫기
                     </button>
@@ -5728,22 +6484,22 @@ export default function AdminPage() {
                       value={newLabelName}
                       onChange={(e) => setNewLabelName(e.target.value)}
                       required
-                      className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      className="flex-1 bg-[#F8F9FA] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                     />
                     <button 
                       type="submit"
-                      className="px-4 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs cursor-pointer border-0"
                     >
                       추가
                     </button>
                   </form>
                   <div className="space-y-2.5 max-w-md pt-2">
-                    <label className="text-[11px] font-bold text-[#735965] block">등록된 라벨 목록 (순서 조정 및 삭제)</label>
-                    <div className="space-y-2 p-3.5 bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-2xl max-h-[300px] overflow-y-auto">
+                    <label className="text-[11px] font-extrabold text-[#0F172A] block">등록된 라벨 목록 (순서 조정 및 삭제)</label>
+                    <div className="space-y-2 p-3.5 bg-[#F8F9FA] border-0 rounded-2xl max-h-[300px] overflow-y-auto shadow-2xs">
                       {labels.map((labName, idx) => (
                         <div
                           key={labName}
-                          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#fff9fb] text-[#bf3e67] border border-[#f2ccd7] group"
+                          className="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold bg-white text-[#0F172A] border-0 shadow-2xs group"
                         >
                           <span>{labName}</span>
                           <div className="flex items-center gap-1.5">
@@ -5751,7 +6507,7 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => handleAdjustLabelOrder(idx, "up")}
                               disabled={idx === 0}
-                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-[#F8F9FA] hover:bg-slate-100 border-0 text-[#0F172A] disabled:opacity-30 text-[9px] transition-colors cursor-pointer"
                               title="위로 이동"
                             >
                               ▲
@@ -5760,7 +6516,7 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => handleAdjustLabelOrder(idx, "down")}
                               disabled={idx === labels.length - 1}
-                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-[#F8F9FA] hover:bg-slate-100 border-0 text-[#0F172A] disabled:opacity-30 text-[9px] transition-colors cursor-pointer"
                               title="아래로 이동"
                             >
                               ▼
@@ -5768,7 +6524,7 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={() => handleDeleteLabel(labName)}
-                              className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 ml-1 font-bold text-sm leading-none transition-colors cursor-pointer"
+                              className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 ml-1 font-bold text-sm leading-none transition-colors cursor-pointer border-0"
                               title="라벨 삭제"
                             >
                               &times;
@@ -5783,14 +6539,14 @@ export default function AdminPage() {
 
               {/* Real-time Category Panel */}
               {showCategoryPanel && (
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-3">
-                    <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-1.5">
+                <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4 animate-fadeIn">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="font-black text-sm text-[#0F172A] flex items-center gap-1.5">
                       <span>🏷 카테고리 실시간 관리 대장</span>
                     </h3>
                     <button 
                       onClick={() => setShowCategoryPanel(false)}
-                      className="text-xs text-[#735965] hover:text-[#f25f8a] font-bold"
+                      className="text-xs text-slate-400 hover:text-slate-700 font-bold cursor-pointer"
                     >
                       닫기
                     </button>
@@ -5802,22 +6558,22 @@ export default function AdminPage() {
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
                       required
-                      className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      className="flex-1 bg-[#F8F9FA] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                     />
                     <button 
                       type="submit"
-                      className="px-4 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs cursor-pointer border-0"
                     >
                       추가
                     </button>
                   </form>
                   <div className="space-y-2.5 max-w-md pt-2">
-                    <label className="text-[11px] font-bold text-[#735965] block">등록된 카테고리 목록 (순서 조정 및 삭제)</label>
-                    <div className="space-y-2 p-3.5 bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-2xl max-h-[300px] overflow-y-auto">
+                    <label className="text-[11px] font-extrabold text-[#0F172A] block">등록된 카테고리 목록 (순서 조정 및 삭제)</label>
+                    <div className="space-y-2 p-3.5 bg-[#F8F9FA] border-0 rounded-2xl max-h-[300px] overflow-y-auto shadow-2xs">
                       {categories.map((catName, idx) => (
                         <div
                           key={catName}
-                          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#fff1f5] text-[#bf3e67] border border-[#f2ccd7] group"
+                          className="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold bg-white text-[#0F172A] border-0 shadow-2xs group"
                         >
                           <span>{catName}</span>
                           <div className="flex items-center gap-1.5">
@@ -5825,7 +6581,7 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => handleAdjustCategoryOrder(idx, "up")}
                               disabled={idx === 0}
-                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-[#F8F9FA] hover:bg-slate-100 border-0 text-[#0F172A] disabled:opacity-30 text-[9px] transition-colors cursor-pointer"
                               title="위로 이동"
                             >
                               ▲
@@ -5834,7 +6590,7 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => handleAdjustCategoryOrder(idx, "down")}
                               disabled={idx === categories.length - 1}
-                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-[#F8F9FA] hover:bg-slate-100 border-0 text-[#0F172A] disabled:opacity-30 text-[9px] transition-colors cursor-pointer"
                               title="아래로 이동"
                             >
                               ▼
@@ -5842,7 +6598,7 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={() => handleDeleteCategory(catName)}
-                              className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 ml-1 font-bold text-sm leading-none transition-colors cursor-pointer"
+                              className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 ml-1 font-bold text-sm leading-none transition-colors cursor-pointer border-0"
                               title="카테고리 삭제"
                             >
                               &times;
@@ -5856,11 +6612,11 @@ export default function AdminPage() {
               )}
 
               {/* Products Search & Category Filter Controls */}
-              <div className="bg-[#fff1f5]/40 border border-[#f2ccd7] rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#735965]">
+              <div className="bg-[#F8F9FA] border-0 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
                   <span>
                     총{" "}
-                    <strong className="text-[#bf3e67] font-black">
+                    <strong className="text-[#0F172A] font-black">
                       {filteredProducts.length}
                     </strong>
                     개의 제품이 검색되었습니다.
@@ -5871,7 +6627,7 @@ export default function AdminPage() {
                         setAdminProductSearch("");
                         setAdminProductCategoryFilter("전체");
                       }}
-                      className="text-[10px] px-2.5 py-0.5 rounded-lg bg-[#ffd3df] hover:bg-[#f25f8a] hover:text-white text-[#bf3e67] border border-[#f2ccd7] transition-all font-extrabold"
+                      className="text-[10px] px-2.5 py-0.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 border-0 transition-all font-extrabold cursor-pointer"
                     >
                       필터 초기화
                     </button>
@@ -5884,7 +6640,7 @@ export default function AdminPage() {
                     <select
                       value={adminProductCategoryFilter}
                       onChange={(e) => setAdminProductCategoryFilter(e.target.value)}
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#735965] focus:outline-none focus:border-[#f25f8a] appearance-none pr-8 cursor-pointer shadow-sm"
+                      className="w-full bg-white border-0 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:outline-none appearance-none pr-8 cursor-pointer shadow-2xs"
                     >
                       <option value="전체">카테고리 전체</option>
                       {categories.map((cat) => (
@@ -5893,7 +6649,7 @@ export default function AdminPage() {
                         </option>
                       ))}
                     </select>
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#735965]/60 text-[10px]">
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-[10px]">
                       ▼
                     </div>
                   </div>
@@ -5905,15 +6661,15 @@ export default function AdminPage() {
                       placeholder="제품명 또는 모델명 검색"
                       value={adminProductSearch}
                       onChange={(e) => setAdminProductSearch(e.target.value)}
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl pl-9 pr-8 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] shadow-sm font-semibold"
+                      className="w-full bg-white border-0 rounded-xl pl-9 pr-8 py-2.5 text-xs text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs font-semibold"
                     />
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#735965]/50">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                       <Search size={14} />
                     </div>
                     {adminProductSearch && (
                       <button
                         onClick={() => setAdminProductSearch("")}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-[#735965]/40 hover:text-red-500 font-extrabold w-5 h-5 flex items-center justify-center rounded-full hover:bg-neutral-100 transition-colors"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-slate-400 hover:text-red-500 font-extrabold w-5 h-5 flex items-center justify-center rounded-full hover:bg-neutral-100 transition-colors"
                       >
                         &times;
                       </button>
@@ -5923,11 +6679,11 @@ export default function AdminPage() {
               </div>
 
               {/* Products Table */}
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
+              <div className="bg-white border-0 rounded-2xl overflow-hidden shadow-2xs">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
+                      <tr className="bg-[#F8F9FA] border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                         <th className="p-4 sm:p-5 text-center">순서</th>
                         <th className="p-4 sm:p-5">이미지</th>
                         <th className="p-4 sm:p-5">카테고리</th>
@@ -5939,10 +6695,10 @@ export default function AdminPage() {
                         <th className="p-4 sm:p-5 text-center">관리</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                    <tbody className="divide-y divide-slate-100 text-xs">
                       {filteredProducts.length === 0 ? (
                         <tr>
-                          <td colSpan={9} className="p-8 text-center text-[#735965] font-bold">
+                          <td colSpan={9} className="p-8 text-center text-slate-400 font-bold">
                             {isProductFiltering
                               ? "검색 및 필터 조건에 부합하는 제품이 없습니다."
                               : "등록된 자재 제품이 존재하지 않습니다."}
@@ -5950,18 +6706,18 @@ export default function AdminPage() {
                         </tr>
                       ) : (
                         filteredProducts.map((p) => (
-                          <tr key={p.id} className="hover:bg-[#fff9fb] transition-colors">
-                            <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{p.orderIndex}</td>
+                          <tr key={p.id} className="hover:bg-[#F8F9FA] transition-colors">
+                            <td className="p-4 sm:p-5 text-center font-bold text-[#0F172A]">{p.orderIndex}</td>
                             <td className="p-4 sm:p-5">
                               {(() => {
                                 const status = p.status || (p.isActive ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종");
                                 const isUnavailable = status === "품절" || status === "단종";
                                 return (
-                                  <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-[#f2ccd7]/60 shadow-sm shrink-0">
+                                  <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-[#EEF0F5] shadow-2xs shrink-0 bg-white">
                                     <img 
-                                      src={p.img} 
+                                      src={optimizeCloudinaryUrl(p.img)} 
                                       alt="" 
-                                      className={`w-full h-full object-cover bg-[#fff1f5] transition-all duration-300 ${
+                                      className={`w-full h-full object-contain p-0.5 transition-all duration-300 ${
                                         isUnavailable ? "brightness-50 grayscale" : ""
                                       }`} 
                                     />
@@ -5977,13 +6733,13 @@ export default function AdminPage() {
                               })()}
                             </td>
                             <td className="p-4 sm:p-5">
-                              <span className="bg-[#ffd3df] text-[#bf3e67] font-bold px-2 py-0.5 rounded text-[10px] border border-[#f2ccd7]">
+                              <span className="bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[10px] border-0">
                                 {p.category}
                               </span>
                             </td>
                             <td className="p-4 sm:p-5">
                               <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="font-bold text-[#2d2026] text-xs">{p.name}</span>
+                                <span className="font-bold text-[#0F172A] text-xs">{p.name}</span>
                                 {p.labels && p.labels.map((l) => {
                                   let bgClass = "";
                                   if (l === "BEST") bgClass = "bg-amber-50 text-amber-600 border border-amber-200";
@@ -5997,24 +6753,24 @@ export default function AdminPage() {
                                   );
                                 })}
                               </div>
-                              <div className="text-[10px] text-[#735965] font-semibold mt-0.5">{p.modelName} ({p.qty}{p.unit})</div>
+                              <div className="text-[10px] text-slate-400 font-semibold mt-0.5">{p.modelName} ({p.qty}{p.unit})</div>
                             </td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-bold">{(p.supplyPrice || 0).toLocaleString()} 원</td>
+                            <td className="p-4 sm:p-5 text-slate-600 font-bold">{(p.supplyPrice || 0).toLocaleString()} 원</td>
                             <td className="p-4 sm:p-5">
-                              <div className="text-[#2d2026] font-extrabold line-through text-[10px] opacity-60">{(p.price || 0).toLocaleString()} 원</div>
-                              <div className="text-[#f25f8a] font-black text-xs">{(p.discountedPrice || 0).toLocaleString()} 원</div>
+                              <div className="text-slate-400 font-bold line-through text-[10px]">{(p.price || 0).toLocaleString()} 원</div>
+                              <div className="text-[#0F172A] font-black text-xs">{(p.discountedPrice || 0).toLocaleString()} 원</div>
                             </td>
                             <td className="p-4 sm:p-5">
                               {(() => {
                                 const status = p.status || (p.isActive ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종");
-                                let badgeClass = "bg-emerald-50 text-emerald-600 border border-emerald-200";
+                                let badgeClass = "bg-emerald-50 text-emerald-600 border-0";
                                 if (status === "품절") {
-                                  badgeClass = "bg-orange-50 text-orange-500 border border-orange-200";
+                                  badgeClass = "bg-orange-50 text-orange-500 border-0";
                                 } else if (status === "단종") {
-                                  badgeClass = "bg-neutral-100 text-neutral-500 border border-neutral-200";
+                                  badgeClass = "bg-neutral-100 text-neutral-500 border-0";
                                 }
                                 return (
-                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}`}>
+                                  <span className={`px-2.5 py-1 rounded text-[10px] font-bold ${badgeClass}`}>
                                     {status}
                                   </span>
                                 );
@@ -6026,7 +6782,7 @@ export default function AdminPage() {
                                   type="button"
                                   onClick={() => handleAdjustProductOrder(p.id, "up")}
                                   disabled={filteredProducts.findIndex((op) => op.id === p.id) === 0}
-                                  className="p-1 rounded bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] disabled:opacity-35 disabled:hover:bg-white text-[#735965] font-bold transition-all text-[9px] cursor-pointer"
+                                  className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border-0 disabled:opacity-30 text-slate-600 font-bold transition-all text-[9px] cursor-pointer"
                                   title="순서 위로"
                                 >
                                   ▲
@@ -6035,7 +6791,7 @@ export default function AdminPage() {
                                   type="button"
                                   onClick={() => handleAdjustProductOrder(p.id, "down")}
                                   disabled={filteredProducts.findIndex((op) => op.id === p.id) === filteredProducts.length - 1}
-                                  className="p-1 rounded bg-white hover:bg-[#fff1f5] border border-[#f2ccd7] disabled:opacity-35 disabled:hover:bg-white text-[#735965] font-bold transition-all text-[9px] cursor-pointer"
+                                  className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border-0 disabled:opacity-30 text-slate-600 font-bold transition-all text-[9px] cursor-pointer"
                                   title="순서 아래로"
                                 >
                                   ▼
@@ -6046,16 +6802,16 @@ export default function AdminPage() {
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
                                   onClick={() => handleOpenProductModal(p)}
-                                  className="px-2.5 py-1 rounded bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-[10px] font-bold transition-all"
+                                  className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border-0 text-[10px] font-extrabold transition-all cursor-pointer shadow-2xs"
                                 >
                                   수정
                                 </button>
                                 <button
                                   onClick={() => handleDeleteProduct(p.id)}
-                                  className="p-1 rounded bg-white text-red-500 hover:bg-red-50 border border-[#f2ccd7] transition-all"
+                                  className="p-1.5 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 border-0 transition-all cursor-pointer"
                                   title="삭제"
                                 >
-                                  <Trash2 size={13} />
+                                  <Trash2 size={14} />
                                 </button>
                               </div>
                             </td>
@@ -6073,45 +6829,45 @@ export default function AdminPage() {
               MENU: 4. ORDER MANAGEMENT
              ========================================== */}
           {currentMenu === "order" && (
-            <div className="space-y-6">
+            <div className="space-y-6 animate-fadeIn">
               
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-bold text-[#2d2026]">전체 가맹점 발주 주문 관리</h2>
-                  <p className="text-xs text-[#735965] font-bold mt-1">가맹점들이 신청한 원자재 발주 요청을 실시간 승인하고 배송 단계를 신속히 제어합니다.</p>
+                  <h2 className="text-xl font-black text-[#0F172A] tracking-tight">전체 가맹점 발주 주문 관리</h2>
+                  <p className="text-xs text-slate-400 font-semibold mt-1">가맹점들이 신청한 원자재 발주 요청을 실시간 승인하고 배송 단계를 신속히 제어합니다.</p>
                 </div>
                 <button
                   type="button"
                   onClick={handleExcelDownload}
-                  className="inline-flex items-center justify-center gap-1.5 px-4.5 py-3 bg-[#03C75A] hover:bg-[#02b350] text-white text-xs font-bold rounded-xl transition-all shadow-sm shrink-0 self-start sm:self-center cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs shrink-0 self-start sm:self-center cursor-pointer border-0"
                 >
-                  <Download size={14} />
+                  <Download size={15} />
                   발주내역 엑셀 다운로드
                 </button>
               </div>
 
               {/* 검색 및 기간 필터 영역 */}
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 shadow-sm space-y-4">
+              <div className="bg-white border border-[#EEF0F5] rounded-[28px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* 통합 검색 */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-[#735965] block">통합 검색</label>
+                    <label className="text-[11px] font-extrabold text-[#0F172A] block">통합 검색</label>
                     <input
                       type="text"
                       placeholder="가맹점명, 점주명, 연락처, 품목명, 주소, 주문번호"
                       value={orderSearchKeyword}
                       onChange={(e) => setOrderSearchKeyword(e.target.value)}
-                      className="w-full bg-[#fff9fb]/10 border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 font-semibold focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#F8F9FD] border border-[#E2E8F0] rounded-2xl px-4 py-3 text-xs text-[#0F172A] placeholder-slate-400 font-bold focus:outline-none focus:border-[#F5AC00]"
                     />
                   </div>
 
                   {/* 기간선택 셀렉트 */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-[#735965] block">발주 기간 필터</label>
+                    <label className="text-[11px] font-extrabold text-[#0F172A] block">발주 기간 필터</label>
                     <select
                       value={orderDateFilterType}
                       onChange={(e) => setOrderDateFilterType(e.target.value)}
-                      className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] font-bold focus:outline-none focus:border-[#f25f8a] cursor-pointer"
+                      className="w-full bg-[#F8F9FD] border border-[#E2E8F0] rounded-2xl px-4 py-3 text-xs text-[#0F172A] font-bold focus:outline-none focus:border-[#F5AC00] cursor-pointer"
                     >
                       <option value="all">전체 기간</option>
                       <option value="today">당일 (오늘)</option>
@@ -6126,20 +6882,20 @@ export default function AdminPage() {
                   {/* 직접 지정 달력 폼 (custom일 때만 노출) */}
                   {orderDateFilterType === "custom" && (
                     <div className="space-y-1.5 animate-fadeIn">
-                      <label className="text-[10px] font-bold text-[#735965] block">직접 기간 선택</label>
+                      <label className="text-[11px] font-extrabold text-[#0F172A] block">직접 기간 선택</label>
                       <div className="flex items-center gap-2">
                         <input
                           type="date"
                           value={orderStartDate}
                           onChange={(e) => setOrderStartDate(e.target.value)}
-                          className="flex-1 bg-white border border-[#f2ccd7] rounded-xl px-2 py-2 text-xs font-semibold focus:outline-none"
+                          className="flex-1 bg-[#F8F9FD] border border-[#E2E8F0] rounded-2xl px-3 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none"
                         />
-                        <span className="text-[#735965] font-bold text-xs">~</span>
+                        <span className="text-slate-400 font-bold text-xs">~</span>
                         <input
                           type="date"
                           value={orderEndDate}
                           onChange={(e) => setOrderEndDate(e.target.value)}
-                          className="flex-1 bg-white border border-[#f2ccd7] rounded-xl px-2 py-2 text-xs font-semibold focus:outline-none"
+                          className="flex-1 bg-[#F8F9FD] border border-[#E2E8F0] rounded-2xl px-3 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none"
                         />
                       </div>
                     </div>
@@ -6148,11 +6904,11 @@ export default function AdminPage() {
               </div>
 
               {/* 발주 목록 테이블 */}
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
+              <div className="bg-white border border-[#EEF0F5] rounded-[28px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse min-w-[1000px]">
                     <thead>
-                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
+                      <tr className="bg-[#F8F9FD] border-b border-[#EEF0F5] text-[11px] font-extrabold text-neutral-400 uppercase tracking-wider">
                         <th className="p-4 sm:p-5 text-center" style={{ width: '60px' }}>순서</th>
                         <th className="p-4 sm:p-5" style={{ width: '100px' }}>신청일자</th>
                         <th className="p-4 sm:p-5" style={{ width: '130px' }}>가맹점명</th>
@@ -6166,10 +6922,10 @@ export default function AdminPage() {
                         <th className="p-4 sm:p-5 text-center" style={{ width: '90px' }}>상세정보</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                    <tbody className="divide-y divide-[#EEF0F5] text-xs">
                       {filteredOrders.length === 0 ? (
                         <tr>
-                          <td colSpan={11} className="p-8 text-center text-[#735965] font-bold">검색 조건에 맞는 가맹점 발주 주문이 존재하지 않습니다.</td>
+                          <td colSpan={11} className="p-10 text-center text-slate-400 font-bold">검색 조건에 맞는 가맹점 발주 주문이 존재하지 않습니다.</td>
                         </tr>
                       ) : (
                         filteredOrders.map((order, idx) => {
@@ -6224,14 +6980,14 @@ export default function AdminPage() {
                                   <button
                                     type="button"
                                     onClick={() => handleOpenOrderModal(order)}
-                                    className="px-3.5 py-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-[10px] font-bold transition-all shadow-sm cursor-pointer"
+                                    className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-extrabold transition-all border-0 shadow-2xs cursor-pointer"
                                   >
                                     상세보기
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteOrder(order._id)}
-                                    className="p-1.5 rounded-lg bg-white hover:bg-red-50 text-red-500 border border-[#f2ccd7] hover:border-red-200 transition-all cursor-pointer"
+                                    className="p-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all border-0 shadow-2xs cursor-pointer"
                                     title="삭제"
                                   >
                                     <Trash2 size={13} />
@@ -6263,7 +7019,7 @@ export default function AdminPage() {
                 </div>
                 <button
                   onClick={() => setShowNoticeModal(true)}
-                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold rounded-lg transition-all shadow-sm shrink-0 self-start sm:self-center"
+                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs shrink-0 self-start sm:self-center cursor-pointer border-0"
                 >
                   <Plus size={15} />
                   신규 공지 작성
@@ -6271,11 +7027,11 @@ export default function AdminPage() {
               </div>
 
               {/* Notices List */}
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
+              <div className="bg-white border-0 rounded-[28px] overflow-hidden shadow-md">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
+                      <tr className="bg-[#F8F9FD] border-b border-[#EEF0F5] text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
                         <th className="p-4 sm:p-5">태그 구분</th>
                         <th className="p-4 sm:p-5">공지 제목</th>
                         <th className="p-4 sm:p-5">등록 일자</th>
@@ -6283,43 +7039,43 @@ export default function AdminPage() {
                         <th className="p-4 sm:p-5 text-center">액션</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                    <tbody className="divide-y divide-[#EEF0F5] text-xs">
                       {notices.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="p-8 text-center text-[#735965]">등록된 공지사항이 존재하지 않습니다.</td>
+                          <td colSpan={5} className="p-8 text-center text-slate-400 font-bold">등록된 공지사항이 존재하지 않습니다.</td>
                         </tr>
                       ) : (
                         notices.map((n) => (
                           <tr key={n.id} className="hover:bg-[#fff9fb] transition-colors">
                             <td className="p-4 sm:p-5">
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                              <span className={`text-[10px] font-extrabold px-3 py-1 rounded-lg border-0 shadow-2xs ${
                                 n.tag === "필독" 
-                                  ? "bg-red-50 text-red-500 border border-red-200" 
-                                  : "bg-[#fff1f5] text-[#735965] border border-[#f2ccd7]"
+                                  ? "bg-red-100 text-red-600" 
+                                  : "bg-slate-100 text-slate-700"
                               }`}>
                                 {n.tag}
                               </span>
                             </td>
                             <td 
-                              className="p-4 sm:p-5 font-bold text-[#2d2026] max-w-xs truncate hover:text-[#f25f8a] hover:underline cursor-pointer"
+                              className="p-4 sm:p-5 font-bold text-[#0F172A] max-w-xs truncate hover:text-[#F5AC00] hover:underline cursor-pointer"
                               onClick={() => handleOpenEditNoticeModal(n)}
                             >
                               {n.title}
                             </td>
-                            <td className="p-4 sm:p-5 text-[#735965] font-semibold">{n.date}</td>
-                            <td className="p-4 sm:p-5 font-bold text-[#735965]">{n.views} 회</td>
+                            <td className="p-4 sm:p-5 text-slate-500 font-semibold">{n.date}</td>
+                            <td className="p-4 sm:p-5 font-bold text-slate-600">{n.views} 회</td>
                             <td className="p-4 sm:p-5 text-center">
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
                                   onClick={() => handleOpenEditNoticeModal(n)}
-                                  className="p-1.5 rounded-lg border border-[#f2ccd7] bg-white hover:bg-[#fff1f5] text-[#bf3e67] hover:border-[#ffd3df] transition-all text-xs cursor-pointer"
+                                  className="p-1.5 rounded-xl border-0 bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-xs cursor-pointer shadow-2xs"
                                   title="수정"
                                 >
                                   <Edit size={14} />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteNotice(n.id, n._id)}
-                                  className="p-1.5 rounded-lg border border-[#f2ccd7] bg-white hover:bg-red-50 text-red-500 hover:border-red-300 transition-all text-xs cursor-pointer"
+                                  className="p-1.5 rounded-xl border-0 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all text-xs cursor-pointer shadow-2xs"
                                   title="삭제"
                                 >
                                   <Trash2 size={14} />
@@ -6433,11 +7189,11 @@ export default function AdminPage() {
               </div>
 
               {/* Consultation Inquiries list */}
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl overflow-hidden shadow-sm">
+              <div className="bg-white border-0 rounded-[28px] overflow-hidden shadow-md">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[11px] font-bold text-[#735965] uppercase tracking-wider">
+                      <tr className="bg-[#F8F9FD] border-b border-[#EEF0F5] text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
                         <th className="p-4 sm:p-5 w-24">신청일</th>
                         <th className="p-4 sm:p-5 w-24">고객명</th>
                         <th className="p-4 sm:p-5 w-44">연락처</th>
@@ -6446,44 +7202,44 @@ export default function AdminPage() {
                         <th className="p-4 sm:p-5 w-28 text-center">액션</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                    <tbody className="divide-y divide-[#EEF0F5] text-xs">
                       {consultations.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="p-8 text-center text-[#735965]">접수된 창업 상담문의가 존재하지 않습니다.</td>
+                          <td colSpan={6} className="p-8 text-center text-slate-400 font-bold">접수된 창업 상담문의가 존재하지 않습니다.</td>
                         </tr>
                       ) : (
                         [...consultations]
                           .sort((a, b) => b.regDate.localeCompare(a.regDate) || (b._creationTime || 0) - (a._creationTime || 0))
                           .map((inq) => (
                             <tr key={inq._id} className="hover:bg-[#fff9fb] transition-colors">
-                              <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{inq.regDate}</td>
-                              <td className="p-4 sm:p-5 font-bold text-[#2d2026] whitespace-nowrap">{inq.name}</td>
-                              <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">
+                              <td className="p-4 sm:p-5 text-slate-500 font-semibold whitespace-nowrap">{inq.regDate}</td>
+                              <td className="p-4 sm:p-5 font-bold text-[#0F172A] whitespace-nowrap">{inq.name}</td>
+                              <td className="p-4 sm:p-5 text-slate-600 font-semibold whitespace-nowrap">
                                 <div className="flex items-center gap-1.5">
                                   <span>{inq.phone}</span>
                                   <button
                                     type="button"
                                     onClick={() => handleCopyToClipboard(inq.phone, "연락처")}
-                                    className="p-1 hover:text-[#f25f8a] text-[#735965] bg-[#fff9fb] border border-[#f2ccd7] rounded cursor-pointer transition-colors"
+                                    className="p-1.5 hover:bg-slate-200 text-slate-600 bg-slate-100 border-0 rounded-lg cursor-pointer transition-all shadow-2xs"
                                     title="복사하기"
                                   >
-                                    <Copy size={11} />
+                                    <Copy size={12} />
                                   </button>
                                 </div>
                               </td>
                               <td className="p-4 sm:p-5">
-                                <span className="bg-[#ffd3df] text-[#bf3e67] font-bold px-2 py-0.5 rounded text-[10px] border border-[#f2ccd7] whitespace-nowrap">
+                                <span className="bg-slate-100 text-slate-700 font-extrabold px-2.5 py-1 rounded-lg text-[11px] border-0 shadow-2xs whitespace-nowrap">
                                   {inq.storeType}
                                 </span>
                               </td>
-                              <td className="p-4 sm:p-5 text-[#2d2026] max-w-xs sm:max-w-sm truncate" title={inq.message}>
+                              <td className="p-4 sm:p-5 text-[#0F172A] max-w-xs sm:max-w-sm truncate" title={inq.message}>
                                 <div className="flex items-center gap-2">
                                   <span className="truncate">{inq.message || "-"}</span>
                                   {inq.message && inq.message.length > 20 && (
                                     <button
                                       type="button"
                                       onClick={() => setSelectedConsultation(inq)}
-                                      className="px-2 py-0.5 rounded bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-[10px] font-bold transition-all whitespace-nowrap"
+                                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border-0 text-[11px] font-extrabold transition-all shadow-2xs whitespace-nowrap cursor-pointer"
                                     >
                                       더보기
                                     </button>
@@ -6494,7 +7250,7 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteConsultation(inq._id)}
-                                  className="p-1.5 rounded-lg border border-[#f2ccd7] bg-white hover:bg-[#fff1f5] text-red-500 hover:border-red-300 transition-all text-xs cursor-pointer"
+                                  className="p-1.5 rounded-xl border-0 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all text-xs cursor-pointer shadow-2xs"
                                   title="삭제"
                                 >
                                   <Trash2 size={14} />
@@ -6527,7 +7283,7 @@ export default function AdminPage() {
 
                 {/* Period selection */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="bg-[#fff1f5] border border-[#f2ccd7] rounded-xl p-1 flex gap-1">
+                  <div className="bg-slate-100 rounded-2xl p-1 flex gap-1 shadow-2xs border-0">
                     {[
                       { key: "today", label: "당일" },
                       { key: "yesterday", label: "전일" },
@@ -6542,10 +7298,10 @@ export default function AdminPage() {
                           setAnalyticsDateFilter(item.key);
                           setIpListPage(1);
                         }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border-0 ${
                           analyticsDateFilter === item.key
-                            ? "bg-[#f25f8a] text-white shadow-sm font-black"
-                            : "text-[#735965] hover:text-[#bf3e67]"
+                            ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
+                            : "text-slate-600 hover:text-[#0F172A]"
                         }`}
                       >
                         {item.label}
@@ -6554,7 +7310,7 @@ export default function AdminPage() {
                   </div>
 
                   {analyticsDateFilter === "custom" && (
-                    <div className="flex items-center gap-1.5 bg-white border border-[#f2ccd7] rounded-xl p-1">
+                    <div className="flex items-center gap-1.5 bg-slate-100 rounded-2xl p-1.5 shadow-2xs border-0">
                       <input
                         type="date"
                         value={analyticsStartDate}
@@ -6562,9 +7318,9 @@ export default function AdminPage() {
                           setAnalyticsStartDate(e.target.value);
                           setIpListPage(1);
                         }}
-                        className="bg-transparent border-0 text-xs font-bold text-[#2d2026] focus:ring-0 p-1"
+                        className="bg-transparent border-0 text-xs font-extrabold text-[#0F172A] focus:ring-0 p-1"
                       />
-                      <span className="text-xs text-[#735965] font-bold">~</span>
+                      <span className="text-xs text-slate-400 font-bold">~</span>
                       <input
                         type="date"
                         value={analyticsEndDate}
@@ -6572,7 +7328,7 @@ export default function AdminPage() {
                           setAnalyticsEndDate(e.target.value);
                           setIpListPage(1);
                         }}
-                        className="bg-transparent border-0 text-xs font-bold text-[#2d2026] focus:ring-0 p-1"
+                        className="bg-transparent border-0 text-xs font-extrabold text-[#0F172A] focus:ring-0 p-1"
                       />
                     </div>
                   )}
@@ -6580,45 +7336,45 @@ export default function AdminPage() {
               </div>
 
               {/* Date display helper */}
-              <div className="bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-xl px-4 py-2 text-xs text-[#bf3e67] font-extrabold flex items-center gap-1.5">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#f25f8a]"></span>
-                분석 대상 기간: {analyticsStartDate || "-"} ~ {analyticsEndDate || "-"} (총 {dateList.length}일)
+              <div className="bg-[#F8F9FA] border-0 rounded-2xl px-5 py-3 text-xs text-[#0F172A] font-extrabold flex items-center gap-2 shadow-2xs">
+                <span className="inline-block w-2 h-2 rounded-full bg-[#FED422]"></span>
+                <span>분석 대상 기간: <strong>{analyticsStartDate || "-"} ~ {analyticsEndDate || "-"}</strong> (총 {dateList.length}일)</span>
               </div>
 
               {/* Metric cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 flex items-center justify-between shadow-sm">
+                <div className="bg-white border-0 rounded-[28px] p-6 flex items-center justify-between shadow-md">
                   <div>
-                    <span className="text-xs text-[#735965] font-bold block mb-1">방문자수 (인입건수)</span>
-                    <strong className="text-2xl font-black text-[#2d2026]">
-                      {totalVisits.toLocaleString()} <span className="text-xs text-[#735965] font-normal">회</span>
+                    <span className="text-xs text-slate-500 font-extrabold block mb-1">방문자수 (인입건수)</span>
+                    <strong className="text-2xl font-black text-[#0F172A]">
+                      {totalVisits.toLocaleString()} <span className="text-xs text-slate-400 font-normal">회</span>
                     </strong>
                   </div>
-                  <div className="bg-[#fff1f5] text-[#f25f8a] p-3 rounded-xl border border-[#f2ccd7]/40">
+                  <div className="bg-slate-100 text-[#0F172A] p-3.5 rounded-2xl shadow-2xs">
                     <Monitor size={22} />
                   </div>
                 </div>
 
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 flex items-center justify-between shadow-sm">
+                <div className="bg-white border-0 rounded-[28px] p-6 flex items-center justify-between shadow-md">
                   <div>
-                    <span className="text-xs text-[#735965] font-bold block mb-1">창업 상담문의</span>
-                    <strong className="text-2xl font-black text-[#f25f8a]">
-                      {totalInquiries.toLocaleString()} <span className="text-xs text-[#735965] font-normal">건</span>
+                    <span className="text-xs text-slate-500 font-extrabold block mb-1">창업 상담문의</span>
+                    <strong className="text-2xl font-black text-[#0F172A]">
+                      {totalInquiries.toLocaleString()} <span className="text-xs text-slate-400 font-normal">건</span>
                     </strong>
                   </div>
-                  <div className="bg-[#fff1f5] text-[#f25f8a] p-3 rounded-xl border border-[#f2ccd7]/40">
+                  <div className="bg-slate-100 text-[#0F172A] p-3.5 rounded-2xl shadow-2xs">
                     <Headphones size={22} />
                   </div>
                 </div>
 
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-5 flex items-center justify-between shadow-sm">
+                <div className="bg-white border-0 rounded-[28px] p-6 flex items-center justify-between shadow-md">
                   <div>
-                    <span className="text-xs text-[#735965] font-bold block mb-1">메뉴 상세 뷰수</span>
-                    <strong className="text-2xl font-black text-[#2d2026]">
-                      {totalMenuViews.toLocaleString()} <span className="text-xs text-[#735965] font-normal">회</span>
+                    <span className="text-xs text-slate-500 font-extrabold block mb-1">메뉴 상세 뷰수</span>
+                    <strong className="text-2xl font-black text-[#0F172A]">
+                      {totalMenuViews.toLocaleString()} <span className="text-xs text-slate-400 font-normal">회</span>
                     </strong>
                   </div>
-                  <div className="bg-[#fff1f5] text-[#f25f8a] p-3 rounded-xl border border-[#f2ccd7]/40">
+                  <div className="bg-slate-100 text-[#0F172A] p-3.5 rounded-2xl shadow-2xs">
                     <BarChart3 size={22} />
                   </div>
                 </div>
@@ -6627,34 +7383,34 @@ export default function AdminPage() {
               {/* Daily trend and referrer */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Daily Table (7 columns) */}
-                <div className="lg:col-span-7 bg-white border border-[#f2ccd7] rounded-2xl shadow-sm flex flex-col overflow-hidden">
-                  <div className="p-4 sm:p-5 border-b border-[#f2ccd7] bg-[#fff9fb]">
-                    <h3 className="text-sm font-bold text-[#2d2026]">일자별 상세 지표</h3>
+                <div className="lg:col-span-7 bg-white border-0 rounded-[28px] shadow-md flex flex-col overflow-hidden">
+                  <div className="p-5 border-b border-slate-100 bg-[#F8F9FD]">
+                    <h3 className="text-sm font-black text-[#0F172A]">일자별 상세 지표</h3>
                   </div>
                   <div className="overflow-x-auto flex-1 max-h-[350px]">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[10px] font-bold text-[#735965] uppercase tracking-wider sticky top-0 z-10">
-                          <th className="p-3">일자</th>
-                          <th className="p-3 text-right">방문자수 (인입)</th>
-                          <th className="p-3 text-right">창업 상담문의</th>
-                          <th className="p-3 text-right">메뉴 상세 뷰수</th>
-                          <th className="p-3 text-right">합계</th>
+                        <tr className="bg-[#F8F9FD] border-b border-slate-100 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider sticky top-0 z-10">
+                          <th className="p-3.5">일자</th>
+                          <th className="p-3.5 text-right">방문자수 (인입)</th>
+                          <th className="p-3.5 text-right">창업 상담문의</th>
+                          <th className="p-3.5 text-right">메뉴 상세 뷰수</th>
+                          <th className="p-3.5 text-right">합계</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                      <tbody className="divide-y divide-slate-100 text-xs">
                         {dailyData.length === 0 ? (
                           <tr>
-                            <td colSpan={5} className="p-8 text-center text-[#735965] font-bold">기간 내 조회된 통계가 없습니다.</td>
+                            <td colSpan={5} className="p-8 text-center text-slate-400 font-bold">기간 내 조회된 통계가 없습니다.</td>
                           </tr>
                         ) : (
                           dailyData.map((row) => (
-                            <tr key={row.date} className="hover:bg-[#fff9fb] transition-colors">
-                              <td className="p-3 text-[#2d2026] font-extrabold">{row.date}</td>
-                              <td className="p-3 text-right text-[#735965] font-semibold">{row.visits.toLocaleString()}</td>
-                              <td className="p-3 text-right text-[#f25f8a] font-bold">{row.inquiries.toLocaleString()}</td>
-                              <td className="p-3 text-right text-[#735965] font-semibold">{row.menuViews.toLocaleString()}</td>
-                              <td className="p-3 text-right text-[#bf3e67] font-extrabold bg-[#fff9fb]/40">
+                            <tr key={row.date} className="hover:bg-slate-50 transition-colors">
+                              <td className="p-3.5 text-[#0F172A] font-extrabold">{row.date}</td>
+                              <td className="p-3.5 text-right text-slate-600 font-semibold">{row.visits.toLocaleString()}</td>
+                              <td className="p-3.5 text-right text-[#0F172A] font-black">{row.inquiries.toLocaleString()}</td>
+                              <td className="p-3.5 text-right text-slate-600 font-semibold">{row.menuViews.toLocaleString()}</td>
+                              <td className="p-3.5 text-right text-[#0F172A] font-black bg-slate-50">
                                 {(row.visits + row.inquiries + row.menuViews).toLocaleString()}
                               </td>
                             </tr>
@@ -6666,32 +7422,32 @@ export default function AdminPage() {
                 </div>
 
                 {/* Referrers Rank (5 columns) */}
-                <div className="lg:col-span-5 bg-white border border-[#f2ccd7] rounded-2xl shadow-sm flex flex-col overflow-hidden">
-                  <div className="p-4 sm:p-5 border-b border-[#f2ccd7] bg-[#fff9fb]">
-                    <h3 className="text-sm font-bold text-[#2d2026]">유입경로(Referrer) 분석</h3>
+                <div className="lg:col-span-5 bg-white border-0 rounded-[28px] shadow-md flex flex-col overflow-hidden">
+                  <div className="p-5 border-b border-slate-100 bg-[#F8F9FD]">
+                    <h3 className="text-sm font-black text-[#0F172A]">유입경로(Referrer) 분석</h3>
                   </div>
                   <div className="p-5 overflow-y-auto max-h-[350px] flex-1 space-y-4">
                     {sortedReferrers.length === 0 ? (
-                      <div className="text-center text-[#735965] font-bold py-12">조회된 유입경로 데이터가 없습니다.</div>
+                      <div className="text-center text-slate-400 font-bold py-12">조회된 유입경로 데이터가 없습니다.</div>
                     ) : (
                       sortedReferrers.map((ref, idx) => {
                         const percent = Math.round((ref.count / totalReferrerCount) * 100);
                         return (
-                          <div key={ref.name} className="space-y-1">
+                          <div key={ref.name} className="space-y-1.5">
                             <div className="flex justify-between items-center text-xs">
-                              <span className="font-extrabold text-[#2d2026] flex items-center gap-1.5">
-                                <span className="inline-block w-4 h-4 rounded-full bg-[#ffd3df] text-[#bf3e67] text-[10px] font-black flex items-center justify-center">
+                              <span className="font-extrabold text-[#0F172A] flex items-center gap-2">
+                                <span className="inline-block w-5 h-5 rounded-full bg-slate-100 text-[#0F172A] text-[10px] font-black flex items-center justify-center shadow-2xs">
                                   {idx + 1}
                                 </span>
                                 {ref.name}
                               </span>
-                              <span className="font-bold text-[#735965]">
+                              <span className="font-bold text-slate-600">
                                 {ref.count.toLocaleString()}건 ({percent}%)
                               </span>
                             </div>
-                            <div className="w-full bg-[#f2ccd7]/30 h-2 rounded-full overflow-hidden">
+                            <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                               <div
-                                  className="bg-[#f25f8a] h-full rounded-full transition-all"
+                                  className="bg-[#FED422] h-full rounded-full transition-all"
                                   style={{ width: `${percent}%` }}
                               ></div>
                             </div>
@@ -6704,35 +7460,35 @@ export default function AdminPage() {
               </div>
 
               {/* Brand Menu View Ranking */}
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl shadow-sm overflow-hidden">
-                <div className="p-4 sm:p-5 border-b border-[#f2ccd7] bg-[#fff9fb] flex justify-between items-center">
-                  <h3 className="text-sm font-bold text-[#2d2026]">브랜드 / 메뉴별 상세 조회수 순위</h3>
-                  <span className="text-[10px] bg-[#ffd3df] text-[#bf3e67] px-2.5 py-0.5 rounded-full font-bold border border-[#f2ccd7]">
+              <div className="bg-white border-0 rounded-[28px] shadow-md overflow-hidden">
+                <div className="p-5 border-b border-slate-100 bg-[#F8F9FD] flex justify-between items-center">
+                  <h3 className="text-sm font-black text-[#0F172A]">브랜드 / 메뉴별 상세 조회수 순위</h3>
+                  <span className="text-[10px] bg-slate-100 text-[#0F172A] px-3 py-1 rounded-full font-extrabold shadow-2xs">
                     총 뷰수: {totalMenuViews.toLocaleString()}회
                   </span>
                 </div>
                 <div className="p-5 space-y-4 max-h-[300px] overflow-y-auto">
                   {sortedMenus.length === 0 ? (
-                    <div className="text-center text-[#735965] font-bold py-8">조회된 메뉴 상세 뷰 데이터가 없습니다.</div>
+                    <div className="text-center text-slate-400 font-bold py-8">조회된 메뉴 상세 뷰 데이터가 없습니다.</div>
                   ) : (
                     sortedMenus.map((menu, idx) => {
                       const percent = Math.round((menu.count / totalMenuViewCount) * 100);
                       return (
                         <div key={menu.name} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-6">
-                          <span className="font-extrabold text-[#2d2026] text-xs sm:w-1/4 flex items-center gap-2">
-                            <span className="inline-block w-5 h-5 rounded-lg bg-[#fff1f5] border border-[#f2ccd7] text-[#bf3e67] text-[10px] font-black flex items-center justify-center shrink-0">
+                          <span className="font-extrabold text-[#0F172A] text-xs sm:w-1/4 flex items-center gap-2">
+                            <span className="inline-block w-5 h-5 rounded-lg bg-slate-100 text-[#0F172A] text-[10px] font-black flex items-center justify-center shrink-0 shadow-2xs">
                               {idx + 1}
                             </span>
                             {menu.name}
                           </span>
                           <div className="flex-1 flex items-center gap-3">
-                            <div className="flex-1 bg-[#f2ccd7]/20 h-2.5 rounded-full overflow-hidden">
+                            <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
                               <div
-                                className="bg-gradient-to-r from-[#f25f8a] to-[#bf3e67] h-full rounded-full transition-all"
+                                className="bg-[#FED422] h-full rounded-full transition-all"
                                 style={{ width: `${percent}%` }}
                               ></div>
                             </div>
-                            <span className="font-bold text-[#735965] text-xs w-20 text-right shrink-0">
+                            <span className="font-bold text-slate-600 text-xs w-20 text-right shrink-0">
                               {menu.count.toLocaleString()}회 ({percent}%)
                             </span>
                           </div>
@@ -6744,16 +7500,16 @@ export default function AdminPage() {
               </div>
 
               {/* IP Access Logs */}
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl shadow-sm overflow-hidden">
-                <div className="p-4 sm:p-5 border-b border-[#f2ccd7] bg-[#fff9fb] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="bg-white border-0 rounded-[28px] shadow-md overflow-hidden">
+                <div className="p-5 border-b border-slate-100 bg-[#F8F9FD] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h3 className="text-sm font-bold text-[#2d2026]">유입 IP 주소별 방문 분석 로그</h3>
-                    <p className="text-[10px] text-[#735965] font-bold mt-0.5">접속 IP별 누적 방문 횟수 및 유입 경로, 최근 방문한 페이지를 요약 조회합니다.</p>
+                    <h3 className="text-sm font-black text-[#0F172A]">유입 IP 주소별 방문 분석 로그</h3>
+                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">접속 IP별 누적 방문 횟수 및 유입 경로, 최근 방문한 페이지를 요약 조회합니다.</p>
                   </div>
 
                   {/* Search */}
                   <div className="relative w-full sm:w-64">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#735965]">
+                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                       <Search size={14} />
                     </span>
                     <input
@@ -6764,7 +7520,7 @@ export default function AdminPage() {
                         setIpSearchQuery(e.target.value);
                         setIpListPage(1);
                       }}
-                      className="pl-9 pr-4 py-1.5 w-full bg-white border border-[#f2ccd7] rounded-xl text-xs font-bold text-[#2d2026] placeholder-[#735965]/50 focus:border-[#f25f8a] focus:ring-1 focus:ring-[#f25f8a] transition-all"
+                      className="pl-9 pr-4 py-2 w-full bg-[#F1F4F8] border-0 rounded-2xl text-xs font-bold text-[#0F172A] placeholder-slate-400 shadow-2xs focus:outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -6772,7 +7528,7 @@ export default function AdminPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[10px] font-bold text-[#735965] uppercase tracking-wider">
+                      <tr className="bg-[#F8F9FD] border-b border-slate-100 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
                         <th className="p-4 w-44">IP 주소</th>
                         <th className="p-4 text-center w-24">누적 방문수</th>
                         <th className="p-4 text-center w-24">메뉴 상세뷰</th>
@@ -6781,35 +7537,35 @@ export default function AdminPage() {
                         <th className="p-4 w-44">최종 접속 일시</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#f2ccd7]/60 text-xs">
+                    <tbody className="divide-y divide-slate-100 text-xs">
                       {paginatedIps.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="p-8 text-center text-[#735965]">검색 필터에 부합하는 IP 기록이 없습니다.</td>
+                          <td colSpan={6} className="p-8 text-center text-slate-400 font-bold">검색 필터에 부합하는 IP 기록이 없습니다.</td>
                         </tr>
                       ) : (
                         paginatedIps.map((row) => (
-                          <tr key={row.ip} className="hover:bg-[#fff9fb] transition-colors">
-                            <td className="p-4 font-extrabold text-[#2d2026]">{row.ip}</td>
-                            <td className="p-4 text-center font-bold text-[#735965]">{row.visitCount.toLocaleString()}회</td>
-                            <td className="p-4 text-center font-bold text-[#bf3e67]">{row.menuViewCount.toLocaleString()}회</td>
-                            <td className="p-4 text-[#735965] font-semibold max-w-xs truncate">
+                          <tr key={row.ip} className="hover:bg-slate-50 transition-colors">
+                            <td className="p-4 font-extrabold text-[#0F172A]">{row.ip}</td>
+                            <td className="p-4 text-center font-bold text-slate-600">{row.visitCount.toLocaleString()}회</td>
+                            <td className="p-4 text-center font-black text-[#0F172A]">{row.menuViewCount.toLocaleString()}회</td>
+                            <td className="p-4 text-slate-600 font-semibold max-w-xs truncate">
                               <div className="flex flex-wrap gap-1">
                                 {Array.from(row.referrers).map((ref, idx) => (
                                   <span
                                     key={idx}
-                                    className="bg-[#fff1f5] border border-[#f2ccd7]/60 text-[#bf3e67] text-[9px] font-black px-1.5 py-0.5 rounded"
+                                    className="bg-slate-100 text-slate-700 text-[10px] font-extrabold px-2.5 py-1 rounded-lg border-0 shadow-2xs"
                                   >
                                     {ref}
                                   </span>
                                 ))}
                               </div>
                             </td>
-                            <td className="p-4 text-[#735965] font-semibold max-w-xs truncate" title={Array.from(row.paths).join(", ")}>
-                              <span className="bg-[#fff9fb] border border-[#f2ccd7]/40 text-[#735965] text-[10px] px-2 py-0.5 rounded">
+                            <td className="p-4 text-slate-600 font-semibold max-w-xs truncate" title={Array.from(row.paths).join(", ")}>
+                              <span className="bg-slate-100 text-slate-700 text-[10px] font-extrabold px-2.5 py-1 rounded-lg border-0 shadow-2xs">
                                 {Array.from(row.paths).pop() || "/"}
                               </span>
                             </td>
-                            <td className="p-4 text-[#735965] font-bold whitespace-nowrap">
+                            <td className="p-4 text-slate-600 font-bold whitespace-nowrap">
                               {new Date(row.lastTime).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}
                             </td>
                           </tr>
@@ -6821,25 +7577,25 @@ export default function AdminPage() {
 
                 {/* Pagination Footer */}
                 {totalIpPages > 1 && (
-                  <div className="p-4 sm:p-5 border-t border-[#f2ccd7] bg-[#fff9fb] flex items-center justify-between">
-                    <span className="text-[10px] text-[#735965] font-bold">
+                  <div className="p-4 sm:p-5 border-t border-slate-100 bg-[#F8F9FD] flex items-center justify-between">
+                    <span className="text-[10px] text-slate-500 font-bold">
                       총 {filteredIpsList.length}개 IP 중 {(ipListPage - 1) * ipItemsPerPage + 1}~{Math.min(ipListPage * ipItemsPerPage, filteredIpsList.length)} 표시
                     </span>
                     <div className="flex items-center gap-1">
                       <button
                         disabled={ipListPage === 1}
                         onClick={() => setIpListPage(p => Math.max(p - 1, 1))}
-                        className="px-2.5 py-1 text-xs font-bold border border-[#f2ccd7] rounded-lg bg-white text-[#735965] disabled:opacity-50 hover:bg-[#fff9fb] transition-all cursor-pointer"
+                        className="px-3 py-1.5 text-xs font-bold border-0 rounded-xl bg-slate-100 text-slate-700 disabled:opacity-30 hover:bg-slate-200 transition-all cursor-pointer shadow-2xs"
                       >
                         이전
                       </button>
-                      <span className="text-xs text-[#2d2026] font-bold px-3">
+                      <span className="text-xs text-[#0F172A] font-bold px-3">
                         {ipListPage} / {totalIpPages}
                       </span>
                       <button
                         disabled={ipListPage === totalIpPages}
                         onClick={() => setIpListPage(p => Math.min(p + 1, totalIpPages))}
-                        className="px-2.5 py-1 text-xs font-bold border border-[#f2ccd7] rounded-lg bg-white text-[#735965] disabled:opacity-50 hover:bg-[#fff9fb] transition-all cursor-pointer"
+                        className="px-3 py-1.5 text-xs font-bold border-0 rounded-xl bg-slate-100 text-slate-700 disabled:opacity-30 hover:bg-slate-200 transition-all cursor-pointer shadow-2xs"
                       >
                         다음
                       </button>
@@ -6866,7 +7622,7 @@ export default function AdminPage() {
                     setMaterialType("training");
                     setShowMaterialModal(true);
                   }}
-                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-bold rounded-lg transition-all shadow-sm shrink-0 self-start sm:self-center"
+                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs shrink-0 self-start sm:self-center cursor-pointer border-0"
                 >
                   <Plus size={15} />
                   신규 자료 등록
@@ -6877,25 +7633,25 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* 1. Trainings Block */}
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-6 shadow-sm space-y-4">
-                  <h3 className="font-extrabold text-base text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
-                    <BookOpen size={18} className="text-[#f25f8a]" />
+                <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4">
+                  <h3 className="font-black text-base text-[#0F172A] border-b border-slate-100 pb-3.5 flex items-center gap-2">
+                    <BookOpen size={18} className="text-[#0F172A]" />
                     점주 조리/AS 교육자료실 ({trainings.length})
                   </h3>
                   <div className="space-y-3.5 max-h-[400px] overflow-y-auto pr-1">
                     {trainings.length === 0 ? (
-                      <p className="text-xs text-[#735965] text-center py-8">교육자료가 비어 있습니다.</p>
+                      <p className="text-xs text-slate-400 font-bold text-center py-8">교육자료가 비어 있습니다.</p>
                     ) : (
                       trainings.map((t) => (
-                        <div key={t.id} className="bg-[#fff1f5]/50 border border-[#f2ccd7] rounded-xl p-4 flex justify-between items-start gap-4">
+                        <div key={t.id} className="bg-[#F8F9FA] border-0 rounded-2xl p-4 flex justify-between items-start gap-4 shadow-2xs">
                           <div className="space-y-1">
-                            <span className="text-[9px] text-[#bf3e67] bg-[#ffd3df] border border-[#f2ccd7] px-2 py-0.5 rounded font-bold">{t.format}</span>
-                            <h4 className="text-xs font-bold text-[#2d2026] leading-tight mt-1">{t.title}</h4>
-                            <p className="text-[10px] text-[#735965] line-clamp-2 leading-relaxed">{t.desc}</p>
+                            <span className="text-[10px] text-slate-700 bg-slate-100 border-0 px-2.5 py-1 rounded-lg font-extrabold shadow-2xs inline-block">{t.format}</span>
+                            <h4 className="text-xs font-bold text-[#0F172A] leading-tight mt-1">{t.title}</h4>
+                            <p className="text-[10px] text-slate-500 line-clamp-2 leading-relaxed">{t.desc}</p>
                           </div>
                           <button
                             onClick={() => handleDeleteMaterial(t.id, "training")}
-                            className="p-1 rounded bg-white text-red-500 hover:text-red-600 transition-colors border border-[#f2ccd7] shrink-0"
+                            className="p-1.5 rounded-xl bg-white text-slate-400 hover:text-red-500 transition-all border-0 shadow-2xs shrink-0 cursor-pointer"
                           >
                             <Trash2 size={13} />
                           </button>
@@ -6906,25 +7662,25 @@ export default function AdminPage() {
                 </div>
 
                 {/* 2. PR/Marketing Assets Block */}
-                <div className="bg-white border border-[#f2ccd7] rounded-2xl p-6 shadow-sm space-y-4">
-                  <h3 className="font-extrabold text-base text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
-                    <ImageIcon size={18} className="text-[#f25f8a]" />
+                <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4">
+                  <h3 className="font-black text-base text-[#0F172A] border-b border-slate-100 pb-3.5 flex items-center gap-2">
+                    <ImageIcon size={18} className="text-[#0F172A]" />
                     점주 홍보/마케팅 자료실 ({prs.length})
                   </h3>
                   <div className="space-y-3.5 max-h-[400px] overflow-y-auto pr-1">
                     {prs.length === 0 ? (
-                      <p className="text-xs text-[#735965] text-center py-8">홍보자료가 비어 있습니다.</p>
+                      <p className="text-xs text-slate-400 font-bold text-center py-8">홍보자료가 비어 있습니다.</p>
                     ) : (
                       prs.map((p) => (
-                        <div key={p.id} className="bg-[#fff1f5]/50 border border-[#f2ccd7] rounded-xl p-4 flex justify-between items-start gap-4">
+                        <div key={p.id} className="bg-[#F8F9FA] border-0 rounded-2xl p-4 flex justify-between items-start gap-4 shadow-2xs">
                           <div className="space-y-1">
-                            <span className="text-[9px] text-[#bf3e67] bg-[#ffd3df] border border-[#f2ccd7] px-2 py-0.5 rounded font-bold">{p.format}</span>
-                            <h4 className="text-xs font-bold text-[#2d2026] leading-tight mt-1">{p.title}</h4>
-                            <p className="text-[10px] text-[#735965] line-clamp-2 leading-relaxed">{p.desc}</p>
+                            <span className="text-[10px] text-slate-700 bg-slate-100 border-0 px-2.5 py-1 rounded-lg font-extrabold shadow-2xs inline-block">{p.format}</span>
+                            <h4 className="text-xs font-bold text-[#0F172A] leading-tight mt-1">{p.title}</h4>
+                            <p className="text-[10px] text-slate-500 line-clamp-2 leading-relaxed">{p.desc}</p>
                           </div>
                           <button
                             onClick={() => handleDeleteMaterial(p.id, "pr")}
-                            className="p-1 rounded bg-white text-red-500 hover:text-red-600 transition-colors border border-[#f2ccd7] shrink-0"
+                            className="p-1.5 rounded-xl bg-white text-slate-400 hover:text-red-500 transition-all border-0 shadow-2xs shrink-0 cursor-pointer"
                           >
                             <Trash2 size={13} />
                           </button>
@@ -6953,21 +7709,21 @@ export default function AdminPage() {
               </div>
 
               {/* Sub tabs navigation */}
-              <div className="flex border-b border-[#f2ccd7] gap-2 p-1 bg-[#fff1f5]/60 rounded-xl w-fit">
+              <div className="flex bg-slate-100 p-1.5 rounded-2xl shadow-2xs border-0 w-fit gap-1.5">
                 {[
-                  { id: "popup", label: "📢 실시간 점주 팝업", color: "bg-[#f25f8a]" },
-                  { id: "banner", label: "🖼️ 홈 대시보드 배너", color: "bg-[#bf3e67]" },
-                  { id: "floating", label: "📱 우측 플로팅 연동", color: "bg-[#735965]" },
-                  { id: "instagram", label: "📸 인스타 피드 연동", color: "bg-[#7c3aed]" }
+                  { id: "popup", label: "📢 실시간 점주 팝업" },
+                  { id: "banner", label: "🖼️ 홈 대시보드 배너" },
+                  { id: "floating", label: "📱 우측 플로팅 연동" },
+                  { id: "instagram", label: "📸 인스타 피드 연동" }
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setBannerSubMenu(tab.id as any)}
-                    className={`px-4 py-2.5 rounded-lg text-xs font-black transition-all ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border-0 ${
                       bannerSubMenu === tab.id
-                        ? `${tab.color} text-white shadow-sm scale-105`
-                        : "text-[#735965] hover:bg-[#ffd3df]/50"
+                        ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
+                        : "text-slate-600 hover:text-[#0F172A]"
                     }`}
                   >
                     {tab.label}
@@ -6979,20 +7735,20 @@ export default function AdminPage() {
               {bannerSubMenu === "popup" && (
                 <div className="space-y-6 animate-fadeIn">
                   {/* Header & New Button */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-[#f2ccd7] rounded-3xl p-6 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border-0 rounded-[28px] p-6 shadow-md">
                     <div className="space-y-1">
-                      <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#f25f8a] animate-pulse"></span>
+                      <h3 className="font-black text-sm text-[#0F172A] flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#FED422] animate-pulse"></span>
                         실시간 팝업 히스토리 & 노출 제어
                       </h3>
-                      <p className="text-[10px] text-[#735965] font-bold">
+                      <p className="text-[10px] text-slate-400 font-bold">
                         랜딩 페이지와 점주 포털 홈에 노출되는 모든 팝업을 등록하고, 게시 기간 및 대상 페이지별로 스마트하게 이력을 관리합니다.
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleOpenPopupModal()}
-                      className="px-4 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-black rounded-xl transition-all shadow-[0_4px_12px_rgba(242,95,138,0.2)] flex items-center justify-center gap-1.5 self-start sm:self-center hover:scale-[1.03]"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs flex items-center justify-center gap-1.5 self-start sm:self-center cursor-pointer border-0"
                     >
                       <Plus size={14} />
                       신규 팝업 등록
@@ -7000,29 +7756,29 @@ export default function AdminPage() {
                   </div>
 
                   {/* Popups History List Table */}
-                  <div className="bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm">
+                  <div className="bg-white border-0 rounded-[28px] overflow-hidden shadow-md">
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse">
                         <thead>
-                          <tr className="bg-[#fff1f5]/60 border-b border-[#f2ccd7]/60">
-                            <th className="p-4 text-[11px] font-black text-[#735965] w-20 text-center">노출 여부</th>
-                            <th className="p-4 text-[11px] font-black text-[#735965]">팝업 제목 및 본문 요약</th>
-                            <th className="p-4 text-[11px] font-black text-[#735965] w-32">게시 대상 페이지</th>
-                            <th className="p-4 text-[11px] font-black text-[#735965] w-48">게시 기간 (기간 필터)</th>
-                            <th className="p-4 text-[11px] font-black text-[#735965] w-28">등록 일자</th>
-                            <th className="p-4 text-[11px] font-black text-[#735965] w-24 text-center">관리</th>
+                          <tr className="bg-[#F8F9FD] border-b border-[#EEF0F5]">
+                            <th className="p-4 text-[11px] font-extrabold text-slate-500 w-20 text-center">노출 여부</th>
+                            <th className="p-4 text-[11px] font-extrabold text-slate-500">팝업 제목 및 본문 요약</th>
+                            <th className="p-4 text-[11px] font-extrabold text-slate-500 w-32">게시 대상 페이지</th>
+                            <th className="p-4 text-[11px] font-extrabold text-slate-500 w-48">게시 기간 (기간 필터)</th>
+                            <th className="p-4 text-[11px] font-extrabold text-slate-500 w-28">등록 일자</th>
+                            <th className="p-4 text-[11px] font-extrabold text-slate-500 w-24 text-center">관리</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#f2ccd7]/30 text-xs">
+                        <tbody className="divide-y divide-slate-100 text-xs">
                           {convexPopupsList === undefined ? (
                             <tr>
-                              <td colSpan={6} className="p-8 text-center text-[#735965] font-bold">
+                              <td colSpan={6} className="p-8 text-center text-slate-400 font-bold">
                                 팝업 히스토리 데이터를 실시간 조회하는 중입니다...
                               </td>
                             </tr>
                           ) : convexPopupsList.length === 0 ? (
                             <tr>
-                              <td colSpan={6} className="p-8 text-center text-[#735965] font-bold">
+                              <td colSpan={6} className="p-8 text-center text-slate-400 font-bold">
                                 등록된 팝업 히스토리가 없습니다. 우측 상단의 [신규 팝업 등록] 버튼을 눌러 첫 팝업을 발행해 보세요!
                               </td>
                             </tr>
@@ -7033,59 +7789,59 @@ export default function AdminPage() {
                               const isEnded = pop.endDate && pop.endDate < today;
                               const isPeriodActive = isStarted && !isEnded;
                               
-                              let pageBadge = "bg-gray-100 text-gray-700";
+                              let pageBadge = "bg-slate-100 text-slate-700";
                               let pageText = "전체 페이지";
                               if (pop.targetPage === "landing") {
-                                pageBadge = "bg-[#bf3e67]/10 text-[#bf3e67]";
+                                pageBadge = "bg-slate-100 text-slate-700";
                                 pageText = "💻 랜딩 페이지";
                               } else if (pop.targetPage === "portal") {
-                                pageBadge = "bg-[#f25f8a]/10 text-[#f25f8a]";
+                                pageBadge = "bg-slate-100 text-slate-700";
                                 pageText = "📢 점주 포털";
                               }
 
                               return (
-                                <tr key={pop._id} className="hover:bg-[#fff9fb]/40 transition-colors">
+                                <tr key={pop._id} className="hover:bg-slate-50 transition-colors">
                                   <td className="p-4 text-center">
                                     <button
                                       type="button"
                                       onClick={() => handleTogglePopupActive(pop._id, pop.isActive)}
-                                      className={`w-10 h-5 rounded-full p-0.5 mx-auto transition-all duration-300 flex ${
-                                        pop.isActive ? "bg-[#f25f8a] justify-end" : "bg-[#735965]/20 justify-start"
+                                      className={`w-10 h-5 rounded-full p-0.5 mx-auto transition-all duration-300 flex border-0 cursor-pointer ${
+                                        pop.isActive ? "bg-[#FED422] justify-end" : "bg-slate-200 justify-start"
                                       }`}
                                     >
-                                      <span className="w-4 h-4 rounded-full bg-white shadow-sm block"></span>
+                                      <span className="w-4 h-4 rounded-full bg-white shadow-2xs block"></span>
                                     </button>
                                   </td>
                                   <td className="p-4 space-y-1">
-                                    <div className="font-extrabold text-[#2d2026] flex items-center gap-1.5">
+                                    <div className="font-extrabold text-[#0F172A] flex items-center gap-1.5">
                                       {pop.title}
                                       {pop.isActive && isPeriodActive && (
-                                        <span className="px-2.5 py-1 rounded-full bg-emerald-500 text-white text-[9px] font-black animate-pulse whitespace-nowrap shrink-0 inline-block">
+                                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500 text-white text-[9px] font-black animate-pulse whitespace-nowrap shrink-0 inline-block shadow-2xs">
                                           현재 게시중
                                         </span>
                                       )}
                                       {pop.isActive && !isPeriodActive && !isEnded && (
-                                        <span className="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[9px] font-black whitespace-nowrap shrink-0 inline-block">
+                                        <span className="px-2.5 py-1 rounded-lg bg-amber-500 text-white text-[9px] font-black whitespace-nowrap shrink-0 inline-block shadow-2xs">
                                           대기중
                                         </span>
                                       )}
                                       {isEnded && (
-                                        <span className="px-2.5 py-1 rounded-full bg-gray-400 text-white text-[9px] font-black whitespace-nowrap shrink-0 inline-block">
+                                        <span className="px-2.5 py-1 rounded-lg bg-slate-400 text-white text-[9px] font-black whitespace-nowrap shrink-0 inline-block shadow-2xs">
                                           기간 종료
                                         </span>
                                       )}
                                     </div>
-                                    <div className="text-[10px] text-[#735965] line-clamp-1 font-medium">{pop.desc}</div>
+                                    <div className="text-[10px] text-slate-500 line-clamp-1 font-medium">{pop.desc}</div>
                                   </td>
                                   <td className="p-4">
-                                    <span className={`px-2 py-1 rounded-lg text-[10px] font-bold ${pageBadge}`}>
+                                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold border-0 shadow-2xs ${pageBadge}`}>
                                       {pageText}
                                     </span>
                                   </td>
-                                  <td className="p-4 font-mono text-[10px] text-[#735965]">
+                                  <td className="p-4 font-mono text-[10px] text-slate-500 font-bold">
                                     {pop.startDate || "무제한"} ~ {pop.endDate || "무제한"}
                                   </td>
-                                  <td className="p-4 text-[10px] text-[#735965] font-bold">
+                                  <td className="p-4 text-[10px] text-slate-500 font-bold">
                                     {pop.createdAt ? pop.createdAt.substring(0, 10) : "-"}
                                   </td>
                                   <td className="p-4">
@@ -7093,7 +7849,7 @@ export default function AdminPage() {
                                       <button
                                         type="button"
                                         onClick={() => handleOpenPopupModal(pop)}
-                                        className="p-1.5 rounded-lg bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7]/60 transition-all"
+                                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border-0 transition-all cursor-pointer shadow-2xs"
                                         title="편집"
                                       >
                                         <Settings size={13} />
@@ -7101,7 +7857,7 @@ export default function AdminPage() {
                                       <button
                                         type="button"
                                         onClick={() => handleDeletePopup(pop._id)}
-                                        className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 transition-all"
+                                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 border-0 transition-all cursor-pointer shadow-2xs"
                                         title="삭제"
                                       >
                                         <Trash2 size={13} />
@@ -7119,695 +7875,690 @@ export default function AdminPage() {
 
                   {/* 팝업 등록 및 수정 모달 */}
                   {showPopupModal && (
-                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-                      <div className="bg-white border border-[#f2ccd7] rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row overflow-hidden animate-scaleUp">
-                        {/* Left: Input Form (60%) */}
-                        <form onSubmit={handleSavePopup} className="p-6 md:p-8 space-y-5 flex-1 border-r border-[#f2ccd7]/40 overflow-y-auto">
-                          <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-3">
-                            <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-2">
-                              <span className="w-2.5 h-2.5 rounded-full bg-[#f25f8a]"></span>
-                              {selectedPopupForEdit ? "공지 팝업 설정 수정" : "신규 공지 팝업 등록 및 발행"}
+                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-md animate-fadeIn overflow-x-hidden">
+                      <div className="bg-white border-0 rounded-[28px] sm:rounded-[32px] w-full max-w-5xl max-w-[calc(100vw-24px)] max-h-[90vh] overflow-hidden shadow-2xl flex flex-col font-sans">
+                        <div className="px-7 py-5 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+                          <div>
+                            <h3 className="font-black text-base sm:text-lg text-[#0F172A] flex items-center gap-2">
+                              <span>📢 {selectedPopupForEdit ? "공지 팝업 설정 수정" : "신규 공지 팝업 등록 및 발행"}</span>
                             </h3>
+                            <p className="text-xs text-slate-400 font-medium mt-0.5">홈페이지 및 점주 포털에 팝업을 게시합니다.</p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                              팝업 설정
+                            </span>
                             <button
                               type="button"
                               onClick={() => setShowPopupModal(false)}
-                              className="p-1.5 rounded-xl hover:bg-[#ffd3df]/50 text-[#735965] transition-colors"
+                              className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
                             >
-                              <X size={18} />
+                              <X size={16} />
                             </button>
                           </div>
+                        </div>
 
-                          {/* Target Page & Active State */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                              <label className="text-[11px] font-black text-[#735965] block">게시 대상 페이지 (필수)</label>
-                              <select
-                                value={popupTargetPage}
-                                onChange={(e) => setPopupTargetPage(e.target.value)}
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] font-bold focus:outline-none focus:border-[#f25f8a]"
-                              >
-                                <option value="all">전체 페이지 노출 (landing + portal)</option>
-                                <option value="landing">💻 홈페이지 메인 랜딩 (landing)</option>
-                                <option value="portal">📢 가맹점 점주 포털 홈 (portal)</option>
-                              </select>
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-[11px] font-black text-[#735965] block">즉시 활성화 설정</label>
-                              <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2.5">
-                                <button
-                                  type="button"
-                                  onClick={() => setPopupActive(!popupActive)}
-                                  className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 flex ${
-                                    popupActive ? "bg-[#f25f8a] justify-end" : "bg-[#735965]/20 justify-start"
-                                  }`}
-                                >
-                                  <span className="w-4 h-4 rounded-full bg-white shadow-sm block"></span>
-                                </button>
-                                <span className="text-[11px] font-black text-[#735965]">
-                                  {popupActive ? "활성화 (노출 대상 편입)" : "비활성화 (임시 저장)"}
+                        <div className="flex flex-col md:flex-row flex-1 overflow-y-auto bg-[#f9fafb]">
+                          {/* Left: Input Form (60%) */}
+                          <form onSubmit={handleSavePopup} className="p-6 sm:p-7 space-y-4 flex-1 border-r border-slate-100 overflow-y-auto">
+                            {/* Card 1: Target & Status (Amber Accent) */}
+                            <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                              <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                                    🎯
+                                  </div>
+                                  <span className="text-xs font-black text-[#0F172A] tracking-tight">게시 대상 및 활성화</span>
+                                </div>
+                                <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                                  게시 대상
                                 </span>
                               </div>
-                            </div>
-                          </div>
 
-                          {/* Display Period Dates */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-[#f2ccd7]/30 pb-4">
-                            <div className="space-y-1.5">
-                              <label className="text-[11px] font-black text-[#735965] block">게시 시작 날짜 (미설정 시 즉시게시)</label>
-                              <input
-                                type="date"
-                                value={popupStartDate}
-                                onChange={(e) => setPopupStartDate(e.target.value)}
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-[11px] font-black text-[#735965] block">게시 종료 날짜 (미설정 시 무기한)</label>
-                              <input
-                                type="date"
-                                value={popupEndDate}
-                                onChange={(e) => setPopupEndDate(e.target.value)}
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Core Text Inputs */}
-                          <div className="space-y-3">
-                            <div className="space-y-1.5">
-                              <label className="text-[11px] font-black text-[#735965] block">팝업 메인 헤드라인 타이틀</label>
-                              <input
-                                type="text"
-                                value={popupTitle}
-                                onChange={(e) => setPopupTitle(e.target.value)}
-                                placeholder="예: 여름 스페셜 '망고파이' 정식 출시!"
-                                required
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-[11px] font-black text-[#735965] block">팝업 상세 공지 본문 내용</label>
-                              <textarea
-                                rows={3}
-                                value={popupDesc}
-                                onChange={(e) => setPopupDesc(e.target.value)}
-                                placeholder="팝업 중앙에 표출될 상세 혜택이나 공지 내용을 입력하세요."
-                                required
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Image & URL Config */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                              <label className="text-[11px] font-black text-[#735965] block">팝업 배경 이미지 파일 (URL)</label>
-                              <input
-                                type="text"
-                                value={popupImage}
-                                onChange={(e) => setPopupImage(e.target.value)}
-                                placeholder="https://example.com/popup.jpg (미지정 시 기본 핑크 그라데이션)"
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-[11px] font-black text-[#735965] block">이미지 직접 업로드</label>
-                              <div className="flex items-center gap-2 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-1.5">
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={handlePopupImageUpload}
-                                  className="text-[10px] text-[#735965] file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[9px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] cursor-pointer flex-1"
-                                />
-                                {popupImage && (
-                                  <button
-                                    type="button"
-                                    onClick={() => setPopupImage("")}
-                                    className="px-1.5 py-0.5 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[9px] font-bold border border-red-200"
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                  <label className="text-xs font-extrabold text-[#0F172A] block">게시 대상 페이지 (필수)</label>
+                                  <select
+                                    value={popupTargetPage}
+                                    onChange={(e) => setPopupTargetPage(e.target.value)}
+                                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
                                   >
-                                    지우기
-                                  </button>
-                                )}
+                                    <option value="all">전체 페이지 노출 (landing + portal)</option>
+                                    <option value="landing">💻 홈페이지 메인 랜딩 (landing)</option>
+                                    <option value="portal">📢 가맹점 점주 포털 홈 (portal)</option>
+                                  </select>
+                                </div>
+                                <div className="space-y-1.5">
+                                  <label className="text-xs font-extrabold text-[#0F172A] block">즉시 활성화 설정</label>
+                                  <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-2.5 shadow-2xs">
+                                    <button
+                                      type="button"
+                                      onClick={() => setPopupActive(!popupActive)}
+                                      className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 flex border-0 cursor-pointer ${
+                                        popupActive ? "bg-[#FED422] justify-end" : "bg-slate-300 justify-start"
+                                      }`}
+                                    >
+                                      <span className="w-4 h-4 rounded-full bg-white shadow-2xs block"></span>
+                                    </button>
+                                    <span className="text-xs font-extrabold text-[#0F172A]">
+                                      {popupActive ? "활성화 (노출 대상 편입)" : "비활성화 (임시 저장)"}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          {/* Link Menu Trigger */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                              <label className="text-[11px] font-black text-[#735965] block">클릭 시 이동 버튼 문구</label>
-                              <input
-                                type="text"
-                                value={popupBtnText}
-                                onChange={(e) => setPopupBtnText(e.target.value)}
-                                placeholder="예: 지금 주문하러 가기"
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-[11px] font-black text-[#735965] block">클릭 시 이동할 메뉴/외부주소</label>
-                              <select
-                                value={popupLink.startsWith("http") ? "custom" : popupLink}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  if (val !== "custom") {
-                                    setPopupLink(val);
-                                  } else {
-                                    setPopupLink("https://");
-                                  }
-                                }}
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                              >
-                                <option value="order">자재 발주하기 (내부 메뉴 연동)</option>
-                                <option value="training">교육자료실 (내부 메뉴 연동)</option>
-                                <option value="material">홍보자료실 (내부 메뉴 연동)</option>
-                                <option value="inquiry">1:1 문의게시판 (내부 메뉴 연동)</option>
-                                <option value="notice">공지사항 페이지 (내부 메뉴 연동)</option>
-                                <option value="custom">외부 웹주소 URL 직접 지정</option>
-                              </select>
-                              {popupLink.startsWith("http") && (
-                                <div className="pt-1.5">
+                            {/* Card 2: Period & Title (Blue Accent) */}
+                            <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
+                              <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+                                    📅
+                                  </div>
+                                  <span className="text-xs font-black text-[#0F172A] tracking-tight">게시 기간 및 제목</span>
+                                </div>
+                                <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                                  기본 정보
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                  <label className="text-xs font-extrabold text-[#0F172A] block">게시 시작 날짜 (미설정 시 즉시게시)</label>
                                   <input
-                                    type="text"
-                                    value={popupLink}
-                                    onChange={(e) => setPopupLink(e.target.value)}
-                                    placeholder="https://example.com"
-                                    className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                                    type="date"
+                                    value={popupStartDate}
+                                    onChange={(e) => setPopupStartDate(e.target.value)}
+                                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
                                   />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <label className="text-xs font-extrabold text-[#0F172A] block">게시 종료 날짜 (미설정 시 상시게시)</label>
+                                  <input
+                                    type="date"
+                                    value={popupEndDate}
+                                    onChange={(e) => setPopupEndDate(e.target.value)}
+                                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <label className="text-xs font-extrabold text-[#0F172A] block">팝업 제목 (필수)</label>
+                                <input
+                                  type="text"
+                                  placeholder="예시) 2026 하절기 신메뉴 런칭 및 프로모션 안내"
+                                  value={popupTitle}
+                                  onChange={(e) => setPopupTitle(e.target.value)}
+                                  required
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Card 3: Image & Link (Emerald Accent) */}
+                            <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+                              <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                                    🖼️
+                                  </div>
+                                  <span className="text-xs font-black text-[#0F172A] tracking-tight">팝업 이미지 및 연결 링크</span>
+                                </div>
+                                <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                                  미디어 및 링크
+                                </span>
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <label className="text-xs font-extrabold text-[#0F172A] block">팝업 이미지 파일 직접 업로드 *</label>
+                                <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-2xl p-3 shadow-2xs">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handlePopupImageUpload}
+                                    className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1"
+                                  />
+                                </div>
+                                <input
+                                  type="text"
+                                  placeholder="https://res.cloudinary.com/... 이미지 경로"
+                                  value={popupImage}
+                                  onChange={(e) => setPopupImage(e.target.value)}
+                                  required
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 mt-2 outline-none transition-all shadow-2xs"
+                                />
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <label className="text-xs font-extrabold text-[#0F172A] block">클릭 시 이동할 링크 URL (선택사항)</label>
+                                <input
+                                  type="text"
+                                  placeholder="예시) /portal/notice 또는 외부 URL"
+                                  value={popupLink}
+                                  onChange={(e) => setPopupLink(e.target.value)}
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all shadow-2xs"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Stage Flow Footer Bar */}
+                            <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                              <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>팝업 발행 준비</span>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPopupModal(false)}
+                                  className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-full transition-all cursor-pointer border-0"
+                                >
+                                  취소
+                                </button>
+                                <button
+                                  type="submit"
+                                  className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-full transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                                >
+                                  <span>{selectedPopupForEdit ? "팝업 수정 저장" : "신규 팝업 발행"}</span>
+                                  <ArrowRight size={14} />
+                                </button>
+                              </div>
+                            </div>
+                          </form>
+
+                          {/* Right: Live Preview Panel */}
+                          <div className="w-full md:w-[380px] bg-[#F8FAFC] p-6 space-y-4 flex flex-col justify-center items-center border-t md:border-t-0 md:border-l border-slate-100">
+                            <span className="text-xs font-extrabold text-[#0F172A] self-start flex items-center gap-1.5">
+                              <Sparkles size={14} className="text-[#F5AC00]" />
+                              실시간 팝업 미리보기
+                            </span>
+
+                            <div className="w-full max-w-[300px] bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200/60 p-4 space-y-3">
+                              {popupImage ? (
+                                <img src={popupImage} alt="미리보기" className="w-full h-48 object-cover rounded-2xl" />
+                              ) : (
+                                <div className="w-full h-48 bg-slate-100 rounded-2xl flex flex-col items-center justify-center text-slate-400 gap-2">
+                                  <Upload size={24} />
+                                  <span className="text-xs font-bold">이미지를 등록해 주세요</span>
                                 </div>
                               )}
-                            </div>
-                          </div>
-
-                          {/* Styling Accordion Detail settings */}
-                          <div className="border-t border-[#f2ccd7]/60 pt-4 space-y-3">
-                            <h4 className="font-extrabold text-[11px] text-[#bf3e67] flex items-center gap-1.5">
-                              🎨 팝업 스타일 및 색상 상세 커스터마이징
-                            </h4>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-[#735965]">제목 글자색</label>
-                                <div className="flex gap-1.5">
-                                  <input
-                                    type="color"
-                                    value={popupTitleColor}
-                                    onChange={(e) => setPopupTitleColor(e.target.value)}
-                                    className="w-8 h-8 border border-[#f2ccd7] rounded-lg cursor-pointer"
-                                  />
-                                  <input
-                                    type="text"
-                                    value={popupTitleColor}
-                                    onChange={(e) => setPopupTitleColor(e.target.value)}
-                                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1 text-[10px] font-mono"
-                                  />
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-[#735965]">제목 글자크기</label>
-                                <select
-                                  value={popupTitleSize}
-                                  onChange={(e) => setPopupTitleSize(e.target.value)}
-                                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1.5 text-[10px]"
-                                >
-                                  <option value="16px">작게 (16px)</option>
-                                  <option value="18px">보통 (18px)</option>
-                                  <option value="20px">크게 (20px)</option>
-                                  <option value="24px">매우 크게 (24px)</option>
-                                </select>
-                              </div>
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-[#735965]">본문 글자색</label>
-                                <div className="flex gap-1.5">
-                                  <input
-                                    type="color"
-                                    value={popupDescColor}
-                                    onChange={(e) => setPopupDescColor(e.target.value)}
-                                    className="w-8 h-8 border border-[#f2ccd7] rounded-lg cursor-pointer"
-                                  />
-                                  <input
-                                    type="text"
-                                    value={popupDescColor}
-                                    onChange={(e) => setPopupDescColor(e.target.value)}
-                                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1 text-[10px] font-mono"
-                                  />
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-[#735965]">본문 글자크기</label>
-                                <select
-                                  value={popupDescSize}
-                                  onChange={(e) => setPopupDescSize(e.target.value)}
-                                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1.5 text-[10px]"
-                                >
-                                  <option value="11px">작게 (11px)</option>
-                                  <option value="12px">보통 (12px)</option>
-                                  <option value="14px">크게 (14px)</option>
-                                </select>
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-[#735965]">이동버튼 배경색</label>
-                                <div className="flex gap-1.5">
-                                  <input
-                                    type="color"
-                                    value={popupBtnBgColor}
-                                    onChange={(e) => setPopupBtnBgColor(e.target.value)}
-                                    className="w-8 h-8 border border-[#f2ccd7] rounded-lg cursor-pointer"
-                                  />
-                                  <input
-                                    type="text"
-                                    value={popupBtnBgColor}
-                                    onChange={(e) => setPopupBtnBgColor(e.target.value)}
-                                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1 text-[10px] font-mono"
-                                  />
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-[#735965]">이동버튼 글씨색</label>
-                                <div className="flex gap-1.5">
-                                  <input
-                                    type="color"
-                                    value={popupBtnTextColor}
-                                    onChange={(e) => setPopupBtnTextColor(e.target.value)}
-                                    className="w-8 h-8 border border-[#f2ccd7] rounded-lg cursor-pointer"
-                                  />
-                                  <input
-                                    type="text"
-                                    value={popupBtnTextColor}
-                                    onChange={(e) => setPopupBtnTextColor(e.target.value)}
-                                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1 text-[10px] font-mono"
-                                  />
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-[#735965]">이동버튼 글씨크기</label>
-                                <select
-                                  value={popupBtnTextSize}
-                                  onChange={(e) => setPopupBtnTextSize(e.target.value)}
-                                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-lg px-2 py-1.5 text-[10px]"
-                                >
-                                  <option value="11px">작게 (11px)</option>
-                                  <option value="12px">보통 (12px)</option>
-                                  <option value="14px">크게 (14px)</option>
-                                </select>
+                              <h5 className="font-black text-sm text-[#0F172A] truncate">{popupTitle || "팝업 제목이 표시됩니다"}</h5>
+                              <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold pt-2 border-t border-slate-100">
+                                <span>오늘 하루 보지 않기</span>
+                                <span className="text-[#0F172A] font-black">닫기 ✕</span>
                               </div>
                             </div>
                           </div>
-
-                          <div className="flex gap-3 border-t border-[#f2ccd7]/60 pt-4">
-                            <button
-                              type="button"
-                              onClick={() => setShowPopupModal(false)}
-                              className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl transition-all"
-                            >
-                              취소
-                            </button>
-                            <button
-                              type="submit"
-                              className="flex-2 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-[0_4px_12px_rgba(242,95,138,0.2)] flex items-center justify-center gap-1.5"
-                            >
-                              <Sparkles size={13} />
-                              {selectedPopupForEdit ? "수정사항 저장" : "새 팝업 게시 발행"}
-                            </button>
-                          </div>
-                        </form>
-
-                        {/* Right: Live Preview Panel (40%) */}
-                        <div className="p-6 md:p-8 bg-[#fff9fb]/80 border-t md:border-t-0 md:border-l border-[#f2ccd7]/40 w-full md:w-80 flex flex-col items-center justify-center min-h-[350px] md:min-h-0">
-                          <h4 className="font-extrabold text-xs text-[#735965] border-b border-[#f2ccd7] pb-2.5 mb-6 w-full text-center">
-                            📱 실시간 레이아웃 모바일 미리보기
-                          </h4>
-
-                          {/* Preview Popup Modal Card */}
-                          <div className="w-[260px] rounded-3xl overflow-hidden shadow-2xl border border-[#f2ccd7] bg-white relative animate-scaleUp">
-                            {/* Card Background (Image or Fallback Gradient) */}
-                            <div 
-                              className="p-5 min-h-[220px] flex flex-col justify-between relative bg-cover bg-center"
-                              style={{ 
-                                backgroundImage: popupImage ? `url(${popupImage})` : "none",
-                                backgroundBlendMode: "overlay",
-                                backgroundColor: popupImage ? "rgba(0,0,0,0.25)" : "transparent",
-                                ...(popupImage ? {} : {
-                                  background: "linear-gradient(135deg, #ffe1ea 0%, #ffd3df 100%)"
-                                })
-                              }}
-                            >
-                              {/* Close Mock Button */}
-                              <div className="absolute top-3 right-3 text-[#735965] opacity-60">
-                                <X size={14} />
-                              </div>
-
-                              <div className="space-y-2 pt-2">
-                                <h5 
-                                  className="font-black leading-tight break-all" 
-                                  style={{ color: popupTitleColor, fontSize: popupTitleSize }}
-                                >
-                                  {popupTitle || "망고파이 컵 16oz 한정 출시!"}
-                                </h5>
-                                <p 
-                                  className="leading-relaxed font-bold break-all whitespace-pre-line"
-                                  style={{ color: popupDescColor, fontSize: popupDescSize }}
-                                >
-                                  {popupDesc || "여름 신상 120pie 망고 컬렉션! 지금 포털에서 주문 시 전용 컵홀더 1박스 무상 증정!"}
-                                </p>
-                              </div>
-
-                              {/* Button Area */}
-                              <div className="mt-4 pt-2">
-                                <div 
-                                  className="w-full py-2.5 rounded-xl font-black text-center shadow-md cursor-pointer text-xs"
-                                  style={{ 
-                                    backgroundColor: popupBtnBgColor, 
-                                    color: popupBtnTextColor,
-                                    fontSize: popupBtnTextSize
-                                  }}
-                                >
-                                  {popupBtnText || "자재 주문하러 가기"}
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* Bottom Close bar */}
-                            <div className="bg-[#2d2026] text-white/80 py-2.5 px-4 text-[10px] font-black flex justify-between items-center border-t border-white/10">
-                              <span className="cursor-pointer hover:underline opacity-80">오늘 하루 보지 않기</span>
-                              <span className="cursor-pointer hover:underline">닫기</span>
-                            </div>
-                          </div>
-
-                          <p className="text-[10px] text-[#735965] font-black text-center mt-6 leading-relaxed max-w-[200px]">
-                            * 실제 노출 시에는 지정된 게시 기간({popupStartDate || "오늘"}~{popupEndDate || "무한"}) 동안 {popupTargetPage === "landing" ? "랜딩 페이지" : popupTargetPage === "portal" ? "점주 포털" : "모든 페이지"}에 활성화 노출됩니다.
-                          </p>
                         </div>
                       </div>
                     </div>
                   )}
+
                 </div>
               )}
 
-              {/* 2. REAL-TIME BANNER MANAGEMENT */}
+              {/* 2. REAL-TIME BANNER MANAGEMENT WITH LIVE VISUAL PREVIEW */}
               {bannerSubMenu === "banner" && (
-                <form onSubmit={handleUpdateBanners} className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-fadeIn">
+                <form onSubmit={handleUpdateBanners} className="space-y-6 animate-fadeIn">
                   
-                  {/* 1. Main Banner Panel */}
-                  <div className="space-y-4">
-                    <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-2.5 flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#f25f8a]"></span>
-                      대시보드 메인 16:8 배너 영역 제어
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">메인 배너 태그 라벨</label>
-                        <input 
-                          type="text"
-                          value={bannerMainTag}
-                          onChange={(e) => setBannerMainTag(e.target.value)}
-                          required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">메인 배너 타이틀 헤드라인</label>
-                        <textarea 
-                          rows={2}
-                          value={bannerMainTitle}
-                          onChange={(e) => setBannerMainTitle(e.target.value)}
-                          required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
-                        />
-                      </div>
+                  {/* Top Bar: Section Title & Save Button */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/90 rounded-[28px] p-6 shadow-md">
+                    <div>
+                      <h3 className="font-black text-base text-[#0F172A] tracking-tight flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#FED422] animate-pulse"></span>
+                        홈 대시보드 배너 실시간 제어 센터
+                      </h3>
+                      <p className="text-xs text-slate-500 font-medium mt-1">
+                        점주 포털 홈 대시보드의 메인 16:8 와이드 배너 및 우측 1:1 사각 배너의 문구, 이미지, 연결 링크를 실시간으로 제어합니다.
+                      </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">메인 배너 이미지 등록 (URL)</label>
-                        <input 
-                          type="text"
-                          value={bannerMainImage}
-                          onChange={(e) => setBannerMainImage(e.target.value)}
-                          placeholder="https://example.com/banner.jpg"
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">메인 배너 이미지 업로드 (로컬 파일)</label>
-                        <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
-                          <input 
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, "main")}
-                            className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
-                          />
-                          {bannerMainImage && (
-                            <button
-                              type="button"
-                              onClick={() => setBannerMainImage("")}
-                              className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
-                            >
-                              지우기
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">메인 배너 세부 상세 설명</label>
-                      <textarea 
-                        rows={3}
-                        value={bannerMainDesc}
-                        onChange={(e) => setBannerMainDesc(e.target.value)}
-                        required
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
-                      />
-                    </div>
+                    <button
+                      type="submit"
+                      className="px-6 py-3.5 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs sm:text-sm font-black rounded-2xl transition-all shadow-xs hover:shadow-md shrink-0 flex items-center justify-center gap-2 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
+                    >
+                      <Sparkles size={16} />
+                      배너 설정 즉시 적용하기
+                    </button>
                   </div>
 
-                  {/* 2. Square Banner Panel */}
-                  <div className="space-y-4 pt-4 border-t border-[#f2ccd7]/60">
-                    <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-2.5 flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#bf3e67]"></span>
-                      대시보드 우측 사각 1:1 배너 영역 제어
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">사각 배너 태그 라벨</label>
-                        <input 
-                          type="text"
-                          value={bannerSideTag}
-                          onChange={(e) => setBannerSideTag(e.target.value)}
-                          required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">사각 배너 타이틀 헤드라인</label>
-                        <textarea 
-                          rows={2}
-                          value={bannerSideTitle}
-                          onChange={(e) => setBannerSideTitle(e.target.value)}
-                          required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">사각 배너 이미지 등록 (URL)</label>
-                        <input 
-                          type="text"
-                          value={bannerSideImage}
-                          onChange={(e) => setBannerSideImage(e.target.value)}
-                          placeholder="https://example.com/square.jpg"
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">사각 배너 이미지 업로드 (로컬 파일)</label>
-                        <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
-                          <input 
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, "side")}
-                            className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
-                          />
-                          {bannerSideImage && (
-                            <button
-                              type="button"
-                              onClick={() => setBannerSideImage("")}
-                              className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
-                            >
-                              지우기
-                            </button>
-                          )}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    {/* Left 7 Columns: Form Controls */}
+                    <div className="lg:col-span-7 space-y-6">
+                      
+                      {/* 1. Main Banner Panel (16:8 Wide) */}
+                      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-md space-y-5">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#FED422]"></span>
+                            <h3 className="font-black text-sm text-[#0F172A]">대시보드 메인 16:8 배너 설정</h3>
+                          </div>
+                          <span className="bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                            메인 배너
+                          </span>
                         </div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">사각 배너 상세 세부 설명</label>
-                        <textarea 
-                          rows={3}
-                          value={bannerSideDesc}
-                          onChange={(e) => setBannerSideDesc(e.target.value)}
-                          required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] resize-none"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">사각 배너 클릭 유도 버튼 텍스트</label>
-                        <input 
-                          type="text"
-                          value={bannerSideBtnText}
-                          onChange={(e) => setBannerSideBtnText(e.target.value)}
-                          required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965]">사각 배너 연결 대상 설정</label>
-                        <select 
-                          value={bannerSideLink.startsWith("http") ? "custom" : bannerSideLink}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            if (val !== "custom") {
-                              setBannerSideLink(val);
-                            } else {
-                              setBannerSideLink("https://");
-                            }
-                          }}
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                        >
-                          <option value="training">교육자료실 (내부 메뉴 연결)</option>
-                          <option value="material">홍보자료실 (내부 메뉴 연결)</option>
-                          <option value="order">자재발주 / 주문하기 (내부 메뉴 연결)</option>
-                          <option value="inquiry">1:1 문의하기 (내부 메뉴 연결)</option>
-                          <option value="custom">직접 URL 웹 주소 입력 연결</option>
-                        </select>
-                      </div>
-                      {bannerSideLink.startsWith("http") && (
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-[#0F172A] block">메인 배너 태그 라벨</label>
+                            <input 
+                              type="text"
+                              value={bannerMainTag}
+                              onChange={(e) => setBannerMainTag(e.target.value)}
+                              required
+                              placeholder="예: Seasonal Spec"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-[#0F172A] block">메인 배너 타이틀 헤드라인</label>
+                            <input 
+                              type="text"
+                              value={bannerMainTitle}
+                              onChange={(e) => setBannerMainTitle(e.target.value)}
+                              required
+                              placeholder="예: 여름 대비 스페셜 신메뉴 런칭!"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Image Input & Dropzone */}
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-[#735965]">직접 입력한 연결 URL 주소</label>
-                          <input 
-                            type="text"
-                            value={bannerSideLink}
-                            onChange={(e) => setBannerSideLink(e.target.value)}
-                            placeholder="https://example.com"
+                          <label className="text-xs font-extrabold text-[#0F172A] block">메인 배너 이미지 설정</label>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {/* Option A: Image URL */}
+                            <input 
+                              type="text"
+                              value={bannerMainImage}
+                              onChange={(e) => setBannerMainImage(e.target.value)}
+                              placeholder="https://res.cloudinary.com/... 이미지 URL"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                            />
+
+                            {/* Option B: Dropzone File Upload */}
+                            <label className="relative border-2 border-dashed border-slate-200 hover:border-[#FED422] rounded-2xl bg-slate-50/70 hover:bg-amber-50/20 p-2.5 flex items-center justify-center cursor-pointer transition-all gap-2 group shadow-2xs">
+                              <Upload size={16} className="text-slate-400 group-hover:text-amber-600 transition-colors" />
+                              <span className="text-xs font-extrabold text-slate-600 group-hover:text-[#0F172A]">로컬 파일 선택 업로드</span>
+                              <input 
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleImageUpload(e, "main")}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-extrabold text-[#0F172A] block">메인 배너 세부 설명</label>
+                          <textarea 
+                            rows={3}
+                            value={bannerMainDesc}
+                            onChange={(e) => setBannerMainDesc(e.target.value)}
                             required
-                            className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                            placeholder="점주 포털 메인 대시보드 배너에 노출될 부가 설명 문구"
+                            className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none resize-none shadow-2xs leading-relaxed"
                           />
                         </div>
-                      )}
+
+                        {/* Button Text & Target Link */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-[#0F172A] block">메인 배너 클릭 유도 버튼 텍스트 (버튼명) *</label>
+                            <input 
+                              type="text"
+                              value={bannerMainBtnText}
+                              onChange={(e) => setBannerMainBtnText(e.target.value)}
+                              required
+                              placeholder="예: 신메뉴 자재 발주하러 가기"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-[#0F172A] block">메인 배너 클릭 시 이동 대상 설정</label>
+                            <select 
+                              value={bannerMainLink.startsWith("http") ? "custom" : bannerMainLink}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val !== "custom") setBannerMainLink(val);
+                                else setBannerMainLink("https://");
+                              }}
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                            >
+                              <option value="order">자재발주 / 주문하기 (내부 메뉴 연결)</option>
+                              <option value="training">교육자료실 (내부 메뉴 연결)</option>
+                              <option value="pr">홍보자료실 (내부 메뉴 연결)</option>
+                              <option value="inquiry">1:1 문의하기 (내부 메뉴 연결)</option>
+                              <option value="notice">공지사항 (내부 메뉴 연결)</option>
+                              <option value="custom">직접 URL 웹 주소 입력 연결</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {bannerMainLink.startsWith("http") && (
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-[#0F172A] block">메인 배너 직접 입력 연결 URL</label>
+                            <input 
+                              type="text"
+                              value={bannerMainLink}
+                              onChange={(e) => setBannerMainLink(e.target.value)}
+                              placeholder="https://example.com"
+                              required
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 2. Square Banner Panel (1:1 Aspect Ratio) */}
+                      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-md space-y-5">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                            <h3 className="font-black text-sm text-[#0F172A]">대시보드 우측 1:1 사각 배너 설정</h3>
+                          </div>
+                          <span className="bg-blue-50 text-blue-800 border border-blue-200/80 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                            사각 배너
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-[#0F172A] block">사각 배너 태그 라벨</label>
+                            <input 
+                              type="text"
+                              value={bannerSideTag}
+                              onChange={(e) => setBannerSideTag(e.target.value)}
+                              required
+                              placeholder="예: Standard Edu"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-[#0F172A] block">사각 배너 타이틀 헤드라인</label>
+                            <input 
+                              type="text"
+                              value={bannerSideTitle}
+                              onChange={(e) => setBannerSideTitle(e.target.value)}
+                              required
+                              placeholder="예: 하절기 식품 안전 점검"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Image Input & Dropzone */}
+                        <div className="space-y-2">
+                          <label className="text-xs font-extrabold text-[#0F172A] block">사각 배너 이미지 설정</label>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <input 
+                              type="text"
+                              value={bannerSideImage}
+                              onChange={(e) => setBannerSideImage(e.target.value)}
+                              placeholder="https://example.com/square.jpg"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                            />
+                            <label className="relative border-2 border-dashed border-slate-200 hover:border-blue-500 rounded-2xl bg-slate-50/70 hover:bg-blue-50/20 p-2.5 flex items-center justify-center cursor-pointer transition-all gap-2 group shadow-2xs">
+                              <Upload size={16} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
+                              <span className="text-xs font-extrabold text-slate-600 group-hover:text-[#0F172A]">로컬 파일 선택 업로드</span>
+                              <input 
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleImageUpload(e, "side")}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-[#0F172A] block">사각 배너 상세 설명</label>
+                            <textarea 
+                              rows={2}
+                              value={bannerSideDesc}
+                              onChange={(e) => setBannerSideDesc(e.target.value)}
+                              required
+                              placeholder="사각 배너 상세 안내 문구"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none resize-none shadow-2xs leading-relaxed"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-[#0F172A] block">클릭 유도 버튼 텍스트</label>
+                            <input 
+                              type="text"
+                              value={bannerSideBtnText}
+                              onChange={(e) => setBannerSideBtnText(e.target.value)}
+                              required
+                              placeholder="예: 교육자료 다운로드"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-extrabold text-[#0F172A] block">사각 배너 클릭 시 이동 대상</label>
+                          <select 
+                            value={bannerSideLink.startsWith("http") ? "custom" : bannerSideLink}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val !== "custom") setBannerSideLink(val);
+                              else setBannerSideLink("https://");
+                            }}
+                            className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                          >
+                            <option value="training">교육자료실 (내부 메뉴 연결)</option>
+                            <option value="material">홍보자료실 (내부 메뉴 연결)</option>
+                            <option value="order">자재발주 / 주문하기 (내부 메뉴 연결)</option>
+                            <option value="inquiry">1:1 문의하기 (내부 메뉴 연결)</option>
+                            <option value="custom">직접 URL 웹 주소 입력 연결</option>
+                          </select>
+                        </div>
+                      </div>
+
                     </div>
+
+                    {/* Right 5 Columns: Live Visual Preview Cards */}
+                    <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24 h-fit">
+                      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-md space-y-5">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <h4 className="font-black text-sm text-[#0F172A] flex items-center gap-2">
+                            <Sparkles size={16} className="text-[#FED422]" />
+                            실시간 대시보드 노출 미리보기
+                          </h4>
+                          <span className="text-[10px] text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded-full">
+                            LIVE PREVIEW
+                          </span>
+                        </div>
+
+                        {/* 1. Main Banner Preview Component */}
+                        <div className="space-y-2">
+                          <span className="text-[11px] font-black text-slate-600 block">① 메인 와이드 배너 (점주 포털 상단)</span>
+                          <div className="relative rounded-2xl overflow-hidden bg-slate-900 text-white p-5 min-h-[160px] flex flex-col justify-between shadow-xs border border-slate-200/40">
+                            {bannerMainImage ? (
+                              <img 
+                                src={optimizeCloudinaryUrl(bannerMainImage)} 
+                                alt="" 
+                                className="absolute inset-0 w-full h-full object-cover opacity-40" 
+                              />
+                            ) : (
+                              <div className="absolute inset-0 bg-gradient-to-r from-amber-950 via-slate-900 to-slate-950 opacity-90"></div>
+                            )}
+
+                            <div className="relative z-10 space-y-1">
+                              <span className="bg-[#FED422] text-[#0F172A] font-black text-[9px] px-2 py-0.5 rounded-full inline-block">
+                                {bannerMainTag || "Seasonal Spec"}
+                              </span>
+                              <h5 className="font-black text-sm text-white leading-tight">
+                                {bannerMainTitle || "메인 배너 타이틀 헤드라인"}
+                              </h5>
+                              <p className="text-[10px] text-slate-300 font-medium line-clamp-2 leading-tight mt-1">
+                                {bannerMainDesc || "메인 배너 세부 설명 문구 영역입니다."}
+                              </p>
+                            </div>
+
+                            <div className="relative z-10 pt-2">
+                              <span className="px-3 py-1.5 rounded-lg bg-[#FED422] text-[#0F172A] text-[10px] font-black inline-flex items-center gap-1 shadow-2xs">
+                                <span>{bannerMainBtnText || "신메뉴 자재 발주하러 가기"}</span>
+                                <span>→</span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 2. Square Side Banner Preview Component */}
+                        <div className="space-y-2 pt-2 border-t border-slate-100">
+                          <span className="text-[11px] font-black text-slate-600 block">② 사각 1:1 배너 (대시보드 우측)</span>
+                          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200/60 flex items-center justify-center">
+                                {bannerSideImage ? (
+                                  <img src={optimizeCloudinaryUrl(bannerSideImage)} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  <ImageIcon size={20} className="text-slate-300" />
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full inline-block mb-0.5">
+                                  {bannerSideTag || "Standard Edu"}
+                                </span>
+                                <h5 className="font-black text-xs text-[#0F172A] truncate">
+                                  {bannerSideTitle || "사각 배너 타이틀"}
+                                </h5>
+                              </div>
+                            </div>
+                            <p className="text-[10px] text-slate-500 font-medium line-clamp-2 leading-relaxed">
+                              {bannerSideDesc || "사각 배너 상세 설명 안내 문구입니다."}
+                            </p>
+                            <button
+                              type="button"
+                              className="w-full py-2 bg-[#FED422] text-[#0F172A] text-[10px] font-black rounded-xl border-0 shadow-2xs cursor-default text-center"
+                            >
+                              {bannerSideBtnText || "버튼 텍스트"} →
+                            </button>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
                   </div>
 
-                  {/* Save Trigger */}
-                  <button
-                    type="submit"
-                    className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-[0_4px_16px_rgba(242,95,138,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01]"
-                  >
-                    <Sparkles size={16} />
-                    본사 대시보드 배너 설정 일괄 실시간 저장
-                  </button>
+                  {/* Bottom Save CTA Bar */}
+                  <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-md flex items-center justify-between gap-4">
+                    <div className="text-xs text-slate-500 font-bold hidden sm:block">
+                      * [배너 설정 즉시 적용하기] 버튼을 누르시면 점주 포털에 실시간 반영됩니다.
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full sm:w-auto px-8 py-4 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] font-black text-sm sm:text-base rounded-2xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0 ml-auto"
+                    >
+                      <Sparkles size={18} />
+                      본사 대시보드 배너 설정 일괄 실시간 저장
+                    </button>
+                  </div>
+
                 </form>
               )}
 
               {/* 3. REAL-TIME FLOATING BUTTON CHANNELS */}
               {bannerSubMenu === "floating" && (
-                <form onSubmit={handleUpdateFloating} className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-fadeIn">
-                  <div className="flex items-center justify-between border-b border-[#f2ccd7]/60 pb-4">
+                <form onSubmit={handleUpdateFloating} className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-md space-y-6 animate-fadeIn">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div className="space-y-1">
-                      <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#735965]"></span>
+                      <h3 className="font-black text-base text-[#0F172A] flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#FED422] animate-pulse"></span>
                         홈페이지 우측 핵심 플로팅 버튼 연동 제어
                       </h3>
-                      <p className="text-[10px] text-[#735965] font-bold">사용자 페이지 우측 하단에 고정 표시될 소셜 연동(인스타, 유튜브, 카카오톡 채널, 전화, 카톡 상담) 트레이 연동 설정입니다.</p>
+                      <p className="text-xs text-slate-500 font-medium">사용자 페이지 우측 하단에 고정 표시될 소셜 연동(인스타, 유튜브, 카카오톡 채널, 전화, 카톡 상담) 트레이 연동 설정입니다.</p>
                     </div>
                     {/* Switch Toggle */}
                     <button
                       type="button"
                       onClick={() => setFloatingActive(!floatingActive)}
-                      className={`w-12 h-6 rounded-full p-1 transition-all duration-300 ${
-                        floatingActive ? "bg-[#f25f8a] flex justify-end" : "bg-[#735965]/20 flex justify-start"
+                      className={`w-12 h-6 rounded-full p-1 transition-all duration-300 border-0 cursor-pointer ${
+                        floatingActive ? "bg-[#FED422] flex justify-end" : "bg-slate-200 flex justify-start"
                       }`}
                     >
-                      <span className="w-4 h-4 rounded-full bg-white shadow-sm block transition-all"></span>
+                      <span className="w-4 h-4 rounded-full bg-white shadow-2xs block transition-all"></span>
                     </button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">공식 인스타그램 주소 (Instagram)</label>
+                      <label className="text-xs font-extrabold text-[#0F172A]">공식 인스타그램 주소 (Instagram)</label>
                       <input
                         type="text"
                         value={floatingInsta}
                         onChange={(e) => setFloatingInsta(e.target.value)}
                         placeholder="https://instagram.com/account"
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">공식 유튜브 채널 주소 (YouTube)</label>
+                      <label className="text-xs font-extrabold text-[#0F172A]">공식 유튜브 채널 주소 (YouTube)</label>
                       <input
                         type="text"
                         value={floatingYoutube}
                         onChange={(e) => setFloatingYoutube(e.target.value)}
                         placeholder="https://youtube.com/c/channel"
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">빠른상담 연결 주소 (예: 카카오 상담페이지)</label>
+                      <label className="text-xs font-extrabold text-[#0F172A]">빠른상담 연결 주소 (예: 카카오 상담페이지)</label>
                       <input
                         type="text"
                         value={floatingChat}
                         onChange={(e) => setFloatingChat(e.target.value)}
                         placeholder="https://pf.kakao.com/_xxxx"
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">다이렉트 전화문의 유도 번호 (전화 연결)</label>
+                      <label className="text-xs font-extrabold text-[#0F172A]">다이렉트 전화문의 유도 번호 (전화 연결)</label>
                       <input
                         type="text"
                         value={floatingPhone}
                         onChange={(e) => setFloatingPhone(e.target.value)}
                         placeholder="예: 1566-3594"
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">실시간 카카오톡 채팅방/오픈채팅 연결 주소 (카톡상담)</label>
+                      <label className="text-xs font-extrabold text-[#0F172A]">실시간 카카오톡 채팅방/오픈채팅 연결 주소 (카톡상담)</label>
                       <input
                         type="text"
                         value={floatingKakao}
                         onChange={(e) => setFloatingKakao(e.target.value)}
                         placeholder="https://open.kakao.com/o/sxxxx"
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">공식 네이버 블로그 주소 (Blog)</label>
+                      <label className="text-xs font-extrabold text-[#0F172A]">공식 네이버 블로그 주소 (Blog)</label>
                       <input
                         type="text"
                         value={floatingBlog}
                         onChange={(e) => setFloatingBlog(e.target.value)}
                         placeholder="https://blog.naver.com/xxxx"
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-4 bg-[#735965] hover:bg-[#5d4752] text-white font-bold text-sm rounded-xl transition-all shadow-[0_4px_16px_rgba(115,89,101,0.25)] flex items-center justify-center gap-2 hover:scale-[1.01]"
+                    className="w-full py-4 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] font-black text-sm rounded-2xl transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-2 active:scale-98 cursor-pointer border-0"
                   >
                     <Sparkles size={16} />
                     홈페이지 플로팅 채널 연동 정보 반영 및 저장
@@ -7819,13 +8570,13 @@ export default function AdminPage() {
               {bannerSubMenu === "instagram" && (
                 <div className="space-y-6 animate-fadeIn">
                   
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-[#f2ccd7] rounded-3xl p-6 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/90 rounded-[28px] p-6 shadow-md">
                     <div className="space-y-1">
-                      <h3 className="font-extrabold text-sm text-[#2d2026] flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#7c3aed] animate-pulse"></span>
+                      <h3 className="font-black text-base text-[#0F172A] flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#FED422] animate-pulse"></span>
                         인스타그램 연동 피드 리스트
                       </h3>
-                      <p className="text-[10px] text-[#735965]">
+                      <p className="text-xs text-slate-500 font-medium">
                         브랜드 홈페이지 하단 인스타그램 섹션에 노출될 게시물 데이터 목록입니다. 클릭 시 상세 팝업 및 인스타 아웃링크가 연동됩니다.
                       </p>
                     </div>
@@ -7840,15 +8591,15 @@ export default function AdminPage() {
                         setInstaOrder((convexInstagram?.length || 0) + 1);
                         setIsInstaModalOpen(true);
                       }}
-                      className="px-4 py-2 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-[11px] font-black rounded-xl transition-all shadow-[0_4px_12px_rgba(124,58,237,0.2)] hover:scale-[1.02] cursor-pointer"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
                     >
                       + 신규 인스타 게시물 연동
                     </button>
                   </div>
 
                   {/* List Table */}
-                  <div className="bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-sm">
-                    <div className="bg-[#fff9fb] px-6 py-3 border-b border-[#f2ccd7]/60 flex items-center justify-between text-[11px] font-bold text-[#735965]">
+                  <div className="bg-white border-0 rounded-[28px] overflow-hidden shadow-md">
+                    <div className="bg-[#F8F9FD] px-6 py-3 border-b border-[#EEF0F5] flex items-center justify-between text-xs font-bold text-slate-600">
                       <span className="flex items-center gap-1.5">
                         🖐️ <strong>순서 변경 팁:</strong> 마우스로 ☰ 핸들을 잡고 위아래로 끌어다 놓거나(Drag & Drop), ▲/▼ 버튼을 눌러 인스타 피드 순서를 자유롭게 조절할 수 있습니다.
                       </span>
@@ -7856,7 +8607,7 @@ export default function AdminPage() {
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse min-w-[750px]">
                         <thead>
-                          <tr className="bg-[#fff1f5]/70 border-b border-[#f2ccd7] text-[10px] font-black text-[#735965] uppercase tracking-wider">
+                          <tr className="bg-[#F8F9FD] border-b border-[#EEF0F5] text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
                             <th className="py-4 px-4 w-12 text-center">드래그</th>
                             <th className="py-4 px-4 w-24 text-center">순서</th>
                             <th className="py-4 px-6 w-24">이미지</th>
@@ -7867,10 +8618,10 @@ export default function AdminPage() {
                             <th className="py-4 px-6 w-28 text-center">관리</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#f2ccd7]/40 text-xs">
+                        <tbody className="divide-y divide-slate-100 text-xs">
                           {localInstaList.length === 0 ? (
                             <tr>
-                              <td colSpan={8} className="py-12 text-center font-bold text-neutral-400">
+                              <td colSpan={8} className="py-12 text-center font-bold text-slate-400">
                                 등록된 인스타그램 게시물이 없습니다.
                               </td>
                             </tr>
@@ -7891,15 +8642,15 @@ export default function AdminPage() {
                                   }}
                                   className={`transition-all select-none ${
                                     isDragging
-                                      ? "opacity-30 bg-purple-100/80 border-y-2 border-dashed border-[#7c3aed]"
+                                      ? "opacity-30 bg-amber-100/80 border-y-2 border-dashed border-[#FED422]"
                                       : isDragOver
-                                      ? "bg-purple-50 border-y-2 border-[#7c3aed]"
-                                      : "hover:bg-[#fff9fb]/60"
+                                      ? "bg-amber-50 border-y-2 border-[#FED422]"
+                                      : "hover:bg-slate-50"
                                   }`}
                                 >
                                   {/* Drag Handle */}
                                   <td className="py-4 px-4 text-center">
-                                    <div className="inline-flex items-center justify-center p-1.5 text-neutral-400 hover:text-[#7c3aed] hover:bg-purple-100/50 rounded-lg cursor-grab active:cursor-grabbing transition-colors" title="드래그하여 순서 변경">
+                                    <div className="inline-flex items-center justify-center p-1.5 text-slate-400 hover:text-[#0F172A] hover:bg-slate-200/50 rounded-lg cursor-grab active:cursor-grabbing transition-colors" title="드래그하여 순서 변경">
                                       <GripVertical size={18} />
                                     </div>
                                   </td>
@@ -7907,7 +8658,7 @@ export default function AdminPage() {
                                   {/* Order with Move Buttons */}
                                   <td className="py-4 px-4 text-center">
                                     <div className="flex items-center justify-center gap-1">
-                                      <span className="font-extrabold text-[#7c3aed] text-xs min-w-[1.25rem]">
+                                      <span className="font-extrabold text-[#0F172A] text-xs min-w-[1.25rem]">
                                         {item.orderIndex || index + 1}
                                       </span>
                                       <div className="flex flex-col gap-0.5">
@@ -7915,7 +8666,7 @@ export default function AdminPage() {
                                           type="button"
                                           disabled={index === 0}
                                           onClick={() => handleInstaMove(index, "up")}
-                                          className="p-0.5 text-neutral-400 hover:text-[#7c3aed] disabled:opacity-20 disabled:hover:text-neutral-400 cursor-pointer"
+                                          className="p-0.5 text-slate-400 hover:text-[#0F172A] disabled:opacity-20 disabled:hover:text-slate-400 cursor-pointer border-0"
                                           title="위로 이동"
                                         >
                                           <ArrowUp size={11} />
@@ -7924,7 +8675,7 @@ export default function AdminPage() {
                                           type="button"
                                           disabled={index === localInstaList.length - 1}
                                           onClick={() => handleInstaMove(index, "down")}
-                                          className="p-0.5 text-neutral-400 hover:text-[#7c3aed] disabled:opacity-20 disabled:hover:text-neutral-400 cursor-pointer"
+                                          className="p-0.5 text-slate-400 hover:text-[#0F172A] disabled:opacity-20 disabled:hover:text-slate-400 cursor-pointer border-0"
                                           title="아래로 이동"
                                         >
                                           <ArrowDown size={11} />
@@ -7935,14 +8686,14 @@ export default function AdminPage() {
 
                                   {/* Image */}
                                   <td className="py-4 px-6">
-                                    <div className="w-14 h-14 rounded-lg overflow-hidden border border-[#f2ccd7]/60 bg-neutral-50 flex items-center justify-center">
+                                    <div className="w-14 h-14 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center shadow-2xs">
                                       <img src={optimizeCloudinaryUrl(item.img)} alt="Insta" className="w-full h-full object-cover" />
                                     </div>
                                   </td>
 
                                   {/* Text Summary */}
                                   <td className="py-4 px-6">
-                                    <p className="font-semibold text-[#2d2026] line-clamp-2 leading-relaxed max-w-md">
+                                    <p className="font-bold text-[#0F172A] line-clamp-2 leading-relaxed max-w-md">
                                       {item.text}
                                     </p>
                                   </td>
@@ -7952,10 +8703,10 @@ export default function AdminPage() {
                                     <button
                                       type="button"
                                       onClick={() => handleToggleInstaMain(item)}
-                                      className={`px-3 py-1.5 rounded-full font-extrabold text-[10px] transition-all cursor-pointer shadow-sm hover:scale-105 inline-flex items-center justify-center gap-1 ${
+                                      className={`px-3 py-1.5 rounded-xl font-extrabold text-[10px] transition-all cursor-pointer border-0 shadow-2xs inline-flex items-center justify-center gap-1 ${
                                         item.isMain
-                                          ? "bg-amber-400 text-neutral-950 border border-amber-500 hover:bg-amber-300"
-                                          : "bg-neutral-100 text-neutral-400 border border-neutral-200 hover:bg-neutral-200 hover:text-neutral-700"
+                                          ? "bg-[#FED422] text-[#0F172A] font-black"
+                                          : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                                       }`}
                                       title={item.isMain ? "클릭 시 메인 노출 해제" : "클릭 시 메인 노출로 지정 (최대 4개)"}
                                     >
@@ -7965,13 +8716,13 @@ export default function AdminPage() {
 
                                   {/* Link */}
                                   <td className="py-4 px-6">
-                                    <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-[#7c3aed] hover:underline font-semibold break-all">
+                                    <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-slate-600 hover:text-[#0F172A] hover:underline font-medium break-all">
                                       {item.link}
                                     </a>
                                   </td>
 
                                   {/* Date */}
-                                  <td className="py-4 px-6 text-[#735965] font-bold">{item.date}</td>
+                                  <td className="py-4 px-6 text-slate-500 font-bold">{item.date}</td>
 
                                   {/* Actions */}
                                   <td className="py-4 px-6 text-center">
@@ -7979,14 +8730,16 @@ export default function AdminPage() {
                                       <button
                                         type="button"
                                         onClick={() => handleOpenInstaEdit(item)}
-                                        className="px-2.5 py-1 bg-white border border-[#f2ccd7] text-[#735965] hover:bg-[#fff1f5] rounded-lg transition-all font-bold text-[10px] cursor-pointer"
+                                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border-0 transition-all font-bold text-[10px] cursor-pointer shadow-2xs"
+                                        title="수정"
                                       >
                                         수정
                                       </button>
                                       <button
                                         type="button"
                                         onClick={() => handleDeleteInstagram(item._id)}
-                                        className="px-2.5 py-1 bg-white border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-all font-bold text-[10px] cursor-pointer"
+                                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 border-0 transition-all font-bold text-[10px] cursor-pointer shadow-2xs"
+                                        title="삭제"
                                       >
                                         삭제
                                       </button>
@@ -8003,136 +8756,174 @@ export default function AdminPage() {
 
                   {/* Form Modal for Creating/Editing Instagram Feed */}
                   {isInstaModalOpen && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-                      <div className="bg-white border border-[#f2ccd7] rounded-3xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-5 animate-fadeIn">
-                        <div className="flex items-center justify-between border-b border-[#f2ccd7] pb-3">
-                          <h3 className="font-extrabold text-base text-[#2d2026]">
-                            {instaId ? "📸 인스타 연동 피드 수정" : "📸 신규 인스타 피드 등록"}
-                          </h3>
-                          <button
-                            type="button"
-                            onClick={() => setIsInstaModalOpen(false)}
-                            className="text-neutral-400 hover:text-black font-extrabold text-sm"
-                          >
-                            ✕
-                          </button>
-                        </div>
-
-                        <form onSubmit={handleSaveInstagram} className="space-y-4 text-left">
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#735965]">게시물 실제 링크 URL <span className="text-red-500">*</span></label>
-                            <div className="flex gap-2">
-                              <input
-                                type="text"
-                                required
-                                value={instaLink}
-                                onChange={(e) => {
-                                  const url = e.target.value;
-                                  setInstaLink(url);
-                                  const autoThumb = getInstagramThumbnailUrl(url);
-                                  if (autoThumb && autoThumb !== url) {
-                                    setInstaImg(autoThumb);
-                                  }
-                                }}
-                                placeholder="https://www.instagram.com/p/..."
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const autoThumb = getInstagramThumbnailUrl(instaLink);
-                                  if (autoThumb && autoThumb !== instaLink) {
-                                    setInstaImg(autoThumb);
-                                    alert("인스타그램 대표 썸네일 이미지가 자동으로 추출되어 설정되었습니다!");
-                                  } else {
-                                    alert("올바른 인스타그램 게시물 링크(https://www.instagram.com/p/...)를 입력해 주세요.");
-                                  }
-                                }}
-                                className="shrink-0 px-3.5 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 font-extrabold text-[11px] rounded-xl transition-all whitespace-nowrap cursor-pointer border border-purple-200"
-                              >
-                                ✨ 썸네일 자동 추출
-                              </button>
-                            </div>
-                            <p className="text-[10px] text-purple-600 font-bold">
-                              * 인스타그램 게시물 링크만 입력하시면 대표 썸네일 이미지를 자동으로 추출하여 표출합니다.
-                            </p>
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn">
+                      <div className="w-full max-w-xl bg-white border-0 rounded-[32px] overflow-hidden shadow-2xl max-h-[90vh] flex flex-col font-sans">
+                        <div className="px-7 py-5 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+                          <div>
+                            <h3 className="font-black text-base sm:text-lg text-[#0F172A]">
+                              {instaId ? "📸 인스타 연동 피드 수정" : "📸 신규 인스타 피드 등록"}
+                            </h3>
+                            <p className="text-xs text-slate-400 font-medium mt-0.5">브랜드 페이지에 연동할 인스타그램 게시물을 관리합니다.</p>
                           </div>
-
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#735965]">이미지 URL <span className="text-neutral-400 font-normal">(선택사항 - 비워둘 경우 게시물 링크에서 자동 추출)</span></label>
-                            <input
-                              type="text"
-                              value={instaImg}
-                              onChange={(e) => setInstaImg(e.target.value)}
-                              placeholder="비워두시면 게시물 링크에서 대표 썸네일을 자동으로 도출합니다."
-                              className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
-                            />
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                              <label className="text-xs font-bold text-[#735965]">게시 일자 <span className="text-red-500">*</span></label>
-                              <input
-                                type="date"
-                                required
-                                value={instaDate}
-                                onChange={(e) => setInstaDate(e.target.value)}
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-xs font-bold text-[#735965]">노출 순서 <span className="text-red-500">*</span></label>
-                              <input
-                                type="number"
-                                required
-                                min={1}
-                                value={instaOrder}
-                                onChange={(e) => setInstaOrder(Number(e.target.value))}
-                                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed]"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#735965]">게시물 설명/본문 내용 <span className="text-red-500">*</span></label>
-                            <textarea
-                              required
-                              rows={5}
-                              value={instaText}
-                              onChange={(e) => setInstaText(e.target.value)}
-                              placeholder="상세 팝업에 표출될 피드 상세 내용을 입력하세요."
-                              className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#7c3aed] resize-none leading-relaxed"
-                            />
-                          </div>
-
-                          <div className="space-y-1.5 bg-amber-50/40 border border-amber-200/50 rounded-xl p-4 flex items-center justify-between">
-                            <div className="space-y-0.5">
-                              <label className="text-xs font-black text-[#735965] flex items-center gap-1.5">
-                                ★ 처음 보이는 4개 피드 지정
-                              </label>
-                              <p className="text-[10px] text-neutral-400 font-bold">체크 시, 브랜드 소개 페이지 최상단 슬라이드 첫 화면(1~4번 칸)에 우선 고정 노출됩니다. (최대 4개)</p>
-                            </div>
-                            <input
-                              type="checkbox"
-                              checked={instaIsMain}
-                              onChange={(e) => setInstaIsMain(e.target.checked)}
-                              className="w-5 h-5 accent-amber-500 cursor-pointer rounded focus:ring-amber-500"
-                            />
-                          </div>
-
-                          <div className="pt-2 flex gap-2">
+                          <div className="flex items-center gap-3">
+                            <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                              인스타그램 피드
+                            </span>
                             <button
                               type="button"
                               onClick={() => setIsInstaModalOpen(false)}
-                              className="flex-1 py-3 border border-neutral-200 hover:bg-neutral-50 font-bold text-xs rounded-xl text-neutral-500 transition-all cursor-pointer"
+                              className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <form onSubmit={handleSaveInstagram} className="p-6 sm:p-7 overflow-y-auto space-y-4 text-left text-xs sm:text-sm flex-1 bg-[#f9fafb]">
+                          {/* Card 1: Feed Link & Image */}
+                          <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                            <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                                  🔗
+                                </div>
+                                <span className="text-xs font-black text-[#0F172A] tracking-tight">게시물 링크 및 미디어</span>
+                              </div>
+                              <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                                링크 및 썸네일
+                              </span>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-extrabold text-[#0F172A]">게시물 실제 링크 URL <span className="text-red-500">*</span></label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  required
+                                  value={instaLink}
+                                  onChange={(e) => {
+                                    const url = e.target.value;
+                                    setInstaLink(url);
+                                    const autoThumb = getInstagramThumbnailUrl(url);
+                                    if (autoThumb && autoThumb !== url) {
+                                      setInstaImg(autoThumb);
+                                    }
+                                  }}
+                                  placeholder="https://www.instagram.com/p/xxxx 또는 reels/xxxx"
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-extrabold text-[#0F172A]">썸네일 이미지 URL (또는 로컬 업로드) <span className="text-red-500">*</span></label>
+                              <div className="flex gap-2 items-center">
+                                <input
+                                  type="text"
+                                  required
+                                  value={instaImg}
+                                  onChange={(e) => setInstaImg(e.target.value)}
+                                  placeholder="https://res.cloudinary.com/... 이미지 주소"
+                                  className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                                />
+                                <div className="relative shrink-0">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      if (!file) return;
+                                      try {
+                                        const formData = new FormData();
+                                        formData.append("file", file);
+                                        formData.append("upload_preset", "120pie_preset");
+                                        const res = await fetch("https://api.cloudinary.com/v1_1/lyjyvy54/image/upload", {
+                                          method: "POST",
+                                          body: formData
+                                        });
+                                        const data = await res.json();
+                                        if (data.secure_url) {
+                                          setInstaImg(data.secure_url);
+                                        }
+                                      } catch (err) {
+                                        console.error("Cloudinary Upload Error:", err);
+                                      }
+                                    }}
+                                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                                  />
+                                  <button
+                                    type="button"
+                                    className="px-3.5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs transition-all border-0 cursor-pointer shadow-2xs"
+                                  >
+                                    파일 업로드
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Card 2: Feed Content & Date */}
+                          <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
+                            <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+                                  📝
+                                </div>
+                                <span className="text-xs font-black text-[#0F172A] tracking-tight">게시글 본문 및 게시일자</span>
+                              </div>
+                              <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                                상세 본문
+                              </span>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-extrabold text-[#0F172A]">게시글 본문 요약 (노출 텍스트)</label>
+                              <textarea
+                                rows={3}
+                                value={instaText}
+                                onChange={(e) => setInstaText(e.target.value)}
+                                placeholder="인스타그램에 등록된 게시글 본문 일부를 입력하세요."
+                                className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none resize-none shadow-2xs"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1.5">
+                                <label className="text-xs font-extrabold text-[#0F172A]">게시 일자</label>
+                                <input
+                                  type="date"
+                                  value={instaDate}
+                                  onChange={(e) => setInstaDate(e.target.value)}
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-xs font-extrabold text-[#0F172A]">노출 순서 (작을수록 앞순위)</label>
+                                <input
+                                  type="number"
+                                  value={instaOrder}
+                                  onChange={(e) => setInstaOrder(parseInt(e.target.value) || 1)}
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Submit Footer */}
+                          <div className="px-1 py-2 flex items-center justify-between border-t border-slate-100 pt-4">
+                            <button
+                              type="button"
+                              onClick={() => setIsInstaModalOpen(false)}
+                              className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-xs rounded-2xl transition-all cursor-pointer border-0 shadow-2xs"
                             >
                               취소
                             </button>
                             <button
                               type="submit"
-                              className="flex-1 py-3 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
+                              className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
                             >
-                              저장하기
+                              <span>{instaId ? "인스타 피드 정보 수정" : "신규 인스타 피드 등록"}</span>
+                              <ArrowRight size={14} />
                             </button>
                           </div>
                         </form>
@@ -8153,8 +8944,8 @@ export default function AdminPage() {
             <div className="space-y-6 animate-fadeIn">
               
               <div>
-                <h2 className="text-xl font-bold text-[#2d2026]">본사 시스템 통합 설정</h2>
-                <p className="text-xs text-[#735965] font-bold mt-1">
+                <h2 className="text-xl font-black text-[#0F172A]">본사 시스템 통합 설정</h2>
+                <p className="text-xs text-slate-400 font-bold mt-1">
                   본사 어드민 최고 관리자 로그인 계정 및 점주 발주 주문의 배송 상태값 목록을 유연하게 제어합니다.
                 </p>
               </div>
@@ -8162,49 +8953,49 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                 
                 {/* 1. Account Management (계정관리) */}
-                <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
-                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
-                    <UserCheck size={18} className="text-[#f25f8a]" />
+                <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-5">
+                  <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
+                    <UserCheck size={18} className="text-[#FED422]" />
                     본사 최고 관리자 계정 변경 관리
                   </h3>
                   
                   <form onSubmit={handleUpdateAdminAccount} className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">관리자 ID *</label>
+                      <label className="text-xs font-extrabold text-[#0F172A]">관리자 ID *</label>
                       <input 
                         type="text"
                         value={adminIdSetting}
                         onChange={(e) => setAdminIdSetting(e.target.value)}
                         required
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">새 비밀번호 (미입력 시 기존 비밀번호 유지)</label>
+                      <label className="text-xs font-extrabold text-[#0F172A]">새 비밀번호 (미입력 시 기존 비밀번호 유지)</label>
                       <input 
                         type="password"
                         placeholder="새 비밀번호 입력"
                         value={adminPwSetting}
                         onChange={(e) => setAdminPwSetting(e.target.value)}
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">새 비밀번호 확인</label>
+                      <label className="text-xs font-extrabold text-[#0F172A]">새 비밀번호 확인</label>
                       <input 
                         type="password"
                         placeholder="새 비밀번호 동일 입력"
                         value={adminPwSettingConfirm}
                         onChange={(e) => setAdminPwSettingConfirm(e.target.value)}
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-3.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5"
+                      className="w-full py-3.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs flex items-center justify-center gap-1.5 border-0 active:scale-95 cursor-pointer"
                     >
                       <Check size={14} />
                       관리자 계정 정보 적용
@@ -8213,15 +9004,15 @@ export default function AdminPage() {
                 </div>
 
                 {/* 2. Delivery Status Values Management (배송상태값 관리) */}
-                <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
-                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
-                    <Truck size={18} className="text-[#bf3e67]" />
+                <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-5">
+                  <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
+                    <Truck size={18} className="text-[#FED422]" />
                     주문 배송 상태값(태그) 관리
                   </h3>
                   
-                  <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
+                  <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">
                     가맹점 발주 현황판 및 어드민에서 사용될 배송 상태의 명칭들을 자유롭게 추가 및 수정할 수 있습니다.<br />
-                    <span className="text-[#bf3e67] font-extrabold">* 단, [주문완료] 및 [배송완료]는 코어 시스템 상태값으로 유지되어야 하므로 임의로 삭제할 수 없습니다.</span>
+                    <span className="text-[#0F172A] font-extrabold">* 단, [주문완료] 및 [배송완료]는 코어 시스템 상태값으로 유지되므로 삭제할 수 없습니다.</span>
                   </p>
 
                   <form onSubmit={handleAddDeliveryStatus} className="flex gap-2">
@@ -8231,28 +9022,28 @@ export default function AdminPage() {
                       value={newStatusName}
                       onChange={(e) => setNewStatusName(e.target.value)}
                       required
-                      className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
                     />
                     <button 
                       type="submit"
-                      className="px-4 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all whitespace-nowrap"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all whitespace-nowrap border-0 shadow-2xs active:scale-95 cursor-pointer"
                     >
                       추가
                     </button>
                   </form>
 
                   <div className="space-y-3 pt-2">
-                    <label className="text-[11px] font-bold text-[#735965] block">현재 활성화된 배송 상태값 리스트</label>
-                    <div className="flex flex-wrap gap-2 bg-[#fff9fb] border border-[#f2ccd7]/60 p-4 rounded-xl">
+                    <label className="text-[11px] font-extrabold text-slate-500 block">현재 활성화된 배송 상태값 리스트</label>
+                    <div className="flex flex-wrap gap-2 bg-[#F8F9FD] border border-[#EEF0F5] p-4 rounded-2xl">
                       {deliveryStatuses.map((st) => {
                         const isCore = ["주문완료", "배송완료"].includes(st);
                         return (
                           <span 
                             key={st}
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap ${
+                            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap border-0 shadow-2xs ${
                               isCore 
-                                ? "bg-[#fff1f5] text-[#bf3e67] border border-[#f2ccd7]" 
-                                : "bg-neutral-100 text-neutral-600 border border-neutral-200"
+                                ? "bg-[#FED422] text-[#0F172A] font-black" 
+                                : "bg-white text-slate-700"
                             }`}
                           >
                             {st}
@@ -8260,7 +9051,7 @@ export default function AdminPage() {
                               <button
                                 type="button"
                                 onClick={() => handleDeleteDeliveryStatus(st)}
-                                className="hover:text-red-500 text-neutral-400 font-extrabold ml-1"
+                                className="hover:text-red-500 text-slate-400 font-extrabold ml-1 cursor-pointer border-0"
                                 title="삭제"
                               >
                                 &times;
@@ -8272,11 +9063,11 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-end pt-2 border-t border-[#f2ccd7]/40">
+                  <div className="flex justify-end pt-2 border-t border-slate-100">
                     <button
                       type="button"
                       onClick={handleResetDeliveryStatuses}
-                      className="px-3.5 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-600 text-[10px] font-bold border border-neutral-300 transition-colors"
+                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold border-0 transition-colors cursor-pointer shadow-2xs"
                     >
                       상태값 기본값으로 리셋
                     </button>
@@ -8284,13 +9075,13 @@ export default function AdminPage() {
                 </div>
 
                 {/* 3. Status Colors Settings (진행상태 버튼 색상 설정) */}
-                <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
-                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
-                    <Palette size={18} className="text-[#f25f8a]" />
+                <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-5">
+                  <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
+                    <Palette size={18} className="text-[#FED422]" />
                     진행상태 버튼 색상 설정
                   </h3>
                   
-                  <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
+                  <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">
                     주문 현황판 및 각 가맹점 포털 페이지에서 사용될 진행상태 버튼(태그)의 색상을 개별로 설정할 수 있습니다.
                   </p>
 
@@ -8307,10 +9098,10 @@ export default function AdminPage() {
                     ])).map((status) => {
                       const currentColor = statusColors[status] || "pink";
                       return (
-                        <div key={status} className="flex items-center justify-between gap-4 bg-[#fff9fb] p-3 rounded-xl border border-[#f2ccd7]/40">
+                        <div key={status} className="flex items-center justify-between gap-4 bg-[#F8F9FD] p-3.5 rounded-2xl border border-[#EEF0F5]">
                           <div className="flex items-center gap-3">
-                            <span className="text-xs font-bold text-[#2d2026]">{status}</span>
-                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
+                            <span className="text-xs font-extrabold text-[#0F172A]">{status}</span>
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-extrabold shadow-2xs ${
                               (() => {
                                 const preset = COLOR_PRESETS[currentColor as keyof typeof COLOR_PRESETS] || COLOR_PRESETS.pink;
                                 return `${preset.bg} ${preset.text} ${preset.border}`;
@@ -8326,7 +9117,7 @@ export default function AdminPage() {
                               const newColors = { ...statusColors, [status]: e.target.value };
                               setStatusColors(newColors);
                             }}
-                            className="bg-white border border-[#f2ccd7] rounded-lg px-2.5 py-1 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] cursor-pointer"
+                            className="bg-[#F1F4F8] border-0 rounded-xl px-3 py-2 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none shadow-2xs transition-all"
                           >
                             {Object.entries(COLOR_PRESETS).map(([key, value]) => (
                               <option key={key} value={key}>
@@ -8343,11 +9134,10 @@ export default function AdminPage() {
                     type="button"
                     onClick={() => {
                       localStorage.setItem("120_status_colors", JSON.stringify(statusColors));
-                      // Dispatch a storage event so portal tab can sync in real-time if open in another tab
                       window.dispatchEvent(new Event("storage"));
                       triggerToast("진행상태 버튼 색상 설정이 성공적으로 저장되었습니다!");
                     }}
-                    className="w-full py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer border-0"
+                    className="w-full py-3.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer border-0 active:scale-95"
                   >
                     <Check size={14} />
                     색상 설정 저장하기
@@ -8355,38 +9145,38 @@ export default function AdminPage() {
                 </div>
 
                 {/* 4. Naver Map API Key Integration (외부 지도 API 연동) */}
-                <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 lg:col-span-2">
-                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
-                    <Map size={18} className="text-[#f25f8a]" />
+                <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-5 lg:col-span-2">
+                  <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
+                    <Map size={18} className="text-[#FED422]" />
                     가맹점 현황 지도 연동 설정 (네이버 지도 API)
                   </h3>
                   
-                  <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
+                  <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">
                     공식 가맹점 안내 페이지의 지도를 구글 맵 대신 국내 환경에 친화적인 <strong>네이버 지도(Naver Maps)</strong>로 직접 연동할 수 있습니다.<br />
                     네이버 클라우드 플랫폼에서 발급받은 Client ID를 등록하면 실시간 지점 좌표 변환 및 120겹파이 로고 이미지 마커 핀 표시 기능이 활성화됩니다.<br />
-                    <span className="text-[#bf3e67] font-extrabold">* 미등록 상태인 경우, 가맹점 안내 페이지는 구글 지도를 통해 안전하게 자동 대체 작동합니다.</span>
+                    <span className="text-[#0F172A] font-extrabold">* 미등록 상태인 경우, 가맹점 안내 페이지는 구글 지도를 통해 안전하게 자동 대체 작동합니다.</span>
                   </p>
 
                   <form onSubmit={handleUpdateNaverClientId} className="space-y-4 max-w-xl">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-[#735965]">네이버 클라우드 플랫폼 Client ID</label>
+                      <label className="text-xs font-extrabold text-[#0F172A]">네이버 클라우드 플랫폼 Client ID</label>
                       <input 
                         type="text"
                         placeholder="네이버 클라우드 플랫폼에서 발급받은 Client ID를 입력하세요"
                         value={naverClientIdSetting}
                         onChange={(e) => setNaverClientIdSetting(e.target.value)}
-                        className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
-                      <p className="text-[10px] text-neutral-400 font-medium leading-relaxed">
-                        발급처: <a href="https://console.ncloud.com" target="_blank" rel="noopener noreferrer" className="text-[#f25f8a] underline hover:text-[#df4977]">Naver Cloud Platform Console</a><br />
+                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                        발급처: <a href="https://console.ncloud.com" target="_blank" rel="noopener noreferrer" className="text-amber-600 underline font-bold">Naver Cloud Platform Console</a><br />
                         ⚙️ <strong>플랫폼 설정 방법</strong>: AI·NAVER API &gt; Application 등록 &gt; <strong>Web 서비스 URL</strong>에 아래 도메인을 등록해주세요.<br />
-                        👉 등록할 사이트 도메인: <code className="bg-neutral-100 text-[#bf3e67] px-1.5 py-0.5 rounded font-mono font-bold text-[11px]">{typeof window !== "undefined" ? window.location.origin : "https://120pie-new.vercel.app"}</code>
+                        👉 등록할 사이트 도메인: <code className="bg-slate-100 text-[#0F172A] px-1.5 py-0.5 rounded font-mono font-bold text-[11px]">{typeof window !== "undefined" ? window.location.origin : "https://120pie-new.vercel.app"}</code>
                       </p>
                     </div>
 
                     <button
                       type="submit"
-                      className="py-3 px-6 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+                      className="py-3.5 px-6 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs flex items-center gap-1.5 border-0 active:scale-95 cursor-pointer"
                     >
                       <Check size={14} />
                       네이버 지도 API 설정 저장
@@ -8395,13 +9185,13 @@ export default function AdminPage() {
                 </div>
 
                 {/* 4. 약관 및 정책 설정 */}
-                <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 lg:col-span-2">
-                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
-                    <FileText size={18} className="text-[#f25f8a]" />
+                <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-5 lg:col-span-2">
+                  <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
+                    <FileText size={18} className="text-[#FED422]" />
                     이용약관, 개인정보처리방침 및 환불정책 설정
                   </h3>
                   
-                  <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
+                  <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">
                     홈페이지 하단 푸터 및 주요 안내에 사용되는 서비스 이용약관, 개인정보처리방침, 환불정책 내용을 관리합니다.<br />
                     작성된 내용은 사이트 전반의 푸터 메뉴를 통해 연동되어 노출됩니다.
                   </p>
@@ -8409,37 +9199,37 @@ export default function AdminPage() {
                   <form onSubmit={handleSavePolicies} className="space-y-5">
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965] block">이용약관</label>
+                        <label className="text-xs font-extrabold text-[#0F172A] block">이용약관</label>
                         <textarea 
                           value={termsOfUseSetting}
                           onChange={(e) => setTermsOfUseSetting(e.target.value)}
                           rows={12}
                           required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] font-mono leading-relaxed resize-y"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 font-mono leading-relaxed resize-y shadow-2xs outline-none"
                           placeholder="이용약관 내용을 입력해 주세요"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965] block">개인정보처리방침</label>
+                        <label className="text-xs font-extrabold text-[#0F172A] block">개인정보처리방침</label>
                         <textarea 
                           value={privacyPolicySetting}
                           onChange={(e) => setPrivacyPolicySetting(e.target.value)}
                           rows={12}
                           required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] font-mono leading-relaxed resize-y"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 font-mono leading-relaxed resize-y shadow-2xs outline-none"
                           placeholder="개인정보처리방침 내용을 입력해 주세요"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-[#735965] block">환불정책</label>
+                        <label className="text-xs font-extrabold text-[#0F172A] block">환불정책</label>
                         <textarea 
                           value={refundPolicySetting}
                           onChange={(e) => setRefundPolicySetting(e.target.value)}
                           rows={12}
                           required
-                          className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] font-mono leading-relaxed resize-y"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 font-mono leading-relaxed resize-y shadow-2xs outline-none"
                           placeholder="환불정책 내용을 입력해 주세요"
                         />
                       </div>
@@ -8447,7 +9237,7 @@ export default function AdminPage() {
 
                     <button
                       type="submit"
-                      className="py-3 px-6 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+                      className="py-3.5 px-6 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs flex items-center gap-1.5 border-0 active:scale-95 cursor-pointer"
                     >
                       <Check size={14} />
                       약관 및 정책 설정 저장
@@ -8457,13 +9247,13 @@ export default function AdminPage() {
 
                 {/* 5. 실시간 SMS 발송 자동 연동 및 문구 설정 */}
                 {smsSettings && (
-                  <div className="bg-white border border-[#f2ccd7] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 lg:col-span-2">
-                    <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
-                      <MessageSquare size={18} className="text-[#f25f8a]" />
+                  <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-6 lg:col-span-2">
+                    <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
+                      <MessageSquare size={18} className="text-[#FED422]" />
                       5. 실시간 SMS 발송 자동 연동 및 문구 설정 (알리고 API 연동)
                     </h3>
                     
-                    <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
+                    <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">
                       가맹점 신청, 자재 주문, 1:1 문의 등 주요 이벤트 발생 시 지정된 고객 및 본사 담당자에게 실시간 문자(SMS/LMS)를 자동 전송합니다.<br />
                       국내 최고 SMS 대행사인 <strong>알리고(Aligo)</strong> 서비스 API를 공식 지원하며, 각 구분별로 고객용/관리자용 템플릿과 활성화 여부를 따로 설정할 수 있습니다.
                     </p>
@@ -8471,11 +9261,11 @@ export default function AdminPage() {
                     <form onSubmit={handleUpdateSmsSettings} className="space-y-6">
                       
                       {/* A. 알리고 API 연동 Key 관리 */}
-                      <div className="bg-[#fff9fb]/40 border border-[#f2ccd7]/60 rounded-2xl p-5 space-y-4">
-                        <h4 className="text-xs font-black text-[#bf3e67] border-b border-[#f2ccd7]/30 pb-2">
+                      <div className="bg-[#F8F9FD] border border-[#EEF0F5] rounded-2xl p-5 space-y-4">
+                        <h4 className="text-xs font-black text-[#0F172A] border-b border-slate-100 pb-2">
                           🔌 알리고 SMS API 연동 자격증명 설정
                         </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold text-[#735965]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-extrabold text-[#0F172A]">
                           <div className="space-y-1.5">
                             <span>알리고 API Key (발송용 비밀키) *</span>
                             <input 
@@ -8486,7 +9276,7 @@ export default function AdminPage() {
                                 ...smsSettings,
                                 aligoKey: e.target.value
                               })}
-                              className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                           <div className="space-y-1.5">
@@ -8499,12 +9289,12 @@ export default function AdminPage() {
                                 ...smsSettings,
                                 aligoUserId: e.target.value
                               })}
-                              className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 pt-1 border-t border-[#f2ccd7]/20">
-                          <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-extrabold text-[#735965] select-none">
+                        <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                          <label className="flex items-center gap-1.5 cursor-pointer text-xs font-extrabold text-[#0F172A] select-none">
                             <input 
                               type="checkbox"
                               checked={smsSettings.aligoTestMode !== false}
@@ -8512,27 +9302,27 @@ export default function AdminPage() {
                                 ...smsSettings,
                                 aligoTestMode: e.target.checked
                               })}
-                              className="w-3.5 h-3.5 accent-[#f25f8a] rounded cursor-pointer"
+                              className="w-4 h-4 text-amber-500 rounded cursor-pointer"
                             />
                             테스트 모드 활성화 (체크 시 충전 포인트 미차감, 실제 문자는 전송되지 않음)
                           </label>
                         </div>
-                        <p className="text-[9px] text-[#735965] leading-relaxed font-semibold">
+                        <p className="text-[10px] text-slate-400 leading-relaxed font-semibold">
                           * 알리고 API Key와 User ID를 올바르게 설정하면 실제 가맹점 신청 및 발주 시 알리고 서버를 경유하여 자동 전송됩니다.<br />
                           * 테스트 모드가 체크되어 있으면 실제 과금이 발생하지 않고 전송 성공 로그만 반환됩니다. 실무에 적용하실 때는 해제해 주세요.
                         </p>
                       </div>
 
                       {/* C. 알리고 API 연동 테스트 발송 (신설) */}
-                      <div className="bg-[#fff9fb]/40 border border-[#f2ccd7]/60 rounded-2xl p-5 space-y-4">
-                        <h4 className="text-xs font-black text-[#bf3e67] border-b border-[#f2ccd7]/30 pb-2 flex items-center gap-1.5">
+                      <div className="bg-[#F8F9FD] border border-[#EEF0F5] rounded-2xl p-5 space-y-4">
+                        <h4 className="text-xs font-black text-[#0F172A] border-b border-slate-100 pb-2 flex items-center gap-1.5">
                           🧪 알리고 API 실시간 발송 테스트
                         </h4>
-                        <p className="text-[10px] text-[#735965] font-semibold leading-relaxed">
+                        <p className="text-[10px] text-slate-500 font-semibold leading-relaxed">
                           입력된 알리고 API Key와 User ID가 올바른지 실제 문자를 발송하여 테스트합니다.<br />
                           * 테스트 모드가 <strong>활성화</strong>된 상태이면 실제 문자가 가지 않고 로그만 반환되므로, 실제 전송을 확인하려면 위 테스트 모드를 <strong>해제</strong>하고 진행해 주세요.
                         </p>
-                        <div className="flex flex-wrap items-end gap-3 text-xs font-semibold text-[#735965]">
+                        <div className="flex flex-wrap items-end gap-3 text-xs font-extrabold text-[#0F172A]">
                           <div className="space-y-1.5 flex-1 min-w-[150px]">
                             <span>발신 번호 (알리고에 등록된 번호)</span>
                             <input 
@@ -8540,7 +9330,7 @@ export default function AdminPage() {
                               placeholder="알리고에 등록된 발신 번호를 적어주세요"
                               value={testSenderPhone}
                               onChange={(e) => setTestSenderPhone(formatPhoneNumber(e.target.value))}
-                              className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                           <div className="space-y-1.5 flex-1 min-w-[150px]">
@@ -8550,14 +9340,14 @@ export default function AdminPage() {
                               placeholder="010-0000-0000"
                               value={testReceiverPhone}
                               onChange={(e) => setTestReceiverPhone(formatPhoneNumber(e.target.value))}
-                              className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                           <button
                             type="button"
                             onClick={handleTestSendSms}
                             disabled={isTestingSms}
-                            className="px-5 py-2 bg-[#f25f8a] hover:bg-[#df4977] text-white text-xs font-black rounded-xl transition-all shadow-sm flex items-center gap-1.5 h-[38px] disabled:opacity-50 cursor-pointer border-0 shrink-0"
+                            className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs flex items-center gap-1.5 h-[42px] disabled:opacity-50 cursor-pointer border-0 shrink-0"
                           >
                             {isTestingSms ? "전송 중..." : "테스트 문자 발송"}
                           </button>
@@ -8576,18 +9366,18 @@ export default function AdminPage() {
                           const config = smsSettings[evt.key];
                           if (!config) return null;
                           return (
-                            <div key={evt.key} className="border border-[#f2ccd7]/60 rounded-3xl p-6 bg-[#fff9fb]/10 shadow-sm space-y-4">
-                              <h4 className="text-xs font-black text-[#bf3e67] border-b border-[#f2ccd7]/60 pb-2 flex items-center gap-1.5 justify-between">
+                            <div key={evt.key} className="border border-[#EEF0F5] rounded-2xl p-6 bg-[#F8F9FD] shadow-2xs space-y-4">
+                              <h4 className="text-xs font-black text-[#0F172A] border-b border-slate-200/60 pb-2 flex items-center gap-1.5 justify-between">
                                 <span className="flex items-center gap-1.5">{evt.label}</span>
-                                <span className="text-[10px] text-neutral-400 font-medium">변수: {evt.vars}</span>
+                                <span className="text-[10px] text-slate-400 font-medium">변수: {evt.vars}</span>
                               </h4>
                               
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* 고객용 */}
-                                <div className="space-y-3.5 bg-white border border-[#f2ccd7]/40 p-4 rounded-2xl relative">
-                                  <div className="flex justify-between items-center border-b border-[#f2ccd7]/20 pb-1.5">
-                                    <span className="text-[11px] font-bold text-[#2d2026]">고객용 ({evt.custLabel})</span>
-                                    <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-[#735965] select-none">
+                                <div className="space-y-3.5 bg-white border border-[#EEF0F5] p-4 rounded-2xl relative shadow-2xs">
+                                  <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                                    <span className="text-xs font-extrabold text-[#0F172A]">고객용 ({evt.custLabel})</span>
+                                    <label className="flex items-center gap-1.5 cursor-pointer text-xs font-extrabold text-[#0F172A] select-none">
                                       <input 
                                         type="checkbox"
                                         checked={config.customer.isActive}
@@ -8598,12 +9388,12 @@ export default function AdminPage() {
                                             customer: { ...config.customer, isActive: e.target.checked }
                                           }
                                         })}
-                                        className="w-3.5 h-3.5 accent-[#f25f8a] rounded cursor-pointer"
+                                        className="w-4 h-4 text-amber-500 rounded cursor-pointer"
                                       />
                                       활성화
                                     </label>
                                   </div>
-                                  <div className="grid grid-cols-2 gap-3 text-[10px] font-semibold text-[#735965]">
+                                  <div className="grid grid-cols-2 gap-3 text-xs font-extrabold text-[#0F172A]">
                                     <div className="space-y-1">
                                       <span>발신 번호</span>
                                       <input 
@@ -8616,7 +9406,7 @@ export default function AdminPage() {
                                             customer: { ...config.customer, sender: formatPhoneNumber(e.target.value) }
                                           }
                                         })}
-                                        className="w-full bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg px-2.5 py-1.5 text-xs text-[#2d2026]"
+                                        className="w-full bg-[#F1F4F8] border-0 rounded-xl px-3 py-2 text-xs font-extrabold text-[#0F172A] shadow-2xs outline-none"
                                       />
                                     </div>
                                     <div className="space-y-1">
@@ -8625,12 +9415,12 @@ export default function AdminPage() {
                                         type="text"
                                         disabled
                                         value="해당 수신자 (자동)"
-                                        className="w-full bg-stone-50 border border-stone-200 text-stone-400 rounded-lg px-2.5 py-1.5 text-xs font-bold cursor-not-allowed"
+                                        className="w-full bg-slate-100 border-0 text-slate-400 rounded-xl px-3 py-2 text-xs font-extrabold cursor-not-allowed"
                                       />
                                     </div>
                                   </div>
                                   <div className="space-y-1">
-                                    <span className="text-[10px] text-[#735965] font-bold">메시지 템플릿</span>
+                                    <span className="text-xs font-extrabold text-[#0F172A]">메시지 템플릿</span>
                                     <textarea 
                                       value={config.customer.template}
                                       onChange={(e) => setSmsSettings({
@@ -8641,16 +9431,16 @@ export default function AdminPage() {
                                         }
                                       })}
                                       rows={3}
-                                      className="w-full bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg px-3 py-2 text-xs text-[#2d2026] leading-relaxed resize-none font-sans font-semibold"
+                                      className="w-full bg-[#F1F4F8] border-0 rounded-xl px-3 py-2.5 text-xs font-extrabold text-[#0F172A] leading-relaxed resize-none shadow-2xs outline-none"
                                     />
                                   </div>
                                 </div>
 
                                 {/* 관리자용 */}
-                                <div className="space-y-3.5 bg-white border border-[#f2ccd7]/40 p-4 rounded-2xl relative">
-                                  <div className="flex justify-between items-center border-b border-[#f2ccd7]/20 pb-1.5">
-                                    <span className="text-[11px] font-bold text-[#2d2026]">관리자용 (본사 알림 수신)</span>
-                                    <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-[#735965] select-none">
+                                <div className="space-y-3.5 bg-white border border-[#EEF0F5] p-4 rounded-2xl relative shadow-2xs">
+                                  <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                                    <span className="text-xs font-extrabold text-[#0F172A]">관리자용 (본사 알림 수신)</span>
+                                    <label className="flex items-center gap-1.5 cursor-pointer text-xs font-extrabold text-[#0F172A] select-none">
                                       <input 
                                         type="checkbox"
                                         checked={config.admin.isActive}
@@ -8661,13 +9451,13 @@ export default function AdminPage() {
                                             admin: { ...config.admin, isActive: e.target.checked }
                                           }
                                         })}
-                                        className="w-3.5 h-3.5 accent-[#f25f8a] rounded cursor-pointer"
+                                        className="w-4 h-4 text-amber-500 rounded cursor-pointer"
                                       />
                                       활성화
                                     </label>
                                   </div>
                                   <div className="space-y-2.5">
-                                    <div className="grid grid-cols-2 gap-3 text-[10px] font-semibold text-[#735965]">
+                                    <div className="grid grid-cols-2 gap-3 text-xs font-extrabold text-[#0F172A]">
                                       <div className="space-y-1">
                                         <span>발신 번호</span>
                                         <input 
@@ -8680,7 +9470,7 @@ export default function AdminPage() {
                                               admin: { ...config.admin, sender: formatPhoneNumber(e.target.value) }
                                             }
                                           })}
-                                          className="w-full bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg px-2.5 py-1.5 text-xs text-[#2d2026]"
+                                          className="w-full bg-[#F1F4F8] border-0 rounded-xl px-3 py-2 text-xs font-extrabold text-[#0F172A] shadow-2xs outline-none"
                                         />
                                       </div>
                                       <div className="space-y-1">
@@ -8694,12 +9484,12 @@ export default function AdminPage() {
                                               ...newAdminPhoneInputs,
                                               [evt.key]: formatPhoneNumber(e.target.value)
                                             })}
-                                            className="min-w-0 flex-1 bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg px-2 py-1.5 text-xs text-[#2d2026] placeholder-[#c4a0ae]"
+                                            className="min-w-0 flex-1 bg-[#F1F4F8] border-0 rounded-xl px-3 py-2 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 shadow-2xs outline-none"
                                           />
                                           <button 
                                             type="button"
                                             onClick={() => addAdminReceiver(evt.key)}
-                                            className="px-2.5 py-1.5 bg-[#f25f8a] hover:bg-[#df4977] text-white text-[10px] font-extrabold rounded-lg shrink-0 cursor-pointer border-0"
+                                            className="px-3 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-xl shrink-0 cursor-pointer border-0 shadow-2xs"
                                           >
                                             추가
                                           </button>
@@ -8709,28 +9499,28 @@ export default function AdminPage() {
                                     
                                     {/* 수신자 번호 리스트 태그 */}
                                     <div className="space-y-1">
-                                      <span className="text-[10px] text-[#735965] font-bold">수신 번호 리스트 ({(config.admin.receivers || []).length}개)</span>
-                                      <div className="flex flex-wrap gap-1.5 bg-[#fff9fb] border border-[#f2ccd7]/30 p-2 rounded-xl min-h-[42px] max-h-[100px] overflow-y-auto">
+                                      <span className="text-xs font-extrabold text-[#0F172A]">수신 번호 리스트 ({(config.admin.receivers || []).length}개)</span>
+                                      <div className="flex flex-wrap gap-1.5 bg-[#F8F9FD] border border-[#EEF0F5] p-2.5 rounded-xl min-h-[42px] max-h-[100px] overflow-y-auto">
                                         {(config.admin.receivers || []).map((num: string) => (
-                                          <span key={num} className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-white border border-[#f2ccd7]/60 rounded-lg text-[10px] text-[#2d2026] font-bold">
+                                          <span key={num} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border-0 shadow-2xs rounded-lg text-xs font-extrabold text-[#0F172A]">
                                             {num}
                                             <button 
                                               type="button" 
                                               onClick={() => removeAdminReceiver(evt.key, num)}
-                                              className="text-red-400 hover:text-red-600 font-extrabold shrink-0 border-0 bg-transparent cursor-pointer"
+                                              className="text-slate-400 hover:text-red-500 font-extrabold shrink-0 border-0 bg-transparent cursor-pointer"
                                             >
                                               &times;
                                             </button>
                                           </span>
                                         ))}
                                         {(config.admin.receivers || []).length === 0 && (
-                                          <span className="text-[9px] text-[#735965]/50 font-bold m-auto">등록된 수신자가 없습니다.</span>
+                                          <span className="text-xs text-slate-400 font-bold m-auto">등록된 수신자가 없습니다.</span>
                                         )}
                                       </div>
                                     </div>
                                   </div>
                                   <div className="space-y-1">
-                                    <span className="text-[10px] text-[#735965] font-bold">메시지 템플릿</span>
+                                    <span className="text-xs font-extrabold text-[#0F172A]">메시지 템플릿</span>
                                     <textarea 
                                       value={config.admin.template}
                                       onChange={(e) => setSmsSettings({
@@ -8741,7 +9531,7 @@ export default function AdminPage() {
                                         }
                                       })}
                                       rows={3}
-                                      className="w-full bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-lg px-3 py-2 text-xs text-[#2d2026] leading-relaxed resize-none font-sans font-semibold"
+                                      className="w-full bg-[#F1F4F8] border-0 rounded-xl px-3 py-2.5 text-xs font-extrabold text-[#0F172A] leading-relaxed resize-none shadow-2xs outline-none"
                                     />
                                   </div>
                                 </div>
@@ -8752,10 +9542,10 @@ export default function AdminPage() {
                       </div>
 
                       {/* 저장 버튼 */}
-                      <div className="flex justify-end border-t border-[#f2ccd7]/40 pt-4">
+                      <div className="flex justify-end border-t border-slate-100 pt-4">
                         <button
                           type="submit"
-                          className="py-3 px-6 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer border-0"
+                          className="py-3.5 px-6 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer border-0 active:scale-95"
                         >
                           <Check size={14} />
                           SMS 알림 및 템플릿 설정 일괄 저장
@@ -8777,14 +9567,14 @@ export default function AdminPage() {
             <div className="space-y-6 animate-fadeIn">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <h2 className="text-xl font-bold text-[#2d2026]">본사 공식 갤러리 관리</h2>
-                  <p className="text-xs text-[#735965] font-bold mt-1">
+                  <h2 className="text-xl font-black text-[#0F172A]">본사 공식 갤러리 관리</h2>
+                  <p className="text-xs text-slate-400 font-bold mt-1">
                     점주 전용 홍보자료, 신메뉴 연출컷 및 가맹점 인테리어 공식 이미지 데이터를 관리합니다.
                   </p>
                 </div>
                 <button
                   onClick={handleOpenAddGalleryModal}
-                  className="px-5 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-xs rounded-xl shadow-md shadow-[#f25f8a]/10 hover:scale-[1.02] transition-all flex items-center gap-1.5 shrink-0"
+                  className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl shadow-2xs hover:scale-[1.02] transition-all flex items-center gap-1.5 shrink-0 cursor-pointer border-0"
                 >
                   <Plus size={14} />
                   신규 이미지 등록
@@ -8793,9 +9583,9 @@ export default function AdminPage() {
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 {/* Left: Category Management Panel (4 cols) */}
-                <div className="lg:col-span-4 bg-white border border-[#f2ccd7] rounded-3xl p-6 shadow-sm space-y-6">
-                  <h3 className="font-extrabold text-sm text-[#2d2026] border-b border-[#f2ccd7] pb-3 flex items-center gap-2">
-                    <BookOpen size={16} className="text-[#f25f8a]" />
+                <div className="lg:col-span-4 bg-white border-0 rounded-[28px] p-6 shadow-md space-y-6">
+                  <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
+                    <BookOpen size={16} className="text-[#FED422]" />
                     카테고리 관리
                   </h3>
 
@@ -8806,23 +9596,23 @@ export default function AdminPage() {
                       value={newGalleryCategoryName}
                       onChange={(e) => setNewGalleryCategoryName(e.target.value)}
                       required
-                      className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-2 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
                     />
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-xs rounded-xl transition-all whitespace-nowrap"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all whitespace-nowrap border-0 shadow-2xs active:scale-95 cursor-pointer"
                     >
                       추가
                     </button>
                   </form>
 
                   <div className="space-y-3">
-                    <label className="text-[11px] font-bold text-[#735965] block">등록된 카테고리 리스트 ({galleryCategories.length}개)</label>
-                    <div className="space-y-2 p-3 bg-[#fff9fb] border border-[#f2ccd7]/60 rounded-2xl min-h-[120px] max-h-[300px] overflow-y-auto">
+                    <label className="text-[11px] font-extrabold text-slate-500 block">등록된 카테고리 리스트 ({galleryCategories.length}개)</label>
+                    <div className="space-y-2 p-3 bg-[#F8F9FD] border border-[#EEF0F5] rounded-2xl min-h-[120px] max-h-[300px] overflow-y-auto">
                       {galleryCategories.map((cat, idx) => (
                         <div
                           key={cat}
-                          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#fff1f5] text-[#bf3e67] border border-[#f2ccd7] group"
+                          className="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-extrabold bg-white text-[#0F172A] border-0 shadow-2xs group"
                         >
                           <span>{cat}</span>
                           <div className="flex items-center gap-1">
@@ -8830,7 +9620,7 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => handleAdjustGalleryCategoryOrder(idx, "up")}
                               disabled={idx === 0}
-                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30 text-[9px] transition-colors cursor-pointer border-0"
                               title="위로 이동"
                             >
                               ▲
@@ -8839,7 +9629,7 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => handleAdjustGalleryCategoryOrder(idx, "down")}
                               disabled={idx === galleryCategories.length - 1}
-                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-white hover:bg-neutral-50 border border-[#f2ccd7] text-[#bf3e67] disabled:opacity-30 disabled:hover:bg-white text-[9px] transition-colors cursor-pointer"
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30 text-[9px] transition-colors cursor-pointer border-0"
                               title="아래로 이동"
                             >
                               ▼
@@ -8847,7 +9637,7 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={() => handleDeleteGalleryCategory(cat)}
-                              className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 ml-1 font-bold text-sm leading-none transition-colors cursor-pointer"
+                              className="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 ml-1 font-bold text-sm leading-none transition-colors cursor-pointer border-0"
                               title="카테고리 삭제"
                             >
                               &times;
@@ -8856,7 +9646,7 @@ export default function AdminPage() {
                         </div>
                       ))}
                     </div>
-                    <p className="text-[10px] text-neutral-450 leading-relaxed">
+                    <p className="text-[10px] text-slate-400 font-bold leading-relaxed">
                       * 카테고리를 삭제하면, 해당 분류로 지정되었던 이미지들은 자동으로 '기타' 분류로 강제 이동 배정됩니다.
                     </p>
                   </div>
@@ -8865,13 +9655,13 @@ export default function AdminPage() {
                 {/* Right: Images Grid List (8 cols) */}
                 <div className="lg:col-span-8 space-y-6">
                   {/* Category Selection Tabs Bar */}
-                  <div className="flex flex-wrap gap-1.5 p-1 bg-[#fff1f5] border border-[#f2ccd7] rounded-2xl">
+                  <div className="flex flex-wrap gap-1.5 p-1.5 bg-slate-100 rounded-2xl shadow-2xs border-0">
                     <button
                       onClick={() => setSelectedGalleryCategory("전체")}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                      className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
                         selectedGalleryCategory === "전체"
-                          ? "bg-[#f25f8a] text-white shadow-sm font-extrabold"
-                          : "text-[#735965] hover:text-[#bf3e67]"
+                          ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
+                          : "text-slate-600 hover:text-[#0F172A]"
                       }`}
                     >
                       전체 ({galleryItems.length})
@@ -8882,10 +9672,10 @@ export default function AdminPage() {
                         <button
                           key={cat}
                           onClick={() => setSelectedGalleryCategory(cat)}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
                             selectedGalleryCategory === cat
-                              ? "bg-[#f25f8a] text-white shadow-sm font-extrabold"
-                              : "text-[#735965] hover:text-[#bf3e67]"
+                              ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
+                              : "text-slate-600 hover:text-[#0F172A]"
                           }`}
                         >
                           {cat} ({count})
@@ -8896,12 +9686,12 @@ export default function AdminPage() {
 
                   {/* Grid layout */}
                   {galleryItems.filter(item => selectedGalleryCategory === "전체" || item.category === selectedGalleryCategory).length === 0 ? (
-                    <div className="bg-white border border-[#f2ccd7] border-dashed rounded-3xl p-16 text-center flex flex-col items-center justify-center">
-                      <ImageIcon size={40} className="text-[#f2ccd7] mb-3 animate-pulse" />
-                      <p className="text-sm font-bold text-neutral-450">해당 카테고리에 등록된 갤러리 이미지가 없습니다.</p>
+                    <div className="bg-white border-0 rounded-[28px] p-16 text-center flex flex-col items-center justify-center shadow-md">
+                      <ImageIcon size={40} className="text-slate-300 mb-3 animate-pulse" />
+                      <p className="text-xs font-bold text-slate-400">해당 카테고리에 등록된 갤러리 이미지가 없습니다.</p>
                       <button
                         onClick={handleOpenAddGalleryModal}
-                        className="mt-4 px-4 py-2.5 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-[11px] rounded-xl transition-all"
+                        className="mt-4 px-5 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs border-0 cursor-pointer"
                       >
                         신규 이미지 추가하기
                       </button>
@@ -8918,20 +9708,20 @@ export default function AdminPage() {
                             onDragOver={(e) => handleDragOver(e, item.id)}
                             onDragEnd={handleDragEnd}
                             onDrop={(e) => handleDrop(e, item.id)}
-                            className={`bg-white border rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group cursor-move select-none ${
+                            className={`bg-white border-0 rounded-[28px] overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col group cursor-move select-none p-4 space-y-3 ${
                               draggedId === item.id
-                                ? "border-[#f25f8a] opacity-40 scale-95 border-dashed"
-                                : "border-[#f2ccd7]"
+                                ? "opacity-40 scale-95 ring-2 ring-[#FED422]"
+                                : ""
                             }`}
                           >
                             {/* Image Container */}
-                            <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 border-b border-[#f2ccd7]/60">
+                            <div className="relative aspect-video w-full overflow-hidden bg-slate-100 rounded-2xl border-0">
                               <img
                                 src={item.url}
                                 alt={item.name}
                                 className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                               />
-                              <span className="absolute top-3 left-3 px-2 py-0.5 rounded text-[10px] font-black bg-[#bf3e67] text-white shadow-sm">
+                              <span className="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-slate-100 text-slate-700 shadow-2xs border-0">
                                 {item.category}
                               </span>
                               <button
@@ -8940,10 +9730,10 @@ export default function AdminPage() {
                                   e.stopPropagation();
                                   handleToggleFeatured(item);
                                 }}
-                                className={`absolute top-3 right-3 px-2.5 py-1 rounded-xl text-[10px] font-black flex items-center gap-1 shadow-sm transition-all duration-200 cursor-pointer backdrop-blur-sm z-10 ${
+                                className={`absolute top-3 right-3 px-2.5 py-1 rounded-xl text-[10px] font-extrabold flex items-center gap-1 shadow-2xs transition-all duration-200 cursor-pointer border-0 ${
                                   item.isFeatured
-                                    ? "bg-amber-400 text-neutral-950 border border-amber-300 hover:bg-amber-500 hover:scale-105 animate-pulse-subtle"
-                                    : "bg-black/50 text-white/90 border border-white/10 opacity-60 group-hover:opacity-100 hover:bg-[#f25f8a] hover:text-white hover:border-[#f2ccd7] hover:scale-105 hover:opacity-100"
+                                    ? "bg-[#FED422] text-[#0F172A] font-black"
+                                    : "bg-slate-100/90 text-slate-600 hover:bg-white hover:text-[#0F172A]"
                                 }`}
                                 title={item.isFeatured ? "대표 이미지 해제" : "대표 이미지 지정 (최대 9개)"}
                               >
@@ -8952,31 +9742,31 @@ export default function AdminPage() {
                             </div>
 
                             {/* Details body */}
-                            <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
+                            <div className="flex-1 flex flex-col justify-between space-y-3 pt-1">
                               <div className="space-y-1">
-                                <h4 className="font-extrabold text-xs text-[#2d2026] line-clamp-2 leading-relaxed" title={item.name}>
+                                <h4 className="font-extrabold text-xs text-[#0F172A] line-clamp-2 leading-relaxed" title={item.name}>
                                   {item.name}
                                 </h4>
-                                <span className="text-[9px] text-[#735965]/70 font-semibold block">
+                                <span className="text-[10px] text-slate-400 font-bold block">
                                   등록일: {item.regDate}
                                 </span>
                               </div>
 
-                              <div className="flex gap-1.5 pt-2 border-t border-neutral-100">
+                              <div className="flex gap-2 pt-2 border-t border-slate-100">
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditGalleryModal(item)}
-                                  className="flex-1 py-2 border border-[#f2ccd7] bg-[#fff9fb] hover:bg-[#ffd3df]/40 text-[#735965] hover:text-[#bf3e67] text-[10px] font-bold rounded-xl transition-all"
+                                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-xl transition-all border-0 shadow-2xs cursor-pointer"
                                 >
                                   수정
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteGalleryItem(item.id, item.name)}
-                                  className="px-2.5 py-2 border border-red-200 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl transition-all flex items-center justify-center"
+                                  className="px-3 py-2 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-xl transition-all flex items-center justify-center border-0 shadow-2xs cursor-pointer"
                                   title="이미지 삭제"
                                 >
-                                  <Trash2 size={13} />
+                                  <Trash2 size={14} />
                                 </button>
                               </div>
                             </div>
@@ -8988,6 +9778,7 @@ export default function AdminPage() {
               </div>
             </div>
           )}
+          </div>
         </main>
       </div>
 
@@ -8995,390 +9786,476 @@ export default function AdminPage() {
           MODALS & FORM POPUPS
          ========================================== */}
 
-      {/* 0. Register/Edit Gallery Item Modal */}
+      {/* 0. Register/Edit Gallery Item Modal (Stage Flow Tech Card Style) */}
       {showGalleryModal && (
         <div
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowGalleryModal(false)}
         >
           <div
-            className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fadeIn"
+            className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col max-h-[90vh] font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <h3 className="text-base font-extrabold text-[#2d2026]">
-                {selectedGalleryItem ? "갤러리 이미지 정보 수정" : "본사 공식 이미지 신규 등록"}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowGalleryModal(false)}
-                className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg"
-              >
-                <X size={15} />
-              </button>
-            </div>
-
-            <form onSubmit={handleGallerySubmit} className="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm flex-1">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-[#735965]">이미지명 *</label>
-                <input
-                  type="text"
-                  placeholder="이미지를 구별할 이름을 입력해 주세요 (e.g. 로제미트파이 연출컷)"
-                  value={galleryItemName}
-                  onChange={(e) => setGalleryItemName(e.target.value)}
-                  required
-                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
-                />
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight">
+                  {selectedGalleryItem ? "갤러리 이미지 정보 수정" : "본사 공식 이미지 신규 등록"}
+                </h3>
+                <p className="text-xs text-neutral-400 font-medium mt-0.5">가맹 매장에 공유할 갤러리 이미지를 등록합니다.</p>
               </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-[#735965]">카테고리 분류 *</label>
-                <select
-                  value={galleryItemCategory}
-                  onChange={(e) => setGalleryItemCategory(e.target.value)}
-                  required
-                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] font-bold"
-                >
-                  {galleryCategories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-[#735965] block">이미지 등록 방식 *</label>
-                <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#fff1f5] border border-[#f2ccd7] rounded-xl">
-                  <button
-                    type="button"
-                    onClick={() => setGalleryUploadMethod("url")}
-                    className={`py-2 rounded-lg text-xs font-bold transition-all ${
-                      galleryUploadMethod === "url"
-                        ? "bg-[#f25f8a] text-white shadow-sm"
-                        : "text-[#735965] hover:text-[#bf3e67]"
-                    }`}
-                  >
-                    이미지 URL 입력
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setGalleryUploadMethod("file")}
-                    className={`py-2 rounded-lg text-xs font-bold transition-all ${
-                      galleryUploadMethod === "file"
-                        ? "bg-[#f25f8a] text-white shadow-sm"
-                        : "text-[#735965] hover:text-[#bf3e67]"
-                    }`}
-                  >
-                    로컬 이미지 업로드
-                  </button>
-                </div>
-              </div>
-
-              {galleryUploadMethod === "url" ? (
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-[#735965]">이미지 웹 URL *</label>
-                  <input
-                    type="url"
-                    placeholder="https://example.com/image.jpg 형태로 외부 웹 이미지 경로를 입력해 주세요"
-                    value={galleryItemUrl}
-                    onChange={(e) => setGalleryItemUrl(e.target.value)}
-                    required={galleryUploadMethod === "url"}
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
-                  />
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-[#735965]">로컬 이미지 파일 업로드 *</label>
-                  <div className="flex items-center gap-3 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
-                    <input
-                      id="gallery-file-input"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleGalleryImageUpload}
-                      required={galleryUploadMethod === "file" && !galleryItemUrl}
-                      className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer flex-1"
-                    />
-                    {galleryItemUrl && (
-                      <button
-                        type="button"
-                        onClick={() => setGalleryItemUrl("")}
-                        className="px-2.5 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200 transition-colors"
-                      >
-                        지우기
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Real-time Image Preview Area */}
-              {galleryItemUrl && (
-                <div className="space-y-2 pt-2">
-                  <span className="text-[10px] font-bold text-[#735965] block">이미지 미리보기</span>
-                  <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-[#f2ccd7] bg-neutral-50 shadow-inner">
-                    <img
-                      src={galleryItemUrl}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      onError={() => {}}
-                    />
-                    <div className="absolute bottom-2 right-2 bg-emerald-500/90 text-white text-[9px] font-extrabold px-2 py-0.5 rounded shadow flex items-center gap-1">
-                      <Check size={10} />
-                      유효한 경로 확인
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {!selectedGalleryItem && (
-                <label className="flex items-center gap-2 text-xs font-bold text-[#735965] py-2 px-1 select-none cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={keepGalleryModalOpen}
-                    onChange={(e) => setKeepGalleryModalOpen(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#f2ccd7] text-[#f25f8a] focus:ring-[#f25f8a] accent-[#f25f8a] cursor-pointer"
-                  />
-                  등록 완료 후 창을 닫지 않고 계속 추가 등록하기
-                </label>
-              )}
-
-              <div className="flex gap-3 pt-4 border-t border-neutral-100">
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                  갤러리 설정
+                </span>
                 <button
                   type="button"
                   onClick={() => setShowGalleryModal(false)}
-                  className="flex-1 py-3 border border-[#f2ccd7] hover:bg-[#fff1f5] text-[#735965] font-bold text-xs rounded-xl transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
                 >
-                  취소 / 닫기
+                  <X size={16} />
                 </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-[#f25f8a] hover:bg-[#df4977] text-white font-extrabold text-xs rounded-xl shadow-sm transition-all cursor-pointer"
-                >
-                  {selectedGalleryItem ? "수정 내용 적용" : "갤러리 등록 완료"}
-                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleGallerySubmit} className="p-6 sm:p-7 overflow-y-auto space-y-4 text-xs sm:text-sm flex-1 bg-[#f9fafb]">
+              {/* Card 1: Name & Category (Amber Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                      🖼️
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">이미지 명칭 및 분류</span>
+                  </div>
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    기본 정보
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-extrabold text-[#0F172A]">이미지명 *</label>
+                  <input
+                    type="text"
+                    placeholder="이미지를 구별할 이름을 입력해 주세요 (e.g. 로제미트파이 연출컷)"
+                    value={galleryItemName}
+                    onChange={(e) => setGalleryItemName(e.target.value)}
+                    required
+                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-extrabold text-[#0F172A]">카테고리 분류 *</label>
+                  <select
+                    value={galleryItemCategory}
+                    onChange={(e) => setGalleryItemCategory(e.target.value)}
+                    required
+                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                  >
+                    {galleryCategories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Card 2: Upload File (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+                      📁
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">이미지 파일 업로드</span>
+                  </div>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    파일 등록
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-2xl p-3 shadow-2xs">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleGalleryImageUpload}
+                    className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1"
+                  />
+                </div>
+                {galleryItemUrl && (
+                  <div className="p-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-xl flex items-center gap-3">
+                    <img src={galleryItemUrl} alt="미리보기" className="w-12 h-12 rounded-lg object-cover" />
+                    <span className="text-[10px] text-neutral-400 font-mono truncate flex-1">{galleryItemUrl}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-mono font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>GALLERY READY</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowGalleryModal(false)}
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-full transition-all cursor-pointer border-0"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-full transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                  >
+                    <span>{selectedGalleryItem ? "수정사항 저장" : "갤러리 이미지 추가"}</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
               </div>
             </form>
           </div>
         </div>
       )}
 
+
       {/* 1.5. Consultation Inquiry Detail Modal */}
       {selectedConsultation && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setSelectedConsultation(null)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <h3 className="text-base font-bold text-[#2d2026]">창업 상담문의 상세 내역</h3>
-              <button onClick={() => setSelectedConsultation(null)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
-                <X size={15} />
-              </button>
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight">📞 창업 상담문의 상세 내역</h3>
+                <p className="text-xs text-neutral-400 font-medium mt-0.5">신청자가 제출한 창업 상담 문의 정보를 확인합니다.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-neutral-400 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                  CONSULTATION
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedConsultation(null)} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
-              <div className="bg-[#fff1f5] border border-[#f2ccd7]/60 p-5 rounded-2xl space-y-3 font-semibold text-[#735965]">
-                <div className="flex justify-between border-b border-[#f2ccd7]/40 pb-2">
-                  <span>신청인</span>
-                  <span className="text-[#2d2026] font-bold">{selectedConsultation.name}</span>
+            <div className="p-6 sm:p-7 overflow-y-auto space-y-4 text-xs sm:text-sm bg-[#f9fafb]">
+              {/* Card 1: Applicant Details (Amber Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3 font-semibold text-slate-600">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <span className="text-xs font-black text-[#0F172A] tracking-tight">신청인 및 연락처 정보</span>
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    APPLICANT
+                  </span>
                 </div>
-                <div className="flex justify-between border-b border-[#f2ccd7]/40 pb-2">
+                <div className="flex justify-between border-b border-neutral-100 pb-2">
+                  <span>신청인</span>
+                  <span className="text-[#0F172A] font-black">{selectedConsultation.name}</span>
+                </div>
+                <div className="flex justify-between border-b border-neutral-100 pb-2">
                   <span>연락처</span>
-                  <span className="text-[#2d2026] font-bold flex items-center gap-1.5">
+                  <span className="text-[#0F172A] font-black flex items-center gap-1.5">
                     {selectedConsultation.phone}
                     <button
                       type="button"
                       onClick={() => handleCopyToClipboard(selectedConsultation.phone, "연락처")}
-                      className="p-1 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7] rounded cursor-pointer transition-colors"
+                      className="p-1 hover:text-[#0F172A] text-slate-400 bg-neutral-100 rounded cursor-pointer transition-colors border-0"
                       title="복사하기"
                     >
                       <Copy size={11} />
                     </button>
                   </span>
                 </div>
-                <div className="flex justify-between border-b border-[#f2ccd7]/40 pb-2">
+                <div className="flex justify-between border-b border-neutral-100 pb-2">
                   <span>도입 희망 유형</span>
-                  <span className="bg-[#ffd3df] text-[#bf3e67] font-bold px-2 py-0.5 rounded text-[10px] border border-[#f2ccd7]">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 font-black px-2.5 py-0.5 rounded-full text-[10px]">
                     {selectedConsultation.storeType}
                   </span>
                 </div>
                 {selectedConsultation.existingStoreName && (
-                  <div className="flex justify-between border-b border-[#f2ccd7]/40 pb-2">
+                  <div className="flex justify-between border-b border-neutral-100 pb-2">
                     <span>기존 매장명</span>
-                    <span className="text-[#2d2026] font-bold">{selectedConsultation.existingStoreName}</span>
+                    <span className="text-[#0F172A] font-black">{selectedConsultation.existingStoreName}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span>신청일</span>
-                  <span className="text-[#2d2026] font-bold">{selectedConsultation.regDate}</span>
+                  <span className="text-[#0F172A] font-black">{selectedConsultation.regDate}</span>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">상세 문의 내용</label>
-                <div className="bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl min-h-[120px] max-h-[240px] overflow-y-auto">
-                  <p className="text-xs sm:text-sm text-[#2d2026] leading-relaxed whitespace-pre-wrap font-medium">
+              {/* Card 2: Message Content (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <span className="text-xs font-black text-[#0F172A] tracking-tight">상세 문의 내용</span>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    MESSAGE
+                  </span>
+                </div>
+                <div className="bg-[#e2e8f0] p-4 rounded-xl min-h-[120px] max-h-[240px] overflow-y-auto border border-neutral-200/80">
+                  <p className="text-xs sm:text-sm text-[#0F172A] leading-relaxed whitespace-pre-wrap font-semibold">
                     {selectedConsultation.message || "입력된 문의 내용이 없습니다."}
                   </p>
                 </div>
               </div>
-            </div>
 
-            <div className="p-5 bg-neutral-50 text-right border-t border-[#f2ccd7]/60">
-              <button 
-                onClick={() => setSelectedConsultation(null)}
-                className="px-6 py-2.5 rounded-xl bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-xs font-bold text-[#735965] transition-colors"
-              >
-                닫기
-              </button>
+              {/* Stage Flow Footer */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-3">
+                <div className="flex items-center gap-2 text-[10px] font-mono font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>RECORD ACTIVE</span>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedConsultation(null)}
+                  className="px-6 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
+                >
+                  닫기
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* 1. Inquiry Reply Writer Modal */}
+      {/* 1. Inquiry Reply Writer Modal (Stage Flow Tech Card Style) */}
       {selectedInquiry && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setSelectedInquiry(null)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <h3 className="text-base font-bold text-[#2d2026]">가맹점 1:1 문의 답변 작성</h3>
-              <button onClick={() => setSelectedInquiry(null)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
-                <X size={15} />
-              </button>
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black tracking-tight text-[#0F172A]">💬 가맹점 1:1 문의 답변 작성</h3>
+                <p className="text-xs text-neutral-400 font-medium mt-0.5">가맹점주 문의건에 대해 본사 공식 답변을 작성합니다.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-neutral-400 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                  INQUIRY REPLY
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedInquiry(null)} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmitAnswer} className="p-6 overflow-y-auto space-y-5 flex-1 text-xs sm:text-sm">
-              <div className="bg-[#fff1f5] border border-[#f2ccd7]/60 p-4 rounded-xl space-y-2">
-                <div className="flex items-center justify-between text-[10px] text-[#735965] font-bold">
-                  <span>유형: {selectedInquiry.category}</span>
-                  <span>접수일자: {selectedInquiry.date}</span>
+            <form onSubmit={handleSubmitAnswer} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
+              {/* Card 1: Original Inquiry (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-2">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    {selectedInquiry.category}
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-neutral-400">접수일자: {selectedInquiry.date}</span>
                 </div>
-                <h4 className="font-bold text-xs text-[#2d2026] leading-tight">{selectedInquiry.title}</h4>
-                <p className="text-xs text-[#735965] leading-relaxed whitespace-pre-wrap mt-2">{selectedInquiry.content}</p>
+                <h4 className="font-black text-xs text-[#0F172A] leading-tight pt-1">{selectedInquiry.title}</h4>
+                <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap font-medium">{selectedInquiry.content}</p>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">본사 공식 답변 내용 기입</label>
+              {/* Card 2: Answer Input (Emerald Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                  <span className="text-xs font-black text-[#0F172A]">본사 공식 답변 내용 기입</span>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    OFFICIAL ANSWER
+                  </span>
+                </div>
                 <textarea 
-                  rows={6}
+                  rows={5}
                   placeholder="가맹점주님이 현장에서 직면한 상황에 대해 구체적인 조치 결과(AS 일정 예약, 오배송 무료 재출고 완료 등)를 친절하고 명확하게 입력해 주시기 바랍니다."
                   value={inquiryAnswerText}
                   onChange={(e) => setInquiryAnswerText(e.target.value)}
                   required
-                  className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] placeholder-[#735965]/50 focus:outline-none focus:border-[#f25f8a] resize-none"
+                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 resize-none transition-all outline-none shadow-2xs"
                 />
               </div>
 
-              <button 
-                type="submit"
-                className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-sm mt-2"
-              >
-                가맹 지원 답변 공식 등록하기
-              </button>
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>HQ RESPONSE READY</span>
+                </div>
+                <button 
+                  type="submit"
+                  className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-full transition-all shadow-2xs cursor-pointer border-0 flex items-center gap-2"
+                >
+                  <span>가맹 지원 답변 공식 등록</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* 2. Notice Creation Modal */}
+      {/* 2. Notice Creation Modal (Stage Flow Tech Card Style) */}
       {showNoticeModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={handleCloseNoticeModal}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <h3 className="text-base font-bold text-[#2d2026]">
-                {selectedNotice ? "가맹 공지사항 상세조회 및 수정" : "신규 가맹 공지사항 정식 작성"}
-              </h3>
-              <button onClick={handleCloseNoticeModal} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
-                <X size={15} />
-              </button>
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black tracking-tight text-[#0F172A]">
+                  {selectedNotice ? "가맹 공지사항 상세조회 및 수정" : "신규 가맹 공지사항 정식 작성"}
+                </h3>
+                <p className="text-xs text-neutral-400 font-medium mt-0.5">전체 가맹점에 공지할 주요 가이드라인을 작성합니다.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                  공지사항 작성 양식
+                </span>
+                <button 
+                  type="button"
+                  onClick={handleCloseNoticeModal} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={handleCreateNotice} className="p-6 overflow-y-auto space-y-5 flex-1 text-xs sm:text-sm">
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">공지 태그 선택</label>
-                <select 
-                  value={newNoticeTag}
-                  onChange={(e) => setNewNoticeTag(e.target.value as any)}
-                  className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] focus:outline-none focus:border-[#f25f8a] cursor-pointer"
-                >
-                  <option value="필독">필독 (긴급 법정 안전 위생 점검 등)</option>
-                  <option value="일반">일반 안내 사항</option>
-                  <option value="이벤트">마케팅 / 런칭 이벤트 공지</option>
-                  <option value="물류">물류 배송 / 공휴일 정기 일정 조정</option>
-                </select>
+            <form onSubmit={handleCreateNotice} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
+              {/* Card 1: Notice Tag & Title (Amber Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                      📢
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">공지 구분 및 제목</span>
+                  </div>
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    기본 설정
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-extrabold text-[#0F172A]">공지 태그 선택</label>
+                  <select 
+                    value={newNoticeTag}
+                    onChange={(e) => setNewNoticeTag(e.target.value as any)}
+                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                  >
+                    <option value="필독">필독 (긴급 법정 안전 위생 점검 등)</option>
+                    <option value="일반">일반 안내 사항</option>
+                    <option value="이벤트">마케팅 / 런칭 이벤트 공지</option>
+                    <option value="물류">물류 배송 / 공휴일 정기 일정 조정</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-extrabold text-[#0F172A]">공지 제목</label>
+                  <input 
+                    type="text"
+                    placeholder="예시) 하절기 위생 합동 검열 대비 본부 가이드라인 수칙"
+                    value={newNoticeTitle}
+                    onChange={(e) => setNewNoticeTitle(e.target.value)}
+                    required
+                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">공지 제목</label>
-                <input 
-                  type="text"
-                  placeholder="예시) 하절기 위생 합동 검열 대비 본부 가이드라인 수칙"
-                  value={newNoticeTitle}
-                  onChange={(e) => setNewNoticeTitle(e.target.value)}
-                  required
-                  className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] placeholder-[#735965]/50 focus:outline-none focus:border-[#f25f8a]"
-                />
-              </div>
+              {/* Card 2: Notice Body Content (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+                      📜
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">상세 공지 본문 내용</span>
+                  </div>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    본문 내용
+                  </span>
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">상세 공지 본문 내용</label>
                 <textarea 
-                  rows={6}
+                  rows={5}
                   placeholder="가맹점 전체에 전달할 상세 수칙 및 안내 내용을 명확히 적어주세요. 점주전용 포털 공지사항실에 실시간 동기화되어 배포됩니다."
                   value={newNoticeContent}
                   onChange={(e) => setNewNoticeContent(e.target.value)}
                   required
-                  className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] placeholder-[#735965]/50 focus:outline-none focus:border-[#f25f8a] resize-none"
+                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 resize-none transition-all outline-none shadow-2xs"
                 />
               </div>
 
-              <button 
-                type="submit"
-                className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-sm mt-2"
-              >
-                {selectedNotice ? "공지사항 수정 및 저장하기 💾" : "공지사항 공식 배포하기 📢"}
-              </button>
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>전체 가맹점 공지 준비 완료</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleCloseNoticeModal}
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                  >
+                    <span>{selectedNotice ? "공지사항 수정 저장" : "공지사항 공식 배포"}</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
             </form>
 
             {selectedNotice && selectedNotice.title.includes("배달앱 메뉴 리뉴얼") && (
-              <div className="p-6 border-t border-[#f2ccd7]/60 bg-[#fff1f5]/30 space-y-3 shrink-0">
+              <div className="p-6 border-t border-slate-100 bg-[#F8FAFC] space-y-3 shrink-0">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-sm text-[#2d2026]">가맹점별 배달앱 계정 제출 현황</h4>
-                  <span className="text-xs font-bold text-[#bf3e67] bg-[#ffd3df] border border-[#f2ccd7] px-2.5 py-0.5 rounded-full">
+                  <h4 className="font-black text-sm text-[#0F172A]">가맹점별 배달앱 계정 제출 현황</h4>
+                  <span className="text-xs font-bold text-[#0F172A] bg-amber-100 border-0 px-3 py-1 rounded-full">
                     총 {submittedCredentials?.length || 0}건 접수
                   </span>
                 </div>
                 
-                <div className="border border-[#f2ccd7] rounded-2xl overflow-hidden bg-white max-h-[220px] overflow-y-auto shadow-sm">
+                <div className="border border-slate-200/60 rounded-2xl overflow-hidden bg-white max-h-[220px] overflow-y-auto shadow-2xs">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[10px] font-bold text-[#735965] uppercase tracking-wider">
+                      <tr className="bg-[#F8FAFC] border-b border-slate-200/60 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
                         <th className="p-3">가맹점명</th>
                         <th className="p-3">배달의민족 계정</th>
                         <th className="p-3">쿠팡이츠 계정</th>
                         <th className="p-3">제출 일시</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#f2ccd7]/60">
+                    <tbody className="divide-y divide-slate-100">
                       {!submittedCredentials || submittedCredentials.length === 0 ? (
                         <tr>
-                          <td colSpan={4} className="p-5 text-center text-[#735965] font-bold">아직 제출된 가맹점 계정 정보가 없습니다.</td>
+                          <td colSpan={4} className="p-5 text-center text-slate-400 font-bold">아직 제출된 가맹점 계정 정보가 없습니다.</td>
                         </tr>
                       ) : (
                         submittedCredentials.map((cred: any) => (
@@ -9405,173 +10282,242 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* 3. Store Registration / Detailed Modal */}
+      {/* 3. Store Registration / Detailed Modal (Stage Flow Tech Card Style) */}
       {showStoreModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowStoreModal(false)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <h3 className="text-base font-bold text-[#2d2026]">
-                {selectedStore ? `가맹점 상세 정보 및 편집 [${selectedStore.name}]` : "가맹점 신규 등록 대장 작성"}
-              </h3>
-              <button onClick={() => setShowStoreModal(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
-                <X size={15} />
-              </button>
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                  <span>🏢 {selectedStore ? `가맹점 상세 정보 및 편집 [${selectedStore.name}]` : "가맹점 신규 등록 대장 작성"}</span>
+                </h3>
+                <p className="text-xs text-neutral-400 font-medium mt-0.5">
+                  가맹점 기본 계정 및 가동 모듈을 관리합니다.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                  가맹점 관리
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => setShowStoreModal(false)} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={handleCreateOrUpdateStore} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm">
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">로그인 계정 ID *</label>
-                  <input 
-                    type="text"
-                    placeholder="계정 아이디를 입력해 주세요 (영문/숫자)"
-                    value={storeLoginId}
-                    onChange={(e) => setStoreLoginId(e.target.value)}
-                    required
-                    disabled={!!selectedStore}
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] disabled:bg-neutral-100 disabled:opacity-60"
-                  />
+            <form onSubmit={handleCreateOrUpdateStore} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
+              {/* Card 1: Account Info (Amber Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                      🔑
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">로그인 계정 및 보안</span>
+                  </div>
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    필수 입력
+                  </span>
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">가맹점명 *</label>
-                  <input 
-                    type="text"
-                    placeholder="예시) 120겹파이 강남역삼점"
-                    value={storeName}
-                    onChange={(e) => setStoreName(e.target.value)}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5 relative">
-                  <label className="font-bold text-[#2d2026]">비밀번호 *</label>
-                  <input 
-                    type="text"
-                    placeholder="비밀번호 설정"
-                    value={storePw}
-                    onChange={(e) => setStorePw(e.target.value)}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">비밀번호 확인 *</label>
-                  <input 
-                    type="text"
-                    placeholder="동일 비밀번호 재입력"
-                    value={storePwConfirm}
-                    onChange={(e) => setStorePwConfirm(e.target.value)}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">점주 실명 *</label>
-                  <input 
-                    type="text"
-                    placeholder="점주 대표자 성함"
-                    value={storeOwner}
-                    onChange={(e) => setStoreOwner(e.target.value)}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">연락처 (하이픈 자동입력) *</label>
-                  <input 
-                    type="text"
-                    placeholder="휴대폰 혹은 대표번호"
-                    value={storePhone}
-                    onChange={handlePhoneInputChange}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">가맹 거래 상태 구분 *</label>
-                  <select 
-                    value={storeStatus}
-                    onChange={(e) => setStoreStatus(e.target.value as any)}
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none"
-                  >
-                    <option value="승인">승인 (정상 오퍼레이션 가동)</option>
-                    <option value="대기">대기 (서류 검토 / 가맹 보류)</option>
-                    <option value="보류">보류 (일시적 거래 홀딩)</option>
-                    <option value="중지">중지 (본부 차단 / 경고 누적)</option>
-                    <option value="취소">취소 (정식 폐점 계약 해지)</option>
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">가맹 등록일</label>
+                    <label className="font-extrabold text-[#0F172A]">로그인 계정 ID *</label>
                     <input 
-                      type="date"
-                      value={storeRegDate}
-                      onChange={(e) => setStoreRegDate(e.target.value)}
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-3 text-xs text-[#2d2026]"
+                      type="text"
+                      placeholder="계정 아이디를 입력해 주세요 (영문/숫자)"
+                      value={storeLoginId}
+                      onChange={(e) => setStoreLoginId(e.target.value)}
+                      required
+                      disabled={!!selectedStore}
+                      className="w-full bg-[#F1F4F8] disabled:bg-[#F1F4F8] disabled:opacity-75 border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">가맹 해지일</label>
+                    <label className="font-extrabold text-[#0F172A]">가맹점명 *</label>
                     <input 
-                      type="date"
-                      value={storeCancelDate}
-                      onChange={(e) => setStoreCancelDate(e.target.value)}
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-3 text-xs text-[#2d2026]"
+                      type="text"
+                      placeholder="예시) 120겹파이 강남역삼점"
+                      value={storeName}
+                      onChange={(e) => setStoreName(e.target.value)}
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">비밀번호 *</label>
+                    <input 
+                      type="text"
+                      placeholder="비밀번호 설정"
+                      value={storePw}
+                      onChange={(e) => setStorePw(e.target.value)}
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">비밀번호 확인 *</label>
+                    <input 
+                      type="text"
+                      placeholder="동일 비밀번호 재입력"
+                      value={storePwConfirm}
+                      onChange={(e) => setStorePwConfirm(e.target.value)}
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Road address and detailed address */}
-              <div className="space-y-2">
-                <label className="font-bold text-[#2d2026] block">가맹 매장 도로명 주소 *</label>
-                <div className="flex gap-2">
-                  <input 
-                    type="text"
-                    placeholder="도로명 주소 (우측 '주소 검색' 버튼을 사용하거나 직접 입력하세요)"
-                    value={storeRoadAddress}
-                    onChange={(e) => setStoreRoadAddress(e.target.value)}
-                    required
-                    className="flex-1 bg-white border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => openDaumPostcode("store")}
-                    className="px-4 py-3 bg-[#bf3e67] hover:bg-[#a63053] text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
-                  >
-                    주소 검색
-                  </button>
+              {/* Card 2: Owner Info (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+                      👤
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">점주 정보 및 연락처</span>
+                  </div>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    점주 정보
+                  </span>
                 </div>
-                <input 
-                  type="text"
-                  placeholder="매장 상세 주소 (e.g. 1층 101호, 2층 전부)"
-                  value={storeDetailAddress}
-                  onChange={(e) => setStoreDetailAddress(e.target.value)}
-                  className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none"
-                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">점주 실명 *</label>
+                    <input 
+                      type="text"
+                      placeholder="점주 대표자 성함"
+                      value={storeOwner}
+                      onChange={(e) => setStoreOwner(e.target.value)}
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">연락처 (하이픈 자동입력) *</label>
+                    <input 
+                      type="text"
+                      placeholder="휴대폰 혹은 대표번호"
+                      value={storePhone}
+                      onChange={handlePhoneInputChange}
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                    />
+                  </div>
+                </div>
               </div>
 
-              {/* Adoption Package Checklist */}
-              <div className="space-y-2">
-                <label className="font-bold text-[#2d2026] block">도입 적용 패키지 브랜드 선택 (중복 체크 가능)</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#fff1f5]/50 border border-[#f2ccd7] p-4 rounded-xl">
+              {/* Card 3: Location & Status (Emerald Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                      📍
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">거래 상태 및 매장 주소</span>
+                  </div>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    위치 및 상태
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">가맹 거래 상태 구분 *</label>
+                    <select 
+                      value={storeStatus}
+                      onChange={(e) => setStoreStatus(e.target.value as any)}
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:outline-none cursor-pointer transition-all shadow-2xs"
+                    >
+                      <option value="승인">승인 (정상 오퍼레이션 가동)</option>
+                      <option value="대기">대기 (서류 검토 / 가맹 보류)</option>
+                      <option value="보류">보류 (일시적 거래 홀딩)</option>
+                      <option value="중지">중지 (본부 차단 / 경고 누적)</option>
+                      <option value="취소">취소 (정식 폐점 계약 해지)</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-extrabold text-[#0F172A]">가맹 등록일</label>
+                      <input 
+                        type="date"
+                        value={storeRegDate}
+                        onChange={(e) => setStoreRegDate(e.target.value)}
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-3 py-3 text-xs font-medium text-[#0F172A] focus:outline-none transition-all shadow-2xs"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-extrabold text-[#0F172A]">가맹 해지일</label>
+                      <input 
+                        type="date"
+                        value={storeCancelDate}
+                        onChange={(e) => setStoreCancelDate(e.target.value)}
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-3 py-3 text-xs font-medium text-[#0F172A] focus:outline-none transition-all shadow-2xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="font-extrabold text-[#0F172A] block">가맹 매장 도로명 주소 *</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text"
+                      placeholder="도로명 주소 검색"
+                      value={storeRoadAddress}
+                      onChange={(e) => setStoreRoadAddress(e.target.value)}
+                      required
+                      className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => openDaumPostcode("store")}
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all cursor-pointer border-0 shrink-0 shadow-2xs"
+                    >
+                      주소 검색
+                    </button>
+                  </div>
+                  <input 
+                    type="text"
+                    placeholder="매장 상세 주소 (e.g. 1층 101호)"
+                    value={storeDetailAddress}
+                    onChange={(e) => setStoreDetailAddress(e.target.value)}
+                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                  />
+                </div>
+              </div>
+
+              {/* Card 4: Packages (Neutral Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-slate-400 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs">
+                      📦
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">도입 적용 패키지 브랜드 선택</span>
+                  </div>
+                  <span className="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    적용 패키지
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-xl p-4">
                   {["120pie", "egg120", "츄러스120", "떡볶이120", "핫도그120", "120coffee"].map((menuKey) => {
                     const isChecked = storeAdoptionMenu.includes(menuKey);
                     return (
@@ -9586,54 +10532,75 @@ export default function AdminPage() {
                               setStoreAdoptionMenu(storeAdoptionMenu.filter((m) => m !== menuKey));
                             }
                           }}
-                          className="w-4 h-4 rounded text-[#f25f8a] border-[#f2ccd7] focus:ring-[#f25f8a]"
+                          className="w-4 h-4 rounded text-amber-500 border-neutral-300 focus:ring-amber-500"
                         />
-                        <span className="text-xs font-bold text-[#2d2026]">{menuKey}</span>
+                        <span className="text-xs font-bold text-[#0F172A]">{menuKey}</span>
                       </label>
                     );
                   })}
                 </div>
               </div>
 
-              <button 
-                type="submit"
-                className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-sm mt-3"
-                style={{ color: '#ffffff' }}
-              >
-                {selectedStore ? "가맹점 상세 정보 수정 저장" : "신규 가맹 계약 지점 공식 등록"}
-              </button>
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>시스템 정상 작동 · 본사 가맹점 관리</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowStoreModal(false)}
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-full transition-all cursor-pointer border-0"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-full transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                  >
+                    <span>가맹점 정보 저장</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* 4. Address Popup Simulator Modal with Real Kakao API Embed */}
+      {/* 4. Address Popup Simulator Modal with Real Kakao API Embed (Yellow Header, border-0) */}
       {showAddressPopup && (
         <div 
-          className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[120] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowAddressPopup(false)}
         >
           <div 
-            className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
+            className="w-full max-w-lg bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-5 border-b border-[#f2ccd7]/60 flex flex-col gap-3 bg-[#fff1f5]/80">
+            {/* Yellow Header */}
+            <div className="p-6 bg-[#FED422] text-[#0F172A] flex flex-col gap-3 shadow-xs">
               <div className="flex justify-between items-center">
-                <h4 className="text-sm font-bold text-[#2d2026]">도로명 주소 실시간 검색</h4>
-                <button onClick={() => setShowAddressPopup(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg cursor-pointer">
-                  <X size={13} />
+                <h4 className="text-sm sm:text-base font-black text-[#0F172A]">📍 도로명 주소 실시간 검색</h4>
+                <button 
+                  type="button"
+                  onClick={() => setShowAddressPopup(false)} 
+                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer"
+                >
+                  <X size={16} />
                 </button>
               </div>
               
               {/* Dual-Mode Tabs */}
-              <div className="flex bg-[#ffd3df]/50 p-1 rounded-xl border border-[#f2ccd7]/60">
+              <div className="flex bg-black/10 p-1 rounded-2xl border-0">
                 <button
                   type="button"
                   onClick={() => setAddressTab("kakao")}
-                  className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all ${
+                  className={`flex-1 py-2 text-xs font-black rounded-xl transition-all border-0 cursor-pointer ${
                     addressTab === "kakao" 
-                      ? "bg-white text-[#bf3e67] shadow-sm border border-[#f2ccd7]/40" 
-                      : "text-[#735965] hover:text-[#bf3e67]"
+                      ? "bg-[#0F172A] text-white shadow-xs" 
+                      : "text-[#0F172A]/70 hover:text-[#0F172A]"
                   }`}
                 >
                   카카오 우편번호 API
@@ -9641,10 +10608,10 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => setAddressTab("simulated")}
-                  className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all ${
+                  className={`flex-1 py-2 text-xs font-black rounded-xl transition-all border-0 cursor-pointer ${
                     addressTab === "simulated" 
-                      ? "bg-white text-[#bf3e67] shadow-sm border border-[#f2ccd7]/40" 
-                      : "text-[#735965] hover:text-[#bf3e67]"
+                      ? "bg-[#0F172A] text-white shadow-xs" 
+                      : "text-[#0F172A]/70 hover:text-[#0F172A]"
                   }`}
                 >
                   모의 간편 검색 (대안)
@@ -9654,29 +10621,29 @@ export default function AdminPage() {
 
             {/* Content Body based on active tab */}
             {addressTab === "kakao" ? (
-              <div className="flex-1 w-full bg-[#fff9fb] overflow-hidden relative">
+              <div className="flex-1 w-full bg-[#F8FAFC] overflow-hidden relative">
                 <div 
                   id="daum-postcode-container" 
                   className="w-full h-full"
                 ></div>
               </div>
             ) : (
-              <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-[#fff9fb]">
+              <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-[#F8FAFC]">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#735965] block">지번/도로명 검색어 입력</label>
+                  <label className="text-xs font-extrabold text-[#0F172A] block">지번/도로명 검색어 입력</label>
                   <input
                     type="text"
                     placeholder="예: 테헤란로, 엘에스로, 당동"
                     value={addressSearchKeyword}
                     onChange={(e) => handleAddressSearch(e.target.value)}
-                    className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] placeholder-[#735965]/40 font-semibold"
+                    className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50 placeholder-slate-400"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <span className="text-[10px] font-bold text-[#735965] block">검색 결과 목록 ({addressSearchResults.length}건)</span>
+                  <span className="text-xs font-extrabold text-[#0F172A] block">검색 결과 목록 ({addressSearchResults.length}건)</span>
                   {addressSearchResults.length === 0 ? (
-                    <div className="p-8 text-center text-[11px] text-[#735965] bg-white border border-[#f2ccd7]/40 rounded-xl font-bold">
+                    <div className="p-8 text-center text-xs text-slate-400 bg-white border border-slate-200/60 rounded-2xl font-bold">
                       {addressSearchKeyword.trim() ? "일치하는 주소 후보가 없습니다." : "검색어를 입력하시면 모의 주소 리스트가 노출됩니다."}
                     </div>
                   ) : (
@@ -9694,7 +10661,7 @@ export default function AdminPage() {
                             setShowAddressPopup(false);
                             triggerToast("모의 주소가 성공적으로 자동 선택 및 입력되었습니다!");
                           }}
-                          className="w-full text-left p-3.5 bg-white hover:bg-[#fff1f5] border border-[#f2ccd7]/50 hover:border-[#f25f8a]/50 rounded-xl text-xs font-semibold text-[#2d2026] transition-all cursor-pointer block hover:shadow-sm"
+                          className="w-full text-left p-3.5 bg-white hover:bg-amber-50 border border-slate-200/80 hover:border-amber-400 rounded-2xl text-xs font-bold text-[#0F172A] transition-all cursor-pointer block hover:shadow-2xs"
                         >
                           {addr}
                         </button>
@@ -9719,156 +10686,213 @@ export default function AdminPage() {
       )}
 
       {/* 5. Product Registration / Edit Modal */}
+      {/* 4. Product Registration / Detailed Modal (Stage Flow Tech Card Style) */}
       {showProductModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowProductModal(false)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <h3 className="text-base font-bold text-[#2d2026]">
-                {selectedProduct ? `원/부자재 품목 명세 수정 [${selectedProduct.name}]` : "신규 식재료/부자재 물류 품목 추가"}
-              </h3>
-              <button onClick={() => setShowProductModal(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
-                <X size={15} />
-              </button>
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                  <span>📦 {selectedProduct ? `원/부자재 품목 명세 수정 [${selectedProduct.name}]` : "신규 식재료/부자재 물류 품목 추가"}</span>
+                </h3>
+                <p className="text-xs text-neutral-400 font-medium mt-0.5">
+                  점주 발주몰에 노출할 제품 정보 및 가격을 설정합니다.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                  제품 등록 양식
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => setShowProductModal(false)} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={handleCreateOrUpdateProduct} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm">
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">카테고리 분류 선택 *</label>
-                  <select 
-                    value={productCategory}
-                    onChange={(e) => setProductCategory(e.target.value)}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none"
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+            <form onSubmit={handleCreateOrUpdateProduct} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
+              {/* Card 1: Product Basic (Amber Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                      🏷️
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">품목 분류 및 제품명</span>
+                  </div>
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    필수 입력
+                  </span>
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">품목 제품명 *</label>
-                  <input 
-                    type="text"
-                    placeholder="예시) 로제미트파이 생지"
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a]"
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">모델 고유 코드/모델명 *</label>
-                  <input 
-                    type="text"
-                    placeholder="예시) RP-DOUGH-01"
-                    value={productModelName}
-                    onChange={(e) => setProductModelName(e.target.value)}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] focus:outline-none"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">포장 단위 *</label>
+                    <label className="font-extrabold text-[#0F172A]">카테고리 분류 선택 *</label>
                     <select 
-                      value={productUnit}
-                      onChange={(e) => setProductUnit(e.target.value as any)}
+                      value={productCategory}
+                      onChange={(e) => setProductCategory(e.target.value)}
                       required
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-3 text-xs text-[#2d2026] focus:outline-none"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all cursor-pointer shadow-2xs"
                     >
-                      <option value="개">개</option>
-                      <option value="박스">박스</option>
-                      <option value="kg">kg</option>
-                      <option value="SET">SET</option>
-                      <option value="EA">EA</option>
-                      <option value="대">대</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-[#2d2026]">단위 수량/중량 *</label>
+                    <label className="font-extrabold text-[#0F172A]">품목 제품명 *</label>
                     <input 
-                      type="number"
-                      min={1}
-                      value={productQty}
-                      onChange={(e) => setProductQty(parseInt(e.target.value, 10) || 1)}
+                      type="text"
+                      placeholder="예시) 로제미트파이 생지"
+                      value={productName}
+                      onChange={(e) => setProductName(e.target.value)}
                       required
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3 py-3 text-xs text-[#2d2026] focus:outline-none"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                     />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">모델 고유 코드/모델명 *</label>
+                    <input 
+                      type="text"
+                      placeholder="예시) RP-DOUGH-01"
+                      value={productModelName}
+                      onChange={(e) => setProductModelName(e.target.value)}
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-extrabold text-[#0F172A]">포장 단위 *</label>
+                      <select 
+                        value={productUnit}
+                        onChange={(e) => setProductUnit(e.target.value as any)}
+                        required
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-3 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all cursor-pointer shadow-2xs"
+                      >
+                        <option value="개">개</option>
+                        <option value="박스">박스</option>
+                        <option value="kg">kg</option>
+                        <option value="SET">SET</option>
+                        <option value="EA">EA</option>
+                        <option value="대">대</option>
+                      </select>
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-extrabold text-[#0F172A]">단위 수량/중량 *</label>
+                      <input 
+                        type="number"
+                        min={1}
+                        value={productQty}
+                        onChange={(e) => setProductQty(parseInt(e.target.value, 10) || 1)}
+                        required
+                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-3 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">공급가 (원) *</label>
-                  <input 
-                    type="text"
-                    value={productSupplyPrice}
-                    onChange={(e) => handlePriceInput(e.target.value, setProductSupplyPrice)}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] text-right font-bold focus:outline-none"
-                  />
+              {/* Card 2: Pricing & Status (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+                      💰
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">가격 및 판매 상태</span>
+                  </div>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    가격 정보
+                  </span>
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">판매가 (원) *</label>
-                  <input 
-                    type="text"
-                    value={productPrice}
-                    onChange={(e) => handlePriceInput(e.target.value, setProductPrice)}
-                    required
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] text-right font-bold focus:outline-none"
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">공급가 (원) *</label>
+                    <input 
+                      type="text"
+                      value={productSupplyPrice}
+                      onChange={(e) => handlePriceInput(e.target.value, setProductSupplyPrice)}
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">판매가 (원) *</label>
+                    <input 
+                      type="text"
+                      value={productPrice}
+                      onChange={(e) => handlePriceInput(e.target.value, setProductPrice)}
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">특별 할인액 (원)</label>
+                    <input 
+                      type="text"
+                      value={productDiscountAmount}
+                      onChange={(e) => handlePriceInput(e.target.value, setProductDiscountAmount)}
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                    />
+                  </div>
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">특별 할인액 (원)</label>
-                  <input 
-                    type="text"
-                    value={productDiscountAmount}
-                    onChange={(e) => handlePriceInput(e.target.value, setProductDiscountAmount)}
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] text-right font-bold focus:outline-none"
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-neutral-400">실시간 할인 적용 공급가 (자동 계산)</label>
+                    <input 
+                      type="text"
+                      value={`${getCalculatedDiscountedPrice().toLocaleString()} 원`}
+                      readOnly
+                      className="w-full bg-amber-50 border border-amber-200/80 rounded-2xl px-4 py-3 text-xs text-amber-700 font-bold text-right outline-none"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">제품 상태 *</label>
+                    <select
+                      value={productStatus}
+                      onChange={(e) => setProductStatus(e.target.value as "판매중" | "품절" | "단종")}
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs text-[#0F172A] font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all outline-none shadow-2xs"
+                    >
+                      <option value="판매중">판매중</option>
+                      <option value="품절">품절 (가맹점 주문불가)</option>
+                      <option value="단종">단종 (가맹점 노출안됨)</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#735965]">실시간 자동 계산 할인 적용 공급가 (리드온리)</label>
-                  <input 
-                    type="text"
-                    value={`${getCalculatedDiscountedPrice().toLocaleString()} 원`}
-                    readOnly
-                    className="w-full bg-neutral-100 border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#bf3e67] font-black text-right"
-                  />
+              {/* Card 3: Images & Description (Emerald Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                      🖼️
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">이미지 및 상세 설명</span>
+                  </div>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    이미지 및 콘텐츠
+                  </span>
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-[#2d2026]">제품 상태 *</label>
-                  <select
-                    value={productStatus}
-                    onChange={(e) => setProductStatus(e.target.value as "판매중" | "품절" | "단종")}
-                    className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs text-[#2d2026] font-bold focus:outline-none cursor-pointer"
-                  >
-                    <option value="판매중">판매중</option>
-                    <option value="품절">품절 (가맹점 주문불가)</option>
-                    <option value="단종">단종 (가맹점 노출안됨)</option>
-                  </select>
-                </div>
-              </div>
 
-              {/* Image url links with file upload option */}
-              <div className="space-y-4">
-                <div className="flex flex-col gap-1.5 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl space-y-2">
-                  <label className="font-bold text-[#2d2026]">썸네일 대표 이미지 *</label>
+                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-xl border-0 space-y-2">
+                  <label className="font-extrabold text-[#0F172A]">썸네일 대표 이미지 *</label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input 
                       type="text"
@@ -9876,377 +10900,232 @@ export default function AdminPage() {
                       value={productImg}
                       onChange={(e) => setProductImg(e.target.value)}
                       required
-                      className="flex-1 bg-white border border-[#f2ccd7]/60 rounded-xl px-4 py-2.5 text-xs text-[#2d2026] focus:outline-none"
+                      className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
                     />
-                    <div className="flex items-center bg-white border border-[#f2ccd7]/60 rounded-xl px-3 py-2 shrink-0">
+                    <div className="flex items-center bg-[#F1F4F8] rounded-2xl px-3 py-2 shrink-0 border-0 shadow-2xs">
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleProductImgUpload}
-                        className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer w-full max-w-[180px]"
+                        className="text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:hover:bg-slate-300 file:text-slate-700 cursor-pointer w-full max-w-[180px]"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl space-y-2">
-                  <label className="font-bold text-[#2d2026]">상세 상세페이지 이미지 (옵션)</label>
+                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-xl border-0 space-y-2">
+                  <label className="font-extrabold text-[#0F172A]">상세 상세페이지 이미지 (옵션)</label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input 
                       type="text"
                       placeholder="https://res.cloudinary.com/... 이미지 상세 웹 경로"
                       value={productDetailImg}
                       onChange={(e) => setProductDetailImg(e.target.value)}
-                      className="flex-1 bg-white border border-[#f2ccd7]/60 rounded-xl px-4 py-2.5 text-xs text-[#2d2026] focus:outline-none"
+                      className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
                     />
-                    <div className="flex items-center bg-white border border-[#f2ccd7]/60 rounded-xl px-3 py-2 shrink-0">
+                    <div className="flex items-center bg-[#F1F4F8] rounded-2xl px-3 py-2 shrink-0 border-0 shadow-2xs">
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleProductDetailImgUpload}
-                        className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] file:hover:bg-[#ffd3df]/80 cursor-pointer w-full max-w-[180px]"
+                        className="text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:hover:bg-slate-300 file:text-slate-700 cursor-pointer w-full max-w-[180px]"
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* 3. Rich Text Editor for Detailed Page Content */}
-                <div className="flex flex-col gap-1.5 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl space-y-2">
-                  <label className="font-bold text-[#2d2026]">상세페이지 텍스트 편집 (크기, 색상, 정렬 등)</label>
-                  <style>{`
-                    #product-detail-rich-editor:empty:before {
-                      content: attr(data-placeholder);
-                      color: #735965;
-                      opacity: 0.4;
-                      font-style: italic;
-                      display: block;
-                    }
-                    .rich-content-view font[size="1"] { font-size: 10px !important; }
-                    .rich-content-view font[size="2"] { font-size: 12px !important; }
-                    .rich-content-view font[size="3"] { font-size: 14px !important; }
-                    .rich-content-view font[size="4"] { font-size: 16px !important; }
-                    .rich-content-view font[size="5"] { font-size: 18px !important; }
-                    .rich-content-view font[size="6"] { font-size: 24px !important; }
-                  `}</style>
-                  <div className="border border-[#f2ccd7] rounded-xl overflow-hidden bg-white shadow-sm">
-                    {/* Editor Toolbar */}
-                    <div className="bg-[#fff1f5] border-b border-[#f2ccd7] p-2 flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs">
+                {/* Rich Text Editor */}
+                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-xl border-0 space-y-2">
+                  <label className="font-extrabold text-[#0F172A]">상세페이지 텍스트 편집 (크기, 색상, 정렬 등)</label>
+                  <div className="border-0 rounded-2xl overflow-hidden bg-white shadow-2xs">
+                    <div className="flex flex-wrap items-center gap-1 p-2 bg-[#F1F4F8] border-b border-slate-100 text-xs">
                       <button
                         type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => executeEditorCommand("bold")}
-                        className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] font-bold hover:bg-[#ffd3df] transition-colors cursor-pointer"
+                        onClick={() => executeEditorCommand('bold')}
+                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 font-bold border-0 cursor-pointer shadow-2xs"
                         title="굵게"
                       >
                         가
                       </button>
                       <button
                         type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => executeEditorCommand("italic")}
-                        className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] italic hover:bg-[#ffd3df] transition-colors cursor-pointer"
+                        onClick={() => executeEditorCommand('italic')}
+                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 italic font-bold border-0 cursor-pointer shadow-2xs"
                         title="기울임"
                       >
                         가
                       </button>
                       <button
                         type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => executeEditorCommand("underline")}
-                        className="px-2.5 py-1 rounded bg-white border border-[#f2ccd7] underline hover:bg-[#ffd3df] transition-colors cursor-pointer"
+                        onClick={() => executeEditorCommand('underline')}
+                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 underline font-bold border-0 cursor-pointer shadow-2xs"
                         title="밑줄"
                       >
                         가
                       </button>
-                      
-                      <div className="h-4 w-px bg-[#f2ccd7] mx-1"></div>
-
+                      <span className="w-px h-4 bg-slate-300 mx-1"></span>
                       <button
                         type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => executeEditorCommand("justifyLeft")}
-                        className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
-                        title="왼쪽 정렬"
+                        onClick={() => executeEditorCommand('justifyLeft')}
+                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 text-[11px] font-bold border-0 cursor-pointer shadow-2xs"
                       >
                         왼쪽
                       </button>
                       <button
                         type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => executeEditorCommand("justifyCenter")}
-                        className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
-                        title="가운데 정렬"
+                        onClick={() => executeEditorCommand('justifyCenter')}
+                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 text-[11px] font-bold border-0 cursor-pointer shadow-2xs"
                       >
                         가운데
                       </button>
                       <button
                         type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => executeEditorCommand("justifyRight")}
-                        className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
-                        title="오른쪽 정렬"
+                        onClick={() => executeEditorCommand('justifyRight')}
+                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 text-[11px] font-bold border-0 cursor-pointer shadow-2xs"
                       >
                         오른쪽
                       </button>
-
-                      <div className="h-4 w-px bg-[#f2ccd7] mx-1"></div>
-
+                      <span className="w-px h-4 bg-slate-300 mx-1"></span>
                       <select
                         onChange={(e) => {
-                          if (!e.target.value) return;
-                          executeEditorCommand("fontSize", e.target.value);
-                          e.target.value = ""; // Reset to placeholder
+                          if (e.target.value) executeEditorCommand('fontSize', e.target.value);
                         }}
-                        className="bg-white border border-[#f2ccd7] rounded px-1 py-1 text-[10px] sm:text-xs focus:outline-none cursor-pointer"
-                        title="글자 크기"
-                        defaultValue=""
+                        className="px-2 py-1 bg-white rounded-lg text-slate-700 text-[11px] font-bold border-0 focus:outline-none cursor-pointer shadow-2xs"
                       >
                         <option value="">글자 크기</option>
-                        <option value="1">매우 작게</option>
-                        <option value="2">작게</option>
-                        <option value="3">보통</option>
-                        <option value="4">크게</option>
-                        <option value="5">매우 크게</option>
-                        <option value="6">최대 크게</option>
+                        <option value="2">작게 (12px)</option>
+                        <option value="3">보통 (14px)</option>
+                        <option value="4">크게 (16px)</option>
+                        <option value="5">매우크게 (18px)</option>
+                        <option value="6">제목급 (24px)</option>
                       </select>
-
                       <select
                         onChange={(e) => {
-                          if (!e.target.value) return;
-                          executeEditorCommand("foreColor", e.target.value);
-                          e.target.value = ""; // Reset to placeholder
+                          if (e.target.value) executeEditorCommand('foreColor', e.target.value);
                         }}
-                        className="bg-white border border-[#f2ccd7] rounded px-1 py-1 text-[10px] sm:text-xs focus:outline-none font-bold cursor-pointer"
-                        title="글자 색상"
-                        defaultValue=""
+                        className="px-2 py-1 bg-white rounded-lg text-slate-700 text-[11px] font-bold border-0 focus:outline-none cursor-pointer shadow-2xs"
                       >
                         <option value="">글자 색상</option>
-                        <option value="#2d2026" style={{ color: "#2d2026" }}>기본색상</option>
-                        <option value="#f25f8a" style={{ color: "#f25f8a" }}>핑크</option>
-                        <option value="#bf3e67" style={{ color: "#bf3e67" }}>로즈</option>
-                        <option value="#3b82f6" style={{ color: "#3b82f6" }}>블루</option>
-                        <option value="#10b981" style={{ color: "#10b981" }}>그린</option>
-                        <option value="#f59e0b" style={{ color: "#f59e0b" }}>골드/옐로우</option>
-                        <option value="#ef4444" style={{ color: "#ef4444" }}>레드</option>
+                        <option value="#0F172A">기본 검정계열</option>
+                        <option value="#2563EB">시원한 파랑</option>
+                        <option value="#DC2626">선명한 빨강</option>
+                        <option value="#D97706">골드 오렌지</option>
+                        <option value="#059669">에메랄드 그린</option>
                       </select>
-
                       <button
                         type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => executeEditorCommand("insertUnorderedList")}
-                        className="px-2 py-1 rounded bg-white border border-[#f2ccd7] hover:bg-[#ffd3df] cursor-pointer"
-                        title="글머리 기호"
+                        onClick={() => executeEditorCommand('insertUnorderedList')}
+                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 text-[11px] font-bold border-0 cursor-pointer shadow-2xs"
                       >
                         • 리스트
                       </button>
-
                       <button
                         type="button"
-                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
-                          if (confirm("상세페이지 텍스트 내용을 초기화하시겠습니까?")) {
-                            setProductDetailText("");
-                            const editorDiv = document.getElementById("product-detail-rich-editor");
-                            if (editorDiv) editorDiv.innerHTML = "";
-                          }
+                          setProductDetailText("");
+                          const ed = document.getElementById("product-detail-rich-editor");
+                          if (ed) ed.innerHTML = "";
                         }}
-                        className="px-2 py-1 rounded bg-white border border-red-200 text-red-500 hover:bg-red-50 ml-auto font-bold cursor-pointer"
-                        title="초기화"
+                        className="px-2.5 py-1 bg-white hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-bold border-0 ml-auto cursor-pointer shadow-2xs"
                       >
                         비우기
                       </button>
                     </div>
 
-                    {/* ContentEditable Editor Area */}
-                    <div
+                    <div 
                       id="product-detail-rich-editor"
                       contentEditable
                       suppressContentEditableWarning
-                      onInput={(e: React.FormEvent<HTMLDivElement>) => {
-                        setProductDetailText(e.currentTarget.innerHTML);
-                        saveSelection();
-                      }}
-                      onBlur={(e: React.FocusEvent<HTMLDivElement>) => {
-                        setProductDetailText(e.currentTarget.innerHTML);
-                      }}
-                      onMouseUp={saveSelection}
-                      onKeyUp={saveSelection}
-                      onSelect={saveSelection}
-                      onFocus={() => {
-                        document.execCommand("defaultParagraphSeparator", false, "div");
-                      }}
-                      className="p-4 min-h-[140px] max-h-[260px] overflow-y-auto focus:outline-none bg-white text-xs sm:text-sm text-[#2d2026] leading-relaxed rich-content-view"
+                      onInput={(e: React.FormEvent<HTMLDivElement>) => setProductDetailText(e.currentTarget.innerHTML)}
                       data-placeholder="이곳에 제품 상세 안내 텍스트를 자유롭게 입력하고 편집하세요..."
-                      style={{ minHeight: "140px" }}
+                      className="w-full min-h-[160px] p-4 text-xs font-semibold text-[#0F172A] focus:outline-none rich-content-view overflow-y-auto max-h-[300px]"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Product Label Selection */}
-              <div className="space-y-2 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl">
-                <label className="font-bold text-[#2d2026] block">자재 적용 라벨 선택 (중복 체크 가능)</label>
-                {labels.length === 0 ? (
-                  <p className="text-[10px] text-[#735965] opacity-50">등록된 라벨이 없습니다. 라벨 관리에서 먼저 추가해 주세요.</p>
-                ) : (
-                  <div className="flex flex-wrap gap-4 pt-1">
-                    {labels.map((labelName) => {
-                      const isChecked = productLabels.includes(labelName);
-                      return (
-                        <label key={labelName} className="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-[#2d2026]">
-                          <input 
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setProductLabels([...productLabels, labelName]);
-                              } else {
-                                setProductLabels(productLabels.filter((l) => l !== labelName));
-                              }
-                            }}
-                            className="w-4 h-4 rounded text-[#f25f8a] border-[#f2ccd7] focus:ring-[#f25f8a] accent-[#f25f8a] cursor-pointer"
-                          />
-                          <span>{labelName}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Product Options Management */}
-              <div className="space-y-2 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl">
-                <label className="font-bold text-[#2d2026] block">제품 옵션 설정 (홍보물 등 옵션 선택이 필요한 품목)</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="예시) A4 사이즈, A3 사이즈, 블랙, 화이트 등"
-                    value={newProductOption}
-                    onChange={(e) => setNewProductOption(e.target.value)}
-                    className="flex-1 bg-white border border-[#f2ccd7]/60 rounded-xl px-4 py-2.5 text-xs text-[#2d2026] focus:outline-none"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        if (newProductOption.trim()) {
-                          if (productOptions.includes(newProductOption.trim())) {
-                            alert("이미 추가된 옵션입니다.");
-                            return;
-                          }
-                          setProductOptions([...productOptions, newProductOption.trim()]);
-                          setNewProductOption("");
-                        }
-                      }
-                    }}
-                  />
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>시스템 정상 작동 · 본사 제품 관리</span>
+                </div>
+                <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => {
-                      if (newProductOption.trim()) {
-                        if (productOptions.includes(newProductOption.trim())) {
-                          alert("이미 추가된 옵션입니다.");
-                          return;
-                        }
-                        setProductOptions([...productOptions, newProductOption.trim()]);
-                        setNewProductOption("");
-                      }
-                    }}
-                    className="px-4 py-2.5 bg-[#ffd3df] hover:bg-[#ffd3df]/80 text-[#bf3e67] font-bold text-xs rounded-xl transition-all"
+                    onClick={() => setShowProductModal(false)}
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
                   >
-                    추가
+                    취소
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                  >
+                    <span>{selectedProduct ? "수정 완료" : "등록 하기"}</span>
+                    <ArrowRight size={14} />
                   </button>
                 </div>
-                
-                {productOptions.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5 pt-2">
-                    {productOptions.map((opt, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#fff1f5] border border-[#f2ccd7] text-[10px] sm:text-xs font-bold text-[#bf3e67]"
-                      >
-                        {opt}
-                        <button
-                          type="button"
-                          onClick={() => setProductOptions(productOptions.filter((_, i) => i !== idx))}
-                          className="hover:text-red-500 font-bold focus:outline-none ml-1 text-[10px] w-3 h-3 flex items-center justify-center rounded-full bg-[#ffd3df]/50"
-                        >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-[10px] text-[#735965]/60 mt-1">
-                    * 등록된 옵션이 없습니다. 옵션이 필요 없는 제품은 비워두세요.
-                  </p>
-                )}
               </div>
-
-              {/* Shipping Type Selection */}
-              <div className="space-y-2 bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl">
-                <label className="font-bold text-[#2d2026] block">배송비 정책 구분 *</label>
-                <div className="relative">
-                  <select
-                    value={productShippingType}
-                    onChange={(e) => setProductShippingType(e.target.value as any)}
-                    required
-                    className="w-full bg-white border border-[#f2ccd7]/60 rounded-xl px-4 py-2.5 text-xs text-[#2d2026] focus:outline-none focus:border-[#f25f8a] appearance-none cursor-pointer font-medium"
-                  >
-                    <option value="free">무료 배송 (0원)</option>
-                    <option value="A">A타입 배송비 ({shippingFeeA}원)</option>
-                    <option value="B">B타입 배송비 ({shippingFeeB}원)</option>
-                    <option value="C">C타입 배송비 ({shippingFeeC}원)</option>
-                    <option value="BOX">BOX타입 배송비 (10개당 {shippingFeeBox}원)</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#735965]">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                    </svg>
-                  </div>
-                </div>
-                <p className="text-[10px] text-[#735965]/80 mt-1">
-                  * 일반 품목(A/B/C)은 장바구니 중 가장 높은 배송비 1회만 청구되며, BOX 품목은 10개당 설정된 요금이 합산 부과됩니다.
-                </p>
-              </div>
-
-              <button 
-                type="submit"
-                className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-sm mt-3"
-              >
-                {selectedProduct ? "수정 명세서 공식 저장" : "새로운 물류 유통 품목 공식 등록"}
-              </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* 6. Material Creation Modal */}
+
+      {/* 6. Material Creation Modal (Stage Flow Tech Card Style) */}
       {showMaterialModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowMaterialModal(false)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col"
+            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <h3 className="text-base font-bold text-[#2d2026]">신규 가맹 지원 자료 등록</h3>
-              <button onClick={() => setShowMaterialModal(false)} className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg">
-                <X size={15} />
-              </button>
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black tracking-tight text-[#0F172A]">신규 가맹 지원 자료 등록</h3>
+                <p className="text-xs text-neutral-400 font-medium mt-0.5">점주 포털에 등록할 교육 및 홍보 자료를 추가합니다.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-wider text-slate-500 uppercase px-3 py-1 rounded-full bg-slate-100 border-0 shadow-2xs">
+                  자료 등록 양식
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => setShowMaterialModal(false)} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={handleCreateMaterial} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm">
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">자료 유형 구분</label>
+            <form onSubmit={handleCreateMaterial} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
+              {/* Card 1: Type Selection (Amber Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                      📁
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">자료 유형 구분</span>
+                  </div>
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    유형 선택
+                  </span>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setMaterialType("training")}
-                    className={`py-3 rounded-xl border text-xs font-bold transition-all ${
+                    className={`py-3 rounded-2xl border-0 text-xs font-black transition-all cursor-pointer ${
                       materialType === "training"
-                        ? "bg-[#f25f8a] text-white border-transparent"
-                        : "bg-white text-[#735965] border-[#f2ccd7] hover:bg-[#fff1f5]"
+                        ? "bg-[#FED422] text-[#0F172A] shadow-2xs"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                   >
                     📖 교육자료실 등록
@@ -10254,10 +11133,10 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setMaterialType("pr")}
-                    className={`py-3 rounded-xl border text-xs font-bold transition-all ${
+                    className={`py-3 rounded-2xl border-0 text-xs font-black transition-all cursor-pointer ${
                       materialType === "pr"
-                        ? "bg-[#f25f8a] text-white border-transparent"
-                        : "bg-white text-[#735965] border-[#f2ccd7] hover:bg-[#fff1f5]"
+                        ? "bg-[#FED422] text-[#0F172A] shadow-2xs"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                   >
                     🖼 홍보자료실 등록
@@ -10265,142 +11144,198 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">자료(파일명) 제목</label>
-                <input 
-                  type="text"
-                  placeholder="예시) 하절기 위생 종합 자가점검 진단서 엑셀 양식"
-                  value={newMaterialTitle}
-                  onChange={(e) => setNewMaterialTitle(e.target.value)}
-                  required
-                  className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] placeholder-[#735965]/50 focus:outline-none focus:border-[#f25f8a]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <label className="font-bold text-[#2d2026]">파일 포맷 확장자</label>
-                  <input 
-                    type="text"
-                    placeholder="PDF, MP4, AI 등"
-                    value={newMaterialFormat}
-                    onChange={(e) => setNewMaterialFormat(e.target.value)}
-                    required
-                    className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] focus:outline-none"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label className="font-bold text-[#2d2026]">권장 크기 용량</label>
-                  <input 
-                    type="text"
-                    placeholder="예시) 4.5 MB"
-                    value={newMaterialSize}
-                    onChange={(e) => setNewMaterialSize(e.target.value)}
-                    required
-                    className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">자료 대표 이미지 주소 (옵션)</label>
-                <input 
-                  type="text"
-                  placeholder="https://res.cloudinary.com/... 이미지 경로"
-                  value={newMaterialImg}
-                  onChange={(e) => setNewMaterialImg(e.target.value)}
-                  className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] focus:outline-none"
-                />
-              </div>
-
-              {/* 실제 가맹지원 파일 직접 업로드 필드 (추가) */}
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026] flex items-center gap-1">
-                  📂 실제 자료 파일 직접 업로드
-                  <span className="text-[10px] text-[#f25f8a] font-extrabold">(필수)</span>
-                </label>
-                <div className="flex items-center gap-3 bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-2.5">
-                  <input
-                    type="file"
-                    onChange={handleMaterialFileUpload}
-                    className="text-xs text-[#735965] file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-black file:bg-[#ffd3df] file:text-[#bf3e67] cursor-pointer flex-1"
-                  />
-                  {newMaterialFileName && (
-                    <div className="text-[10px] font-bold text-[#bf3e67] bg-[#ffd3df] px-2 py-1 rounded max-w-[150px] truncate" title={newMaterialFileName}>
-                      {newMaterialFileName}
+              {/* Card 2: Title & Specifications (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+                      📜
                     </div>
-                  )}
-                  {newMaterialFileUrl && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setNewMaterialFileUrl("");
-                        setNewMaterialFileName("");
-                      }}
-                      className="px-2 py-1 rounded bg-red-50 hover:bg-red-100 text-red-500 text-[10px] font-bold border border-red-200"
-                    >
-                      지우기
-                    </button>
-                  )}
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">제목 및 포맷 상세</span>
+                  </div>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    상세 정보
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-extrabold text-[#0F172A]">자료(파일명) 제목 *</label>
+                  <input 
+                    type="text"
+                    placeholder="예시) 하절기 위생 종합 자가점검 진단서 엑셀 양식"
+                    value={newMaterialTitle}
+                    onChange={(e) => setNewMaterialTitle(e.target.value)}
+                    required
+                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-extrabold text-[#0F172A]">자료 상세 설명 (옵션)</label>
+                  <input 
+                    type="text"
+                    placeholder="예시) 매장 위생점검 수칙 및 필수 준수 사항 가이드라인"
+                    value={newMaterialDesc}
+                    onChange={(e) => setNewMaterialDesc(e.target.value)}
+                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">파일 포맷 확장자 *</label>
+                    <input 
+                      type="text"
+                      placeholder="PDF, MP4, AI 등"
+                      value={newMaterialFormat}
+                      onChange={(e) => setNewMaterialFormat(e.target.value)}
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">권장 크기 용량 *</label>
+                    <input 
+                      type="text"
+                      placeholder="예시) 4.5 MB"
+                      value={newMaterialSize}
+                      onChange={(e) => setNewMaterialSize(e.target.value)}
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-[#2d2026]">자료 세부 설명 요약</label>
-                <textarea 
-                  rows={4}
-                  placeholder="점주들이 자료를 내려받기 전 어떤 내용을 담고 있는지 충분히 인지할 수 있도록 명료하게 작성해 주세요."
-                  value={newMaterialDesc}
-                  onChange={(e) => setNewMaterialDesc(e.target.value)}
-                  required
-                  className="w-full bg-[#fff1f5] border border-[#f2ccd7] rounded-xl px-4 py-3 text-sm text-[#2d2026] placeholder-[#735965]/50 focus:outline-none focus:border-[#f25f8a] resize-none"
-                />
+              {/* Card 3: Files & Preview Image (Emerald Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                      📥
+                    </div>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">파일 및 대표 썸네일</span>
+                  </div>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    파일 첨부
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-extrabold text-[#0F172A]">자료 대표 이미지 주소 (옵션)</label>
+                  <input 
+                    type="text"
+                    placeholder="https://res.cloudinary.com/... 이미지 경로"
+                    value={newMaterialImg}
+                    onChange={(e) => setNewMaterialImg(e.target.value)}
+                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-extrabold text-[#0F172A] flex items-center gap-1">
+                    📂 실제 자료 파일 직접 업로드
+                    <span className="text-[10px] text-amber-600 font-extrabold">(필수)</span>
+                  </label>
+                  <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-2xl p-3 shadow-2xs">
+                    <input
+                      type="file"
+                      onChange={handleMaterialFileUpload}
+                      className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1"
+                    />
+                    {newMaterialFileName && (
+                      <div className="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2.5 py-1 rounded-xl max-w-[150px] truncate" title={newMaterialFileName}>
+                        {newMaterialFileName}
+                      </div>
+                    )}
+                    {newMaterialFileUrl && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewMaterialFileUrl("");
+                          setNewMaterialFileName("");
+                        }}
+                        className="px-3 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 text-[10px] font-bold border-0 cursor-pointer shadow-2xs"
+                      >
+                        지우기
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <button 
-                type="submit"
-                className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white font-bold text-sm rounded-xl transition-all shadow-sm mt-2"
-              >
-                신규 지원 자료 공식 배포 등록
-              </button>
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>자료 업로드 준비 완료</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowMaterialModal(false)}
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                  >
+                    <span>지원 자료 추가</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* 7. Order Detail Popup Modal */}
+      {/* 7. Order Detail Popup Modal (Stage Flow Tech Card Style) */}
       {showOrderModal && selectedOrder && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowOrderModal(false)}
         >
           <div 
-            className="w-full max-w-3xl bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+            className="w-full max-w-3xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className="p-5 sm:p-6 border-b border-[#f2ccd7]/60 flex justify-between items-center bg-[#fff1f5]/50">
-              <div className="flex-1">
-                <h3 className="text-sm sm:text-base font-black text-[#2d2026] flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-                  <span>📦 발주 주문 상세 내역</span>
-                  <span className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full bg-red-50 text-red-500 border border-red-200 font-bold w-fit">
-                    {selectedOrder.id}
-                  </span>
-                </h3>
+            {/* Stage Flow White Header */}
+            <div className="px-7 py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                  <Package size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                    <span>발주 주문 상세 내역</span>
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-neutral-100 border border-neutral-200/80 text-neutral-600 font-mono font-bold">
+                      {selectedOrder.id}
+                    </span>
+                  </h3>
+                  <p className="text-xs text-neutral-400 font-medium mt-0.5">가맹점 발주 품목 및 물류 배송 송장을 관리합니다.</p>
+                </div>
               </div>
-              <button 
-                type="button"
-                onClick={() => setShowOrderModal(false)} 
-                className="p-1.5 text-[#735965] hover:text-[#f25f8a] bg-white border border-[#f2ccd7] rounded-lg shrink-0 ml-4 cursor-pointer"
-              >
-                <X size={15} />
-              </button>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                  발주 상세
+                </span>
+                <button 
+                  type="button"
+                  onClick={() => setShowOrderModal(false)} 
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
             {/* Body */}
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
+            <div className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
               
-              {/* Delivery Recipient Info (Dynamic Store Join with Clip Board Copy) */}
+              {/* Delivery Recipient Info Card (Amber Accent) */}
               {(() => {
                 const storeInfo = stores.find(s => s.id === selectedOrder.storeId) || {
                   name: selectedOrder.storeId === "owner" ? "본사 테스트" : "강남역삼점",
@@ -10412,199 +11347,214 @@ export default function AdminPage() {
                 const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`.trim();
                 
                 return (
-                  <div className="space-y-4 bg-gradient-to-br from-[#fff1f5]/70 to-white border border-[#f2ccd7]/80 p-6 rounded-2xl shadow-sm">
-                    <h4 className="font-extrabold text-sm text-[#bf3e67] border-b border-[#f2ccd7]/60 pb-2.5 flex items-center gap-1.5">
-                      <Store size={15} />
-                      수령인 & 배송지 정보 (가맹점 정보)
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold text-[#735965]">
-                      <div className="bg-white/60 p-3 rounded-xl border border-[#f2ccd7]/30 flex justify-between items-center">
+                  <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                    <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <Store size={16} className="text-amber-500" />
+                        <span className="text-xs font-black text-[#0F172A] tracking-tight">수령인 & 배송지 정보 (가맹점 정보)</span>
+                      </div>
+                      <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                        가맹점 정보
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold text-slate-600">
+                      <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex justify-between items-center">
                         <div>
-                          <span className="block text-[9px] text-[#735965]/60 mb-0.5 font-bold">가맹점명</span>
-                          <strong className="text-[#2d2026] text-xs">{storeInfo.name}</strong>
+                          <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">가맹점명</span>
+                          <strong className="text-[#0F172A] text-xs font-black">{storeInfo.name}</strong>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleCopyToClipboard(storeInfo.name, "가맹점명")}
-                          className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/40 rounded-lg shrink-0 cursor-pointer hover:shadow-sm"
+                          className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-neutral-200/60 hover:bg-neutral-200 rounded-lg shrink-0 cursor-pointer border-0 transition-colors"
                           title="복사하기"
                         >
-                          <Copy size={11} />
+                          <Copy size={12} />
                         </button>
                       </div>
 
-                      <div className="bg-white/60 p-3 rounded-xl border border-[#f2ccd7]/30 flex justify-between items-center">
+                      <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex justify-between items-center">
                         <div>
-                          <span className="block text-[9px] text-[#735965]/60 mb-0.5 font-bold">점주 대표자</span>
-                          <strong className="text-[#2d2026] text-xs">{storeInfo.owner}</strong>
+                          <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">점주 대표자</span>
+                          <strong className="text-[#0F172A] text-xs font-black">{storeInfo.owner}</strong>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleCopyToClipboard(storeInfo.owner, "대표자명")}
-                          className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/40 rounded-lg shrink-0 cursor-pointer hover:shadow-sm"
+                          className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-neutral-200/60 hover:bg-neutral-200 rounded-lg shrink-0 cursor-pointer border-0 transition-colors"
                           title="복사하기"
                         >
-                          <Copy size={11} />
+                          <Copy size={12} />
                         </button>
                       </div>
 
-                      <div className="bg-white/60 p-3 rounded-xl border border-[#f2ccd7]/30 flex justify-between items-center">
+                      <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex justify-between items-center">
                         <div>
-                          <span className="block text-[9px] text-[#735965]/60 mb-0.5 font-bold">연락처</span>
-                          <strong className="text-[#2d2026] text-xs">{storeInfo.phone}</strong>
+                          <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">연락처</span>
+                          <strong className="text-[#0F172A] text-xs font-black">{storeInfo.phone}</strong>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleCopyToClipboard(storeInfo.phone, "연락처")}
-                          className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/40 rounded-lg shrink-0 cursor-pointer hover:shadow-sm"
+                          className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-neutral-200/60 hover:bg-neutral-200 rounded-lg shrink-0 cursor-pointer border-0 transition-colors"
                           title="복사하기"
                         >
-                          <Copy size={11} />
+                          <Copy size={12} />
                         </button>
                       </div>
 
-                      <div className="bg-white/60 p-3 rounded-xl border border-[#f2ccd7]/30 flex justify-between items-center">
+                      <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex justify-between items-center">
                         <div>
-                          <span className="block text-[9px] text-[#735965]/60 mb-0.5 font-bold">주문 신청일</span>
-                          <strong className="text-[#2d2026] text-xs">{selectedOrder.date}</strong>
+                          <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">주문 신청일</span>
+                          <strong className="text-[#0F172A] text-xs font-black">{selectedOrder.date}</strong>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleCopyToClipboard(selectedOrder.date, "신청일")}
-                          className="p-1.5 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7]/40 rounded-lg shrink-0 cursor-pointer hover:shadow-sm"
+                          className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-neutral-200/60 hover:bg-neutral-200 rounded-lg shrink-0 cursor-pointer border-0 transition-colors"
                           title="복사하기"
                         >
-                          <Copy size={11} />
+                          <Copy size={12} />
                         </button>
                       </div>
                     </div>
-                    <div className="pt-3.5 text-xs font-semibold text-[#735965] border-t border-[#f2ccd7]/40 bg-white/60 p-4 rounded-xl border border-[#f2ccd7]/30 flex justify-between items-center gap-4">
+                    <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex justify-between items-center gap-4">
                       <div className="flex-1">
-                        <span className="block text-[9px] text-[#735965]/60 mb-0.5 font-bold">배송지 주소</span>
-                        <strong className="text-[#2d2026] text-xs break-words leading-tight">{storeAddress}</strong>
+                        <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">배송지 주소</span>
+                        <strong className="text-[#0F172A] text-xs font-black break-words leading-tight">{storeAddress}</strong>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleCopyToClipboard(storeAddress, "배송지 주소")}
-                        className="p-2 hover:text-[#f25f8a] text-[#735965] bg-white border border-[#f2ccd7] rounded-xl shrink-0 cursor-pointer hover:shadow-md transition-all self-center"
+                        className="p-2 hover:bg-neutral-200 text-slate-600 bg-neutral-200/60 rounded-xl shrink-0 cursor-pointer transition-all border-0 self-center"
                         title="주소 복사"
                       >
-                        <Copy size={13} />
+                        <Copy size={14} />
                       </button>
                     </div>
                   </div>
                 );
               })()}
 
-              {/* Order Item List */}
-              <div className="space-y-3">
-                <h4 className="font-extrabold text-sm text-[#bf3e67] flex items-center gap-1.5">
-                  <Package size={15} />
-                  발주 신청 품목 및 정산 내역 ({selectedOrder.items.length})
-                </h4>
-                <div className="border border-[#f2ccd7]/60 rounded-2xl overflow-hidden bg-white">
+              {/* Order Item List Card (Blue Accent) */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <Package size={16} className="text-blue-500" />
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">발주 신청 품목 및 정산 내역 ({selectedOrder.items.length})</span>
+                  </div>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    품목 목록
+                  </span>
+                </div>
+
+                <div className="border border-neutral-200/90 rounded-xl overflow-hidden bg-white shadow-2xs">
                   <div className="overflow-x-auto w-full">
                     <table className="w-full text-left border-collapse text-[11px] min-w-[480px] sm:min-w-0" style={{ tableLayout: 'fixed' }}>
                       <thead>
-                        <tr className="bg-[#fff1f5] border-b border-[#f2ccd7] text-[10px] font-bold text-[#735965] uppercase">
-                          <th className="px-3 py-2.5" style={{ width: '40%' }}>품목명</th>
-                          <th className="px-2 py-2.5 text-right" style={{ width: '20%' }}>단가</th>
-                          <th className="px-2 py-2.5 text-center" style={{ width: '15%' }}>수량</th>
-                          <th className="px-3 py-2.5 text-right" style={{ width: '25%' }}>금액</th>
+                        <tr className="bg-[#f8f9fa] border-b border-neutral-200/80 text-[10px] font-extrabold text-neutral-400 uppercase">
+                          <th className="px-4 py-3" style={{ width: '40%' }}>품목명</th>
+                          <th className="px-3 py-3 text-right" style={{ width: '20%' }}>단가</th>
+                          <th className="px-3 py-3 text-center" style={{ width: '15%' }}>수량</th>
+                          <th className="px-4 py-3 text-right" style={{ width: '25%' }}>금액</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#f2ccd7]/40">
+                      <tbody className="divide-y divide-neutral-100">
                         {selectedOrder.items.map((item, idx) => (
-                          <tr key={idx} className="hover:bg-[#fff9fb]/40 font-medium">
-                            <td className="px-3 py-2.5 font-bold text-[#2d2026] leading-tight break-words text-[11px] sm:text-xs" style={{ wordBreak: 'break-word' }}>
+                          <tr key={idx} className="hover:bg-neutral-50 font-medium">
+                            <td className="px-4 py-3 font-black text-[#0F172A] leading-tight break-words text-[11px] sm:text-xs" style={{ wordBreak: 'break-word' }}>
                               {item.productName}
                             </td>
-                            <td className="px-2 py-2.5 text-right text-[#735965] text-[11px]">{item.price.toLocaleString()}</td>
-                            <td className="px-2 py-2.5 text-center font-bold text-[#2d2026] text-[11px]">{item.quantity}</td>
-                            <td className="px-3 py-2.5 text-right font-bold text-[#f25f8a] text-[11px]">{(item.price * item.quantity).toLocaleString()}</td>
+                            <td className="px-3 py-3 text-right text-slate-500 text-[11px] font-bold">{item.price.toLocaleString()}</td>
+                            <td className="px-3 py-3 text-center font-black text-[#0F172A] text-[11px]">{item.quantity}</td>
+                            <td className="px-4 py-3 text-right font-black text-[#0F172A] text-[11px]">{(item.price * item.quantity).toLocaleString()} 원</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 </div>
+
+                {/* Status control and Total price summary */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                  <div className="space-y-1.5 bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80">
+                    <label className="text-xs font-black text-[#0F172A] block">상태값 변경 선택</label>
+                    <select
+                      value={selectedOrder.status}
+                      onChange={(e) => updateOrderStatus(selectedOrder.id, e.target.value)}
+                      className="w-full bg-[#e2e8f0] border-0 rounded-xl px-4 py-2.5 text-xs text-[#0F172A] font-bold focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer outline-none transition-all"
+                    >
+                      {deliveryStatuses.map((st) => (
+                        <option key={st} value={st}>{st}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex flex-col justify-center items-end text-right">
+                    <span className="text-[10px] text-neutral-400 font-bold block mb-0.5">결제 수단 정보: <strong className="text-[#0F172A] font-black">{selectedOrder.payMethod === "card" || selectedOrder.payMethod === "CARD" ? "카드결제" : "현금 입금 진행"}</strong></span>
+                    <span className="text-[10px] text-neutral-400 font-bold block mb-0.5">총 결제 합계액 (부가세 포함)</span>
+                    <strong className="text-lg font-black text-amber-500">
+                      {selectedOrder.totalPrice.toLocaleString()} 원
+                    </strong>
+                  </div>
+                </div>
               </div>
 
-              {/* Status control and Total price summary */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-[#f2ccd7]/60">
-                <div className="space-y-2 bg-[#fff1f5]/50 border border-[#f2ccd7]/60 p-4 rounded-xl">
-                  <label className="text-xs font-bold text-[#bf3e67] block">상태값 변경 선택</label>
-                  <select
-                     value={selectedOrder.status}
-                     onChange={(e) => updateOrderStatus(selectedOrder.id, e.target.value)}
-                     className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3 py-2.5 text-xs text-[#2d2026] font-bold focus:outline-none focus:border-[#f25f8a] cursor-pointer"
-                  >
-                    {deliveryStatuses.map((st) => (
-                      <option key={st} value={st}>{st}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="bg-[#fff1f5]/80 border border-[#f2ccd7]/60 p-4 rounded-xl flex flex-col justify-center items-end text-right">
-                  <span className="text-[10px] text-[#735965] font-bold block mb-1">결제 수단 정보</span>
-                  <span className="text-xs text-[#bf3e67] font-black block mb-2">
-                    {selectedOrder.payMethod === "card" || selectedOrder.payMethod === "CARD" ? "카드결제" : "현금 입금 진행"}
+              {/* Delivery & Tracking Info Card (Emerald Accent) */}
+              <form onSubmit={handleUpdateOrderTracking} className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <Truck size={16} className="text-emerald-500" />
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">배송 물류 송장 정보 (다중 송장 지원)</span>
+                  </div>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    송장 관리
                   </span>
-                  <span className="text-[10px] text-[#735965]/80 font-bold block mb-1">총 결제 합계액 (부가세 포함)</span>
-                  <strong className="text-xl font-black text-[#bf3e67]">
-                    {selectedOrder.totalPrice.toLocaleString()} 원
-                  </strong>
                 </div>
-              </div>
-
-              {/* 배송 및 송장 정보 관리 (신설) */}
-              <form onSubmit={handleUpdateOrderTracking} className="space-y-4 bg-[#fff1f5]/50 border border-[#f2ccd7]/60 p-5 rounded-2xl shadow-sm">
-                <h4 className="font-extrabold text-xs text-[#bf3e67] flex items-center gap-1.5 border-b border-[#f2ccd7]/40 pb-2">
-                  🚚 배송 물류 송장 정보 등록/수정 (다중 송장 지원)
-                </h4>
                 
-                {/* 등록된 송장 리스트 */}
+                {/* Registered Tracking List */}
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-[#735965] block">등록된 송장 목록 ({modalTrackingList.length})</label>
+                  <label className="text-[10px] font-bold text-neutral-400 block">등록된 송장 목록 ({modalTrackingList.length})</label>
                   {modalTrackingList.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {modalTrackingList.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between bg-white border border-[#f2ccd7]/40 px-3 py-2 rounded-xl text-xs font-semibold text-[#2d2026] shadow-sm hover:border-[#f25f8a] transition-all">
+                        <div key={idx} className="flex items-center justify-between bg-[#f8f9fa] border border-neutral-200/80 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#0F172A]">
                           <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-lg bg-[#fff1f5] text-[9px] font-black text-[#bf3e67] border border-[#f2ccd7]/60">
+                            <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-[10px] font-black text-amber-900">
                               {item.courier}
                             </span>
-                            <span className="font-mono text-[#bf3e67] font-bold text-xs">{item.trackingNo}</span>
+                            <span className="font-mono text-[#0F172A] font-black text-xs">{item.trackingNo}</span>
                           </div>
                           <button
                             type="button"
                             onClick={() => {
                               setModalTrackingList(modalTrackingList.filter((_, i) => i !== idx));
                             }}
-                            className="p-1 hover:bg-[#fff1f5] rounded-full text-red-400 hover:text-red-600 transition-colors cursor-pointer"
+                            className="p-1 hover:bg-neutral-200 rounded-full text-slate-400 hover:text-rose-600 transition-colors cursor-pointer border-0"
                             title="삭제"
                           >
-                            <Trash2 size={12} />
+                            <Trash2 size={13} />
                           </button>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-4 bg-white border border-dashed border-[#f2ccd7]/60 rounded-xl text-[11px] font-bold text-[#735965]/50 shadow-inner">
+                    <div className="text-center py-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-xl text-[11px] font-bold text-neutral-400">
                       등록된 송장 번호가 없습니다. 아래에서 송장을 등록해 주세요.
                     </div>
                   )}
                 </div>
 
-                {/* 송장 추가 입력 폼 */}
-                <div className="bg-white/80 border border-[#f2ccd7]/30 p-3 rounded-xl space-y-3">
+                {/* Add Tracking Form */}
+                <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                     <div className="sm:col-span-4 space-y-1">
-                      <label className="text-[10px] font-bold text-[#735965] block">택배사 선택</label>
+                      <label className="text-[10px] font-extrabold text-[#0F172A] block">택배사 선택</label>
                       <select
                         value={selectedCourier}
                         onChange={(e) => setSelectedCourier(e.target.value)}
-                        className="w-full bg-white border border-[#f2ccd7] rounded-lg px-2.5 py-2 text-xs text-[#2d2026] font-bold focus:outline-none cursor-pointer"
+                        className="w-full bg-[#e2e8f0] border-0 rounded-xl px-3 py-2.5 text-xs text-[#0F172A] font-bold focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 cursor-pointer outline-none transition-all"
                       >
                         <option value="CJ대한통운">CJ대한통운</option>
                         <option value="한진택배">한진택배</option>
@@ -10616,13 +11566,13 @@ export default function AdminPage() {
                     </div>
 
                     <div className="sm:col-span-6 space-y-1">
-                      <label className="text-[10px] font-bold text-[#735965] block">송장번호 입력</label>
+                      <label className="text-[10px] font-extrabold text-[#0F172A] block">송장번호 입력</label>
                       <input
                         type="text"
                         placeholder="하이픈(-) 없이 입력"
                         value={inputTrackingNo}
                         onChange={(e) => setInputTrackingNo(e.target.value)}
-                        className="w-full bg-white border border-[#f2ccd7] rounded-lg px-2.5 py-2 text-xs text-[#2d2026] focus:outline-none font-medium"
+                        className="w-full bg-[#e2e8f0] border-0 rounded-xl px-3 py-2.5 text-xs text-[#0F172A] font-bold placeholder-neutral-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                       />
                     </div>
 
@@ -10630,7 +11580,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={handleToAddTracking}
-                        className="w-full py-2 bg-[#fff1f5] hover:bg-[#ffd3df] text-[#bf3e67] border border-[#f2ccd7] text-xs font-black rounded-lg transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1"
+                        className="w-full py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black rounded-xl transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1 border-0"
                       >
                         <Plus size={14} />
                         추가
@@ -10639,40 +11589,31 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-[#f2ccd7]/30">
-                  <style dangerouslySetInnerHTML={{ __html: `
-                    #admin-portal #admin-submit-tracking-btn,
-                    #admin-portal #admin-submit-tracking-btn *,
-                    #admin-portal .admin-submit-tracking-btn,
-                    #admin-portal .admin-submit-tracking-btn * {
-                      color: #ffffff !important;
-                      fill: #ffffff !important;
-                    }
-                  ` }} />
+                <div className="pt-2">
                   <button
-                    id="admin-submit-tracking-btn"
                     type="submit"
-                    className="admin-submit-tracking-btn w-full py-3 bg-[#bf3e67] hover:bg-[#a02c52] text-white !text-white text-xs font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
-                    style={{ color: '#ffffff' }}
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 active:scale-95"
                   >
-                    <span className="text-white !text-white flex items-center justify-center gap-1.5" style={{ color: '#ffffff' }}>
-                      <Truck size={14} className="text-white !text-white" style={{ color: '#ffffff' }} />
-                      송장 등록 및 배송중 변경
-                    </span>
+                    <Truck size={15} />
+                    송장 등록 및 배송중 상태 변경
                   </button>
                 </div>
               </form>
 
-            </div>
-
-            {/* Footer */}
-            <div className="p-5 bg-neutral-50 text-right border-t border-[#f2ccd7]/60">
-              <button 
-                onClick={() => setShowOrderModal(false)}
-                className="px-6 py-2.5 rounded-xl bg-white border border-[#f2ccd7] hover:bg-[#fff9fb] text-xs font-bold text-[#735965] transition-colors"
-              >
-                닫기
-              </button>
+              {/* Stage Flow Footer Bar */}
+              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-mono font-extrabold text-neutral-400 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>ORDER SYSTEM ACTIVE</span>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setShowOrderModal(false)}
+                  className="px-6 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
+                >
+                  닫기
+                </button>
+              </div>
             </div>
           </div>
         </div>
