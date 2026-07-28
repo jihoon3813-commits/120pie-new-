@@ -3086,50 +3086,50 @@ export default function PortalPage() {
                   </div>
 
                   {/* Module 2: egg120 */}
-                  <div className="bg-[#F8FAFC] hover:bg-amber-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-amber-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-slate-100 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
                     <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                       <img
                         src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158865/Group_5_1_cdwr4y.png"
                         alt="egg120"
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain grayscale-[40%]"
                       />
                     </div>
                     <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-[#0F172A] block">egg120</strong>
-                      <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
-                        계란빵 가동중
+                      <strong className="text-xs font-black text-slate-500 block">egg120</strong>
+                      <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                        가맹 도입 대기
                       </span>
                     </div>
                   </div>
 
                   {/* Module 3: 츄러스120 */}
-                  <div className="bg-[#F8FAFC] hover:bg-amber-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-amber-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-slate-100 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
                     <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                       <img
                         src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_7_iowfzq.png"
                         alt="츄러스120"
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain grayscale-[40%]"
                       />
                     </div>
                     <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-[#0F172A] block">츄러스120</strong>
-                      <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
-                        스페인 츄러스 가동중
+                      <strong className="text-xs font-black text-slate-500 block">츄러스120</strong>
+                      <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                        가맹 도입 대기
                       </span>
                     </div>
                   </div>
 
                   {/* Module 4: 떡볶이120 */}
-                  <div className="bg-[#F8FAFC] hover:bg-rose-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-rose-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
+                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-slate-100 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
                     <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                       <img
                         src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_6_io2ejc.png"
                         alt="떡볶이120"
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain grayscale-[40%]"
                       />
                     </div>
                     <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-[#0F172A] block">떡볶이120</strong>
+                      <strong className="text-xs font-black text-slate-500 block">떡볶이120</strong>
                       <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
                         가맹 도입 대기
                       </span>
@@ -3137,35 +3137,35 @@ export default function PortalPage() {
                   </div>
 
                   {/* Module 5: 핫도그120 */}
-                  <div className="bg-[#F8FAFC] hover:bg-emerald-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-emerald-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-slate-100 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
                     <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                       <img
                         src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_8_d8kfzr.png"
                         alt="핫도그120"
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain grayscale-[40%]"
                       />
                     </div>
                     <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-[#0F172A] block">핫도그120</strong>
-                      <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
-                        수제 핫도그 가동중
+                      <strong className="text-xs font-black text-slate-500 block">핫도그120</strong>
+                      <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                        가맹 도입 대기
                       </span>
                     </div>
                   </div>
 
                   {/* Module 6: 120coffee */}
-                  <div className="bg-[#F8FAFC] hover:bg-emerald-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-emerald-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-slate-100 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer opacity-50">
                     <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                       <img
                         src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_9_iskk3b.png"
                         alt="120coffee"
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain grayscale-[40%]"
                       />
                     </div>
                     <div className="space-y-1 w-full">
-                      <strong className="text-xs font-black text-[#0F172A] block">120coffee</strong>
-                      <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
-                        가성비 음료 가동중
+                      <strong className="text-xs font-black text-slate-500 block">120coffee</strong>
+                      <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded block w-full truncate">
+                        가맹 도입 대기
                       </span>
                     </div>
                   </div>
