@@ -4294,28 +4294,6 @@ export default function PortalPage() {
         </main>
       </div>
 
-      {/* MOBILE BOTTOM NAVIGATION BAR */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#f2ccd7] grid grid-cols-5 p-1 shadow-[0_-5px_25px_rgba(0,0,0,0.12)]">
-        {[
-          { key: "dashboard", label: "홈", icon: LayoutDashboard },
-          { key: "order", label: "발주", icon: ShoppingBag },
-          { key: "history", label: "내역", icon: History },
-          { key: "notice", label: "공지", icon: Megaphone },
-          { key: "inquiry", label: "AS문의", icon: MessageSquare }
-        ].map((item) => (
-          <button
-            key={item.key}
-            onClick={() => setCurrentMenu(item.key)}
-            className={`flex flex-col items-center justify-center py-2.5 transition-colors ${
-              currentMenu === item.key ? "text-[#f25f8a] font-extrabold" : "text-[#735965] font-bold"
-            }`}
-          >
-            <item.icon size={18} />
-            <span className="text-[9px] mt-1">{item.label}</span>
-          </button>
-        ))}
-      </nav>
-
       {/* MODALS */}
       
       {/* 1. Notice Reading Modal (Stage Flow Tech Card Style) */}
@@ -5911,7 +5889,7 @@ export default function PortalPage() {
                         <CheckCircle2 size={16} className="text-[#FED422]" /> 발주 품목 확인
                       </span>
                       
-                      <div className="space-y-3 max-h-[240px] overflow-y-auto pr-1">
+                      <div className="space-y-3 pr-1">
                         {groupedCartItems.map(([typeKey, group]) => (
                           <div key={typeKey} className="space-y-2">
                             <div className="flex justify-between items-center bg-[#F8FAFC] px-3 py-1.5 rounded-xl border-0 select-none">
@@ -6306,7 +6284,7 @@ export default function PortalPage() {
           INTERACTIVE MULTI FLOATING BUTTONS
          ========================================== */}
       {floatingSettings?.isActive && (
-        <div className="fixed right-6 bottom-6 z-[90] flex flex-col items-end gap-3 font-bold text-xs select-none text-white animate-fadeIn">
+        <div className="hidden lg:flex fixed right-6 bottom-6 z-[90] flex-col items-end gap-3 font-bold text-xs select-none text-white animate-fadeIn">
           {/* Expanded Menu Actions Tray */}
           {floatingOpen && (
             <div className="flex flex-col items-end gap-2.5 mb-1.5 animate-slideUp">
@@ -6409,7 +6387,7 @@ export default function PortalPage() {
 
       {/* MOBILE BOTTOM FLOATING CART BAR (Always visible above bottom navigation when items are added in order menu) */}
       {cart.length > 0 && currentMenu === "order" && (
-        <div className="lg:hidden fixed bottom-[57px] inset-x-0 z-40 bg-white border-t border-[#f2ccd7] px-4 py-3 shadow-[0_-4px_20px_rgba(242,204,215,0.25)] flex items-center justify-between animate-slideUp select-none">
+        <div className="lg:hidden fixed bottom-4 inset-x-4 z-40 bg-white border border-[#f2ccd7] px-4 py-3 rounded-2xl shadow-[0_8px_25px_rgba(0,0,0,0.15)] flex items-center justify-between animate-slideUp select-none">
           <div className="flex flex-col text-left">
             <span className="text-[9px] font-black text-[#735965]">총 {cart.reduce((sum, item) => sum + item.quantity, 0)}개 품목 담김</span>
             <span className="text-sm font-black text-[#bf3e67]">{cartTotal.toLocaleString()}원</span>
@@ -6468,7 +6446,7 @@ export default function PortalPage() {
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 overflow-y-auto space-y-6 flex-1 max-h-[50vh]">
+            <div className="p-6 overflow-y-auto space-y-6 flex-1 max-h-[75vh]">
               {cart.length === 0 ? (
                 <div className="py-16 text-center space-y-3">
                   <ShoppingBag size={40} className="text-slate-300 mx-auto" />
