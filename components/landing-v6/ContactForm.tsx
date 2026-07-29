@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { X } from "lucide-react";
+import { useModalBackHandler } from "@/components/MobileBackManager";
 
 const storeTypes = ["기존 카페 운영 중", "저가커피 매장 운영 중", "디저트 카페 운영 중", "배달형 매장 운영 중", "예비 창업자", "기타"];
 const goals = ["객단가 상승", "디저트 매출 강화", "샵인샵 도입", "창업비용 확인", "박람회 방문", "배달 메뉴 강화"];
@@ -32,6 +33,10 @@ export default function ContactForm({
   isOpen?: boolean;
   onClose?: () => void;
 }) {
+  useModalBackHandler("contact-form-modal", isModal && isOpen, () => {
+    if (onClose) onClose();
+  });
+
   const sendSmsAction = useAction(api.aligo.sendSms);
   const addInquiry = useMutation(api.inquiries.add);
   const [form, setForm] = useState(initialForm);

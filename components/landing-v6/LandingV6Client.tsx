@@ -28,6 +28,7 @@ import QuickInquiryBar from "./QuickInquiryBar";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 import MobileBottomInquiryBar from "@/components/MobileBottomInquiryBar";
+import { useModalBackHandler } from "@/components/MobileBackManager";
 
 import CursorFollower from "@/components/CursorFollower";
 
@@ -36,6 +37,8 @@ export default function LandingV6Client() {
 
   const openContactModal = () => setIsContactModalOpen(true);
   const closeContactModal = () => setIsContactModalOpen(false);
+
+  useModalBackHandler("landing-v6-contact-modal", isContactModalOpen, closeContactModal);
 
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950 font-sans antialiased selection:bg-amber-500 selection:text-neutral-950 transition-colors duration-300">

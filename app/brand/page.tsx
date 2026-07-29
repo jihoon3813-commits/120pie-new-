@@ -238,9 +238,14 @@ const VIRAL_CARDS = [
   }
 ];
 
+import BrandHeader from "@/components/BrandHeader";
+import { useModalBackHandler } from "@/components/MobileBackManager";
+
 export default function BrandHome() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isConsulting, setIsConsulting] = useState(false);
+
+  useModalBackHandler("brand-consulting-modal", isConsulting, () => setIsConsulting(false));
   const [activeCategory, setActiveCategory] = useState("120겹파이");
   const [searchRegion, setSearchRegion] = useState("전체");
   const [searchKeyword, setSearchKeyword] = useState("");

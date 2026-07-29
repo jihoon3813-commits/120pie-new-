@@ -57,6 +57,7 @@ export const metadata = {
 
 import ConvexClientProvider from "./ConvexClientProvider";
 import TrackPageView from "@/app/components/TrackPageView";
+import MobileBackManager from "@/components/MobileBackManager";
 import Script from "next/script";
 
 export default function RootLayout({
@@ -190,6 +191,7 @@ export default function RootLayout({
             strategy="afterInteractive"
           />
           <TrackPageView />
+          <MobileBackManager />
           {children}
         </ConvexClientProvider>
       </body>

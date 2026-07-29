@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useModalBackHandler } from "@/components/MobileBackManager";
 
 interface HeaderProps {
   logoUrl?: string;
@@ -16,6 +17,8 @@ export default function Header({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+
+  useModalBackHandler("franchise-mobile-menu", isMobileMenuOpen, () => setIsMobileMenuOpen(false));
 
   useEffect(() => {
     const handleScroll = () => {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, X, ChevronRight } from "lucide-react";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 import MobileBottomInquiryBar from "@/components/MobileBottomInquiryBar";
+import { useModalBackHandler } from "@/components/MobileBackManager";
 
 interface BrandHeaderProps {
   onConsultClick?: () => void;
@@ -12,6 +13,8 @@ interface BrandHeaderProps {
 
 export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useModalBackHandler("brand-mobile-menu", mobileMenuOpen, () => setMobileMenuOpen(false));
 
   return (
     <>

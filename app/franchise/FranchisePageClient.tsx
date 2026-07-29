@@ -41,6 +41,7 @@ import Footer from "@/app/components/Footer";
 import MobileBottomInquiryBar from "@/components/MobileBottomInquiryBar";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
+import { useModalBackHandler } from "@/components/MobileBackManager";
 import { api } from "@/convex/_generated/api";
 import { triggerConsultationSms } from "@/app/utils/sms";
 
@@ -94,6 +95,8 @@ const SUCCESS_CASES: SuccessCase[] = [
 export default function FranchisePageClient() {
   const [theme, setTheme] = useState<"pink" | "yellow">("yellow");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  useModalBackHandler("franchise-page-mobile-nav", mobileNavOpen, () => setMobileNavOpen(false));
   const [selectedPlanTab, setSelectedPlanTab] = useState<"8py" | "10py">("8py");
   const [activeMenuTab, setActiveMenuTab] = useState<"pie" | "egg" | "churros" | "side" | "drink" | "bakery" | "croffle">("pie");
   
