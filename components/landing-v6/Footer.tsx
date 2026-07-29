@@ -129,7 +129,7 @@ export default function Footer({
               환불정책
             </button>
             <span className="text-neutral-800">|</span>
-            <Link href="/admin" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-400">
+            <Link href="/admin" className="hover:text-neutral-400">
               본사어드민
             </Link>
           </div>
