@@ -22,6 +22,9 @@ export function registerModalBackHandler(id: string, onClose: CloseCallback) {
     modalStack[existingIdx] = { id, onClose };
   } else {
     modalStack.push({ id, onClose });
+    try {
+      window.history.pushState({ modalId: id }, "", window.location.href);
+    } catch (e) {}
   }
 }
 
@@ -55,24 +58,19 @@ export default function MobileBackManager() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Do NOT push trap state on the Gate Page (`/`) itself so user can navigate back out of site normally from gate
+    // Do NOT push trap state on Gate Page (`/`)
     if (pathname === "/") return;
 
-    // Trap history on current page entry
     const trapHistory = () => {
       try {
         window.history.pushState({ isBackTrap: true, path: pathname }, "", window.location.href);
       } catch (e) {}
     };
 
-    // Push initial trap state whenever pathname changes!
     trapHistory();
 
-    const handlePopState = () => {
-      // Re-push trap state IMMEDIATELY to prevent browser from navigating away or flickering
-      trapHistory();
-
-      // 1. If any modal/popup is open in modalStack, close top modal ONLY
+    const handlePopState = (e: PopStateEvent) => {
+      // 1. If any modal/sub-menu is registered in modalStack, close top item ONLY
       if (modalStack.length > 0) {
         const topModal = modalStack.pop();
         if (topModal) {
@@ -81,7 +79,10 @@ export default function MobileBackManager() {
         return;
       }
 
-      // 2. Determine current location name for custom exit modal
+      // 2. Re-push trap state to hold history on current page
+      trapHistory();
+
+      // 3. Determine location name
       const currentPath = window.location.pathname;
       if (currentPath.startsWith("/brand")) {
         setPageLocationName("120PIE 브랜드 홈페이지");
@@ -91,7 +92,7 @@ export default function MobileBackManager() {
         setPageLocationName("120PIE 창업 홈페이지");
       }
 
-      // 3. Open custom Exit/Navigation Choice Modal
+      // 4. Open Exit Choice Modal
       setShowExitChoiceModal(true);
     };
 
