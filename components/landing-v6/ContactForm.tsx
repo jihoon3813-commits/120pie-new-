@@ -435,9 +435,28 @@ interface InputProps {
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
+  type?: string;
+  inputMode?: "text" | "search" | "email" | "tel" | "url" | "numeric" | "decimal";
+  pattern?: string;
 }
 
-function FormInput({ label, required = false, value, onChange, placeholder = "" }: InputProps) {
+function FormInput({
+  label,
+  required = false,
+  value,
+  onChange,
+  placeholder = "",
+  type,
+  inputMode,
+  pattern,
+}: InputProps) {
+  const isPhone = label.includes("연락처") || label.includes("전화");
+  const isNumeric = label.includes("평수") || label.includes("금액") || label.includes("인원");
+
+  const finalType = type || (isPhone ? "tel" : "text");
+  const finalInputMode = inputMode || (isPhone ? "tel" : isNumeric ? "numeric" : undefined);
+  const finalPattern = pattern || (isPhone || isNumeric ? "[0-9]*" : undefined);
+
   return (
     <div className="space-y-1.5">
       <label className="text-xs font-bold text-neutral-400 flex items-center gap-0.5">
@@ -445,7 +464,9 @@ function FormInput({ label, required = false, value, onChange, placeholder = "" 
         {required && <span className="text-rose-500">*</span>}
       </label>
       <input
-        type="text"
+        type={finalType}
+        inputMode={finalInputMode}
+        pattern={finalPattern}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}

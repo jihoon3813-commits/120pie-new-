@@ -2295,6 +2295,8 @@ export default function FranchisePageClient() {
                     <label className={`text-xs font-extrabold ${textDesc} block`}>연락처</label>
                     <input
                       type="tel"
+                      inputMode="tel"
+                      pattern="[0-9]*"
                       name="phone"
                       maxLength={13}
                       placeholder="연락처를 입력하세요"

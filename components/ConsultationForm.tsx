@@ -51,6 +51,7 @@ export default function ConsultationForm({
   const [error, setError] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showMoreFields, setShowMoreFields] = useState(false);
 
   const formatPhoneNumber = (value: string) => {
     const raw = value.replace(/[^\d]/g, "");
@@ -72,13 +73,14 @@ export default function ConsultationForm({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const required = [form.name, form.phone, form.region, form.storeStatus];
+    // Simplified required fields: Name + Phone
+    const required = [form.name, form.phone];
     if (required.some((value) => !value.trim())) {
-      setError("필수 입력 항목(* marked)을 모두 입력해주세요.");
+      setError("성함과 연락처(* marked)를 입력해 주세요.");
       return;
     }
     if (!/^[0-9+\-\s]{8,15}$/.test(form.phone)) {
-      setError("연락처 형식을 확인해주세요. (예: 010-0000-0000)");
+      setError("연락처 형식을 확인해 주세요. (예: 010-0000-0000)");
       return;
     }
 
@@ -101,9 +103,9 @@ export default function ConsultationForm({
       await addInquiry({
         name: form.name.trim(),
         phone: form.phone.trim(),
-        storeType: form.storeStatus,
+        storeType: form.storeStatus || "상담 시 확인",
         existingStoreName: form.storeName.trim() || "",
-        message: formattedMessage || "상담 신청",
+        message: formattedMessage || "모바일 빠른 간편 상담 신청",
         regDate: new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" }),
       });
     } catch (dbErr) {
@@ -118,98 +120,72 @@ export default function ConsultationForm({
           const smsSettings = JSON.parse(stored);
           const eventConfig = smsSettings.consultation;
           if (eventConfig && smsSettings.aligoKey && smsSettings.aligoUserId) {
-            // 고객용
-            if (eventConfig.customer?.isActive) {
-              let msg = eventConfig.customer.template
-                .replace(/{name}/g, form.name)
-                .replace(/{phone}/g, form.phone)
-                .replace(/{storeType}/g, form.storeStatus);
+            let msg = eventConfig.message || "창업 상담이 성공적으로 신청되었습니다.";
+            msg = msg
+              .replace(/{name}/g, form.name)
+              .replace(/{phone}/g, form.phone)
+              .replace(/{region}/g, form.region || "미지정")
+              .replace(/{storeStatus}/g, form.storeStatus || "미지정");
 
-              sendSmsAction({
-                key: smsSettings.aligoKey,
-                userId: smsSettings.aligoUserId,
-                sender: eventConfig.customer.sender.replace(/[^0-9]/g, ""),
-                receiver: form.phone.replace(/[^0-9]/g, ""),
-                msg,
-                isTest: smsSettings.aligoTestMode !== false,
-              }).catch(console.error);
-            }
+            sendSmsAction({
+              key: smsSettings.aligoKey,
+              userId: smsSettings.aligoUserId,
+              sender: (smsSettings.senderPhone || "18995685").replace(/[^0-9]/g, ""),
+              receiver: form.phone.replace(/[^0-9]/g, ""),
+              msg,
+              isTest: smsSettings.aligoTestMode !== false,
+            }).catch(console.error);
 
-            // 관리자용
-            if (eventConfig.admin?.isActive) {
-              const adminReceivers = eventConfig.admin.receivers || [];
-              if (adminReceivers.length > 0) {
-                let msg = eventConfig.admin.template
-                  .replace(/{name}/g, form.name)
-                  .replace(/{phone}/g, form.phone)
-                  .replace(/{storeType}/g, form.storeStatus);
-
-                sendSmsAction({
-                  key: smsSettings.aligoKey,
-                  userId: smsSettings.aligoUserId,
-                  sender: eventConfig.admin.sender.replace(/[^0-9]/g, ""),
-                  receiver: adminReceivers.map((n: string) => n.replace(/[^0-9]/g, "")).join(","),
-                  msg,
-                  isTest: smsSettings.aligoTestMode !== false,
-                }).catch(console.error);
+            if (smsSettings.adminPhones && Array.isArray(smsSettings.adminPhones)) {
+              for (const adminPhone of smsSettings.adminPhones) {
+                if (adminPhone) {
+                  sendSmsAction({
+                    key: smsSettings.aligoKey,
+                    userId: smsSettings.aligoUserId,
+                    sender: (smsSettings.senderPhone || "18995685").replace(/[^0-9]/g, ""),
+                    receiver: adminPhone.replace(/[^0-9]/g, ""),
+                    msg: `[120PIE 상담신청]\n이름: ${form.name}\n연락처: ${form.phone}\n지역: ${form.region || "미지정"}\n상태: ${form.storeStatus || "미지정"}`,
+                    isTest: smsSettings.aligoTestMode !== false,
+                  }).catch(console.error);
+                }
               }
             }
           }
-        } catch (e) {
-          console.error("SMS error:", e);
+        } catch (smsErr) {
+          console.error("Failed to process SMS trigger:", smsErr);
         }
       }
     }
 
-    // 3. Analytics Tracking
-    try {
-      fetch("/api/track", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "inquiry_submit",
-          path: typeof window !== "undefined" ? window.location.pathname : "/brand",
-          referrer: typeof document !== "undefined" ? document.referrer || "direct" : "direct",
-        }),
-      }).catch(console.error);
-    } catch (e) {
-      // ignore tracking errors
-    }
-
     setIsSubmitting(false);
     setIsSubmitted(true);
-    setForm(initialForm);
   };
 
   return (
-    <div className="w-full text-left font-sans">
-      {/* SUCCESS MODAL POPUP */}
+    <div className="w-full">
+      {/* SUCCESS MODAL */}
       {isSubmitted && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-          <div className="bg-neutral-900 border border-[#FBC400]/40 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-[#FBC400] to-amber-500" />
-            
-            <div className="w-16 h-16 mx-auto mb-4 bg-[#FBC400]/10 text-[#FBC400] rounded-full flex items-center justify-center border border-[#FBC400]/30 shadow-[0_0_20px_rgba(251,196,0,0.2)]">
-              <CheckCircle2 className="w-8 h-8 text-[#FBC400]" />
-            </div>
-
-            <h3 className="text-xl font-black text-white mb-2 tracking-tight">
-              상담 신청 완료
-            </h3>
-
-            <p className="text-sm text-neutral-300 leading-relaxed mb-6 font-medium">
-              상담 신청이 정상 접수되었습니다.
-              <br />
-              담당 컨설턴트가 빠르게 연락 드리겠습니다.
-            </p>
-
+        <div className="text-center py-8 space-y-4 animate-fadeIn">
+          <div className="w-16 h-16 bg-[#FBC400]/20 text-[#FBC400] rounded-full flex items-center justify-center mx-auto mb-2 border border-[#FBC400]/30 shadow-lg">
+            <CheckCircle2 className="w-10 h-10" />
+          </div>
+          <h3 className="text-2xl font-black text-white">
+            상담 신청이 완료되었습니다!
+          </h3>
+          <p className="text-neutral-300 text-sm leading-relaxed max-w-md mx-auto font-medium">
+            작성해 주신 연락처(<span className="text-[#FBC400] font-bold">{form.phone}</span>)로
+            <br />
+            1:1 전문 컨설턴트가 빠르게 안내해 드리겠습니다.
+          </p>
+          <div className="pt-4 max-w-xs mx-auto">
             <button
               type="button"
               onClick={() => {
                 setIsSubmitted(false);
+                setForm(initialForm);
                 if (onSuccessClose) onSuccessClose();
               }}
-              className="w-full py-3.5 bg-[#FBC400] hover:bg-amber-400 active:scale-[0.98] text-neutral-950 text-base font-extrabold rounded-xl transition-all shadow-lg shadow-[#FBC400]/20 cursor-pointer"
+              className="w-full py-3.5 bg-[#FBC400] hover:bg-amber-400 active:scale-[0.98] text-neutral-950 text-base font-extrabold rounded-xl transition-all shadow-lg shadow-[#FBC400]/20 cursor-pointer border-0"
             >
               확인
             </button>
@@ -218,125 +194,148 @@ export default function ConsultationForm({
       )}
 
       {/* FORM BODY */}
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Row 1: 이름 / 연락처 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormInput
-            label="이름"
-            required
-            value={form.name}
-            onChange={(val) => update("name", val)}
-            placeholder="홍길동"
-          />
-          <FormInput
-            label="연락처"
-            required
-            value={form.phone}
-            onChange={(val) => update("phone", val)}
-            placeholder="010-0000-0000"
-          />
-        </div>
-
-        {/* Row 2: 희망 지역 / 매장 운영 상태 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormInput
-            label="희망 창업 지역"
-            required
-            value={form.region}
-            onChange={(val) => update("region", val)}
-            placeholder="예: 서울 강남구 / 경기 성남시"
-          />
-          <FormSelect
-            label="매장 운영 상태"
-            required
-            value={form.storeStatus}
-            options={storeTypes}
-            onChange={(val) => update("storeStatus", val)}
-          />
-        </div>
-
-        {/* Row 3: 기존 매장명 / 매장 평수 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormInput
-            label="기존 매장명 (선택)"
-            value={form.storeName}
-            onChange={(val) => update("storeName", val)}
-            placeholder="예: 120카페"
-          />
-          <FormInput
-            label="매장 평수 (선택)"
-            value={form.storeSize}
-            onChange={(val) => update("storeSize", val)}
-            placeholder="예: 15평"
-          />
-        </div>
-
-        {/* Row 4: 도입 관심 목적 / 관심 메뉴 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormSelect
-            label="도입 관심 목적 (선택)"
-            value={form.goal}
-            options={goals}
-            onChange={(val) => update("goal", val)}
-          />
-          <FormSelect
-            label="관심 메뉴 (선택)"
-            value={form.interestedMenu}
-            options={menus}
-            onChange={(val) => update("interestedMenu", val)}
-          />
-        </div>
-
-        {/* Row 5: 상담 희망 시간 */}
-        <FormInput
-          label="상담 희망 시간 (선택)"
-          value={form.preferredTime}
-          onChange={(val) => update("preferredTime", val)}
-          placeholder="예: 평일 오후 2시~5시 / 주말 상시"
-        />
-
-        {/* Textarea: 문의 내용 */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold text-neutral-300 flex items-center gap-1">
-            추가 문의 사항 (선택)
-          </label>
-          <textarea
-            value={form.message}
-            onChange={(e) => update("message", e.target.value)}
-            rows={3}
-            className="w-full bg-neutral-900/90 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#FBC400] focus:ring-1 focus:ring-[#FBC400] transition-all resize-none"
-            placeholder="궁금하신 내용이나 추가 전달사항을 자유롭게 입력해주세요."
-          />
-        </div>
-
-        {/* Error Alert */}
-        {error && (
-          <div className="flex items-center gap-2 p-3.5 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold rounded-xl">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
-            <span>{error}</span>
+      {!isSubmitted && (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Row 1: 필수 이름 & 필수 연락처 (숫자패드 자동 연동) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormInput
+              label="이름"
+              required
+              value={form.name}
+              onChange={(val) => update("name", val)}
+              placeholder="홍길동"
+            />
+            <FormInput
+              label="연락처"
+              required
+              type="tel"
+              inputMode="tel"
+              pattern="[0-9]*"
+              value={form.phone}
+              onChange={(val) => update("phone", val)}
+              placeholder="010-0000-0000"
+            />
           </div>
-        )}
 
-        {/* Submit Button & Call Hotline */}
-        <div className="pt-2 space-y-3">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-4 bg-[#FBC400] hover:bg-amber-400 active:scale-[0.99] text-neutral-950 font-black text-base sm:text-lg rounded-xl transition-all shadow-xl shadow-[#FBC400]/10 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            {isSubmitting ? (
-              <span>접수 중...</span>
-            ) : (
-              <span>무료 창업 컨설팅 신청하기 →</span>
-            )}
-          </button>
-
-          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-neutral-400 pt-1">
-            <PhoneCall className="w-3.5 h-3.5 text-[#FBC400]" />
-            <span>빠른 전화 상담: <strong className="text-white font-bold">1566-3594</strong></span>
+          {/* Row 2: 희망 지역 & 매장 운영 상태 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormInput
+              label="희망 창업 지역 (선택)"
+              value={form.region}
+              onChange={(val) => update("region", val)}
+              placeholder="예: 서울 강남구 / 경기 성남시"
+            />
+            <FormSelect
+              label="매장 운영 상태 (선택)"
+              value={form.storeStatus}
+              options={storeTypes}
+              onChange={(val) => update("storeStatus", val)}
+            />
           </div>
-        </div>
-      </form>
+
+          {/* Collapsible Toggle for Extra Detailed Fields */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() => setShowMoreFields(!showMoreFields)}
+              className="w-full py-2.5 px-3 bg-neutral-900/60 hover:bg-neutral-900 border border-neutral-800 rounded-xl text-xs font-bold text-neutral-400 hover:text-amber-400 flex items-center justify-between transition-colors cursor-pointer"
+            >
+              <span>
+                {showMoreFields ? "▲ 상세 옵션 항목 접기" : "+ 매장 평수 / 기존 매장명 등 추가 정보 입력 (선택)"}
+              </span>
+              <span className="text-[#FBC400]">{showMoreFields ? "−" : "+"}</span>
+            </button>
+          </div>
+
+          {/* Expanded Optional Fields */}
+          {showMoreFields && (
+            <div className="space-y-4 pt-2 border-t border-neutral-800/80 animate-fadeIn">
+              {/* Row 3: 기존 매장명 / 매장 평수 (숫자패드 지원) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormInput
+                  label="기존 매장명 (선택)"
+                  value={form.storeName}
+                  onChange={(val) => update("storeName", val)}
+                  placeholder="예: 120카페"
+                />
+                <FormInput
+                  label="매장 평수 (선택)"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={form.storeSize}
+                  onChange={(val) => update("storeSize", val)}
+                  placeholder="예: 15평"
+                />
+              </div>
+
+              {/* Row 4: 도입 관심 목적 / 관심 메뉴 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormSelect
+                  label="도입 관심 목적 (선택)"
+                  value={form.goal}
+                  options={goals}
+                  onChange={(val) => update("goal", val)}
+                />
+                <FormSelect
+                  label="관심 메뉴 (선택)"
+                  value={form.interestedMenu}
+                  options={menus}
+                  onChange={(val) => update("interestedMenu", val)}
+                />
+              </div>
+
+              {/* Row 5: 상담 희망 시간 */}
+              <FormInput
+                label="상담 희망 시간 (선택)"
+                value={form.preferredTime}
+                onChange={(val) => update("preferredTime", val)}
+                placeholder="예: 평일 오후 2시~5시 / 주말 상시"
+              />
+
+              {/* Textarea: 문의 내용 */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-neutral-300 flex items-center gap-1">
+                  추가 문의 사항 (선택)
+                </label>
+                <textarea
+                  value={form.message}
+                  onChange={(e) => update("message", e.target.value)}
+                  rows={2}
+                  className="w-full bg-neutral-900/90 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#FBC400] focus:ring-1 focus:ring-[#FBC400] transition-all resize-none"
+                  placeholder="궁금하신 내용을 입력해주세요."
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Error Alert */}
+          {error && (
+            <div className="flex items-center gap-2 p-3.5 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold rounded-xl">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Submit Button & Call Hotline */}
+          <div className="pt-2 space-y-3">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-4 bg-[#FBC400] hover:bg-amber-400 active:scale-[0.98] text-neutral-950 text-base font-black rounded-xl transition-all shadow-lg shadow-[#FBC400]/20 flex items-center justify-center gap-2 border-0 cursor-pointer disabled:opacity-50"
+            >
+              <span>{isSubmitting ? "접수 진행 중..." : "⚡ VIP 무료 창업 상담 신청"}</span>
+            </button>
+
+            <a
+              href="tel:18995685"
+              className="w-full py-3 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-300 hover:text-white text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-2 no-underline"
+            >
+              <PhoneCall size={14} className="text-[#FBC400]" />
+              <span>전화 빠른 상담: 1899-5685</span>
+            </a>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
@@ -347,6 +346,9 @@ interface InputProps {
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
+  type?: string;
+  inputMode?: "text" | "search" | "email" | "tel" | "url" | "numeric" | "decimal";
+  pattern?: string;
 }
 
 function FormInput({
@@ -354,8 +356,18 @@ function FormInput({
   required = false,
   value,
   onChange,
-  placeholder = "",
+  placeholder,
+  type,
+  inputMode,
+  pattern,
 }: InputProps) {
+  const isPhone = label.includes("연락처") || label.includes("전화");
+  const isNumeric = label.includes("평수") || label.includes("금액") || label.includes("인원");
+
+  const finalType = type || (isPhone ? "tel" : "text");
+  const finalInputMode = inputMode || (isPhone ? "tel" : isNumeric ? "numeric" : undefined);
+  const finalPattern = pattern || (isPhone || isNumeric ? "[0-9]*" : undefined);
+
   return (
     <div className="space-y-1.5">
       <label className="text-xs font-bold text-neutral-300 flex items-center gap-1">
@@ -363,7 +375,9 @@ function FormInput({
         {required && <span className="text-[#FBC400]">*</span>}
       </label>
       <input
-        type="text"
+        type={finalType}
+        inputMode={finalInputMode}
+        pattern={finalPattern}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
