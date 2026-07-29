@@ -238,7 +238,6 @@ const VIRAL_CARDS = [
   }
 ];
 
-import BrandHeader from "@/components/BrandHeader";
 import { useModalBackHandler } from "@/components/MobileBackManager";
 
 export default function BrandHome() {
