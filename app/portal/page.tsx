@@ -6411,7 +6411,7 @@ export default function PortalPage() {
           onClick={() => closeModal(() => setMobileCartOpen(false))}
         >
           <div 
-            className="w-full sm:max-w-md bg-white border-0 rounded-t-[28px] sm:rounded-[28px] overflow-hidden shadow-2xl max-h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
+            className="w-full sm:max-w-md bg-white border-0 rounded-t-[28px] sm:rounded-[28px] overflow-hidden shadow-2xl max-h-[92vh] flex flex-col animate-slideUp sm:animate-custom-scale"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Yellow Header */}
@@ -6446,7 +6446,7 @@ export default function PortalPage() {
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 overflow-y-auto space-y-6 flex-1 max-h-[75vh]">
+            <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 max-h-none">
               {cart.length === 0 ? (
                 <div className="py-16 text-center space-y-3">
                   <ShoppingBag size={40} className="text-slate-300 mx-auto" />

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { LogOut, DoorOpen, HelpCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 type CloseCallback = () => void;
 
@@ -48,24 +48,28 @@ export function useModalBackHandler(id: string, isOpen: boolean, onClose: () => 
 
 export default function MobileBackManager() {
   const router = useRouter();
+  const pathname = usePathname();
   const [showExitChoiceModal, setShowExitChoiceModal] = useState(false);
   const [pageLocationName, setPageLocationName] = useState("120PIE 홈페이지");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Trap history synchronously to prevent browser from navigating away or flickering
+    // Do NOT push trap state on the Gate Page (`/`) itself so user can navigate back out of site normally from gate
+    if (pathname === "/") return;
+
+    // Trap history on current page entry
     const trapHistory = () => {
       try {
-        window.history.pushState({ isBackTrap: true }, "", window.location.href);
+        window.history.pushState({ isBackTrap: true, path: pathname }, "", window.location.href);
       } catch (e) {}
     };
 
-    // Push initial trap state on mount
+    // Push initial trap state whenever pathname changes!
     trapHistory();
 
     const handlePopState = () => {
-      // Re-push trap state IMMEDIATELY to hold history on current page
+      // Re-push trap state IMMEDIATELY to prevent browser from navigating away or flickering
       trapHistory();
 
       // 1. If any modal/popup is open in modalStack, close top modal ONLY
@@ -95,7 +99,7 @@ export default function MobileBackManager() {
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, []);
+  }, [pathname]);
 
   const handleGoToGate = () => {
     setShowExitChoiceModal(false);
