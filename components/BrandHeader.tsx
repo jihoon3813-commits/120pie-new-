@@ -61,8 +61,6 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
             {/* 점주메뉴: Always visible on both mobile and desktop */}
             <Link
               href="/portal"
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex px-2.5 py-1.5 sm:px-4 sm:py-2 bg-white text-neutral-800 hover:text-neutral-950 font-bold text-xs rounded-full transition-all border border-neutral-200 hover:border-neutral-400 cursor-pointer whitespace-nowrap"
             >
               점주메뉴

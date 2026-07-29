@@ -2672,6 +2672,16 @@ export default function PortalPage() {
           
           <div className="h-6 w-px bg-slate-200 hidden md:block"></div>
 
+          {/* 자재주문 바로가기 버튼 */}
+          <button
+            type="button"
+            onClick={() => setCurrentMenu("order")}
+            className="px-3 py-1.5 rounded-full bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-xs font-black transition-all flex items-center gap-1.5 shadow-sm shrink-0 whitespace-nowrap border-0 cursor-pointer active:scale-95"
+          >
+            <ShoppingBag size={14} className="text-[#0F172A] shrink-0" />
+            <span>자재주문 바로가기</span>
+          </button>
+
           <Link
             href="/"
             className="hidden sm:inline-flex px-3.5 py-1.5 rounded-full border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-black text-slate-700 transition-all items-center gap-1.5 shadow-2xs shrink-0 whitespace-nowrap"
