@@ -2220,397 +2220,104 @@ export default function PortalPage() {
 
   if (!isLoggedIn) {
     return (
-      <div id="owner-portal" className="h-screen w-screen text-[#0D233A] flex flex-col font-sans select-none antialiased justify-center items-center p-4" style={{ backgroundColor: '#ffffff' }}>
+      <div id="owner-portal" className="min-h-screen w-screen bg-[#0B0F17] text-white flex flex-col font-sans select-none antialiased justify-center items-center p-4 relative overflow-hidden">
+        {/* Soft Warm Ambient Radial Glow */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(circle at 50% 25%, rgba(254, 212, 34, 0.15) 0%, rgba(11, 15, 23, 0) 70%)"
+          }}
+        />
+
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-[150] bg-[#f25f8a] text-white px-5 py-3.5 rounded-xl font-bold text-sm shadow-[0_8px_30px_rgba(242,95,138,0.25)] flex items-center gap-2.5 animate-bounce">
-            <CheckCircle2 size={16} />
+          <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-5 py-3.5 rounded-2xl font-black text-sm shadow-[0_8px_30px_rgba(254,212,34,0.3)] flex items-center gap-2.5 animate-bounce">
+            <CheckCircle2 size={18} className="text-[#0F172A]" />
             {toastMessage}
           </div>
         )}
         
-        <div className="max-w-md w-full bg-white border border-[#f2ccd7] rounded-3xl p-8 sm:p-10 shadow-[0_12px_40px_rgba(242,204,215,0.25)] space-y-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#ffd3df] via-[#f25f8a] to-[#bf3e67]"></div>
+        <div className="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-[32px] p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] space-y-7 relative overflow-hidden text-left z-10">
+          {/* Top Yellow Brand Accent Line */}
+          <div className="absolute top-0 left-0 right-0 h-2 bg-[#FED422]" />
           
-          <div className="text-center space-y-4">
-            <div className="inline-flex w-16 h-16 rounded-2xl bg-[#fff1f5] border border-[#f2ccd7] p-2 items-center justify-center shadow-sm">
+          <div className="text-center space-y-3.5 pt-2">
+            {/* Prominent Large Brand Logo */}
+            <div className="flex justify-center mb-1">
               <img
-                src="/logo_yellow_blue.png"
-                alt="120pie 로고"
-                className="w-full h-full object-contain"
+                src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
+                alt="120PIE 로고"
+                className="h-10 sm:h-12 w-auto object-contain drop-shadow-md"
               />
             </div>
+            
             <div className="space-y-1.5">
-              <h2 className="text-xl sm:text-2xl font-black text-[#2d2026] tracking-tight">120pie &amp; coffee</h2>
-              <p className="text-xs font-bold text-[#bf3e67] bg-[#ffd3df] px-3 py-1 rounded-full w-fit mx-auto border border-[#f2ccd7]">
-                점주전용 가맹 관리 포털
-              </p>
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">점주 전용 포털</h2>
+              <span className="inline-block text-xs font-black text-[#0F172A] bg-[#FED422] px-4 py-1 rounded-full shadow-2xs">
+                가맹점 파트너 관리 시스템
+              </span>
             </div>
-            <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
-              본 시스템은 120겹파이 공식 가맹점 점주님들을 위한 공간입니다. 등록된 파트너 계정으로 로그인해 주세요.
+            
+            <p className="text-xs text-slate-400 font-semibold leading-relaxed max-w-xs mx-auto">
+              본 시스템은 120겹파이 공식 가맹점 점주님들을 위한 전용 포털입니다. 발급받은 파트너 계정으로 로그인해 주세요.
             </p>
           </div>
 
-          <form onSubmit={handleLoginSubmit} className="space-y-5">
+          <form onSubmit={handleLoginSubmit} className="space-y-4 pt-1">
             {loginError && (
-              <div className="bg-red-50 border border-red-200 text-red-500 rounded-xl p-3.5 text-xs font-bold flex items-center gap-2">
-                <AlertCircle size={15} />
+              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-2xl p-3.5 text-xs font-bold flex items-center gap-2">
+                <AlertCircle size={16} className="shrink-0 text-rose-400" />
                 <span>{loginError}</span>
               </div>
             )}
             
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-[#735965] block">점주 아이디</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-200 block">점주 아이디</label>
               <input
                 type="text"
-                placeholder="ID를 입력하세요"
+                placeholder="점주 아이디를 입력하세요"
                 value={loginId}
                 onChange={(e) => setLoginId(e.target.value)}
                 required
-                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs sm:text-sm text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] transition-colors"
+                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-[#735965] block">비밀번호</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-200 block">비밀번호</label>
               <input
                 type="password"
                 placeholder="비밀번호를 입력하세요"
                 value={loginPw}
                 onChange={(e) => setLoginPw(e.target.value)}
                 required
-                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs sm:text-sm text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] transition-colors"
+                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_16px_rgba(242,95,138,0.2)] flex items-center justify-center gap-2 hover:scale-[1.01] border-0"
+              className="w-full py-4 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-sm sm:text-base font-black rounded-2xl transition-all shadow-lg shadow-[#FED422]/20 flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.99] mt-2"
             >
-              로그인 완료
+              <span>로그인 완료</span>
+              <ArrowRight size={18} className="text-[#0F172A]" />
             </button>
 
             <button
               type="button"
               onClick={() => setShowRegisterModal(true)}
-              className="w-full py-4 bg-[#fff1f5] hover:bg-[#ffd3df] border border-[#f2ccd7] text-[#bf3e67] text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 mt-3 hover:scale-[1.01] cursor-pointer"
+              className="w-full py-3.5 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-200 text-xs sm:text-sm font-extrabold rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
             >
               🏢 가맹점 등록 신청
             </button>
           </form>
 
-
-          
-          <div className="text-center pt-2 space-y-3">
-            <Link href="/" className="text-xs text-[#735965] hover:text-[#bf3e67] hover:underline font-bold transition-all flex items-center justify-center gap-1">
-              ← 메인 랜딩 페이지로 돌아가기
+          <div className="text-center pt-2">
+            <Link href="/" className="text-xs text-slate-400 hover:text-white font-bold transition-colors inline-flex items-center gap-1.5">
+              <ArrowLeft size={13} />
+              <span>메인 랜딩 페이지로 돌아가기</span>
             </Link>
           </div>
         </div>
-
-        {/* 가맹점 신규 등록 대장 작성 모달 */}
-        {showRegisterModal && (
-          <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-            <div 
-              className="w-full max-w-2xl bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col my-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Yellow Header */}
-              <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shadow-xs">
-                <h3 className="font-black text-[#0F172A] text-sm sm:text-base flex items-center gap-2">
-                  🏢 가맹점 신규 등록 대장 작성
-                </h3>
-                <button 
-                  type="button"
-                  onClick={() => setShowRegisterModal(false)}
-                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              {/* Form */}
-              <form onSubmit={handleRegisterStoreSubmit} className="p-6 sm:p-8 overflow-y-auto max-h-[75vh] space-y-5 text-xs sm:text-sm text-left">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">로그인 계정 ID *</label>
-                    <input 
-                      type="text"
-                      placeholder="계정 아이디를 입력해 주세요 (영문/숫자)"
-                      value={regId}
-                      onChange={(e) => setRegId(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
-                      required
-                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">가맹점명 *</label>
-                    <input 
-                      type="text"
-                      placeholder="예시) 120겹파이 강남역삼점"
-                      value={regName}
-                      onChange={(e) => setRegName(e.target.value)}
-                      required
-                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">비밀번호 *</label>
-                    <input 
-                      type="password"
-                      placeholder="비밀번호 설정"
-                      value={regPw}
-                      onChange={(e) => setRegPw(e.target.value)}
-                      required
-                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">비밀번호 확인 *</label>
-                    <input 
-                      type="password"
-                      placeholder="동일 비밀번호 재입력"
-                      value={regPwConfirm}
-                      onChange={(e) => setRegPwConfirm(e.target.value)}
-                      required
-                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">점주 실명 *</label>
-                    <input 
-                      type="text"
-                      placeholder="점주 대표자 성함"
-                      value={regOwner}
-                      onChange={(e) => setRegOwner(e.target.value)}
-                      required
-                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">연락처 (하이픈 자동입력) *</label>
-                    <input 
-                      type="text"
-                      placeholder="휴대폰 혹은 대표번호"
-                      value={regPhone}
-                      onChange={handleRegPhoneChange}
-                      required
-                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">가맹 거래 상태 구분 *</label>
-                    <select 
-                      disabled
-                      value="대기"
-                      className="w-full bg-slate-100 border-0 rounded-2xl px-4 py-3 text-xs text-slate-500 focus:outline-none cursor-not-allowed font-bold"
-                    >
-                      <option value="대기">대기 (서류 검토 / 가맹 보류)</option>
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">가맹 등록일</label>
-                    <input 
-                      type="date"
-                      value={regDate}
-                      onChange={(e) => setRegDate(e.target.value)}
-                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-3 py-3 text-xs text-[#0F172A] font-semibold"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">가맹 해지일</label>
-                    <input 
-                      type="text"
-                      disabled
-                      placeholder="연도-월-일"
-                      className="w-full bg-slate-100 border-0 rounded-2xl px-3 py-3 text-xs text-slate-400 cursor-not-allowed"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="font-extrabold text-[#0F172A] block">가맹 매장 도로명 주소 *</label>
-                  <div className="flex gap-2">
-                    <input 
-                      type="text"
-                      placeholder="도로명 주소 (우측 '주소 검색' 버튼을 사용하거나 직접 입력하세요)"
-                      value={regRoadAddress}
-                      onChange={(e) => setRegRoadAddress(e.target.value)}
-                      required
-                      className="flex-1 bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => openDaumPostcode("register")}
-                      className="px-5 py-3 rounded-full bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black transition-all shadow-md shrink-0 cursor-pointer border-0"
-                    >
-                      주소 검색
-                    </button>
-                  </div>
-                  <input 
-                    type="text"
-                    placeholder="매장 상세 주소 (e.g. 1층 101호, 2층 전부)"
-                    value={regDetailAddress}
-                    onChange={(e) => setRegDetailAddress(e.target.value)}
-                    className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50 mt-2"
-                  />
-                </div>
-
-                {/* 도입 적용 패키지 브랜드 선택 */}
-                <div className="space-y-3">
-                  <label className="font-extrabold text-[#0F172A] block">도입 적용 패키지 브랜드 선택 (중복 체크 가능)</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#F8FAFC] border-0 rounded-2xl p-4">
-                    {[
-                      { key: "120pie", label: "120pie" },
-                      { key: "egg120", label: "egg120" },
-                      { key: "츄러스120", label: "츄러스120" },
-                      { key: "떡볶이120", label: "떡볶이120" },
-                      { key: "핫도그120", label: "핫도그120" },
-                      { key: "120coffee", label: "120coffee" },
-                    ].map((menu) => (
-                      <label key={menu.key} className="flex items-center gap-2 cursor-pointer select-none py-1 text-xs text-slate-700 font-extrabold">
-                        <input 
-                          type="checkbox"
-                          checked={regAdoptionMenu.includes(menu.key)}
-                          onChange={() => {
-                            if (regAdoptionMenu.includes(menu.key)) {
-                              setRegAdoptionMenu(regAdoptionMenu.filter(m => m !== menu.key));
-                            } else {
-                              setRegAdoptionMenu([...regAdoptionMenu, menu.key]);
-                            }
-                          }}
-                          className="w-4 h-4 accent-[#F5AC00] rounded border-slate-300 cursor-pointer"
-                        />
-                        <span>{menu.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  className="w-full py-3.5 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs sm:text-sm font-black rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-6"
-                >
-                  신규 가맹 계약 지점 공식 등록
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* 도로명 주소 실시간 검색 모달 (Yellow Header, border-0, Clean Style) */}
-        {showAddressPopup && (
-          <div 
-            className="fixed inset-0 z-[120] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
-            onClick={() => setShowAddressPopup(false)}
-          >
-            <div 
-              className="w-full max-w-lg bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Yellow Header */}
-              <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex flex-col gap-3 shadow-xs">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-base font-black text-[#0F172A]">도로명 주소 실시간 검색</h4>
-                  <button 
-                    type="button"
-                    onClick={() => setShowAddressPopup(false)} 
-                    className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-                
-                {/* Tabs */}
-                <div className="flex bg-black/10 p-1 rounded-full border-0">
-                  <button
-                    type="button"
-                    onClick={() => setAddressTab("kakao")}
-                    className={`flex-1 py-2 text-xs font-black rounded-full transition-all cursor-pointer border-0 ${
-                      addressTab === "kakao" 
-                        ? "bg-white text-[#0F172A] shadow-xs" 
-                        : "text-[#0F172A]/70 hover:text-[#0F172A]"
-                    }`}
-                  >
-                    카카오 우편번호 API
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAddressTab("simulated")}
-                    className={`flex-1 py-2 text-xs font-black rounded-full transition-all cursor-pointer border-0 ${
-                      addressTab === "simulated" 
-                        ? "bg-white text-[#0F172A] shadow-xs" 
-                        : "text-[#0F172A]/70 hover:text-[#0F172A]"
-                    }`}
-                  >
-                    모의 간편 검색 (대안)
-                  </button>
-                </div>
-              </div>
-
-              {/* Content Body */}
-              {addressTab === "kakao" ? (
-                <div className="flex-1 w-full bg-[#F8FAFC] overflow-hidden relative">
-                  <div 
-                    id="daum-postcode-container" 
-                    className="w-full h-full"
-                  ></div>
-                </div>
-              ) : (
-                <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-[#F8FAFC]">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-[#0F172A] block">지번/도로명 검색어 입력</label>
-                    <input
-                      type="text"
-                      placeholder="예: 테헤란로, 엘에스로, 당동"
-                      value={addressSearchKeyword}
-                      onChange={(e) => handleRegAddressSearch(e.target.value)}
-                      className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50"
-                    />
-                  </div>
-                  
-                  {addressSearchResults.length > 0 ? (
-                    <div className="border-0 rounded-2xl overflow-hidden divide-y divide-slate-100 bg-white shadow-2xs">
-                      {addressSearchResults.map((addr, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => {
-                            if (addressSearchTarget === "profile") {
-                              setProfileRoadAddress(addr);
-                            } else if (addressSearchTarget === "delivery") {
-                              setDeliveryAddress(addr);
-                            } else {
-                              setRegRoadAddress(addr);
-                            }
-                            setShowAddressPopup(false);
-                            triggerToast("도로명 주소가 자동 선택되었습니다.");
-                          }}
-                          className="w-full px-5 py-3.5 text-left text-xs font-bold text-slate-700 hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all block cursor-pointer border-0 bg-transparent"
-                        >
-                          {addr}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    addressSearchKeyword.trim() !== "" && (
-                      <p className="text-center text-xs text-slate-400 font-bold py-6">검색 결과가 존재하지 않습니다.</p>
-                    )
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     );
   }
@@ -5435,7 +5142,7 @@ export default function PortalPage() {
                       setTrackingInfo(null);
                     });
                   }}
-                  className="px-8 py-2.5 rounded-full bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black shadow-md transition-all cursor-pointer border-0"
+                  className="px-8 py-2.5 rounded-full bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-xs font-black shadow-md transition-all cursor-pointer border-0"
                 >
                   닫기
                 </button>
@@ -6396,16 +6103,16 @@ export default function PortalPage() {
 
       {/* MOBILE BOTTOM FLOATING CART BAR (Always visible above bottom navigation when items are added in order menu) */}
       {cart.length > 0 && currentMenu === "order" && (
-        <div className="lg:hidden fixed bottom-4 inset-x-4 z-40 bg-white border border-[#f2ccd7] px-4 py-3 rounded-2xl shadow-[0_8px_25px_rgba(0,0,0,0.15)] flex items-center justify-between animate-slideUp select-none">
+        <div className="lg:hidden fixed bottom-4 inset-x-4 z-40 bg-white border border-[#FED422]/60 px-4 py-3 rounded-2xl shadow-[0_8px_25px_rgba(0,0,0,0.15)] flex items-center justify-between animate-slideUp select-none">
           <div className="flex flex-col text-left">
             <span className="text-[9px] font-black text-[#735965]">총 {cart.reduce((sum, item) => sum + item.quantity, 0)}개 품목 담김</span>
-            <span className="text-sm font-black text-[#bf3e67]">{cartTotal.toLocaleString()}원</span>
+            <span className="text-sm font-black text-[#0F172A]">{cartTotal.toLocaleString()}원</span>
           </div>
           <button
             onClick={() => {
               setMobileCartOpen(true);
             }}
-            className="px-4 py-2 bg-[#fae100] hover:bg-[#e6cf00] text-[#2d2026] text-[10px] font-black rounded-xl shadow-sm flex items-center gap-1 transition-all cursor-pointer border-0"
+            className="px-4 py-2 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-[10px] font-black rounded-xl shadow-sm flex items-center gap-1 transition-all cursor-pointer border-0"
           >
             <ShoppingBag size={12} className="text-[#2d2026]" />
             장바구니 확인
@@ -6426,7 +6133,7 @@ export default function PortalPage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Fixed Yellow Header */}
-            <div className="p-4 sm:p-5 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shrink-0 shadow-md rounded-t-[28px] relative z-20">
+            <div className="p-4 sm:p-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-md rounded-t-[28px] relative z-20">
               <div className="flex items-center gap-2">
                 {/* Left Back Arrow Button for Mobile */}
                 <button

@@ -6,6 +6,7 @@ import { api } from "../../convex/_generated/api";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 import { getInstagramThumbnailUrl } from "@/app/utils/instagram";
 import Link from "next/link";
+import { useModalBackHandler } from "@/components/MobileBackManager";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -1571,6 +1572,20 @@ export default function AdminPage() {
   const [selectedCourier, setSelectedCourier] = useState<string>("CJ대한통운");
   const [inputTrackingNo, setInputTrackingNo] = useState<string>("");
   const [modalTrackingList, setModalTrackingList] = useState<{ courier: string; trackingNo: string }[]>([]);
+
+  // Admin back navigation handling (Modals -> close modal; Back button anywhere in admin -> ask Exit/Gate modal)
+  useModalBackHandler("admin-order-modal", showOrderModal, () => setShowOrderModal(false));
+  useModalBackHandler("admin-product-modal", showProductModal, () => setShowProductModal(false));
+  useModalBackHandler("admin-notice-modal", showNoticeModal, () => setShowNoticeModal(false));
+  useModalBackHandler("admin-store-modal", showStoreModal, () => setShowStoreModal(false));
+  useModalBackHandler("admin-material-modal", showMaterialModal, () => setShowMaterialModal(false));
+  useModalBackHandler("admin-gallery-modal", showGalleryModal, () => setShowGalleryModal(false));
+  useModalBackHandler("admin-popup-modal", showPopupModal, () => setShowPopupModal(false));
+  useModalBackHandler("admin-insta-modal", isInstaModalOpen, () => setIsInstaModalOpen(false));
+  useModalBackHandler("admin-inquiry-modal", !!selectedInquiry, () => setSelectedInquiry(null));
+  useModalBackHandler("admin-consultation-modal", !!selectedConsultation, () => setSelectedConsultation(null));
+  useModalBackHandler("admin-contract-modal", !!selectedContract, () => setSelectedContract(null));
+
 
   // 발주 필터링 및 통합검색, 엑셀 내보내기 헬퍼 상태
   const [orderSearchKeyword, setOrderSearchKeyword] = useState<string>("");
@@ -4220,81 +4235,93 @@ export default function AdminPage() {
 
   if (!isLoggedIn) {
     return (
-      <div id="admin-portal" className="h-screen w-screen bg-[#0B0F17] text-white flex flex-col font-sans antialiased justify-center items-center p-4">
+      <div id="admin-portal" className="min-h-screen w-screen bg-[#0B0F17] text-white flex flex-col font-sans select-none antialiased justify-center items-center p-4 relative overflow-hidden">
+        {/* Soft Warm Ambient Yellow Glow */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(circle at 50% 30%, rgba(254, 212, 34, 0.12) 0%, rgba(11, 15, 23, 0) 70%)"
+          }}
+        />
+
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-[150] bg-[#FF6B4A] text-white px-5 py-3.5 rounded-xl font-bold text-sm shadow-[0_8px_30px_rgba(255,107,74,0.3)] flex items-center gap-2.5 animate-bounce">
-            <CheckCircle2 size={16} />
+          <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-5 py-3.5 rounded-2xl font-black text-sm shadow-[0_8px_30px_rgba(254,212,34,0.3)] flex items-center gap-2.5 animate-bounce">
+            <CheckCircle2 size={18} className="text-[#0F172A]" />
             {toastMessage}
           </div>
         )}
         
-        <div className="max-w-md w-full bg-[#161C26] border border-slate-700/80 rounded-3xl p-8 sm:p-10 shadow-2xl space-y-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#FF6B4A]"></div>
+        <div className="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-[32px] p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] space-y-7 relative overflow-hidden text-left z-10">
+          {/* Top Yellow Brand Accent Line */}
+          <div className="absolute top-0 left-0 right-0 h-2 bg-[#FED422]" />
           
-          <div className="text-center space-y-4">
-            <div className="inline-flex w-16 h-16 rounded-2xl bg-[#fff1f5] border border-[#f2ccd7] p-2 items-center justify-center shadow-sm">
+          <div className="text-center space-y-3.5 pt-2">
+            {/* Prominent Large Brand Logo */}
+            <div className="flex justify-center mb-1">
               <img
-                src="/logo_yellow_blue.png"
-                alt="120pie 로고"
-                className="w-full h-full object-contain"
+                src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
+                alt="120PIE 로고"
+                className="h-10 sm:h-12 w-auto object-contain drop-shadow-md"
               />
             </div>
+            
             <div className="space-y-1.5">
-              <h2 className="text-xl sm:text-2xl font-black text-[#2d2026] tracking-tight">120pie Head Office</h2>
-              <p className="text-xs font-bold text-[#bf3e67] bg-[#ffd3df] px-3 py-1 rounded-full w-fit mx-auto border border-[#f2ccd7]">
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">120PIE HEAD OFFICE</h2>
+              <span className="inline-block text-xs font-black text-[#0F172A] bg-[#FED422] px-4 py-1 rounded-full shadow-2xs">
                 통합 본사 어드민 포털
-              </p>
+              </span>
             </div>
-            <p className="text-[11px] text-[#735965] font-semibold leading-relaxed">
-              본 시스템은 120겹파이 가맹본부 관리자용 관리 화면입니다. 인가된 본사 ID로 로그인해 주세요.
+            
+            <p className="text-xs text-slate-400 font-semibold leading-relaxed max-w-xs mx-auto">
+              본 시스템은 120겹파이 가맹본부 관리자용 전용 제어 시스템입니다. 인가된 본사 계정으로 로그인해 주세요.
             </p>
           </div>
 
-          <form onSubmit={handleLoginSubmit} className="space-y-5">
+          <form onSubmit={handleLoginSubmit} className="space-y-4 pt-1">
             {loginError && (
-              <div className="bg-red-50 border border-red-200 text-red-500 rounded-xl p-3.5 text-xs font-bold flex items-center gap-2">
-                <AlertCircle size={15} />
+              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-2xl p-3.5 text-xs font-bold flex items-center gap-2">
+                <AlertCircle size={16} className="shrink-0 text-rose-400" />
                 <span>{loginError}</span>
               </div>
             )}
             
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-[#735965] block">본사 관리자 ID</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-200 block">본사 관리자 ID</label>
               <input
                 type="text"
-                placeholder="ID를 입력하세요"
+                placeholder="관리자 ID를 입력하세요"
                 value={loginId}
                 onChange={(e) => setLoginId(e.target.value)}
                 required
-                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs sm:text-sm text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] transition-colors"
+                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-[#735965] block">보안 비밀번호</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-200 block">보안 비밀번호</label>
               <input
                 type="password"
                 placeholder="비밀번호를 입력하세요"
                 value={loginPw}
                 onChange={(e) => setLoginPw(e.target.value)}
                 required
-                className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-4 py-3 text-xs sm:text-sm text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a] transition-colors"
+                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-4 bg-[#f25f8a] hover:bg-[#df4977] text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_16px_rgba(242,95,138,0.2)] flex items-center justify-center gap-2 hover:scale-[1.01]"
+              className="w-full py-4 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-sm sm:text-base font-black rounded-2xl transition-all shadow-lg shadow-[#FED422]/20 flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.99] mt-2"
             >
-              로그인 완료
+              <span>로그인 완료</span>
+              <ArrowRight size={18} className="text-[#0F172A]" />
             </button>
           </form>
 
-
-          
           <div className="text-center pt-2">
-            <Link href="/" className="text-xs text-[#735965] hover:text-[#bf3e67] hover:underline font-bold transition-all flex items-center justify-center gap-1">
-              ← 메인 랜딩 페이지로 돌아가기
+            <Link href="/" className="text-xs text-slate-400 hover:text-white font-bold transition-colors inline-flex items-center gap-1.5">
+              <ArrowLeft size={13} />
+              <span>메인 랜딩 페이지로 돌아가기</span>
             </Link>
           </div>
         </div>
