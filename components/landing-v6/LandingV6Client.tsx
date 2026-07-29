@@ -27,6 +27,7 @@ import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import QuickInquiryBar from "./QuickInquiryBar";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
+import MobileBottomInquiryBar from "@/components/MobileBottomInquiryBar";
 
 import CursorFollower from "@/components/CursorFollower";
 
@@ -125,6 +126,9 @@ export default function LandingV6Client() {
 
       {/* Right Side Inquiry Banner (300px width) */}
       <RightSideInquiryBanner />
+
+      {/* 모바일 상시 고정 하단 상담신청바 */}
+      <MobileBottomInquiryBar onOpenConsultation={openContactModal} />
     </div>
   );
 }

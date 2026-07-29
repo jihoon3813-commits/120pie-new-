@@ -49,8 +49,8 @@ export default function RightFloatingQuickBar({
   const phoneTarget = convexFloating?.phoneNo ? `tel:${convexFloating.phoneNo}` : "tel:1899-5685";
 
   return (
-    <div className={`fixed right-2.5 bottom-20 sm:right-6 sm:bottom-24 z-[90] flex-col items-end select-none transition-all duration-300 ${
-      isBannerClosed ? "flex" : "flex lg:hidden"
+    <div className={`hidden md:flex fixed right-2.5 bottom-20 sm:right-6 sm:bottom-24 z-[90] flex-col items-end select-none transition-all duration-300 ${
+      isBannerClosed ? "md:flex" : "md:flex lg:hidden"
     }`}>
       {/* Main Floating Container */}
       <div className="bg-neutral-950/90 backdrop-blur-md opacity-95 hover:opacity-100 border border-neutral-800 text-white rounded-3xl p-2 sm:p-2.5 flex flex-col items-center gap-1.5 sm:gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.5)] transition-all duration-300 w-15 sm:w-20">

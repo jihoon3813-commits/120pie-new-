@@ -75,41 +75,41 @@ export default function Header({
             ))}
           </nav>
 
-          {/* Action Buttons */}
-          <div className="flex items-center space-x-3">
+          {/* Action & Mobile Navigation Buttons */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* 브랜드홈페이지 바로가기: Desktop only in header */}
             <Link
               href="/brand"
-              className="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-[#fbc400] text-neutral-950 font-black text-xs rounded-full transition-all duration-300 shadow-xs hover:bg-amber-400 cursor-pointer whitespace-nowrap"
+              className="hidden md:inline-block px-3.5 py-1.5 sm:px-4 sm:py-2 bg-[#fbc400] text-neutral-950 font-black text-xs rounded-full transition-all duration-300 shadow-xs hover:bg-amber-400 cursor-pointer whitespace-nowrap"
             >
               브랜드홈페이지 바로가기 &rarr;
             </Link>
+
+            {/* 점주메뉴: Always visible on both mobile and desktop */}
             <Link
               href="/portal"
               target="_blank"
               rel="noopener noreferrer"
-              className={`hidden sm:inline-block text-xs font-bold transition-colors duration-200 px-3 py-1.5 border rounded-full ${
+              className={`inline-block text-xs font-bold transition-colors duration-200 px-2.5 py-1.5 sm:px-3 sm:py-1.5 border rounded-full whitespace-nowrap ${
                 isScrolled
-                  ? "text-neutral-600 hover:text-neutral-950 border-neutral-300"
-                  : "text-neutral-300 hover:text-white border-neutral-700"
+                  ? "text-neutral-700 hover:text-neutral-950 border-neutral-300"
+                  : "text-neutral-200 hover:text-white border-neutral-700"
               }`}
             >
-              점주 전용
+              점주메뉴
             </Link>
-          </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+            {/* Mobile Menu Button (더보기) */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               type="button"
-              className={`inline-flex items-center justify-center p-2 rounded-md focus:outline-none transition-colors ${
+              className={`md:hidden inline-flex items-center justify-center p-1.5 rounded-md focus:outline-none transition-colors ${
                 isScrolled
                   ? "text-neutral-700 hover:text-amber-500"
                   : "text-neutral-200 hover:text-amber-400"
               }`}
-              aria-expanded="false"
+              aria-label="더보기 메뉴 열기"
             >
-              <span className="sr-only">메뉴 열기</span>
               {isMobileMenuOpen ? (
                 <svg
                   className="h-6 w-6"
@@ -148,7 +148,7 @@ export default function Header({
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-neutral-900/95 dark:bg-neutral-950/95 backdrop-blur-lg border-b border-neutral-800 dark:border-neutral-800">
-          <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3">
+          <div className="px-3 pt-3 pb-4 space-y-2">
             {menuItems.map((item) => (
               <Link
                 key={item.label}
@@ -159,15 +159,23 @@ export default function Header({
                 {item.label}
               </Link>
             ))}
-            <div className="pt-4 pb-2 border-t border-neutral-800 dark:border-neutral-800 flex flex-col space-y-2 px-3">
+            <div className="pt-3 pb-1 border-t border-neutral-800 dark:border-neutral-800 flex flex-col space-y-2.5 px-1">
+              <Link
+                href="/brand"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 px-4 bg-[#fbc400] text-neutral-950 font-black text-sm rounded-lg hover:bg-amber-400 transition-colors flex items-center justify-between shadow-sm cursor-pointer"
+              >
+                <span>브랜드홈페이지 바로가기</span>
+                <span>&rarr;</span>
+              </Link>
               <Link
                 href="/portal"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full text-center py-2 text-sm font-semibold text-neutral-300 dark:text-neutral-300 border border-neutral-700 dark:border-neutral-700 rounded-md"
+                className="w-full text-center py-2 text-sm font-semibold text-neutral-300 dark:text-neutral-300 border border-neutral-700 dark:border-neutral-700 rounded-md hover:bg-neutral-800 transition-colors"
               >
-                점주 전용
+                점주메뉴 (점주 전용 포털)
               </Link>
             </div>
           </div>

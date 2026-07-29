@@ -9,10 +9,10 @@ import ConsultationForm from "@/components/ConsultationForm";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
+import BrandHeader from "@/components/BrandHeader";
 
 export default function BiInteriorPage() {
   const [isConsulting, setIsConsulting] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const SUB_MENU_TABS = [
     { id: "story", label: "120PIE & COFFEE", href: "/brand/story" },
@@ -26,80 +26,7 @@ export default function BiInteriorPage() {
       <CursorFollower />
 
       {/* HEADER / NAVIGATION BAR */}
-      <header className="sticky top-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/95 py-3 border-b border-neutral-100 shadow-sm isolate">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
-          {/* Logo */}
-          <Link href="/" title="게이트 페이지로 이동" className="flex items-center gap-2 group shrink-0">
-            <img
-              src={optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png")}
-              alt="120pie 로고"
-              className="h-[22px] md:h-[26px] w-auto object-contain transition-transform duration-300 group-hover:scale-102"
-            />
-          </Link>
-
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 lg:gap-10 font-medium text-[16px] text-neutral-700">
-            <Link href="/brand/story" className="text-amber-600 font-bold border-b-2 border-amber-500 pb-0.5">
-              브랜드 소개
-            </Link>
-            <Link href="/brand/menu" className="hover:text-amber-600 transition-colors">
-              메뉴 소개
-            </Link>
-            <Link href="/stores" className="hover:text-amber-600 transition-colors">
-              매장 찾기
-            </Link>
-            <Link href="/brand/franchise" className="hover:text-amber-600 transition-colors">
-              창업 안내
-            </Link>
-          </nav>
-
-          {/* Right Header Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <Link
-              href="/franchise"
-              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-neutral-950 text-[#fbc400] font-black text-xs rounded-full transition-all duration-300 shadow-xs hover:bg-black border border-neutral-800 cursor-pointer whitespace-nowrap"
-            >
-              창업홈페이지 바로가기 &rarr;
-            </Link>
-            <Link
-              href="/portal"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-white text-neutral-800 hover:text-neutral-950 font-bold text-xs rounded-full transition-all border border-neutral-200 hover:border-neutral-400 cursor-pointer whitespace-nowrap"
-            >
-              점주 전용
-            </Link>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-1.5 text-neutral-700 hover:text-amber-600 transition-colors"
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* MOBILE NAVIGATION OVERLAY */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 top-16 z-40 bg-neutral-900/98 flex flex-col p-6 space-y-6 md:hidden animate-fadeIn">
-          <nav className="flex flex-col space-y-4 font-medium text-lg text-neutral-200 text-left">
-            <Link href="/brand/story" className="py-2 border-b border-neutral-800 text-[#fbc400] font-bold text-left block">
-              브랜드 소개
-            </Link>
-            <Link href="/brand/menu" className="py-2 border-b border-neutral-800 hover:text-[#fbc400] transition-colors text-left block">
-              메뉴 소개
-            </Link>
-            <Link href="/stores" className="py-2 border-b border-neutral-800 hover:text-[#fbc400] transition-colors text-left block">
-              매장 찾기
-            </Link>
-            <Link href="/brand/franchise" className="py-2 border-b border-neutral-800 hover:text-[#fbc400] transition-colors text-left block">
-              창업 안내
-            </Link>
-          </nav>
-        </div>
-      )}
+      <BrandHeader onConsultClick={() => setIsConsulting(true)} />
 
       {/* SUB VISUAL HERO BANNER */}
       <section className="relative w-full bg-neutral-950 py-20 sm:py-28 text-white overflow-hidden text-left select-none">

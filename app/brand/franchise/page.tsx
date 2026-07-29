@@ -14,6 +14,7 @@ import Footer from "@/app/components/Footer";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
+import BrandHeader from "@/components/BrandHeader";
 
 // Cloudinary assets with f_auto,q_auto
 const LOGO_URL = optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/v1784533894/Group_1_4_jl4rlr.png");
@@ -298,111 +299,7 @@ export default function BrandFranchisePage() {
   return (
     <div className="min-h-screen bg-[#faf8f5] text-neutral-900 font-sans">
       {/* 1. BRAND NAVIGATION HEADER */}
-      <header className="sticky top-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/95 py-3 border-b border-neutral-100 shadow-sm isolate">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
-          {/* Logo */}
-          <Link href="/" title="게이트 페이지로 이동" className="flex items-center gap-2 group shrink-0">
-            <img
-              src={LOGO_URL}
-              alt="120pie 로고"
-              className="h-[22px] md:h-[26px] w-auto object-contain transition-transform duration-300 group-hover:scale-102"
-            />
-          </Link>
-
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 lg:gap-10 font-medium text-[16px] text-neutral-700">
-            <Link href="/brand/story" className="hover:text-amber-600 transition-colors whitespace-nowrap">
-              브랜드 소개
-            </Link>
-            <Link href="/brand/menu" className="hover:text-amber-600 transition-colors whitespace-nowrap">
-              메뉴 소개
-            </Link>
-            <Link href="/stores" className="hover:text-amber-600 transition-colors whitespace-nowrap">
-              매장 찾기
-            </Link>
-            <Link href="/brand/franchise" className="hover:text-amber-600 transition-colors whitespace-nowrap">
-              창업 안내
-            </Link>
-          </nav>
-
-          {/* Right Header Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <Link
-              href="/franchise"
-              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-neutral-950 text-[#fbc400] font-black text-xs rounded-full transition-all duration-300 shadow-xs hover:bg-black border border-neutral-800 cursor-pointer whitespace-nowrap"
-            >
-              창업홈페이지 바로가기 &rarr;
-            </Link>
-            <Link
-              href="/portal"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-white text-neutral-800 hover:text-neutral-950 font-bold text-xs rounded-full transition-all border border-neutral-200 hover:border-neutral-400 cursor-pointer whitespace-nowrap"
-            >
-              점주 전용
-            </Link>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-1.5 text-neutral-700 hover:text-amber-600 transition-colors"
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* MOBILE NAVIGATION OVERLAY */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 top-[57px] z-[9999] bg-white text-neutral-900 flex flex-col justify-between p-6 sm:p-8 md:hidden animate-fadeIn h-[calc(100vh-57px)] overflow-y-auto shadow-2xl border-t border-neutral-100">
-          <nav className="flex flex-col space-y-1 font-bold text-lg text-neutral-900 text-left">
-            <Link 
-              href="/brand/story" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
-            >
-              <span>브랜드 소개</span>
-              <ChevronRight size={18} className="text-neutral-400" />
-            </Link>
-            <Link 
-              href="/brand/menu" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
-            >
-              <span>메뉴 소개</span>
-              <ChevronRight size={18} className="text-neutral-400" />
-            </Link>
-            <Link 
-              href="/stores" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
-            >
-              <span>매장 찾기</span>
-              <ChevronRight size={18} className="text-neutral-400" />
-            </Link>
-            <Link
-              href="/brand/franchise"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-4 border-b border-neutral-100 hover:text-amber-600 transition-colors text-left flex items-center justify-between font-extrabold text-lg text-neutral-900"
-            >
-              <span>창업 안내</span>
-              <ChevronRight size={18} className="text-neutral-400" />
-            </Link>
-          </nav>
-          <div className="pt-6 border-t border-neutral-100">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setIsConsulting(true);
-              }}
-              className="w-full py-4 bg-[#fbc400] hover:bg-[#e0a800] text-[#0D233A] font-extrabold text-center rounded-2xl text-base transition-colors shadow-md block border-0 cursor-pointer"
-            >
-              창업 상담 문의하기
-            </button>
-          </div>
-        </div>
-      )}
+      <BrandHeader onConsultClick={() => setIsConsulting(true)} />
 
       {/* 2. HERO SECTION */}
       <section className="relative w-full bg-neutral-950 text-white py-20 sm:py-28 overflow-hidden">
