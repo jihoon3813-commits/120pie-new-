@@ -63,13 +63,22 @@ export default function MobileBackManager() {
 
     const trapHistory = () => {
       try {
+        // Push 2 states if opened in new tab (window.history.length <= 2) so back button NEVER closes tab immediately!
         window.history.pushState({ isBackTrap: true, path: pathname }, "", window.location.href);
+        if (window.history.length <= 2) {
+          window.history.pushState({ isBackTrap: true, path: pathname }, "", window.location.href);
+        }
       } catch (e) {}
     };
 
     trapHistory();
 
-    const handlePopState = (e: PopStateEvent) => {
+    const handlePopState = () => {
+      // Re-push trap state IMMEDIATELY to prevent new tab from closing or navigating away
+      try {
+        window.history.pushState({ isBackTrap: true, path: pathname }, "", window.location.href);
+      } catch (err) {}
+
       // 1. If any modal/sub-menu is registered in modalStack, close top item ONLY
       if (modalStack.length > 0) {
         const topModal = modalStack.pop();
@@ -79,10 +88,7 @@ export default function MobileBackManager() {
         return;
       }
 
-      // 2. Re-push trap state to hold history on current page
-      trapHistory();
-
-      // 3. Determine location name
+      // 2. Determine location name for custom exit modal
       const currentPath = window.location.pathname;
       if (currentPath.startsWith("/brand")) {
         setPageLocationName("120PIE 브랜드 홈페이지");
@@ -92,7 +98,7 @@ export default function MobileBackManager() {
         setPageLocationName("120PIE 창업 홈페이지");
       }
 
-      // 4. Open Exit Choice Modal
+      // 3. Open Exit/Gate Choice Modal
       setShowExitChoiceModal(true);
     };
 

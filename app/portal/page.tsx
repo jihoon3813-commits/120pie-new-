@@ -6403,18 +6403,20 @@ export default function PortalPage() {
         </div>
       )}
 
-      {/* 7. Mobile Cart Modal (Yellow Header, Spacious Layout with Full Continuous Material Items List) */}
+      {/* 7. Mobile Cart Modal (Yellow Header, Clean Fixed Header with Full Continuous Material Items List) */}
       {mobileCartOpen && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none animate-custom-fade font-sans"
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none animate-custom-fade font-sans"
+          style={{ overscrollBehaviorY: "contain", touchAction: "pan-y" }}
           onClick={() => closeModal(() => setMobileCartOpen(false))}
         >
           <div 
-            className="w-full sm:max-w-lg bg-white border-0 rounded-t-[28px] sm:rounded-[28px] overflow-hidden shadow-2xl h-[88vh] sm:h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
+            className="w-full sm:max-w-lg bg-white border-0 rounded-t-[28px] sm:rounded-[28px] overflow-hidden shadow-2xl h-[90vh] sm:h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
+            style={{ overscrollBehaviorY: "contain" }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Yellow Header */}
-            <div className="p-5 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shrink-0 shadow-xs">
+            {/* Fixed Yellow Header */}
+            <div className="p-5 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shrink-0 shadow-md rounded-t-[28px] relative z-20">
               <div className="flex items-center gap-2.5">
                 <ShoppingBag size={22} className="text-[#0F172A]" />
                 <h3 className="font-black text-base sm:text-lg text-[#0F172A]">발주 장바구니 ({cart.reduce((sum, item) => sum + item.quantity, 0)}개)</h3>
@@ -6445,7 +6447,10 @@ export default function PortalPage() {
             </div>
 
             {/* Main Scrollable Body: Full Vertical Items List */}
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-left">
+            <div 
+              className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-left"
+              style={{ overscrollBehaviorY: "contain", touchAction: "pan-y" }}
+            >
               {cart.length === 0 ? (
                 <div className="py-20 text-center space-y-3">
                   <ShoppingBag size={48} className="text-slate-300 mx-auto" />
