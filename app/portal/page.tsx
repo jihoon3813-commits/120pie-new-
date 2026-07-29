@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useModalBackHandler } from "@/components/MobileBackManager";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -851,6 +852,15 @@ export default function PortalPage() {
     message: "",
     type: "alert"
   });
+
+  // Admin back navigation handling (Sub-menus -> return to Dashboard, Modals -> close modal)
+  useModalBackHandler("portal-sub-menu", currentMenu !== "dashboard", () => setCurrentMenu("dashboard"));
+  useModalBackHandler("portal-dialog", customDialog.isOpen, () => setCustomDialog(prev => ({ ...prev, isOpen: false })));
+  useModalBackHandler("portal-notice-modal", !!selectedNotice, () => setSelectedNotice(null));
+  useModalBackHandler("portal-order-modal", !!selectedOrder, () => setSelectedOrder(null));
+  useModalBackHandler("portal-product-modal", !!selectedProductDetail, () => setSelectedProductDetail(null));
+  useModalBackHandler("portal-cart-modal", mobileCartOpen, () => setMobileCartOpen(false));
+  useModalBackHandler("portal-inquiry-modal", showInquiryModal, () => setShowInquiryModal(false));
 
   const showCustomAlert = (title: string, message: string, onConfirm?: () => void) => {
     setCustomDialog({
@@ -2922,7 +2932,7 @@ export default function PortalPage() {
         )}
 
         {/* MAIN CONTENT AREA (100% Full Width Screen Layout like Admin) */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto w-full max-w-full">
+        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 overflow-y-auto w-full max-w-full">
           <div className="w-full max-w-full space-y-6">
           
           {/* MENU CONTENT: 1. DASHBOARD */}
@@ -4285,7 +4295,7 @@ export default function PortalPage() {
       </div>
 
       {/* MOBILE BOTTOM NAVIGATION BAR */}
-      <nav className="lg:hidden shrink-0 bg-white border-t border-[#f2ccd7] grid grid-cols-5 p-1 relative z-30 shadow-md">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#f2ccd7] grid grid-cols-5 p-1 shadow-[0_-5px_25px_rgba(0,0,0,0.12)]">
         {[
           { key: "dashboard", label: "홈", icon: LayoutDashboard },
           { key: "order", label: "발주", icon: ShoppingBag },
