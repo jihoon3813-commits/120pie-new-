@@ -6413,25 +6413,39 @@ export default function PortalPage() {
         </div>
       )}
 
-      {/* 7. Mobile Cart Modal (Yellow Header, Clean Fixed Header with Full Continuous Material Items List) */}
+      {/* 7. Mobile Cart Modal (Yellow Header with Left Back Arrow, Clean Rounded Top, Full Items List) */}
       {mobileCartOpen && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none animate-custom-fade font-sans"
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none animate-custom-fade font-sans pt-10 sm:pt-0"
           style={{ overscrollBehaviorY: "contain", touchAction: "pan-y" }}
           onClick={() => closeModal(() => setMobileCartOpen(false))}
         >
           <div 
-            className="w-full sm:max-w-lg bg-white border-0 rounded-t-[28px] sm:rounded-[28px] overflow-hidden shadow-2xl h-[90vh] sm:h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
+            className="w-full sm:max-w-lg bg-white border-0 rounded-t-[28px] sm:rounded-[28px] overflow-hidden shadow-2xl max-h-[84vh] sm:max-h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
             style={{ overscrollBehaviorY: "contain" }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Fixed Yellow Header */}
-            <div className="p-5 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shrink-0 shadow-md rounded-t-[28px] relative z-20">
-              <div className="flex items-center gap-2.5">
-                <ShoppingBag size={22} className="text-[#0F172A]" />
-                <h3 className="font-black text-base sm:text-lg text-[#0F172A]">발주 장바구니 ({cart.reduce((sum, item) => sum + item.quantity, 0)}개)</h3>
-              </div>
+            <div className="p-4 sm:p-5 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shrink-0 shadow-md rounded-t-[28px] relative z-20">
               <div className="flex items-center gap-2">
+                {/* Left Back Arrow Button for Mobile */}
+                <button
+                  type="button"
+                  onClick={() => closeModal(() => setMobileCartOpen(false))}
+                  className="p-1.5 text-[#0F172A] hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer flex items-center justify-center shrink-0"
+                  aria-label="뒤로가기 닫기"
+                  title="뒤로가기"
+                >
+                  <ArrowLeft size={20} className="text-[#0F172A]" />
+                </button>
+                <div className="flex items-center gap-2 min-w-0">
+                  <ShoppingBag size={20} className="text-[#0F172A] shrink-0" />
+                  <h3 className="font-black text-sm sm:text-lg text-[#0F172A] tracking-tight truncate">
+                    발주 장바구니 ({cart.reduce((sum, item) => sum + item.quantity, 0)}개)
+                  </h3>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 {cart.length > 0 && (
                   <button 
                     type="button"
@@ -6441,15 +6455,17 @@ export default function PortalPage() {
                         setMobileCartOpen(false);
                       });
                     }} 
-                    className="text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer border-0 bg-white px-3 py-1.5 rounded-full shadow-2xs"
+                    className="text-[11px] sm:text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer border-0 bg-white px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full shadow-2xs"
                   >
-                    <Trash2 size={13} /> 비우기
+                    <Trash2 size={12} /> 비우기
                   </button>
                 )}
                 <button 
                   type="button"
                   onClick={() => closeModal(() => setMobileCartOpen(false))} 
-                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer"
+                  className="p-1.5 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer shrink-0"
+                  aria-label="창 닫기"
+                  title="닫기"
                 >
                   <X size={18} />
                 </button>
