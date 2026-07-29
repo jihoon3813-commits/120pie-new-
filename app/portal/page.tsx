@@ -853,8 +853,7 @@ export default function PortalPage() {
     type: "alert"
   });
 
-  // Admin back navigation handling (Sub-menus -> return to Dashboard, Modals -> close modal)
-  useModalBackHandler("portal-sub-menu", currentMenu !== "dashboard", () => setCurrentMenu("dashboard"));
+  // Admin back navigation handling (Modals -> close modal; Back button anywhere in admin -> ask Exit/Gate Choice)
   useModalBackHandler("portal-dialog", customDialog.isOpen, () => setCustomDialog(prev => ({ ...prev, isOpen: false })));
   useModalBackHandler("portal-notice-modal", !!selectedNotice, () => setSelectedNotice(null));
   useModalBackHandler("portal-order-modal", !!selectedOrder, () => setSelectedOrder(null));
@@ -6404,20 +6403,20 @@ export default function PortalPage() {
         </div>
       )}
 
-      {/* 7. Mobile Cart Modal (Yellow Header, border-0, Clean Style) */}
+      {/* 7. Mobile Cart Modal (Yellow Header, Spacious Layout with Full Continuous Material Items List) */}
       {mobileCartOpen && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none animate-custom-fade"
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none animate-custom-fade font-sans"
           onClick={() => closeModal(() => setMobileCartOpen(false))}
         >
           <div 
-            className="w-full sm:max-w-md bg-white border-0 rounded-t-[28px] sm:rounded-[28px] overflow-hidden shadow-2xl max-h-[92vh] flex flex-col animate-slideUp sm:animate-custom-scale"
+            className="w-full sm:max-w-lg bg-white border-0 rounded-t-[28px] sm:rounded-[28px] overflow-hidden shadow-2xl h-[88vh] sm:h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Yellow Header */}
-            <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shrink-0 shadow-xs">
+            <div className="p-5 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shrink-0 shadow-xs">
               <div className="flex items-center gap-2.5">
-                <ShoppingBag size={20} className="text-[#0F172A]" />
+                <ShoppingBag size={22} className="text-[#0F172A]" />
                 <h3 className="font-black text-base sm:text-lg text-[#0F172A]">발주 장바구니 ({cart.reduce((sum, item) => sum + item.quantity, 0)}개)</h3>
               </div>
               <div className="flex items-center gap-2">
@@ -6445,22 +6444,25 @@ export default function PortalPage() {
               </div>
             </div>
 
-            {/* Modal Content */}
-            <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 max-h-none">
+            {/* Main Scrollable Body: Full Vertical Items List */}
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-left">
               {cart.length === 0 ? (
-                <div className="py-16 text-center space-y-3">
-                  <ShoppingBag size={40} className="text-slate-300 mx-auto" />
-                  <p className="text-xs text-slate-500 font-bold leading-relaxed max-w-[180px] mx-auto">
+                <div className="py-20 text-center space-y-3">
+                  <ShoppingBag size={48} className="text-slate-300 mx-auto" />
+                  <p className="text-sm text-slate-500 font-bold leading-relaxed max-w-[200px] mx-auto">
                     발주할 물품의 '담기' 버튼을 클릭해 장바구니를 채워주세요.
                   </p>
                 </div>
               ) : (
                 <>
-                  {/* Cart Items list (Grouped by Shipping Type) */}
-                  <div className="space-y-4 pr-1">
+                  {/* Cart Items list (Full Continuous List) */}
+                  <div className="space-y-4">
+                    <span className="text-xs font-black text-slate-700 block pb-1 border-b border-slate-100">
+                      선택한 발주 자재 목록 ({cart.reduce((sum, item) => sum + item.quantity, 0)}개)
+                    </span>
                     {groupedCartItems.map(([typeKey, group]) => (
-                      <div key={typeKey} className="space-y-2 text-left">
-                        <div className="flex justify-between items-center bg-[#F8FAFC] px-3 py-1.5 rounded-xl border-0 select-none">
+                      <div key={typeKey} className="space-y-2.5">
+                        <div className="flex justify-between items-center bg-[#F8FAFC] px-3.5 py-2 rounded-xl border border-slate-100 select-none">
                           <span className="font-black text-xs text-[#0F172A]">{group.title}</span>
                           {group.feeLabel && (
                             <span className="text-[10px] text-slate-500 font-bold">
@@ -6469,21 +6471,21 @@ export default function PortalPage() {
                           )}
                         </div>
                         
-                        <div className="space-y-2">
+                        <div className="space-y-2.5">
                           {group.items.map((item) => {
                             const p = (products || []).find((prod) => prod.id === item.productId);
                             if (!p) return null;
                             return (
-                              <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border-0 shadow-2xs p-3 rounded-2xl">
-                                <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
+                              <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border border-slate-200/80 p-3.5 rounded-2xl shadow-xs">
+                                <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0 border border-slate-100" />
                                 <div className="flex-1 min-w-0 text-left">
-                                  <h4 className="font-black text-xs text-[#0F172A] truncate">{p.name}</h4>
+                                  <h4 className="font-black text-xs sm:text-sm text-[#0F172A] leading-tight">{p.name}</h4>
                                   {item.selectedOption && (
-                                    <span className="text-[10px] text-slate-500 font-bold block mt-0.5 select-none">
+                                    <span className="text-[10px] text-amber-700 font-extrabold block mt-0.5 select-none">
                                       [옵션: {item.selectedOption}]
                                     </span>
                                   )}
-                                  <span className="text-[10px] text-slate-400 font-bold block mt-0.5">{p.price.toLocaleString()} 원 · {p.packSize}</span>
+                                  <span className="text-[11px] text-slate-500 font-bold block mt-1">{p.price.toLocaleString()} 원 · {p.packSize}</span>
                                 </div>
                                 <div className="flex flex-col items-end gap-1.5 shrink-0">
                                   <button 
@@ -6494,12 +6496,12 @@ export default function PortalPage() {
                                         setMobileCartOpen(false);
                                       }
                                     }} 
-                                    className="text-slate-400 hover:text-rose-600 transition-colors p-0.5 cursor-pointer bg-transparent border-0" 
+                                    className="text-slate-400 hover:text-rose-600 transition-colors p-1 cursor-pointer bg-transparent border-0" 
                                     aria-label="삭제"
                                   >
-                                    <X size={14} />
+                                    <X size={15} />
                                   </button>
-                                  <div className="flex items-center bg-[#F8FAFC] rounded-full p-1 border-0">
+                                  <div className="flex items-center bg-[#F8FAFC] rounded-full p-1 border border-slate-200 shadow-2xs">
                                     <button 
                                       type="button"
                                       onClick={() => {
@@ -6508,17 +6510,17 @@ export default function PortalPage() {
                                           setMobileCartOpen(false);
                                         }
                                       }} 
-                                      className="p-1 hover:text-[#0F172A] text-slate-400 transition-colors cursor-pointer bg-transparent border-0"
+                                      className="p-1 hover:text-[#0F172A] text-slate-500 transition-colors cursor-pointer bg-transparent border-0"
                                     >
-                                      <Minus size={10} />
+                                      <Minus size={11} />
                                     </button>
                                     <span className="px-2 text-xs font-black text-[#0F172A] w-5 text-center">{item.quantity}</span>
                                     <button 
                                       type="button"
                                       onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity + 1)} 
-                                      className="p-1 hover:text-[#0F172A] text-slate-400 transition-colors cursor-pointer bg-transparent border-0"
+                                      className="p-1 hover:text-[#0F172A] text-slate-500 transition-colors cursor-pointer bg-transparent border-0"
                                     >
-                                      <Plus size={10} />
+                                      <Plus size={11} />
                                     </button>
                                   </div>
                                 </div>
@@ -6529,84 +6531,86 @@ export default function PortalPage() {
                       </div>
                     ))}
                   </div>
+
+                  {/* Bill Summary Section (Inside Scrollable Area below full items list) */}
+                  <div className="pt-4 border-t border-slate-200 space-y-3 bg-[#F8FAFC] p-4 rounded-2xl border border-slate-100">
+                    <h5 className="font-black text-xs text-[#0F172A]">결제 예상 금액</h5>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between text-slate-600 font-bold">
+                        <span>상품 합계</span>
+                        <span>{cartSubtotal.toLocaleString()} 원</span>
+                      </div>
+                      <div className="flex justify-between text-slate-600 font-bold">
+                        <div className="flex flex-col text-left">
+                          <span>배송비</span>
+                          {shippingFee > 0 && (
+                            <span className="text-[10px] text-slate-400 font-bold">({shippingTypeLabel} 적용)</span>
+                          )}
+                        </div>
+                        <span>{shippingFee === 0 ? "무료" : `${shippingFee.toLocaleString()} 원`}</span>
+                      </div>
+                      <div className="flex justify-between text-[#0F172A] font-black text-sm border-t border-slate-200 pt-2.5">
+                        <span>최종 결제 금액</span>
+                        <span className="text-amber-600">{cartTotal.toLocaleString()} 원</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 이달의 카드 무이자 혜택 안내 */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs text-left">
+                    <div className="flex items-center gap-1.5 text-[#0F172A] font-black text-xs mb-2">
+                      <CreditCard size={16} className="shrink-0 text-[#F5AC00]" />
+                      <span>7월 카드사 무이자 혜택 (5만원 이상)</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[10px] font-semibold text-[#735965]/90 border-b border-slate-100 pb-2 mb-2">
+                      <div className="flex justify-between items-center">
+                        <span>• 현대 / 신한</span>
+                        <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>• 삼성 / 국민</span>
+                        <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>• 롯데 / 전북</span>
+                        <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>• BC / 우리</span>
+                        <span className="font-extrabold text-[#bf3e67]">2~5개월</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>• 하나 / 광주</span>
+                        <span className="font-extrabold text-[#bf3e67]">2~5개월</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>• NH농협</span>
+                        <span className="font-extrabold text-[#bf3e67]">2~6개월</span>
+                      </div>
+                    </div>
+                    <div className="text-[8px] text-[#735965]/70 font-medium leading-normal">
+                      * 법인/체크/선불/기프트/하이버리드 카드는 제외됩니다.<br />
+                      * 자세한 사항은 PG사(KG이니시스) 결제창에서 확인 가능합니다.
+                    </div>
+                  </div>
                 </>
               )}
             </div>
 
-            {/* Modal Footer */}
+            {/* Sticky Bottom Action Bar */}
             {cart.length > 0 && (
-              <div className="p-6 border-t border-slate-100 bg-[#F8FAFC] shrink-0 space-y-4">
-                {/* Cart Bill Details */}
-                <div className="space-y-2.5 text-xs">
-                  <div className="flex justify-between text-slate-600 font-bold">
-                    <span>상품 합계</span>
-                    <span>{cartSubtotal.toLocaleString()} 원</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600 font-bold">
-                    <div className="flex flex-col text-left">
-                      <span>배송비</span>
-                      {shippingFee > 0 && (
-                        <span className="text-[10px] text-slate-400 font-bold">({shippingTypeLabel} 적용)</span>
-                      )}
-                    </div>
-                    <span>{shippingFee === 0 ? "무료" : `${shippingFee.toLocaleString()} 원`}</span>
-                  </div>
-                  <div className="flex justify-between text-[#0F172A] font-black text-sm border-t border-slate-200 pt-3">
-                    <span>최종 결제 금액</span>
-                    <span>{cartTotal.toLocaleString()} 원</span>
-                  </div>
-                </div>
-
-                {/* Order action button */}
+              <div className="p-4 border-t border-slate-200 bg-white shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
                 <button 
                   type="button"
                   onClick={() => {
                     closeModal(() => setMobileCartOpen(false));
                     placeOrder();
                   }}
-                  className="w-full py-3.5 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs sm:text-sm font-black rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0"
+                  className="w-full py-3.5 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-sm font-black rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-98"
                 >
-                  <CheckCircle2 size={16} />
-                  결제 진행하기
+                  <CheckCircle2 size={18} />
+                  <span>{cartTotal.toLocaleString()}원 결제 진행하기</span>
                 </button>
-
-                {/* 이달의 카드 무이자 혜택 안내 */}
-                <div className="mt-3 bg-white border-0 rounded-2xl p-4 shadow-2xs text-left">
-                  <div className="flex items-center gap-1.5 text-[#0F172A] font-black text-xs mb-2">
-                    <CreditCard size={16} className="shrink-0 text-[#F5AC00]" />
-                    <span>7월 카드사 무이자 혜택 (5만원 이상)</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[10px] font-semibold text-[#735965]/90 border-b border-[#f2ccd7]/30 pb-2 mb-2">
-                    <div className="flex justify-between items-center">
-                      <span>• 현대 / 신한</span>
-                      <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>• 삼성 / 국민</span>
-                      <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>• 롯데 / 전북</span>
-                      <span className="font-extrabold text-[#bf3e67]">2~3개월</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>• BC / 우리</span>
-                      <span className="font-extrabold text-[#bf3e67]">2~5개월</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>• 하나 / 광주</span>
-                      <span className="font-extrabold text-[#bf3e67]">2~5개월</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>• NH농협</span>
-                      <span className="font-extrabold text-[#bf3e67]">2~6개월</span>
-                    </div>
-                  </div>
-                  <div className="text-[8px] text-[#735965]/70 font-medium leading-normal">
-                    * 법인/체크/선불/기프트/하이버리드 카드는 제외됩니다.<br />
-                    * 자세한 사항은 PG사(KG이니시스) 결제창에서 확인 가능합니다.
-                  </div>
-                </div>
               </div>
             )}
           </div>
