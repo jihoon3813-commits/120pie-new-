@@ -29,28 +29,33 @@ export async function GET(request: NextRequest) {
     }
 
     const html = await res.text();
-    // Search for img src with cdninstagram.com in HTML
-    const imgMatches = html.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/gi);
+    const imgMatches = html.match(/<img[^>]+>/gi);
 
     let thumbnailUrl = "";
     if (imgMatches) {
       for (const tag of imgMatches) {
-        const srcMatch = tag.match(/src=["']([^"']+)["']/i);
-        if (srcMatch && srcMatch[1]) {
-          const rawUrl = srcMatch[1].replace(/&amp;/g, "&");
-          // Ignore avatar profile pictures (s100x100) or icons, prefer post content (t51.82787-15 or e35 / 1500)
-          if (rawUrl.includes("cdninstagram") && (rawUrl.includes("t51.82787") || rawUrl.includes("e35") || rawUrl.includes("s640x640") || rawUrl.includes("p240x240"))) {
-            thumbnailUrl = rawUrl;
+        // Skip profile avatars (100x100 profile_pic)
+        if (tag.includes("profile_pic") || tag.includes("s100x100")) continue;
+
+        // 1. Check srcset attribute for higher resolution candidate
+        const srcsetMatch = tag.match(/srcset=["']([^"']+)["']/i);
+        if (srcsetMatch && srcsetMatch[1]) {
+          const sources = srcsetMatch[1].split(",");
+          const lastSource = sources[sources.length - 1].trim().split(" ")[0];
+          if (lastSource && (lastSource.includes("cdninstagram") || lastSource.includes("fbcdn"))) {
+            thumbnailUrl = lastSource.replace(/&amp;/g, "&");
             break;
           }
         }
-      }
 
-      // Fallback: take any cdninstagram URL if strict filter did not match
-      if (!thumbnailUrl && imgMatches.length > 1) {
-        const lastTagSrc = imgMatches[imgMatches.length - 1].match(/src=["']([^"']+)["']/i);
-        if (lastTagSrc && lastTagSrc[1]) {
-          thumbnailUrl = lastTagSrc[1].replace(/&amp;/g, "&");
+        // 2. Fallback to src attribute
+        const srcMatch = tag.match(/src=["']([^"']+)["']/i);
+        if (srcMatch && srcMatch[1]) {
+          const rawUrl = srcMatch[1].replace(/&amp;/g, "&");
+          if (rawUrl.includes("cdninstagram") || rawUrl.includes("fbcdn")) {
+            thumbnailUrl = rawUrl;
+            break;
+          }
         }
       }
     }

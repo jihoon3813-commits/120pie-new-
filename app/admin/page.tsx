@@ -3514,15 +3514,31 @@ export default function AdminPage() {
     }
   };
 
-  const handleOpenInstaEdit = (item: any) => {
+  const handleOpenInstaEdit = async (item: any) => {
     setInstaId(item._id);
-    setInstaImg(item.img);
     setInstaText(item.text);
     setInstaLink(item.link);
     setInstaDate(item.date);
     setInstaOrder(item.orderIndex);
     setInstaIsMain(item.isMain ?? false);
     setIsInstaModalOpen(true);
+
+    if (!item.img || item.img.includes("weserv.nl")) {
+      setInstaImg("");
+      if (item.link) {
+        try {
+          const res = await fetch(`/api/instagram-thumb?url=${encodeURIComponent(item.link)}`);
+          const data = await res.json();
+          if (data.success && data.thumbnailUrl) {
+            setInstaImg(data.thumbnailUrl);
+          }
+        } catch (err) {
+          console.error("Failed to auto-refresh thumbnail on edit:", err);
+        }
+      }
+    } else {
+      setInstaImg(item.img);
+    }
   };
 
   const handleSavePopup = async (e: React.FormEvent) => {
@@ -8631,6 +8647,7 @@ export default function AdminPage() {
                         setInstaLink("");
                         setInstaDate(new Date().toISOString().split("T")[0]);
                         setInstaOrder((convexInstagram?.length || 0) + 1);
+                        setInstaIsMain(false);
                         setIsInstaModalOpen(true);
                       }}
                       className="px-5 py-3 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
