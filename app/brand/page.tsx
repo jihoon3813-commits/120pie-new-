@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { MENU_DATA } from "@/app/constants/menu";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
-import { getInstagramThumbnailUrl } from "@/app/utils/instagram";
+import { getInstagramThumbnailUrl, INSTAGRAM_FALLBACK_IMAGE } from "@/app/utils/instagram";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 import InteriorConcept from "@/components/landing-v6/InteriorConcept";
 import ConsultationForm from "@/components/ConsultationForm";
@@ -1483,11 +1483,11 @@ export default function BrandHome() {
                         {/* Feed Image Container (Aspect 4:5) */}
                         <div className="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100 flex items-center justify-center">
                           <img 
-                            src={optimizeCloudinaryUrl(getInstagramThumbnailUrl(item.img || item.link))}
+                            src={optimizeCloudinaryUrl(getInstagramThumbnailUrl(item.img, item.link))}
                             alt="Instagram Post"
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
                             onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).src = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784555518/4344223e-1040-4413-9233-bf6b98fe0412.png";
+                              (e.currentTarget as HTMLImageElement).src = INSTAGRAM_FALLBACK_IMAGE;
                             }}
                           />
                           {/* Hover overlay icon */}
@@ -1554,11 +1554,11 @@ export default function BrandHome() {
               {/* Left Column: Big Image (Strict 4:5 Aspect Ratio) */}
               <div className="w-full md:w-auto md:h-full aspect-[4/5] bg-neutral-100 flex items-center justify-center overflow-hidden shrink-0 relative">
                 <img 
-                  src={optimizeCloudinaryUrl(getInstagramThumbnailUrl(selectedInsta.img || selectedInsta.link))} 
+                  src={optimizeCloudinaryUrl(getInstagramThumbnailUrl(selectedInsta.img, selectedInsta.link))} 
                   alt="Post Detail" 
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784555518/4344223e-1040-4413-9233-bf6b98fe0412.png";
+                    (e.currentTarget as HTMLImageElement).src = INSTAGRAM_FALLBACK_IMAGE;
                   }}
                 />
               </div>
