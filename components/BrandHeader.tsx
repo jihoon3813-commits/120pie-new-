@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ChevronRight } from "lucide-react";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
@@ -13,13 +13,29 @@ interface BrandHeaderProps {
 
 export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useModalBackHandler("brand-mobile-menu", mobileMenuOpen, () => setMobileMenuOpen(false));
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
       {/* BRAND GNB HEADER */}
-      <header className="sticky top-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/95 py-3 border-b border-neutral-100 shadow-sm isolate">
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 py-3 border-b border-neutral-200/80 isolate ${
+          isScrolled
+            ? "bg-white shadow-md opacity-100"
+            : "bg-white/95 backdrop-blur-md shadow-xs"
+        }`}
+      >
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
           {/* Logo */}
           <Link href="/brand" title="브랜드 홈페이지 메인으로 이동" className="flex items-center gap-2 group shrink-0">
