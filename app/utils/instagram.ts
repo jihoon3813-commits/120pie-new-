@@ -13,27 +13,32 @@ export function extractInstagramShortcode(url: string): string | null {
   return match ? match[1] : null;
 }
 
+export const INSTAGRAM_FALLBACK_IMAGE = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784555518/4344223e-1040-4413-9233-bf6b98fe0412.png";
+
 export function getInstagramThumbnailUrl(urlOrImg: string): string {
-  if (!urlOrImg) return "";
+  if (!urlOrImg || !urlOrImg.trim()) {
+    return INSTAGRAM_FALLBACK_IMAGE;
+  }
 
-  // 1. 이미 직렬 이미지 파일(Cloudinary, weserv.nl, data:, .jpg 등)인 경우 그대로 반환
+  const trimmed = urlOrImg.trim();
+
+  // 1. 이미 직렬 이미지 파일(Cloudinary, data:, cdninstagram, weserv, .jpg, .png 등)인 경우 그대로 반환
   if (
-    urlOrImg.startsWith("data:") ||
-    urlOrImg.includes("cloudinary.com") ||
-    urlOrImg.includes("weserv.nl") ||
-    urlOrImg.includes("cdninstagram.com") ||
-    urlOrImg.match(/\.(jpeg|jpg|gif|png|webp|avif)(\?.*)?$/i)
+    trimmed.startsWith("data:") ||
+    trimmed.includes("cloudinary.com") ||
+    trimmed.includes("weserv.nl") ||
+    trimmed.includes("cdninstagram.com") ||
+    trimmed.match(/\.(jpeg|jpg|gif|png|webp|avif)(\?.*)?$/i)
   ) {
-    return urlOrImg;
+    return trimmed;
   }
 
-  // 2. 인스타그램 게시물/릴스 URL에서 shortcode 추출 후 weserv.nl CDN 프록시 엔드포인트 도출
-  const shortcode = extractInstagramShortcode(urlOrImg);
+  // 2. 인스타그램 게시물/릴스 URL에서 shortcode 추출 후 썸네일 엔드포인트 도출
+  const shortcode = extractInstagramShortcode(trimmed);
   if (shortcode) {
-    // weserv.nl 프록시를 사용하여 Instagram CORS/Referer 차단을 우회하고 고화질 썸네일 반환
-    return `https://images.weserv.nl/?url=https://www.instagram.com/p/${shortcode}/media/?size=l`;
+    return `https://images.weserv.nl/?url=https://www.instagram.com/p/${shortcode}/media/?size=m`;
   }
 
-  return urlOrImg;
+  return trimmed;
 }
 

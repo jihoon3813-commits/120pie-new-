@@ -1486,6 +1486,9 @@ export default function BrandHome() {
                             src={optimizeCloudinaryUrl(getInstagramThumbnailUrl(item.img || item.link))}
                             alt="Instagram Post"
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784555518/4344223e-1040-4413-9233-bf6b98fe0412.png";
+                            }}
                           />
                           {/* Hover overlay icon */}
                           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -1554,6 +1557,9 @@ export default function BrandHome() {
                   src={optimizeCloudinaryUrl(getInstagramThumbnailUrl(selectedInsta.img || selectedInsta.link))} 
                   alt="Post Detail" 
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784555518/4344223e-1040-4413-9233-bf6b98fe0412.png";
+                  }}
                 />
               </div>
 
