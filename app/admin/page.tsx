@@ -1523,6 +1523,7 @@ export default function AdminPage() {
   const [instaOrder, setInstaOrder] = useState(1);
   const [instaIsMain, setInstaIsMain] = useState(false);
   const [isInstaModalOpen, setIsInstaModalOpen] = useState(false);
+  const [isRefreshingInstaHd, setIsRefreshingInstaHd] = useState(false);
   
   // Instagram Drag & Drop Reorder States
   const [draggedInstaIndex, setDraggedInstaIndex] = useState<number | null>(null);
@@ -3538,6 +3539,38 @@ export default function AdminPage() {
       }
     } else {
       setInstaImg(item.img);
+    }
+  };
+
+  const handleRefreshAllInstaHd = async () => {
+    if (!convexInstagram || convexInstagram.length === 0) return;
+    setIsRefreshingInstaHd(true);
+    try {
+      let updatedCount = 0;
+      for (const item of convexInstagram) {
+        if (item.link) {
+          const res = await fetch(`/api/instagram-thumb?url=${encodeURIComponent(item.link)}`);
+          const data = await res.json();
+          if (data.success && data.thumbnailUrl) {
+            await saveInstagramMutation({
+              id: item._id,
+              img: data.thumbnailUrl,
+              text: item.text,
+              link: item.link,
+              date: item.date,
+              orderIndex: item.orderIndex,
+              isMain: item.isMain,
+            });
+            updatedCount++;
+          }
+        }
+      }
+      alert(`총 ${updatedCount}개의 인스타그램 피드 썸네일이 FULL HD 초고화질로 성공적으로 갱신되었습니다!`);
+    } catch (err) {
+      console.error("HD Refresh Error:", err);
+      alert("HD 썸네일 갱신 중 에러가 발생했습니다.");
+    } finally {
+      setIsRefreshingInstaHd(false);
     }
   };
 
@@ -8638,22 +8671,33 @@ export default function AdminPage() {
                         브랜드 홈페이지 하단 인스타그램 섹션에 노출될 게시물 데이터 목록입니다. 클릭 시 상세 팝업 및 인스타 아웃링크가 연동됩니다.
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setInstaId(null);
-                        setInstaImg("");
-                        setInstaText("");
-                        setInstaLink("");
-                        setInstaDate(new Date().toISOString().split("T")[0]);
-                        setInstaOrder((convexInstagram?.length || 0) + 1);
-                        setInstaIsMain(false);
-                        setIsInstaModalOpen(true);
-                      }}
-                      className="px-5 py-3 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
-                    >
-                      + 신규 인스타 게시물 연동
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleRefreshAllInstaHd}
+                        disabled={isRefreshingInstaHd}
+                        className="px-4 py-3 bg-neutral-900 hover:bg-black text-[#FED422] text-xs font-black rounded-2xl transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 disabled:opacity-50"
+                        title="모든 인스타 게시물의 썸네일을 FULL HD 1080p 고화질로 자동 갱신합니다."
+                      >
+                        {isRefreshingInstaHd ? "⚡ 고화질 HD 갱신 중..." : "⚡ 전체 피드 HD 고화질 갱신"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setInstaId(null);
+                          setInstaImg("");
+                          setInstaText("");
+                          setInstaLink("");
+                          setInstaDate(new Date().toISOString().split("T")[0]);
+                          setInstaOrder((convexInstagram?.length || 0) + 1);
+                          setInstaIsMain(false);
+                          setIsInstaModalOpen(true);
+                        }}
+                        className="px-5 py-3 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
+                      >
+                        + 신규 인스타 게시물 연동
+                      </button>
+                    </div>
                   </div>
 
                   {/* List Table */}

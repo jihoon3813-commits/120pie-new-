@@ -29,34 +29,25 @@ export async function GET(request: NextRequest) {
     }
 
     const html = await res.text();
-    const imgMatches = html.match(/<img[^>]+>/gi);
+    const rawMatches = html.match(/https:\/\/[^"'\s\\]*(?:cdninstagram|fbcdn)[^"'\s\\]*/g);
 
     let thumbnailUrl = "";
-    if (imgMatches) {
-      for (const tag of imgMatches) {
-        // Skip profile avatars (100x100 profile_pic)
-        if (tag.includes("profile_pic") || tag.includes("s100x100")) continue;
+    if (rawMatches) {
+      const candidates = Array.from(new Set(rawMatches.map(u => u.replace(/&amp;/g, "&"))))
+        .filter(u => !u.includes("profile_pic") && !u.includes("s100x100") && !u.includes("rsrc.php"));
 
-        // 1. Check srcset attribute for higher resolution candidate
-        const srcsetMatch = tag.match(/srcset=["']([^"']+)["']/i);
-        if (srcsetMatch && srcsetMatch[1]) {
-          const sources = srcsetMatch[1].split(",");
-          const lastSource = sources[sources.length - 1].trim().split(" ")[0];
-          if (lastSource && (lastSource.includes("cdninstagram") || lastSource.includes("fbcdn"))) {
-            thumbnailUrl = lastSource.replace(/&amp;/g, "&");
-            break;
-          }
-        }
+      // Priority 1: Full HD Original Uncompressed Image (contains dst-jpg_e35_tt6 or e35 without downscales)
+      const fullRes = candidates.find(u => 
+        u.includes("dst-jpg_e35_tt6") || 
+        (u.includes("e35") && !u.includes("p240x240") && !u.includes("s150x150") && !u.includes("s320x320") && !u.includes("s480x480") && !u.includes("s640x640"))
+      );
 
-        // 2. Fallback to src attribute
-        const srcMatch = tag.match(/src=["']([^"']+)["']/i);
-        if (srcMatch && srcMatch[1]) {
-          const rawUrl = srcMatch[1].replace(/&amp;/g, "&");
-          if (rawUrl.includes("cdninstagram") || rawUrl.includes("fbcdn")) {
-            thumbnailUrl = rawUrl;
-            break;
-          }
-        }
+      if (fullRes) {
+        thumbnailUrl = fullRes;
+      } else {
+        // Priority 2: Standard resolution candidate from post body
+        const nonSmall = candidates.find(u => !u.includes("p240x240") && !u.includes("s150x150") && !u.includes("s240x240"));
+        thumbnailUrl = nonSmall || candidates[0] || "";
       }
     }
 
