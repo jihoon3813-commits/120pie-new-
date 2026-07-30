@@ -30,10 +30,10 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
     <>
       {/* BRAND GNB HEADER (FIXED TOP) */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 border-b border-neutral-200/80 isolate ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 isolate ${
           isScrolled
-            ? "bg-white shadow-md opacity-100"
-            : "bg-white/95 backdrop-blur-md shadow-xs"
+            ? "bg-neutral-900/90 backdrop-blur-md border-b border-neutral-800/80 shadow-md"
+            : "bg-white border-b border-neutral-200/80 shadow-xs"
         }`}
       >
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
@@ -41,25 +41,29 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
           <Link href="/brand" title="브랜드 홈페이지 메인으로 이동" className="flex items-center gap-2 group shrink-0">
             <img
               src={optimizeCloudinaryUrl(
-                "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
+                isScrolled
+                  ? "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784536582/Group_2_ma3j8j.png"
+                  : "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
               )}
               alt="120pie 로고"
-              className="h-[22px] md:h-[26px] w-auto object-contain transition-transform duration-300 group-hover:scale-102"
+              className="h-[22px] md:h-[26px] w-auto object-contain transition-all duration-300 group-hover:scale-102"
             />
           </Link>
 
           {/* Navigation Links (Desktop) */}
-          <nav className="hidden md:flex items-center gap-8 lg:gap-10 font-medium text-[16px] text-neutral-700">
-            <Link href="/brand/story" className="hover:text-amber-600 transition-colors whitespace-nowrap">
+          <nav className={`hidden md:flex items-center gap-8 lg:gap-10 font-medium text-[16px] transition-colors duration-300 ${
+            isScrolled ? "text-neutral-200" : "text-neutral-700"
+          }`}>
+            <Link href="/brand/story" className={`transition-colors whitespace-nowrap ${isScrolled ? "hover:text-amber-400" : "hover:text-amber-600"}`}>
               브랜드 소개
             </Link>
-            <Link href="/brand/menu" className="hover:text-amber-600 transition-colors whitespace-nowrap">
+            <Link href="/brand/menu" className={`transition-colors whitespace-nowrap ${isScrolled ? "hover:text-amber-400" : "hover:text-amber-600"}`}>
               메뉴 소개
             </Link>
-            <Link href="/stores" className="hover:text-amber-600 transition-colors whitespace-nowrap">
+            <Link href="/stores" className={`transition-colors whitespace-nowrap ${isScrolled ? "hover:text-amber-400" : "hover:text-amber-600"}`}>
               매장 찾기
             </Link>
-            <Link href="/brand/franchise" className="hover:text-amber-600 transition-colors whitespace-nowrap">
+            <Link href="/brand/franchise" className={`transition-colors whitespace-nowrap ${isScrolled ? "hover:text-amber-400" : "hover:text-amber-600"}`}>
               창업 안내
             </Link>
           </nav>
@@ -69,7 +73,11 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
             {/* 창업홈페이지 바로가기: Desktop only in header */}
             <Link
               href="/franchise"
-              className="hidden md:inline-flex px-3 py-1.5 sm:px-4 sm:py-2 bg-neutral-950 text-[#fbc400] font-black text-xs rounded-full transition-all duration-300 shadow-xs hover:bg-black border border-neutral-800 cursor-pointer whitespace-nowrap"
+              className={`hidden md:inline-flex px-3 py-1.5 sm:px-4 sm:py-2 font-black text-xs rounded-full transition-all duration-300 shadow-xs cursor-pointer whitespace-nowrap ${
+                isScrolled
+                  ? "bg-[#fbc400] text-neutral-950 hover:bg-amber-400"
+                  : "bg-neutral-950 text-[#fbc400] hover:bg-black border border-neutral-800"
+              }`}
             >
               창업홈페이지 바로가기 &rarr;
             </Link>
@@ -77,7 +85,11 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
             {/* 점주메뉴: Always visible on both mobile and desktop */}
             <Link
               href="/portal"
-              className="inline-flex px-2.5 py-1.5 sm:px-4 sm:py-2 bg-white text-neutral-800 hover:text-neutral-950 font-bold text-xs rounded-full transition-all border border-neutral-200 hover:border-neutral-400 cursor-pointer whitespace-nowrap"
+              className={`inline-flex px-2.5 py-1.5 sm:px-4 sm:py-2 font-bold text-xs rounded-full transition-all border cursor-pointer whitespace-nowrap ${
+                isScrolled
+                  ? "bg-neutral-800/90 text-neutral-200 hover:text-white border-neutral-700 hover:border-neutral-500"
+                  : "bg-white text-neutral-800 hover:text-neutral-950 border-neutral-200 hover:border-neutral-400"
+              }`}
             >
               점주메뉴
             </Link>
@@ -85,7 +97,9 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
             {/* Mobile Menu Button (더보기) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-1.5 text-neutral-700 hover:text-amber-600 transition-colors"
+              className={`md:hidden p-1.5 transition-colors ${
+                isScrolled ? "text-neutral-200 hover:text-amber-400" : "text-neutral-700 hover:text-amber-600"
+              }`}
               aria-label="더보기 메뉴 열기"
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
