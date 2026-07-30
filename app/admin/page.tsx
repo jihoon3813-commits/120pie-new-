@@ -8729,7 +8729,14 @@ export default function AdminPage() {
                                   {/* Image */}
                                   <td className="py-4 px-6">
                                     <div className="w-14 h-14 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center shadow-2xs">
-                                      <img src={optimizeCloudinaryUrl(item.img)} alt="Insta" className="w-full h-full object-cover" />
+                                      <img 
+                                        src={optimizeCloudinaryUrl(getInstagramThumbnailUrl(item.img, item.link))} 
+                                        alt="Insta 썸네일" 
+                                        className="w-full h-full object-cover" 
+                                        onError={(e) => {
+                                          (e.currentTarget as HTMLImageElement).src = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784555518/4344223e-1040-4413-9233-bf6b98fe0412.png";
+                                        }}
+                                      />
                                     </div>
                                   </td>
 
@@ -8843,12 +8850,21 @@ export default function AdminPage() {
                                   type="text"
                                   required
                                   value={instaLink}
-                                  onChange={(e) => {
+                                  onChange={async (e) => {
                                     const url = e.target.value;
                                     setInstaLink(url);
-                                    const autoThumb = getInstagramThumbnailUrl(url);
-                                    if (autoThumb && autoThumb !== url) {
-                                      setInstaImg(autoThumb);
+                                    if (url.includes("instagram.com") || url.includes("instagr.am")) {
+                                      try {
+                                        const res = await fetch(`/api/instagram-thumb?url=${encodeURIComponent(url)}`);
+                                        const data = await res.json();
+                                        if (data.success && data.thumbnailUrl) {
+                                          setInstaImg(data.thumbnailUrl);
+                                        } else {
+                                          setInstaImg(getInstagramThumbnailUrl(url));
+                                        }
+                                      } catch {
+                                        setInstaImg(getInstagramThumbnailUrl(url));
+                                      }
                                     }
                                   }}
                                   placeholder="https://www.instagram.com/p/xxxx 또는 reels/xxxx"
