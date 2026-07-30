@@ -46,7 +46,7 @@ export default function RightFloatingQuickBar({
   const instaTarget = convexFloating?.instaUrl || "https://www.instagram.com/120pie77/";
   const blogTarget = convexFloating?.blogUrl || "https://blog.naver.com/120pie_coffee";
   const youtubeTarget = convexFloating?.youtubeUrl || "https://www.youtube.com";
-  const phoneTarget = convexFloating?.phoneNo ? `tel:${convexFloating.phoneNo}` : "tel:1899-5685";
+  const phoneTarget = convexFloating?.phoneNo ? `tel:${convexFloating.phoneNo}` : "tel:1566-3594";
 
   return (
     <div className={`hidden md:flex fixed right-2.5 bottom-20 sm:right-6 sm:bottom-24 z-[90] flex-col items-end select-none transition-all duration-300 ${
@@ -113,7 +113,7 @@ export default function RightFloatingQuickBar({
         <a
           href={phoneTarget}
           className="w-full py-2 px-1 rounded-2xl bg-neutral-900/90 border border-neutral-800/80 hover:bg-[#FBC400] hover:text-neutral-950 hover:border-[#FBC400] transition-all duration-200 flex flex-col items-center justify-center text-center group text-neutral-200 cursor-pointer"
-          title={`전화문의 (${convexFloating?.phoneNo || "1899-5685"})`}
+          title={`전화문의 (${convexFloating?.phoneNo || "1566-3594"})`}
         >
           <Phone size={16} className="mb-1 text-[#FBC400] group-hover:text-neutral-950 transition-colors" />
           <span className="text-[9px] sm:text-[10px] font-extrabold leading-tight block">전화문의</span>

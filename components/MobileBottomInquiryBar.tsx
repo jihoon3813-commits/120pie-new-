@@ -11,7 +11,7 @@ interface MobileBottomInquiryBarProps {
 
 export default function MobileBottomInquiryBar({
   onOpenConsultation,
-  phoneNo = "1899-5685",
+  phoneNo = "1566-3594",
   buttonText = "빠른 창업 상담 신청",
 }: MobileBottomInquiryBarProps) {
   const handleConsultClick = () => {

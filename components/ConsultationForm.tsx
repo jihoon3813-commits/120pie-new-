@@ -327,11 +327,11 @@ export default function ConsultationForm({
             </button>
 
             <a
-              href="tel:18995685"
+              href="tel:15663594"
               className="w-full py-3 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-300 hover:text-white text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-2 no-underline"
             >
               <PhoneCall size={14} className="text-[#FBC400]" />
-              <span>전화 빠른 상담: 1899-5685</span>
+              <span>전화 빠른 상담: 1566-3594</span>
             </a>
           </div>
         </form>

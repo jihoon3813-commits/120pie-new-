@@ -184,13 +184,13 @@ export default function QuickInquiryBar({ isFixed = true }: QuickInquiryBarProps
       <div className="flex items-center pl-32">
         {/* Pop-out model photo bottom-aligned to the bar */}
         <img
-          src="https://res.cloudinary.com/lyjyvy54/image/upload/v1784086225/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_6%EC%9D%BC_%EC%98%A4%ED%9B%84_08_25_50_1_yw77w3.png"
+          src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784086225/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_6%EC%9D%BC_%EC%98%A4%ED%9B%84_08_25_50_1_yw77w3.png"
           alt="120PIE 매장 전경"
           className="absolute bottom-0 left-4 h-[108px] w-auto object-contain z-10 pointer-events-none select-none"
         />
         <div className="flex flex-col text-left">
           <span className="text-[10px] text-neutral-800 font-extrabold uppercase tracking-widest leading-none mb-1">120PIE Premium franchise</span>
-          <span className="text-sm font-black text-black tracking-tight leading-none">가맹문의 1688-0000</span>
+          <a href="tel:1566-3594" className="text-sm font-black text-black tracking-tight leading-none hover:text-amber-900 transition-colors">가맹문의 1566-3594</a>
         </div>
       </div>
 

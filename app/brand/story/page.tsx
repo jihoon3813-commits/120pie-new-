@@ -10,6 +10,7 @@ import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 import BrandHeader from "@/components/BrandHeader";
+import Footer from "@/app/components/Footer";
 
 export default function BrandStoryPage() {
   const [isConsulting, setIsConsulting] = useState(false);
@@ -430,33 +431,7 @@ export default function BrandStoryPage() {
       <QuickInquiryBar isFixed={true} />
 
       {/* FOOTER */}
-      <footer className="bg-neutral-50 border-t border-[#e6dfc3]/40 py-12 sm:py-16 text-neutral-400">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-left">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-8 border-b border-neutral-200">
-            <img
-              src={optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png")}
-              alt="120pie 로고"
-              className="h-8 w-auto object-contain brightness-75 grayscale"
-            />
-            <div className="flex flex-wrap gap-4 text-xs font-bold text-neutral-400">
-              <Link href="/brand/story" className="hover:text-neutral-600 transition-colors">회사소개</Link>
-              <a href="#" className="hover:text-neutral-600 transition-colors">이용약관</a>
-              <a href="#" className="hover:text-neutral-600 transition-colors">개인정보처리방침</a>
-              <button onClick={() => setIsConsulting(true)} className="hover:text-neutral-600 transition-colors text-amber-600 font-extrabold bg-transparent border-0 cursor-pointer">가맹문의</button>
-            </div>
-          </div>
-
-          <div className="space-y-2 text-xs font-semibold leading-relaxed">
-            <p className="text-neutral-500 font-bold">(주) 120파이 프랜차이즈 본사</p>
-            <p>대표자: 홍길동 | 사업자등록번호: 000-00-00000 | 통신판매업신고: 제2026-서울강남-0000호</p>
-            <p>주소: 서울특별시 강남구 테헤란로 120 | 고객센터: 1566-3594 | 이메일: contact@120pie.com</p>
-          </div>
-
-          <div className="pt-4 border-t border-neutral-200/60 flex flex-col sm:flex-row justify-between items-center text-[11px] font-bold text-neutral-400 gap-2">
-            <p>© 120PIE & COFFEE Corp. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer theme="yellow" />
 
       {/* Right Floating Quick Docking Bar */}
       <RightFloatingQuickBar onOpenConsultation={() => setIsConsulting(true)} />

@@ -18,6 +18,7 @@ import ConsultationForm from "@/components/ConsultationForm";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 import BrandHeader from "@/components/BrandHeader";
+import Footer from "@/app/components/Footer";
 
 const SIGNATURE_MENUS = [
   {
@@ -1616,40 +1617,7 @@ export default function BrandHome() {
       <QuickInquiryBar isFixed={true} />
 
       {/* FOOTER */}
-      <footer className="bg-neutral-50 border-t border-[#e6dfc3]/40 py-12 sm:py-16 text-neutral-400">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-left">
-          
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-8 border-b border-neutral-200">
-            <img
-              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
-              alt="120pie 로고"
-              className="h-8 w-auto object-contain brightness-75 grayscale"
-            />
-            <div className="flex flex-wrap gap-4 text-xs font-bold text-neutral-400">
-              <a href="#" className="hover:text-neutral-600 transition-colors">회사소개</a>
-              <a href="#" className="hover:text-neutral-600 transition-colors">이용약관</a>
-              <a href="#" className="hover:text-neutral-600 transition-colors">개인정보처리방침</a>
-              <button onClick={() => setIsConsulting(true)} className="hover:text-neutral-600 transition-colors text-amber-600 font-extrabold bg-transparent border-0 cursor-pointer">가맹문의</button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-[11px] font-bold leading-relaxed">
-            <div className="space-y-1">
-              <p>주식회사 120파이 코퍼레이션 | 대표이사: 관리자</p>
-              <p>본사 주소: 경기도 안양시 만안구 가맹사업지원센터 본사 120겹파이 빌딩 3층</p>
-              <p>사업자등록번호: 000-00-00000 | 통신판매업신고번호: 제0000-경기안양-0000호</p>
-            </div>
-            <div className="md:text-right space-y-1 flex flex-col md:items-end">
-              <p>가맹상담 대표번호: 1688-0000 (평일 09:00 ~ 18:00)</p>
-              <p>이메일: franchise@120pie.com | 제휴문의: partner@120pie.com</p>
-              <p className="text-[10px] text-neutral-400 tracking-wider mt-2">
-                © 120PIE Corp. All rights reserved.
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </footer>
+      <Footer theme="yellow" />
 
       {/* MENU DETAIL DIALOG MODAL (POPUP) */}
       {selectedMenuItem && (
