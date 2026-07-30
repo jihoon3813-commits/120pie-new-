@@ -28,6 +28,12 @@ const SIGNATURE_MENUS = [
     img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076391/edited-photo_-_2026-07-06T123534.491_cumykv.png",
   },
   {
+    name: "카야치즈파이",
+    subName: "Kaya Cheese Pie",
+    label: "NEW",
+    img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785389819/edited-photo_-_2026-07-30T122142.921_k6tlef.png",
+  },
+  {
     name: "함박치즈파이",
     subName: "Hambak Cheese Pie",
     label: "NEW",
@@ -82,7 +88,7 @@ const SLIDE_BANNERS = [
     id: 2,
     title: "여름 신메뉴 컵빙수 출시",
     desc: "말차 & 인절미 컵빙수 2종",
-    img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784619580/120_%EC%8A%A4%EB%AC%B4%EB%94%94_1_1_lcrv7x.png",
+    img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785389750/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_30%EC%9D%BC_%EC%98%A4%ED%9B%84_02_35_35_pdjpit.png",
   }
 ];
 
@@ -251,7 +257,7 @@ export default function BrandHome() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedMenuItem, setSelectedMenuItem] = useState<any>(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [menuIndex, setMenuIndex] = useState(8);
+  const [menuIndex, setMenuIndex] = useState(9);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [moveStep, setMoveStep] = useState(33.333);
   
@@ -538,6 +544,45 @@ export default function BrandHome() {
 
   const handleNextMenu = () => {
     setMenuIndex((prev) => prev + 1);
+  };
+
+  // 대표메뉴 자동 슬라이드 & 마우스/터치 드래그 상태
+  const [isMenuHovered, setIsMenuHovered] = useState(false);
+  const [menuDragStartX, setMenuDragStartX] = useState<number | null>(null);
+  const [menuDragOffset, setMenuDragOffset] = useState(0);
+  const [isMenuDragging, setIsMenuDragging] = useState(false);
+
+  // 대표메뉴 자동 슬라이드 (1.75초마다 2배 빠르게 자연스럽게 왼쪽 방향으로 이동)
+  useEffect(() => {
+    if (isMenuHovered || isMenuDragging) return;
+    const timer = setInterval(() => {
+      setMenuIndex((prev) => prev + 1);
+    }, 1750);
+    return () => clearInterval(timer);
+  }, [isMenuHovered, isMenuDragging]);
+
+  const handleMenuDragStart = (clientX: number) => {
+    setMenuDragStartX(clientX);
+    setIsMenuDragging(true);
+    setMenuDragOffset(0);
+  };
+
+  const handleMenuDragMove = (clientX: number) => {
+    if (!isMenuDragging || menuDragStartX === null) return;
+    setMenuDragOffset(menuDragStartX - clientX);
+  };
+
+  const handleMenuDragEnd = () => {
+    if (!isMenuDragging) return;
+    const threshold = 40;
+    if (menuDragOffset > threshold) {
+      setMenuIndex((prev) => prev + 1);
+    } else if (menuDragOffset < -threshold) {
+      setMenuIndex((prev) => prev - 1);
+    }
+    setMenuDragStartX(null);
+    setMenuDragOffset(0);
+    setIsMenuDragging(false);
   };
 
   const handlePrevConcept = () => {
@@ -888,13 +933,32 @@ export default function BrandHome() {
             </button>
 
             {/* Viewport Wrapper */}
-            <div className="flex-1 overflow-hidden py-10 h-[350px] sm:h-[550px] flex items-center">
+            <div 
+              className="flex-1 overflow-hidden py-10 h-[350px] sm:h-[550px] flex items-center cursor-grab active:cursor-grabbing select-none"
+              onMouseEnter={() => setIsMenuHovered(true)}
+              onMouseLeave={() => {
+                setIsMenuHovered(false);
+                handleMenuDragEnd();
+              }}
+              onMouseDown={(e) => handleMenuDragStart(e.clientX)}
+              onMouseMove={(e) => handleMenuDragMove(e.clientX)}
+              onMouseUp={handleMenuDragEnd}
+              onTouchStart={(e) => {
+                setIsMenuHovered(true);
+                handleMenuDragStart(e.touches[0].clientX);
+              }}
+              onTouchMove={(e) => handleMenuDragMove(e.touches[0].clientX)}
+              onTouchEnd={() => {
+                setIsMenuHovered(false);
+                handleMenuDragEnd();
+              }}
+            >
               {/* Slider Track */}
               <div
                 className="flex items-center w-full"
                 style={{
-                  transform: `translateX(-${menuIndex * moveStep}%)`,
-                  transition: isTransitioning ? "transform 700ms cubic-bezier(0.25, 1, 0.5, 1)" : "none"
+                  transform: `translateX(calc(-${menuIndex * moveStep}% - ${menuDragOffset}px))`,
+                  transition: isMenuDragging ? "none" : (isTransitioning ? "transform 450ms cubic-bezier(0.25, 1, 0.5, 1)" : "none")
                 }}
               >
                 {extendedMenus.map((menu, index) => {

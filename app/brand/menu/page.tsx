@@ -25,6 +25,8 @@ const toEnglishSub = (name: string): string => {
     "팥치즈 파이": "Redbean Cheese Pie",
     "콘치즈 파이": "Corn Cheese Pie",
     "꿀호떡 파이": "Honey Hotteok Pie",
+    "카야치즈 파이": "Kaya Cheese Pie",
+    "카야치즈파이": "Kaya Cheese Pie",
     "불고기 파이": "K-Bulgogi Meat Pie",
     "불닭 파이": "Spicy Hot Chicken Pie",
     "함박치즈 파이": "Hambak Cheese Pie",
@@ -415,14 +417,20 @@ export default function BrandMenuPage() {
                     {(item.badge || item.tag) && (
                       <span
                         className={`absolute top-0 left-2 sm:left-3 px-2 sm:px-3 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-black tracking-wider shadow-xs uppercase rounded-b-sm ${
-                          item.badge === "NEW" || item.tag === "NEW"
+                          item.tag === "NEW" || item.badge === "NEW"
                             ? "bg-red-600 text-white"
-                            : item.badge === "ORIGINAL" || item.badge === "대표" || item.tag === "HIT"
+                            : item.badge === "ORIGINAL" || item.badge === "대표"
+                            ? "bg-[#FBC400] text-neutral-950"
+                            : item.badge === "MEAT"
+                            ? "bg-rose-600 text-white"
+                            : item.badge === "PIZZA"
+                            ? "bg-orange-500 text-white"
+                            : item.tag === "HIT"
                             ? "bg-[#FBC400] text-neutral-950"
                             : "bg-neutral-900 text-[#FBC400]"
                         }`}
                       >
-                        {item.badge || item.tag}
+                        {item.tag === "NEW" || item.badge === "NEW" ? "NEW" : (item.badge || item.tag)}
                       </span>
                     )}
 

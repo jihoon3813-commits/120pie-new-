@@ -22,7 +22,7 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
       <header className="sticky top-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/95 py-3 border-b border-neutral-100 shadow-sm isolate">
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
           {/* Logo */}
-          <Link href="/" title="게이트 페이지로 이동" className="flex items-center gap-2 group shrink-0">
+          <Link href="/brand" title="브랜드 홈페이지 메인으로 이동" className="flex items-center gap-2 group shrink-0">
             <img
               src={optimizeCloudinaryUrl(
                 "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"

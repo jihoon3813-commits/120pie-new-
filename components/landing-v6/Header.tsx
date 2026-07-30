@@ -48,7 +48,7 @@ export default function Header({
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center">
+            <Link href="/franchise" className="flex items-center">
               <img
                 src={
                   isScrolled

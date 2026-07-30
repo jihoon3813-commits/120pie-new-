@@ -21,6 +21,7 @@ export const MENU_DATA: Record<string, MenuCategory> = {
     title: "커피와 함께 즐기기 좋은 대표 메뉴, 120파이",
     desc: "고소한 크림 파이부터 든든한 미트와 피자 파이까지, 손님의 취향과 시간대에 맞춰 폭넓게 제안할 수 있는 120파이 메뉴입니다.",
     items: [
+      { name: "카야치즈 파이", desc: "달콤한 카야잼과 고소한 모짜렐라 치즈가 환상적으로 어우러진 시그니처 파이입니다.", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785389819/edited-photo_-_2026-07-30T122142.921_k6tlef.png", badge: "ORIGINAL", tag: "NEW" },
       { name: "애플파이", desc: "달콤한 사과 풍미로 따뜻한 커피와 편안하게 곁들이기 좋습니다.", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076388/edited-photo_-_2026-07-06T123253.062_abg0wv.png", badge: "ORIGINAL", tag: "HIT" },
       { name: "커스터드 파이", desc: "부드럽고 달콤한 커스터드 크림을 채운 클래식 디저트 파이입니다.", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076389/edited-photo_-_2026-07-06T123308.924_oddurc.png", badge: "ORIGINAL" },
       { name: "크림치즈 파이", desc: "산뜻한 크림치즈의 부드러움을 바삭한 결 사이에 담았습니다.", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076390/edited-photo_-_2026-07-06T123331.133_bltqyk.png", badge: "ORIGINAL", tag: "추천" },
