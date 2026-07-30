@@ -28,9 +28,9 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
 
   return (
     <>
-      {/* BRAND GNB HEADER */}
+      {/* BRAND GNB HEADER (FIXED TOP) */}
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 py-3 border-b border-neutral-200/80 isolate ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 border-b border-neutral-200/80 isolate ${
           isScrolled
             ? "bg-white shadow-md opacity-100"
             : "bg-white/95 backdrop-blur-md shadow-xs"
@@ -93,6 +93,9 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
           </div>
         </div>
       </header>
+
+      {/* Layout Spacer to preserve page flow for fixed header */}
+      <div className="h-[53px] sm:h-[57px] w-full shrink-0" aria-hidden="true" />
 
       {/* MOBILE NAVIGATION OVERLAY */}
       {mobileMenuOpen && (
