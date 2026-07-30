@@ -30,7 +30,7 @@ export default function MobileBottomInquiryBar({
       {/* Left side: Quick Call Link */}
       <a
         href={`tel:${phoneNo.replace(/[^0-9]/g, "")}`}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-200 hover:text-white transition-colors shrink-0 text-xs font-bold"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-neutral-900 border border-neutral-800 text-neutral-200 hover:text-white transition-colors shrink-0 text-xs font-bold"
       >
         <Phone size={14} className="text-[#fbc400] animate-pulse" />
         <span className="tabular-nums">{phoneNo}</span>
@@ -40,7 +40,7 @@ export default function MobileBottomInquiryBar({
       <button
         type="button"
         onClick={handleConsultClick}
-        className="flex-1 py-2.5 px-3 bg-[#fbc400] hover:bg-amber-400 text-neutral-950 font-black text-xs sm:text-sm rounded-xl flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all border-0 cursor-pointer whitespace-nowrap"
+        className="flex-1 py-2.5 px-3 bg-[#fbc400] hover:bg-amber-400 text-neutral-950 font-black text-xs sm:text-sm rounded-md flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all border-0 cursor-pointer whitespace-nowrap"
       >
         <Sparkles size={14} className="fill-neutral-950 shrink-0" />
         <span>{buttonText}</span>

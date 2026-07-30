@@ -206,37 +206,37 @@ export default function ContactForm({
   const content = (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
       {/* Text Left */}
-      <div className={`lg:col-span-5 space-y-4 lg:space-y-6 ${isModal ? "text-neutral-900 dark:text-white" : "text-white"}`}>
-        <span className="text-xs font-bold text-amber-500 tracking-wider uppercase">
+      <div className={`lg:col-span-5 space-y-3 lg:space-y-5 ${isModal ? "text-neutral-900 dark:text-white" : "text-white"}`}>
+        <span className="text-[11px] font-bold text-amber-500 tracking-wider uppercase">
           Start Your Business
         </span>
-        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+        <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight leading-tight">
           지금, 우리 지역에서
           <br />
           120pie를 시작할 수 있을까요?
         </h2>
-        <p className={`text-sm sm:text-base leading-relaxed ${isModal ? "text-neutral-500 dark:text-neutral-450" : "text-neutral-400"}`}>
+        <p className={`text-xs sm:text-sm leading-relaxed ${isModal ? "text-neutral-500 dark:text-neutral-450" : "text-neutral-400"}`}>
           매장 상황과 희망 지역에 맞춰
           <br />
           가장 적합한 창업 방식을 안내드립니다.
         </p>
-        <div className={`space-y-4 pt-4 border-t ${isModal ? "border-neutral-200 dark:border-neutral-800" : "border-neutral-800"}`}>
+        <div className={`space-y-3 pt-3 border-t ${isModal ? "border-neutral-200 dark:border-neutral-800" : "border-neutral-800"}`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-9 h-9 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
             </div>
             <div>
-              <p className="text-xs text-neutral-450 font-bold">창업 문의 핫라인</p>
-              <p className={`text-base font-bold ${isModal ? "text-neutral-900 dark:text-white" : "text-white"}`}>1566-3594</p>
+              <p className="text-[11px] text-neutral-450 font-bold">창업 문의 핫라인</p>
+              <p className={`text-sm font-bold ${isModal ? "text-neutral-900 dark:text-white" : "text-white"}`}>1566-3594</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Form Right */}
-      <div className="lg:col-span-7 bg-neutral-950 p-5 sm:p-10 rounded-3xl border border-neutral-800/80 shadow-2xl">
+      <div className="lg:col-span-7 bg-neutral-950 p-4 sm:p-7 rounded-lg sm:rounded-xl border border-neutral-800/80 shadow-xl">
         <form onSubmit={handleSubmit} className="space-y-6 text-left">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <FormInput
@@ -389,7 +389,7 @@ export default function ContactForm({
 
           <button
             type="submit"
-            className="w-full py-4 bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-neutral-950 text-sm font-extrabold rounded-xl transition-all shadow-lg hover:shadow-amber-500/10"
+            className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-neutral-950 text-sm font-extrabold rounded-md transition-all shadow-lg hover:shadow-amber-500/10"
           >
             무료 창업 컨설팅 신청하기
           </button>
@@ -406,13 +406,13 @@ export default function ContactForm({
           if (e.target === e.currentTarget && onClose) onClose();
         }}
       >
-        <div className="relative w-full max-w-5xl bg-white dark:bg-neutral-900 rounded-[2.5rem] shadow-2xl p-6 sm:p-10 max-h-[90vh] overflow-y-auto border border-neutral-200 dark:border-neutral-800 text-left">
+        <div className="relative w-full max-w-5xl bg-white dark:bg-neutral-900 rounded-lg sm:rounded-xl shadow-2xl p-5 sm:p-8 max-h-[90vh] overflow-y-auto border border-neutral-200 dark:border-neutral-800 text-left">
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors z-30"
+            className="absolute top-5 right-5 p-1 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors z-30"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
           {content}
         </div>
@@ -470,7 +470,7 @@ function FormInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+        className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-4 py-3 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
       />
     </div>
   );
@@ -494,7 +494,7 @@ function FormSelect({ label, required = false, value, options, onChange }: Selec
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all appearance-none cursor-pointer"
+        className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all appearance-none cursor-pointer"
       >
         <option value="" className="text-neutral-600">
           선택해주세요

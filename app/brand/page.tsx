@@ -1648,30 +1648,30 @@ export default function BrandHome() {
           onClick={() => setIsConsulting(false)}
         >
           <div
-            className="w-full max-w-3xl bg-neutral-950 border border-[#FBC400]/30 rounded-3xl sm:rounded-[2.5rem] p-6 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative my-auto overflow-hidden text-left"
+            className="w-full max-w-2xl bg-neutral-950 border border-[#FBC400]/30 rounded-lg sm:rounded-xl p-5 sm:p-7 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative my-auto overflow-hidden text-left"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Gold Gradient Accent */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-[#FBC400] to-amber-500" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-[#FBC400] to-amber-500" />
 
             {/* Close Button */}
             <button
               onClick={() => setIsConsulting(false)}
-              className="absolute top-5 right-5 sm:top-6 sm:right-6 p-2.5 text-neutral-400 hover:text-white bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-full cursor-pointer transition-colors z-50"
+              className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-white bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-md cursor-pointer transition-colors z-50"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
             {/* Modal Header */}
-            <div className="mb-6 select-none space-y-1.5 pr-8">
-              <span className="inline-block px-3 py-1 bg-[#FBC400]/10 border border-[#FBC400]/30 text-[#FBC400] text-[11px] font-black tracking-widest rounded-full uppercase">
+            <div className="mb-4 select-none space-y-1 pr-8">
+              <span className="inline-block px-2.5 py-0.5 bg-[#FBC400]/10 border border-[#FBC400]/30 text-[#FBC400] text-[10px] font-black tracking-widest rounded-md uppercase">
                 120PIE FRANCHISE CONSULTING
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                창업 상담 문의
+              <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
+                빠른 창업 신청
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-400 font-semibold">
-                기본 정보를 작성해 주시면 전문 컨설턴트가 1:1 맞춤 상담을 안내해 드립니다.
+              <p className="text-xs text-neutral-400 font-medium">
+                성함과 연락처를 남겨주시면 1:1 담당 컨설턴트가 빠르게 안내해 드립니다.
               </p>
             </div>
 
