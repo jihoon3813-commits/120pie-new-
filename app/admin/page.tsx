@@ -61,6 +61,7 @@ import {
   MapPin,
   ExternalLink,
   LayoutGrid,
+  Grid3X3,
   List
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
@@ -1478,7 +1479,7 @@ export default function AdminPage() {
   const [storeSearchQuery, setStoreSearchQuery] = useState<string>("");
   const [storeStatusFilter, setStoreStatusFilter] = useState<string>("전체");
   const [storeSortOrder, setStoreSortOrder] = useState<"latest" | "oldest">("latest");
-  const [storeViewMode, setStoreViewMode] = useState<"1col" | "2col">("2col");
+  const [storeViewMode, setStoreViewMode] = useState<"1col" | "2col" | "3col">("3col");
 
   // Computed filtered and sorted stores (Default: Latest registration date on top)
   const filteredAndSortedStores = useMemo(() => {
@@ -6382,7 +6383,7 @@ export default function AdminPage() {
                       ))}
                     </div>
 
-                    {/* View Mode Toggle (1열 보기 / 2열 보기, 기본: 2열 보기) */}
+                    {/* View Mode Toggle (1열 보기 / 2열 보기 / 3열 보기, 기본: 3열 보기) */}
                     <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl shadow-2xs border-0">
                       <button
                         onClick={() => setStoreViewMode("1col")}
@@ -6403,10 +6404,22 @@ export default function AdminPage() {
                             ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
                             : "text-slate-500 hover:text-[#0F172A]"
                         }`}
-                        title="2열 보기 (2컬럼 카드 그리드)"
+                        title="2열 보기 (2컬럼 그리드)"
                       >
                         <LayoutGrid size={14} />
                         <span>2열 보기</span>
+                      </button>
+                      <button
+                        onClick={() => setStoreViewMode("3col")}
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                          storeViewMode === "3col"
+                            ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
+                            : "text-slate-500 hover:text-[#0F172A]"
+                        }`}
+                        title="3열 보기 (3컬럼 그리드)"
+                      >
+                        <Grid3X3 size={14} />
+                        <span>3열 보기</span>
                       </button>
                     </div>
 
@@ -6562,14 +6575,14 @@ export default function AdminPage() {
                   )}
                 </div>
               ) : (
-                /* 2열 보기 (2-Column Grid Mode) - DEFAULT */
+                /* 2열 보기 / 3열 보기 (Grid Mode) - DEFAULT: 3col */
                 filteredAndSortedStores.length === 0 ? (
                   <div className="bg-white rounded-[28px] border-0 p-16 text-center text-slate-400 font-extrabold shadow-md flex flex-col items-center justify-center space-y-2">
                     <Search size={36} className="text-slate-300 animate-pulse" />
                     <p className="text-xs">조건에 해당하는 가맹점 데이터가 없습니다.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className={storeViewMode === "3col" ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" : "grid grid-cols-1 md:grid-cols-2 gap-4"}>
                     {filteredAndSortedStores.map((store) => (
                       <div 
                         key={store.id}
