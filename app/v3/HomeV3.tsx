@@ -505,7 +505,7 @@ function OwnerSystemSection({ isPink = false, isYellow = false }: { isPink?: boo
             </div>
 
             <div>
-              <Link 
+              <a 
                 href="/portal" 
                 target="_blank" 
                 rel="noopener noreferrer" 
@@ -514,7 +514,7 @@ function OwnerSystemSection({ isPink = false, isYellow = false }: { isPink?: boo
                 }`}
               >
                 점주 지원 살펴보기 <ArrowRight size={16} />
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -1474,9 +1474,9 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 블랙
               </Link>
             </div>
-            <Link className={`hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-lg border text-xs font-bold ${portalBtnClass}`} href="/portal" target="_blank" rel="noopener noreferrer">
+            <a className={`hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-lg border text-xs font-bold ${portalBtnClass}`} href="/portal" target="_blank" rel="noopener noreferrer">
               점주전용
-            </Link>
+            </a>
             <button type="button" onClick={() => setInquiryModalOpen(true)} className={`pink-primary-button hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-xs sm:text-sm font-black hover:scale-[1.02] transition-all border-0 cursor-pointer ${
               isPinkVariant 
                 ? "bg-rose-500 hover:bg-rose-600 text-white shadow-[0_4px_16px_rgba(244,63,94,0.2)]" 
@@ -1519,7 +1519,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
               </Link>
             </div>
             <div className="flex gap-2 mt-3 w-full">
-              <Link
+              <a
                 href="/portal"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -1527,7 +1527,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                 className={`flex-1 flex items-center justify-center rounded-xl px-4 py-3.5 text-xs sm:text-sm font-black border transition-all ${portalBtnClass}`}
               >
                 점주전용
-              </Link>
+              </a>
               <button
                 type="button"
                 onClick={() => { setMobileNavOpen(false); setInquiryModalOpen(true); }}

@@ -355,13 +355,13 @@ export default function CostsPageClient() {
                 블랙
               </button>
             </div>
-            <Link className={`hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-lg border text-xs font-bold ${
+            <a className={`hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-lg border text-xs font-bold ${
               isYellow
                 ? "border-[#e6dfc3] bg-white text-[#576575] hover:bg-[#fffcf0] hover:text-[#0d233a] transition-all"
                 : "border-neutral-800 bg-neutral-900 text-neutral-350 hover:bg-neutral-800 hover:text-white transition-all"
             }`} href="/portal" target="_blank" rel="noopener noreferrer">
               점주전용
-            </Link>
+            </a>
             <button
               type="button"
               onClick={() => setInquiryForcedOpen(true)}
@@ -412,7 +412,7 @@ export default function CostsPageClient() {
               </Link>
             </div>
             <div className="flex gap-2 mt-3 w-full">
-              <Link
+              <a
                 href="/portal"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -424,7 +424,7 @@ export default function CostsPageClient() {
                 }`}
               >
                 점주전용
-              </Link>
+              </a>
               <button
                 type="button"
                 onClick={() => { setMobileNavOpen(false); setInquiryForcedOpen(true); }}

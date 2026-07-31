@@ -127,7 +127,7 @@ export default function Footer({ theme }: FooterProps) {
         }`}>
           <p>Copyright(c)2026 GOWELL-LIFE Co.,Ltd. All Right Reserved.</p>
           <div className="flex items-center gap-3">
-            <Link
+            <a
               href="/portal"
               target="_blank"
               rel="noopener noreferrer"
@@ -136,9 +136,9 @@ export default function Footer({ theme }: FooterProps) {
               }`}
             >
               점주포털
-            </Link>
+            </a>
             <span className={isPinkVariant ? "text-neutral-300" : isYellowVariant ? "text-neutral-300" : "text-neutral-850"}>|</span>
-            <Link
+            <a
               href="/admin"
               target="_blank"
               rel="noopener noreferrer"
@@ -147,7 +147,7 @@ export default function Footer({ theme }: FooterProps) {
               }`}
             >
               본사 어드민
-            </Link>
+            </a>
           </div>
         </div>
       </div>
