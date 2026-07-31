@@ -25,6 +25,8 @@ import {
   Minus,
   Trash2,
   Download,
+  Video,
+  FileText,
   ChevronRight,
   Clock,
   CheckCircle2,
@@ -43,7 +45,6 @@ import {
   PlusCircle,
   ArrowRightLeft,
   Store,
-  FileText,
   UserCheck,
   Sparkles,
   Settings,
@@ -239,6 +240,8 @@ interface Material {
   format: string;
   desc: string;
   img?: string;
+  fileUrl?: string;
+  fileName?: string;
 }
 
 // ==========================================
@@ -2553,6 +2556,77 @@ export default function AdminPage() {
     setNewMaterialFileName("");
     setShowMaterialModal(false);
     triggerToast(`신규 ${materialType === "training" ? "교육" : "홍보"}자료가 성공적으로 등록되었습니다!`);
+  };
+
+  const handleDownload = (title: string, fileUrl?: string, fileName?: string) => {
+    if (fileUrl) {
+      triggerToast(`'${fileName || title}' 다운로드를 시작합니다.`);
+      try {
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.target = "_blank";
+        link.download = fileName || title;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        console.error("Download failed:", err);
+        window.open(fileUrl, "_blank");
+      }
+    } else {
+      triggerToast(`'${title}' 등록된 첨부파일이 없습니다.`);
+    }
+  };
+
+  const renderMaterialThumbnail = (item: any) => {
+    const isImg = (url?: string, fmt?: string) => {
+      const ext = (fmt || "").toUpperCase();
+      if (["JPG", "JPEG", "PNG", "GIF", "WEBP"].includes(ext)) return true;
+      if (url && (url.startsWith("data:image/") || url.includes("cloudinary.com") || url.match(/\.(jpg|jpeg|png|gif|webp)$/i))) return true;
+      return false;
+    };
+
+    const isVideo = (url?: string, fmt?: string) => {
+      const ext = (fmt || "").toUpperCase();
+      if (["MP4", "MOV", "AVI", "MKV", "WEBM"].includes(ext)) return true;
+      if (url && (url.startsWith("data:video/") || url.match(/\.(mp4|mov|avi|mkv|webm)$/i))) return true;
+      return false;
+    };
+
+    const hasImg = item.img && item.img.trim() !== "";
+    const hasFileUrl = item.fileUrl && item.fileUrl.trim() !== "";
+
+    if (hasImg) {
+      return (
+        <div className="w-14 h-14 rounded-2xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200/80 relative shadow-2xs">
+          <img src={optimizeCloudinaryUrl(item.img)} alt="" className="w-full h-full object-cover" />
+        </div>
+      );
+    }
+
+    if (hasFileUrl && isImg(item.fileUrl, item.format)) {
+      return (
+        <div className="w-14 h-14 rounded-2xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200/80 relative shadow-2xs">
+          <img src={optimizeCloudinaryUrl(item.fileUrl)} alt="" className="w-full h-full object-cover" />
+        </div>
+      );
+    }
+
+    if (isVideo(item.fileUrl, item.format)) {
+      return (
+        <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex flex-col items-center justify-center shrink-0 border border-amber-200/80 shadow-2xs gap-0.5">
+          <Video size={20} className="text-amber-500" />
+          <span className="text-[8px] font-black text-amber-700 uppercase">영상</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex flex-col items-center justify-center shrink-0 border border-blue-200/80 shadow-2xs gap-0.5">
+        <FileText size={20} className="text-blue-500" />
+        <span className="text-[8px] font-black text-blue-700 uppercase">{item.format || "FILE"}</span>
+      </div>
+    );
   };
 
   const handleDeleteMaterial = (id: string, type: "training" | "pr") => {
@@ -7764,27 +7838,51 @@ export default function AdminPage() {
                 
                 {/* 1. Trainings Block */}
                 <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4">
-                  <h3 className="font-black text-base text-[#0F172A] border-b border-slate-100 pb-3.5 flex items-center gap-2">
-                    <BookOpen size={18} className="text-[#0F172A]" />
-                    점주 조리/AS 교육자료실 ({trainings.length})
+                  <h3 className="font-black text-base text-[#0F172A] border-b border-slate-100 pb-3.5 flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <BookOpen size={18} className="text-[#0F172A]" />
+                      점주 조리/AS 교육자료실 ({trainings.length})
+                    </span>
+                    <span className="text-[10px] font-black bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">
+                      가맹 교육
+                    </span>
                   </h3>
-                  <div className="space-y-3.5 max-h-[400px] overflow-y-auto pr-1">
+                  <div className="space-y-3.5 max-h-[520px] overflow-y-auto pr-1">
                     {trainings.length === 0 ? (
-                      <p className="text-xs text-slate-400 font-bold text-center py-8">교육자료가 비어 있습니다.</p>
+                      <p className="text-xs text-slate-400 font-bold text-center py-8">등록된 교육자료가 없습니다.</p>
                     ) : (
                       trainings.map((t) => (
-                        <div key={t.id} className="bg-[#F8F9FA] border-0 rounded-2xl p-4 flex justify-between items-start gap-4 shadow-2xs">
-                          <div className="space-y-1">
-                            <span className="text-[10px] text-slate-700 bg-slate-100 border-0 px-2.5 py-1 rounded-lg font-extrabold shadow-2xs inline-block">{t.format}</span>
-                            <h4 className="text-xs font-bold text-[#0F172A] leading-tight mt-1">{t.title}</h4>
-                            <p className="text-[10px] text-slate-500 line-clamp-2 leading-relaxed">{t.desc}</p>
+                        <div key={t.id} className="bg-[#F8F9FA] border border-slate-100 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-2xs hover:border-[#FED422] transition-all group">
+                          <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                            {renderMaterialThumbnail(t)}
+                            <div className="space-y-1 min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[9px] text-slate-700 bg-slate-200/80 px-2 py-0.5 rounded font-extrabold">{t.format}</span>
+                                <span className="text-[10px] text-slate-400 font-bold">{t.date} · {t.size}</span>
+                              </div>
+                              <h4 className="text-xs font-black text-[#0F172A] leading-tight truncate group-hover:text-amber-600 transition-colors">{t.title}</h4>
+                              <p className="text-[10px] text-slate-500 line-clamp-1 leading-relaxed">{t.desc}</p>
+                            </div>
                           </div>
-                          <button
-                            onClick={() => handleDeleteMaterial(t.id, "training")}
-                            className="p-1.5 rounded-xl bg-white text-slate-400 hover:text-red-500 transition-all border-0 shadow-2xs shrink-0 cursor-pointer"
-                          >
-                            <Trash2 size={13} />
-                          </button>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleDownload(t.title, t.fileUrl, t.fileName)}
+                              className="px-3 py-1.5 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-extrabold text-[11px] transition-all border-0 cursor-pointer shadow-2xs flex items-center gap-1"
+                              title="다운로드 및 자료 확인"
+                            >
+                              <Download size={12} />
+                              <span>다운로드</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMaterial(t.id, "training")}
+                              className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-all border border-slate-200/60 shadow-2xs shrink-0 cursor-pointer"
+                              title="자료 삭제"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
                         </div>
                       ))
                     )}
@@ -7793,27 +7891,51 @@ export default function AdminPage() {
 
                 {/* 2. PR/Marketing Assets Block */}
                 <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4">
-                  <h3 className="font-black text-base text-[#0F172A] border-b border-slate-100 pb-3.5 flex items-center gap-2">
-                    <ImageIcon size={18} className="text-[#0F172A]" />
-                    점주 홍보/마케팅 자료실 ({prs.length})
+                  <h3 className="font-black text-base text-[#0F172A] border-b border-slate-100 pb-3.5 flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <ImageIcon size={18} className="text-[#0F172A]" />
+                      점주 홍보/마케팅 자료실 ({prs.length})
+                    </span>
+                    <span className="text-[10px] font-black bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full">
+                      홍보 자재
+                    </span>
                   </h3>
-                  <div className="space-y-3.5 max-h-[400px] overflow-y-auto pr-1">
+                  <div className="space-y-3.5 max-h-[520px] overflow-y-auto pr-1">
                     {prs.length === 0 ? (
-                      <p className="text-xs text-slate-400 font-bold text-center py-8">홍보자료가 비어 있습니다.</p>
+                      <p className="text-xs text-slate-400 font-bold text-center py-8">등록된 홍보자료가 없습니다.</p>
                     ) : (
                       prs.map((p) => (
-                        <div key={p.id} className="bg-[#F8F9FA] border-0 rounded-2xl p-4 flex justify-between items-start gap-4 shadow-2xs">
-                          <div className="space-y-1">
-                            <span className="text-[10px] text-slate-700 bg-slate-100 border-0 px-2.5 py-1 rounded-lg font-extrabold shadow-2xs inline-block">{p.format}</span>
-                            <h4 className="text-xs font-bold text-[#0F172A] leading-tight mt-1">{p.title}</h4>
-                            <p className="text-[10px] text-slate-500 line-clamp-2 leading-relaxed">{p.desc}</p>
+                        <div key={p.id} className="bg-[#F8F9FA] border border-slate-100 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-2xs hover:border-[#FED422] transition-all group">
+                          <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                            {renderMaterialThumbnail(p)}
+                            <div className="space-y-1 min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[9px] text-slate-700 bg-slate-200/80 px-2 py-0.5 rounded font-extrabold">{p.format}</span>
+                                <span className="text-[10px] text-slate-400 font-bold">{p.date} · {p.size}</span>
+                              </div>
+                              <h4 className="text-xs font-black text-[#0F172A] leading-tight truncate group-hover:text-amber-600 transition-colors">{p.title}</h4>
+                              <p className="text-[10px] text-slate-500 line-clamp-1 leading-relaxed">{p.desc}</p>
+                            </div>
                           </div>
-                          <button
-                            onClick={() => handleDeleteMaterial(p.id, "pr")}
-                            className="p-1.5 rounded-xl bg-white text-slate-400 hover:text-red-500 transition-all border-0 shadow-2xs shrink-0 cursor-pointer"
-                          >
-                            <Trash2 size={13} />
-                          </button>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleDownload(p.title, p.fileUrl, p.fileName)}
+                              className="px-3 py-1.5 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-extrabold text-[11px] transition-all border-0 cursor-pointer shadow-2xs flex items-center gap-1"
+                              title="다운로드 및 자료 확인"
+                            >
+                              <Download size={12} />
+                              <span>다운로드</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMaterial(p.id, "pr")}
+                              className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-all border border-slate-200/60 shadow-2xs shrink-0 cursor-pointer"
+                              title="자료 삭제"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
                         </div>
                       ))
                     )}

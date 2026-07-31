@@ -21,6 +21,7 @@ import {
   Minus,
   Trash2,
   Download,
+  FileText,
   ChevronRight,
   Clock,
   CheckCircle2,
@@ -2082,6 +2083,69 @@ export default function PortalPage() {
     }
   };
 
+  const renderPortalMaterialThumbnail = (item: any) => {
+    const isImg = (url?: string, fmt?: string) => {
+      const ext = (fmt || "").toUpperCase();
+      if (["JPG", "JPEG", "PNG", "GIF", "WEBP"].includes(ext)) return true;
+      if (url && (url.startsWith("data:image/") || url.includes("cloudinary.com") || url.match(/\.(jpg|jpeg|png|gif|webp)$/i))) return true;
+      return false;
+    };
+
+    const isVideo = (url?: string, fmt?: string) => {
+      const ext = (fmt || "").toUpperCase();
+      if (["MP4", "MOV", "AVI", "MKV", "WEBM"].includes(ext)) return true;
+      if (url && (url.startsWith("data:video/") || url.match(/\.(mp4|mov|avi|mkv|webm)$/i))) return true;
+      return false;
+    };
+
+    const hasImg = item.img && item.img.trim() !== "";
+    const hasFileUrl = item.fileUrl && item.fileUrl.trim() !== "";
+
+    if (hasImg) {
+      return (
+        <div className="h-44 bg-slate-100 overflow-hidden relative shrink-0">
+          <img src={optimizeCloudinaryUrl(item.img)} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
+            {item.format}
+          </span>
+        </div>
+      );
+    }
+
+    if (hasFileUrl && isImg(item.fileUrl, item.format)) {
+      return (
+        <div className="h-44 bg-slate-100 overflow-hidden relative shrink-0">
+          <img src={optimizeCloudinaryUrl(item.fileUrl)} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
+            {item.format}
+          </span>
+        </div>
+      );
+    }
+
+    if (isVideo(item.fileUrl, item.format)) {
+      return (
+        <div className="h-44 bg-gradient-to-br from-amber-500 to-amber-600 flex flex-col items-center justify-center shrink-0 border-b border-amber-400 relative text-white group-hover:from-amber-600 group-hover:to-amber-700 transition-all">
+          <Video size={48} className="text-white drop-shadow-md group-hover:scale-110 transition-transform" />
+          <span className="text-xs font-black mt-2 tracking-wider uppercase drop-shadow-xs">동영상 강좌 / 가이드</span>
+          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
+            {item.format}
+          </span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="h-44 bg-slate-100 flex flex-col items-center justify-center shrink-0 border-b border-slate-200/60 relative text-slate-400 group-hover:bg-slate-200/60 transition-all">
+        <FileText size={48} className="text-slate-400 group-hover:scale-110 transition-transform" />
+        <span className="text-xs font-black mt-2 text-slate-600 uppercase">{item.format || "DOCUMENT"}</span>
+        <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
+          {item.format}
+        </span>
+      </div>
+    );
+  };
+
   // ==========================================
   // REAL-TIME COURIER TRACKING ROUTER
   // ==========================================
@@ -2476,11 +2540,11 @@ export default function PortalPage() {
               {[
                 { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
                 { key: "order", label: "자재 주문", icon: ShoppingBag, badge: cart.length > 0 ? cart.length : undefined },
-                { key: "history", label: "주문 내역", icon: History },
-                { key: "notice", label: "공지사항", icon: Megaphone, badge: newNoticesCount },
-                { key: "inquiry", label: "1:1 문의", icon: MessageSquare },
-                { key: "training", label: "교육 자료", icon: BookOpen },
-                { key: "pr", label: "홍보 자재", icon: ImageIcon },
+                { key: "history", label: "주문 내역", icon: History, badge: orders.length > 0 ? orders.length : undefined },
+                { key: "notice", label: "공지사항", icon: Megaphone, badge: notices.length > 0 ? notices.length : undefined },
+                { key: "inquiry", label: "1:1 문의", icon: MessageSquare, badge: inquiries.length > 0 ? inquiries.length : undefined },
+                { key: "training", label: "교육 자료", icon: BookOpen, badge: trainings.length > 0 ? trainings.length : undefined },
+                { key: "pr", label: "홍보 자재", icon: ImageIcon, badge: prs.length > 0 ? prs.length : undefined },
                 { key: "profile", label: "정보변경", icon: User }
               ].map(({ key, label, icon: Icon, badge }) => {
                 const isActive = currentMenu === key;
@@ -2501,13 +2565,13 @@ export default function PortalPage() {
                       }`}
                     >
                       <div className="flex items-center gap-3.5 min-w-0">
-                        <Icon size={18} className={isActive ? "text-[#F5AC00]" : "text-[#94A3B8] shrink-0"} />
+                        <Icon size={18} className={isActive ? "text-[#0F172A]" : "text-[#94A3B8] shrink-0"} />
                         {!isSidebarCollapsed && <span className="truncate">{label}</span>}
                       </div>
 
                       {!isSidebarCollapsed && badge !== undefined && (
-                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full shrink-0 ${
-                          isActive ? "bg-[#F5AC00] text-[#0F172A]" : "bg-[#232B3B] text-[#94A3B8]"
+                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full shrink-0 shadow-2xs ${
+                          isActive ? "bg-[#0F172A] text-[#FED422]" : "bg-[#FED422] text-[#0F172A]"
                         }`}>
                           {badge}
                         </span>
@@ -2515,7 +2579,7 @@ export default function PortalPage() {
 
                       {/* Collapsed Mode Notification Dot */}
                       {isSidebarCollapsed && badge !== undefined && (
-                        <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-[#F5AC00]"></span>
+                        <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-[#FED422] animate-pulse"></span>
                       )}
                     </button>
 
@@ -2587,11 +2651,11 @@ export default function PortalPage() {
                   {[
                     { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
                     { key: "order", label: "자재 주문", icon: ShoppingBag, badge: cart.length > 0 ? cart.length : undefined },
-                    { key: "history", label: "주문 내역", icon: History },
-                    { key: "notice", label: "공지사항", icon: Megaphone, badge: newNoticesCount },
-                    { key: "inquiry", label: "1:1 문의", icon: MessageSquare },
-                    { key: "training", label: "교육 자료", icon: BookOpen },
-                    { key: "pr", label: "홍보 자재", icon: ImageIcon },
+                    { key: "history", label: "주문 내역", icon: History, badge: orders.length > 0 ? orders.length : undefined },
+                    { key: "notice", label: "공지사항", icon: Megaphone, badge: notices.length > 0 ? notices.length : undefined },
+                    { key: "inquiry", label: "1:1 문의", icon: MessageSquare, badge: inquiries.length > 0 ? inquiries.length : undefined },
+                    { key: "training", label: "교육 자료", icon: BookOpen, badge: trainings.length > 0 ? trainings.length : undefined },
+                    { key: "pr", label: "홍보 자재", icon: ImageIcon, badge: prs.length > 0 ? prs.length : undefined },
                     { key: "profile", label: "정보변경", icon: User }
                   ].map(({ key, label, icon: Icon, badge }) => (
                     <button
@@ -2603,7 +2667,7 @@ export default function PortalPage() {
                       }}
                       className={`w-full px-4 py-3 rounded-2xl flex items-center justify-between text-sm font-black transition-all border-0 cursor-pointer ${
                         currentMenu === key
-                          ? "bg-[#F5AC00] text-[#0F172A] shadow-md"
+                          ? "bg-[#FED422] text-[#0F172A] shadow-md"
                           : "text-slate-400 hover:text-white hover:bg-slate-800/60"
                       }`}
                     >
@@ -2611,9 +2675,9 @@ export default function PortalPage() {
                         <Icon size={18} className={currentMenu === key ? "text-[#0F172A]" : "text-slate-400"} />
                         <span>{label}</span>
                       </div>
-                      {badge && (
+                      {badge !== undefined && (
                         <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
-                          currentMenu === key ? "bg-[#0F172A] text-white" : "bg-[#F5AC00] text-[#0F172A]"
+                          currentMenu === key ? "bg-[#0F172A] text-[#FED422]" : "bg-[#FED422] text-[#0F172A]"
                         }`}>
                           {badge}
                         </span>
@@ -2737,24 +2801,25 @@ export default function PortalPage() {
                   </div>
                 </button>
 
-                {/* Card 3: Answered Inquiries */}
+                {/* Card 3: Educational & PR Materials */}
                 <button 
                   type="button"
-                  onClick={() => setCurrentMenu("inquiry")}
-                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
+                  onClick={() => setCurrentMenu("training")}
+                  className="bg-white border border-[#EEF0F5] hover:border-[#FED422] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-extrabold text-neutral-500 tracking-tight">1:1 문의 / 답변 현황</span>
-                    <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
-                      <MessageSquare size={22} />
+                    <span className="text-xs font-extrabold text-neutral-500 tracking-tight">가맹점 교육/홍보자료</span>
+                    <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 group-hover:bg-[#FED422] group-hover:text-[#0F172A] flex items-center justify-center transition-all shadow-sm">
+                      <BookOpen size={22} />
                     </div>
                   </div>
                   <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
-                    {answeredInqCount} <span className="text-sm font-bold text-neutral-400">건 완료</span>
+                    {trainings.length + prs.length} <span className="text-sm font-bold text-neutral-400">개 등록</span>
                   </strong>
-                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
-                    <span className="px-2 py-0.5 rounded-full bg-purple-50 border border-purple-100">답변완료</span>
-                    <span className="text-neutral-400 font-semibold">신속 소통 지원</span>
+                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#0F172A]">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                      {trainings.length + prs.length}개 최신업데이트
+                    </span>
                   </div>
                 </button>
 
@@ -2762,7 +2827,7 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => setCurrentMenu("notice")}
-                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#FED422] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-neutral-500 tracking-tight">본사 공지사항</span>
@@ -2771,11 +2836,12 @@ export default function PortalPage() {
                     </div>
                   </div>
                   <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
-                    {newNoticesCount} <span className="text-sm font-bold text-neutral-400">건 신규</span>
+                    {notices.length} <span className="text-sm font-bold text-neutral-400">건 등록</span>
                   </strong>
-                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+15.2%</span>
-                    <span className="text-neutral-400 font-semibold">필독 공지 수신</span>
+                  <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#0F172A]">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                      {notices.length}건 배포완료
+                    </span>
                   </div>
                 </button>
               </div>
@@ -2891,18 +2957,25 @@ export default function PortalPage() {
                   <div className="grid grid-cols-3 gap-4">
                     {[
                       { key: "order", label: "자재 주문", icon: ShoppingBag, desc: "원자재 발주", color: "bg-[#FED422] text-[#0F172A] hover:bg-[#e5be1f]" },
-                      { key: "inquiry", label: "1:1 문의", icon: MessageSquare, desc: "신속한 가맹 소통", color: "bg-white text-[#0F172A] border border-slate-100 hover:bg-[#F8FAFC]" },
-                      { key: "pr", label: "홍보 자재", icon: ImageIcon, desc: "시즌 디자인 다운", color: "bg-white text-[#0F172A] border border-slate-100 hover:bg-[#F8FAFC]" }
+                      { key: "training", label: "교육 자료", icon: BookOpen, desc: "조리/운영 매뉴얼", color: "bg-white text-[#0F172A] border border-slate-100 hover:bg-[#F8FAFC]", badge: trainings.length },
+                      { key: "pr", label: "홍보 자재", icon: ImageIcon, desc: "시즌 디자인 다운", color: "bg-white text-[#0F172A] border border-slate-100 hover:bg-[#F8FAFC]", badge: prs.length }
                     ].map((btn) => (
                       <button
                         key={btn.key}
                         type="button"
                         onClick={() => setCurrentMenu(btn.key)}
-                        className={`p-5 flex flex-col justify-between min-h-[120px] text-left transition-all shadow-2xs rounded-2xl border-0 cursor-pointer ${btn.color}`}
+                        className={`p-5 flex flex-col justify-between min-h-[120px] text-left transition-all shadow-2xs rounded-2xl border-0 cursor-pointer relative overflow-hidden group ${btn.color}`}
                       >
-                        <btn.icon size={22} className={btn.key === "order" ? "text-[#0F172A]" : "text-[#0F172A]"} />
+                        <div className="flex items-center justify-between w-full">
+                          <btn.icon size={22} className="text-[#0F172A]" />
+                          {btn.badge !== undefined && (
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] shadow-2xs">
+                              {btn.badge}개
+                            </span>
+                          )}
+                        </div>
                         <div>
-                          <strong className="text-sm font-black block">{btn.label}</strong>
+                          <strong className="text-sm font-black block group-hover:text-amber-600 transition-colors">{btn.label}</strong>
                           <span className={`text-[10px] font-bold block opacity-80 mt-1 ${btn.key === "order" ? "text-[#0F172A]" : "text-slate-500"}`}>{btn.desc}</span>
                         </div>
                       </button>
@@ -3751,21 +3824,7 @@ export default function PortalPage() {
                       key={t.id}
                       className="bg-white border border-slate-200/90 hover:border-[#FED422] rounded-3xl overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-200 group"
                     >
-                      {t.img ? (
-                        <div className="h-44 bg-slate-100 overflow-hidden relative shrink-0">
-                          <img src={optimizeCloudinaryUrl(t.img)} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
-                            {t.format}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="h-44 bg-slate-50 flex items-center justify-center shrink-0 border-b border-slate-100 relative">
-                          <BookOpen size={48} className="text-slate-300" />
-                          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
-                            {t.format}
-                          </span>
-                        </div>
-                      )}
+                      {renderPortalMaterialThumbnail(t)}
 
                       <div className="p-5 flex-1 flex flex-col justify-between gap-4">
                         <div className="space-y-2">
@@ -3829,21 +3888,7 @@ export default function PortalPage() {
                       key={p.id}
                       className="bg-white border border-slate-200/90 hover:border-[#FED422] rounded-3xl overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-200 group"
                     >
-                      {p.img ? (
-                        <div className="h-44 bg-slate-100 overflow-hidden relative shrink-0">
-                          <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
-                            {p.format}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="h-44 bg-slate-50 flex items-center justify-center shrink-0 border-b border-slate-100 relative">
-                          <ImageIcon size={48} className="text-slate-300" />
-                          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
-                            {p.format}
-                          </span>
-                        </div>
-                      )}
+                      {renderPortalMaterialThumbnail(p)}
 
                       <div className="p-5 flex-1 flex flex-col justify-between gap-4">
                         <div className="space-y-2">
