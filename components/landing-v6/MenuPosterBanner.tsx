@@ -4,6 +4,9 @@ import { Sparkles } from "lucide-react";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 
 const POSTER_IMAGES_ROW1 = [
+  "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471150/120%ED%8C%8C%EC%9D%B4-%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C-%ED%8F%AC%EC%8A%A4%ED%84%B0__231003_kxtdte.jpg",
+  "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471118/KakaoTalk_20260209_200759426_p6hfm2.png",
+  "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EA%B3%A0%EA%B5%AC%EB%A7%88-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_t4wokx.jpg",
   "https://res.cloudinary.com/dfkntvpmv/image/upload/f_auto,q_auto/v1783570620/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_30%EC%9D%BC_%EC%98%A4%ED%9B%84_05_58_55_wx2peg.png",
   "https://res.cloudinary.com/dfkntvpmv/image/upload/f_auto,q_auto/v1783570606/120_%EC%88%98%EB%B0%95%EC%A3%BC%EC%8A%A4_POP_A4_3_dow8re.png",
   "https://res.cloudinary.com/dfkntvpmv/image/upload/f_auto,q_auto/v1783570599/120%ED%8C%8C%EC%9D%B4-%ED%9D%91%EC%9E%84%EC%9E%90-%ED%8F%AC%EC%8A%A4%ED%84%B0__231007_r1kiww.jpg",
@@ -15,6 +18,8 @@ const POSTER_IMAGES_ROW1 = [
 ];
 
 const POSTER_IMAGES_ROW2 = [
+  "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_mkxnex.jpg",
+  "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EB%A7%9D%EA%B3%A0-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_axo5ms.jpg",
   "https://res.cloudinary.com/dfkntvpmv/image/upload/f_auto,q_auto/v1783570598/120%ED%8C%8C%EC%9D%B4_%ED%95%A8%EB%B0%95%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_Pop_Poster_vvkfbe.jpg",
   "https://res.cloudinary.com/dfkntvpmv/image/upload/f_auto,q_auto/v1783570598/120%ED%8C%8C%EC%9D%B4-%ED%81%AC%EB%A6%BC%EC%B9%98%EC%A6%88-%ED%8F%AC%EC%8A%A4%ED%84%B0__230925_wph2wa.jpg",
   "https://res.cloudinary.com/dfkntvpmv/image/upload/f_auto,q_auto/v1783570598/%EB%A7%A4%EC%9E%A5POP_2_%EC%A7%81%ED%99%94%EB%B6%88%EB%8B%AD_NONEWON_wxdczh.jpg",
