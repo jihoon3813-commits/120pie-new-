@@ -1,16 +1,34 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
+// 0. Convex 파일 업로드용 Upload URL 생성
+export const generateUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
 // 1. 전체 가맹지원 자료 리스트 조회 (최신 등록일 순)
 export const list = query({
   args: { type: v.optional(v.string()) }, // "training" | "pr"
   handler: async (ctx: any, args: any) => {
     const items = await ctx.db.query("materials").collect();
     const sorted = items.sort((a: any, b: any) => b.date.localeCompare(a.date));
+    const withUrls = await Promise.all(
+      sorted.map(async (item: any) => {
+        let fileUrl = item.fileUrl;
+        if (item.storageId) {
+          const url = await ctx.storage.getUrl(item.storageId);
+          if (url) fileUrl = url;
+        }
+        return { ...item, fileUrl };
+      })
+    );
     if (args.type) {
-      return sorted.filter((item: any) => item.type === args.type);
+      return withUrls.filter((item: any) => item.type === args.type);
     }
-    return sorted;
+    return withUrls;
   },
 });
 
@@ -25,6 +43,7 @@ export const createOrUpdate = mutation({
     desc: v.string(),
     img: v.optional(v.string()),
     fileUrl: v.optional(v.string()),
+    storageId: v.optional(v.string()),
     fileName: v.optional(v.string()),
     type: v.string(),
   },
@@ -44,6 +63,14 @@ export const createOrUpdate = mutation({
 export const deleteMaterial = mutation({
   args: { _id: v.id("materials") },
   handler: async (ctx: any, args: any) => {
+    const item = await ctx.db.get(args._id);
+    if (item && item.storageId) {
+      try {
+        await ctx.storage.delete(item.storageId);
+      } catch (err) {
+        console.warn("Failed to delete storage file:", err);
+      }
+    }
     await ctx.db.delete(args._id);
     return true;
   },

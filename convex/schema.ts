@@ -126,6 +126,7 @@ export default defineSchema({
     desc: v.string(),
     img: v.optional(v.string()), // 썸네일 이미지 (Base64)
     fileUrl: v.optional(v.string()), // 실제 파일 바이너리 (Base64 Data URL)
+    storageId: v.optional(v.string()), // Convex Storage ID
     fileName: v.optional(v.string()), // 업로드된 실제 파일명
     type: v.string(), // "training" (교육자료) | "pr" (홍보자료)
   }),

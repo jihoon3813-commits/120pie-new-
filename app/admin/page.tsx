@@ -612,6 +612,7 @@ export default function AdminPage() {
   const convexMaterials = useQuery(api.materials.list);
   const saveMaterialMutation = useMutation(api.materials.createOrUpdate);
   const deleteMaterialMutation = useMutation(api.materials.deleteMaterial);
+  const generateMaterialUploadUrlMutation = useMutation(api.materials.generateUploadUrl);
 
   const convexStoreInquiries = useQuery(api.storeInquiries.list);
   const answerInquiryMutation = useMutation(api.storeInquiries.answerInquiry);
@@ -972,7 +973,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (selectedContract && contracts.length > 0) {
       const updated = contracts.find((c) => c._id === selectedContract._id);
-      if (updated) {
+      if (updated && JSON.stringify(updated) !== JSON.stringify(selectedContract)) {
         setSelectedContract(updated);
       }
     }
@@ -1389,6 +1390,8 @@ export default function AdminPage() {
   const [newMaterialImg, setNewMaterialImg] = useState<string>("");
   const [newMaterialFileUrl, setNewMaterialFileUrl] = useState<string>("");
   const [newMaterialFileName, setNewMaterialFileName] = useState<string>("");
+  const [newMaterialStorageId, setNewMaterialStorageId] = useState<string>("");
+  const [isUploadingMaterialFile, setIsUploadingMaterialFile] = useState<boolean>(false);
 
   // 1. STORE MANAGEMENT STATES
   const [selectedStore, setSelectedStore] = useState<StoreInfo | null>(null);
@@ -2429,7 +2432,7 @@ export default function AdminPage() {
   // ==========================================
   // MATERIALS & PR ACTIONS: Add & Delete (File Upload & Convex Integration)
   // ==========================================
-  const handleMaterialFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMaterialFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -2452,20 +2455,46 @@ export default function AdminPage() {
     }
 
     setNewMaterialFileName(file.name);
+    setIsUploadingMaterialFile(true);
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === "string") {
-        setNewMaterialFileUrl(reader.result);
+    try {
+      // 1. Convex 파일 업로드용 Upload URL 생성
+      const postUrl = await generateMaterialUploadUrlMutation();
+
+      // 2. Convex File Storage에 파일 직접 POST 업로드
+      const res = await fetch(postUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type || "application/octet-stream" },
+        body: file,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Convex storage upload failed with status ${res.status}`);
       }
-    };
-    reader.readAsDataURL(file);
+
+      const { storageId } = await res.json();
+      setNewMaterialStorageId(storageId);
+      setNewMaterialFileUrl(`convex:${storageId}`);
+    } catch (err) {
+      console.error("Convex Material Storage Upload Exception:", err);
+      alert("Convex 파일 저장소 업로드 중 오류가 발생했습니다.");
+    } finally {
+      setIsUploadingMaterialFile(false);
+    }
   };
 
   const handleCreateMaterial = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMaterialTitle) {
       alert("자료 제목을 입력해 주세요.");
+      return;
+    }
+    if (isUploadingMaterialFile) {
+      alert("파일이 Convex 서버로 업로드 중입니다. 업로드가 완료된 후 등록해 주세요.");
+      return;
+    }
+    if (!newMaterialFileUrl) {
+      alert("실제 자료 파일을 첨부해 주세요.");
       return;
     }
 
@@ -2479,6 +2508,7 @@ export default function AdminPage() {
       desc: newMaterialDesc || newMaterialTitle,
       img: newMaterialImg || undefined,
       fileUrl: newMaterialFileUrl || undefined,
+      storageId: newMaterialStorageId || undefined,
       fileName: newMaterialFileName || undefined,
       type: materialType,
     };
@@ -2499,11 +2529,19 @@ export default function AdminPage() {
     if (materialType === "training") {
       const updated = [newMat, ...trainings];
       setTrainings(updated as any);
-      localStorage.setItem("120_trainings", JSON.stringify(updated));
+      try {
+        localStorage.setItem("120_trainings", JSON.stringify(updated));
+      } catch (e) {
+        console.warn("LocalStorage quota alert suppressed:", e);
+      }
     } else {
       const updated = [newMat, ...prs];
       setPrs(updated as any);
-      localStorage.setItem("120_prs", JSON.stringify(updated));
+      try {
+        localStorage.setItem("120_prs", JSON.stringify(updated));
+      } catch (e) {
+        console.warn("LocalStorage quota alert suppressed:", e);
+      }
     }
 
     // 폼 초기화
@@ -2511,6 +2549,7 @@ export default function AdminPage() {
     setNewMaterialDesc("");
     setNewMaterialImg("");
     setNewMaterialFileUrl("");
+    setNewMaterialStorageId("");
     setNewMaterialFileName("");
     setShowMaterialModal(false);
     triggerToast(`신규 ${materialType === "training" ? "교육" : "홍보"}자료가 성공적으로 등록되었습니다!`);
@@ -11352,26 +11391,41 @@ export default function AdminPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-extrabold text-[#0F172A] flex items-center gap-1">
-                    📂 실제 자료 파일 직접 업로드
-                    <span className="text-[10px] text-amber-600 font-extrabold">(필수)</span>
+                  <label className="font-extrabold text-[#0F172A] flex items-center justify-between">
+                    <span className="flex items-center gap-1">
+                      📂 실제 자료 파일 직접 업로드
+                      <span className="text-[10px] text-amber-600 font-extrabold">(필수)</span>
+                    </span>
+                    {isUploadingMaterialFile && (
+                      <span className="text-[10px] text-amber-600 font-bold animate-pulse flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-spin"></span>
+                        서버 업로드 중... ⏳
+                      </span>
+                    )}
+                    {!isUploadingMaterialFile && newMaterialFileUrl && (
+                      <span className="text-[10px] text-emerald-600 font-extrabold flex items-center gap-1">
+                        ✓ 서버 업로드 완료
+                      </span>
+                    )}
                   </label>
                   <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-2xl p-3 shadow-2xs">
                     <input
                       type="file"
+                      disabled={isUploadingMaterialFile}
                       onChange={handleMaterialFileUpload}
-                      className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1"
+                      className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1 disabled:opacity-50"
                     />
                     {newMaterialFileName && (
                       <div className="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2.5 py-1 rounded-xl max-w-[150px] truncate" title={newMaterialFileName}>
                         {newMaterialFileName}
                       </div>
                     )}
-                    {newMaterialFileUrl && (
+                    {newMaterialFileUrl && !isUploadingMaterialFile && (
                       <button
                         type="button"
                         onClick={() => {
                           setNewMaterialFileUrl("");
+                          setNewMaterialStorageId("");
                           setNewMaterialFileName("");
                         }}
                         className="px-3 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 text-[10px] font-bold border-0 cursor-pointer shadow-2xs"
@@ -11386,8 +11440,8 @@ export default function AdminPage() {
               {/* Stage Flow Footer Bar */}
               <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
                 <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>자료 업로드 준비 완료</span>
+                  <span className={`w-2 h-2 rounded-full ${isUploadingMaterialFile ? "bg-amber-500 animate-ping" : newMaterialFileUrl ? "bg-emerald-500 animate-pulse" : "bg-slate-300"}`}></span>
+                  <span>{isUploadingMaterialFile ? "대용량 파일 서버 업로드 중..." : newMaterialFileUrl ? "자료 업로드 준비 완료" : "자료 파일 선택 대기"}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
@@ -11399,9 +11453,10 @@ export default function AdminPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                    disabled={isUploadingMaterialFile}
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] disabled:bg-slate-300 disabled:text-slate-500 text-[#0F172A] font-black text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer disabled:cursor-not-allowed border-0 flex items-center gap-2"
                   >
-                    <span>지원 자료 추가</span>
+                    <span>{isUploadingMaterialFile ? "업로드 중..." : "지원 자료 추가"}</span>
                     <ArrowRight size={14} />
                   </button>
                 </div>
