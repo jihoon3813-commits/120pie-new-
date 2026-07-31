@@ -367,6 +367,11 @@ function AdoptionModal({ exampleId, onClose }: { exampleId: string | null, onClo
 }
 
 const MARQUEE_IMAGES = [
+  { name: "커스터드파이 포스터", src: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471150/120%ED%8C%8C%EC%9D%B4-%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C-%ED%8F%AC%EC%8A%A4%ED%84%B0__231003_kxtdte.jpg" },
+  { name: "창업혜택 포스터", src: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471118/KakaoTalk_20260209_200759426_p6hfm2.png" },
+  { name: "고구마파이 포스터", src: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EA%B3%A0%EA%B5%AC%EB%A7%88-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_t4wokx.jpg" },
+  { name: "블루베리파이 포스터", src: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_mkxnex.jpg" },
+  { name: "망고파이 포스터", src: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EB%A7%9D%EA%B3%A0-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_axo5ms.jpg" },
   { name: "로제미트파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184221/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_s3svi2.jpg" },
   { name: "블루베리파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184610/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_zfmatx.jpg" },
   { name: "콘치즈파이", src: "https://res.cloudinary.com/dfarfqx7e/image/upload/f_auto,q_auto/v1781184643/%EC%BD%98%EC%B9%98%EC%A6%88%ED%8C%8C%EC%9D%B4_%EB%88%84%EB%81%BC__260131_lio2tj.jpg" },

@@ -1071,6 +1071,11 @@ export default function FranchisePageClient() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
                   {[
                     { name: "카야치즈 파이", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785389819/edited-photo_-_2026-07-30T122142.921_k6tlef.png" },
+                    { name: "커스터드 파이 (포스터)", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471150/120%ED%8C%8C%EC%9D%B4-%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C-%ED%8F%AC%EC%8A%A4%ED%84%B0__231003_kxtdte.jpg" },
+                    { name: "고구마 파이 (포스터)", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EA%B3%A0%EA%B5%AC%EB%A7%88-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_t4wokx.jpg" },
+                    { name: "블루베리 파이 (포스터)", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_mkxnex.jpg" },
+                    { name: "망고 파이 (포스터)", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EB%A7%9D%EA%B3%A0-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_axo5ms.jpg" },
+                    { name: "창업혜택 안내 (포스터)", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471118/KakaoTalk_20260209_200759426_p6hfm2.png" },
                     { name: "꿀호떡 파이", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076391/edited-photo_-_2026-07-06T123534.491_cumykv.png" },
                     { name: "페페로니피자 파이", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076393/edited-photo_-_2026-07-06T123914.344_ozvcjh.png" },
                     { name: "로제미트 파이", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076393/edited-photo_-_2026-07-06T123900.583_obxtij.png" },
