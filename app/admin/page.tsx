@@ -407,6 +407,64 @@ const DEFAULT_PRODUCTS: Product[] = [
   }
 ];
 
+const DEFAULT_PRS: Material[] = [
+  {
+    id: "PR-01",
+    title: "120파이 커스터드파이 공식 홍보 포스터 (JPG)",
+    date: "2026-05-18",
+    size: "12.4 MB",
+    format: "JPG",
+    desc: "부드럽고 달콤한 120겹 커스터드파이 매장 연출컷 및 고화질 원본 홍보 포스터 파일입니다.",
+    img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471150/120%ED%8C%8C%EC%9D%B4-%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C-%ED%8F%AC%EC%8A%A4%ED%84%B0__231003_kxtdte.jpg",
+    fileUrl: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471150/120%ED%8C%8C%EC%9D%B4-%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C-%ED%8F%AC%EC%8A%A4%ED%84%B0__231003_kxtdte.jpg",
+    fileName: "120파이_커스터드파이_포스터.jpg"
+  },
+  {
+    id: "PR-02",
+    title: "120파이 카카오톡 채널 전용 홍보 포스터 (PNG)",
+    date: "2026-05-19",
+    size: "8.7 MB",
+    format: "PNG",
+    desc: "카카오톡 플러스친구 및 소셜 미디어 배포 전용 120파이 브랜드 홍보 이미지입니다.",
+    img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471118/KakaoTalk_20260209_200759426_p6hfm2.png",
+    fileUrl: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471118/KakaoTalk_20260209_200759426_p6hfm2.png",
+    fileName: "120파이_카카오톡_홍보.png"
+  },
+  {
+    id: "PR-03",
+    title: "120파이 고구마파이 공식 홍보 포스터 (JPG)",
+    date: "2026-05-20",
+    size: "14.1 MB",
+    format: "JPG",
+    desc: "달콤하고 고소한 고구마 무스가 가득 들어간 고구마파이 매장 유리창용 고화질 포스터입니다.",
+    img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EA%B3%A0%EA%B5%AC%EB%A7%88-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_t4wokx.jpg",
+    fileUrl: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EA%B3%A0%EA%B5%AC%EB%A7%88-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_t4wokx.jpg",
+    fileName: "120파이_고구마파이_포스터.jpg"
+  },
+  {
+    id: "PR-04",
+    title: "120파이 블루베리파이 공식 홍보 포스터 (JPG)",
+    date: "2026-05-21",
+    size: "15.3 MB",
+    format: "JPG",
+    desc: "상큼한 블루베리 과육이 씹히는 프리미엄 블루베리파이 매장 부착용 원본 그래픽 시안입니다.",
+    img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_mkxnex.jpg",
+    fileUrl: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_mkxnex.jpg",
+    fileName: "120파이_블루베리파이_포스터.jpg"
+  },
+  {
+    id: "PR-05",
+    title: "120파이 망고파이 스페셜 시즌 홍보 포스터 (JPG)",
+    date: "2026-05-22",
+    size: "13.8 MB",
+    format: "JPG",
+    desc: "여름 대비 스페셜 신메뉴 망고파이 매장 윈도우용 시네마틱 고화질 원본 포스터입니다.",
+    img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EB%A7%9D%EA%B3%A0-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_axo5ms.jpg",
+    fileUrl: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EB%A7%9D%EA%B3%A0-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_axo5ms.jpg",
+    fileName: "120파이_망고파이_포스터.jpg"
+  }
+];
+
 const DEFAULT_BANNER: BannerSettings = {
   mainTag: "Seasonal Spec",
   mainTitle: "여름 대비 스페셜 신메뉴\n'망고파이' 물류 정식 공급!",
@@ -1789,7 +1847,7 @@ export default function AdminPage() {
       setInquiries(loadState("120_inquiries", []));
       setNotices(loadState("120_notices", []));
       setTrainings(loadState("120_trainings", []));
-      setPrs(loadState("120_prs", []));
+      setPrs(loadState("120_prs", DEFAULT_PRS));
 
       // Settings and Status Load
       const ds = loadState("120_delivery_statuses", ["주문완료", "배송준비중", "배송중", "배송완료"]);
