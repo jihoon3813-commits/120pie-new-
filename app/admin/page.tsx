@@ -59,7 +59,9 @@ import {
   ArrowUp,
   ArrowDown,
   MapPin,
-  ExternalLink
+  ExternalLink,
+  LayoutGrid,
+  List
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
@@ -1472,10 +1474,11 @@ export default function AdminPage() {
   const [storeCancelDate, setStoreCancelDate] = useState<string>("");
   const [storeAdoptionMenu, setStoreAdoptionMenu] = useState<string[]>([]);
 
-  // Store management filter and sort states
+  // Store management filter, sort and view mode states
   const [storeSearchQuery, setStoreSearchQuery] = useState<string>("");
   const [storeStatusFilter, setStoreStatusFilter] = useState<string>("전체");
   const [storeSortOrder, setStoreSortOrder] = useState<"latest" | "oldest">("latest");
+  const [storeViewMode, setStoreViewMode] = useState<"1col" | "2col">("2col");
 
   // Computed filtered and sorted stores (Default: Latest registration date on top)
   const filteredAndSortedStores = useMemo(() => {
@@ -6360,7 +6363,7 @@ export default function AdminPage() {
                     )}
                   </div>
 
-                  {/* Status Filter Tabs & Sort Dropdown */}
+                  {/* Status Filter Tabs, View Mode Toggle & Sort Dropdown */}
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Status Tabs */}
                     <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl shadow-2xs border-0">
@@ -6379,6 +6382,34 @@ export default function AdminPage() {
                       ))}
                     </div>
 
+                    {/* View Mode Toggle (1열 보기 / 2열 보기, 기본: 2열 보기) */}
+                    <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl shadow-2xs border-0">
+                      <button
+                        onClick={() => setStoreViewMode("1col")}
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                          storeViewMode === "1col"
+                            ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
+                            : "text-slate-500 hover:text-[#0F172A]"
+                        }`}
+                        title="1열 보기 (목록 리스트)"
+                      >
+                        <List size={14} />
+                        <span>1열 보기</span>
+                      </button>
+                      <button
+                        onClick={() => setStoreViewMode("2col")}
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                          storeViewMode === "2col"
+                            ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
+                            : "text-slate-500 hover:text-[#0F172A]"
+                        }`}
+                        title="2열 보기 (2컬럼 카드 그리드)"
+                      >
+                        <LayoutGrid size={14} />
+                        <span>2열 보기</span>
+                      </button>
+                    </div>
+
                     {/* Sort Order Dropdown (Default: Latest) */}
                     <select
                       value={storeSortOrder}
@@ -6392,142 +6423,276 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Stores Card Rows List */}
-              <div className="space-y-3">
-                {/* Column Table Header */}
-                <div className="hidden lg:grid grid-cols-12 gap-3 px-6 py-2 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider items-center">
-                  <div className="col-span-2">등록일</div>
-                  <div className="col-span-4">가맹점명 / ID / 주소</div>
-                  <div className="col-span-1.5">점주명</div>
-                  <div className="col-span-1.5">연락처</div>
-                  <div className="col-span-1.5">도입 메뉴</div>
-                  <div className="col-span-0.5 text-center">상태</div>
-                  <div className="col-span-1 text-right">관리</div>
-                </div>
+              {/* Stores List / Grid Container */}
+              {storeViewMode === "1col" ? (
+                /* 1열 보기 (List Mode) */
+                <div className="space-y-3">
+                  {/* Column Table Header */}
+                  <div className="hidden lg:grid grid-cols-12 gap-3 px-6 py-2 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider items-center">
+                    <div className="col-span-2">등록일</div>
+                    <div className="col-span-4">가맹점명 / ID / 주소</div>
+                    <div className="col-span-1.5">점주명</div>
+                    <div className="col-span-1.5">연락처</div>
+                    <div className="col-span-1.5">도입 메뉴</div>
+                    <div className="col-span-0.5 text-center">상태</div>
+                    <div className="col-span-1 text-right">관리</div>
+                  </div>
 
-                {filteredAndSortedStores.length === 0 ? (
+                  {filteredAndSortedStores.length === 0 ? (
+                    <div className="bg-white rounded-[28px] border-0 p-16 text-center text-slate-400 font-extrabold shadow-md flex flex-col items-center justify-center space-y-2">
+                      <Search size={36} className="text-slate-300 animate-pulse" />
+                      <p className="text-xs">조건에 해당하는 가맹점 데이터가 없습니다.</p>
+                    </div>
+                  ) : (
+                    filteredAndSortedStores.map((store) => (
+                      <div 
+                        key={store.id} 
+                        className="bg-white rounded-[24px] p-4 sm:p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-3 items-start lg:items-center"
+                      >
+                        {/* Registration Date */}
+                        <div className="col-span-2 flex items-center gap-2">
+                          <span className="lg:hidden text-xs text-slate-400 font-semibold">등록일:</span>
+                          <span className="text-xs font-extrabold text-slate-600 bg-[#F1F4F8] rounded-xl px-3 py-1.5 shadow-2xs border-0">
+                            {store.regDate || "2026-07-28"}
+                          </span>
+                        </div>
+
+                        {/* Store Name, ID & Address */}
+                        <div className="col-span-4 min-w-0 space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="font-black text-sm text-[#0F172A] truncate">{store.name}</h4>
+                            <span className="text-[11px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                              ID: {store.id}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-400 font-extrabold flex items-center gap-1.5 truncate">
+                            <MapPin size={13} className="text-amber-500 shrink-0" />
+                            <span className="truncate">
+                              {store.roadAddress ? `${store.roadAddress} ${store.detailAddress || ""}`.trim() : "주소 정보 미등록"}
+                            </span>
+                          </p>
+                        </div>
+
+                        {/* Owner */}
+                        <div className="col-span-1.5 text-xs font-extrabold text-[#0F172A]">
+                          <span className="lg:hidden text-slate-400 font-semibold mr-2">점주:</span>
+                          {store.owner}
+                        </div>
+
+                        {/* Phone */}
+                        <div className="col-span-1.5 text-xs font-extrabold text-slate-600 font-mono">
+                          <span className="lg:hidden text-slate-400 font-semibold mr-2">연락처:</span>
+                          {store.phone}
+                        </div>
+
+                        {/* Adoption Menu Badges */}
+                        <div className="col-span-1.5 flex flex-wrap gap-1">
+                          {store.adoptionMenu && store.adoptionMenu.map((m) => {
+                            const isPie = m === "120pie";
+                            const isEgg = m === "egg120";
+                            const isChurros = m === "츄러스120";
+                            const isCoffee = m === "120coffee";
+                            return (
+                              <span 
+                                key={m} 
+                                className={`text-[10px] font-extrabold px-2 py-0.5 rounded-lg border-0 shadow-2xs ${
+                                  isPie 
+                                    ? "bg-amber-100 text-amber-800" 
+                                    : isEgg 
+                                    ? "bg-orange-100 text-orange-800" 
+                                    : isChurros 
+                                    ? "bg-yellow-100 text-yellow-800" 
+                                    : isCoffee 
+                                    ? "bg-slate-100 text-slate-700" 
+                                    : "bg-blue-100 text-blue-800"
+                                }`}
+                              >
+                                {m}
+                              </span>
+                            );
+                          })}
+                        </div>
+
+                        {/* Status Badge */}
+                        <div className="col-span-0.5 lg:text-center">
+                          <span className={`px-3 py-1 rounded-xl text-[11px] font-extrabold border-0 shadow-2xs inline-block ${
+                            store.status === "승인" 
+                              ? "bg-emerald-100 text-emerald-700" 
+                              : store.status === "대기"
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-rose-100 text-rose-700"
+                          }`}>
+                            {store.status}
+                          </span>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="col-span-1 flex items-center lg:justify-end gap-1.5 w-full lg:w-auto pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+                          <button
+                            onClick={() => {
+                              if (typeof window !== "undefined") {
+                                localStorage.setItem("120_owner_logged_in", "true");
+                                localStorage.setItem("120_active_store_id", store.id);
+                                window.open("/portal", "_blank");
+                              }
+                            }}
+                            className="px-2.5 py-1.5 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1 font-black text-xs shrink-0"
+                            title={`${store.name} 점주포털 자동로그인 이동 (새 탭)`}
+                          >
+                            <ExternalLink size={13} />
+                            <span>점주포털</span>
+                          </button>
+                          <button
+                            onClick={() => handleOpenStoreModal(store)}
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border-0 shadow-2xs shrink-0"
+                            title="상세 수정"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteStore(store.id)}
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all cursor-pointer border-0 shadow-2xs shrink-0"
+                            title="삭제"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              ) : (
+                /* 2열 보기 (2-Column Grid Mode) - DEFAULT */
+                filteredAndSortedStores.length === 0 ? (
                   <div className="bg-white rounded-[28px] border-0 p-16 text-center text-slate-400 font-extrabold shadow-md flex flex-col items-center justify-center space-y-2">
                     <Search size={36} className="text-slate-300 animate-pulse" />
                     <p className="text-xs">조건에 해당하는 가맹점 데이터가 없습니다.</p>
                   </div>
                 ) : (
-                  filteredAndSortedStores.map((store) => (
-                    <div 
-                      key={store.id} 
-                      className="bg-white rounded-[24px] p-4 sm:p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-3 items-start lg:items-center"
-                    >
-                      {/* Registration Date */}
-                      <div className="col-span-2 flex items-center gap-2">
-                        <span className="lg:hidden text-xs text-slate-400 font-semibold">등록일:</span>
-                        <span className="text-xs font-extrabold text-slate-600 bg-[#F1F4F8] rounded-xl px-3 py-1.5 shadow-2xs border-0">
-                          {store.regDate || "2026-07-28"}
-                        </span>
-                      </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredAndSortedStores.map((store) => (
+                      <div 
+                        key={store.id}
+                        className="bg-white rounded-[24px] p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col justify-between space-y-4"
+                      >
+                        {/* Card Top: Store Header & Status */}
+                        <div className="space-y-2.5">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="space-y-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="font-black text-base text-[#0F172A] truncate">{store.name}</h4>
+                                <span className="text-[11px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                                  ID: {store.id}
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-400 font-extrabold flex items-center gap-1.5 truncate">
+                                <MapPin size={13} className="text-amber-500 shrink-0" />
+                                <span className="truncate">
+                                  {store.roadAddress ? `${store.roadAddress} ${store.detailAddress || ""}`.trim() : "주소 정보 미등록"}
+                                </span>
+                              </p>
+                            </div>
 
-                      {/* Store Name, ID & Address */}
-                      <div className="col-span-4 min-w-0 space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="font-black text-sm text-[#0F172A] truncate">{store.name}</h4>
-                          <span className="text-[11px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                            ID: {store.id}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-400 font-extrabold flex items-center gap-1.5 truncate">
-                          <MapPin size={13} className="text-amber-500 shrink-0" />
-                          <span className="truncate">
-                            {store.roadAddress ? `${store.roadAddress} ${store.detailAddress || ""}`.trim() : "주소 정보 미등록"}
-                          </span>
-                        </p>
-                      </div>
-
-                      {/* Owner */}
-                      <div className="col-span-1.5 text-xs font-extrabold text-[#0F172A]">
-                        <span className="lg:hidden text-slate-400 font-semibold mr-2">점주:</span>
-                        {store.owner}
-                      </div>
-
-                      {/* Phone */}
-                      <div className="col-span-1.5 text-xs font-extrabold text-slate-600 font-mono">
-                        <span className="lg:hidden text-slate-400 font-semibold mr-2">연락처:</span>
-                        {store.phone}
-                      </div>
-
-                      {/* Adoption Menu Badges */}
-                      <div className="col-span-1.5 flex flex-wrap gap-1">
-                        {store.adoptionMenu && store.adoptionMenu.map((m) => {
-                          const isPie = m === "120pie";
-                          const isEgg = m === "egg120";
-                          const isChurros = m === "츄러스120";
-                          const isCoffee = m === "120coffee";
-                          return (
-                            <span 
-                              key={m} 
-                              className={`text-[10px] font-extrabold px-2 py-0.5 rounded-lg border-0 shadow-2xs ${
-                                isPie 
-                                  ? "bg-amber-100 text-amber-800" 
-                                  : isEgg 
-                                  ? "bg-orange-100 text-orange-800" 
-                                  : isChurros 
-                                  ? "bg-yellow-100 text-yellow-800" 
-                                  : isCoffee 
-                                  ? "bg-slate-100 text-slate-700" 
-                                  : "bg-blue-100 text-blue-800"
-                              }`}
-                            >
-                              {m}
+                            {/* Status Badge */}
+                            <span className={`px-3 py-1 rounded-xl text-[11px] font-extrabold border-0 shadow-2xs shrink-0 ${
+                              store.status === "승인" 
+                                ? "bg-emerald-100 text-emerald-700" 
+                                : store.status === "대기"
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-rose-100 text-rose-700"
+                            }`}>
+                              {store.status}
                             </span>
-                          );
-                        })}
-                      </div>
+                          </div>
 
-                      {/* Status Badge */}
-                      <div className="col-span-0.5 lg:text-center">
-                        <span className={`px-3 py-1 rounded-xl text-[11px] font-extrabold border-0 shadow-2xs inline-block ${
-                          store.status === "승인" 
-                            ? "bg-emerald-100 text-emerald-700" 
-                            : store.status === "대기"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-rose-100 text-rose-700"
-                        }`}>
-                          {store.status}
-                        </span>
-                      </div>
+                          {/* Info Grid: RegDate, Owner, Phone */}
+                          <div className="grid grid-cols-3 gap-2 p-3 bg-[#F8FAFC] rounded-2xl text-xs mt-3 border border-slate-100">
+                            <div>
+                              <span className="block text-[10px] font-bold text-slate-400 mb-0.5">등록일</span>
+                              <span className="font-extrabold text-slate-700">{store.regDate || "2026-07-28"}</span>
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-bold text-slate-400 mb-0.5">점주명</span>
+                              <span className="font-extrabold text-[#0F172A]">{store.owner}</span>
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-bold text-slate-400 mb-0.5">연락처</span>
+                              <span className="font-extrabold text-slate-600 font-mono">{store.phone}</span>
+                            </div>
+                          </div>
 
-                      {/* Actions */}
-                      <div className="col-span-1 flex items-center lg:justify-end gap-1.5 w-full lg:w-auto pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100">
-                        <button
-                          onClick={() => {
-                            if (typeof window !== "undefined") {
-                              localStorage.setItem("120_owner_logged_in", "true");
-                              localStorage.setItem("120_active_store_id", store.id);
-                              window.open("/portal", "_blank");
-                            }
-                          }}
-                          className="px-2.5 py-1.5 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1 font-black text-xs shrink-0"
-                          title={`${store.name} 점주포털 자동로그인 이동 (새 탭)`}
-                        >
-                          <ExternalLink size={13} />
-                          <span>점주포털</span>
-                        </button>
-                        <button
-                          onClick={() => handleOpenStoreModal(store)}
-                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border-0 shadow-2xs shrink-0"
-                          title="상세 수정"
-                        >
-                          <Edit size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteStore(store.id)}
-                          className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all cursor-pointer border-0 shadow-2xs shrink-0"
-                          title="삭제"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                          {/* Adoption Menu Badges */}
+                          {store.adoptionMenu && store.adoptionMenu.length > 0 && (
+                            <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                              <span className="text-[10px] font-bold text-slate-400 mr-1">도입 메뉴:</span>
+                              {store.adoptionMenu.map((m) => {
+                                const isPie = m === "120pie";
+                                const isEgg = m === "egg120";
+                                const isChurros = m === "츄러스120";
+                                const isCoffee = m === "120coffee";
+                                return (
+                                  <span 
+                                    key={m} 
+                                    className={`text-[10px] font-extrabold px-2 py-0.5 rounded-lg border-0 shadow-2xs ${
+                                      isPie 
+                                        ? "bg-amber-100 text-amber-800" 
+                                        : isEgg 
+                                        ? "bg-orange-100 text-orange-800" 
+                                        : isChurros 
+                                        ? "bg-yellow-100 text-yellow-800" 
+                                        : isCoffee 
+                                        ? "bg-slate-100 text-slate-700" 
+                                        : "bg-blue-100 text-blue-800"
+                                    }`}
+                                  >
+                                    {m}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Card Bottom: Actions */}
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-100 gap-2">
+                          <button
+                            onClick={() => {
+                              if (typeof window !== "undefined") {
+                                localStorage.setItem("120_owner_logged_in", "true");
+                                localStorage.setItem("120_active_store_id", store.id);
+                                window.open("/portal", "_blank");
+                              }
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1.5 font-black text-xs"
+                            title={`${store.name} 점주포털 자동로그인 이동 (새 탭)`}
+                          >
+                            <ExternalLink size={13} />
+                            <span>점주포털</span>
+                          </button>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => handleOpenStoreModal(store)}
+                              className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1 text-xs font-extrabold"
+                              title="상세 수정"
+                            >
+                              <Edit size={13} />
+                              <span>수정</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteStore(store.id)}
+                              className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all cursor-pointer border-0 shadow-2xs"
+                              title="삭제"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
+                    ))}
+                  </div>
+                )
+              )}
             </div>
           )}
 
