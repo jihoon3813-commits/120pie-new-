@@ -2151,7 +2151,7 @@ export default function PortalPage() {
       return (
         <div className="h-44 bg-slate-100 overflow-hidden relative shrink-0">
           <img src={optimizeCloudinaryUrl(item.img)} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
+          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-md shadow-xs">
             {item.format}
           </span>
         </div>
@@ -2162,7 +2162,7 @@ export default function PortalPage() {
       return (
         <div className="h-44 bg-slate-100 overflow-hidden relative shrink-0">
           <img src={optimizeCloudinaryUrl(item.fileUrl)} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
+          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-md shadow-xs">
             {item.format}
           </span>
         </div>
@@ -2174,7 +2174,7 @@ export default function PortalPage() {
         <div className="h-44 bg-gradient-to-br from-amber-500 to-amber-600 flex flex-col items-center justify-center shrink-0 border-b border-amber-400 relative text-white group-hover:from-amber-600 group-hover:to-amber-700 transition-all">
           <Video size={48} className="text-white drop-shadow-md group-hover:scale-110 transition-transform" />
           <span className="text-xs font-black mt-2 tracking-wider uppercase drop-shadow-xs">동영상 강좌 / 가이드</span>
-          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
+          <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-md shadow-xs">
             {item.format}
           </span>
         </div>
@@ -2185,7 +2185,7 @@ export default function PortalPage() {
       <div className="h-44 bg-slate-100 flex flex-col items-center justify-center shrink-0 border-b border-slate-200/60 relative text-slate-400 group-hover:bg-slate-200/60 transition-all">
         <FileText size={48} className="text-slate-400 group-hover:scale-110 transition-transform" />
         <span className="text-xs font-black mt-2 text-slate-600 uppercase">{item.format || "DOCUMENT"}</span>
-        <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-xl shadow-xs">
+        <span className="absolute bottom-3 right-3 bg-[#0F172A]/90 text-white backdrop-blur-xs text-[10px] font-black px-3 py-1 rounded-md shadow-xs">
           {item.format}
         </span>
       </div>
@@ -2340,13 +2340,13 @@ export default function PortalPage() {
         />
 
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-5 py-3.5 rounded-2xl font-black text-sm shadow-[0_8px_30px_rgba(254,212,34,0.3)] flex items-center gap-2.5 animate-bounce">
+          <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-5 py-3.5 rounded-lg font-black text-sm shadow-[0_8px_30px_rgba(254,212,34,0.3)] flex items-center gap-2.5 animate-bounce">
             <CheckCircle2 size={18} className="text-[#0F172A]" />
             {toastMessage}
           </div>
         )}
         
-        <div className="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-[32px] p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] space-y-7 relative overflow-hidden text-left z-10">
+        <div className="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-lg p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] space-y-7 relative overflow-hidden text-left z-10">
           {/* Top Yellow Brand Accent Line */}
           <div className="absolute top-0 left-0 right-0 h-2 bg-[#FED422]" />
           
@@ -2362,7 +2362,7 @@ export default function PortalPage() {
             
             <div className="space-y-1.5">
               <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">점주 전용 포털</h2>
-              <span className="inline-block text-xs font-black text-[#0F172A] bg-[#FED422] px-4 py-1 rounded-full shadow-2xs">
+              <span className="inline-block text-xs font-black text-[#0F172A] bg-[#FED422] px-4 py-1 rounded-md shadow-2xs">
                 가맹점 파트너 관리 시스템
               </span>
             </div>
@@ -2374,7 +2374,7 @@ export default function PortalPage() {
 
           <form onSubmit={handleLoginSubmit} className="space-y-4 pt-1">
             {loginError && (
-              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-2xl p-3.5 text-xs font-bold flex items-center gap-2">
+              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-lg p-3.5 text-xs font-bold flex items-center gap-2">
                 <AlertCircle size={16} className="shrink-0 text-rose-400" />
                 <span>{loginError}</span>
               </div>
@@ -2388,7 +2388,7 @@ export default function PortalPage() {
                 value={loginId}
                 onChange={(e) => setLoginId(e.target.value)}
                 required
-                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
+                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-lg px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
               />
             </div>
 
@@ -2400,13 +2400,13 @@ export default function PortalPage() {
                 value={loginPw}
                 onChange={(e) => setLoginPw(e.target.value)}
                 required
-                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
+                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-lg px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-4 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-sm sm:text-base font-black rounded-2xl transition-all shadow-lg shadow-[#FED422]/20 flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.99] mt-2"
+              className="w-full py-4 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-sm sm:text-base font-black rounded-lg transition-all shadow-lg shadow-[#FED422]/20 flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.99] mt-2"
             >
               <span>로그인 완료</span>
               <ArrowRight size={18} className="text-[#0F172A]" />
@@ -2415,7 +2415,7 @@ export default function PortalPage() {
             <button
               type="button"
               onClick={() => setShowRegisterModal(true)}
-              className="w-full py-3.5 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-200 text-xs sm:text-sm font-extrabold rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+              className="w-full py-3.5 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-200 text-xs sm:text-sm font-extrabold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
             >
               🏢 가맹점 등록 신청
             </button>
@@ -2437,7 +2437,7 @@ export default function PortalPage() {
       
       {/* TOAST SYSTEM */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-6 py-4 rounded-full font-black text-sm shadow-xl flex items-center gap-2.5 animate-bounce border-0">
+        <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-6 py-4 rounded-md font-black text-sm shadow-xl flex items-center gap-2.5 animate-bounce border-0">
           <CheckCircle2 size={18} />
           {toastMessage}
         </div>
@@ -2459,7 +2459,7 @@ export default function PortalPage() {
           <button
             type="button"
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="hidden lg:flex p-1.5 text-slate-500 hover:text-[#0F141C] hover:bg-white rounded-xl transition-colors cursor-pointer border border-slate-200/80 bg-white shadow-2xs"
+            className="hidden lg:flex p-1.5 text-slate-500 hover:text-[#0F141C] hover:bg-white rounded-md transition-colors cursor-pointer border border-slate-200/80 bg-white shadow-2xs"
             title={isSidebarCollapsed ? "사이드바 펼치기" : "사이드바 접기"}
           >
             {isSidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
@@ -2475,7 +2475,7 @@ export default function PortalPage() {
               alt="120pie & coffee"
               className="h-5 sm:h-7 w-auto object-contain group-hover:scale-102 transition-transform shrink-0"
             />
-            <span className="hidden sm:inline-block text-[11px] px-3 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs whitespace-nowrap shrink-0">
+            <span className="hidden sm:inline-block text-[11px] px-3 py-0.5 rounded-md bg-[#FED422] text-[#0F172A] font-black shadow-2xs whitespace-nowrap shrink-0">
               점주포털
             </span>
           </button>
@@ -2493,7 +2493,7 @@ export default function PortalPage() {
           <button
             type="button"
             onClick={() => setCurrentMenu("order")}
-            className="px-3 py-1.5 rounded-full bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-xs font-black transition-all flex items-center gap-1.5 shadow-sm shrink-0 whitespace-nowrap border-0 cursor-pointer active:scale-95"
+            className="px-3 py-1.5 rounded-md bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-xs font-black transition-all flex items-center gap-1.5 shadow-sm shrink-0 whitespace-nowrap border-0 cursor-pointer active:scale-95"
           >
             <ShoppingBag size={14} className="text-[#0F172A] shrink-0" />
             <span>자재주문 바로가기</span>
@@ -2501,7 +2501,7 @@ export default function PortalPage() {
 
           <Link
             href="/"
-            className="hidden sm:inline-flex px-3.5 py-1.5 rounded-full border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-black text-slate-700 transition-all items-center gap-1.5 shadow-2xs shrink-0 whitespace-nowrap"
+            className="hidden sm:inline-flex px-3.5 py-1.5 rounded-md border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-black text-slate-700 transition-all items-center gap-1.5 shadow-2xs shrink-0 whitespace-nowrap"
           >
             <ArrowLeft size={13} className="text-[#FED422] shrink-0" />
             <span>메인 사이트</span>
@@ -2570,13 +2570,13 @@ export default function PortalPage() {
                     <h4 className="font-black text-xl text-white truncate tracking-tight">{activeStore.name}</h4>
                     <p className="text-xs text-[#FED422] font-bold truncate drop-shadow-xs">{activeStore.owner} 사장님</p>
                   </div>
-                  <span className="mt-1 bg-[#FED422] text-[#0F172A] text-[11px] font-black px-4 py-1 rounded-full shadow-lg tracking-wider font-mono">
+                  <span className="mt-1 bg-[#FED422] text-[#0F172A] text-[11px] font-black px-4 py-1 rounded-md shadow-lg tracking-wider font-mono">
                     #{activeStore.id}
                   </span>
                 </div>
               </div>
             ) : (
-              <div className="w-12 h-12 mx-auto my-3 rounded-2xl border border-slate-700/80 overflow-hidden shadow-md bg-slate-900 flex items-center justify-center text-[#F5AC00] font-black text-xs">
+              <div className="w-12 h-12 mx-auto my-3 rounded-lg border border-slate-700/80 overflow-hidden shadow-md bg-slate-900 flex items-center justify-center text-[#F5AC00] font-black text-xs">
                 가맹
               </div>
             )}
@@ -2604,7 +2604,7 @@ export default function PortalPage() {
                       }}
                       className={`w-full ${
                         isSidebarCollapsed ? "px-2.5 py-3.5 justify-center" : "px-4 py-3.5 justify-between"
-                      } rounded-2xl flex items-center text-xs font-bold transition-all border-0 outline-none focus:outline-none focus:ring-0 cursor-pointer ${
+                      } rounded-lg flex items-center text-xs font-bold transition-all border-0 outline-none focus:outline-none focus:ring-0 cursor-pointer ${
                         isActive
                           ? "bg-[#FED422] text-[#0F172A] shadow-md font-black"
                           : "text-[#94A3B8] hover:text-white hover:bg-white/5 bg-transparent"
@@ -2631,7 +2631,7 @@ export default function PortalPage() {
 
                     {/* Tooltip for Collapsed Sidebar */}
                     {isSidebarCollapsed && (
-                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3.5 py-2 bg-[#0F141C] text-white text-xs font-bold rounded-xl shadow-2xl whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-slate-700">
+                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3.5 py-2 bg-[#0F141C] text-white text-xs font-bold rounded-md shadow-2xl whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-slate-700">
                         {label} {badge !== undefined ? `(${badge})` : ""}
                       </div>
                     )}
@@ -2645,7 +2645,7 @@ export default function PortalPage() {
             <button
               type="button"
               onClick={handleLogout}
-              className={`w-full ${isSidebarCollapsed ? "px-2 py-2.5 justify-center" : "px-4 py-2.5 justify-start"} rounded-2xl flex items-center gap-3.5 text-xs font-bold text-[#94A3B8] hover:text-rose-400 hover:bg-rose-500/10 transition-colors text-left border-0 cursor-pointer`}
+              className={`w-full ${isSidebarCollapsed ? "px-2 py-2.5 justify-center" : "px-4 py-2.5 justify-start"} rounded-lg flex items-center gap-3.5 text-xs font-bold text-[#94A3B8] hover:text-rose-400 hover:bg-rose-500/10 transition-colors text-left border-0 cursor-pointer`}
               title={isSidebarCollapsed ? "시스템 로그아웃" : undefined}
             >
               <LogOut size={18} className="shrink-0" />
@@ -2677,14 +2677,14 @@ export default function PortalPage() {
                   <button 
                     type="button"
                     onClick={() => setMobileMenuOpen(false)} 
-                    className="p-2 text-slate-400 hover:text-white bg-slate-800 rounded-full border-0 cursor-pointer"
+                    className="p-2 text-slate-400 hover:text-white bg-slate-800 rounded-md border-0 cursor-pointer"
                   >
                     <X size={16} />
                   </button>
                 </div>
 
-                <div className="bg-slate-800/80 border-0 rounded-2xl p-4 flex gap-3 items-center">
-                  <div className="w-10 h-10 rounded-xl bg-[#F5AC00] text-[#0F172A] flex items-center justify-center font-black text-sm shrink-0">
+                <div className="bg-slate-800/80 border-0 rounded-lg p-4 flex gap-3 items-center">
+                  <div className="w-10 h-10 rounded-md bg-[#F5AC00] text-[#0F172A] flex items-center justify-center font-black text-sm shrink-0">
                     가맹
                   </div>
                   <div>
@@ -2711,7 +2711,7 @@ export default function PortalPage() {
                         setCurrentMenu(key);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full px-4 py-3 rounded-2xl flex items-center justify-between text-sm font-black transition-all border-0 cursor-pointer ${
+                      className={`w-full px-4 py-3 rounded-lg flex items-center justify-between text-sm font-black transition-all border-0 cursor-pointer ${
                         currentMenu === key
                           ? "bg-[#FED422] text-[#0F172A] shadow-md"
                           : "text-slate-400 hover:text-white hover:bg-slate-800/60"
@@ -2736,7 +2736,7 @@ export default function PortalPage() {
               <div className="border-t border-slate-800 pt-5 space-y-2">
                 <Link
                   href="/"
-                  className="w-full px-4 py-3 rounded-2xl flex items-center justify-between text-xs font-black bg-slate-800/90 text-white hover:bg-slate-700 transition-colors border-0"
+                  className="w-full px-4 py-3 rounded-lg flex items-center justify-between text-xs font-black bg-slate-800/90 text-white hover:bg-slate-700 transition-colors border-0"
                 >
                   <div className="flex items-center gap-2.5">
                     <ArrowLeft size={15} className="text-[#FED422]" />
@@ -2747,7 +2747,7 @@ export default function PortalPage() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full px-4 py-3 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-400 hover:text-rose-400 hover:bg-slate-800/60 transition-colors text-left border-0 cursor-pointer"
+                  className="w-full px-4 py-3 rounded-lg flex items-center gap-3 text-xs font-bold text-slate-400 hover:text-rose-400 hover:bg-slate-800/60 transition-colors text-left border-0 cursor-pointer"
                 >
                   <LogOut size={16} />
                   <span>시스템 로그아웃</span>
@@ -2766,7 +2766,7 @@ export default function PortalPage() {
             <div className="space-y-6 animate-fadeIn">
               
               {/* 1. 상단 파트너십/어드민 환영 배너 (본사 어드민과 100% 동일한 매장 배경 이미지) */}
-              <div className="w-full bg-[#0B0F17] text-white rounded-[28px] p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 group border-0">
+              <div className="w-full bg-[#0B0F17] text-white rounded-lg p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 group border-0">
                 {/* 배경 이미지 커버 */}
                 <div 
                   className="absolute inset-0 bg-cover bg-center opacity-75 group-hover:scale-103 transition-transform duration-700 pointer-events-none"
@@ -2779,7 +2779,7 @@ export default function PortalPage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/40 pointer-events-none"></div>
 
                 <div className="space-y-2.5 max-w-3xl relative z-10">
-                  <span className="bg-[#F5A623] text-slate-950 text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                  <span className="bg-[#F5A623] text-slate-950 text-[10px] font-black px-3.5 py-1 rounded-md uppercase tracking-wider shadow-md">
                     PARTNERSHIP PORTAL
                   </span>
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-snug text-white drop-shadow-md">
@@ -2792,11 +2792,11 @@ export default function PortalPage() {
 
                 {/* 우측 시네마틱 글래스모피즘 토글 박스 2개 */}
                 <div className="flex items-center gap-3 shrink-0 relative z-10">
-                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-2xl text-center min-w-[120px] shadow-xl">
+                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-lg text-center min-w-[120px] shadow-xl">
                     <span className="text-[10px] text-slate-400 font-extrabold block mb-0.5">매장 고유 코드</span>
                     <strong className="text-xs font-mono font-black text-[#F5A623] tracking-wider">#{activeStore.id}</strong>
                   </div>
-                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-2xl text-center min-w-[120px] shadow-xl">
+                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-lg text-center min-w-[120px] shadow-xl">
                     <span className="text-[10px] text-slate-400 font-extrabold block mb-0.5">실시간 물류 상태</span>
                     <strong className="text-xs font-black text-emerald-400 animate-pulse">정상 작동 중</strong>
                   </div>
@@ -2809,11 +2809,11 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" })}
-                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-neutral-500 tracking-tight">운영 중 패키지 모듈</span>
-                    <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#F5AC00] group-hover:bg-[#F5AC00] group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                    <div className="w-12 h-12 rounded-lg bg-amber-50 text-[#F5AC00] group-hover:bg-[#F5AC00] group-hover:text-white flex items-center justify-center transition-all shadow-sm">
                       <LayoutDashboard size={22} />
                     </div>
                   </div>
@@ -2821,7 +2821,7 @@ export default function PortalPage() {
                     {activePackageCount} <span className="text-sm font-bold text-neutral-400">/ 6개 가동</span>
                   </strong>
                   <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+12.5%</span>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">+12.5%</span>
                     <span className="text-neutral-400 font-semibold">정상 라이선스 가동</span>
                   </div>
                 </button>
@@ -2830,11 +2830,11 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => setCurrentMenu("history")}
-                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-neutral-500 tracking-tight">진행 중 배송/발주</span>
-                    <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                    <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
                       <Truck size={22} />
                     </div>
                   </div>
@@ -2842,7 +2842,7 @@ export default function PortalPage() {
                     {shippingCount} <span className="text-sm font-bold text-neutral-400">건 배송중</span>
                   </strong>
                   <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+8.3%</span>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">+8.3%</span>
                     <span className="text-neutral-400 font-semibold">전월 대비</span>
                   </div>
                 </button>
@@ -2851,11 +2851,11 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => setCurrentMenu("training")}
-                  className="bg-white border border-[#EEF0F5] hover:border-[#FED422] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#FED422] transition-all rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-neutral-500 tracking-tight">가맹점 교육/홍보자료</span>
-                    <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 group-hover:bg-[#FED422] group-hover:text-[#0F172A] flex items-center justify-center transition-all shadow-sm">
+                    <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 group-hover:bg-[#FED422] group-hover:text-[#0F172A] flex items-center justify-center transition-all shadow-sm">
                       <BookOpen size={22} />
                     </div>
                   </div>
@@ -2863,7 +2863,7 @@ export default function PortalPage() {
                     {trainings.length + prs.length} <span className="text-sm font-bold text-neutral-400">개 등록</span>
                   </strong>
                   <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#0F172A]">
-                    <span className="px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                    <span className="px-2.5 py-0.5 rounded-md bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
                       {trainings.length + prs.length}개 최신업데이트
                     </span>
                   </div>
@@ -2873,11 +2873,11 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => setCurrentMenu("notice")}
-                  className="bg-white border border-[#EEF0F5] hover:border-[#FED422] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#FED422] transition-all rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden border-0"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-neutral-500 tracking-tight">본사 공지사항</span>
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                    <div className="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
                       <Megaphone size={22} />
                     </div>
                   </div>
@@ -2885,7 +2885,7 @@ export default function PortalPage() {
                     {notices.length} <span className="text-sm font-bold text-neutral-400">건 등록</span>
                   </strong>
                   <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#0F172A]">
-                    <span className="px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                    <span className="px-2.5 py-0.5 rounded-md bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
                       {notices.length}건 배포완료
                     </span>
                   </div>
@@ -2893,13 +2893,13 @@ export default function PortalPage() {
               </div>
 
               {/* 2. 가동 중인 120 패키지 운영 모듈 (본사 어드민과 100% 동일한 3D 아이콘 7종 동기화) */}
-              <div id="packages-section" className="bg-white rounded-[28px] p-6 sm:p-7 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0 space-y-5">
+              <div id="packages-section" className="bg-white rounded-lg p-6 sm:p-7 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0 space-y-5">
                 <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                   <div>
                     <h2 className="text-lg font-black text-[#0F172A] tracking-tight">전국 가동 중인 120 패키지 운영 모듈</h2>
                     <p className="text-xs text-slate-400 font-medium mt-0.5">점포에서 라이선스를 취득해 작동 중인 브랜드 패키지 총 현황입니다.</p>
                   </div>
-                  <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 shrink-0">
+                  <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-100 shrink-0">
                     가동 라이선스 승인 완료
                   </span>
                 </div>
@@ -2908,13 +2908,13 @@ export default function PortalPage() {
                   {PACKAGES.map((pkg) => (
                     <div 
                       key={pkg.name}
-                      className={`rounded-2xl p-3.5 text-center border space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer ${
+                      className={`rounded-lg p-3.5 text-center border space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer ${
                         pkg.active 
                           ? "bg-[#F8FAFC] hover:bg-emerald-50/50 border-slate-100 hover:border-emerald-200" 
                           : "bg-[#F8FAFC] border-slate-100 opacity-50"
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                         <img
                           src={pkg.img}
                           alt={pkg.label}
@@ -2937,7 +2937,7 @@ export default function PortalPage() {
                   ))}
 
                   {/* Module 7: Add Module */}
-                  <div className="bg-[#F8FAFC] rounded-2xl p-3.5 text-center border border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 opacity-60">
+                  <div className="bg-[#F8FAFC] rounded-lg p-3.5 text-center border border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 opacity-60">
                     <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-black text-sm">
                       +
                     </div>
@@ -2952,7 +2952,7 @@ export default function PortalPage() {
                 <div className="lg:col-span-8 space-y-6">
                   
                   {/* 120PIE 시즌 스페셜 메인 가로 배너 (본사 어드민 연동 배너) */}
-                  <div className="w-full bg-[#0F172A] text-white rounded-[28px] p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col justify-between gap-6 group border-0 min-h-[220px]">
+                  <div className="w-full bg-[#0F172A] text-white rounded-lg p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col justify-between gap-6 group border-0 min-h-[220px]">
                     {/* 배경 시네마틱 이미지 커버 (본사 어드민 설정 이미지 최우선 연동) */}
                     <div 
                       className="absolute inset-0 bg-cover bg-center opacity-65 group-hover:scale-103 transition-transform duration-700 pointer-events-none"
@@ -2969,7 +2969,7 @@ export default function PortalPage() {
                     <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A] via-[#0F172A]/85 to-transparent pointer-events-none"></div>
 
                     <div className="space-y-3 max-w-2xl relative z-10">
-                      <span className="bg-[#F5AC00] text-[#0F172A] text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md inline-block">
+                      <span className="bg-[#F5AC00] text-[#0F172A] text-[10px] font-black px-3.5 py-1 rounded-md uppercase tracking-wider shadow-md inline-block">
                         {banner?.mainTag || "Seasonal Spec"}
                       </span>
                       <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white drop-shadow-md whitespace-pre-line">
@@ -2991,7 +2991,7 @@ export default function PortalPage() {
                             setCurrentMenu(target);
                           }
                         }}
-                        className="px-5 py-2.5 rounded-xl bg-[#F5AC00] hover:bg-[#e09d00] text-[#0F172A] text-xs font-black transition-all inline-flex items-center gap-2 shadow-lg cursor-pointer border-0 active:scale-98"
+                        className="px-5 py-2.5 rounded-md bg-[#F5AC00] hover:bg-[#e09d00] text-[#0F172A] text-xs font-black transition-all inline-flex items-center gap-2 shadow-lg cursor-pointer border-0 active:scale-98"
                       >
                         <span>{banner?.mainBtnText || "신메뉴 자재 발주하러 가기"}</span>
                         <ChevronRight size={15} />
@@ -3010,12 +3010,12 @@ export default function PortalPage() {
                         key={btn.key}
                         type="button"
                         onClick={() => setCurrentMenu(btn.key)}
-                        className={`p-5 flex flex-col justify-between min-h-[120px] text-left transition-all shadow-2xs rounded-2xl border-0 cursor-pointer relative overflow-hidden group ${btn.color}`}
+                        className={`p-5 flex flex-col justify-between min-h-[120px] text-left transition-all shadow-2xs rounded-lg border-0 cursor-pointer relative overflow-hidden group ${btn.color}`}
                       >
                         <div className="flex items-center justify-between w-full">
                           <btn.icon size={22} className="text-[#0F172A]" />
                           {btn.badge !== undefined && (
-                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] shadow-2xs">
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-[#FED422] text-[#0F172A] shadow-2xs">
                               {btn.badge}개
                             </span>
                           )}
@@ -3033,7 +3033,7 @@ export default function PortalPage() {
                 <div className="lg:col-span-4 space-y-6">
                   
                   {/* Recent Notices Widget */}
-                  <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0">
+                  <div className="bg-white rounded-lg p-6 sm:p-8 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0">
                     <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
                       <h4 className="font-black text-base text-[#0F172A]">최근 본사 공지사항</h4>
                       <button 
@@ -3050,7 +3050,7 @@ export default function PortalPage() {
                           key={notice.id}
                           type="button"
                           onClick={() => setSelectedNotice(notice)}
-                          className="w-full py-3 text-left flex items-center justify-between gap-3 group hover:bg-[#F8FAFC] px-3 rounded-xl transition-colors border-0 cursor-pointer"
+                          className="w-full py-3 text-left flex items-center justify-between gap-3 group hover:bg-[#F8FAFC] px-3 rounded-md transition-colors border-0 cursor-pointer"
                         >
                           <div className="min-w-0 flex-1 space-y-1">
                             <div className="flex items-center gap-2">
@@ -3069,7 +3069,7 @@ export default function PortalPage() {
                   </div>
 
                   {/* Recent Orders Widget */}
-                  <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0">
+                  <div className="bg-white rounded-lg p-6 sm:p-8 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0">
                     <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
                       <h4 className="font-black text-base text-[#0F172A]">최근 발주 내역</h4>
                       <button 
@@ -3088,7 +3088,7 @@ export default function PortalPage() {
                           <div 
                             key={order.id} 
                             onClick={() => setSelectedOrder(order)}
-                            className="bg-[#F8FAFC] border-0 hover:bg-slate-100/80 p-4 rounded-2xl cursor-pointer transition-all group"
+                            className="bg-[#F8FAFC] border-0 hover:bg-slate-100/80 p-4 rounded-lg cursor-pointer transition-all group"
                           >
                             <div className="flex justify-between items-center text-[10px] mb-2">
                               <span className="text-slate-400 font-extrabold">{order.date}</span>
@@ -3135,13 +3135,13 @@ export default function PortalPage() {
               <div className="lg:col-span-8 space-y-6">
                 
                 {/* Category selector (Stage Flow Card Style) */}
-                <div className="flex sm:flex-wrap overflow-x-auto sm:overflow-x-visible flex-nowrap whitespace-nowrap gap-1.5 sm:gap-2 bg-white border border-neutral-200/80 p-2 sm:p-2.5 rounded-2xl shadow-2xs scrollbar-none">
+                <div className="flex sm:flex-wrap overflow-x-auto sm:overflow-x-visible flex-nowrap whitespace-nowrap gap-1.5 sm:gap-2 bg-white border border-neutral-200/80 p-2 sm:p-2.5 rounded-lg shadow-2xs scrollbar-none">
                   {["전체", ...categories].map((cat) => (
                     <button
                       key={cat}
                       type="button"
                       onClick={() => setActiveCategory(cat)}
-                      className={`px-3.5 sm:px-4 py-2 rounded-xl font-extrabold text-[11px] sm:text-xs transition-all shrink-0 cursor-pointer border-0 ${
+                      className={`px-3.5 sm:px-4 py-2 rounded-md font-extrabold text-[11px] sm:text-xs transition-all shrink-0 cursor-pointer border-0 ${
                         activeCategory === cat
                           ? "bg-[#FED422] text-[#0F172A] shadow-2xs"
                           : "text-slate-500 hover:text-[#0F172A] hover:bg-slate-100"
@@ -3161,10 +3161,10 @@ export default function PortalPage() {
                         {/* 1. Mobile Row View (Compact Left Thumbnail Layout) */}
                         <div 
                           onClick={() => setSelectedProductDetail(p)}
-                          className="sm:hidden bg-white border border-neutral-200/80 hover:border-[#FED422] active:scale-[0.99] transition-all rounded-2xl p-3 flex gap-3 items-center shadow-2xs cursor-pointer relative"
+                          className="sm:hidden bg-white border border-neutral-200/80 hover:border-[#FED422] active:scale-[0.99] transition-all rounded-lg p-3 flex gap-3 items-center shadow-2xs cursor-pointer relative"
                         >
                           {/* Left: Thumbnail & Stock State */}
-                          <div className="w-16 h-16 rounded-xl bg-white overflow-hidden shrink-0 border border-neutral-200/60 relative">
+                          <div className="w-16 h-16 rounded-md bg-white overflow-hidden shrink-0 border border-neutral-200/60 relative">
                             <img src={optimizeCloudinaryUrl(p.img)} alt={p.name} className="w-full h-full object-contain p-1" />
                             {p.stock === "out_of_stock" && (
                               <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
@@ -3195,7 +3195,7 @@ export default function PortalPage() {
                                   <button
                                     type="button"
                                     onClick={() => setSelectedProductDetail(p)}
-                                    className="px-2.5 py-1 rounded-xl bg-[#FED422] text-[#0F172A] text-[10px] font-black shadow-2xs border-0 cursor-pointer"
+                                    className="px-2.5 py-1 rounded-md bg-[#FED422] text-[#0F172A] text-[10px] font-black shadow-2xs border-0 cursor-pointer"
                                   >
                                     옵션선택
                                   </button>
@@ -3221,7 +3221,7 @@ export default function PortalPage() {
                                   <button
                                     type="button"
                                     onClick={() => addToCart(p.id)}
-                                    className="px-2.5 py-1 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] border-0 text-[10px] font-black text-[#0F172A] transition-all cursor-pointer shadow-2xs"
+                                    className="px-2.5 py-1 rounded-md bg-[#FED422] hover:bg-[#e5be1f] border-0 text-[10px] font-black text-[#0F172A] transition-all cursor-pointer shadow-2xs"
                                   >
                                     담기
                                   </button>
@@ -3234,7 +3234,7 @@ export default function PortalPage() {
                         {/* 2. Desktop 3-Column Grid Card View */}
                         <div 
                           onClick={() => setSelectedProductDetail(p)}
-                          className="hidden sm:flex bg-white border border-neutral-200/90 hover:border-[#FED422] transition-all rounded-2xl overflow-hidden flex-col justify-between shadow-2xs cursor-pointer hover:shadow-md hover:-translate-y-0.5 aspect-[4/5] w-full relative min-h-0"
+                          className="hidden sm:flex bg-white border border-neutral-200/90 hover:border-[#FED422] transition-all rounded-lg overflow-hidden flex-col justify-between shadow-2xs cursor-pointer hover:shadow-md hover:-translate-y-0.5 aspect-[4/5] w-full relative min-h-0"
                         >
                           {/* Thumbnail image & stock state badge (Generous 64% height for clean white backdrop) */}
                           <div className="h-[64%] w-full relative bg-white overflow-hidden shrink-0 border-b border-neutral-100 flex items-center justify-center p-3">
@@ -3257,7 +3257,7 @@ export default function PortalPage() {
                                 <span className="bg-orange-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-2xs whitespace-nowrap">품절임박</span>
                               )}
                             </div>
-                            <span className="absolute bottom-2 right-2 bg-white/95 backdrop-blur-sm text-[9px] text-slate-700 font-extrabold px-2 py-0.5 rounded-full border border-slate-200/80 whitespace-nowrap shadow-2xs">
+                            <span className="absolute bottom-2 right-2 bg-white/95 backdrop-blur-sm text-[9px] text-slate-700 font-extrabold px-2 py-0.5 rounded-md border border-slate-200/80 whitespace-nowrap shadow-2xs">
                               {p.category}
                             </span>
                           </div>
@@ -3295,7 +3295,7 @@ export default function PortalPage() {
                               </div>
                               
                               {p.stock === "out_of_stock" ? (
-                                <span className="bg-slate-100 text-slate-400 font-extrabold text-xs px-3 py-1.5 rounded-xl whitespace-nowrap shrink-0">일시품절</span>
+                                <span className="bg-slate-100 text-slate-400 font-extrabold text-xs px-3 py-1.5 rounded-md whitespace-nowrap shrink-0">일시품절</span>
                               ) : p.options && p.options.length > 0 ? (
                                 <button
                                   type="button"
@@ -3303,12 +3303,12 @@ export default function PortalPage() {
                                     e.stopPropagation();
                                     setSelectedProductDetail(p);
                                   }}
-                                  className="px-4 py-2 rounded-xl bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all shadow-xs hover:shadow-md shrink-0 whitespace-nowrap border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
+                                  className="px-4 py-2 rounded-md bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all shadow-xs hover:shadow-md shrink-0 whitespace-nowrap border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
                                 >
                                   옵션 선택
                                 </button>
                               ) : cartQty > 0 ? (
-                                <div className="flex items-center border border-slate-200 bg-slate-50 rounded-xl p-1 shrink-0 shadow-2xs" onClick={(e) => e.stopPropagation()}>
+                                <div className="flex items-center border border-slate-200 bg-slate-50 rounded-md p-1 shrink-0 shadow-2xs" onClick={(e) => e.stopPropagation()}>
                                   <button 
                                     type="button"
                                     onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
@@ -3332,7 +3332,7 @@ export default function PortalPage() {
                                     e.stopPropagation();
                                     addToCart(p.id);
                                   }}
-                                  className="px-4 py-2 rounded-xl bg-[#FED422] hover:bg-[#f5c800] border-0 text-xs font-black text-[#0F172A] transition-all shrink-0 whitespace-nowrap cursor-pointer shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5"
+                                  className="px-4 py-2 rounded-md bg-[#FED422] hover:bg-[#f5c800] border-0 text-xs font-black text-[#0F172A] transition-all shrink-0 whitespace-nowrap cursor-pointer shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5"
                                 >
                                   <ShoppingBag size={13} />
                                   담기
@@ -3350,12 +3350,12 @@ export default function PortalPage() {
 
               {/* Right Side: High-End Interactive Franchisee Shopping Cart */}
               <div className="lg:col-span-4 h-fit lg:self-start lg:sticky lg:top-[96px]">
-                <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-md space-y-5">
+                <div className="bg-white border border-slate-200/90 rounded-lg p-5 sm:p-6 shadow-md space-y-5">
                   
                   {/* Cart Header */}
                   <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-2xl bg-[#FED422] flex items-center justify-center text-[#0F172A] shadow-xs">
+                      <div className="w-9 h-9 rounded-lg bg-[#FED422] flex items-center justify-center text-[#0F172A] shadow-xs">
                         <ShoppingBag size={18} />
                       </div>
                       <div>
@@ -3366,7 +3366,7 @@ export default function PortalPage() {
                     
                     {cart.length > 0 && (
                       <div className="flex items-center gap-2">
-                        <span className="bg-[#FED422] text-[#0F172A] text-[10px] font-black px-2.5 py-1 rounded-full shadow-2xs">
+                        <span className="bg-[#FED422] text-[#0F172A] text-[10px] font-black px-2.5 py-1 rounded-md shadow-2xs">
                           총 {cart.reduce((acc, item) => acc + item.quantity, 0)}개
                         </span>
                         <button 
@@ -3382,8 +3382,8 @@ export default function PortalPage() {
                   </div>
 
                   {cart.length === 0 ? (
-                    <div className="py-14 text-center space-y-3 bg-slate-50/60 rounded-2xl border border-dashed border-slate-200">
-                      <div className="w-12 h-12 rounded-2xl bg-white text-slate-300 flex items-center justify-center mx-auto shadow-2xs">
+                    <div className="py-14 text-center space-y-3 bg-slate-50/60 rounded-lg border border-dashed border-slate-200">
+                      <div className="w-12 h-12 rounded-lg bg-white text-slate-300 flex items-center justify-center mx-auto shadow-2xs">
                         <ShoppingBag size={24} />
                       </div>
                       <div className="space-y-1">
@@ -3399,9 +3399,9 @@ export default function PortalPage() {
                       <div className="space-y-4 max-h-[340px] overflow-y-auto pr-1">
                         {groupedCartItems.map(([typeKey, group]) => (
                           <div key={typeKey} className="space-y-2">
-                            <div className="flex justify-between items-center bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100 select-none">
+                            <div className="flex justify-between items-center bg-slate-50 px-3 py-1.5 rounded-md border border-slate-100 select-none">
                               <span className="font-extrabold text-[11px] text-[#0F172A] flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#FED422]"></span>
+                                <span className="w-1.5 h-1.5 rounded-md bg-[#FED422]"></span>
                                 {group.title}
                               </span>
                               {group.feeLabel && (
@@ -3416,8 +3416,8 @@ export default function PortalPage() {
                                 const p = (products || []).find((prod) => prod.id === item.productId);
                                 if (!p) return null;
                                 return (
-                                  <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border border-slate-200/80 hover:border-slate-300 p-3 rounded-2xl shadow-2xs transition-all">
-                                    <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-200/60 p-1 shrink-0 flex items-center justify-center overflow-hidden">
+                                  <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border border-slate-200/80 hover:border-slate-300 p-3 rounded-lg shadow-2xs transition-all">
+                                    <div className="w-11 h-11 rounded-md bg-slate-50 border border-slate-200/60 p-1 shrink-0 flex items-center justify-center overflow-hidden">
                                       <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-full h-full object-contain" />
                                     </div>
                                     
@@ -3458,7 +3458,7 @@ export default function PortalPage() {
                       </div>
 
                       {/* Cart Bill Details Panel */}
-                      <div className="bg-[#0F172A] text-white rounded-2xl p-4 space-y-3 shadow-sm text-xs">
+                      <div className="bg-[#0F172A] text-white rounded-lg p-4 space-y-3 shadow-sm text-xs">
                         <div className="flex justify-between text-slate-300 font-bold">
                           <span>상품 합계</span>
                           <span className="font-extrabold text-white">{cartSubtotal.toLocaleString()} 원</span>
@@ -3495,14 +3495,14 @@ export default function PortalPage() {
                             }
                             setShowCheckoutModal(true);
                           }}
-                          className="w-full py-4 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-sm font-black rounded-2xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.98] hover:-translate-y-0.5"
+                          className="w-full py-4 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-sm font-black rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.98] hover:-translate-y-0.5"
                         >
                           <CheckCircle2 size={18} />
                           발주 결제 진행하기
                         </button>
 
                         {/* 이달의 카드 무이자 혜택 안내 */}
-                        <div className="mt-3 bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 shadow-2xs text-left">
+                        <div className="mt-3 bg-slate-50 border border-slate-200/80 rounded-lg p-3.5 shadow-2xs text-left">
                           <div className="flex items-center gap-1.5 text-[#0F172A] font-extrabold text-xs mb-2">
                             <CreditCard size={14} className="shrink-0 text-[#0F172A]" />
                             <span>7월 카드사 무이자 혜택 (5만원 이상)</span>
@@ -3558,7 +3558,7 @@ export default function PortalPage() {
                 <div>
                   <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                     <span>정기 자재 발주 내역</span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                    <span className="text-xs px-2.5 py-0.5 rounded-md bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
                       {orders.length}건
                     </span>
                   </h2>
@@ -3568,23 +3568,23 @@ export default function PortalPage() {
 
               {/* Order Status Summary Counter Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-1">
+                <div className="bg-white border border-slate-200/90 rounded-lg p-4 shadow-2xs space-y-1">
                   <span className="text-[10px] text-slate-400 font-bold block">전체 발주</span>
                   <strong className="text-lg font-black text-[#0F172A]">{orders.length}건</strong>
                 </div>
-                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-1">
+                <div className="bg-white border border-slate-200/90 rounded-lg p-4 shadow-2xs space-y-1">
                   <span className="text-[10px] text-amber-600 font-bold block">주문완료 / 접수</span>
                   <strong className="text-lg font-black text-amber-600">
                     {orders.filter(o => o.status === "주문완료" || o.status === "배송준비중" || o.status === "입금대기").length}건
                   </strong>
                 </div>
-                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-1">
+                <div className="bg-white border border-slate-200/90 rounded-lg p-4 shadow-2xs space-y-1">
                   <span className="text-[10px] text-blue-600 font-bold block">배송 진행중</span>
                   <strong className="text-lg font-black text-blue-600">
                     {orders.filter(o => o.status === "배송중").length}건
                   </strong>
                 </div>
-                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-1">
+                <div className="bg-white border border-slate-200/90 rounded-lg p-4 shadow-2xs space-y-1">
                   <span className="text-[10px] text-emerald-600 font-bold block">배송 완료</span>
                   <strong className="text-lg font-black text-emerald-600">
                     {orders.filter(o => o.status === "배송완료").length}건
@@ -3593,7 +3593,7 @@ export default function PortalPage() {
               </div>
 
               {/* Order List Table Card (Stage Flow Premium Style) */}
-              <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm">
+              <div className="bg-white border border-slate-200/90 rounded-lg overflow-hidden shadow-sm">
                 <div className="overflow-x-auto [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -3651,7 +3651,7 @@ export default function PortalPage() {
                             <td className="p-4 sm:p-5 text-center" onClick={(e) => e.stopPropagation()}>
                               <button 
                                 onClick={() => setSelectedOrder(order)}
-                                className="px-3 py-1.5 rounded-xl bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all cursor-pointer shadow-2xs hover:shadow-xs border-0"
+                                className="px-3 py-1.5 rounded-md bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all cursor-pointer shadow-2xs hover:shadow-xs border-0"
                               >
                                 상세보기
                               </button>
@@ -3678,7 +3678,7 @@ export default function PortalPage() {
                 <div>
                   <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                     <span>가맹점 공지사항</span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                    <span className="text-xs px-2.5 py-0.5 rounded-md bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
                       총 {notices.length}개
                     </span>
                   </h2>
@@ -3694,7 +3694,7 @@ export default function PortalPage() {
                         key={filterTag}
                         type="button"
                         onClick={() => setSelectedNoticeCategory(filterTag === "전체" ? "" : filterTag)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer border-0 whitespace-nowrap shadow-2xs ${
+                        className={`px-3 py-1.5 rounded-md text-xs font-black transition-all cursor-pointer border-0 whitespace-nowrap shadow-2xs ${
                           isActive 
                             ? "bg-[#FED422] text-[#0F172A] shadow-xs" 
                             : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200/80"
@@ -3716,7 +3716,7 @@ export default function PortalPage() {
 
                   if (filteredNotices.length === 0) {
                     return (
-                      <div className="bg-white border border-slate-200/90 rounded-3xl p-12 text-center text-slate-400 font-bold space-y-2">
+                      <div className="bg-white border border-slate-200/90 rounded-lg p-12 text-center text-slate-400 font-bold space-y-2">
                         <p className="text-sm font-black text-slate-600">등록된 공지사항이 없습니다.</p>
                         <p className="text-xs text-slate-400 font-medium">선택하신 카테고리의 공지 내역이 존재하지 않습니다.</p>
                       </div>
@@ -3728,7 +3728,7 @@ export default function PortalPage() {
                       key={n.id}
                       type="button"
                       onClick={() => handleNoticeClick(n)}
-                      className="w-full text-left bg-white border border-slate-200/90 hover:border-[#FED422] transition-all duration-200 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-md cursor-pointer hover:-translate-y-0.5 group"
+                      className="w-full text-left bg-white border border-slate-200/90 hover:border-[#FED422] transition-all duration-200 rounded-lg p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-md cursor-pointer hover:-translate-y-0.5 group"
                     >
                       <div className="space-y-2 flex-1 min-w-0">
                         <div className="flex items-center gap-2.5 flex-wrap">
@@ -3755,7 +3755,7 @@ export default function PortalPage() {
                       </div>
 
                       <div className="shrink-0 flex items-center gap-2 self-end sm:self-center">
-                        <span className="px-3 py-1.5 rounded-xl bg-slate-50 group-hover:bg-[#FED422] text-[#0F172A] text-xs font-black transition-all border border-slate-200/60 group-hover:border-amber-300 shadow-2xs flex items-center gap-1">
+                        <span className="px-3 py-1.5 rounded-md bg-slate-50 group-hover:bg-[#FED422] text-[#0F172A] text-xs font-black transition-all border border-slate-200/60 group-hover:border-amber-300 shadow-2xs flex items-center gap-1">
                           상세 읽기 <ChevronRight size={14} />
                         </span>
                       </div>
@@ -3777,7 +3777,7 @@ export default function PortalPage() {
                 <div>
                   <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                     <span>가맹점 1:1 전용 문의</span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                    <span className="text-xs px-2.5 py-0.5 rounded-md bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
                       {inquiries.length}건
                     </span>
                   </h2>
@@ -3786,7 +3786,7 @@ export default function PortalPage() {
                 <button
                   type="button"
                   onClick={() => setShowInquiryModal(true)}
-                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black rounded-xl transition-all shadow-xs hover:shadow-md shrink-0 self-start sm:self-center cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
+                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black rounded-md transition-all shadow-xs hover:shadow-md shrink-0 self-start sm:self-center cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
                 >
                   <Send size={14} />
                   신규 1:1 문의 접수
@@ -3796,7 +3796,7 @@ export default function PortalPage() {
               {/* Inquiry List Cards */}
               <div className="grid grid-cols-1 gap-3.5">
                 {inquiries.length === 0 ? (
-                  <div className="bg-white border border-slate-200/90 rounded-3xl p-12 text-center text-slate-400 font-bold space-y-2">
+                  <div className="bg-white border border-slate-200/90 rounded-lg p-12 text-center text-slate-400 font-bold space-y-2">
                     <p className="text-sm font-black text-slate-600">등록된 문의 내역이 없습니다.</p>
                     <p className="text-xs text-slate-400 font-medium">상단의 [신규 1:1 문의 접수] 버튼을 눌러 본사 지원팀에 문의를 남겨주세요.</p>
                   </div>
@@ -3806,11 +3806,11 @@ export default function PortalPage() {
                       key={inq.id}
                       type="button"
                       onClick={() => setSelectedInquiry(inq)}
-                      className="w-full text-left bg-white border border-slate-200/90 hover:border-[#FED422] transition-all duration-200 rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-3 group shadow-2xs hover:shadow-md cursor-pointer hover:-translate-y-0.5"
+                      className="w-full text-left bg-white border border-slate-200/90 hover:border-[#FED422] transition-all duration-200 rounded-lg p-5 sm:p-6 flex flex-col justify-between gap-3 group shadow-2xs hover:shadow-md cursor-pointer hover:-translate-y-0.5"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2.5 flex-wrap">
-                          <span className="text-[10px] font-black text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200/80">
+                          <span className="text-[10px] font-black text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200/80">
                             {inq.category}
                           </span>
                           <h3 className="font-extrabold text-sm sm:text-base text-[#0F172A] group-hover:text-amber-600 transition-colors leading-snug truncate">
@@ -3828,7 +3828,7 @@ export default function PortalPage() {
                       
                       <div className="flex items-center justify-between text-xs text-slate-400 font-medium border-t border-slate-100 pt-3 mt-1 w-full">
                         <span>접수번호: <strong className="font-mono text-slate-600">{inq.id}</strong> · 접수일자: {inq.date}</span>
-                        <span className="px-3 py-1 rounded-xl bg-slate-50 group-hover:bg-[#FED422] text-[#0F172A] font-black transition-all border border-slate-200/60 group-hover:border-amber-300 shadow-2xs flex items-center gap-1 text-xs">
+                        <span className="px-3 py-1 rounded-md bg-slate-50 group-hover:bg-[#FED422] text-[#0F172A] font-black transition-all border border-slate-200/60 group-hover:border-amber-300 shadow-2xs flex items-center gap-1 text-xs">
                           상세 대화 보기 <ChevronRight size={13} />
                         </span>
                       </div>
@@ -3850,7 +3850,7 @@ export default function PortalPage() {
                 <div>
                   <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                     <span>가맹점 교육/매뉴얼 자료실</span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                    <span className="text-xs px-2.5 py-0.5 rounded-md bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
                       {trainings.length}개 자료
                     </span>
                   </h2>
@@ -3861,14 +3861,14 @@ export default function PortalPage() {
               {/* Materials Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {trainings.length === 0 ? (
-                  <div className="col-span-2 bg-white border border-slate-200/90 rounded-3xl p-12 text-center text-slate-400 font-bold space-y-2">
+                  <div className="col-span-2 bg-white border border-slate-200/90 rounded-lg p-12 text-center text-slate-400 font-bold space-y-2">
                     <p className="text-sm font-black text-slate-600">등록된 교육 자료가 없습니다.</p>
                   </div>
                 ) : (
                   trainings.map((t) => (
                     <div 
                       key={t.id}
-                      className="bg-white border border-slate-200/90 hover:border-[#FED422] rounded-3xl overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-200 group"
+                      className="bg-white border border-slate-200/90 hover:border-[#FED422] rounded-lg overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-200 group"
                     >
                       {renderPortalMaterialThumbnail(t)}
 
@@ -3883,14 +3883,14 @@ export default function PortalPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedMaterial(t)}
-                            className="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200/60 text-xs font-extrabold text-[#0F172A] transition-all cursor-pointer"
+                            className="flex-1 px-4 py-2.5 rounded-md bg-slate-100 hover:bg-slate-200 border border-slate-200/60 text-xs font-extrabold text-[#0F172A] transition-all cursor-pointer"
                           >
                             상세보기
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDownload(t.title, t.fileUrl, t.fileName)}
-                            className="px-4 py-2.5 rounded-xl bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-2xs border-0 cursor-pointer hover:shadow-xs"
+                            className="px-4 py-2.5 rounded-md bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-2xs border-0 cursor-pointer hover:shadow-xs"
                           >
                             <Download size={13} /> 다운로드
                           </button>
@@ -3914,7 +3914,7 @@ export default function PortalPage() {
                 <div>
                   <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                     <span>가맹점 홍보/마케팅 자재실</span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
+                    <span className="text-xs px-2.5 py-0.5 rounded-md bg-[#FED422] text-[#0F172A] font-black shadow-2xs">
                       {prs.length}개 자재
                     </span>
                   </h2>
@@ -3925,14 +3925,14 @@ export default function PortalPage() {
               {/* PR Materials Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {prs.length === 0 ? (
-                  <div className="col-span-2 bg-white border border-slate-200/90 rounded-3xl p-12 text-center text-slate-400 font-bold space-y-2">
+                  <div className="col-span-2 bg-white border border-slate-200/90 rounded-lg p-12 text-center text-slate-400 font-bold space-y-2">
                     <p className="text-sm font-black text-slate-600">등록된 홍보 자료가 없습니다.</p>
                   </div>
                 ) : (
                   prs.map((p) => (
                     <div 
                       key={p.id}
-                      className="bg-white border border-slate-200/90 hover:border-[#FED422] rounded-3xl overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-200 group"
+                      className="bg-white border border-slate-200/90 hover:border-[#FED422] rounded-lg overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-200 group"
                     >
                       {renderPortalMaterialThumbnail(p)}
 
@@ -3947,14 +3947,14 @@ export default function PortalPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedMaterial(p)}
-                            className="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200/60 text-xs font-extrabold text-[#0F172A] transition-all cursor-pointer"
+                            className="flex-1 px-4 py-2.5 rounded-md bg-slate-100 hover:bg-slate-200 border border-slate-200/60 text-xs font-extrabold text-[#0F172A] transition-all cursor-pointer"
                           >
                             상세보기
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDownload(p.title, p.fileUrl, p.fileName)}
-                            className="px-4 py-2.5 rounded-xl bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-2xs border-0 cursor-pointer hover:shadow-xs"
+                            className="px-4 py-2.5 rounded-md bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-2xs border-0 cursor-pointer hover:shadow-xs"
                           >
                             <Download size={13} /> 다운로드
                           </button>
@@ -3978,7 +3978,7 @@ export default function PortalPage() {
                 <p className="text-xs text-[#735965] font-bold mt-1">로그인 비밀번호, 점주명, 연락처 및 배송 주소 등 가맹점 정보를 수정할 수 있습니다.</p>
               </div>
 
-              <div className="bg-white border border-[#f2ccd7] rounded-2xl p-6 shadow-sm space-y-6">
+              <div className="bg-white border border-[#f2ccd7] rounded-lg p-6 shadow-sm space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs font-semibold text-[#735965]">
                   {/* 로그인 ID (읽기전용) */}
                   <div className="space-y-1.5">
@@ -3987,7 +3987,7 @@ export default function PortalPage() {
                       type="text"
                       disabled
                       value={activeStore.id}
-                      className="w-full bg-[#fcf8fa] border border-[#f2ccd7]/60 rounded-xl px-3.5 py-2.5 text-xs text-[#735965] font-bold cursor-not-allowed"
+                      className="w-full bg-[#fcf8fa] border border-[#f2ccd7]/60 rounded-md px-3.5 py-2.5 text-xs text-[#735965] font-bold cursor-not-allowed"
                     />
                   </div>
 
@@ -3998,7 +3998,7 @@ export default function PortalPage() {
                       type="text"
                       disabled
                       value={activeStore.name}
-                      className="w-full bg-[#fcf8fa] border border-[#f2ccd7]/60 rounded-xl px-3.5 py-2.5 text-xs text-[#735965] font-bold cursor-not-allowed"
+                      className="w-full bg-[#fcf8fa] border border-[#f2ccd7]/60 rounded-md px-3.5 py-2.5 text-xs text-[#735965] font-bold cursor-not-allowed"
                     />
                   </div>
 
@@ -4010,7 +4010,7 @@ export default function PortalPage() {
                       placeholder="변경할 비밀번호 입력 (기존 유지 시 그대로 두세요)"
                       value={profilePw}
                       onChange={(e) => setProfilePw(e.target.value)}
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-md px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
                     />
                   </div>
 
@@ -4022,7 +4022,7 @@ export default function PortalPage() {
                       placeholder="변경할 비밀번호 다시 입력"
                       value={profilePwConfirm}
                       onChange={(e) => setProfilePwConfirm(e.target.value)}
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-md px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
                     />
                   </div>
 
@@ -4034,7 +4034,7 @@ export default function PortalPage() {
                       placeholder="점주명을 입력하세요"
                       value={profileOwner}
                       onChange={(e) => setProfileOwner(e.target.value)}
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-md px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
                     />
                   </div>
 
@@ -4046,7 +4046,7 @@ export default function PortalPage() {
                       placeholder="010-0000-0000"
                       value={profilePhone}
                       onChange={(e) => setProfilePhone(formatPhoneNumber(e.target.value))}
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-md px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
                     />
                   </div>
 
@@ -4059,12 +4059,12 @@ export default function PortalPage() {
                         placeholder="우편물 배송용 도로명 주소를 검색 또는 입력해 주세요"
                         value={profileRoadAddress}
                         onChange={(e) => setProfileRoadAddress(e.target.value)}
-                        className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                        className="flex-1 bg-[#fff9fb] border border-[#f2ccd7] rounded-md px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
                       />
                       <button
                         type="button"
                         onClick={() => openDaumPostcode("profile")}
-                        className="px-4 py-2.5 bg-[#735965] hover:bg-[#5a444f] text-white text-xs font-bold rounded-xl transition-all cursor-pointer border-0 shrink-0"
+                        className="px-4 py-2.5 bg-[#735965] hover:bg-[#5a444f] text-white text-xs font-bold rounded-md transition-all cursor-pointer border-0 shrink-0"
                       >
                         주소 검색
                       </button>
@@ -4079,7 +4079,7 @@ export default function PortalPage() {
                       placeholder="동, 호수, 층 등 상세 주소를 입력하세요"
                       value={profileDetailAddress}
                       onChange={(e) => setProfileDetailAddress(e.target.value)}
-                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
+                      className="w-full bg-[#fff9fb] border border-[#f2ccd7] rounded-md px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 focus:outline-none focus:border-[#f25f8a]"
                     />
                   </div>
                 </div>
@@ -4089,7 +4089,7 @@ export default function PortalPage() {
                     type="button"
                     onClick={handleUpdateProfile}
                     disabled={isUpdatingProfile}
-                    className="px-6 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-xl transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50 cursor-pointer border-0"
+                    className="px-6 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-md transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50 cursor-pointer border-0"
                   >
                     {isUpdatingProfile ? "저장 중..." : "정보 변경 내용 저장"}
                   </button>
@@ -4110,19 +4110,19 @@ export default function PortalPage() {
           onClick={() => setSelectedNotice(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
+            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
             <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div className="flex items-center gap-2.5">
-                <span className="bg-[#0F172A] text-white text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-1 rounded-full">
+                <span className="bg-[#0F172A] text-white text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-1 rounded-md">
                   {selectedNotice.tag}
                 </span>
                 <span className="text-xs text-[#0F172A]/80 font-bold">{selectedNotice.date} · 조회수 {selectedNotice.views}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
                   공지사항
                 </span>
                 <button 
@@ -4136,7 +4136,7 @@ export default function PortalPage() {
             </div>
 
             <div className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 bg-[#f9fafb]">
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                 <h3 className="text-lg sm:text-xl font-black text-[#0F172A] leading-tight">{selectedNotice.title}</h3>
                 <div className="h-px bg-neutral-100 w-full my-3"></div>
                 <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold whitespace-pre-wrap">
@@ -4145,15 +4145,15 @@ export default function PortalPage() {
               </div>
               
               {selectedNotice.title.includes("배달앱 메뉴 리뉴얼") && (
-                <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3 relative">
+                <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3 relative">
                   <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">배달앱 메뉴 리뉴얼 신청</span>
                     {savedCredentials ? (
-                      <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-md text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
                         ● 제출 완료
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[10px] font-black bg-rose-50 text-rose-700 border border-rose-200">
+                      <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-md text-[10px] font-black bg-rose-50 text-rose-700 border border-rose-200">
                         ● 제출 전
                       </span>
                     )}
@@ -4165,7 +4165,7 @@ export default function PortalPage() {
                   <button
                     type="button"
                     onClick={() => setShowCredentialModal(true)}
-                    className={`w-full py-3 text-xs sm:text-sm font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 ${
+                    className={`w-full py-3 text-xs sm:text-sm font-black rounded-md transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 ${
                       savedCredentials 
                         ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
                         : "bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A]"
@@ -4189,7 +4189,7 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => setSelectedNotice(null)}
-                  className="px-6 py-2.5 rounded-full bg-[#FED422] hover:bg-[#e5be1f] text-xs font-black text-[#0F172A] transition-colors border-0 cursor-pointer shadow-xs"
+                  className="px-6 py-2.5 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-xs font-black text-[#0F172A] transition-colors border-0 cursor-pointer shadow-xs"
                 >
                   닫기
                 </button>
@@ -4206,7 +4206,7 @@ export default function PortalPage() {
           onClick={() => setShowCredentialModal(false)}
         >
           <div 
-            className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
@@ -4216,7 +4216,7 @@ export default function PortalPage() {
                 <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">배달앱 메뉴 리뉴얼 작업을 위한 사장님 계정을 제출합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
                   연동 계정
                 </span>
                 <button 
@@ -4230,10 +4230,10 @@ export default function PortalPage() {
             </div>
 
             <form onSubmit={handleSubmitCredentials} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
                   <span className="text-xs font-black text-[#0F172A]">가맹점 정보</span>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     가맹점
                   </span>
                 </div>
@@ -4245,15 +4245,15 @@ export default function PortalPage() {
                   })()}
                   disabled
                   style={{ backgroundColor: '#e2e8f0' }}
-                  className="w-full disabled:opacity-80 border-0 rounded-xl px-4 py-3 text-xs text-[#0F172A] font-bold outline-none"
+                  className="w-full disabled:opacity-80 border-0 rounded-md px-4 py-3 text-xs text-[#0F172A] font-bold outline-none"
                 />
               </div>
 
               {/* 배민 정보 (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
                   <h4 className="font-black text-xs text-[#0F172A]">배달의민족 사장님 계정</h4>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     배달의민족
                   </span>
                 </div>
@@ -4266,7 +4266,7 @@ export default function PortalPage() {
                       value={baeminId}
                       onChange={(e) => setBaeminId(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
@@ -4277,17 +4277,17 @@ export default function PortalPage() {
                       value={baeminPw}
                       onChange={(e) => setBaeminPw(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 쿠팡 정보 (Emerald Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
                   <h4 className="font-black text-xs text-[#0F172A]">쿠팡이츠 사장님 계정</h4>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     쿠팡이츠
                   </span>
                 </div>
@@ -4300,7 +4300,7 @@ export default function PortalPage() {
                       value={coupangId}
                       onChange={(e) => setCoupangId(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
@@ -4311,14 +4311,14 @@ export default function PortalPage() {
                       value={coupangPw}
                       onChange={(e) => setCoupangPw(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 안내 문구 */}
-              <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 text-xs text-neutral-500 font-bold space-y-1.5 leading-relaxed">
+              <div className="bg-white rounded-lg p-4 border border-neutral-200/90 text-xs text-neutral-500 font-bold space-y-1.5 leading-relaxed">
                 <p className="text-[#0F172A] font-black">* 전달해주신 계정 정보는 메뉴 리뉴얼 작업 목적으로만 사용되며, 작업 완료 후 즉시 폐기하거나 사장님께서 비밀번호를 변경하셔도 무방합니다.</p>
                 <p>※ 계정 정보는 외부에 공유되지 않으며 안전하게 관리됩니다.</p>
               </div>
@@ -4333,13 +4333,13 @@ export default function PortalPage() {
                   <button
                     type="button"
                     onClick={() => setShowCredentialModal(false)}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-full transition-all cursor-pointer border-0"
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0"
                   >
                     취소
                   </button>
                   <button 
                     type="submit"
-                    className="px-7 py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white font-black text-xs rounded-full transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                    className="px-7 py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white font-black text-xs rounded-md transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
                   >
                     <span>정보 제출하기</span>
                     <ArrowRight size={14} />
@@ -4358,19 +4358,19 @@ export default function PortalPage() {
           onClick={() => setSelectedInquiry(null)}
         >
           <div 
-            className="w-full max-w-2xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
+            className="w-full max-w-2xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-lg sm:rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow White Header */}
             <div className="px-5 sm:px-7 py-4 sm:py-5 bg-white border-b border-neutral-200/80 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
-                <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-1 rounded-full shrink-0">
+                <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-1 rounded-md shrink-0">
                   {selectedInquiry.category}
                 </span>
                 <span className="text-xs text-neutral-400 font-medium truncate">접수일: {selectedInquiry.date}</span>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200/60">
+                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-neutral-500 uppercase px-2.5 py-1 rounded-md bg-neutral-100 border border-neutral-200/60">
                   문의 내역
                 </span>
                 <button 
@@ -4384,44 +4384,44 @@ export default function PortalPage() {
             </div>
 
             <div className="p-5 sm:p-7 overflow-y-auto space-y-4 flex-1 bg-[#f9fafb] [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
                 <div className="flex justify-between items-center border-b border-neutral-100 pb-2">
                   <span className="text-xs font-black text-[#0F172A]">문의 내역</span>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black px-2.5 py-0.5 rounded-md">
                     {selectedInquiry.status}
                   </span>
                 </div>
                 <h3 className="text-base sm:text-lg font-black text-[#0F172A] leading-tight">{selectedInquiry.title}</h3>
-                <div className="bg-[#F8F9FA] border-0 p-4 rounded-xl">
+                <div className="bg-[#F8F9FA] border-0 p-4 rounded-md">
                   <p className="text-xs sm:text-sm text-[#0F172A] leading-relaxed font-semibold whitespace-pre-wrap">{selectedInquiry.content}</p>
                 </div>
               </div>
 
               {selectedInquiry.status === "답변완료" && selectedInquiry.answer ? (
-                <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-3">
+                <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-3">
                   <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
                     <span className="text-xs font-black text-[#0F172A]">본사 가맹사업관리팀 공식 답변</span>
-                    <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                       답변 완료
                     </span>
                   </div>
-                  <div className="bg-[#F8F9FA] border-0 p-4 rounded-xl">
+                  <div className="bg-[#F8F9FA] border-0 p-4 rounded-md">
                     <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold whitespace-pre-wrap">
                       {selectedInquiry.answer}
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3">
+                <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3">
                   <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
                     <h4 className="text-xs font-black text-[#0F172A] flex items-center gap-1.5">
                       <Clock size={14} className="text-amber-500" /> 본사 답변 대기중
                     </h4>
-                    <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                    <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                       답변 대기중
                     </span>
                   </div>
-                  <div className="bg-[#F8F9FA] border-0 p-4 rounded-xl">
+                  <div className="bg-[#F8F9FA] border-0 p-4 rounded-md">
                     <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-semibold">
                       점주님께서 올려주신 소중한 문의 사항이 본사 고객케어팀 및 기술 오퍼레이션 본부로 긴급 전달되었습니다. 최대한 상세하게 검토 후 12시간 이내에 정확하게 피드백 및 기기 AS 상담을 지원하겠습니다.
                     </p>
@@ -4438,7 +4438,7 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => setSelectedInquiry(null)}
-                  className="px-6 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
+                  className="px-6 py-2.5 rounded-md bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
                 >
                   확인 완료
                 </button>
@@ -4455,19 +4455,19 @@ export default function PortalPage() {
           onClick={() => setSelectedMaterial(null)}
         >
           <div 
-            className="w-full max-w-2xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
+            className="w-full max-w-2xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-lg sm:rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
             <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div className="flex items-center gap-2.5">
-                <span className="bg-[#0F172A] text-white text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full">
+                <span className="bg-[#0F172A] text-white text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-md">
                   {selectedMaterial.format}
                 </span>
                 <span className="text-xs text-[#0F172A]/80 font-bold">{selectedMaterial.date} · 크기 {selectedMaterial.size}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
                   교육/홍보 자료
                 </span>
                 <button 
@@ -4482,14 +4482,14 @@ export default function PortalPage() {
 
             <div className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 bg-[#f9fafb] [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {/* Material Detail Card */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                 {selectedMaterial.img && (
-                  <div className="w-full h-48 rounded-xl overflow-hidden bg-neutral-100 border border-neutral-200/80">
+                  <div className="w-full h-48 rounded-md overflow-hidden bg-neutral-100 border border-neutral-200/80">
                     <img src={optimizeCloudinaryUrl(selectedMaterial.img)} alt="" className="w-full h-full object-cover" />
                   </div>
                 )}
                 <h3 className="text-base sm:text-lg font-black text-[#0F172A] leading-tight">{selectedMaterial.title}</h3>
-                <div className="bg-[#F8F9FA] border-0 p-4 rounded-xl">
+                <div className="bg-[#F8F9FA] border-0 p-4 rounded-md">
                   <span className="text-[10px] text-neutral-400 font-black uppercase tracking-wider block mb-1">상세 설명</span>
                   <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold">
                     {selectedMaterial.desc}
@@ -4507,7 +4507,7 @@ export default function PortalPage() {
                   <button 
                     type="button"
                     onClick={() => setSelectedMaterial(null)}
-                    className="px-5 py-2.5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-xs font-bold text-slate-700 transition-all border-0 cursor-pointer"
+                    className="px-5 py-2.5 rounded-md bg-neutral-100 hover:bg-neutral-200 text-xs font-bold text-slate-700 transition-all border-0 cursor-pointer"
                   >
                     닫기
                   </button>
@@ -4517,7 +4517,7 @@ export default function PortalPage() {
                       setSelectedMaterial(null);
                       handleDownload(selectedMaterial.title, selectedMaterial.fileUrl, selectedMaterial.fileName);
                     }}
-                    className="px-7 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black transition-all flex items-center gap-2 border-0 shadow-md active:scale-95 cursor-pointer"
+                    className="px-7 py-2.5 rounded-md bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black transition-all flex items-center gap-2 border-0 shadow-md active:scale-95 cursor-pointer"
                   >
                     <Download size={14} />
                     <span>다운로드</span>
@@ -4536,7 +4536,7 @@ export default function PortalPage() {
           onClick={() => setShowInquiryModal(false)}
         >
           <div 
-            className="w-full max-w-xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-xl max-w-[calc(100vw-24px)] bg-white border border-neutral-200/80 rounded-lg sm:rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
@@ -4546,7 +4546,7 @@ export default function PortalPage() {
                 <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">매장 운영 중 발생하는 물류, 기기 AS, 정산 문의를 접수합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
                   문의 서식
                 </span>
                 <button 
@@ -4561,7 +4561,7 @@ export default function PortalPage() {
 
             <form onSubmit={submitInquiry} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb] [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {/* Card 1: Category & Title (Amber Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
@@ -4569,7 +4569,7 @@ export default function PortalPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">문의 유형 및 제목</span>
                   </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     문의 유형
                   </span>
                 </div>
@@ -4579,7 +4579,7 @@ export default function PortalPage() {
                   <select 
                     value={inquiryCategory}
                     onChange={(e) => setInquiryCategory(e.target.value)}
-                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs sm:text-sm font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs sm:text-sm font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
                   >
                     <option value="물류">물류 배송 / 자재 훼손 오배송 건</option>
                     <option value="기술/AS">조리 타이머 및 집기 AS 수리 접수</option>
@@ -4597,13 +4597,13 @@ export default function PortalPage() {
                     value={inquiryTitle}
                     onChange={(e) => setInquiryTitle(e.target.value)}
                     required
-                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs sm:text-sm font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs sm:text-sm font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
                   />
                 </div>
               </div>
 
               {/* Card 2: Details Content (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
@@ -4611,7 +4611,7 @@ export default function PortalPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">문의 세부 내용</span>
                   </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     문의 내용
                   </span>
                 </div>
@@ -4622,7 +4622,7 @@ export default function PortalPage() {
                   value={inquiryContent}
                   onChange={(e) => setInquiryContent(e.target.value)}
                   required
-                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs sm:text-sm font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 resize-none outline-none transition-all shadow-2xs"
+                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs sm:text-sm font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 resize-none outline-none transition-all shadow-2xs"
                 />
               </div>
 
@@ -4636,13 +4636,13 @@ export default function PortalPage() {
                   <button
                     type="button"
                     onClick={() => closeModal(() => setShowInquiryModal(false))}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-full transition-all cursor-pointer border-0"
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0"
                   >
                     취소
                   </button>
                   <button 
                     type="submit"
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-full transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
                   >
                     <span>AS 문의 접수</span>
                     <ArrowRight size={14} />
@@ -4663,19 +4663,19 @@ export default function PortalPage() {
           onClick={() => setSelectedOrder(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
+            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[85vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
             <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-black/10 text-[#0F172A] flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-md bg-black/10 text-[#0F172A] flex items-center justify-center font-bold">
                   <Package size={20} />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                     <span>발주 상세 내역</span>
-                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-black/10 text-[#0F172A] font-mono font-bold">
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-md bg-black/10 text-[#0F172A] font-mono font-bold">
                       {selectedOrder.id}
                     </span>
                   </h3>
@@ -4683,7 +4683,7 @@ export default function PortalPage() {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
                   ORDER DETAILS
                 </span>
                 <button 
@@ -4699,19 +4699,19 @@ export default function PortalPage() {
             <div className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs bg-[#f9fafb] [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               
               {/* Status Timeline Card (Amber Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <span className="text-xs font-black text-[#0F172A] tracking-tight">물류 배송 진행 현황</span>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     TIMELINE
                   </span>
                 </div>
                 
                 <div className="relative flex items-center justify-between mt-6 px-4">
                   {/* Bounded Progress Line Track (Prevents right-side line overflow) */}
-                  <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-[3px] bg-neutral-200 z-0 overflow-hidden rounded-full">
+                  <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-[3px] bg-neutral-200 z-0 overflow-hidden rounded-md">
                     <div 
-                      className="h-full bg-amber-500 transition-all duration-500 rounded-full"
+                      className="h-full bg-amber-500 transition-all duration-500 rounded-md"
                       style={{
                         width: selectedOrder.status === "주문완료" ? "0%" 
                              : selectedOrder.status === "배송준비중" ? "33%" 
@@ -4759,12 +4759,12 @@ export default function PortalPage() {
               </div>
 
               {/* Order Items Table Card (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <span className="text-xs font-black text-[#0F172A]">발주 자재 명세표</span>
                   <span className="text-[10px] font-mono font-bold text-neutral-400">신청 일자: {selectedOrder.date}</span>
                 </div>
-                <div className="border border-neutral-200/90 rounded-xl overflow-hidden bg-white shadow-2xs">
+                <div className="border border-neutral-200/90 rounded-md overflow-hidden bg-white shadow-2xs">
                   <div className="overflow-x-auto w-full [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     <table className="w-full text-left border-collapse min-w-[480px] sm:min-w-0" style={{ tableLayout: 'fixed' }}>
                       <colgroup>
@@ -4799,14 +4799,14 @@ export default function PortalPage() {
               </div>
 
               {/* Payment Summary Card (Emerald Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <span className="text-xs font-black text-[#0F172A]">결제 및 정산 요약</span>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     PAYMENT
                   </span>
                 </div>
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-[#f8f9fa] p-4 rounded-xl border border-neutral-200/80">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-[#f8f9fa] p-4 rounded-md border border-neutral-200/80">
                   <div className="space-y-1">
                     <span className="text-xs text-neutral-400 font-extrabold block">결제 수단 정보</span>
                     <strong className="text-xs text-[#0F172A] block font-black">
@@ -4821,7 +4821,7 @@ export default function PortalPage() {
 
                 {/* 무통장입금 선택 시 계좌 입금 안내 추가 */}
                 {((selectedOrder as any).payMethod === "bank" || selectedOrder.status === "입금대기") && (
-                  <div className="bg-[#f8f9fa] border border-neutral-200/80 p-4 rounded-xl space-y-2.5 text-xs">
+                  <div className="bg-[#f8f9fa] border border-neutral-200/80 p-4 rounded-md space-y-2.5 text-xs">
                     <div className="flex justify-between items-center border-b border-neutral-200/80 pb-2">
                       <span className="font-black text-[#0F172A] flex items-center gap-1.5">
                         <Landmark size={14} className="text-amber-500" /> 무통장 입금 안내
@@ -4829,7 +4829,7 @@ export default function PortalPage() {
                       <button
                         type="button"
                         onClick={() => handleCopyToClipboard(`K뱅크 700-120-270001 (주)고우웰라이프 ${selectedOrder.totalPrice.toLocaleString()}원`, "전체 계좌 정보")}
-                        className="text-[10px] text-[#0F172A] hover:bg-neutral-200 font-black flex items-center gap-1 cursor-pointer bg-white px-3 py-1 rounded-full transition-all border border-neutral-200"
+                        className="text-[10px] text-[#0F172A] hover:bg-neutral-200 font-black flex items-center gap-1 cursor-pointer bg-white px-3 py-1 rounded-md transition-all border border-neutral-200"
                       >
                         <Copy size={10} /> 전체 복사
                       </button>
@@ -4859,7 +4859,7 @@ export default function PortalPage() {
               </div>
 
               {/* Delivery Carrier Info Card (Slate Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-slate-400 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-slate-400 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <span className="font-black text-[#0F172A] flex items-center gap-1.5"><Truck size={16} className="text-slate-600" /> 배송 및 송장 정보</span>
                   <span className={`px-3 py-1 rounded-full text-[10px] font-mono font-black ${
@@ -4906,7 +4906,7 @@ export default function PortalPage() {
                                     selectedOrder.date
                                   );
                                 }}
-                                className="w-full py-3 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-md active:scale-95"
+                                className="w-full py-3 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-md active:scale-95"
                               >
                                 배송 위치 실시간 조회하기 <ChevronRight size={14} />
                               </button>
@@ -4920,10 +4920,10 @@ export default function PortalPage() {
                           <span className="text-xs text-neutral-400 font-black block mb-1">등록된 배송 송장 ({trackingItems.length}개)</span>
                           <div className="grid grid-cols-1 gap-3">
                             {trackingItems.map((item, idx) => (
-                              <div key={idx} className="bg-[#f8f9fa] border border-neutral-200/80 rounded-xl p-4 space-y-3 shadow-2xs">
+                              <div key={idx} className="bg-[#f8f9fa] border border-neutral-200/80 rounded-md p-4 space-y-3 shadow-2xs">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-2">
-                                    <span className="px-2.5 py-0.5 rounded-full bg-[#0F172A] text-[9px] font-black text-white">
+                                    <span className="px-2.5 py-0.5 rounded-md bg-[#0F172A] text-[9px] font-black text-white">
                                       {item.courier}
                                     </span>
                                     <span className="font-mono text-[#0F172A] font-black text-xs">{item.trackingNo}</span>
@@ -4940,7 +4940,7 @@ export default function PortalPage() {
                                       selectedOrder.date
                                     );
                                   }}
-                                  className="w-full py-2.5 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1 cursor-pointer border-0 shadow-xs active:scale-95"
+                                  className="w-full py-2.5 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black transition-all flex items-center justify-center gap-1 cursor-pointer border-0 shadow-xs active:scale-95"
                                 >
                                   배송 위치 실시간 조회하기 <ChevronRight size={14} />
                                 </button>
@@ -4969,7 +4969,7 @@ export default function PortalPage() {
                     <button 
                       type="button"
                       onClick={() => cancelOrder(selectedOrder.id)}
-                      className="px-5 py-2.5 rounded-full bg-rose-50 hover:bg-rose-100 text-xs font-black text-rose-600 transition-all cursor-pointer border border-rose-200 flex items-center gap-1.5"
+                      className="px-5 py-2.5 rounded-md bg-rose-50 hover:bg-rose-100 text-xs font-black text-rose-600 transition-all cursor-pointer border border-rose-200 flex items-center gap-1.5"
                     >
                       <Trash2 size={14} />
                       주문 취소
@@ -4978,7 +4978,7 @@ export default function PortalPage() {
                   <button 
                     type="button"
                     onClick={() => closeModal(() => setSelectedOrder(null))}
-                    className="px-6 py-2.5 rounded-full bg-[#FED422] hover:bg-[#e5be1f] text-xs font-black text-[#0F172A] transition-all cursor-pointer border-0 shadow-xs"
+                    className="px-6 py-2.5 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-xs font-black text-[#0F172A] transition-all cursor-pointer border-0 shadow-xs"
                   >
                     상세내역 창 닫기
                   </button>
@@ -5049,13 +5049,13 @@ export default function PortalPage() {
             }}
           >
             <div 
-              className="w-full max-w-2xl bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col animate-scaleUp max-h-[85vh]"
+              className="w-full max-w-2xl bg-white border-0 rounded-lg overflow-hidden shadow-2xl flex flex-col animate-scaleUp max-h-[85vh]"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Yellow Header */}
               <div className="p-6 bg-[#F5AC00] text-[#0F172A] flex justify-between items-center shadow-xs">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-[#0F172A] rounded-full text-white">
+                  <div className="p-2.5 bg-[#0F172A] rounded-md text-white">
                     <Truck size={20} />
                   </div>
                   <div>
@@ -5073,7 +5073,7 @@ export default function PortalPage() {
                       setTrackingInfo(null);
                     });
                   }}
-                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer shrink-0"
+                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-md transition-all border-0 cursor-pointer shrink-0"
                 >
                   <X size={18} />
                 </button>
@@ -5098,7 +5098,7 @@ export default function PortalPage() {
                 ) : (
                   <>
                     {/* Delivery Basic Specs */}
-                    <div className="bg-[#F8FAFC] border-0 rounded-2xl p-5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-bold">
+                    <div className="bg-[#F8FAFC] border-0 rounded-lg p-5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-bold">
                       <div>
                         <span className="text-[10px] text-slate-400 font-extrabold block">발주 코드</span>
                         <span className="font-mono text-[#0F172A] font-bold">{trackingInfo.orderId}</span>
@@ -5130,9 +5130,9 @@ export default function PortalPage() {
 
                       {/* Horizontal visual line */}
                       <div className="relative pt-4 pb-2">
-                        <div className="absolute left-6 right-6 top-[28px] h-1.5 bg-slate-200 rounded-full z-0">
+                        <div className="absolute left-6 right-6 top-[28px] h-1.5 bg-slate-200 rounded-md z-0">
                           <div 
-                            className="h-full bg-[#F5AC00] rounded-full transition-all duration-1000"
+                            className="h-full bg-[#F5AC00] rounded-md transition-all duration-1000"
                             style={{ width: `${(trackingData.currentStep / 4) * 100}%` }}
                           ></div>
                         </div>
@@ -5161,7 +5161,7 @@ export default function PortalPage() {
                     </div>
 
                     {/* Friendly Notice Box */}
-                    <div className="p-4 bg-[#F8FAFC] border-0 rounded-2xl text-xs font-bold text-slate-600 leading-relaxed flex gap-2.5">
+                    <div className="p-4 bg-[#F8FAFC] border-0 rounded-lg text-xs font-bold text-slate-600 leading-relaxed flex gap-2.5">
                       <div className="text-base shrink-0">📢</div>
                       <p>
                         본 물류 정보는 {apiTrackingData ? <strong>{trackingInfo.courier} 공식 서버망</strong> : <strong>120콜드체인 실시간 관제 시스템</strong>}과 100% 연동된 신뢰할 수 있는 실시간 데이터입니다. 신선 파이 생지 및 원재료의 최상 신선도를 위해 <strong>영하 18도의 친환경 초저온 차량</strong>으로 안전하게 이송되고 있으니 편히 안심하셔도 좋습니다.
@@ -5184,7 +5184,7 @@ export default function PortalPage() {
                               <div className="space-y-1">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <span className="text-[10px] font-mono text-slate-400 font-bold">{cp.time}</span>
-                                  <span className="text-[10px] text-[#0F172A] font-black bg-[#F8FAFC] px-2 py-0.5 rounded-full">
+                                  <span className="text-[10px] text-[#0F172A] font-black bg-[#F8FAFC] px-2 py-0.5 rounded-md">
                                     {cp.location}
                                   </span>
                                   <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
@@ -5221,7 +5221,7 @@ export default function PortalPage() {
                     const url = urlMap[trackingInfo.courier] || `https://www.hanjin.com/ko/delivery/delivery/tracking.do?wblnum=${trackingInfo.trackingNo}`;
                     window.open(url, "_blank");
                   }}
-                  className="flex-1 py-2.5 rounded-full bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 transition-all cursor-pointer border-0 flex items-center justify-center gap-1.5 shadow-2xs"
+                  className="flex-1 py-2.5 rounded-md bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 transition-all cursor-pointer border-0 flex items-center justify-center gap-1.5 shadow-2xs"
                 >
                   <ExternalLink size={14} /> 공식 택배사에서 확인하기
                 </button>
@@ -5233,7 +5233,7 @@ export default function PortalPage() {
                       setTrackingInfo(null);
                     });
                   }}
-                  className="px-8 py-2.5 rounded-full bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-xs font-black shadow-md transition-all cursor-pointer border-0"
+                  className="px-8 py-2.5 rounded-md bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-xs font-black shadow-md transition-all cursor-pointer border-0"
                 >
                   닫기
                 </button>
@@ -5250,14 +5250,14 @@ export default function PortalPage() {
           onClick={() => setSelectedProductDetail(null)}
         >
           <div 
-            className="w-full max-w-3xl bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl max-h-[85vh] flex flex-col animate-scaleUp"
+            className="w-full max-w-3xl bg-white border-0 rounded-lg overflow-hidden shadow-2xl max-h-[85vh] flex flex-col animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Yellow Header */}
             <div className="p-6 bg-[#FED422] text-[#0F172A] flex justify-between items-center shadow-xs">
               <div className="flex-1">
                 <h3 className="text-base sm:text-lg font-black text-[#0F172A] flex items-center gap-2">
-                  <span className="bg-[#0F172A] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                  <span className="bg-[#0F172A] text-white text-[10px] font-black px-2.5 py-0.5 rounded-md">
                     {selectedProductDetail.category}
                   </span>
                   <span>{selectedProductDetail.name} 상세 정보</span>
@@ -5266,7 +5266,7 @@ export default function PortalPage() {
               <button 
                 type="button"
                 onClick={() => closeModal(() => setSelectedProductDetail(null))} 
-                className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer shrink-0 ml-4"
+                className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-md transition-all border-0 cursor-pointer shrink-0 ml-4"
               >
                 <X size={18} />
               </button>
@@ -5277,7 +5277,7 @@ export default function PortalPage() {
               {/* Product Core Info: Thumbnail & Spec Table */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 {/* 1. Thumbnail Image */}
-                <div className="md:col-span-5 border border-[#EEF0F5] rounded-2xl overflow-hidden shadow-2xs bg-white aspect-square flex items-center justify-center relative w-full">
+                <div className="md:col-span-5 border border-[#EEF0F5] rounded-lg overflow-hidden shadow-2xs bg-white aspect-square flex items-center justify-center relative w-full">
                   <img 
                     src={optimizeCloudinaryUrl(selectedProductDetail.img)} 
                     alt={selectedProductDetail.name} 
@@ -5301,7 +5301,7 @@ export default function PortalPage() {
                 </div>
 
                 {/* 2. Spec Table */}
-                <div className="md:col-span-7 bg-white border-0 rounded-2xl overflow-hidden shadow-2xs flex flex-col w-full">
+                <div className="md:col-span-7 bg-white border-0 rounded-lg overflow-hidden shadow-2xs flex flex-col w-full">
                   <div className="px-5 py-3.5 bg-[#F8FAFC] border-b border-slate-100 shrink-0">
                     <span className="font-black text-[#0F172A] text-xs">품목 기본 명세 규격표</span>
                   </div>
@@ -5314,7 +5314,7 @@ export default function PortalPage() {
                       <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
                         <td className="px-4 py-3 bg-[#F8FAFC] font-extrabold text-slate-400">카테고리</td>
                         <td className="px-4 py-3">
-                          <span className="bg-[#0F172A] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                          <span className="bg-[#0F172A] text-white text-[10px] font-black px-2.5 py-0.5 rounded-md">
                             {selectedProductDetail.category}
                           </span>
                         </td>
@@ -5338,21 +5338,21 @@ export default function PortalPage() {
                             const type = selectedProductDetail.shippingType || "A";
                             if (type === "free") {
                               return (
-                                <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                                <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2.5 py-0.5 rounded-md">
                                   무료 배송
                                 </span>
                               );
                             }
                             if (type === "BOX") {
                               return (
-                                <span className="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                                <span className="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-0.5 rounded-md">
                                   BOX타입 (10개당 {shippingFeeBox?.toLocaleString()}원)
                                 </span>
                               );
                             }
                             const feeMap: Record<string, number> = { A: shippingFeeA, B: shippingFeeB, C: shippingFeeC };
                             return (
-                              <span className="bg-slate-100 text-slate-700 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                              <span className="bg-slate-100 text-slate-700 text-[10px] font-black px-2.5 py-0.5 rounded-md">
                                 {type}타입 ({feeMap[type]?.toLocaleString()}원)
                               </span>
                             );
@@ -5372,7 +5372,7 @@ export default function PortalPage() {
               {(selectedProductDetail.detailImg || selectedProductDetail.detailText) && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-                    <span className="w-2 h-4 rounded-full bg-[#F5AC00]"></span>
+                    <span className="w-2 h-4 rounded-md bg-[#F5AC00]"></span>
                     <span className="font-black text-[#0F172A] text-xs sm:text-sm">🔍 제품 상세 정보 안내</span>
                   </div>
                   
@@ -5398,7 +5398,7 @@ export default function PortalPage() {
                         .rich-content-view font[size="6"] { font-size: 24px !important; }
                       `}</style>
                       <div 
-                        className="border-0 rounded-2xl p-6 bg-[#F8FAFC] shadow-2xs text-xs sm:text-sm text-[#0F172A] leading-relaxed whitespace-normal break-words overflow-x-auto min-h-[80px] rich-content-view"
+                        className="border-0 rounded-lg p-6 bg-[#F8FAFC] shadow-2xs text-xs sm:text-sm text-[#0F172A] leading-relaxed whitespace-normal break-words overflow-x-auto min-h-[80px] rich-content-view"
                         dangerouslySetInnerHTML={{ __html: selectedProductDetail.detailText }}
                       />
                     </div>
@@ -5406,11 +5406,11 @@ export default function PortalPage() {
 
                   {/* Detail Image */}
                   {selectedProductDetail.detailImg && (
-                    <div className="border-0 rounded-2xl overflow-hidden shadow-2xs bg-[#F8FAFC] flex items-center justify-center p-3 min-h-[200px]">
+                    <div className="border-0 rounded-lg overflow-hidden shadow-2xs bg-[#F8FAFC] flex items-center justify-center p-3 min-h-[200px]">
                       <img 
                         src={optimizeCloudinaryUrl(selectedProductDetail.detailImg)} 
                         alt={`${selectedProductDetail.name} 상세페이지`} 
-                        className="w-full h-auto object-contain rounded-xl"
+                        className="w-full h-auto object-contain rounded-md"
                       />
                     </div>
                   )}
@@ -5421,7 +5421,7 @@ export default function PortalPage() {
               <div className="flex flex-col gap-4">
                 
                 {/* Delivery policy card */}
-                <div className="bg-[#F8FAFC] border-0 rounded-2xl p-6 space-y-3.5 shadow-2xs">
+                <div className="bg-[#F8FAFC] border-0 rounded-lg p-6 space-y-3.5 shadow-2xs">
                   <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
                     <Truck size={18} className="text-[#F5AC00]" />
                     <span className="font-black text-[#0F172A] text-sm">🚚 본사 물류 배송 정책</span>
@@ -5439,7 +5439,7 @@ export default function PortalPage() {
                 </div>
 
                 {/* Return policy card */}
-                <div className="bg-[#F8FAFC] border-0 rounded-2xl p-6 space-y-3.5 shadow-2xs">
+                <div className="bg-[#F8FAFC] border-0 rounded-lg p-6 space-y-3.5 shadow-2xs">
                   <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
                     <ArrowRightLeft size={18} className="text-[#F5AC00]" />
                     <span className="font-black text-[#0F172A] text-sm">🔄 교환 및 반품 규정 안내</span>
@@ -5465,7 +5465,7 @@ export default function PortalPage() {
                       <select
                         value={selectedProductOption}
                         onChange={(e) => setSelectedProductOption(e.target.value)}
-                        className="flex-1 max-w-xs bg-[#F1F5F9] border-0 rounded-2xl px-4 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50 cursor-pointer"
+                        className="flex-1 max-w-xs bg-[#F1F5F9] border-0 rounded-lg px-4 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50 cursor-pointer"
                       >
                         <option value="">-- 필수 옵션을 선택하세요 --</option>
                         {selectedProductDetail.options.map((opt: string) => (
@@ -5493,7 +5493,7 @@ export default function PortalPage() {
                           }
                           setSelectedProductOption(""); // Reset select choice
                         }}
-                        className="px-5 py-2.5 rounded-full bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black transition-all shadow-md border-0 cursor-pointer"
+                        className="px-5 py-2.5 rounded-md bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-xs font-black transition-all shadow-md border-0 cursor-pointer"
                       >
                         옵션 추가
                       </button>
@@ -5501,14 +5501,14 @@ export default function PortalPage() {
 
                     {/* Selected Options List */}
                     {localSelectedOptions.length > 0 && (
-                      <div className="bg-white border-0 rounded-2xl p-4 space-y-2.5 max-h-[160px] overflow-y-auto shadow-2xs">
+                      <div className="bg-white border-0 rounded-lg p-4 space-y-2.5 max-h-[160px] overflow-y-auto shadow-2xs">
                         <span className="text-[10px] text-slate-400 font-black block uppercase tracking-wider">선택된 옵션 목록</span>
                         {localSelectedOptions.map((item, idx) => (
-                          <div key={idx} className="flex items-center justify-between gap-3 bg-[#F8FAFC] border-0 p-3 rounded-xl text-xs font-bold text-[#0F172A]">
+                          <div key={idx} className="flex items-center justify-between gap-3 bg-[#F8FAFC] border-0 p-3 rounded-md text-xs font-bold text-[#0F172A]">
                             <span className="truncate flex-1 pr-2">{item.optionName}</span>
                             <div className="flex items-center gap-3 shrink-0">
                               {/* Option Qty Controller */}
-                              <div className="flex items-center bg-white rounded-full p-1 border-0 shadow-2xs">
+                              <div className="flex items-center bg-white rounded-md p-1 border-0 shadow-2xs">
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -5559,7 +5559,7 @@ export default function PortalPage() {
                   /* Optionless Qty Controller */
                   <div className="flex items-center gap-3">
                     <span className="font-extrabold text-[#0F172A] text-xs shrink-0">발주 수량 설정</span>
-                    <div className="flex items-center bg-white rounded-full p-1.5 border-0 shadow-2xs">
+                    <div className="flex items-center bg-white rounded-md p-1.5 border-0 shadow-2xs">
                       <button
                         type="button"
                         onClick={() => {
@@ -5593,7 +5593,7 @@ export default function PortalPage() {
                     <button
                       type="button"
                       disabled
-                      className="flex-1 sm:flex-none px-7 py-3 rounded-full bg-slate-200 text-slate-400 text-xs font-black transition-all cursor-not-allowed flex items-center justify-center gap-1.5 border-0"
+                      className="flex-1 sm:flex-none px-7 py-3 rounded-md bg-slate-200 text-slate-400 text-xs font-black transition-all cursor-not-allowed flex items-center justify-center gap-1.5 border-0"
                     >
                       일시품절 (주문 불가)
                     </button>
@@ -5615,7 +5615,7 @@ export default function PortalPage() {
                         }
                         closeModal(() => setSelectedProductDetail(null));
                       }}
-                      className="flex-1 sm:flex-none px-8 py-3 rounded-full bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5 border-0"
+                      className="flex-1 sm:flex-none px-8 py-3 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5 border-0"
                     >
                       <ShoppingBag size={16} />
                       장바구니 담기
@@ -5624,7 +5624,7 @@ export default function PortalPage() {
                   <button 
                     type="button"
                     onClick={() => closeModal(() => setSelectedProductDetail(null))}
-                    className="px-7 py-3 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-all cursor-pointer border-0"
+                    className="px-7 py-3 rounded-md bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-all cursor-pointer border-0"
                   >
                     닫기
                   </button>
@@ -5642,7 +5642,7 @@ export default function PortalPage() {
           onClick={() => setShowCheckoutModal(false)}
         >
           <div 
-            className="w-full max-w-4xl bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-scaleIn"
+            className="w-full max-w-4xl bg-white border-0 rounded-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Yellow Header */}
@@ -5661,7 +5661,7 @@ export default function PortalPage() {
                       clearCart();
                       setShowCheckoutModal(false);
                     }} 
-                    className="text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer bg-white px-3 py-1.5 rounded-full border-0 shadow-2xs"
+                    className="text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer bg-white px-3 py-1.5 rounded-md border-0 shadow-2xs"
                   >
                     <Trash2 size={13} /> 비우기
                   </button>
@@ -5669,7 +5669,7 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => setShowCheckoutModal(false)} 
-                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer"
+                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-md transition-all border-0 cursor-pointer"
                 >
                   <X size={18} />
                 </button>
@@ -5699,7 +5699,7 @@ export default function PortalPage() {
                       <div className="space-y-3 pr-1">
                         {groupedCartItems.map(([typeKey, group]) => (
                           <div key={typeKey} className="space-y-2">
-                            <div className="flex justify-between items-center bg-[#F8FAFC] px-3 py-1.5 rounded-xl border-0 select-none">
+                            <div className="flex justify-between items-center bg-[#F8FAFC] px-3 py-1.5 rounded-md border-0 select-none">
                               <span className="font-black text-xs text-[#0F172A]">{group.title}</span>
                               {group.feeLabel && (
                                 <span className="text-[10px] text-slate-500 font-bold">
@@ -5713,8 +5713,8 @@ export default function PortalPage() {
                                 const p = (products || []).find((prod) => prod.id === item.productId);
                                 if (!p) return null;
                                 return (
-                                  <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border-0 shadow-2xs p-3 rounded-2xl">
-                                    <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                                  <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border-0 shadow-2xs p-3 rounded-lg">
+                                    <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-12 h-12 rounded-md object-cover shrink-0" />
                                     <div className="flex-1 min-w-0">
                                       <h4 className="font-black text-xs text-[#0F172A] truncate">{p.name}</h4>
                                       {item.selectedOption && (
@@ -5733,7 +5733,7 @@ export default function PortalPage() {
                                       >
                                         <X size={14} />
                                       </button>
-                                      <div className="flex items-center bg-[#F8FAFC] rounded-full p-1 border-0">
+                                      <div className="flex items-center bg-[#F8FAFC] rounded-md p-1 border-0">
                                         <button 
                                           type="button"
                                           onClick={() => updateCartQty(p.id, item.selectedOption, item.quantity - 1)} 
@@ -5765,7 +5765,7 @@ export default function PortalPage() {
                       <div className="flex items-center gap-1.5 border-b border-slate-100 pb-2">
                         <MapPin size={16} className="text-[#FED422] shrink-0" />
                         <span className="font-black text-xs text-[#0F172A]">배송지 정보 입력</span>
-                        <span className="text-[10px] text-slate-400 font-bold ml-auto bg-[#F8FAFC] px-2.5 py-0.5 rounded-full select-none">
+                        <span className="text-[10px] text-slate-400 font-bold ml-auto bg-[#F8FAFC] px-2.5 py-0.5 rounded-md select-none">
                           기본 주소지 정보 자동 입력됨
                         </span>
                       </div>
@@ -5779,12 +5779,12 @@ export default function PortalPage() {
                               value={deliveryAddress}
                               onChange={(e) => setDeliveryAddress(e.target.value)}
                               placeholder="도로명 주소를 검색 또는 직접 입력하세요"
-                              className="flex-1 px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
+                              className="flex-1 px-4 py-3 text-xs font-bold border-0 rounded-lg bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
                             />
                             <button
                               type="button"
                               onClick={() => openDaumPostcode("delivery")}
-                              className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-full transition-all cursor-pointer border-0 shrink-0 shadow-md"
+                              className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-md transition-all cursor-pointer border-0 shrink-0 shadow-md"
                             >
                               주소 검색
                             </button>
@@ -5797,7 +5797,7 @@ export default function PortalPage() {
                             value={deliveryDetailAddress}
                             onChange={(e) => setDeliveryDetailAddress(e.target.value)}
                             placeholder="상세 주소 (동/호수/층 등)"
-                            className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
+                            className="w-full px-4 py-3 text-xs font-bold border-0 rounded-lg bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
@@ -5808,7 +5808,7 @@ export default function PortalPage() {
                               value={recipientName}
                               onChange={(e) => setRecipientName(e.target.value)}
                               placeholder="수령인 이름"
-                              className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
+                              className="w-full px-4 py-3 text-xs font-bold border-0 rounded-lg bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
                             />
                           </div>
                           <div>
@@ -5818,7 +5818,7 @@ export default function PortalPage() {
                               value={recipientPhone}
                               onChange={(e) => setRecipientPhone(formatPhoneNumber(e.target.value))}
                               placeholder="010-0000-0000"
-                              className="w-full px-4 py-3 text-xs font-bold border-0 rounded-2xl bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
+                              className="w-full px-4 py-3 text-xs font-bold border-0 rounded-lg bg-[#F1F5F9] text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FED422]/50"
                             />
                           </div>
                         </div>
@@ -5840,7 +5840,7 @@ export default function PortalPage() {
                         <button
                           type="button"
                           onClick={() => setOrderPayMethod("card")}
-                          className={`flex items-center justify-center gap-2 py-3.5 rounded-2xl border-0 text-xs font-black transition-all cursor-pointer ${
+                          className={`flex items-center justify-center gap-2 py-3.5 rounded-lg border-0 text-xs font-black transition-all cursor-pointer ${
                             orderPayMethod === "card"
                               ? "bg-[#FED422] text-[#0F172A] shadow-md"
                               : "bg-[#F8FAFC] text-slate-600 hover:bg-slate-200"
@@ -5852,7 +5852,7 @@ export default function PortalPage() {
                         <button
                           type="button"
                           onClick={() => setOrderPayMethod("bank")}
-                          className={`flex items-center justify-center gap-2 py-3.5 rounded-2xl border-0 text-xs font-black transition-all cursor-pointer ${
+                          className={`flex items-center justify-center gap-2 py-3.5 rounded-lg border-0 text-xs font-black transition-all cursor-pointer ${
                             orderPayMethod === "bank"
                               ? "bg-[#FED422] text-[#0F172A] shadow-md"
                               : "bg-[#F8FAFC] text-slate-600 hover:bg-slate-200"
@@ -5865,7 +5865,7 @@ export default function PortalPage() {
 
                       {/* 무통장입금 정보 박스 */}
                       {orderPayMethod === "bank" && (
-                        <div className="bg-[#F8FAFC] border-0 p-5 rounded-2xl space-y-3 animate-fadeIn text-xs">
+                        <div className="bg-[#F8FAFC] border-0 p-5 rounded-lg space-y-3 animate-fadeIn text-xs">
                           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                             <span className="font-black text-[#0F172A] flex items-center gap-1">
                               <Landmark size={14} className="text-[#FED422]" /> 입금 계좌 정보
@@ -5873,19 +5873,19 @@ export default function PortalPage() {
                             <button
                               type="button"
                               onClick={() => handleCopyToClipboard(`K뱅크 700-120-270001 (주)고우웰라이프 ${cartTotal.toLocaleString()}원`, "전체 계좌 정보")}
-                              className="text-[10px] text-[#0F172A] font-black flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1 rounded-full border-0 shadow-2xs hover:bg-[#FED422]"
+                              className="text-[10px] text-[#0F172A] font-black flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1 rounded-md border-0 shadow-2xs hover:bg-[#FED422]"
                             >
                               <Copy size={11} /> 전체 복사
                             </button>
                           </div>
                           <div className="space-y-2 text-slate-600 font-bold">
-                            <div className="flex justify-between items-center bg-white px-3.5 py-2.5 rounded-xl border-0 shadow-2xs">
+                            <div className="flex justify-between items-center bg-white px-3.5 py-2.5 rounded-md border-0 shadow-2xs">
                               <div>
                                 <span className="block text-[9px] text-slate-400 font-extrabold">은행 / 예금주</span>
                                 <span className="text-xs font-black text-[#0F172A]">K뱅크 / (주)고우웰라이프</span>
                               </div>
                             </div>
-                            <div className="flex justify-between items-center bg-white px-3.5 py-2.5 rounded-xl border-0 shadow-2xs">
+                            <div className="flex justify-between items-center bg-white px-3.5 py-2.5 rounded-md border-0 shadow-2xs">
                               <div>
                                 <span className="block text-[9px] text-slate-400 font-extrabold">계좌번호</span>
                                 <span className="text-xs font-mono font-black text-[#0F172A]">700-120-270001</span>
@@ -5899,7 +5899,7 @@ export default function PortalPage() {
                                 <Copy size={12} />
                               </button>
                             </div>
-                            <div className="flex justify-between items-center bg-white px-3.5 py-2.5 rounded-xl border-0 shadow-2xs">
+                            <div className="flex justify-between items-center bg-white px-3.5 py-2.5 rounded-md border-0 shadow-2xs">
                               <div>
                                 <span className="block text-[9px] text-slate-400 font-extrabold">입금 금액</span>
                                 <span className="text-xs font-black text-[#0F172A]">{cartTotal.toLocaleString()} 원</span>
@@ -5919,7 +5919,7 @@ export default function PortalPage() {
                     </div>
 
                     {/* 4. 최종 결제 내역 확인 */}
-                    <div className="bg-[#F8FAFC] border-0 rounded-2xl p-6 space-y-5">
+                    <div className="bg-[#F8FAFC] border-0 rounded-lg p-6 space-y-5">
                       <span className="font-black text-xs text-[#0F172A] flex items-center gap-1.5 border-b border-slate-200 pb-2 select-none">
                         <CheckCircle2 size={16} className="text-[#FED422]" /> 최종 금액 확인
                       </span>
@@ -5964,7 +5964,7 @@ export default function PortalPage() {
                           placeOrder();
                           setShowCheckoutModal(false);
                         }}
-                        className="w-full py-4 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-sm font-black rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-2"
+                        className="w-full py-4 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-sm font-black rounded-md transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 mt-2"
                       >
                         <CheckCircle2 size={18} />
                         {orderPayMethod === "card" ? "최종 결제 진행" : "발주 신청 완료 (무통장입금)"}
@@ -5986,7 +5986,7 @@ export default function PortalPage() {
       {showPopup && popupSettings && (
         <div className="fixed inset-0 z-[120] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div 
-            className="w-full max-w-md bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp"
+            className="w-full max-w-md bg-white border-0 rounded-lg overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header / Background visual */}
@@ -6049,7 +6049,7 @@ export default function PortalPage() {
                         setShowPopup(false);
                       }
                     }}
-                    className="w-full py-3.5 font-black rounded-full shadow-md transition-all cursor-pointer border-0"
+                    className="w-full py-3.5 font-black rounded-md shadow-md transition-all cursor-pointer border-0"
                     style={{
                       backgroundColor: popupSettings.btnBgColor || "#F5AC00",
                       color: popupSettings.btnTextColor || "#0F172A",
@@ -6101,7 +6101,7 @@ export default function PortalPage() {
                   href={floatingSettings.instaUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-[#cf2a7a] hover:bg-[#b01e63] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
+                  className="bg-[#cf2a7a] hover:bg-[#b01e63] p-2.5 rounded-md flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
                   <Camera size={17} className="!text-white" style={{ color: "#ffffff" }} />
                   <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">공식 인스타</span>
@@ -6114,7 +6114,7 @@ export default function PortalPage() {
                   href={floatingSettings.blogUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-[#03C75A] hover:bg-[#02b350] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
+                  className="bg-[#03C75A] hover:bg-[#02b350] p-2.5 rounded-md flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
                   <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" className="!text-white" style={{ color: "#ffffff" }}>
                     <path d="M16.273 19.143L8.538 9.385V19.143H4.425V4.857h4.088l7.653 9.637V4.857h4.088v14.286h-3.981z" />
@@ -6129,7 +6129,7 @@ export default function PortalPage() {
                   href={floatingSettings.youtubeUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-[#ff0000] hover:bg-[#cc0000] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
+                  className="bg-[#ff0000] hover:bg-[#cc0000] p-2.5 rounded-md flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
                   <Video size={17} className="!text-white" style={{ color: "#ffffff" }} />
                   <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">유튜브 채널</span>
@@ -6140,7 +6140,7 @@ export default function PortalPage() {
               {floatingSettings.phoneNo && (
                 <a
                   href={`tel:${floatingSettings.phoneNo}`}
-                  className="bg-[#007aff] hover:bg-[#0062cc] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
+                  className="bg-[#007aff] hover:bg-[#0062cc] p-2.5 rounded-md flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
                   <Phone size={17} className="text-white" />
                   <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">본사 전화문의</span>
@@ -6153,7 +6153,7 @@ export default function PortalPage() {
                   href={floatingSettings.kakaoUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-[#fae100] hover:bg-[#e6cf00] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border border-yellow-400"
+                  className="bg-[#fae100] hover:bg-[#e6cf00] p-2.5 rounded-md flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border border-yellow-400"
                 >
                   <MessageCircle size={17} className="text-white" />
                   <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">1:1 카톡문의</span>
@@ -6169,7 +6169,7 @@ export default function PortalPage() {
                     setShowInquiryModal(true);
                     setFloatingOpen(false);
                   }}
-                  className="bg-[#f25f8a] hover:bg-[#df4977] p-2.5 rounded-full flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
+                  className="bg-[#f25f8a] hover:bg-[#df4977] p-2.5 rounded-md flex items-center justify-center text-white shadow-md transition-all scale-100 hover:scale-110 active:scale-95 cursor-pointer relative group border-0"
                 >
                   <MessageSquare size={17} className="text-white" />
                   <span className="absolute right-12 bg-[#2d2026] text-white text-[9px] font-extrabold px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all duration-200">1:1 빠른 문의접수</span>
@@ -6194,7 +6194,7 @@ export default function PortalPage() {
 
       {/* MOBILE BOTTOM FLOATING CART BAR (Always visible above bottom navigation when items are added in order menu) */}
       {cart.length > 0 && currentMenu === "order" && (
-        <div className="lg:hidden fixed bottom-4 inset-x-4 z-40 bg-white border border-[#FED422]/60 px-4 py-3 rounded-2xl shadow-[0_8px_25px_rgba(0,0,0,0.15)] flex items-center justify-between animate-slideUp select-none">
+        <div className="lg:hidden fixed bottom-4 inset-x-4 z-40 bg-white border border-[#FED422]/60 px-4 py-3 rounded-lg shadow-[0_8px_25px_rgba(0,0,0,0.15)] flex items-center justify-between animate-slideUp select-none">
           <div className="flex flex-col text-left">
             <span className="text-[9px] font-black text-[#735965]">총 {cart.reduce((sum, item) => sum + item.quantity, 0)}개 품목 담김</span>
             <span className="text-sm font-black text-[#0F172A]">{cartTotal.toLocaleString()}원</span>
@@ -6203,7 +6203,7 @@ export default function PortalPage() {
             onClick={() => {
               setMobileCartOpen(true);
             }}
-            className="px-4 py-2 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-[10px] font-black rounded-xl shadow-sm flex items-center gap-1 transition-all cursor-pointer border-0"
+            className="px-4 py-2 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-[10px] font-black rounded-md shadow-sm flex items-center gap-1 transition-all cursor-pointer border-0"
           >
             <ShoppingBag size={12} className="text-[#2d2026]" />
             장바구니 확인
@@ -6219,7 +6219,7 @@ export default function PortalPage() {
           onClick={() => closeModal(() => setMobileCartOpen(false))}
         >
           <div 
-            className="w-full sm:max-w-lg bg-white border-0 rounded-t-[28px] sm:rounded-[28px] overflow-hidden shadow-2xl max-h-[84vh] sm:max-h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
+            className="w-full sm:max-w-lg bg-white border-0 rounded-t-[28px] sm:rounded-lg overflow-hidden shadow-2xl max-h-[84vh] sm:max-h-[85vh] flex flex-col animate-slideUp sm:animate-custom-scale"
             style={{ overscrollBehaviorY: "contain" }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -6230,7 +6230,7 @@ export default function PortalPage() {
                 <button
                   type="button"
                   onClick={() => closeModal(() => setMobileCartOpen(false))}
-                  className="p-1.5 text-[#0F172A] hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer flex items-center justify-center shrink-0"
+                  className="p-1.5 text-[#0F172A] hover:bg-black/10 rounded-md transition-all border-0 cursor-pointer flex items-center justify-center shrink-0"
                   aria-label="뒤로가기 닫기"
                   title="뒤로가기"
                 >
@@ -6253,7 +6253,7 @@ export default function PortalPage() {
                         setMobileCartOpen(false);
                       });
                     }} 
-                    className="text-[11px] sm:text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer border-0 bg-white px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full shadow-2xs"
+                    className="text-[11px] sm:text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer border-0 bg-white px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-md shadow-2xs"
                   >
                     <Trash2 size={12} /> 비우기
                   </button>
@@ -6261,7 +6261,7 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => closeModal(() => setMobileCartOpen(false))} 
-                  className="p-1.5 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer shrink-0"
+                  className="p-1.5 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-md transition-all border-0 cursor-pointer shrink-0"
                   aria-label="창 닫기"
                   title="닫기"
                 >
@@ -6291,7 +6291,7 @@ export default function PortalPage() {
                     </span>
                     {groupedCartItems.map(([typeKey, group]) => (
                       <div key={typeKey} className="space-y-2.5">
-                        <div className="flex justify-between items-center bg-[#F8FAFC] px-3.5 py-2 rounded-xl border border-slate-100 select-none">
+                        <div className="flex justify-between items-center bg-[#F8FAFC] px-3.5 py-2 rounded-md border border-slate-100 select-none">
                           <span className="font-black text-xs text-[#0F172A]">{group.title}</span>
                           {group.feeLabel && (
                             <span className="text-[10px] text-slate-500 font-bold">
@@ -6305,8 +6305,8 @@ export default function PortalPage() {
                             const p = (products || []).find((prod) => prod.id === item.productId);
                             if (!p) return null;
                             return (
-                              <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border border-slate-200/80 p-3.5 rounded-2xl shadow-xs">
-                                <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0 border border-slate-100" />
+                              <div key={`${item.productId}-${item.selectedOption || ""}`} className="flex gap-3 justify-between items-center bg-white border border-slate-200/80 p-3.5 rounded-lg shadow-xs">
+                                <img src={optimizeCloudinaryUrl(p.img)} alt="" className="w-12 h-12 rounded-md object-cover shrink-0 border border-slate-100" />
                                 <div className="flex-1 min-w-0 text-left">
                                   <h4 className="font-black text-xs sm:text-sm text-[#0F172A] leading-tight">{p.name}</h4>
                                   {item.selectedOption && (
@@ -6330,7 +6330,7 @@ export default function PortalPage() {
                                   >
                                     <X size={15} />
                                   </button>
-                                  <div className="flex items-center bg-[#F8FAFC] rounded-full p-1 border border-slate-200 shadow-2xs">
+                                  <div className="flex items-center bg-[#F8FAFC] rounded-md p-1 border border-slate-200 shadow-2xs">
                                     <button 
                                       type="button"
                                       onClick={() => {
@@ -6362,7 +6362,7 @@ export default function PortalPage() {
                   </div>
 
                   {/* Bill Summary Section (Inside Scrollable Area below full items list) */}
-                  <div className="pt-4 border-t border-slate-200 space-y-3 bg-[#F8FAFC] p-4 rounded-2xl border border-slate-100">
+                  <div className="pt-4 border-t border-slate-200 space-y-3 bg-[#F8FAFC] p-4 rounded-lg border border-slate-100">
                     <h5 className="font-black text-xs text-[#0F172A]">결제 예상 금액</h5>
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between text-slate-600 font-bold">
@@ -6386,7 +6386,7 @@ export default function PortalPage() {
                   </div>
 
                   {/* 이달의 카드 무이자 혜택 안내 */}
-                  <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs text-left">
+                  <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-2xs text-left">
                     <div className="flex items-center gap-1.5 text-[#0F172A] font-black text-xs mb-2">
                       <CreditCard size={16} className="shrink-0 text-[#F5AC00]" />
                       <span>7월 카드사 무이자 혜택 (5만원 이상)</span>
@@ -6435,7 +6435,7 @@ export default function PortalPage() {
                     closeModal(() => setMobileCartOpen(false));
                     placeOrder();
                   }}
-                  className="w-full py-3.5 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-sm font-black rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-98"
+                  className="w-full py-3.5 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-sm font-black rounded-md transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-98"
                 >
                   <CheckCircle2 size={18} />
                   <span>{cartTotal.toLocaleString()}원 결제 진행하기</span>
@@ -6449,14 +6449,14 @@ export default function PortalPage() {
       {/* Premium Custom Alert / Confirm Modal */}
       {customDialog.isOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-sm animate-custom-fade select-none">
-          <div className="bg-white border border-neutral-100 rounded-3xl w-full max-w-[340px] overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.12)] relative my-auto flex flex-col p-6 animate-custom-scale">
+          <div className="bg-white border border-neutral-100 rounded-lg w-full max-w-[340px] overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.12)] relative my-auto flex flex-col p-6 animate-custom-scale">
             
             {/* Top decorative color bar */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 to-[#f25f8a]"></div>
             
             {/* Icon / Title */}
             <div className="flex items-center gap-2.5 mb-3 mt-1 text-left">
-              <div className="p-2 rounded-full bg-amber-50 text-amber-500 shrink-0">
+              <div className="p-2 rounded-md bg-amber-50 text-amber-500 shrink-0">
                 <AlertCircle size={18} />
               </div>
               <h3 className="text-sm sm:text-base font-black text-neutral-800 leading-snug">
@@ -6475,7 +6475,7 @@ export default function PortalPage() {
                 <button
                   type="button"
                   onClick={customDialog.onCancel}
-                  className="px-4 py-2 bg-neutral-50 hover:bg-neutral-100 text-neutral-500 font-extrabold text-xs rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer border border-neutral-200"
+                  className="px-4 py-2 bg-neutral-50 hover:bg-neutral-100 text-neutral-500 font-extrabold text-xs rounded-md transition-all shadow-sm active:scale-95 cursor-pointer border border-neutral-200"
                 >
                   취소
                 </button>
@@ -6483,7 +6483,7 @@ export default function PortalPage() {
               <button
                 type="button"
                 onClick={customDialog.onConfirm}
-                className="px-5 py-2.5 bg-amber-400 hover:bg-amber-350 text-neutral-950 font-black text-xs rounded-xl transition-all shadow-md active:scale-95 cursor-pointer border-0"
+                className="px-5 py-2.5 bg-amber-400 hover:bg-amber-350 text-neutral-950 font-black text-xs rounded-md transition-all shadow-md active:scale-95 cursor-pointer border-0"
               >
                 확인
               </button>
@@ -6516,7 +6516,7 @@ export default function PortalPage() {
           onClick={() => setShowAddressPopup(false)}
         >
           <div 
-            className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
+            className="w-full max-w-lg bg-white border border-[#f2ccd7] rounded-lg overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-5 border-b border-[#f2ccd7]/60 flex flex-col gap-3 bg-[#fff1f5]/80">
@@ -6528,7 +6528,7 @@ export default function PortalPage() {
               </div>
               
               {/* Tabs */}
-              <div className="flex bg-[#ffd3df]/50 p-1 rounded-xl border border-[#f2ccd7]/60">
+              <div className="flex bg-[#ffd3df]/50 p-1 rounded-md border border-[#f2ccd7]/60">
                 <button
                   type="button"
                   onClick={() => setAddressTab("kakao")}
@@ -6571,12 +6571,12 @@ export default function PortalPage() {
                     placeholder="예: 테헤란로, 엘에스로, 당동"
                     value={addressSearchKeyword}
                     onChange={(e) => handleRegAddressSearch(e.target.value)}
-                    className="w-full bg-white border border-[#f2ccd7] rounded-xl px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 font-semibold focus:outline-none focus:border-[#f25f8a]"
+                    className="w-full bg-white border border-[#f2ccd7] rounded-md px-3.5 py-2.5 text-xs text-[#2d2026] placeholder-[#735965]/40 font-semibold focus:outline-none focus:border-[#f25f8a]"
                   />
                 </div>
                 
                 {addressSearchResults.length > 0 ? (
-                  <div className="border border-[#f2ccd7]/60 rounded-xl overflow-hidden divide-y divide-[#f2ccd7]/40 bg-white">
+                  <div className="border border-[#f2ccd7]/60 rounded-md overflow-hidden divide-y divide-[#f2ccd7]/40 bg-white">
                     {addressSearchResults.map((addr, idx) => (
                       <button
                         key={idx}

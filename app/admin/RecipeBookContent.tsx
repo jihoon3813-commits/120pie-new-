@@ -105,7 +105,7 @@ export default function RecipeBookContent() {
   const searchResults = searchRecipes();
 
   return (
-    <div className="w-full flex flex-col min-h-0 bg-[#fffdfa] text-neutral-800 p-4 sm:p-6 lg:p-8 rounded-3xl border border-[#f2ccd7]/70 shadow-sm relative recipe-book-root">
+    <div className="w-full flex flex-col min-h-0 bg-[#fffdfa] text-neutral-800 p-4 sm:p-6 lg:p-8 rounded-lg border border-[#f2ccd7]/70 shadow-sm relative recipe-book-root">
       
       {/* ------------------------------------------------------------- */}
       {/* TOP ACTIONS AND CONTROL BAR */}
@@ -123,7 +123,7 @@ export default function RecipeBookContent() {
 
         <div className="flex flex-wrap items-center gap-2.5">
           {/* View Mode Toggle */}
-          <div className="bg-[#fff1f5] border border-[#f2ccd7] rounded-xl p-1 flex text-xs font-bold text-[#735965]">
+          <div className="bg-[#fff1f5] border border-[#f2ccd7] rounded-md p-1 flex text-xs font-bold text-[#735965]">
             <button 
               onClick={() => setViewMode("book")}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer border-0 ${viewMode === "book" ? "bg-[#f25f8a] text-white" : "hover:text-[#bf3e67]"}`}
@@ -140,7 +140,7 @@ export default function RecipeBookContent() {
 
           <button
             onClick={handlePrint}
-            className="px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold transition-all inline-flex items-center gap-1.5 border-0 cursor-pointer shadow-sm"
+            className="px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-md text-xs font-bold transition-all inline-flex items-center gap-1.5 border-0 cursor-pointer shadow-sm"
           >
             <Printer size={14} />
             레시피북 인쇄 (A4)
@@ -162,13 +162,13 @@ export default function RecipeBookContent() {
               placeholder="음료 또는 디저트 이름 입력..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-[#f2ccd7] rounded-xl text-xs sm:text-sm text-neutral-800 focus:outline-none focus:border-[#f25f8a] placeholder-neutral-400 shadow-inner"
+              className="w-full pl-10 pr-4 py-3 bg-white border border-[#f2ccd7] rounded-md text-xs sm:text-sm text-neutral-800 focus:outline-none focus:border-[#f25f8a] placeholder-neutral-400 shadow-inner"
             />
           </div>
 
           {/* Real-time search results */}
           {searchQuery.trim() !== "" && (
-            <div className="absolute top-[72px] left-0 right-0 bg-white border border-[#f2ccd7] rounded-xl shadow-xl z-30 max-h-60 overflow-y-auto p-2">
+            <div className="absolute top-[72px] left-0 right-0 bg-white border border-[#f2ccd7] rounded-md shadow-xl z-30 max-h-60 overflow-y-auto p-2">
               <span className="text-[10px] font-bold text-neutral-400 px-2 block mb-1">검색 결과 ({searchResults.length}건)</span>
               {searchResults.length === 0 ? (
                 <p className="text-xs text-neutral-500 p-3 text-center">검색 결과가 없습니다.</p>
@@ -212,7 +212,7 @@ export default function RecipeBookContent() {
               <button
                 key={btn.page}
                 onClick={() => jumpToPage(btn.page)}
-                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                className={`px-3 py-2 rounded-md text-xs font-bold transition-all border cursor-pointer ${
                   currentPage === btn.page
                     ? "bg-[#f25f8a] border-[#f25f8a] text-white font-extrabold shadow-sm"
                     : "bg-white border-[#f2ccd7] text-[#735965] hover:bg-[#fff1f5] hover:text-[#bf3e67]"
@@ -233,7 +233,7 @@ export default function RecipeBookContent() {
           /* BOOK VIEW (WITH ANIMS) */
           <div className="w-full flex flex-col items-center">
             {/* Pages Spread container */}
-            <div className="relative w-full max-w-[700px] aspect-[1/1.414] shadow-[0_16px_40px_rgba(0,0,0,0.12)] border border-neutral-200/80 rounded-2xl overflow-hidden bg-white select-text">
+            <div className="relative w-full max-w-[700px] aspect-[1/1.414] shadow-[0_16px_40px_rgba(0,0,0,0.12)] border border-neutral-200/80 rounded-lg overflow-hidden bg-white select-text">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentPage}
@@ -253,7 +253,7 @@ export default function RecipeBookContent() {
               <button
                 onClick={prevPage}
                 disabled={currentPage === 0}
-                className="p-3 bg-white border border-[#f2ccd7] text-[#735965] hover:text-[#bf3e67] hover:bg-[#fff1f5] disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-neutral-400 rounded-full transition-all cursor-pointer border-0 shadow-sm"
+                className="p-3 bg-white border border-[#f2ccd7] text-[#735965] hover:text-[#bf3e67] hover:bg-[#fff1f5] disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-neutral-400 rounded-md transition-all cursor-pointer border-0 shadow-sm"
               >
                 <ChevronLeft size={20} />
               </button>
@@ -265,7 +265,7 @@ export default function RecipeBookContent() {
               <button
                 onClick={nextPage}
                 disabled={currentPage === totalPages - 1}
-                className="p-3 bg-white border border-[#f2ccd7] text-[#735965] hover:text-[#bf3e67] hover:bg-[#fff1f5] disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-neutral-400 rounded-full transition-all cursor-pointer border-0 shadow-sm"
+                className="p-3 bg-white border border-[#f2ccd7] text-[#735965] hover:text-[#bf3e67] hover:bg-[#fff1f5] disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-neutral-400 rounded-md transition-all cursor-pointer border-0 shadow-sm"
               >
                 <ChevronRight size={20} />
               </button>
@@ -275,7 +275,7 @@ export default function RecipeBookContent() {
           /* FULL SCROLL VIEW */
           <div ref={bookContainerRef} className="w-full flex flex-col items-center gap-12 max-h-[80vh] overflow-y-auto p-4 select-text">
             {Array.from({ length: totalPages }).map((_, i) => (
-              <div key={i} className="w-full max-w-[700px] aspect-[1/1.414] shadow-[0_12px_32px_rgba(0,0,0,0.08)] border border-neutral-200 rounded-2xl overflow-hidden bg-white shrink-0 relative">
+              <div key={i} className="w-full max-w-[700px] aspect-[1/1.414] shadow-[0_12px_32px_rgba(0,0,0,0.08)] border border-neutral-200 rounded-lg overflow-hidden bg-white shrink-0 relative">
                 <div className="absolute top-4 right-4 bg-neutral-900/60 text-white px-2 py-1 rounded text-[10px] font-bold z-10">PAGE {i + 1}</div>
                 <PageRenderer pageNum={i} />
               </div>
@@ -377,8 +377,8 @@ function CoverPage() {
   return (
     <div className="w-full h-full bg-[#1b191c] text-white flex flex-col justify-between p-12 relative overflow-hidden select-none print-page-break">
       {/* Decorative lines */}
-      <div className="absolute top-0 right-0 w-44 h-44 bg-[#f25f8a]/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-52 h-52 bg-amber-400/10 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-44 h-44 bg-[#f25f8a]/10 rounded-md blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-52 h-52 bg-amber-400/10 rounded-md blur-3xl" />
 
       {/* Top logo sign */}
       <div className="flex items-center gap-3">
@@ -394,7 +394,7 @@ function CoverPage() {
             <span className="text-[#f25f8a]">RECIPE</span><br />
             MANUAL
           </h1>
-          <div className="w-20 h-1 bg-amber-400 rounded-full mt-4" />
+          <div className="w-20 h-1 bg-amber-400 rounded-md mt-4" />
         </div>
         
         <div className="space-y-2">
@@ -491,18 +491,18 @@ function RecipePageTableRenderer({ categoryIndex, subCategoryIndex, limit = 99, 
 
   return (
     <div className="space-y-4">
-      <div className="bg-[#fcf8fa] border border-[#f2ccd7]/60 rounded-xl px-4 py-2 flex items-center justify-between">
+      <div className="bg-[#fcf8fa] border border-[#f2ccd7]/60 rounded-md px-4 py-2 flex items-center justify-between">
         <h4 className="text-xs font-extrabold text-[#bf3e67]">{subCategory.name}</h4>
         <span className="text-[10px] font-bold text-neutral-400">Recipe list</span>
       </div>
 
       <div className="space-y-3.5">
         {recipesToShow.map((recipe, idx) => (
-          <div key={idx} className="border border-neutral-100 rounded-xl overflow-hidden shadow-sm bg-white">
+          <div key={idx} className="border border-neutral-100 rounded-md overflow-hidden shadow-sm bg-white">
             {/* Header banner */}
             <div className="bg-[#1b191c] text-white px-3.5 py-1.5 flex justify-between items-center text-xs font-black">
               <span className="flex items-center gap-2">
-                <span className="w-1.5 h-3 bg-amber-400 rounded-full" />
+                <span className="w-1.5 h-3 bg-amber-400 rounded-md" />
                 {recipe.name}
               </span>
               <span className="text-[10px] text-amber-400">No.{recipe.no}</span>
@@ -866,7 +866,7 @@ function BackCoverPage() {
   return (
     <div className="w-full h-full bg-[#1b191c] text-white flex flex-col justify-between p-12 relative overflow-hidden select-none print-page-break">
       {/* Decorative Blur */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-[#f25f8a]/5 rounded-full blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-[#f25f8a]/5 rounded-md blur-3xl" />
 
       {/* Top Header */}
       <div className="text-center">
@@ -875,7 +875,7 @@ function BackCoverPage() {
 
       {/* Security Block */}
       <div className="my-auto text-center space-y-6 max-w-sm mx-auto">
-        <div className="w-14 h-14 bg-neutral-800/80 border border-neutral-700/50 rounded-2xl flex items-center justify-center mx-auto text-amber-400">
+        <div className="w-14 h-14 bg-neutral-800/80 border border-neutral-700/50 rounded-lg flex items-center justify-center mx-auto text-amber-400">
           <BookOpen size={24} />
         </div>
         <div className="space-y-2">
@@ -884,7 +884,7 @@ function BackCoverPage() {
             본 문서에 수록된 레시피 및 가이드라인은 가맹점의 조리 매뉴얼 기밀사항에 해당합니다. 무단 복사, 배포, 유포 및 타 브랜드 모방 시 민형사상의 법적 책임을 물을 수 있습니다.
           </p>
         </div>
-        <div className="border border-neutral-800 rounded-xl px-4 py-2.5 text-[10px] text-neutral-400 inline-block font-semibold">
+        <div className="border border-neutral-800 rounded-md px-4 py-2.5 text-[10px] text-neutral-400 inline-block font-semibold">
           문의: 1566-3594 | 120piecoffee@gmail.com
         </div>
       </div>

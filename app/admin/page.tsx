@@ -1332,13 +1332,13 @@ export default function AdminPage() {
             type="text"
             value={formatPriceInput(value)}
             onChange={(e) => handlePriceChange(field, e.target.value)}
-            className="w-full px-3.5 py-2.5 pr-8 border-0 rounded-xl text-xs focus:outline-none font-bold text-[#0F172A] bg-[#F8F9FA] shadow-2xs placeholder-slate-400"
+            className="w-full px-3.5 py-2.5 pr-8 border-0 rounded-md text-xs focus:outline-none font-bold text-[#0F172A] bg-[#F8F9FA] shadow-2xs placeholder-slate-400"
             placeholder={formatPriceInput(defaultVal)}
           />
           <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold">원</span>
         </div>
         <div className="flex flex-col gap-1">
-          <div className="text-[11px] text-[#0F172A] font-semibold bg-[#F8F9FA] border-0 rounded-xl p-2.5 mt-0.5 shadow-2xs">
+          <div className="text-[11px] text-[#0F172A] font-semibold bg-[#F8F9FA] border-0 rounded-md p-2.5 mt-0.5 shadow-2xs">
             {getFormattedKoreanAmount(value, placeholderStr)}
           </div>
           {!hasValue && (
@@ -2660,7 +2660,7 @@ export default function AdminPage() {
 
     if (hasImg) {
       return (
-        <div className="w-14 h-14 rounded-2xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200/80 relative shadow-2xs">
+        <div className="w-14 h-14 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200/80 relative shadow-2xs">
           <img src={optimizeCloudinaryUrl(item.img)} alt="" className="w-full h-full object-cover" />
         </div>
       );
@@ -2668,7 +2668,7 @@ export default function AdminPage() {
 
     if (hasFileUrl && isImg(item.fileUrl, item.format)) {
       return (
-        <div className="w-14 h-14 rounded-2xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200/80 relative shadow-2xs">
+        <div className="w-14 h-14 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200/80 relative shadow-2xs">
           <img src={optimizeCloudinaryUrl(item.fileUrl)} alt="" className="w-full h-full object-cover" />
         </div>
       );
@@ -2676,7 +2676,7 @@ export default function AdminPage() {
 
     if (isVideo(item.fileUrl, item.format)) {
       return (
-        <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex flex-col items-center justify-center shrink-0 border border-amber-200/80 shadow-2xs gap-0.5">
+        <div className="w-14 h-14 rounded-lg bg-amber-50 text-amber-600 flex flex-col items-center justify-center shrink-0 border border-amber-200/80 shadow-2xs gap-0.5">
           <Video size={20} className="text-amber-500" />
           <span className="text-[8px] font-black text-amber-700 uppercase">영상</span>
         </div>
@@ -2684,7 +2684,7 @@ export default function AdminPage() {
     }
 
     return (
-      <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex flex-col items-center justify-center shrink-0 border border-blue-200/80 shadow-2xs gap-0.5">
+      <div className="w-14 h-14 rounded-lg bg-blue-50 text-blue-600 flex flex-col items-center justify-center shrink-0 border border-blue-200/80 shadow-2xs gap-0.5">
         <FileText size={20} className="text-blue-500" />
         <span className="text-[8px] font-black text-blue-700 uppercase">{item.format || "FILE"}</span>
       </div>
@@ -4469,13 +4469,13 @@ export default function AdminPage() {
         />
 
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-5 py-3.5 rounded-2xl font-black text-sm shadow-[0_8px_30px_rgba(254,212,34,0.3)] flex items-center gap-2.5 animate-bounce">
+          <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-5 py-3.5 rounded-lg font-black text-sm shadow-[0_8px_30px_rgba(254,212,34,0.3)] flex items-center gap-2.5 animate-bounce">
             <CheckCircle2 size={18} className="text-[#0F172A]" />
             {toastMessage}
           </div>
         )}
         
-        <div className="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-[32px] p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] space-y-7 relative overflow-hidden text-left z-10">
+        <div className="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-lg p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] space-y-7 relative overflow-hidden text-left z-10">
           {/* Top Yellow Brand Accent Line */}
           <div className="absolute top-0 left-0 right-0 h-2 bg-[#FED422]" />
           
@@ -4491,7 +4491,7 @@ export default function AdminPage() {
             
             <div className="space-y-1.5">
               <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">120PIE HEAD OFFICE</h2>
-              <span className="inline-block text-xs font-black text-[#0F172A] bg-[#FED422] px-4 py-1 rounded-full shadow-2xs">
+              <span className="inline-block text-xs font-black text-[#0F172A] bg-[#FED422] px-4 py-1 rounded-md shadow-2xs">
                 통합 본사 어드민 포털
               </span>
             </div>
@@ -4503,7 +4503,7 @@ export default function AdminPage() {
 
           <form onSubmit={handleLoginSubmit} className="space-y-4 pt-1">
             {loginError && (
-              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-2xl p-3.5 text-xs font-bold flex items-center gap-2">
+              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-lg p-3.5 text-xs font-bold flex items-center gap-2">
                 <AlertCircle size={16} className="shrink-0 text-rose-400" />
                 <span>{loginError}</span>
               </div>
@@ -4517,7 +4517,7 @@ export default function AdminPage() {
                 value={loginId}
                 onChange={(e) => setLoginId(e.target.value)}
                 required
-                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
+                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-lg px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
               />
             </div>
 
@@ -4529,13 +4529,13 @@ export default function AdminPage() {
                 value={loginPw}
                 onChange={(e) => setLoginPw(e.target.value)}
                 required
-                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
+                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-lg px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-4 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-sm sm:text-base font-black rounded-2xl transition-all shadow-lg shadow-[#FED422]/20 flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.99] mt-2"
+              className="w-full py-4 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-sm sm:text-base font-black rounded-lg transition-all shadow-lg shadow-[#FED422]/20 flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.99] mt-2"
             >
               <span>로그인 완료</span>
               <ArrowRight size={18} className="text-[#0F172A]" />
@@ -4663,7 +4663,7 @@ export default function AdminPage() {
       
       {/* TOAST SYSTEM */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-[150] bg-[#0B0F17] text-white px-5 py-3.5 rounded-2xl font-bold text-sm shadow-[0_12px_35px_rgba(11,15,23,0.4)] flex items-center gap-2.5 animate-bounce">
+        <div className="fixed bottom-6 right-6 z-[150] bg-[#0B0F17] text-white px-5 py-3.5 rounded-lg font-bold text-sm shadow-[0_12px_35px_rgba(11,15,23,0.4)] flex items-center gap-2.5 animate-bounce">
           <CheckCircle2 size={16} className="text-[#FF6B4A]" />
           {toastMessage}
         </div>
@@ -4675,7 +4675,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-1.5 text-slate-600 hover:text-[#FF6B4A] hover:bg-orange-50 rounded-xl transition-colors cursor-pointer shrink-0"
+            className="lg:hidden p-1.5 text-slate-600 hover:text-[#FF6B4A] hover:bg-orange-50 rounded-md transition-colors cursor-pointer shrink-0"
             aria-label="메뉴 열기"
           >
             <Menu size={20} />
@@ -4684,7 +4684,7 @@ export default function AdminPage() {
           {/* Sidebar Collapse Toggle Button (Desktop) */}
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="hidden lg:flex p-1.5 text-slate-500 hover:text-[#0F141C] hover:bg-slate-50 rounded-xl transition-colors cursor-pointer border border-slate-200/80 bg-white"
+            className="hidden lg:flex p-1.5 text-slate-500 hover:text-[#0F141C] hover:bg-slate-50 rounded-md transition-colors cursor-pointer border border-slate-200/80 bg-white"
             title={isSidebarCollapsed ? "사이드바 펼치기" : "사이드바 접기"}
           >
             {isSidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
@@ -4699,7 +4699,7 @@ export default function AdminPage() {
               alt="120pie & coffee"
               className="h-5 sm:h-7 w-auto object-contain group-hover:scale-102 transition-transform shrink-0"
             />
-            <span className="hidden sm:inline-block text-[11px] px-3.5 py-0.5 rounded-full bg-[#FED422] text-[#0F172A] font-black shadow-2xs shrink-0 whitespace-nowrap border-0">
+            <span className="hidden sm:inline-block text-[11px] px-3.5 py-0.5 rounded-md bg-[#FED422] text-[#0F172A] font-black shadow-2xs shrink-0 whitespace-nowrap border-0">
               본사 어드민
             </span>
           </button>
@@ -4715,7 +4715,7 @@ export default function AdminPage() {
 
           <Link
             href="/"
-            className="hidden sm:inline-flex px-3.5 py-1.5 rounded-full border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-black text-slate-700 transition-all items-center gap-1.5 shrink-0 whitespace-nowrap"
+            className="hidden sm:inline-flex px-3.5 py-1.5 rounded-md border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-black text-slate-700 transition-all items-center gap-1.5 shrink-0 whitespace-nowrap"
           >
             <ArrowLeft size={13} className="text-[#FF6B4A] shrink-0" />
             <span>메인 사이트</span>
@@ -4783,7 +4783,7 @@ export default function AdminPage() {
                     <h4 className="font-black text-xl text-white truncate tracking-tight">가맹지원본부</h4>
                     <p className="text-xs text-amber-300 font-bold truncate drop-shadow-xs">HQ-ADMIN</p>
                   </div>
-                  <span className="mt-1 bg-[#FED422] text-[#0F172A] text-[11px] font-black px-4 py-1 rounded-full shadow-lg tracking-wider font-mono border-0">
+                  <span className="mt-1 bg-[#FED422] text-[#0F172A] text-[11px] font-black px-4 py-1 rounded-md shadow-lg tracking-wider font-mono border-0">
                     #HQ-MASTER
                   </span>
                 </div>
@@ -4823,7 +4823,7 @@ export default function AdminPage() {
                         setCurrentMenu(key);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full ${isSidebarCollapsed ? "px-2.5 py-3.5 justify-center" : "px-4 py-3.5 justify-between"} rounded-2xl flex items-center text-xs font-bold transition-all cursor-pointer border-0 outline-none focus:outline-none focus:ring-0 ${
+                      className={`w-full ${isSidebarCollapsed ? "px-2.5 py-3.5 justify-center" : "px-4 py-3.5 justify-between"} rounded-lg flex items-center text-xs font-bold transition-all cursor-pointer border-0 outline-none focus:outline-none focus:ring-0 ${
                         isActive
                           ? "bg-[#FED422] text-[#0F172A] shadow-md font-black"
                           : "text-[#94A3B8] hover:text-white hover:bg-white/5 bg-transparent"
@@ -4850,7 +4850,7 @@ export default function AdminPage() {
 
                     {/* Tooltip for Collapsed Sidebar */}
                     {isSidebarCollapsed && (
-                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3.5 py-2 bg-[#0F141C] text-white text-xs font-bold rounded-xl shadow-2xl whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-slate-700">
+                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3.5 py-2 bg-[#0F141C] text-white text-xs font-bold rounded-md shadow-2xl whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-slate-700">
                         {label} {badge !== undefined ? `(${badge})` : ""}
                       </div>
                     )}
@@ -4863,7 +4863,7 @@ export default function AdminPage() {
           <div className="border-t border-slate-800/80 pt-4 space-y-1 relative z-10">
             <button
               onClick={handleLogout}
-              className={`w-full ${isSidebarCollapsed ? "px-2 py-2.5 justify-center" : "px-4 py-2.5 justify-start"} rounded-2xl flex items-center gap-3 text-xs font-bold text-[#94A3B8] hover:text-white hover:bg-red-500/20 transition-colors text-left cursor-pointer`}
+              className={`w-full ${isSidebarCollapsed ? "px-2 py-2.5 justify-center" : "px-4 py-2.5 justify-start"} rounded-lg flex items-center gap-3 text-xs font-bold text-[#94A3B8] hover:text-white hover:bg-red-500/20 transition-colors text-left cursor-pointer`}
               title={isSidebarCollapsed ? "로그아웃" : undefined}
             >
               <LogOut size={17} className="shrink-0" />
@@ -4901,14 +4901,14 @@ export default function AdminPage() {
                   </button>
                   <button 
                     onClick={() => setMobileMenuOpen(false)} 
-                    className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors cursor-pointer border-0"
+                    className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-md transition-colors cursor-pointer border-0"
                     aria-label="닫기"
                   >
                     <X size={20} />
                   </button>
                 </div>
 
-                <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 flex gap-3 items-center shadow-xs">
+                <div className="bg-white border border-[#E2E8F0] rounded-md p-4 flex gap-3 items-center shadow-xs">
                   <div className="w-10 h-10 rounded-lg bg-[#0D233A] text-white flex items-center justify-center font-black text-xs shrink-0">
                     HQ
                   </div>
@@ -4942,7 +4942,7 @@ export default function AdminPage() {
                           setCurrentMenu(key);
                           setMobileMenuOpen(false);
                         }}
-                        className={`w-full px-4 py-3 rounded-xl flex items-center justify-between text-xs font-extrabold transition-all border-0 outline-none focus:outline-none focus:ring-0 ${
+                        className={`w-full px-4 py-3 rounded-md flex items-center justify-between text-xs font-extrabold transition-all border-0 outline-none focus:outline-none focus:ring-0 ${
                           isActive
                             ? "bg-[#FED422] text-[#0F172A] shadow-md font-black"
                             : "text-slate-300 hover:bg-white/10 bg-transparent"
@@ -4968,7 +4968,7 @@ export default function AdminPage() {
               <div className="border-t border-slate-800 pt-4 space-y-2">
                 <Link
                   href="/"
-                  className="w-full px-4 py-3 rounded-xl flex items-center justify-between text-xs font-black bg-slate-800/90 text-white hover:bg-slate-700 transition-colors border-0"
+                  className="w-full px-4 py-3 rounded-md flex items-center justify-between text-xs font-black bg-slate-800/90 text-white hover:bg-slate-700 transition-colors border-0"
                 >
                   <div className="flex items-center gap-2.5">
                     <ArrowLeft size={15} className="text-[#FF6B4A]" />
@@ -4978,7 +4978,7 @@ export default function AdminPage() {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-xs font-extrabold text-slate-400 hover:text-red-400 hover:bg-slate-800/60 transition-colors text-left border-0 cursor-pointer"
+                  className="w-full px-4 py-3 rounded-md flex items-center gap-3 text-xs font-extrabold text-slate-400 hover:text-red-400 hover:bg-slate-800/60 transition-colors text-left border-0 cursor-pointer"
                 >
                   <LogOut size={16} />
                   <span>로그아웃</span>
@@ -4999,7 +4999,7 @@ export default function AdminPage() {
             <div className="space-y-6 animate-fadeIn">
               
               {/* 1. 상단 파트너십/어드민 환영 배너 (점주 포털과 100% 동일한 배경 이미지) */}
-              <div className="w-full bg-[#0B0F17] text-white rounded-[28px] p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 group border-0">
+              <div className="w-full bg-[#0B0F17] text-white rounded-lg p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 group border-0">
                 {/* 배경 이미지 커버 */}
                 <div 
                   className="absolute inset-0 bg-cover bg-center opacity-75 group-hover:scale-103 transition-transform duration-700 pointer-events-none"
@@ -5012,7 +5012,7 @@ export default function AdminPage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/40 pointer-events-none"></div>
 
                 <div className="space-y-2.5 max-w-3xl relative z-10">
-                  <span className="bg-[#F5A623] text-slate-950 text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                  <span className="bg-[#F5A623] text-slate-950 text-[10px] font-black px-3.5 py-1 rounded-md uppercase tracking-wider shadow-md">
                     HQ MASTER PORTAL
                   </span>
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-snug text-white drop-shadow-md">
@@ -5025,11 +5025,11 @@ export default function AdminPage() {
 
                 {/* 우측 시네마틱 글래스모피즘 토글 박스 2개 (점주 메뉴와 100% 동일) */}
                 <div className="flex items-center gap-3 shrink-0 relative z-10">
-                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-2xl text-center min-w-[120px] shadow-xl">
+                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-lg text-center min-w-[120px] shadow-xl">
                     <span className="text-[10px] text-slate-400 font-extrabold block mb-0.5">HQ 권한 랭크</span>
                     <strong className="text-xs font-mono font-black text-[#F5A623] tracking-wider">#MASTER</strong>
                   </div>
-                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-2xl text-center min-w-[120px] shadow-xl">
+                  <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-lg text-center min-w-[120px] shadow-xl">
                     <span className="text-[10px] text-slate-400 font-extrabold block mb-0.5">실시간 어드민 상태</span>
                     <strong className="text-xs font-black text-emerald-400">정상 작동 중</strong>
                   </div>
@@ -5041,11 +5041,11 @@ export default function AdminPage() {
                 {/* Card 1: Total Stores */}
                 <button 
                   onClick={() => setCurrentMenu("store")}
-                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-neutral-500 tracking-tight">전체 매장 현황</span>
-                    <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#F5AC00] group-hover:bg-[#F5AC00] group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                    <div className="w-12 h-12 rounded-lg bg-amber-50 text-[#F5AC00] group-hover:bg-[#F5AC00] group-hover:text-white flex items-center justify-center transition-all shadow-sm">
                       <Store size={22} />
                     </div>
                   </div>
@@ -5053,7 +5053,7 @@ export default function AdminPage() {
                     {stores.length.toLocaleString()} <span className="text-sm font-bold text-neutral-400">개 매장</span>
                   </strong>
                   <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+12.5%</span>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">+12.5%</span>
                     <span className="text-neutral-400 font-semibold">전월 대비</span>
                   </div>
                 </button>
@@ -5061,11 +5061,11 @@ export default function AdminPage() {
                 {/* Card 2: Today Orders */}
                 <button 
                   onClick={() => setCurrentMenu("order")}
-                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-neutral-500 tracking-tight">오늘 발주 건수</span>
-                    <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                    <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
                       <ShoppingBag size={22} />
                     </div>
                   </div>
@@ -5073,7 +5073,7 @@ export default function AdminPage() {
                     {orders.length.toLocaleString()} <span className="text-sm font-bold text-neutral-400">건</span>
                   </strong>
                   <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+8.3%</span>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">+8.3%</span>
                     <span className="text-neutral-400 font-semibold">전월 대비</span>
                   </div>
                 </button>
@@ -5081,11 +5081,11 @@ export default function AdminPage() {
                 {/* Card 3: Pending Inquiries */}
                 <button 
                   onClick={() => setCurrentMenu("inquiry")}
-                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-neutral-500 tracking-tight">미처리 AS / 문의</span>
-                    <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                    <div className="w-12 h-12 rounded-lg bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
                       <MessageSquare size={22} />
                     </div>
                   </div>
@@ -5093,7 +5093,7 @@ export default function AdminPage() {
                     {pendingInquiriesCount} <span className="text-sm font-bold text-neutral-400">건</span>
                   </strong>
                   <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-rose-500">
-                    <span className="px-2 py-0.5 rounded-full bg-rose-50 border border-rose-100">-3%</span>
+                    <span className="px-2 py-0.5 rounded-md bg-rose-50 border border-rose-100">-3%</span>
                     <span className="text-neutral-400 font-semibold">전월 대비</span>
                   </div>
                 </button>
@@ -5101,11 +5101,11 @@ export default function AdminPage() {
                 {/* Card 4: Consultations */}
                 <button 
                   onClick={() => setCurrentMenu("consultation")}
-                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
+                  className="bg-white border border-[#EEF0F5] hover:border-[#F5AC00] transition-all rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left group cursor-pointer relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-neutral-500 tracking-tight">가맹 창업 상담 문의</span>
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
+                    <div className="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-all shadow-sm">
                       <Headphones size={22} />
                     </div>
                   </div>
@@ -5113,20 +5113,20 @@ export default function AdminPage() {
                     {consultations.length.toLocaleString()} <span className="text-sm font-bold text-neutral-400">건</span>
                   </strong>
                   <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">+15.2%</span>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">+15.2%</span>
                     <span className="text-neutral-400 font-semibold">전월 대비</span>
                   </div>
                 </button>
               </div>
 
               {/* 2. 전국 가동 중인 120 패키지 브랜드 모듈 (점주 포털과 100% 동일한 6개 3D 지정 아이콘 동기화) */}
-              <div className="bg-white rounded-[28px] p-6 sm:p-7 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0 space-y-5">
+              <div className="bg-white rounded-lg p-6 sm:p-7 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-0 space-y-5">
                 <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                   <div>
                     <h2 className="text-lg font-black text-[#0F172A] tracking-tight">전국 가동 중인 120 패키지 운영 모듈</h2>
                     <p className="text-xs text-slate-400 font-medium mt-0.5">전국 가맹점에서 라이선스를 취득해 작동 중인 브랜드 패키지 총 현황입니다.</p>
                   </div>
-                  <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 shrink-0">
+                  <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-100 shrink-0">
                     전국 모듈 가동중 (HQ MASTER)
                   </span>
                 </div>
@@ -5152,8 +5152,8 @@ export default function AdminPage() {
                     return (
                       <>
                         {/* Module 1: 120pie */}
-                        <div className="bg-[#F8FAFC] hover:bg-emerald-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-emerald-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
-                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <div className="bg-[#F8FAFC] hover:bg-emerald-50/50 rounded-lg p-3.5 text-center border border-slate-100 hover:border-emerald-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                             <img
                               src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_4_1_zptjbn.png"
                               alt="120pie"
@@ -5162,15 +5162,15 @@ export default function AdminPage() {
                           </div>
                           <div className="space-y-1 w-full">
                             <strong className="text-xs font-black text-[#0F172A] block">120pie</strong>
-                            <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                            <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-md block w-full truncate shadow-2xs">
                               {pieCount}개 매장 가동중
                             </span>
                           </div>
                         </div>
 
                         {/* Module 2: egg120 */}
-                        <div className="bg-[#F8FAFC] hover:bg-amber-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-amber-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
-                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <div className="bg-[#F8FAFC] hover:bg-amber-50/50 rounded-lg p-3.5 text-center border border-slate-100 hover:border-amber-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                             <img
                               src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158865/Group_5_1_cdwr4y.png"
                               alt="egg120"
@@ -5180,7 +5180,7 @@ export default function AdminPage() {
                           <div className="space-y-1 w-full">
                             <strong className="text-xs font-black text-slate-700 block">egg120</strong>
                             {eggCount > 0 ? (
-                              <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                              <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md block w-full truncate shadow-2xs">
                                 {eggCount}개 매장 가동중
                               </span>
                             ) : (
@@ -5192,8 +5192,8 @@ export default function AdminPage() {
                         </div>
 
                         {/* Module 3: 츄러스120 */}
-                        <div className="bg-[#F8FAFC] hover:bg-orange-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-orange-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
-                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <div className="bg-[#F8FAFC] hover:bg-orange-50/50 rounded-lg p-3.5 text-center border border-slate-100 hover:border-orange-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                             <img
                               src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_7_iowfzq.png"
                               alt="츄러스120"
@@ -5203,7 +5203,7 @@ export default function AdminPage() {
                           <div className="space-y-1 w-full">
                             <strong className="text-xs font-black text-slate-700 block">츄러스120</strong>
                             {churrosCount > 0 ? (
-                              <span className="text-[10px] font-black text-orange-700 bg-orange-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                              <span className="text-[10px] font-black text-orange-700 bg-orange-100 px-2 py-0.5 rounded-md block w-full truncate shadow-2xs">
                                 {churrosCount}개 매장 가동중
                               </span>
                             ) : (
@@ -5215,8 +5215,8 @@ export default function AdminPage() {
                         </div>
 
                         {/* Module 4: 떡볶이120 */}
-                        <div className="bg-[#F8FAFC] hover:bg-rose-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-rose-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
-                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <div className="bg-[#F8FAFC] hover:bg-rose-50/50 rounded-lg p-3.5 text-center border border-slate-100 hover:border-rose-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                             <img
                               src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_6_io2ejc.png"
                               alt="떡볶이120"
@@ -5226,7 +5226,7 @@ export default function AdminPage() {
                           <div className="space-y-1 w-full">
                             <strong className="text-xs font-black text-slate-700 block">떡볶이120</strong>
                             {ddeokCount > 0 ? (
-                              <span className="text-[10px] font-black text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                              <span className="text-[10px] font-black text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md block w-full truncate shadow-2xs">
                                 {ddeokCount}개 매장 가동중
                               </span>
                             ) : (
@@ -5238,8 +5238,8 @@ export default function AdminPage() {
                         </div>
 
                         {/* Module 5: 핫도그120 */}
-                        <div className="bg-[#F8FAFC] hover:bg-yellow-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-yellow-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
-                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <div className="bg-[#F8FAFC] hover:bg-yellow-50/50 rounded-lg p-3.5 text-center border border-slate-100 hover:border-yellow-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                             <img
                               src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_8_d8kfzr.png"
                               alt="핫도그120"
@@ -5249,7 +5249,7 @@ export default function AdminPage() {
                           <div className="space-y-1 w-full">
                             <strong className="text-xs font-black text-slate-700 block">핫도그120</strong>
                             {hotdogCount > 0 ? (
-                              <span className="text-[10px] font-black text-yellow-800 bg-yellow-100 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                              <span className="text-[10px] font-black text-yellow-800 bg-yellow-100 px-2 py-0.5 rounded-md block w-full truncate shadow-2xs">
                                 {hotdogCount}개 매장 가동중
                               </span>
                             ) : (
@@ -5261,8 +5261,8 @@ export default function AdminPage() {
                         </div>
 
                         {/* Module 6: 120coffee */}
-                        <div className="bg-[#F8FAFC] hover:bg-amber-100/40 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-amber-300 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
-                          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <div className="bg-[#F8FAFC] hover:bg-amber-100/40 rounded-lg p-3.5 text-center border border-slate-100 hover:border-amber-300 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center group-hover:scale-110 transition-transform">
                             <img
                               src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_9_iskk3b.png"
                               alt="120coffee"
@@ -5272,7 +5272,7 @@ export default function AdminPage() {
                           <div className="space-y-1 w-full">
                             <strong className="text-xs font-black text-slate-700 block">120coffee</strong>
                             {coffeeCount > 0 ? (
-                              <span className="text-[10px] font-black text-amber-800 bg-amber-200/70 px-2 py-0.5 rounded-full block w-full truncate shadow-2xs">
+                              <span className="text-[10px] font-black text-amber-800 bg-amber-200/70 px-2 py-0.5 rounded-md block w-full truncate shadow-2xs">
                                 {coffeeCount}개 매장 가동중
                               </span>
                             ) : (
@@ -5284,8 +5284,8 @@ export default function AdminPage() {
                         </div>
 
                         {/* Module 7: 추가 패키지 */}
-                        <div className="bg-[#F8FAFC] hover:bg-indigo-50/50 rounded-2xl p-3.5 text-center border border-slate-100 hover:border-indigo-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
-                          <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
+                        <div className="bg-[#F8FAFC] hover:bg-indigo-50/50 rounded-lg p-3.5 text-center border border-slate-100 hover:border-indigo-200 space-y-2.5 flex flex-col items-center justify-between transition-all group cursor-pointer">
+                          <div className="w-9 h-9 rounded-md bg-indigo-50 text-indigo-500 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
                             <PlusCircle size={18} />
                           </div>
                           <div className="space-y-1 w-full">
@@ -5305,7 +5305,7 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* Left (2 Cols): Smooth Performance Chart */}
-                <div className="lg:col-span-2 bg-white border border-[#EEF0F5] rounded-[28px] p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+                <div className="lg:col-span-2 bg-white border border-[#EEF0F5] rounded-lg p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col justify-between">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div>
                       <h3 className="text-lg font-black text-[#1E1B18]">가맹본부 성과 모니터링</h3>
@@ -5378,7 +5378,7 @@ export default function AdminPage() {
                     </svg>
 
                     {/* Chart Tooltip Overlay */}
-                    <div className="absolute top-[22%] left-[52%] -translate-x-1/2 bg-[#1E1B18] text-white px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-lg flex items-center gap-2">
+                    <div className="absolute top-[22%] left-[52%] -translate-x-1/2 bg-[#1E1B18] text-white px-3 py-1.5 rounded-md text-[10px] font-bold shadow-lg flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-[#F5AC00]"></span>
                       <span>7월 3주차: <strong>370건</strong></span>
                     </div>
@@ -5398,13 +5398,13 @@ export default function AdminPage() {
                 {/* Right (1 Col): 최신 공지사항(3개) & 최신 교육/홍보물(3개) */}
                 <div className="space-y-6 flex flex-col justify-between">
                   {/* 1. 최신 공지사항 (3개) */}
-                  <div className="bg-white border border-[#EEF0F5] rounded-[28px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex-1 flex flex-col justify-between">
+                  <div className="bg-white border border-[#EEF0F5] rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
                         <div className="flex items-center gap-2">
                           <div className="w-2.5 h-2.5 rounded-full bg-[#F5AC00]"></div>
                           <h4 className="text-base font-black text-[#1E1B18]">최신 공지사항</h4>
-                          <span className="text-[10px] font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">최신 3건</span>
+                          <span className="text-[10px] font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100">최신 3건</span>
                         </div>
                         <button 
                           onClick={() => setCurrentMenu("notice")}
@@ -5428,7 +5428,7 @@ export default function AdminPage() {
                             <div 
                               key={notice.id || idx} 
                               onClick={() => setCurrentMenu("notice")}
-                              className="flex items-center justify-between p-3 rounded-2xl bg-[#F8F9FD] hover:bg-amber-50/60 border border-[#EEF0F5] transition-all cursor-pointer group"
+                              className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FD] hover:bg-amber-50/60 border border-[#EEF0F5] transition-all cursor-pointer group"
                             >
                               <div className="flex items-center gap-2.5 min-w-0 pr-2">
                                 <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${notice.isImportant ? 'bg-rose-100 text-rose-600' : 'bg-slate-200 text-slate-600'}`}>
@@ -5449,13 +5449,13 @@ export default function AdminPage() {
                   </div>
 
                   {/* 2. 최신 교육 & 홍보물 (3개) */}
-                  <div className="bg-white border border-[#EEF0F5] rounded-[28px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex-1 flex flex-col justify-between">
+                  <div className="bg-white border border-[#EEF0F5] rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
                         <div className="flex items-center gap-2">
                           <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
                           <h4 className="text-base font-black text-[#1E1B18]">최신 교육 & 홍보물</h4>
-                          <span className="text-[10px] font-black text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">최신 3건</span>
+                          <span className="text-[10px] font-black text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">최신 3건</span>
                         </div>
                         <button 
                           onClick={() => setCurrentMenu("material")}
@@ -5480,7 +5480,7 @@ export default function AdminPage() {
                             <div 
                               key={mat.id || idx} 
                               onClick={() => setCurrentMenu("material")}
-                              className="flex items-center justify-between p-3 rounded-2xl bg-[#F8F9FD] hover:bg-blue-50/60 border border-[#EEF0F5] transition-all cursor-pointer group"
+                              className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FD] hover:bg-blue-50/60 border border-[#EEF0F5] transition-all cursor-pointer group"
                             >
                               <div className="flex items-center gap-2.5 min-w-0 pr-2">
                                 <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${mat.category === '홍보물' ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-100 text-blue-600'}`}>
@@ -5520,7 +5520,7 @@ export default function AdminPage() {
                   </button>
                 </div>
 
-                <div className="bg-white border border-[#EEF0F5] rounded-[24px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+                <div className="bg-white border border-[#EEF0F5] rounded-lg overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
@@ -5543,7 +5543,7 @@ export default function AdminPage() {
                               <span className="text-[10px] block text-neutral-400 font-semibold mt-0.5">{store.phone}</span>
                             </td>
                             <td className="p-4 sm:p-5">
-                              <span className="bg-amber-50 text-[#3D2E0A] font-extrabold px-3 py-1 rounded-full text-[10px] border border-amber-200">
+                              <span className="bg-amber-50 text-[#3D2E0A] font-extrabold px-3 py-1 rounded-md text-[10px] border border-amber-200">
                                 {store.adoptionMenu ? store.adoptionMenu.length : 0}개 모듈 가동중
                               </span>
                             </td>
@@ -5575,7 +5575,7 @@ export default function AdminPage() {
           {currentMenu === "contract" && (
             <div className="flex flex-col lg:flex-row gap-6 h-auto min-h-[calc(100vh-140px)] animate-fadeIn w-full min-w-0">
               {/* LEFT SIDEBAR: CONTRACTOR LIST */}
-              <div className="w-full lg:w-80 bg-white border border-[#f2ccd7] rounded-2xl p-4 flex flex-col shadow-sm shrink-0">
+              <div className="w-full lg:w-80 bg-white border border-[#f2ccd7] rounded-lg p-4 flex flex-col shadow-sm shrink-0">
                 <div className="mb-4">
                   <h3 className="text-lg font-extrabold text-[#2d2026] mb-1">가맹계약 관리</h3>
                   <p className="text-xs text-[#735965] font-bold">계약자 목록을 조회하고 새 계약 정보를 등록할 수 있습니다.</p>
@@ -5591,7 +5591,7 @@ export default function AdminPage() {
                     setIsContractFormOpen(true);
                     setSelectedContract(null);
                   }}
-                  className="w-full py-2.5 mb-4 rounded-xl bg-[#bf3e67] hover:bg-[#a03153] text-white font-extrabold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                  className="w-full py-2.5 mb-4 rounded-md bg-[#bf3e67] hover:bg-[#a03153] text-white font-extrabold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                 >
                   <Plus size={16} />
                   <span>계약정보 신규 등록</span>
@@ -5606,7 +5606,7 @@ export default function AdminPage() {
                     onChange={(e) => {
                       setContractSearchQuery(e.target.value);
                     }}
-                    className="w-full pl-9 pr-4 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs placeholder-slate-400"
+                    className="w-full pl-9 pr-4 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs placeholder-slate-400"
                   />
                   <Search size={14} className="absolute left-3 top-3.5 text-slate-400" />
                 </div>
@@ -5633,7 +5633,7 @@ export default function AdminPage() {
                             setSelectedContract(c);
                             setIsContractFormOpen(false);
                           }}
-                          className={`w-full text-left p-3.5 rounded-xl border-0 transition-all flex flex-col gap-1.5 ${
+                          className={`w-full text-left p-3.5 rounded-md border-0 transition-all flex flex-col gap-1.5 ${
                             isSelected
                               ? "bg-slate-200/90 text-[#0F172A] shadow-xs font-black"
                               : "bg-[#F8F9FA] text-slate-700 hover:bg-slate-100"
@@ -5657,18 +5657,18 @@ export default function AdminPage() {
               </div>
               
               {/* RIGHT CONTENT: DETAIL VIEW OR FORM */}
-              <div className="flex-1 bg-white border-0 rounded-2xl p-6 flex flex-col shadow-xs min-w-0 w-full">
+              <div className="flex-1 bg-white border-0 rounded-lg p-6 flex flex-col shadow-xs min-w-0 w-full">
                 {isContractFormOpen ? (
                   /* REGISTRATION / EDIT FORM */
                   <form onSubmit={handleContractSubmit} className="space-y-8">
                     {/* Section 1: 인적 정보 */}
                     <div>
-                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-xl border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
+                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-md border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
                         <span>1. 계약자 및 가맹점 인적 정보</span>
                       </div>
                       
                       {/* 계약 구분 선택 */}
-                      <div className="mb-4 bg-[#F8F9FA] border-0 p-4 rounded-2xl flex flex-col gap-2 shadow-2xs">
+                      <div className="mb-4 bg-[#F8F9FA] border-0 p-4 rounded-lg flex flex-col gap-2 shadow-2xs">
                         <span className="text-xs font-black text-[#0F172A]">계약 구분 <span className="text-red-500">*</span></span>
                         <div className="flex items-center gap-6">
                           {["신규", "갱신", "양수"].map((type) => (
@@ -5695,7 +5695,7 @@ export default function AdminPage() {
                             required
                             value={contractForm.ownerName}
                             onChange={(e) => setContractForm({ ...contractForm, ownerName: e.target.value })}
-                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            className="w-full px-3.5 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
                             placeholder="홍길동"
                           />
                         </div>
@@ -5706,7 +5706,7 @@ export default function AdminPage() {
                             required
                             value={contractForm.ownerBirth}
                             onChange={(e) => setContractForm({ ...contractForm, ownerBirth: e.target.value })}
-                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            className="w-full px-3.5 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
                             placeholder="YYYY-MM-DD 또는 900101"
                           />
                         </div>
@@ -5717,7 +5717,7 @@ export default function AdminPage() {
                             required
                             value={contractForm.ownerPhone}
                             onChange={(e) => setContractForm({ ...contractForm, ownerPhone: e.target.value })}
-                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            className="w-full px-3.5 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
                             placeholder="010-1234-5678"
                           />
                         </div>
@@ -5728,7 +5728,7 @@ export default function AdminPage() {
                             required
                             value={contractForm.storeName}
                             onChange={(e) => setContractForm({ ...contractForm, storeName: e.target.value })}
-                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            className="w-full px-3.5 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
                             placeholder="120겹파이 역삼역점"
                           />
                         </div>
@@ -5740,13 +5740,13 @@ export default function AdminPage() {
                               required
                               readOnly
                               value={contractRoadAddress}
-                              className="flex-1 px-3.5 py-2.5 border-0 rounded-xl text-xs bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                              className="flex-1 px-3.5 py-2.5 border-0 rounded-md text-xs bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
                               placeholder="주소 검색 버튼을 눌러 도로명 주소를 입력하세요."
                             />
                             <button
                               type="button"
                               onClick={() => openDaumPostcode("contract")}
-                              className="px-4 py-2.5 bg-[#FED422] text-[#0F172A] text-xs font-bold rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
+                              className="px-4 py-2.5 bg-[#FED422] text-[#0F172A] text-xs font-bold rounded-md transition-all cursor-pointer border-0 shadow-2xs"
                             >
                               주소 검색
                             </button>
@@ -5755,7 +5755,7 @@ export default function AdminPage() {
                             type="text"
                             value={contractDetailAddress}
                             onChange={(e) => setContractDetailAddress(e.target.value)}
-                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            className="w-full px-3.5 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
                             placeholder="가맹점 상세 주소 (e.g. 2층 202호)"
                           />
                         </div>
@@ -5767,7 +5767,7 @@ export default function AdminPage() {
                               required
                               value={contractForm.storeSize || ""}
                               onChange={(e) => setContractForm({ ...contractForm, storeSize: parseFloat(e.target.value) || 0 })}
-                              className="w-full px-3.5 py-2.5 pr-8 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                              className="w-full px-3.5 py-2.5 pr-8 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
                               placeholder="33"
                             />
                             <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold">㎡</span>
@@ -5780,7 +5780,7 @@ export default function AdminPage() {
                             required
                             value={contractForm.businessArea}
                             onChange={(e) => setContractForm({ ...contractForm, businessArea: e.target.value })}
-                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            className="w-full px-3.5 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
                             placeholder="가맹점 반경 500m 내"
                           />
                         </div>
@@ -5789,7 +5789,7 @@ export default function AdminPage() {
                     
                     {/* Section 2: 계약 기간 */}
                     <div>
-                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-xl border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
+                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-md border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
                         <span>2. 계약 기간</span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -5800,7 +5800,7 @@ export default function AdminPage() {
                             required
                             value={contractForm.contractStart}
                             onChange={(e) => setContractForm({ ...contractForm, contractStart: e.target.value })}
-                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            className="w-full px-3.5 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
                           />
                         </div>
                         <div>
@@ -5810,7 +5810,7 @@ export default function AdminPage() {
                             required
                             value={contractForm.contractEnd}
                             onChange={(e) => setContractForm({ ...contractForm, contractEnd: e.target.value })}
-                            className="w-full px-3.5 py-2.5 border-0 rounded-xl text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            className="w-full px-3.5 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
                           />
                         </div>
                       </div>
@@ -5818,12 +5818,12 @@ export default function AdminPage() {
                     
                     {/* Section 3: 금액 정보 */}
                     <div className="space-y-5">
-                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-xl border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
+                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-md border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
                         <span>3. 금액 정보 설정</span>
                       </div>
                       
                       {/* 3.1 가맹 및 감리 비용 */}
-                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                      <div className="border-0 rounded-lg p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
                         <div className="border-b border-slate-200/60 pb-2">
                           <span className="block text-xs font-black text-[#0F172A] uppercase tracking-wider">3-1. 가맹 및 감리 비용</span>
                         </div>
@@ -5834,7 +5834,7 @@ export default function AdminPage() {
                       </div>
 
                       {/* 3.2 예치가맹금 설정 */}
-                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                      <div className="border-0 rounded-lg p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
                         <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
                           <span className="block text-xs font-black text-[#0F172A] uppercase tracking-wider">3-2. 예치가맹금 설정</span>
                           <button
@@ -5872,7 +5872,7 @@ export default function AdminPage() {
                       </div>
 
                       {/* 3.3 로열티 및 보증 비용 */}
-                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                      <div className="border-0 rounded-lg p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
                         <div className="border-b border-slate-200/60 pb-2">
                           <span className="block text-xs font-black text-[#0F172A] uppercase tracking-wider">3-3. 로열티 및 보증 비용</span>
                         </div>
@@ -5883,7 +5883,7 @@ export default function AdminPage() {
                       </div>
 
                       {/* 3.4 교육비 설정 */}
-                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                      <div className="border-0 rounded-lg p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
                         <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
                           <span className="block text-xs font-black text-[#0F172A] uppercase tracking-wider">3-4. 교육비 설정</span>
                           <button
@@ -5908,7 +5908,7 @@ export default function AdminPage() {
                       </div>
 
                       {/* 3.5 초도 및 위약 비용 */}
-                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                      <div className="border-0 rounded-lg p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
                         <div className="border-b border-slate-200/60 pb-2">
                           <span className="block text-xs font-black text-[#0F172A] uppercase tracking-wider">3-5. 초도 및 위약 비용</span>
                         </div>
@@ -5922,10 +5922,10 @@ export default function AdminPage() {
 
                     {/* Section 4: 최종 서명 계약서 첨부 */}
                     <div>
-                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-xl border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
+                      <div className="text-sm font-black text-[#0F172A] bg-[#F8F9FA] px-4 py-3 rounded-md border-l-4 border-l-[#0F172A] flex items-center justify-between shadow-2xs mb-4">
                         <span>4. 최종 서명 계약서 첨부 (선택사항)</span>
                       </div>
-                      <div className="border-0 rounded-2xl p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
+                      <div className="border-0 rounded-lg p-5 bg-[#F8F9FA] space-y-4 shadow-2xs">
                         <div className="flex items-center gap-3">
                           <input
                             type="file"
@@ -5961,13 +5961,13 @@ export default function AdminPage() {
                           />
                           <label
                             htmlFor="contract-pdf-upload"
-                            className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer border-0 inline-flex items-center gap-2 shadow-2xs"
+                            className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-md transition-all cursor-pointer border-0 inline-flex items-center gap-2 shadow-2xs"
                           >
                             <Upload size={14} />
                             {contractForm.fileName ? "최종 계약서 재등록" : "최종 계약서 등록"}
                           </label>
                           {contractForm.fileName && (
-                            <div className="flex items-center gap-2 text-xs text-[#0F172A] bg-white px-3 py-2 rounded-xl border-0 shadow-2xs">
+                            <div className="flex items-center gap-2 text-xs text-[#0F172A] bg-white px-3 py-2 rounded-md border-0 shadow-2xs">
                               <FileText size={16} className="text-slate-600" />
                               <span className="font-bold truncate max-w-[200px]">{contractForm.fileName}</span>
                               <button
@@ -5997,7 +5997,7 @@ export default function AdminPage() {
                   <div className="flex items-center gap-3 pt-6 border-t border-slate-100 shrink-0">
                     <button
                       type="submit"
-                      className="px-6 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
+                      className="px-6 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-md transition-all cursor-pointer border-0 shadow-2xs"
                     >
                       {isContractEditMode ? "수정 완료" : "등록 하기"}
                     </button>
@@ -6009,7 +6009,7 @@ export default function AdminPage() {
                           setSelectedContract(contracts[0]);
                         }
                       }}
-                      className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors border-0 cursor-pointer shadow-2xs"
+                      className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-md transition-colors border-0 cursor-pointer shadow-2xs"
                     >
                       취소
                     </button>
@@ -6048,7 +6048,7 @@ export default function AdminPage() {
                     </div>
                     
                     {/* CONTRACT STATUS BAR */}
-                    <div className="bg-[#F8F9FA] border-0 rounded-2xl p-4 space-y-2.5 shadow-2xs">
+                    <div className="bg-[#F8F9FA] border-0 rounded-lg p-4 space-y-2.5 shadow-2xs">
                       <span className="block text-xs font-black text-[#0F172A]">가맹계약 상태값 수정</span>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                         {[
@@ -6077,7 +6077,7 @@ export default function AdminPage() {
                     {/* DETAILS GRID */}
                     <div className="space-y-6">
                       {/* Section 1: 인적 정보 */}
-                      <div className="bg-white border-0 rounded-2xl overflow-hidden shadow-2xs">
+                      <div className="bg-white border-0 rounded-lg overflow-hidden shadow-2xs">
                         <div className="bg-[#F8F9FA] border-b border-slate-100 px-4 py-3 flex items-center justify-between">
                           <span className="text-xs font-black text-[#0F172A]">1. 계약자 및 가맹점 인적 정보</span>
                           <button
@@ -6105,7 +6105,7 @@ export default function AdminPage() {
                       </div>
                       
                       {/* Section 2: 계약 기간 */}
-                      <div className="bg-white border-0 rounded-2xl overflow-hidden shadow-2xs">
+                      <div className="bg-white border-0 rounded-lg overflow-hidden shadow-2xs">
                         <div className="bg-[#F8F9FA] border-b border-slate-100 px-4 py-3">
                           <span className="text-xs font-black text-[#0F172A]">2. 계약 기간</span>
                         </div>
@@ -6120,7 +6120,7 @@ export default function AdminPage() {
                       </div>
                       
                       {/* Section 3: 금액 정보 */}
-                      <div className="bg-white border-0 rounded-2xl overflow-hidden shadow-2xs">
+                      <div className="bg-white border-0 rounded-lg overflow-hidden shadow-2xs">
                         <div className="bg-[#F8F9FA] border-b border-slate-100 px-4 py-3">
                           <span className="text-xs font-black text-[#0F172A]">3. 계약 금액 상세 정보</span>
                         </div>
@@ -6135,7 +6135,7 @@ export default function AdminPage() {
                           )}
                           
                           {/* 예치가맹금(표) */}
-                          <div className="border-0 rounded-xl overflow-hidden my-3 bg-[#F8F9FA] p-1">
+                          <div className="border-0 rounded-md overflow-hidden my-3 bg-[#F8F9FA] p-1">
                             <table className="w-full text-left border-collapse text-xs table-fixed">
                               <thead>
                                 <tr className="bg-[#F8F9FA] border-b border-slate-200/60 font-extrabold text-slate-500 text-[10px]">
@@ -6177,7 +6177,7 @@ export default function AdminPage() {
                           )}
                           
                           {/* 교육비(표) */}
-                          <div className="border-0 rounded-xl overflow-hidden my-3 bg-[#F8F9FA] p-1">
+                          <div className="border-0 rounded-md overflow-hidden my-3 bg-[#F8F9FA] p-1">
                             <table className="w-full text-left border-collapse text-xs table-fixed">
                               <thead>
                                 <tr className="bg-[#F8F9FA] border-b border-slate-200/60 font-extrabold text-slate-500 text-[10px]">
@@ -6208,13 +6208,13 @@ export default function AdminPage() {
                       </div>
 
                       {/* Section 4: 최종 서명 계약서 첨부 */}
-                      <div className="bg-white border-0 rounded-2xl overflow-hidden shadow-2xs">
+                      <div className="bg-white border-0 rounded-lg overflow-hidden shadow-2xs">
                         <div className="bg-[#F8F9FA] border-b border-slate-100 px-4 py-3">
                           <span className="text-xs font-black text-[#0F172A]">4. 계약 서명 완료 파일</span>
                         </div>
                         <div className="p-4 space-y-3.5 text-xs text-[#2d2026]">
                           {selectedContract.fileName ? (
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F8F9FA] border-0 p-3.5 rounded-xl shadow-2xs">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F8F9FA] border-0 p-3.5 rounded-md shadow-2xs">
                               <div className="flex items-center gap-2">
                                 <FileText size={20} className="text-slate-600" />
                                 <div className="flex flex-col">
@@ -6242,7 +6242,7 @@ export default function AdminPage() {
                               </div>
                             </div>
                           ) : (
-                            <div className="text-center py-4 bg-slate-50 rounded-xl text-slate-400 font-bold border-0">
+                            <div className="text-center py-4 bg-slate-50 rounded-md text-slate-400 font-bold border-0">
                               등록된 최종 서명 계약서가 없습니다.
                             </div>
                           )}
@@ -6303,7 +6303,7 @@ export default function AdminPage() {
                   </div>
                 ) : (
                   /* EMPTY STATE */
-                  <div className="flex-1 flex flex-col items-center justify-center text-center p-8 border border-dashed border-[#f2ccd7] rounded-2xl bg-[#fff9fb]/10">
+                  <div className="flex-1 flex flex-col items-center justify-center text-center p-8 border border-dashed border-[#f2ccd7] rounded-lg bg-[#fff9fb]/10">
                     <FileText size={48} className="text-[#f2ccd7] mb-3 animate-pulse" />
                     <h4 className="font-extrabold text-sm text-[#2d2026]">선택된 계약정보 없음</h4>
                     <p className="text-xs text-[#735965] font-bold mt-1 max-w-xs leading-relaxed">
@@ -6322,7 +6322,7 @@ export default function AdminPage() {
             <div className="space-y-6 animate-fadeIn">
               
               {/* Header and Controls bar */}
-              <div className="flex flex-col gap-4 bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-[28px] border-0 shadow-md space-y-3">
+              <div className="flex flex-col gap-4 bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-lg border-0 shadow-md space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h2 className="text-xl font-black text-[#0F172A] tracking-tight">가맹점 관리 및 상세 설정</h2>
@@ -6334,7 +6334,7 @@ export default function AdminPage() {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => handleOpenStoreModal()}
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs cursor-pointer border-0 active:scale-95 shrink-0"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all shadow-2xs cursor-pointer border-0 active:scale-95 shrink-0"
                     >
                       <Plus size={15} />
                       + 가맹점 신규 등록
@@ -6352,7 +6352,7 @@ export default function AdminPage() {
                       placeholder="가맹점명, ID, 점주명, 연락처, 주소 검색..."
                       value={storeSearchQuery}
                       onChange={(e) => setStoreSearchQuery(e.target.value)}
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg pl-10 pr-4 py-2.5 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                     />
                     {storeSearchQuery && (
                       <button
@@ -6367,12 +6367,12 @@ export default function AdminPage() {
                   {/* Status Filter Tabs, View Mode Toggle & Sort Dropdown */}
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Status Tabs */}
-                    <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl shadow-2xs border-0">
+                    <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-lg shadow-2xs border-0">
                       {["전체", "승인", "대기", "보류", "중지"].map((st) => (
                         <button
                           key={st}
                           onClick={() => setStoreStatusFilter(st)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                          className={`px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border-0 cursor-pointer ${
                             storeStatusFilter === st
                               ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
                               : "text-slate-600 hover:text-[#0F172A]"
@@ -6384,10 +6384,10 @@ export default function AdminPage() {
                     </div>
 
                     {/* View Mode Toggle (1열 보기 / 2열 보기 / 3열 보기, 기본: 3열 보기) */}
-                    <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl shadow-2xs border-0">
+                    <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-lg shadow-2xs border-0">
                       <button
                         onClick={() => setStoreViewMode("1col")}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border-0 cursor-pointer ${
                           storeViewMode === "1col"
                             ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
                             : "text-slate-500 hover:text-[#0F172A]"
@@ -6399,7 +6399,7 @@ export default function AdminPage() {
                       </button>
                       <button
                         onClick={() => setStoreViewMode("2col")}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border-0 cursor-pointer ${
                           storeViewMode === "2col"
                             ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
                             : "text-slate-500 hover:text-[#0F172A]"
@@ -6411,7 +6411,7 @@ export default function AdminPage() {
                       </button>
                       <button
                         onClick={() => setStoreViewMode("3col")}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border-0 cursor-pointer ${
                           storeViewMode === "3col"
                             ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
                             : "text-slate-500 hover:text-[#0F172A]"
@@ -6427,7 +6427,7 @@ export default function AdminPage() {
                     <select
                       value={storeSortOrder}
                       onChange={(e) => setStoreSortOrder(e.target.value as "latest" | "oldest")}
-                      className="bg-[#F1F4F8] border-0 rounded-2xl px-3.5 py-2 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none shadow-2xs transition-all"
+                      className="bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none shadow-2xs transition-all"
                     >
                       <option value="latest">최신 등록순 (기본)</option>
                       <option value="oldest">오래된 등록순</option>
@@ -6452,7 +6452,7 @@ export default function AdminPage() {
                   </div>
 
                   {filteredAndSortedStores.length === 0 ? (
-                    <div className="bg-white rounded-[28px] border-0 p-16 text-center text-slate-400 font-extrabold shadow-md flex flex-col items-center justify-center space-y-2">
+                    <div className="bg-white rounded-lg border-0 p-16 text-center text-slate-400 font-extrabold shadow-md flex flex-col items-center justify-center space-y-2">
                       <Search size={36} className="text-slate-300 animate-pulse" />
                       <p className="text-xs">조건에 해당하는 가맹점 데이터가 없습니다.</p>
                     </div>
@@ -6460,12 +6460,12 @@ export default function AdminPage() {
                     filteredAndSortedStores.map((store) => (
                       <div 
                         key={store.id} 
-                        className="bg-white rounded-[24px] p-4 sm:p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-3 items-start lg:items-center"
+                        className="bg-white rounded-lg p-4 sm:p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-3 items-start lg:items-center"
                       >
                         {/* Registration Date */}
                         <div className="col-span-2 flex items-center gap-2">
                           <span className="lg:hidden text-xs text-slate-400 font-semibold">등록일:</span>
-                          <span className="text-xs font-extrabold text-slate-600 bg-[#F1F4F8] rounded-xl px-3 py-1.5 shadow-2xs border-0">
+                          <span className="text-xs font-extrabold text-slate-600 bg-[#F1F4F8] rounded-md px-3 py-1.5 shadow-2xs border-0">
                             {store.regDate || "2026-07-28"}
                           </span>
                         </div>
@@ -6528,7 +6528,7 @@ export default function AdminPage() {
 
                         {/* Status Badge */}
                         <div className="col-span-0.5 lg:text-center">
-                          <span className={`px-3 py-1 rounded-xl text-[11px] font-extrabold border-0 shadow-2xs inline-block ${
+                          <span className={`px-3 py-1 rounded-md text-[11px] font-extrabold border-0 shadow-2xs inline-block ${
                             store.status === "승인" 
                               ? "bg-emerald-100 text-emerald-700" 
                               : store.status === "대기"
@@ -6549,7 +6549,7 @@ export default function AdminPage() {
                                 window.open("/portal", "_blank");
                               }
                             }}
-                            className="px-2.5 py-1.5 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1 font-black text-xs shrink-0"
+                            className="px-2.5 py-1.5 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1 font-black text-xs shrink-0"
                             title={`${store.name} 점주포털 자동로그인 이동 (새 탭)`}
                           >
                             <ExternalLink size={13} />
@@ -6557,14 +6557,14 @@ export default function AdminPage() {
                           </button>
                           <button
                             onClick={() => handleOpenStoreModal(store)}
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border-0 shadow-2xs shrink-0"
+                            className="p-2 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border-0 shadow-2xs shrink-0"
                             title="상세 수정"
                           >
                             <Edit size={14} />
                           </button>
                           <button
                             onClick={() => handleDeleteStore(store.id)}
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all cursor-pointer border-0 shadow-2xs shrink-0"
+                            className="p-2 rounded-md bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all cursor-pointer border-0 shadow-2xs shrink-0"
                             title="삭제"
                           >
                             <Trash2 size={14} />
@@ -6577,7 +6577,7 @@ export default function AdminPage() {
               ) : (
                 /* 2열 보기 / 3열 보기 (Grid Mode) - DEFAULT: 3col */
                 filteredAndSortedStores.length === 0 ? (
-                  <div className="bg-white rounded-[28px] border-0 p-16 text-center text-slate-400 font-extrabold shadow-md flex flex-col items-center justify-center space-y-2">
+                  <div className="bg-white rounded-lg border-0 p-16 text-center text-slate-400 font-extrabold shadow-md flex flex-col items-center justify-center space-y-2">
                     <Search size={36} className="text-slate-300 animate-pulse" />
                     <p className="text-xs">조건에 해당하는 가맹점 데이터가 없습니다.</p>
                   </div>
@@ -6586,7 +6586,7 @@ export default function AdminPage() {
                     {filteredAndSortedStores.map((store) => (
                       <div 
                         key={store.id}
-                        className="bg-white rounded-[24px] p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col justify-between space-y-4"
+                        className="bg-white rounded-lg p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col justify-between space-y-4"
                       >
                         {/* Card Top: Store Header & Status */}
                         <div className="space-y-2.5">
@@ -6607,7 +6607,7 @@ export default function AdminPage() {
                             </div>
 
                             {/* Status Badge */}
-                            <span className={`px-3 py-1 rounded-xl text-[11px] font-extrabold border-0 shadow-2xs shrink-0 ${
+                            <span className={`px-3 py-1 rounded-md text-[11px] font-extrabold border-0 shadow-2xs shrink-0 ${
                               store.status === "승인" 
                                 ? "bg-emerald-100 text-emerald-700" 
                                 : store.status === "대기"
@@ -6619,7 +6619,7 @@ export default function AdminPage() {
                           </div>
 
                           {/* Info Grid: RegDate, Owner, Phone */}
-                          <div className="grid grid-cols-3 gap-2 p-3 bg-[#F8FAFC] rounded-2xl text-xs mt-3 border border-slate-100">
+                          <div className="grid grid-cols-3 gap-2 p-3 bg-[#F8FAFC] rounded-lg text-xs mt-3 border border-slate-100">
                             <div>
                               <span className="block text-[10px] font-bold text-slate-400 mb-0.5">등록일</span>
                               <span className="font-extrabold text-slate-700">{store.regDate || "2026-07-28"}</span>
@@ -6676,7 +6676,7 @@ export default function AdminPage() {
                                 window.open("/portal", "_blank");
                               }
                             }}
-                            className="px-3.5 py-2 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1.5 font-black text-xs"
+                            className="px-3.5 py-2 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1.5 font-black text-xs"
                             title={`${store.name} 점주포털 자동로그인 이동 (새 탭)`}
                           >
                             <ExternalLink size={13} />
@@ -6686,7 +6686,7 @@ export default function AdminPage() {
                           <div className="flex items-center gap-1.5">
                             <button
                               onClick={() => handleOpenStoreModal(store)}
-                              className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1 text-xs font-extrabold"
+                              className="px-3 py-2 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1 text-xs font-extrabold"
                               title="상세 수정"
                             >
                               <Edit size={13} />
@@ -6694,7 +6694,7 @@ export default function AdminPage() {
                             </button>
                             <button
                               onClick={() => handleDeleteStore(store.id)}
-                              className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all cursor-pointer border-0 shadow-2xs"
+                              className="p-2 rounded-md bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all cursor-pointer border-0 shadow-2xs"
                               title="삭제"
                             >
                               <Trash2 size={14} />
@@ -6730,7 +6730,7 @@ export default function AdminPage() {
                       setShowLabelPanel(false);
                       setShowPolicyPanel(false);
                     }}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-2xl transition-all border-0 cursor-pointer shadow-2xs"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all border-0 cursor-pointer shadow-2xs"
                   >
                     카테고리 관리
                   </button>
@@ -6740,7 +6740,7 @@ export default function AdminPage() {
                       setShowCategoryPanel(false);
                       setShowPolicyPanel(false);
                     }}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-2xl transition-all border-0 cursor-pointer shadow-2xs"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all border-0 cursor-pointer shadow-2xs"
                   >
                     라벨 관리
                   </button>
@@ -6750,14 +6750,14 @@ export default function AdminPage() {
                       setShowCategoryPanel(false);
                       setShowLabelPanel(false);
                     }}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-2xl transition-all border-0 cursor-pointer shadow-2xs"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all border-0 cursor-pointer shadow-2xs"
                   >
                     <Truck size={14} className="text-slate-600" />
                     배송/반품 설정
                   </button>
                   <button
                     onClick={() => handleOpenProductModal()}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs cursor-pointer border-0"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all shadow-2xs cursor-pointer border-0"
                   >
                     <Plus size={16} />
                     + 제품 신규 등록
@@ -6767,7 +6767,7 @@ export default function AdminPage() {
 
               {/* Shipping and Return Policy Panel */}
               {showPolicyPanel && (
-                <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4 animate-fadeIn">
+                <div className="bg-white border-0 rounded-lg p-6 shadow-md space-y-4 animate-fadeIn">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 className="font-black text-sm text-[#0F172A] flex items-center gap-2">
                       <Truck size={17} className="text-slate-700" />
@@ -6798,7 +6798,7 @@ export default function AdminPage() {
                             setShippingFeeA(val);
                           }}
                           required
-                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                         />
                       </div>
                       <div className="space-y-2">
@@ -6817,7 +6817,7 @@ export default function AdminPage() {
                             setShippingFeeB(val);
                           }}
                           required
-                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                         />
                       </div>
                       <div className="space-y-2">
@@ -6836,7 +6836,7 @@ export default function AdminPage() {
                             setShippingFeeC(val);
                           }}
                           required
-                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                         />
                       </div>
                       <div className="space-y-2">
@@ -6855,7 +6855,7 @@ export default function AdminPage() {
                             setShippingFeeBox(val);
                           }}
                           required
-                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                         />
                       </div>
                     </div>
@@ -6868,7 +6868,7 @@ export default function AdminPage() {
                         value={shippingPolicy}
                         onChange={(e) => setShippingPolicy(e.target.value)}
                         required
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl p-4 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none resize-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg p-4 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none resize-none shadow-2xs"
                       />
                     </div>
 
@@ -6880,7 +6880,7 @@ export default function AdminPage() {
                         value={returnPolicy}
                         onChange={(e) => setReturnPolicy(e.target.value)}
                         required
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl p-4 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none resize-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg p-4 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:outline-none resize-none shadow-2xs"
                       />
                     </div>
 
@@ -6888,13 +6888,13 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => setShowPolicyPanel(false)}
-                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
+                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-md transition-all cursor-pointer border-0 shadow-2xs"
                       >
                         취소
                       </button>
                       <button
                         type="submit"
-                        className="px-5 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-xl transition-all shadow-2xs cursor-pointer border-0"
+                        className="px-5 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs cursor-pointer border-0"
                       >
                         설정 저장하기
                       </button>
@@ -6905,7 +6905,7 @@ export default function AdminPage() {
 
               {/* Real-time Label Panel */}
               {showLabelPanel && (
-                <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4 animate-fadeIn">
+                <div className="bg-white border-0 rounded-lg p-6 shadow-md space-y-4 animate-fadeIn">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 className="font-black text-sm text-[#0F172A] flex items-center gap-1.5">
                       <span>🏷 라벨 실시간 관리 대장</span>
@@ -6924,22 +6924,22 @@ export default function AdminPage() {
                       value={newLabelName}
                       onChange={(e) => setNewLabelName(e.target.value)}
                       required
-                      className="flex-1 bg-[#F8F9FA] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
+                      className="flex-1 bg-[#F8F9FA] border-0 rounded-lg px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                     />
                     <button 
                       type="submit"
-                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs cursor-pointer border-0"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all shadow-2xs cursor-pointer border-0"
                     >
                       추가
                     </button>
                   </form>
                   <div className="space-y-2.5 max-w-md pt-2">
                     <label className="text-[11px] font-extrabold text-[#0F172A] block">등록된 라벨 목록 (순서 조정 및 삭제)</label>
-                    <div className="space-y-2 p-3.5 bg-[#F8F9FA] border-0 rounded-2xl max-h-[300px] overflow-y-auto shadow-2xs">
+                    <div className="space-y-2 p-3.5 bg-[#F8F9FA] border-0 rounded-lg max-h-[300px] overflow-y-auto shadow-2xs">
                       {labels.map((labName, idx) => (
                         <div
                           key={labName}
-                          className="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold bg-white text-[#0F172A] border-0 shadow-2xs group"
+                          className="flex items-center justify-between px-4 py-2.5 rounded-md text-xs font-bold bg-white text-[#0F172A] border-0 shadow-2xs group"
                         >
                           <span>{labName}</span>
                           <div className="flex items-center gap-1.5">
@@ -6979,7 +6979,7 @@ export default function AdminPage() {
 
               {/* Real-time Category Panel */}
               {showCategoryPanel && (
-                <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4 animate-fadeIn">
+                <div className="bg-white border-0 rounded-lg p-6 shadow-md space-y-4 animate-fadeIn">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 className="font-black text-sm text-[#0F172A] flex items-center gap-1.5">
                       <span>🏷 카테고리 실시간 관리 대장</span>
@@ -6998,22 +6998,22 @@ export default function AdminPage() {
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
                       required
-                      className="flex-1 bg-[#F8F9FA] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
+                      className="flex-1 bg-[#F8F9FA] border-0 rounded-lg px-4 py-3 text-xs font-bold text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs"
                     />
                     <button 
                       type="submit"
-                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs cursor-pointer border-0"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all shadow-2xs cursor-pointer border-0"
                     >
                       추가
                     </button>
                   </form>
                   <div className="space-y-2.5 max-w-md pt-2">
                     <label className="text-[11px] font-extrabold text-[#0F172A] block">등록된 카테고리 목록 (순서 조정 및 삭제)</label>
-                    <div className="space-y-2 p-3.5 bg-[#F8F9FA] border-0 rounded-2xl max-h-[300px] overflow-y-auto shadow-2xs">
+                    <div className="space-y-2 p-3.5 bg-[#F8F9FA] border-0 rounded-lg max-h-[300px] overflow-y-auto shadow-2xs">
                       {categories.map((catName, idx) => (
                         <div
                           key={catName}
-                          className="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold bg-white text-[#0F172A] border-0 shadow-2xs group"
+                          className="flex items-center justify-between px-4 py-2.5 rounded-md text-xs font-bold bg-white text-[#0F172A] border-0 shadow-2xs group"
                         >
                           <span>{catName}</span>
                           <div className="flex items-center gap-1.5">
@@ -7052,7 +7052,7 @@ export default function AdminPage() {
               )}
 
               {/* Products Search & Category Filter Controls */}
-              <div className="bg-[#F8F9FA] border-0 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-2xs">
+              <div className="bg-[#F8F9FA] border-0 rounded-lg p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-2xs">
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
                   <span>
                     총{" "}
@@ -7080,7 +7080,7 @@ export default function AdminPage() {
                     <select
                       value={adminProductCategoryFilter}
                       onChange={(e) => setAdminProductCategoryFilter(e.target.value)}
-                      className="w-full bg-white border-0 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:outline-none appearance-none pr-8 cursor-pointer shadow-2xs"
+                      className="w-full bg-white border-0 rounded-md px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:outline-none appearance-none pr-8 cursor-pointer shadow-2xs"
                     >
                       <option value="전체">카테고리 전체</option>
                       {categories.map((cat) => (
@@ -7101,7 +7101,7 @@ export default function AdminPage() {
                       placeholder="제품명 또는 모델명 검색"
                       value={adminProductSearch}
                       onChange={(e) => setAdminProductSearch(e.target.value)}
-                      className="w-full bg-white border-0 rounded-xl pl-9 pr-8 py-2.5 text-xs text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs font-semibold"
+                      className="w-full bg-white border-0 rounded-md pl-9 pr-8 py-2.5 text-xs text-[#0F172A] placeholder-slate-400 focus:outline-none shadow-2xs font-semibold"
                     />
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                       <Search size={14} />
@@ -7119,7 +7119,7 @@ export default function AdminPage() {
               </div>
 
               {/* Products Table */}
-              <div className="bg-white border-0 rounded-2xl overflow-hidden shadow-2xs">
+              <div className="bg-white border-0 rounded-lg overflow-hidden shadow-2xs">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -7279,7 +7279,7 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={handleExcelDownload}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs shrink-0 self-start sm:self-center cursor-pointer border-0"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all shadow-2xs shrink-0 self-start sm:self-center cursor-pointer border-0"
                 >
                   <Download size={15} />
                   발주내역 엑셀 다운로드
@@ -7287,7 +7287,7 @@ export default function AdminPage() {
               </div>
 
               {/* 검색 및 기간 필터 영역 */}
-              <div className="bg-white border border-[#EEF0F5] rounded-[28px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] space-y-4">
+              <div className="bg-white border border-[#EEF0F5] rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* 통합 검색 */}
                   <div className="space-y-1.5">
@@ -7297,7 +7297,7 @@ export default function AdminPage() {
                       placeholder="가맹점명, 점주명, 연락처, 품목명, 주소, 주문번호"
                       value={orderSearchKeyword}
                       onChange={(e) => setOrderSearchKeyword(e.target.value)}
-                      className="w-full bg-[#F8F9FD] border border-[#E2E8F0] rounded-2xl px-4 py-3 text-xs text-[#0F172A] placeholder-slate-400 font-bold focus:outline-none focus:border-[#F5AC00]"
+                      className="w-full bg-[#F8F9FD] border border-[#E2E8F0] rounded-lg px-4 py-3 text-xs text-[#0F172A] placeholder-slate-400 font-bold focus:outline-none focus:border-[#F5AC00]"
                     />
                   </div>
 
@@ -7307,7 +7307,7 @@ export default function AdminPage() {
                     <select
                       value={orderDateFilterType}
                       onChange={(e) => setOrderDateFilterType(e.target.value)}
-                      className="w-full bg-[#F8F9FD] border border-[#E2E8F0] rounded-2xl px-4 py-3 text-xs text-[#0F172A] font-bold focus:outline-none focus:border-[#F5AC00] cursor-pointer"
+                      className="w-full bg-[#F8F9FD] border border-[#E2E8F0] rounded-lg px-4 py-3 text-xs text-[#0F172A] font-bold focus:outline-none focus:border-[#F5AC00] cursor-pointer"
                     >
                       <option value="all">전체 기간</option>
                       <option value="today">당일 (오늘)</option>
@@ -7328,14 +7328,14 @@ export default function AdminPage() {
                           type="date"
                           value={orderStartDate}
                           onChange={(e) => setOrderStartDate(e.target.value)}
-                          className="flex-1 bg-[#F8F9FD] border border-[#E2E8F0] rounded-2xl px-3 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none"
+                          className="flex-1 bg-[#F8F9FD] border border-[#E2E8F0] rounded-lg px-3 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none"
                         />
                         <span className="text-slate-400 font-bold text-xs">~</span>
                         <input
                           type="date"
                           value={orderEndDate}
                           onChange={(e) => setOrderEndDate(e.target.value)}
-                          className="flex-1 bg-[#F8F9FD] border border-[#E2E8F0] rounded-2xl px-3 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none"
+                          className="flex-1 bg-[#F8F9FD] border border-[#E2E8F0] rounded-lg px-3 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none"
                         />
                       </div>
                     </div>
@@ -7344,7 +7344,7 @@ export default function AdminPage() {
               </div>
 
               {/* 발주 목록 테이블 */}
-              <div className="bg-white border border-[#EEF0F5] rounded-[28px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+              <div className="bg-white border border-[#EEF0F5] rounded-lg overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse min-w-[1000px]">
                     <thead>
@@ -7420,14 +7420,14 @@ export default function AdminPage() {
                                   <button
                                     type="button"
                                     onClick={() => handleOpenOrderModal(order)}
-                                    className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-extrabold transition-all border-0 shadow-2xs cursor-pointer"
+                                    className="px-3 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-extrabold transition-all border-0 shadow-2xs cursor-pointer"
                                   >
                                     상세보기
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteOrder(order._id)}
-                                    className="p-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all border-0 shadow-2xs cursor-pointer"
+                                    className="p-1.5 rounded-md bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all border-0 shadow-2xs cursor-pointer"
                                     title="삭제"
                                   >
                                     <Trash2 size={13} />
@@ -7459,7 +7459,7 @@ export default function AdminPage() {
                 </div>
                 <button
                   onClick={() => setShowNoticeModal(true)}
-                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs shrink-0 self-start sm:self-center cursor-pointer border-0"
+                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all shadow-2xs shrink-0 self-start sm:self-center cursor-pointer border-0"
                 >
                   <Plus size={15} />
                   신규 공지 작성
@@ -7467,7 +7467,7 @@ export default function AdminPage() {
               </div>
 
               {/* Notices List */}
-              <div className="bg-white border-0 rounded-[28px] overflow-hidden shadow-md">
+              <div className="bg-white border-0 rounded-lg overflow-hidden shadow-md">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -7508,14 +7508,14 @@ export default function AdminPage() {
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
                                   onClick={() => handleOpenEditNoticeModal(n)}
-                                  className="p-1.5 rounded-xl border-0 bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-xs cursor-pointer shadow-2xs"
+                                  className="p-1.5 rounded-md border-0 bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-xs cursor-pointer shadow-2xs"
                                   title="수정"
                                 >
                                   <Edit size={14} />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteNotice(n.id, n._id)}
-                                  className="p-1.5 rounded-xl border-0 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all text-xs cursor-pointer shadow-2xs"
+                                  className="p-1.5 rounded-md border-0 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all text-xs cursor-pointer shadow-2xs"
                                   title="삭제"
                                 >
                                   <Trash2 size={14} />
@@ -7547,12 +7547,12 @@ export default function AdminPage() {
               {/* Inquiries list */}
               <div className="grid grid-cols-1 gap-4">
                 {inquiries.length === 0 ? (
-                  <div className="bg-white border border-[#f2ccd7] rounded-2xl p-8 text-center text-[#735965]">등록된 1:1 가맹점 문의 사항이 없습니다.</div>
+                  <div className="bg-white border border-[#f2ccd7] rounded-lg p-8 text-center text-[#735965]">등록된 1:1 가맹점 문의 사항이 없습니다.</div>
                 ) : (
                   inquiries.map((inq) => (
                     <div 
                       key={inq.id}
-                      className="bg-white border border-[#f2ccd7] rounded-2xl p-5 flex flex-col justify-between gap-4 shadow-sm"
+                      className="bg-white border border-[#f2ccd7] rounded-lg p-5 flex flex-col justify-between gap-4 shadow-sm"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
@@ -7582,7 +7582,7 @@ export default function AdminPage() {
 
                       <div className="space-y-2">
                         <h4 className="font-bold text-base text-[#2d2026] leading-tight">{inq.title}</h4>
-                        <div className="bg-[#fff1f5] border border-[#f2ccd7]/60 p-4 rounded-xl">
+                        <div className="bg-[#fff1f5] border border-[#f2ccd7]/60 p-4 rounded-md">
                           <p className="text-xs sm:text-sm text-[#2d2026] leading-relaxed whitespace-pre-wrap font-semibold">{inq.content}</p>
                         </div>
                       </div>
@@ -7592,7 +7592,7 @@ export default function AdminPage() {
                           <span className="text-[10px] font-bold text-emerald-600 tracking-wider uppercase bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit block">
                             작성된 본사 답변
                           </span>
-                          <div className="bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-xl">
+                          <div className="bg-[#fff9fb] border border-[#f2ccd7] p-4 rounded-md">
                             <p className="text-xs sm:text-sm text-[#2d2026] leading-relaxed whitespace-pre-wrap font-medium">{inq.answer}</p>
                           </div>
                         </div>
@@ -7629,7 +7629,7 @@ export default function AdminPage() {
               </div>
 
               {/* Consultation Inquiries list */}
-              <div className="bg-white border-0 rounded-[28px] overflow-hidden shadow-md">
+              <div className="bg-white border-0 rounded-lg overflow-hidden shadow-md">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -7690,7 +7690,7 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteConsultation(inq._id)}
-                                  className="p-1.5 rounded-xl border-0 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all text-xs cursor-pointer shadow-2xs"
+                                  className="p-1.5 rounded-md border-0 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all text-xs cursor-pointer shadow-2xs"
                                   title="삭제"
                                 >
                                   <Trash2 size={14} />
@@ -7723,7 +7723,7 @@ export default function AdminPage() {
 
                 {/* Period selection */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="bg-slate-100 rounded-2xl p-1 flex gap-1 shadow-2xs border-0">
+                  <div className="bg-slate-100 rounded-lg p-1 flex gap-1 shadow-2xs border-0">
                     {[
                       { key: "today", label: "당일" },
                       { key: "yesterday", label: "전일" },
@@ -7738,7 +7738,7 @@ export default function AdminPage() {
                           setAnalyticsDateFilter(item.key);
                           setIpListPage(1);
                         }}
-                        className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border-0 ${
+                        className={`px-3.5 py-1.5 rounded-md text-xs font-extrabold transition-all cursor-pointer border-0 ${
                           analyticsDateFilter === item.key
                             ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
                             : "text-slate-600 hover:text-[#0F172A]"
@@ -7750,7 +7750,7 @@ export default function AdminPage() {
                   </div>
 
                   {analyticsDateFilter === "custom" && (
-                    <div className="flex items-center gap-1.5 bg-slate-100 rounded-2xl p-1.5 shadow-2xs border-0">
+                    <div className="flex items-center gap-1.5 bg-slate-100 rounded-lg p-1.5 shadow-2xs border-0">
                       <input
                         type="date"
                         value={analyticsStartDate}
@@ -7776,45 +7776,45 @@ export default function AdminPage() {
               </div>
 
               {/* Date display helper */}
-              <div className="bg-[#F8F9FA] border-0 rounded-2xl px-5 py-3 text-xs text-[#0F172A] font-extrabold flex items-center gap-2 shadow-2xs">
+              <div className="bg-[#F8F9FA] border-0 rounded-lg px-5 py-3 text-xs text-[#0F172A] font-extrabold flex items-center gap-2 shadow-2xs">
                 <span className="inline-block w-2 h-2 rounded-full bg-[#FED422]"></span>
                 <span>분석 대상 기간: <strong>{analyticsStartDate || "-"} ~ {analyticsEndDate || "-"}</strong> (총 {dateList.length}일)</span>
               </div>
 
               {/* Metric cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white border-0 rounded-[28px] p-6 flex items-center justify-between shadow-md">
+                <div className="bg-white border-0 rounded-lg p-6 flex items-center justify-between shadow-md">
                   <div>
                     <span className="text-xs text-slate-500 font-extrabold block mb-1">방문자수 (인입건수)</span>
                     <strong className="text-2xl font-black text-[#0F172A]">
                       {totalVisits.toLocaleString()} <span className="text-xs text-slate-400 font-normal">회</span>
                     </strong>
                   </div>
-                  <div className="bg-slate-100 text-[#0F172A] p-3.5 rounded-2xl shadow-2xs">
+                  <div className="bg-slate-100 text-[#0F172A] p-3.5 rounded-lg shadow-2xs">
                     <Monitor size={22} />
                   </div>
                 </div>
 
-                <div className="bg-white border-0 rounded-[28px] p-6 flex items-center justify-between shadow-md">
+                <div className="bg-white border-0 rounded-lg p-6 flex items-center justify-between shadow-md">
                   <div>
                     <span className="text-xs text-slate-500 font-extrabold block mb-1">창업 상담문의</span>
                     <strong className="text-2xl font-black text-[#0F172A]">
                       {totalInquiries.toLocaleString()} <span className="text-xs text-slate-400 font-normal">건</span>
                     </strong>
                   </div>
-                  <div className="bg-slate-100 text-[#0F172A] p-3.5 rounded-2xl shadow-2xs">
+                  <div className="bg-slate-100 text-[#0F172A] p-3.5 rounded-lg shadow-2xs">
                     <Headphones size={22} />
                   </div>
                 </div>
 
-                <div className="bg-white border-0 rounded-[28px] p-6 flex items-center justify-between shadow-md">
+                <div className="bg-white border-0 rounded-lg p-6 flex items-center justify-between shadow-md">
                   <div>
                     <span className="text-xs text-slate-500 font-extrabold block mb-1">메뉴 상세 뷰수</span>
                     <strong className="text-2xl font-black text-[#0F172A]">
                       {totalMenuViews.toLocaleString()} <span className="text-xs text-slate-400 font-normal">회</span>
                     </strong>
                   </div>
-                  <div className="bg-slate-100 text-[#0F172A] p-3.5 rounded-2xl shadow-2xs">
+                  <div className="bg-slate-100 text-[#0F172A] p-3.5 rounded-lg shadow-2xs">
                     <BarChart3 size={22} />
                   </div>
                 </div>
@@ -7823,7 +7823,7 @@ export default function AdminPage() {
               {/* Daily trend and referrer */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Daily Table (7 columns) */}
-                <div className="lg:col-span-7 bg-white border-0 rounded-[28px] shadow-md flex flex-col overflow-hidden">
+                <div className="lg:col-span-7 bg-white border-0 rounded-lg shadow-md flex flex-col overflow-hidden">
                   <div className="p-5 border-b border-slate-100 bg-[#F8F9FD]">
                     <h3 className="text-sm font-black text-[#0F172A]">일자별 상세 지표</h3>
                   </div>
@@ -7862,7 +7862,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Referrers Rank (5 columns) */}
-                <div className="lg:col-span-5 bg-white border-0 rounded-[28px] shadow-md flex flex-col overflow-hidden">
+                <div className="lg:col-span-5 bg-white border-0 rounded-lg shadow-md flex flex-col overflow-hidden">
                   <div className="p-5 border-b border-slate-100 bg-[#F8F9FD]">
                     <h3 className="text-sm font-black text-[#0F172A]">유입경로(Referrer) 분석</h3>
                   </div>
@@ -7885,9 +7885,9 @@ export default function AdminPage() {
                                 {ref.count.toLocaleString()}건 ({percent}%)
                               </span>
                             </div>
-                            <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                            <div className="w-full bg-slate-100 h-2.5 rounded-md overflow-hidden">
                               <div
-                                  className="bg-[#FED422] h-full rounded-full transition-all"
+                                  className="bg-[#FED422] h-full rounded-md transition-all"
                                   style={{ width: `${percent}%` }}
                               ></div>
                             </div>
@@ -7900,10 +7900,10 @@ export default function AdminPage() {
               </div>
 
               {/* Brand Menu View Ranking */}
-              <div className="bg-white border-0 rounded-[28px] shadow-md overflow-hidden">
+              <div className="bg-white border-0 rounded-lg shadow-md overflow-hidden">
                 <div className="p-5 border-b border-slate-100 bg-[#F8F9FD] flex justify-between items-center">
                   <h3 className="text-sm font-black text-[#0F172A]">브랜드 / 메뉴별 상세 조회수 순위</h3>
-                  <span className="text-[10px] bg-slate-100 text-[#0F172A] px-3 py-1 rounded-full font-extrabold shadow-2xs">
+                  <span className="text-[10px] bg-slate-100 text-[#0F172A] px-3 py-1 rounded-md font-extrabold shadow-2xs">
                     총 뷰수: {totalMenuViews.toLocaleString()}회
                   </span>
                 </div>
@@ -7922,9 +7922,9 @@ export default function AdminPage() {
                             {menu.name}
                           </span>
                           <div className="flex-1 flex items-center gap-3">
-                            <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                            <div className="flex-1 bg-slate-100 h-2.5 rounded-md overflow-hidden">
                               <div
-                                className="bg-[#FED422] h-full rounded-full transition-all"
+                                className="bg-[#FED422] h-full rounded-md transition-all"
                                 style={{ width: `${percent}%` }}
                               ></div>
                             </div>
@@ -7940,7 +7940,7 @@ export default function AdminPage() {
               </div>
 
               {/* IP Access Logs */}
-              <div className="bg-white border-0 rounded-[28px] shadow-md overflow-hidden">
+              <div className="bg-white border-0 rounded-lg shadow-md overflow-hidden">
                 <div className="p-5 border-b border-slate-100 bg-[#F8F9FD] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h3 className="text-sm font-black text-[#0F172A]">유입 IP 주소별 방문 분석 로그</h3>
@@ -7960,7 +7960,7 @@ export default function AdminPage() {
                         setIpSearchQuery(e.target.value);
                         setIpListPage(1);
                       }}
-                      className="pl-9 pr-4 py-2 w-full bg-[#F1F4F8] border-0 rounded-2xl text-xs font-bold text-[#0F172A] placeholder-slate-400 shadow-2xs focus:outline-none transition-all"
+                      className="pl-9 pr-4 py-2 w-full bg-[#F1F4F8] border-0 rounded-lg text-xs font-bold text-[#0F172A] placeholder-slate-400 shadow-2xs focus:outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -8025,7 +8025,7 @@ export default function AdminPage() {
                       <button
                         disabled={ipListPage === 1}
                         onClick={() => setIpListPage(p => Math.max(p - 1, 1))}
-                        className="px-3 py-1.5 text-xs font-bold border-0 rounded-xl bg-slate-100 text-slate-700 disabled:opacity-30 hover:bg-slate-200 transition-all cursor-pointer shadow-2xs"
+                        className="px-3 py-1.5 text-xs font-bold border-0 rounded-md bg-slate-100 text-slate-700 disabled:opacity-30 hover:bg-slate-200 transition-all cursor-pointer shadow-2xs"
                       >
                         이전
                       </button>
@@ -8035,7 +8035,7 @@ export default function AdminPage() {
                       <button
                         disabled={ipListPage === totalIpPages}
                         onClick={() => setIpListPage(p => Math.min(p + 1, totalIpPages))}
-                        className="px-3 py-1.5 text-xs font-bold border-0 rounded-xl bg-slate-100 text-slate-700 disabled:opacity-30 hover:bg-slate-200 transition-all cursor-pointer shadow-2xs"
+                        className="px-3 py-1.5 text-xs font-bold border-0 rounded-md bg-slate-100 text-slate-700 disabled:opacity-30 hover:bg-slate-200 transition-all cursor-pointer shadow-2xs"
                       >
                         다음
                       </button>
@@ -8062,7 +8062,7 @@ export default function AdminPage() {
                     setMaterialType("training");
                     setShowMaterialModal(true);
                   }}
-                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs shrink-0 self-start sm:self-center cursor-pointer border-0"
+                  className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all shadow-2xs shrink-0 self-start sm:self-center cursor-pointer border-0"
                 >
                   <Plus size={15} />
                   신규 자료 등록
@@ -8073,13 +8073,13 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* 1. Trainings Block */}
-                <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4">
+                <div className="bg-white border-0 rounded-lg p-6 shadow-md space-y-4">
                   <h3 className="font-black text-base text-[#0F172A] border-b border-slate-100 pb-3.5 flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <BookOpen size={18} className="text-[#0F172A]" />
                       점주 조리/AS 교육자료실 ({trainings.length})
                     </span>
-                    <span className="text-[10px] font-black bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">
+                    <span className="text-[10px] font-black bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-md">
                       가맹 교육
                     </span>
                   </h3>
@@ -8088,7 +8088,7 @@ export default function AdminPage() {
                       <p className="text-xs text-slate-400 font-bold text-center py-8">등록된 교육자료가 없습니다.</p>
                     ) : (
                       trainings.map((t) => (
-                        <div key={t.id} className="bg-[#F8F9FA] border border-slate-100 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-2xs hover:border-[#FED422] transition-all group">
+                        <div key={t.id} className="bg-[#F8F9FA] border border-slate-100 rounded-lg p-4 flex items-center justify-between gap-3 shadow-2xs hover:border-[#FED422] transition-all group">
                           <div className="flex items-center gap-3.5 min-w-0 flex-1">
                             {renderMaterialThumbnail(t)}
                             <div className="space-y-1 min-w-0 flex-1">
@@ -8104,7 +8104,7 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={() => handleDownload(t.title, t.fileUrl, t.fileName)}
-                              className="px-3 py-1.5 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-extrabold text-[11px] transition-all border-0 cursor-pointer shadow-2xs flex items-center gap-1"
+                              className="px-3 py-1.5 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-extrabold text-[11px] transition-all border-0 cursor-pointer shadow-2xs flex items-center gap-1"
                               title="다운로드 및 자료 확인"
                             >
                               <Download size={12} />
@@ -8113,7 +8113,7 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={() => handleDeleteMaterial(t.id, "training")}
-                              className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-all border border-slate-200/60 shadow-2xs shrink-0 cursor-pointer"
+                              className="p-1.5 rounded-md bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-all border border-slate-200/60 shadow-2xs shrink-0 cursor-pointer"
                               title="자료 삭제"
                             >
                               <Trash2 size={13} />
@@ -8126,13 +8126,13 @@ export default function AdminPage() {
                 </div>
 
                 {/* 2. PR/Marketing Assets Block */}
-                <div className="bg-white border-0 rounded-[28px] p-6 shadow-md space-y-4">
+                <div className="bg-white border-0 rounded-lg p-6 shadow-md space-y-4">
                   <h3 className="font-black text-base text-[#0F172A] border-b border-slate-100 pb-3.5 flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <ImageIcon size={18} className="text-[#0F172A]" />
                       점주 홍보/마케팅 자료실 ({prs.length})
                     </span>
-                    <span className="text-[10px] font-black bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full">
+                    <span className="text-[10px] font-black bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-md">
                       홍보 자재
                     </span>
                   </h3>
@@ -8141,7 +8141,7 @@ export default function AdminPage() {
                       <p className="text-xs text-slate-400 font-bold text-center py-8">등록된 홍보자료가 없습니다.</p>
                     ) : (
                       prs.map((p) => (
-                        <div key={p.id} className="bg-[#F8F9FA] border border-slate-100 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-2xs hover:border-[#FED422] transition-all group">
+                        <div key={p.id} className="bg-[#F8F9FA] border border-slate-100 rounded-lg p-4 flex items-center justify-between gap-3 shadow-2xs hover:border-[#FED422] transition-all group">
                           <div className="flex items-center gap-3.5 min-w-0 flex-1">
                             {renderMaterialThumbnail(p)}
                             <div className="space-y-1 min-w-0 flex-1">
@@ -8157,7 +8157,7 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={() => handleDownload(p.title, p.fileUrl, p.fileName)}
-                              className="px-3 py-1.5 rounded-xl bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-extrabold text-[11px] transition-all border-0 cursor-pointer shadow-2xs flex items-center gap-1"
+                              className="px-3 py-1.5 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-extrabold text-[11px] transition-all border-0 cursor-pointer shadow-2xs flex items-center gap-1"
                               title="다운로드 및 자료 확인"
                             >
                               <Download size={12} />
@@ -8166,7 +8166,7 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={() => handleDeleteMaterial(p.id, "pr")}
-                              className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-all border border-slate-200/60 shadow-2xs shrink-0 cursor-pointer"
+                              className="p-1.5 rounded-md bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-all border border-slate-200/60 shadow-2xs shrink-0 cursor-pointer"
                               title="자료 삭제"
                             >
                               <Trash2 size={13} />
@@ -8197,7 +8197,7 @@ export default function AdminPage() {
               </div>
 
               {/* Sub tabs navigation */}
-              <div className="flex bg-slate-100 p-1.5 rounded-2xl shadow-2xs border-0 w-fit gap-1.5">
+              <div className="flex bg-slate-100 p-1.5 rounded-lg shadow-2xs border-0 w-fit gap-1.5">
                 {[
                   { id: "popup", label: "📢 실시간 점주 팝업" },
                   { id: "banner", label: "🖼️ 홈 대시보드 배너" },
@@ -8208,7 +8208,7 @@ export default function AdminPage() {
                     key={tab.id}
                     type="button"
                     onClick={() => setBannerSubMenu(tab.id as any)}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border-0 ${
+                    className={`px-4 py-2.5 rounded-md text-xs font-extrabold transition-all cursor-pointer border-0 ${
                       bannerSubMenu === tab.id
                         ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
                         : "text-slate-600 hover:text-[#0F172A]"
@@ -8223,7 +8223,7 @@ export default function AdminPage() {
               {bannerSubMenu === "popup" && (
                 <div className="space-y-6 animate-fadeIn">
                   {/* Header & New Button */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border-0 rounded-[28px] p-6 shadow-md">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border-0 rounded-lg p-6 shadow-md">
                     <div className="space-y-1">
                       <h3 className="font-black text-sm text-[#0F172A] flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full bg-[#FED422] animate-pulse"></span>
@@ -8236,7 +8236,7 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={() => handleOpenPopupModal()}
-                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs flex items-center justify-center gap-1.5 self-start sm:self-center cursor-pointer border-0"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all shadow-2xs flex items-center justify-center gap-1.5 self-start sm:self-center cursor-pointer border-0"
                     >
                       <Plus size={14} />
                       신규 팝업 등록
@@ -8244,7 +8244,7 @@ export default function AdminPage() {
                   </div>
 
                   {/* Popups History List Table */}
-                  <div className="bg-white border-0 rounded-[28px] overflow-hidden shadow-md">
+                  <div className="bg-white border-0 rounded-lg overflow-hidden shadow-md">
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse">
                         <thead>
@@ -8337,7 +8337,7 @@ export default function AdminPage() {
                                       <button
                                         type="button"
                                         onClick={() => handleOpenPopupModal(pop)}
-                                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border-0 transition-all cursor-pointer shadow-2xs"
+                                        className="p-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 border-0 transition-all cursor-pointer shadow-2xs"
                                         title="편집"
                                       >
                                         <Settings size={13} />
@@ -8345,7 +8345,7 @@ export default function AdminPage() {
                                       <button
                                         type="button"
                                         onClick={() => handleDeletePopup(pop._id)}
-                                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 border-0 transition-all cursor-pointer shadow-2xs"
+                                        className="p-1.5 rounded-md bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 border-0 transition-all cursor-pointer shadow-2xs"
                                         title="삭제"
                                       >
                                         <Trash2 size={13} />
@@ -8364,7 +8364,7 @@ export default function AdminPage() {
                   {/* 팝업 등록 및 수정 모달 */}
                   {showPopupModal && (
                     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-md animate-fadeIn overflow-x-hidden">
-                      <div className="bg-white border-0 rounded-[28px] sm:rounded-[32px] w-full max-w-5xl max-w-[calc(100vw-24px)] max-h-[90vh] overflow-hidden shadow-2xl flex flex-col font-sans">
+                      <div className="bg-white border-0 rounded-lg sm:rounded-lg w-full max-w-5xl max-w-[calc(100vw-24px)] max-h-[90vh] overflow-hidden shadow-2xl flex flex-col font-sans">
                         <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
                           <div>
                             <h3 className="font-black text-base sm:text-lg text-[#0F172A] flex items-center gap-2">
@@ -8373,7 +8373,7 @@ export default function AdminPage() {
                             <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">홈페이지 및 점주 포털에 팝업을 게시합니다.</p>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
+                            <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
                               팝업 설정
                             </span>
                             <button
@@ -8390,7 +8390,7 @@ export default function AdminPage() {
                           {/* Left: Input Form (60%) */}
                           <form onSubmit={handleSavePopup} className="p-6 sm:p-7 space-y-4 flex-1 border-r border-slate-100 overflow-y-auto">
                             {/* Card 1: Target & Status (Amber Accent) */}
-                            <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                            <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                               <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                                 <div className="flex items-center gap-2.5">
                                   <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
@@ -8398,7 +8398,7 @@ export default function AdminPage() {
                                   </div>
                                   <span className="text-xs font-black text-[#0F172A] tracking-tight">게시 대상 및 활성화</span>
                                 </div>
-                                <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                                <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                                   게시 대상
                                 </span>
                               </div>
@@ -8409,7 +8409,7 @@ export default function AdminPage() {
                                   <select
                                     value={popupTargetPage}
                                     onChange={(e) => setPopupTargetPage(e.target.value)}
-                                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
                                   >
                                     <option value="all">전체 페이지 노출 (landing + portal)</option>
                                     <option value="landing">💻 홈페이지 메인 랜딩 (landing)</option>
@@ -8418,7 +8418,7 @@ export default function AdminPage() {
                                 </div>
                                 <div className="space-y-1.5">
                                   <label className="text-xs font-extrabold text-[#0F172A] block">즉시 활성화 설정</label>
-                                  <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-2.5 shadow-2xs">
+                                  <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-lg px-4 py-2.5 shadow-2xs">
                                     <button
                                       type="button"
                                       onClick={() => setPopupActive(!popupActive)}
@@ -8437,7 +8437,7 @@ export default function AdminPage() {
                             </div>
 
                             {/* Card 2: Period & Title (Blue Accent) */}
-                            <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
+                            <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
                               <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                                 <div className="flex items-center gap-2.5">
                                   <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
@@ -8445,7 +8445,7 @@ export default function AdminPage() {
                                   </div>
                                   <span className="text-xs font-black text-[#0F172A] tracking-tight">게시 기간 및 제목</span>
                                 </div>
-                                <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                                <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                                   기본 정보
                                 </span>
                               </div>
@@ -8457,7 +8457,7 @@ export default function AdminPage() {
                                     type="date"
                                     value={popupStartDate}
                                     onChange={(e) => setPopupStartDate(e.target.value)}
-                                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
                                   />
                                 </div>
                                 <div className="space-y-1.5">
@@ -8466,7 +8466,7 @@ export default function AdminPage() {
                                     type="date"
                                     value={popupEndDate}
                                     onChange={(e) => setPopupEndDate(e.target.value)}
-                                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
                                   />
                                 </div>
                               </div>
@@ -8479,13 +8479,13 @@ export default function AdminPage() {
                                   value={popupTitle}
                                   onChange={(e) => setPopupTitle(e.target.value)}
                                   required
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
                                 />
                               </div>
                             </div>
 
                             {/* Card 3: Image & Link (Emerald Accent) */}
-                            <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+                            <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
                               <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                                 <div className="flex items-center gap-2.5">
                                   <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
@@ -8493,19 +8493,19 @@ export default function AdminPage() {
                                   </div>
                                   <span className="text-xs font-black text-[#0F172A] tracking-tight">팝업 이미지 및 연결 링크</span>
                                 </div>
-                                <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                                <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                                   미디어 및 링크
                                 </span>
                               </div>
 
                               <div className="space-y-1.5">
                                 <label className="text-xs font-extrabold text-[#0F172A] block">팝업 이미지 파일 직접 업로드 *</label>
-                                <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-2xl p-3 shadow-2xs">
+                                <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-lg p-3 shadow-2xs">
                                   <input
                                     type="file"
                                     accept="image/*"
                                     onChange={handlePopupImageUpload}
-                                    className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1"
+                                    className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1"
                                   />
                                 </div>
                                 <input
@@ -8514,7 +8514,7 @@ export default function AdminPage() {
                                   value={popupImage}
                                   onChange={(e) => setPopupImage(e.target.value)}
                                   required
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 mt-2 outline-none transition-all shadow-2xs"
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 mt-2 outline-none transition-all shadow-2xs"
                                 />
                               </div>
 
@@ -8525,7 +8525,7 @@ export default function AdminPage() {
                                   placeholder="예시) /portal/notice 또는 외부 URL"
                                   value={popupLink}
                                   onChange={(e) => setPopupLink(e.target.value)}
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all shadow-2xs"
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all shadow-2xs"
                                 />
                               </div>
                             </div>
@@ -8540,13 +8540,13 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => setShowPopupModal(false)}
-                                  className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-full transition-all cursor-pointer border-0"
+                                  className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0"
                                 >
                                   취소
                                 </button>
                                 <button
                                   type="submit"
-                                  className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-full transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                                  className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
                                 >
                                   <span>{selectedPopupForEdit ? "팝업 수정 저장" : "신규 팝업 발행"}</span>
                                   <ArrowRight size={14} />
@@ -8562,11 +8562,11 @@ export default function AdminPage() {
                               실시간 팝업 미리보기
                             </span>
 
-                            <div className="w-full max-w-[300px] bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200/60 p-4 space-y-3">
+                            <div className="w-full max-w-[300px] bg-white rounded-lg overflow-hidden shadow-md border border-slate-200/60 p-4 space-y-3">
                               {popupImage ? (
-                                <img src={popupImage} alt="미리보기" className="w-full h-48 object-cover rounded-2xl" />
+                                <img src={popupImage} alt="미리보기" className="w-full h-48 object-cover rounded-lg" />
                               ) : (
-                                <div className="w-full h-48 bg-slate-100 rounded-2xl flex flex-col items-center justify-center text-slate-400 gap-2">
+                                <div className="w-full h-48 bg-slate-100 rounded-lg flex flex-col items-center justify-center text-slate-400 gap-2">
                                   <Upload size={24} />
                                   <span className="text-xs font-bold">이미지를 등록해 주세요</span>
                                 </div>
@@ -8591,7 +8591,7 @@ export default function AdminPage() {
                 <form onSubmit={handleUpdateBanners} className="space-y-6 animate-fadeIn">
                   
                   {/* Top Bar: Section Title & Save Button */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/90 rounded-[28px] p-6 shadow-md">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/90 rounded-lg p-6 shadow-md">
                     <div>
                       <h3 className="font-black text-base text-[#0F172A] tracking-tight flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-[#FED422] animate-pulse"></span>
@@ -8603,7 +8603,7 @@ export default function AdminPage() {
                     </div>
                     <button
                       type="submit"
-                      className="px-6 py-3.5 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs sm:text-sm font-black rounded-2xl transition-all shadow-xs hover:shadow-md shrink-0 flex items-center justify-center gap-2 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
+                      className="px-6 py-3.5 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs sm:text-sm font-black rounded-lg transition-all shadow-xs hover:shadow-md shrink-0 flex items-center justify-center gap-2 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
                     >
                       <Sparkles size={16} />
                       배너 설정 즉시 적용하기
@@ -8616,13 +8616,13 @@ export default function AdminPage() {
                     <div className="lg:col-span-7 space-y-6">
                       
                       {/* 1. Main Banner Panel (16:8 Wide) */}
-                      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-md space-y-5">
+                      <div className="bg-white border border-slate-200/90 rounded-lg p-6 shadow-md space-y-5">
                         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                           <div className="flex items-center gap-2">
                             <span className="w-2.5 h-2.5 rounded-full bg-[#FED422]"></span>
                             <h3 className="font-black text-sm text-[#0F172A]">대시보드 메인 16:8 배너 설정</h3>
                           </div>
-                          <span className="bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                          <span className="bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] font-black px-2.5 py-0.5 rounded-md">
                             메인 배너
                           </span>
                         </div>
@@ -8636,7 +8636,7 @@ export default function AdminPage() {
                               onChange={(e) => setBannerMainTag(e.target.value)}
                               required
                               placeholder="예: Seasonal Spec"
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                           <div className="space-y-1.5">
@@ -8647,7 +8647,7 @@ export default function AdminPage() {
                               onChange={(e) => setBannerMainTitle(e.target.value)}
                               required
                               placeholder="예: 여름 대비 스페셜 신메뉴 런칭!"
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                         </div>
@@ -8663,11 +8663,11 @@ export default function AdminPage() {
                               value={bannerMainImage}
                               onChange={(e) => setBannerMainImage(e.target.value)}
                               placeholder="https://res.cloudinary.com/... 이미지 URL"
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
 
                             {/* Option B: Dropzone File Upload */}
-                            <label className="relative border-2 border-dashed border-slate-200 hover:border-[#FED422] rounded-2xl bg-slate-50/70 hover:bg-amber-50/20 p-2.5 flex items-center justify-center cursor-pointer transition-all gap-2 group shadow-2xs">
+                            <label className="relative border-2 border-dashed border-slate-200 hover:border-[#FED422] rounded-lg bg-slate-50/70 hover:bg-amber-50/20 p-2.5 flex items-center justify-center cursor-pointer transition-all gap-2 group shadow-2xs">
                               <Upload size={16} className="text-slate-400 group-hover:text-amber-600 transition-colors" />
                               <span className="text-xs font-extrabold text-slate-600 group-hover:text-[#0F172A]">로컬 파일 선택 업로드</span>
                               <input 
@@ -8688,7 +8688,7 @@ export default function AdminPage() {
                             onChange={(e) => setBannerMainDesc(e.target.value)}
                             required
                             placeholder="점주 포털 메인 대시보드 배너에 노출될 부가 설명 문구"
-                            className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none resize-none shadow-2xs leading-relaxed"
+                            className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none resize-none shadow-2xs leading-relaxed"
                           />
                         </div>
 
@@ -8702,7 +8702,7 @@ export default function AdminPage() {
                               onChange={(e) => setBannerMainBtnText(e.target.value)}
                               required
                               placeholder="예: 신메뉴 자재 발주하러 가기"
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                           <div className="space-y-1.5">
@@ -8714,7 +8714,7 @@ export default function AdminPage() {
                                 if (val !== "custom") setBannerMainLink(val);
                                 else setBannerMainLink("https://");
                               }}
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
                             >
                               <option value="order">자재발주 / 주문하기 (내부 메뉴 연결)</option>
                               <option value="training">교육자료실 (내부 메뉴 연결)</option>
@@ -8735,20 +8735,20 @@ export default function AdminPage() {
                               onChange={(e) => setBannerMainLink(e.target.value)}
                               placeholder="https://example.com"
                               required
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                         )}
                       </div>
 
                       {/* 2. Square Banner Panel (1:1 Aspect Ratio) */}
-                      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-md space-y-5">
+                      <div className="bg-white border border-slate-200/90 rounded-lg p-6 shadow-md space-y-5">
                         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                           <div className="flex items-center gap-2">
                             <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
                             <h3 className="font-black text-sm text-[#0F172A]">대시보드 우측 1:1 사각 배너 설정</h3>
                           </div>
-                          <span className="bg-blue-50 text-blue-800 border border-blue-200/80 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                          <span className="bg-blue-50 text-blue-800 border border-blue-200/80 text-[10px] font-black px-2.5 py-0.5 rounded-md">
                             사각 배너
                           </span>
                         </div>
@@ -8762,7 +8762,7 @@ export default function AdminPage() {
                               onChange={(e) => setBannerSideTag(e.target.value)}
                               required
                               placeholder="예: Standard Edu"
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                           <div className="space-y-1.5">
@@ -8773,7 +8773,7 @@ export default function AdminPage() {
                               onChange={(e) => setBannerSideTitle(e.target.value)}
                               required
                               placeholder="예: 하절기 식품 안전 점검"
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                         </div>
@@ -8787,9 +8787,9 @@ export default function AdminPage() {
                               value={bannerSideImage}
                               onChange={(e) => setBannerSideImage(e.target.value)}
                               placeholder="https://example.com/square.jpg"
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                             />
-                            <label className="relative border-2 border-dashed border-slate-200 hover:border-blue-500 rounded-2xl bg-slate-50/70 hover:bg-blue-50/20 p-2.5 flex items-center justify-center cursor-pointer transition-all gap-2 group shadow-2xs">
+                            <label className="relative border-2 border-dashed border-slate-200 hover:border-blue-500 rounded-lg bg-slate-50/70 hover:bg-blue-50/20 p-2.5 flex items-center justify-center cursor-pointer transition-all gap-2 group shadow-2xs">
                               <Upload size={16} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
                               <span className="text-xs font-extrabold text-slate-600 group-hover:text-[#0F172A]">로컬 파일 선택 업로드</span>
                               <input 
@@ -8811,7 +8811,7 @@ export default function AdminPage() {
                               onChange={(e) => setBannerSideDesc(e.target.value)}
                               required
                               placeholder="사각 배너 상세 안내 문구"
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none resize-none shadow-2xs leading-relaxed"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none resize-none shadow-2xs leading-relaxed"
                             />
                           </div>
                           <div className="space-y-1.5">
@@ -8822,7 +8822,7 @@ export default function AdminPage() {
                               onChange={(e) => setBannerSideBtnText(e.target.value)}
                               required
                               placeholder="예: 교육자료 다운로드"
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                         </div>
@@ -8836,7 +8836,7 @@ export default function AdminPage() {
                               if (val !== "custom") setBannerSideLink(val);
                               else setBannerSideLink("https://");
                             }}
-                            className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                            className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 cursor-pointer outline-none transition-all shadow-2xs"
                           >
                             <option value="training">교육자료실 (내부 메뉴 연결)</option>
                             <option value="material">홍보자료실 (내부 메뉴 연결)</option>
@@ -8851,13 +8851,13 @@ export default function AdminPage() {
 
                     {/* Right 5 Columns: Live Visual Preview Cards */}
                     <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24 h-fit">
-                      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-md space-y-5">
+                      <div className="bg-white border border-slate-200/90 rounded-lg p-6 shadow-md space-y-5">
                         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                           <h4 className="font-black text-sm text-[#0F172A] flex items-center gap-2">
                             <Sparkles size={16} className="text-[#FED422]" />
                             실시간 대시보드 노출 미리보기
                           </h4>
-                          <span className="text-[10px] text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded-md">
                             LIVE PREVIEW
                           </span>
                         </div>
@@ -8865,7 +8865,7 @@ export default function AdminPage() {
                         {/* 1. Main Banner Preview Component */}
                         <div className="space-y-2">
                           <span className="text-[11px] font-black text-slate-600 block">① 메인 와이드 배너 (점주 포털 상단)</span>
-                          <div className="relative rounded-2xl overflow-hidden bg-slate-900 text-white p-5 min-h-[160px] flex flex-col justify-between shadow-xs border border-slate-200/40">
+                          <div className="relative rounded-lg overflow-hidden bg-slate-900 text-white p-5 min-h-[160px] flex flex-col justify-between shadow-xs border border-slate-200/40">
                             {bannerMainImage ? (
                               <img 
                                 src={optimizeCloudinaryUrl(bannerMainImage)} 
@@ -8877,7 +8877,7 @@ export default function AdminPage() {
                             )}
 
                             <div className="relative z-10 space-y-1">
-                              <span className="bg-[#FED422] text-[#0F172A] font-black text-[9px] px-2 py-0.5 rounded-full inline-block">
+                              <span className="bg-[#FED422] text-[#0F172A] font-black text-[9px] px-2 py-0.5 rounded-md inline-block">
                                 {bannerMainTag || "Seasonal Spec"}
                               </span>
                               <h5 className="font-black text-sm text-white leading-tight">
@@ -8900,9 +8900,9 @@ export default function AdminPage() {
                         {/* 2. Square Side Banner Preview Component */}
                         <div className="space-y-2 pt-2 border-t border-slate-100">
                           <span className="text-[11px] font-black text-slate-600 block">② 사각 1:1 배너 (대시보드 우측)</span>
-                          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-3">
+                          <div className="bg-white border border-slate-200/90 rounded-lg p-4 shadow-2xs space-y-3">
                             <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200/60 flex items-center justify-center">
+                              <div className="w-12 h-12 rounded-md bg-slate-100 overflow-hidden shrink-0 border border-slate-200/60 flex items-center justify-center">
                                 {bannerSideImage ? (
                                   <img src={optimizeCloudinaryUrl(bannerSideImage)} alt="" className="w-full h-full object-cover" />
                                 ) : (
@@ -8910,7 +8910,7 @@ export default function AdminPage() {
                                 )}
                               </div>
                               <div className="min-w-0 flex-1">
-                                <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full inline-block mb-0.5">
+                                <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md inline-block mb-0.5">
                                   {bannerSideTag || "Standard Edu"}
                                 </span>
                                 <h5 className="font-black text-xs text-[#0F172A] truncate">
@@ -8923,7 +8923,7 @@ export default function AdminPage() {
                             </p>
                             <button
                               type="button"
-                              className="w-full py-2 bg-[#FED422] text-[#0F172A] text-[10px] font-black rounded-xl border-0 shadow-2xs cursor-default text-center"
+                              className="w-full py-2 bg-[#FED422] text-[#0F172A] text-[10px] font-black rounded-md border-0 shadow-2xs cursor-default text-center"
                             >
                               {bannerSideBtnText || "버튼 텍스트"} →
                             </button>
@@ -8936,13 +8936,13 @@ export default function AdminPage() {
                   </div>
 
                   {/* Bottom Save CTA Bar */}
-                  <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-md flex items-center justify-between gap-4">
+                  <div className="bg-white border border-slate-200/90 rounded-lg p-5 shadow-md flex items-center justify-between gap-4">
                     <div className="text-xs text-slate-500 font-bold hidden sm:block">
                       * [배너 설정 즉시 적용하기] 버튼을 누르시면 점주 포털에 실시간 반영됩니다.
                     </div>
                     <button
                       type="submit"
-                      className="w-full sm:w-auto px-8 py-4 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] font-black text-sm sm:text-base rounded-2xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0 ml-auto"
+                      className="w-full sm:w-auto px-8 py-4 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] font-black text-sm sm:text-base rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0 ml-auto"
                     >
                       <Sparkles size={18} />
                       본사 대시보드 배너 설정 일괄 실시간 저장
@@ -8954,7 +8954,7 @@ export default function AdminPage() {
 
               {/* 3. REAL-TIME FLOATING BUTTON CHANNELS */}
               {bannerSubMenu === "floating" && (
-                <form onSubmit={handleUpdateFloating} className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-md space-y-6 animate-fadeIn">
+                <form onSubmit={handleUpdateFloating} className="bg-white border border-slate-200/90 rounded-lg p-6 sm:p-8 shadow-md space-y-6 animate-fadeIn">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div className="space-y-1">
                       <h3 className="font-black text-base text-[#0F172A] flex items-center gap-2">
@@ -8983,7 +8983,7 @@ export default function AdminPage() {
                         value={floatingInsta}
                         onChange={(e) => setFloatingInsta(e.target.value)}
                         placeholder="https://instagram.com/account"
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                     <div className="space-y-2">
@@ -8993,7 +8993,7 @@ export default function AdminPage() {
                         value={floatingYoutube}
                         onChange={(e) => setFloatingYoutube(e.target.value)}
                         placeholder="https://youtube.com/c/channel"
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                   </div>
@@ -9006,7 +9006,7 @@ export default function AdminPage() {
                         value={floatingChat}
                         onChange={(e) => setFloatingChat(e.target.value)}
                         placeholder="https://pf.kakao.com/_xxxx"
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                     <div className="space-y-2">
@@ -9016,7 +9016,7 @@ export default function AdminPage() {
                         value={floatingPhone}
                         onChange={(e) => setFloatingPhone(e.target.value)}
                         placeholder="예: 1566-3594"
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                   </div>
@@ -9029,7 +9029,7 @@ export default function AdminPage() {
                         value={floatingKakao}
                         onChange={(e) => setFloatingKakao(e.target.value)}
                         placeholder="https://open.kakao.com/o/sxxxx"
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                     <div className="space-y-2">
@@ -9039,14 +9039,14 @@ export default function AdminPage() {
                         value={floatingBlog}
                         onChange={(e) => setFloatingBlog(e.target.value)}
                         placeholder="https://blog.naver.com/xxxx"
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-4 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] font-black text-sm rounded-2xl transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-2 active:scale-98 cursor-pointer border-0"
+                    className="w-full py-4 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] font-black text-sm rounded-lg transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-2 active:scale-98 cursor-pointer border-0"
                   >
                     <Sparkles size={16} />
                     홈페이지 플로팅 채널 연동 정보 반영 및 저장
@@ -9058,7 +9058,7 @@ export default function AdminPage() {
               {bannerSubMenu === "instagram" && (
                 <div className="space-y-6 animate-fadeIn">
                   
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/90 rounded-[28px] p-6 shadow-md">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/90 rounded-lg p-6 shadow-md">
                     <div className="space-y-1">
                       <h3 className="font-black text-base text-[#0F172A] flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-[#FED422] animate-pulse"></span>
@@ -9073,7 +9073,7 @@ export default function AdminPage() {
                         type="button"
                         onClick={handleRefreshAllInstaHd}
                         disabled={isRefreshingInstaHd}
-                        className="px-4 py-3 bg-neutral-900 hover:bg-black text-[#FED422] text-xs font-black rounded-2xl transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 disabled:opacity-50"
+                        className="px-4 py-3 bg-neutral-900 hover:bg-black text-[#FED422] text-xs font-black rounded-lg transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 disabled:opacity-50"
                         title="모든 인스타 게시물의 썸네일을 FULL HD 1080p 고화질로 자동 갱신합니다."
                       >
                         {isRefreshingInstaHd ? "⚡ 고화질 HD 갱신 중..." : "⚡ 전체 피드 HD 고화질 갱신"}
@@ -9090,7 +9090,7 @@ export default function AdminPage() {
                           setInstaIsMain(false);
                           setIsInstaModalOpen(true);
                         }}
-                        className="px-5 py-3 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
+                        className="px-5 py-3 bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black rounded-lg transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 hover:-translate-y-0.5 active:translate-y-0"
                       >
                         + 신규 인스타 게시물 연동
                       </button>
@@ -9098,7 +9098,7 @@ export default function AdminPage() {
                   </div>
 
                   {/* List Table */}
-                  <div className="bg-white border-0 rounded-[28px] overflow-hidden shadow-md">
+                  <div className="bg-white border-0 rounded-lg overflow-hidden shadow-md">
                     <div className="bg-[#F8F9FD] px-6 py-3 border-b border-[#EEF0F5] flex items-center justify-between text-xs font-bold text-slate-600">
                       <span className="flex items-center gap-1.5">
                         🖐️ <strong>순서 변경 팁:</strong> 마우스로 ☰ 핸들을 잡고 위아래로 끌어다 놓거나(Drag & Drop), ▲/▼ 버튼을 눌러 인스타 피드 순서를 자유롭게 조절할 수 있습니다.
@@ -9186,7 +9186,7 @@ export default function AdminPage() {
 
                                   {/* Image */}
                                   <td className="py-4 px-6">
-                                    <div className="w-14 h-14 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center shadow-2xs">
+                                    <div className="w-14 h-14 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center shadow-2xs">
                                       <img 
                                         src={optimizeCloudinaryUrl(getInstagramThumbnailUrl(item.img, item.link))} 
                                         alt="Insta 썸네일" 
@@ -9210,7 +9210,7 @@ export default function AdminPage() {
                                     <button
                                       type="button"
                                       onClick={() => handleToggleInstaMain(item)}
-                                      className={`px-3 py-1.5 rounded-xl font-extrabold text-[10px] transition-all cursor-pointer border-0 shadow-2xs inline-flex items-center justify-center gap-1 ${
+                                      className={`px-3 py-1.5 rounded-md font-extrabold text-[10px] transition-all cursor-pointer border-0 shadow-2xs inline-flex items-center justify-center gap-1 ${
                                         item.isMain
                                           ? "bg-[#FED422] text-[#0F172A] font-black"
                                           : "bg-slate-100 text-slate-500 hover:bg-slate-200"
@@ -9237,7 +9237,7 @@ export default function AdminPage() {
                                       <button
                                         type="button"
                                         onClick={() => handleOpenInstaEdit(item)}
-                                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border-0 transition-all font-bold text-[10px] cursor-pointer shadow-2xs"
+                                        className="p-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 border-0 transition-all font-bold text-[10px] cursor-pointer shadow-2xs"
                                         title="수정"
                                       >
                                         수정
@@ -9245,7 +9245,7 @@ export default function AdminPage() {
                                       <button
                                         type="button"
                                         onClick={() => handleDeleteInstagram(item._id)}
-                                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 border-0 transition-all font-bold text-[10px] cursor-pointer shadow-2xs"
+                                        className="p-1.5 rounded-md bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 border-0 transition-all font-bold text-[10px] cursor-pointer shadow-2xs"
                                         title="삭제"
                                       >
                                         삭제
@@ -9264,7 +9264,7 @@ export default function AdminPage() {
                   {/* Form Modal for Creating/Editing Instagram Feed */}
                   {isInstaModalOpen && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn">
-                      <div className="w-full max-w-xl bg-white border-0 rounded-[32px] overflow-hidden shadow-2xl max-h-[90vh] flex flex-col font-sans">
+                      <div className="w-full max-w-xl bg-white border-0 rounded-lg overflow-hidden shadow-2xl max-h-[90vh] flex flex-col font-sans">
                         <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
                           <div>
                             <h3 className="font-black text-base sm:text-lg text-[#0F172A]">
@@ -9273,7 +9273,7 @@ export default function AdminPage() {
                             <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">브랜드 페이지에 연동할 인스타그램 게시물을 관리합니다.</p>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
+                            <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
                               인스타그램 피드
                             </span>
                             <button
@@ -9288,7 +9288,7 @@ export default function AdminPage() {
 
                         <form onSubmit={handleSaveInstagram} className="p-6 sm:p-7 overflow-y-auto space-y-4 text-left text-xs sm:text-sm flex-1 bg-[#f9fafb]">
                           {/* Card 1: Feed Link & Image */}
-                          <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                          <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                             <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                               <div className="flex items-center gap-2.5">
                                 <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
@@ -9296,7 +9296,7 @@ export default function AdminPage() {
                                 </div>
                                 <span className="text-xs font-black text-[#0F172A] tracking-tight">게시물 링크 및 미디어</span>
                               </div>
-                              <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                              <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                                 링크 및 썸네일
                               </span>
                             </div>
@@ -9326,7 +9326,7 @@ export default function AdminPage() {
                                     }
                                   }}
                                   placeholder="https://www.instagram.com/p/xxxx 또는 reels/xxxx"
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                                 />
                               </div>
                             </div>
@@ -9340,7 +9340,7 @@ export default function AdminPage() {
                                   value={instaImg}
                                   onChange={(e) => setInstaImg(e.target.value)}
                                   placeholder="https://res.cloudinary.com/... 이미지 주소"
-                                  className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                                  className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                                 />
                                 <div className="relative shrink-0">
                                   <input
@@ -9369,7 +9369,7 @@ export default function AdminPage() {
                                   />
                                   <button
                                     type="button"
-                                    className="px-3.5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs transition-all border-0 cursor-pointer shadow-2xs"
+                                    className="px-3.5 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs transition-all border-0 cursor-pointer shadow-2xs"
                                   >
                                     파일 업로드
                                   </button>
@@ -9379,7 +9379,7 @@ export default function AdminPage() {
                           </div>
 
                           {/* Card 2: Feed Content & Date */}
-                          <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
+                          <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
                             <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                               <div className="flex items-center gap-2.5">
                                 <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
@@ -9387,7 +9387,7 @@ export default function AdminPage() {
                                 </div>
                                 <span className="text-xs font-black text-[#0F172A] tracking-tight">게시글 본문 및 게시일자</span>
                               </div>
-                              <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                              <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                                 상세 본문
                               </span>
                             </div>
@@ -9399,7 +9399,7 @@ export default function AdminPage() {
                                 value={instaText}
                                 onChange={(e) => setInstaText(e.target.value)}
                                 placeholder="인스타그램에 등록된 게시글 본문 일부를 입력하세요."
-                                className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none resize-none shadow-2xs"
+                                className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none resize-none shadow-2xs"
                               />
                             </div>
 
@@ -9410,7 +9410,7 @@ export default function AdminPage() {
                                   type="date"
                                   value={instaDate}
                                   onChange={(e) => setInstaDate(e.target.value)}
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                                 />
                               </div>
                               <div className="space-y-1.5">
@@ -9419,7 +9419,7 @@ export default function AdminPage() {
                                   type="number"
                                   value={instaOrder}
                                   onChange={(e) => setInstaOrder(parseInt(e.target.value) || 1)}
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                                 />
                               </div>
                             </div>
@@ -9430,13 +9430,13 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={() => setIsInstaModalOpen(false)}
-                              className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-xs rounded-2xl transition-all cursor-pointer border-0 shadow-2xs"
+                              className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-xs rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
                             >
                               취소
                             </button>
                             <button
                               type="submit"
-                              className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                              className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
                             >
                               <span>{instaId ? "인스타 피드 정보 수정" : "신규 인스타 피드 등록"}</span>
                               <ArrowRight size={14} />
@@ -9469,7 +9469,7 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                 
                 {/* 1. Account Management (계정관리) */}
-                <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-5">
+                <div className="bg-white border-0 rounded-lg p-6 sm:p-8 shadow-md space-y-5">
                   <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
                     <UserCheck size={18} className="text-[#FED422]" />
                     본사 최고 관리자 계정 변경 관리
@@ -9483,7 +9483,7 @@ export default function AdminPage() {
                         value={adminIdSetting}
                         onChange={(e) => setAdminIdSetting(e.target.value)}
                         required
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                     
@@ -9494,7 +9494,7 @@ export default function AdminPage() {
                         placeholder="새 비밀번호 입력"
                         value={adminPwSetting}
                         onChange={(e) => setAdminPwSetting(e.target.value)}
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
 
@@ -9505,13 +9505,13 @@ export default function AdminPage() {
                         placeholder="새 비밀번호 동일 입력"
                         value={adminPwSettingConfirm}
                         onChange={(e) => setAdminPwSettingConfirm(e.target.value)}
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-3.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs flex items-center justify-center gap-1.5 border-0 active:scale-95 cursor-pointer"
+                      className="w-full py-3.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all shadow-2xs flex items-center justify-center gap-1.5 border-0 active:scale-95 cursor-pointer"
                     >
                       <Check size={14} />
                       관리자 계정 정보 적용
@@ -9520,7 +9520,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* 2. Delivery Status Values Management (배송상태값 관리) */}
-                <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-5">
+                <div className="bg-white border-0 rounded-lg p-6 sm:p-8 shadow-md space-y-5">
                   <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
                     <Truck size={18} className="text-[#FED422]" />
                     주문 배송 상태값(태그) 관리
@@ -9538,11 +9538,11 @@ export default function AdminPage() {
                       value={newStatusName}
                       onChange={(e) => setNewStatusName(e.target.value)}
                       required
-                      className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
+                      className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
                     />
                     <button 
                       type="submit"
-                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all whitespace-nowrap border-0 shadow-2xs active:scale-95 cursor-pointer"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all whitespace-nowrap border-0 shadow-2xs active:scale-95 cursor-pointer"
                     >
                       추가
                     </button>
@@ -9550,13 +9550,13 @@ export default function AdminPage() {
 
                   <div className="space-y-3 pt-2">
                     <label className="text-[11px] font-extrabold text-slate-500 block">현재 활성화된 배송 상태값 리스트</label>
-                    <div className="flex flex-wrap gap-2 bg-[#F8F9FD] border border-[#EEF0F5] p-4 rounded-2xl">
+                    <div className="flex flex-wrap gap-2 bg-[#F8F9FD] border border-[#EEF0F5] p-4 rounded-lg">
                       {deliveryStatuses.map((st) => {
                         const isCore = ["주문완료", "배송완료"].includes(st);
                         return (
                           <span 
                             key={st}
-                            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap border-0 shadow-2xs ${
+                            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs font-extrabold whitespace-nowrap border-0 shadow-2xs ${
                               isCore 
                                 ? "bg-[#FED422] text-[#0F172A] font-black" 
                                 : "bg-white text-slate-700"
@@ -9583,7 +9583,7 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={handleResetDeliveryStatuses}
-                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold border-0 transition-colors cursor-pointer shadow-2xs"
+                      className="px-4 py-2 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold border-0 transition-colors cursor-pointer shadow-2xs"
                     >
                       상태값 기본값으로 리셋
                     </button>
@@ -9591,7 +9591,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* 3. Status Colors Settings (진행상태 버튼 색상 설정) */}
-                <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-5">
+                <div className="bg-white border-0 rounded-lg p-6 sm:p-8 shadow-md space-y-5">
                   <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
                     <Palette size={18} className="text-[#FED422]" />
                     진행상태 버튼 색상 설정
@@ -9614,7 +9614,7 @@ export default function AdminPage() {
                     ])).map((status) => {
                       const currentColor = statusColors[status] || "pink";
                       return (
-                        <div key={status} className="flex items-center justify-between gap-4 bg-[#F8F9FD] p-3.5 rounded-2xl border border-[#EEF0F5]">
+                        <div key={status} className="flex items-center justify-between gap-4 bg-[#F8F9FD] p-3.5 rounded-lg border border-[#EEF0F5]">
                           <div className="flex items-center gap-3">
                             <span className="text-xs font-extrabold text-[#0F172A]">{status}</span>
                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-extrabold shadow-2xs ${
@@ -9633,7 +9633,7 @@ export default function AdminPage() {
                               const newColors = { ...statusColors, [status]: e.target.value };
                               setStatusColors(newColors);
                             }}
-                            className="bg-[#F1F4F8] border-0 rounded-xl px-3 py-2 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none shadow-2xs transition-all"
+                            className="bg-[#F1F4F8] border-0 rounded-md px-3 py-2 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none shadow-2xs transition-all"
                           >
                             {Object.entries(COLOR_PRESETS).map(([key, value]) => (
                               <option key={key} value={key}>
@@ -9653,7 +9653,7 @@ export default function AdminPage() {
                       window.dispatchEvent(new Event("storage"));
                       triggerToast("진행상태 버튼 색상 설정이 성공적으로 저장되었습니다!");
                     }}
-                    className="w-full py-3.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer border-0 active:scale-95"
+                    className="w-full py-3.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer border-0 active:scale-95"
                   >
                     <Check size={14} />
                     색상 설정 저장하기
@@ -9661,7 +9661,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* 4. Naver Map API Key Integration (외부 지도 API 연동) */}
-                <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-5 lg:col-span-2">
+                <div className="bg-white border-0 rounded-lg p-6 sm:p-8 shadow-md space-y-5 lg:col-span-2">
                   <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
                     <Map size={18} className="text-[#FED422]" />
                     가맹점 현황 지도 연동 설정 (네이버 지도 API)
@@ -9681,7 +9681,7 @@ export default function AdminPage() {
                         placeholder="네이버 클라우드 플랫폼에서 발급받은 Client ID를 입력하세요"
                         value={naverClientIdSetting}
                         onChange={(e) => setNaverClientIdSetting(e.target.value)}
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                       <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
                         발급처: <a href="https://console.ncloud.com" target="_blank" rel="noopener noreferrer" className="text-amber-600 underline font-bold">Naver Cloud Platform Console</a><br />
@@ -9692,7 +9692,7 @@ export default function AdminPage() {
 
                     <button
                       type="submit"
-                      className="py-3.5 px-6 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs flex items-center gap-1.5 border-0 active:scale-95 cursor-pointer"
+                      className="py-3.5 px-6 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all shadow-2xs flex items-center gap-1.5 border-0 active:scale-95 cursor-pointer"
                     >
                       <Check size={14} />
                       네이버 지도 API 설정 저장
@@ -9701,7 +9701,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* 4. 약관 및 정책 설정 */}
-                <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-5 lg:col-span-2">
+                <div className="bg-white border-0 rounded-lg p-6 sm:p-8 shadow-md space-y-5 lg:col-span-2">
                   <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
                     <FileText size={18} className="text-[#FED422]" />
                     이용약관, 개인정보처리방침 및 환불정책 설정
@@ -9721,7 +9721,7 @@ export default function AdminPage() {
                           onChange={(e) => setTermsOfUseSetting(e.target.value)}
                           rows={12}
                           required
-                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 font-mono leading-relaxed resize-y shadow-2xs outline-none"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 font-mono leading-relaxed resize-y shadow-2xs outline-none"
                           placeholder="이용약관 내용을 입력해 주세요"
                         />
                       </div>
@@ -9733,7 +9733,7 @@ export default function AdminPage() {
                           onChange={(e) => setPrivacyPolicySetting(e.target.value)}
                           rows={12}
                           required
-                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 font-mono leading-relaxed resize-y shadow-2xs outline-none"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 font-mono leading-relaxed resize-y shadow-2xs outline-none"
                           placeholder="개인정보처리방침 내용을 입력해 주세요"
                         />
                       </div>
@@ -9745,7 +9745,7 @@ export default function AdminPage() {
                           onChange={(e) => setRefundPolicySetting(e.target.value)}
                           rows={12}
                           required
-                          className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 font-mono leading-relaxed resize-y shadow-2xs outline-none"
+                          className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 font-mono leading-relaxed resize-y shadow-2xs outline-none"
                           placeholder="환불정책 내용을 입력해 주세요"
                         />
                       </div>
@@ -9753,7 +9753,7 @@ export default function AdminPage() {
 
                     <button
                       type="submit"
-                      className="py-3.5 px-6 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs flex items-center gap-1.5 border-0 active:scale-95 cursor-pointer"
+                      className="py-3.5 px-6 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all shadow-2xs flex items-center gap-1.5 border-0 active:scale-95 cursor-pointer"
                     >
                       <Check size={14} />
                       약관 및 정책 설정 저장
@@ -9763,7 +9763,7 @@ export default function AdminPage() {
 
                 {/* 5. 실시간 SMS 발송 자동 연동 및 문구 설정 */}
                 {smsSettings && (
-                  <div className="bg-white border-0 rounded-[28px] p-6 sm:p-8 shadow-md space-y-6 lg:col-span-2">
+                  <div className="bg-white border-0 rounded-lg p-6 sm:p-8 shadow-md space-y-6 lg:col-span-2">
                     <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
                       <MessageSquare size={18} className="text-[#FED422]" />
                       5. 실시간 SMS 발송 자동 연동 및 문구 설정 (알리고 API 연동)
@@ -9777,7 +9777,7 @@ export default function AdminPage() {
                     <form onSubmit={handleUpdateSmsSettings} className="space-y-6">
                       
                       {/* A. 알리고 API 연동 Key 관리 */}
-                      <div className="bg-[#F8F9FD] border border-[#EEF0F5] rounded-2xl p-5 space-y-4">
+                      <div className="bg-[#F8F9FD] border border-[#EEF0F5] rounded-lg p-5 space-y-4">
                         <h4 className="text-xs font-black text-[#0F172A] border-b border-slate-100 pb-2">
                           🔌 알리고 SMS API 연동 자격증명 설정
                         </h4>
@@ -9792,7 +9792,7 @@ export default function AdminPage() {
                                 ...smsSettings,
                                 aligoKey: e.target.value
                               })}
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                           <div className="space-y-1.5">
@@ -9805,7 +9805,7 @@ export default function AdminPage() {
                                 ...smsSettings,
                                 aligoUserId: e.target.value
                               })}
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                         </div>
@@ -9830,7 +9830,7 @@ export default function AdminPage() {
                       </div>
 
                       {/* C. 알리고 API 연동 테스트 발송 (신설) */}
-                      <div className="bg-[#F8F9FD] border border-[#EEF0F5] rounded-2xl p-5 space-y-4">
+                      <div className="bg-[#F8F9FD] border border-[#EEF0F5] rounded-lg p-5 space-y-4">
                         <h4 className="text-xs font-black text-[#0F172A] border-b border-slate-100 pb-2 flex items-center gap-1.5">
                           🧪 알리고 API 실시간 발송 테스트
                         </h4>
@@ -9846,7 +9846,7 @@ export default function AdminPage() {
                               placeholder="알리고에 등록된 발신 번호를 적어주세요"
                               value={testSenderPhone}
                               onChange={(e) => setTestSenderPhone(formatPhoneNumber(e.target.value))}
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                           <div className="space-y-1.5 flex-1 min-w-[150px]">
@@ -9856,14 +9856,14 @@ export default function AdminPage() {
                               placeholder="010-0000-0000"
                               value={testReceiverPhone}
                               onChange={(e) => setTestReceiverPhone(formatPhoneNumber(e.target.value))}
-                              className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                              className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                             />
                           </div>
                           <button
                             type="button"
                             onClick={handleTestSendSms}
                             disabled={isTestingSms}
-                            className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all shadow-2xs flex items-center gap-1.5 h-[42px] disabled:opacity-50 cursor-pointer border-0 shrink-0"
+                            className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all shadow-2xs flex items-center gap-1.5 h-[42px] disabled:opacity-50 cursor-pointer border-0 shrink-0"
                           >
                             {isTestingSms ? "전송 중..." : "테스트 문자 발송"}
                           </button>
@@ -9882,7 +9882,7 @@ export default function AdminPage() {
                           const config = smsSettings[evt.key];
                           if (!config) return null;
                           return (
-                            <div key={evt.key} className="border border-[#EEF0F5] rounded-2xl p-6 bg-[#F8F9FD] shadow-2xs space-y-4">
+                            <div key={evt.key} className="border border-[#EEF0F5] rounded-lg p-6 bg-[#F8F9FD] shadow-2xs space-y-4">
                               <h4 className="text-xs font-black text-[#0F172A] border-b border-slate-200/60 pb-2 flex items-center gap-1.5 justify-between">
                                 <span className="flex items-center gap-1.5">{evt.label}</span>
                                 <span className="text-[10px] text-slate-400 font-medium">변수: {evt.vars}</span>
@@ -9890,7 +9890,7 @@ export default function AdminPage() {
                               
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* 고객용 */}
-                                <div className="space-y-3.5 bg-white border border-[#EEF0F5] p-4 rounded-2xl relative shadow-2xs">
+                                <div className="space-y-3.5 bg-white border border-[#EEF0F5] p-4 rounded-lg relative shadow-2xs">
                                   <div className="flex justify-between items-center border-b border-slate-100 pb-2">
                                     <span className="text-xs font-extrabold text-[#0F172A]">고객용 ({evt.custLabel})</span>
                                     <label className="flex items-center gap-1.5 cursor-pointer text-xs font-extrabold text-[#0F172A] select-none">
@@ -9922,7 +9922,7 @@ export default function AdminPage() {
                                             customer: { ...config.customer, sender: formatPhoneNumber(e.target.value) }
                                           }
                                         })}
-                                        className="w-full bg-[#F1F4F8] border-0 rounded-xl px-3 py-2 text-xs font-extrabold text-[#0F172A] shadow-2xs outline-none"
+                                        className="w-full bg-[#F1F4F8] border-0 rounded-md px-3 py-2 text-xs font-extrabold text-[#0F172A] shadow-2xs outline-none"
                                       />
                                     </div>
                                     <div className="space-y-1">
@@ -9931,7 +9931,7 @@ export default function AdminPage() {
                                         type="text"
                                         disabled
                                         value="해당 수신자 (자동)"
-                                        className="w-full bg-slate-100 border-0 text-slate-400 rounded-xl px-3 py-2 text-xs font-extrabold cursor-not-allowed"
+                                        className="w-full bg-slate-100 border-0 text-slate-400 rounded-md px-3 py-2 text-xs font-extrabold cursor-not-allowed"
                                       />
                                     </div>
                                   </div>
@@ -9947,13 +9947,13 @@ export default function AdminPage() {
                                         }
                                       })}
                                       rows={3}
-                                      className="w-full bg-[#F1F4F8] border-0 rounded-xl px-3 py-2.5 text-xs font-extrabold text-[#0F172A] leading-relaxed resize-none shadow-2xs outline-none"
+                                      className="w-full bg-[#F1F4F8] border-0 rounded-md px-3 py-2.5 text-xs font-extrabold text-[#0F172A] leading-relaxed resize-none shadow-2xs outline-none"
                                     />
                                   </div>
                                 </div>
 
                                 {/* 관리자용 */}
-                                <div className="space-y-3.5 bg-white border border-[#EEF0F5] p-4 rounded-2xl relative shadow-2xs">
+                                <div className="space-y-3.5 bg-white border border-[#EEF0F5] p-4 rounded-lg relative shadow-2xs">
                                   <div className="flex justify-between items-center border-b border-slate-100 pb-2">
                                     <span className="text-xs font-extrabold text-[#0F172A]">관리자용 (본사 알림 수신)</span>
                                     <label className="flex items-center gap-1.5 cursor-pointer text-xs font-extrabold text-[#0F172A] select-none">
@@ -9986,7 +9986,7 @@ export default function AdminPage() {
                                               admin: { ...config.admin, sender: formatPhoneNumber(e.target.value) }
                                             }
                                           })}
-                                          className="w-full bg-[#F1F4F8] border-0 rounded-xl px-3 py-2 text-xs font-extrabold text-[#0F172A] shadow-2xs outline-none"
+                                          className="w-full bg-[#F1F4F8] border-0 rounded-md px-3 py-2 text-xs font-extrabold text-[#0F172A] shadow-2xs outline-none"
                                         />
                                       </div>
                                       <div className="space-y-1">
@@ -10000,12 +10000,12 @@ export default function AdminPage() {
                                               ...newAdminPhoneInputs,
                                               [evt.key]: formatPhoneNumber(e.target.value)
                                             })}
-                                            className="min-w-0 flex-1 bg-[#F1F4F8] border-0 rounded-xl px-3 py-2 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 shadow-2xs outline-none"
+                                            className="min-w-0 flex-1 bg-[#F1F4F8] border-0 rounded-md px-3 py-2 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 shadow-2xs outline-none"
                                           />
                                           <button 
                                             type="button"
                                             onClick={() => addAdminReceiver(evt.key)}
-                                            className="px-3 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-xl shrink-0 cursor-pointer border-0 shadow-2xs"
+                                            className="px-3 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-md shrink-0 cursor-pointer border-0 shadow-2xs"
                                           >
                                             추가
                                           </button>
@@ -10016,7 +10016,7 @@ export default function AdminPage() {
                                     {/* 수신자 번호 리스트 태그 */}
                                     <div className="space-y-1">
                                       <span className="text-xs font-extrabold text-[#0F172A]">수신 번호 리스트 ({(config.admin.receivers || []).length}개)</span>
-                                      <div className="flex flex-wrap gap-1.5 bg-[#F8F9FD] border border-[#EEF0F5] p-2.5 rounded-xl min-h-[42px] max-h-[100px] overflow-y-auto">
+                                      <div className="flex flex-wrap gap-1.5 bg-[#F8F9FD] border border-[#EEF0F5] p-2.5 rounded-md min-h-[42px] max-h-[100px] overflow-y-auto">
                                         {(config.admin.receivers || []).map((num: string) => (
                                           <span key={num} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border-0 shadow-2xs rounded-lg text-xs font-extrabold text-[#0F172A]">
                                             {num}
@@ -10047,7 +10047,7 @@ export default function AdminPage() {
                                         }
                                       })}
                                       rows={3}
-                                      className="w-full bg-[#F1F4F8] border-0 rounded-xl px-3 py-2.5 text-xs font-extrabold text-[#0F172A] leading-relaxed resize-none shadow-2xs outline-none"
+                                      className="w-full bg-[#F1F4F8] border-0 rounded-md px-3 py-2.5 text-xs font-extrabold text-[#0F172A] leading-relaxed resize-none shadow-2xs outline-none"
                                     />
                                   </div>
                                 </div>
@@ -10061,7 +10061,7 @@ export default function AdminPage() {
                       <div className="flex justify-end border-t border-slate-100 pt-4">
                         <button
                           type="submit"
-                          className="py-3.5 px-6 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer border-0 active:scale-95"
+                          className="py-3.5 px-6 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer border-0 active:scale-95"
                         >
                           <Check size={14} />
                           SMS 알림 및 템플릿 설정 일괄 저장
@@ -10090,7 +10090,7 @@ export default function AdminPage() {
                 </div>
                 <button
                   onClick={handleOpenAddGalleryModal}
-                  className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl shadow-2xs hover:scale-[1.02] transition-all flex items-center gap-1.5 shrink-0 cursor-pointer border-0"
+                  className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg shadow-2xs hover:scale-[1.02] transition-all flex items-center gap-1.5 shrink-0 cursor-pointer border-0"
                 >
                   <Plus size={14} />
                   신규 이미지 등록
@@ -10099,7 +10099,7 @@ export default function AdminPage() {
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 {/* Left: Category Management Panel (4 cols) */}
-                <div className="lg:col-span-4 bg-white border-0 rounded-[28px] p-6 shadow-md space-y-6">
+                <div className="lg:col-span-4 bg-white border-0 rounded-lg p-6 shadow-md space-y-6">
                   <h3 className="font-black text-sm text-[#0F172A] border-b border-slate-100 pb-3 flex items-center gap-2">
                     <BookOpen size={16} className="text-[#FED422]" />
                     카테고리 관리
@@ -10112,11 +10112,11 @@ export default function AdminPage() {
                       value={newGalleryCategoryName}
                       onChange={(e) => setNewGalleryCategoryName(e.target.value)}
                       required
-                      className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
+                      className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
                     />
                     <button
                       type="submit"
-                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all whitespace-nowrap border-0 shadow-2xs active:scale-95 cursor-pointer"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all whitespace-nowrap border-0 shadow-2xs active:scale-95 cursor-pointer"
                     >
                       추가
                     </button>
@@ -10124,11 +10124,11 @@ export default function AdminPage() {
 
                   <div className="space-y-3">
                     <label className="text-[11px] font-extrabold text-slate-500 block">등록된 카테고리 리스트 ({galleryCategories.length}개)</label>
-                    <div className="space-y-2 p-3 bg-[#F8F9FD] border border-[#EEF0F5] rounded-2xl min-h-[120px] max-h-[300px] overflow-y-auto">
+                    <div className="space-y-2 p-3 bg-[#F8F9FD] border border-[#EEF0F5] rounded-lg min-h-[120px] max-h-[300px] overflow-y-auto">
                       {galleryCategories.map((cat, idx) => (
                         <div
                           key={cat}
-                          className="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-extrabold bg-white text-[#0F172A] border-0 shadow-2xs group"
+                          className="flex items-center justify-between px-4 py-2.5 rounded-md text-xs font-extrabold bg-white text-[#0F172A] border-0 shadow-2xs group"
                         >
                           <span>{cat}</span>
                           <div className="flex items-center gap-1">
@@ -10171,10 +10171,10 @@ export default function AdminPage() {
                 {/* Right: Images Grid List (8 cols) */}
                 <div className="lg:col-span-8 space-y-6">
                   {/* Category Selection Tabs Bar */}
-                  <div className="flex flex-wrap gap-1.5 p-1.5 bg-slate-100 rounded-2xl shadow-2xs border-0">
+                  <div className="flex flex-wrap gap-1.5 p-1.5 bg-slate-100 rounded-lg shadow-2xs border-0">
                     <button
                       onClick={() => setSelectedGalleryCategory("전체")}
-                      className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                      className={`px-4 py-2.5 rounded-md text-xs font-extrabold transition-all border-0 cursor-pointer ${
                         selectedGalleryCategory === "전체"
                           ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
                           : "text-slate-600 hover:text-[#0F172A]"
@@ -10188,7 +10188,7 @@ export default function AdminPage() {
                         <button
                           key={cat}
                           onClick={() => setSelectedGalleryCategory(cat)}
-                          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                          className={`px-4 py-2.5 rounded-md text-xs font-extrabold transition-all border-0 cursor-pointer ${
                             selectedGalleryCategory === cat
                               ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
                               : "text-slate-600 hover:text-[#0F172A]"
@@ -10202,12 +10202,12 @@ export default function AdminPage() {
 
                   {/* Grid layout */}
                   {galleryItems.filter(item => selectedGalleryCategory === "전체" || item.category === selectedGalleryCategory).length === 0 ? (
-                    <div className="bg-white border-0 rounded-[28px] p-16 text-center flex flex-col items-center justify-center shadow-md">
+                    <div className="bg-white border-0 rounded-lg p-16 text-center flex flex-col items-center justify-center shadow-md">
                       <ImageIcon size={40} className="text-slate-300 mb-3 animate-pulse" />
                       <p className="text-xs font-bold text-slate-400">해당 카테고리에 등록된 갤러리 이미지가 없습니다.</p>
                       <button
                         onClick={handleOpenAddGalleryModal}
-                        className="mt-4 px-5 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-2xl transition-all shadow-2xs border-0 cursor-pointer"
+                        className="mt-4 px-5 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all shadow-2xs border-0 cursor-pointer"
                       >
                         신규 이미지 추가하기
                       </button>
@@ -10224,14 +10224,14 @@ export default function AdminPage() {
                             onDragOver={(e) => handleDragOver(e, item.id)}
                             onDragEnd={handleDragEnd}
                             onDrop={(e) => handleDrop(e, item.id)}
-                            className={`bg-white border-0 rounded-[28px] overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col group cursor-move select-none p-4 space-y-3 ${
+                            className={`bg-white border-0 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col group cursor-move select-none p-4 space-y-3 ${
                               draggedId === item.id
                                 ? "opacity-40 scale-95 ring-2 ring-[#FED422]"
                                 : ""
                             }`}
                           >
                             {/* Image Container */}
-                            <div className="relative aspect-video w-full overflow-hidden bg-slate-100 rounded-2xl border-0">
+                            <div className="relative aspect-video w-full overflow-hidden bg-slate-100 rounded-lg border-0">
                               <img
                                 src={item.url}
                                 alt={item.name}
@@ -10246,7 +10246,7 @@ export default function AdminPage() {
                                   e.stopPropagation();
                                   handleToggleFeatured(item);
                                 }}
-                                className={`absolute top-3 right-3 px-2.5 py-1 rounded-xl text-[10px] font-extrabold flex items-center gap-1 shadow-2xs transition-all duration-200 cursor-pointer border-0 ${
+                                className={`absolute top-3 right-3 px-2.5 py-1 rounded-md text-[10px] font-extrabold flex items-center gap-1 shadow-2xs transition-all duration-200 cursor-pointer border-0 ${
                                   item.isFeatured
                                     ? "bg-[#FED422] text-[#0F172A] font-black"
                                     : "bg-slate-100/90 text-slate-600 hover:bg-white hover:text-[#0F172A]"
@@ -10272,14 +10272,14 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditGalleryModal(item)}
-                                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-xl transition-all border-0 shadow-2xs cursor-pointer"
+                                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-md transition-all border-0 shadow-2xs cursor-pointer"
                                 >
                                   수정
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteGalleryItem(item.id, item.name)}
-                                  className="px-3 py-2 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-xl transition-all flex items-center justify-center border-0 shadow-2xs cursor-pointer"
+                                  className="px-3 py-2 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-md transition-all flex items-center justify-center border-0 shadow-2xs cursor-pointer"
                                   title="이미지 삭제"
                                 >
                                   <Trash2 size={14} />
@@ -10309,7 +10309,7 @@ export default function AdminPage() {
           onClick={() => setShowGalleryModal(false)}
         >
           <div
-            className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col max-h-[90vh] font-sans"
+            className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col max-h-[90vh] font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
@@ -10321,7 +10321,7 @@ export default function AdminPage() {
                 <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">가맹 매장에 공유할 갤러리 이미지를 등록합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
                   갤러리 설정
                 </span>
                 <button
@@ -10336,7 +10336,7 @@ export default function AdminPage() {
 
             <form onSubmit={handleGallerySubmit} className="p-6 sm:p-7 overflow-y-auto space-y-4 text-xs sm:text-sm flex-1 bg-[#f9fafb]">
               {/* Card 1: Name & Category (Amber Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
@@ -10344,7 +10344,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">이미지 명칭 및 분류</span>
                   </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     기본 정보
                   </span>
                 </div>
@@ -10357,7 +10357,7 @@ export default function AdminPage() {
                     value={galleryItemName}
                     onChange={(e) => setGalleryItemName(e.target.value)}
                     required
-                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                   />
                 </div>
 
@@ -10367,7 +10367,7 @@ export default function AdminPage() {
                     value={galleryItemCategory}
                     onChange={(e) => setGalleryItemCategory(e.target.value)}
                     required
-                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
                   >
                     {galleryCategories.map((cat) => (
                       <option key={cat} value={cat}>
@@ -10379,7 +10379,7 @@ export default function AdminPage() {
               </div>
 
               {/* Card 2: Upload File (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
@@ -10387,21 +10387,21 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">이미지 파일 업로드</span>
                   </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     파일 등록
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-2xl p-3 shadow-2xs">
+                <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-lg p-3 shadow-2xs">
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleGalleryImageUpload}
-                    className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1"
+                    className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1"
                   />
                 </div>
                 {galleryItemUrl && (
-                  <div className="p-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-xl flex items-center gap-3">
+                  <div className="p-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-md flex items-center gap-3">
                     <img src={galleryItemUrl} alt="미리보기" className="w-12 h-12 rounded-lg object-cover" />
                     <span className="text-[10px] text-neutral-400 font-mono truncate flex-1">{galleryItemUrl}</span>
                   </div>
@@ -10418,13 +10418,13 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setShowGalleryModal(false)}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-full transition-all cursor-pointer border-0"
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0"
                   >
                     취소
                   </button>
                   <button
                     type="submit"
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-full transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
                   >
                     <span>{selectedGalleryItem ? "수정사항 저장" : "갤러리 이미지 추가"}</span>
                     <ArrowRight size={14} />
@@ -10444,7 +10444,7 @@ export default function AdminPage() {
           onClick={() => setSelectedConsultation(null)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
@@ -10454,7 +10454,7 @@ export default function AdminPage() {
                 <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">신청자가 제출한 창업 상담 문의 정보를 확인합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
                   CONSULTATION
                 </span>
                 <button 
@@ -10469,10 +10469,10 @@ export default function AdminPage() {
 
             <div className="p-6 sm:p-7 overflow-y-auto space-y-4 text-xs sm:text-sm bg-[#f9fafb]">
               {/* Card 1: Applicant Details (Amber Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3 font-semibold text-slate-600">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3 font-semibold text-slate-600">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <span className="text-xs font-black text-[#0F172A] tracking-tight">신청인 및 연락처 정보</span>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     APPLICANT
                   </span>
                 </div>
@@ -10496,7 +10496,7 @@ export default function AdminPage() {
                 </div>
                 <div className="flex justify-between border-b border-neutral-100 pb-2">
                   <span>도입 희망 유형</span>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 font-black px-2.5 py-0.5 rounded-full text-[10px]">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 font-black px-2.5 py-0.5 rounded-md text-[10px]">
                     {selectedConsultation.storeType}
                   </span>
                 </div>
@@ -10513,14 +10513,14 @@ export default function AdminPage() {
               </div>
 
               {/* Card 2: Message Content (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <span className="text-xs font-black text-[#0F172A] tracking-tight">상세 문의 내용</span>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     MESSAGE
                   </span>
                 </div>
-                <div className="bg-[#e2e8f0] p-4 rounded-xl min-h-[120px] max-h-[240px] overflow-y-auto border border-neutral-200/80">
+                <div className="bg-[#e2e8f0] p-4 rounded-md min-h-[120px] max-h-[240px] overflow-y-auto border border-neutral-200/80">
                   <p className="text-xs sm:text-sm text-[#0F172A] leading-relaxed whitespace-pre-wrap font-semibold">
                     {selectedConsultation.message || "입력된 문의 내용이 없습니다."}
                   </p>
@@ -10536,7 +10536,7 @@ export default function AdminPage() {
                 <button 
                   type="button"
                   onClick={() => setSelectedConsultation(null)}
-                  className="px-6 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
+                  className="px-6 py-2.5 rounded-md bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
                 >
                   닫기
                 </button>
@@ -10553,7 +10553,7 @@ export default function AdminPage() {
           onClick={() => setSelectedInquiry(null)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
@@ -10563,7 +10563,7 @@ export default function AdminPage() {
                 <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">가맹점주 문의건에 대해 본사 공식 답변을 작성합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
                   INQUIRY REPLY
                 </span>
                 <button 
@@ -10578,9 +10578,9 @@ export default function AdminPage() {
 
             <form onSubmit={handleSubmitAnswer} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
               {/* Card 1: Original Inquiry (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-2">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-2">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     {selectedInquiry.category}
                   </span>
                   <span className="text-[10px] font-mono font-bold text-neutral-400">접수일자: {selectedInquiry.date}</span>
@@ -10590,10 +10590,10 @@ export default function AdminPage() {
               </div>
 
               {/* Card 2: Answer Input (Emerald Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
                   <span className="text-xs font-black text-[#0F172A]">본사 공식 답변 내용 기입</span>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     OFFICIAL ANSWER
                   </span>
                 </div>
@@ -10603,7 +10603,7 @@ export default function AdminPage() {
                   value={inquiryAnswerText}
                   onChange={(e) => setInquiryAnswerText(e.target.value)}
                   required
-                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 resize-none transition-all outline-none shadow-2xs"
+                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 resize-none transition-all outline-none shadow-2xs"
                 />
               </div>
 
@@ -10615,7 +10615,7 @@ export default function AdminPage() {
                 </div>
                 <button 
                   type="submit"
-                  className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-full transition-all shadow-2xs cursor-pointer border-0 flex items-center gap-2"
+                  className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs cursor-pointer border-0 flex items-center gap-2"
                 >
                   <span>가맹 지원 답변 공식 등록</span>
                   <ArrowRight size={14} />
@@ -10633,7 +10633,7 @@ export default function AdminPage() {
           onClick={handleCloseNoticeModal}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
@@ -10645,7 +10645,7 @@ export default function AdminPage() {
                 <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">전체 가맹점에 공지할 주요 가이드라인을 작성합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
                   공지사항 작성 양식
                 </span>
                 <button 
@@ -10660,7 +10660,7 @@ export default function AdminPage() {
 
             <form onSubmit={handleCreateNotice} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
               {/* Card 1: Notice Tag & Title (Amber Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
@@ -10668,7 +10668,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">공지 구분 및 제목</span>
                   </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     기본 설정
                   </span>
                 </div>
@@ -10678,7 +10678,7 @@ export default function AdminPage() {
                   <select 
                     value={newNoticeTag}
                     onChange={(e) => setNewNoticeTag(e.target.value as any)}
-                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
                   >
                     <option value="필독">필독 (긴급 법정 안전 위생 점검 등)</option>
                     <option value="일반">일반 안내 사항</option>
@@ -10695,13 +10695,13 @@ export default function AdminPage() {
                     value={newNoticeTitle}
                     onChange={(e) => setNewNoticeTitle(e.target.value)}
                     required
-                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
                   />
                 </div>
               </div>
 
               {/* Card 2: Notice Body Content (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
@@ -10709,7 +10709,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">상세 공지 본문 내용</span>
                   </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     본문 내용
                   </span>
                 </div>
@@ -10720,7 +10720,7 @@ export default function AdminPage() {
                   value={newNoticeContent}
                   onChange={(e) => setNewNoticeContent(e.target.value)}
                   required
-                  className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 resize-none transition-all outline-none shadow-2xs"
+                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 resize-none transition-all outline-none shadow-2xs"
                 />
               </div>
 
@@ -10734,13 +10734,13 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={handleCloseNoticeModal}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0 shadow-2xs"
                   >
                     취소
                   </button>
                   <button
                     type="submit"
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
                   >
                     <span>{selectedNotice ? "공지사항 수정 저장" : "공지사항 공식 배포"}</span>
                     <ArrowRight size={14} />
@@ -10753,12 +10753,12 @@ export default function AdminPage() {
               <div className="p-6 border-t border-slate-100 bg-[#F8FAFC] space-y-3 shrink-0">
                 <div className="flex items-center justify-between">
                   <h4 className="font-black text-sm text-[#0F172A]">가맹점별 배달앱 계정 제출 현황</h4>
-                  <span className="text-xs font-bold text-[#0F172A] bg-amber-100 border-0 px-3 py-1 rounded-full">
+                  <span className="text-xs font-bold text-[#0F172A] bg-amber-100 border-0 px-3 py-1 rounded-md">
                     총 {submittedCredentials?.length || 0}건 접수
                   </span>
                 </div>
                 
-                <div className="border border-slate-200/60 rounded-2xl overflow-hidden bg-white max-h-[220px] overflow-y-auto shadow-2xs">
+                <div className="border border-slate-200/60 rounded-lg overflow-hidden bg-white max-h-[220px] overflow-y-auto shadow-2xs">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className="bg-[#F8FAFC] border-b border-slate-200/60 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
@@ -10805,7 +10805,7 @@ export default function AdminPage() {
           onClick={() => setShowStoreModal(false)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
@@ -10819,7 +10819,7 @@ export default function AdminPage() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
                   가맹점 관리
                 </span>
                 <button 
@@ -10834,7 +10834,7 @@ export default function AdminPage() {
 
             <form onSubmit={handleCreateOrUpdateStore} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
               {/* Card 1: Account Info (Amber Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
@@ -10842,7 +10842,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">로그인 계정 및 보안</span>
                   </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     필수 입력
                   </span>
                 </div>
@@ -10857,7 +10857,7 @@ export default function AdminPage() {
                       onChange={(e) => setStoreLoginId(e.target.value)}
                       required
                       disabled={!!selectedStore}
-                      className="w-full bg-[#F1F4F8] disabled:bg-[#F1F4F8] disabled:opacity-75 border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] disabled:bg-[#F1F4F8] disabled:opacity-75 border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -10868,7 +10868,7 @@ export default function AdminPage() {
                       value={storeName}
                       onChange={(e) => setStoreName(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
@@ -10882,7 +10882,7 @@ export default function AdminPage() {
                       value={storePw}
                       onChange={(e) => setStorePw(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -10893,14 +10893,14 @@ export default function AdminPage() {
                       value={storePwConfirm}
                       onChange={(e) => setStorePwConfirm(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Card 2: Owner Info (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
@@ -10908,7 +10908,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">점주 정보 및 연락처</span>
                   </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     점주 정보
                   </span>
                 </div>
@@ -10922,7 +10922,7 @@ export default function AdminPage() {
                       value={storeOwner}
                       onChange={(e) => setStoreOwner(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -10933,14 +10933,14 @@ export default function AdminPage() {
                       value={storePhone}
                       onChange={handlePhoneInputChange}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Card 3: Location & Status (Emerald Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
@@ -10948,7 +10948,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">거래 상태 및 매장 주소</span>
                   </div>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     위치 및 상태
                   </span>
                 </div>
@@ -10959,7 +10959,7 @@ export default function AdminPage() {
                     <select 
                       value={storeStatus}
                       onChange={(e) => setStoreStatus(e.target.value as any)}
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:outline-none cursor-pointer transition-all shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:outline-none cursor-pointer transition-all shadow-2xs"
                     >
                       <option value="승인">승인 (정상 오퍼레이션 가동)</option>
                       <option value="대기">대기 (서류 검토 / 가맹 보류)</option>
@@ -10975,7 +10975,7 @@ export default function AdminPage() {
                         type="date"
                         value={storeRegDate}
                         onChange={(e) => setStoreRegDate(e.target.value)}
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-3 py-3 text-xs font-medium text-[#0F172A] focus:outline-none transition-all shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3 py-3 text-xs font-medium text-[#0F172A] focus:outline-none transition-all shadow-2xs"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -10984,7 +10984,7 @@ export default function AdminPage() {
                         type="date"
                         value={storeCancelDate}
                         onChange={(e) => setStoreCancelDate(e.target.value)}
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-3 py-3 text-xs font-medium text-[#0F172A] focus:outline-none transition-all shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3 py-3 text-xs font-medium text-[#0F172A] focus:outline-none transition-all shadow-2xs"
                       />
                     </div>
                   </div>
@@ -10999,12 +10999,12 @@ export default function AdminPage() {
                       value={storeRoadAddress}
                       onChange={(e) => setStoreRoadAddress(e.target.value)}
                       required
-                      className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
                     />
                     <button
                       type="button"
                       onClick={() => openDaumPostcode("store")}
-                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-2xl transition-all cursor-pointer border-0 shrink-0 shadow-2xs"
+                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all cursor-pointer border-0 shrink-0 shadow-2xs"
                     >
                       주소 검색
                     </button>
@@ -11014,13 +11014,13 @@ export default function AdminPage() {
                     placeholder="매장 상세 주소 (e.g. 1층 101호)"
                     value={storeDetailAddress}
                     onChange={(e) => setStoreDetailAddress(e.target.value)}
-                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
                   />
                 </div>
               </div>
 
               {/* Card 4: Packages (Neutral Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-slate-400 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-slate-400 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs">
@@ -11028,12 +11028,12 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">도입 적용 패키지 브랜드 선택</span>
                   </div>
-                  <span className="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     적용 패키지
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-xl p-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-md p-4">
                   {["120pie", "egg120", "츄러스120", "떡볶이120", "핫도그120", "120coffee"].map((menuKey) => {
                     const isChecked = storeAdoptionMenu.includes(menuKey);
                     return (
@@ -11067,13 +11067,13 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setShowStoreModal(false)}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-full transition-all cursor-pointer border-0"
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0"
                   >
                     취소
                   </button>
                   <button
                     type="submit"
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-full transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
                   >
                     <span>가맹점 정보 저장</span>
                     <ArrowRight size={14} />
@@ -11092,7 +11092,7 @@ export default function AdminPage() {
           onClick={() => setShowAddressPopup(false)}
         >
           <div 
-            className="w-full max-w-lg bg-white border-0 rounded-[28px] overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
+            className="w-full max-w-lg bg-white border-0 rounded-lg overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Yellow Header */}
@@ -11102,18 +11102,18 @@ export default function AdminPage() {
                 <button 
                   type="button"
                   onClick={() => setShowAddressPopup(false)} 
-                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-full transition-all border-0 cursor-pointer"
+                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-md transition-all border-0 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
               </div>
               
               {/* Dual-Mode Tabs */}
-              <div className="flex bg-black/10 p-1 rounded-2xl border-0">
+              <div className="flex bg-black/10 p-1 rounded-lg border-0">
                 <button
                   type="button"
                   onClick={() => setAddressTab("kakao")}
-                  className={`flex-1 py-2 text-xs font-black rounded-xl transition-all border-0 cursor-pointer ${
+                  className={`flex-1 py-2 text-xs font-black rounded-md transition-all border-0 cursor-pointer ${
                     addressTab === "kakao" 
                       ? "bg-[#0F172A] text-white shadow-xs" 
                       : "text-[#0F172A]/70 hover:text-[#0F172A]"
@@ -11124,7 +11124,7 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => setAddressTab("simulated")}
-                  className={`flex-1 py-2 text-xs font-black rounded-xl transition-all border-0 cursor-pointer ${
+                  className={`flex-1 py-2 text-xs font-black rounded-md transition-all border-0 cursor-pointer ${
                     addressTab === "simulated" 
                       ? "bg-[#0F172A] text-white shadow-xs" 
                       : "text-[#0F172A]/70 hover:text-[#0F172A]"
@@ -11152,14 +11152,14 @@ export default function AdminPage() {
                     placeholder="예: 테헤란로, 엘에스로, 당동"
                     value={addressSearchKeyword}
                     onChange={(e) => handleAddressSearch(e.target.value)}
-                    className="w-full bg-[#F1F5F9] border-0 rounded-2xl px-4 py-3 text-xs font-bold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50 placeholder-slate-400"
+                    className="w-full bg-[#F1F5F9] border-0 rounded-lg px-4 py-3 text-xs font-bold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50 placeholder-slate-400"
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <span className="text-xs font-extrabold text-[#0F172A] block">검색 결과 목록 ({addressSearchResults.length}건)</span>
                   {addressSearchResults.length === 0 ? (
-                    <div className="p-8 text-center text-xs text-slate-400 bg-white border border-slate-200/60 rounded-2xl font-bold">
+                    <div className="p-8 text-center text-xs text-slate-400 bg-white border border-slate-200/60 rounded-lg font-bold">
                       {addressSearchKeyword.trim() ? "일치하는 주소 후보가 없습니다." : "검색어를 입력하시면 모의 주소 리스트가 노출됩니다."}
                     </div>
                   ) : (
@@ -11177,7 +11177,7 @@ export default function AdminPage() {
                             setShowAddressPopup(false);
                             triggerToast("모의 주소가 성공적으로 자동 선택 및 입력되었습니다!");
                           }}
-                          className="w-full text-left p-3.5 bg-white hover:bg-amber-50 border border-slate-200/80 hover:border-amber-400 rounded-2xl text-xs font-bold text-[#0F172A] transition-all cursor-pointer block hover:shadow-2xs"
+                          className="w-full text-left p-3.5 bg-white hover:bg-amber-50 border border-slate-200/80 hover:border-amber-400 rounded-lg text-xs font-bold text-[#0F172A] transition-all cursor-pointer block hover:shadow-2xs"
                         >
                           {addr}
                         </button>
@@ -11192,7 +11192,7 @@ export default function AdminPage() {
               <button 
                 type="button"
                 onClick={() => setShowAddressPopup(false)}
-                className="px-5 py-2.5 rounded-xl bg-white border border-[#f2ccd7] text-[11px] font-bold text-[#735965] hover:bg-[#fff1f5] cursor-pointer transition-colors"
+                className="px-5 py-2.5 rounded-md bg-white border border-[#f2ccd7] text-[11px] font-bold text-[#735965] hover:bg-[#fff1f5] cursor-pointer transition-colors"
               >
                 검색 창 닫기
               </button>
@@ -11209,7 +11209,7 @@ export default function AdminPage() {
           onClick={() => setShowProductModal(false)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
@@ -11223,7 +11223,7 @@ export default function AdminPage() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
                   제품 등록 양식
                 </span>
                 <button 
@@ -11238,7 +11238,7 @@ export default function AdminPage() {
 
             <form onSubmit={handleCreateOrUpdateProduct} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
               {/* Card 1: Product Basic (Amber Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
@@ -11246,7 +11246,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">품목 분류 및 제품명</span>
                   </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     필수 입력
                   </span>
                 </div>
@@ -11258,7 +11258,7 @@ export default function AdminPage() {
                       value={productCategory}
                       onChange={(e) => setProductCategory(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all cursor-pointer shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all cursor-pointer shadow-2xs"
                     >
                       {categories.map((cat) => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -11273,7 +11273,7 @@ export default function AdminPage() {
                       value={productName}
                       onChange={(e) => setProductName(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                     />
                   </div>
                 </div>
@@ -11287,7 +11287,7 @@ export default function AdminPage() {
                       value={productModelName}
                       onChange={(e) => setProductModelName(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
@@ -11297,7 +11297,7 @@ export default function AdminPage() {
                         value={productUnit}
                         onChange={(e) => setProductUnit(e.target.value as any)}
                         required
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-3 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all cursor-pointer shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all cursor-pointer shadow-2xs"
                       >
                         <option value="개">개</option>
                         <option value="박스">박스</option>
@@ -11315,7 +11315,7 @@ export default function AdminPage() {
                         value={productQty}
                         onChange={(e) => setProductQty(parseInt(e.target.value, 10) || 1)}
                         required
-                        className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-3 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
                       />
                     </div>
                   </div>
@@ -11323,7 +11323,7 @@ export default function AdminPage() {
               </div>
 
               {/* Card 2: Pricing & Status (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
@@ -11331,7 +11331,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">가격 및 판매 상태</span>
                   </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     가격 정보
                   </span>
                 </div>
@@ -11344,7 +11344,7 @@ export default function AdminPage() {
                       value={productSupplyPrice}
                       onChange={(e) => handlePriceInput(e.target.value, setProductSupplyPrice)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -11354,7 +11354,7 @@ export default function AdminPage() {
                       value={productPrice}
                       onChange={(e) => handlePriceInput(e.target.value, setProductPrice)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -11363,7 +11363,7 @@ export default function AdminPage() {
                       type="text"
                       value={productDiscountAmount}
                       onChange={(e) => handlePriceInput(e.target.value, setProductDiscountAmount)}
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                     />
                   </div>
                 </div>
@@ -11375,7 +11375,7 @@ export default function AdminPage() {
                       type="text"
                       value={`${getCalculatedDiscountedPrice().toLocaleString()} 원`}
                       readOnly
-                      className="w-full bg-amber-50 border border-amber-200/80 rounded-2xl px-4 py-3 text-xs text-amber-700 font-bold text-right outline-none"
+                      className="w-full bg-amber-50 border border-amber-200/80 rounded-lg px-4 py-3 text-xs text-amber-700 font-bold text-right outline-none"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -11383,7 +11383,7 @@ export default function AdminPage() {
                     <select
                       value={productStatus}
                       onChange={(e) => setProductStatus(e.target.value as "판매중" | "품절" | "단종")}
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs text-[#0F172A] font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all outline-none shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs text-[#0F172A] font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all outline-none shadow-2xs"
                     >
                       <option value="판매중">판매중</option>
                       <option value="품절">품절 (가맹점 주문불가)</option>
@@ -11394,7 +11394,7 @@ export default function AdminPage() {
               </div>
 
               {/* Card 3: Images & Description (Emerald Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
@@ -11402,12 +11402,12 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">이미지 및 상세 설명</span>
                   </div>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     이미지 및 콘텐츠
                   </span>
                 </div>
 
-                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-xl border-0 space-y-2">
+                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-md border-0 space-y-2">
                   <label className="font-extrabold text-[#0F172A]">썸네일 대표 이미지 *</label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input 
@@ -11416,9 +11416,9 @@ export default function AdminPage() {
                       value={productImg}
                       onChange={(e) => setProductImg(e.target.value)}
                       required
-                      className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
+                      className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
                     />
-                    <div className="flex items-center bg-[#F1F4F8] rounded-2xl px-3 py-2 shrink-0 border-0 shadow-2xs">
+                    <div className="flex items-center bg-[#F1F4F8] rounded-lg px-3 py-2 shrink-0 border-0 shadow-2xs">
                       <input
                         type="file"
                         accept="image/*"
@@ -11429,7 +11429,7 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-xl border-0 space-y-2">
+                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-md border-0 space-y-2">
                   <label className="font-extrabold text-[#0F172A]">상세 상세페이지 이미지 (옵션)</label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input 
@@ -11437,9 +11437,9 @@ export default function AdminPage() {
                       placeholder="https://res.cloudinary.com/... 이미지 상세 웹 경로"
                       value={productDetailImg}
                       onChange={(e) => setProductDetailImg(e.target.value)}
-                      className="flex-1 bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
+                      className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
                     />
-                    <div className="flex items-center bg-[#F1F4F8] rounded-2xl px-3 py-2 shrink-0 border-0 shadow-2xs">
+                    <div className="flex items-center bg-[#F1F4F8] rounded-lg px-3 py-2 shrink-0 border-0 shadow-2xs">
                       <input
                         type="file"
                         accept="image/*"
@@ -11451,9 +11451,9 @@ export default function AdminPage() {
                 </div>
 
                 {/* Rich Text Editor */}
-                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-xl border-0 space-y-2">
+                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-md border-0 space-y-2">
                   <label className="font-extrabold text-[#0F172A]">상세페이지 텍스트 편집 (크기, 색상, 정렬 등)</label>
-                  <div className="border-0 rounded-2xl overflow-hidden bg-white shadow-2xs">
+                  <div className="border-0 rounded-lg overflow-hidden bg-white shadow-2xs">
                     <div className="flex flex-wrap items-center gap-1 p-2 bg-[#F1F4F8] border-b border-slate-100 text-xs">
                       <button
                         type="button"
@@ -11570,13 +11570,13 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setShowProductModal(false)}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0 shadow-2xs"
                   >
                     취소
                   </button>
                   <button
                     type="submit"
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
                   >
                     <span>{selectedProduct ? "수정 완료" : "등록 하기"}</span>
                     <ArrowRight size={14} />
@@ -11596,7 +11596,7 @@ export default function AdminPage() {
           onClick={() => setShowMaterialModal(false)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
@@ -11606,7 +11606,7 @@ export default function AdminPage() {
                 <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">점주 포털에 등록할 교육 및 홍보 자료를 추가합니다.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
                   자료 등록 양식
                 </span>
                 <button 
@@ -11621,7 +11621,7 @@ export default function AdminPage() {
 
             <form onSubmit={handleCreateMaterial} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
               {/* Card 1: Type Selection (Amber Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
@@ -11629,7 +11629,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">자료 유형 구분</span>
                   </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     유형 선택
                   </span>
                 </div>
@@ -11638,7 +11638,7 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setMaterialType("training")}
-                    className={`py-3 rounded-2xl border-0 text-xs font-black transition-all cursor-pointer ${
+                    className={`py-3 rounded-lg border-0 text-xs font-black transition-all cursor-pointer ${
                       materialType === "training"
                         ? "bg-[#FED422] text-[#0F172A] shadow-2xs"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -11649,7 +11649,7 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setMaterialType("pr")}
-                    className={`py-3 rounded-2xl border-0 text-xs font-black transition-all cursor-pointer ${
+                    className={`py-3 rounded-lg border-0 text-xs font-black transition-all cursor-pointer ${
                       materialType === "pr"
                         ? "bg-[#FED422] text-[#0F172A] shadow-2xs"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -11661,7 +11661,7 @@ export default function AdminPage() {
               </div>
 
               {/* Card 2: Title & Specifications (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
@@ -11669,7 +11669,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">제목 및 포맷 상세</span>
                   </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     상세 정보
                   </span>
                 </div>
@@ -11682,7 +11682,7 @@ export default function AdminPage() {
                     value={newMaterialTitle}
                     onChange={(e) => setNewMaterialTitle(e.target.value)}
                     required
-                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                   />
                 </div>
 
@@ -11693,7 +11693,7 @@ export default function AdminPage() {
                     placeholder="예시) 매장 위생점검 수칙 및 필수 준수 사항 가이드라인"
                     value={newMaterialDesc}
                     onChange={(e) => setNewMaterialDesc(e.target.value)}
-                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                   />
                 </div>
 
@@ -11706,7 +11706,7 @@ export default function AdminPage() {
                       value={newMaterialFormat}
                       onChange={(e) => setNewMaterialFormat(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -11717,14 +11717,14 @@ export default function AdminPage() {
                       value={newMaterialSize}
                       onChange={(e) => setNewMaterialSize(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Card 3: Files & Preview Image (Emerald Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
@@ -11732,7 +11732,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">파일 및 대표 썸네일</span>
                   </div>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     파일 첨부
                   </span>
                 </div>
@@ -11744,7 +11744,7 @@ export default function AdminPage() {
                     placeholder="https://res.cloudinary.com/... 이미지 경로"
                     value={newMaterialImg}
                     onChange={(e) => setNewMaterialImg(e.target.value)}
-                    className="w-full bg-[#F1F4F8] border-0 rounded-2xl px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
                   />
                 </div>
 
@@ -11766,15 +11766,15 @@ export default function AdminPage() {
                       </span>
                     )}
                   </label>
-                  <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-2xl p-3 shadow-2xs">
+                  <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-lg p-3 shadow-2xs">
                     <input
                       type="file"
                       disabled={isUploadingMaterialFile}
                       onChange={handleMaterialFileUpload}
-                      className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1 disabled:opacity-50"
+                      className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1 disabled:opacity-50"
                     />
                     {newMaterialFileName && (
-                      <div className="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2.5 py-1 rounded-xl max-w-[150px] truncate" title={newMaterialFileName}>
+                      <div className="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2.5 py-1 rounded-md max-w-[150px] truncate" title={newMaterialFileName}>
                         {newMaterialFileName}
                       </div>
                     )}
@@ -11805,14 +11805,14 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setShowMaterialModal(false)}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-xl transition-all cursor-pointer border-0 shadow-2xs"
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0 shadow-2xs"
                   >
                     취소
                   </button>
                   <button
                     type="submit"
                     disabled={isUploadingMaterialFile}
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] disabled:bg-slate-300 disabled:text-slate-500 text-[#0F172A] font-black text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer disabled:cursor-not-allowed border-0 flex items-center gap-2"
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] disabled:bg-slate-300 disabled:text-slate-500 text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs active:scale-95 cursor-pointer disabled:cursor-not-allowed border-0 flex items-center gap-2"
                   >
                     <span>{isUploadingMaterialFile ? "업로드 중..." : "지원 자료 추가"}</span>
                     <ArrowRight size={14} />
@@ -11831,19 +11831,19 @@ export default function AdminPage() {
           onClick={() => setShowOrderModal(false)}
         >
           <div 
-            className="w-full max-w-3xl bg-white border border-neutral-200/80 rounded-[32px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-3xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Stage Flow Yellow Header */}
             <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-black/10 text-[#0F172A] flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-md bg-black/10 text-[#0F172A] flex items-center justify-center font-bold">
                   <Package size={20} />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                     <span>발주 주문 상세 내역</span>
-                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-black/10 text-[#0F172A] font-mono font-bold">
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-md bg-black/10 text-[#0F172A] font-mono font-bold">
                       {selectedOrder.id}
                     </span>
                   </h3>
@@ -11851,7 +11851,7 @@ export default function AdminPage() {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-full bg-black/5">
+                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
                   발주 상세
                 </span>
                 <button 
@@ -11879,19 +11879,19 @@ export default function AdminPage() {
                 const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`.trim();
                 
                 return (
-                  <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
+                  <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
                     <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                       <div className="flex items-center gap-2">
                         <Store size={16} className="text-amber-500" />
                         <span className="text-xs font-black text-[#0F172A] tracking-tight">수령인 & 배송지 정보 (가맹점 정보)</span>
                       </div>
-                      <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                      <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                         가맹점 정보
                       </span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold text-slate-600">
-                      <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex justify-between items-center">
+                      <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center">
                         <div>
                           <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">가맹점명</span>
                           <strong className="text-[#0F172A] text-xs font-black">{storeInfo.name}</strong>
@@ -11906,7 +11906,7 @@ export default function AdminPage() {
                         </button>
                       </div>
 
-                      <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex justify-between items-center">
+                      <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center">
                         <div>
                           <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">점주 대표자</span>
                           <strong className="text-[#0F172A] text-xs font-black">{storeInfo.owner}</strong>
@@ -11921,7 +11921,7 @@ export default function AdminPage() {
                         </button>
                       </div>
 
-                      <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex justify-between items-center">
+                      <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center">
                         <div>
                           <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">연락처</span>
                           <strong className="text-[#0F172A] text-xs font-black">{storeInfo.phone}</strong>
@@ -11936,7 +11936,7 @@ export default function AdminPage() {
                         </button>
                       </div>
 
-                      <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex justify-between items-center">
+                      <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center">
                         <div>
                           <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">주문 신청일</span>
                           <strong className="text-[#0F172A] text-xs font-black">{selectedOrder.date}</strong>
@@ -11951,7 +11951,7 @@ export default function AdminPage() {
                         </button>
                       </div>
                     </div>
-                    <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex justify-between items-center gap-4">
+                    <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center gap-4">
                       <div className="flex-1">
                         <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">배송지 주소</span>
                         <strong className="text-[#0F172A] text-xs font-black break-words leading-tight">{storeAddress}</strong>
@@ -11959,7 +11959,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => handleCopyToClipboard(storeAddress, "배송지 주소")}
-                        className="p-2 hover:bg-neutral-200 text-slate-600 bg-neutral-200/60 rounded-xl shrink-0 cursor-pointer transition-all border-0 self-center"
+                        className="p-2 hover:bg-neutral-200 text-slate-600 bg-neutral-200/60 rounded-md shrink-0 cursor-pointer transition-all border-0 self-center"
                         title="주소 복사"
                       >
                         <Copy size={14} />
@@ -11970,18 +11970,18 @@ export default function AdminPage() {
               })()}
 
               {/* Order Item List Card (Blue Accent) */}
-              <div className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
+              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2">
                     <Package size={16} className="text-blue-500" />
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">발주 신청 품목 및 정산 내역 ({selectedOrder.items.length})</span>
                   </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     품목 목록
                   </span>
                 </div>
 
-                <div className="border border-neutral-200/90 rounded-xl overflow-hidden bg-white shadow-2xs">
+                <div className="border border-neutral-200/90 rounded-md overflow-hidden bg-white shadow-2xs">
                   <div className="overflow-x-auto w-full">
                     <table className="w-full text-left border-collapse text-[11px] min-w-[480px] sm:min-w-0" style={{ tableLayout: 'fixed' }}>
                       <thead>
@@ -12010,12 +12010,12 @@ export default function AdminPage() {
 
                 {/* Status control and Total price summary */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                  <div className="space-y-1.5 bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80">
+                  <div className="space-y-1.5 bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80">
                     <label className="text-xs font-black text-[#0F172A] block">상태값 변경 선택</label>
                     <select
                       value={selectedOrder.status}
                       onChange={(e) => updateOrderStatus(selectedOrder.id, e.target.value)}
-                      className="w-full bg-[#e2e8f0] border-0 rounded-xl px-4 py-2.5 text-xs text-[#0F172A] font-bold focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer outline-none transition-all"
+                      className="w-full bg-[#e2e8f0] border-0 rounded-md px-4 py-2.5 text-xs text-[#0F172A] font-bold focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer outline-none transition-all"
                     >
                       {deliveryStatuses.map((st) => (
                         <option key={st} value={st}>{st}</option>
@@ -12023,7 +12023,7 @@ export default function AdminPage() {
                     </select>
                   </div>
 
-                  <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 flex flex-col justify-center items-end text-right">
+                  <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex flex-col justify-center items-end text-right">
                     <span className="text-[10px] text-neutral-400 font-bold block mb-0.5">결제 수단 정보: <strong className="text-[#0F172A] font-black">{selectedOrder.payMethod === "card" || selectedOrder.payMethod === "CARD" ? "카드결제" : "현금 입금 진행"}</strong></span>
                     <span className="text-[10px] text-neutral-400 font-bold block mb-0.5">총 결제 합계액 (부가세 포함)</span>
                     <strong className="text-lg font-black text-amber-500">
@@ -12034,13 +12034,13 @@ export default function AdminPage() {
               </div>
 
               {/* Delivery & Tracking Info Card (Emerald Accent) */}
-              <form onSubmit={handleUpdateOrderTracking} className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
+              <form onSubmit={handleUpdateOrderTracking} className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2">
                     <Truck size={16} className="text-emerald-500" />
                     <span className="text-xs font-black text-[#0F172A] tracking-tight">배송 물류 송장 정보 (다중 송장 지원)</span>
                   </div>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full">
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     송장 관리
                   </span>
                 </div>
@@ -12051,9 +12051,9 @@ export default function AdminPage() {
                   {modalTrackingList.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {modalTrackingList.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between bg-[#f8f9fa] border border-neutral-200/80 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#0F172A]">
+                        <div key={idx} className="flex items-center justify-between bg-[#f8f9fa] border border-neutral-200/80 px-3.5 py-2.5 rounded-md text-xs font-semibold text-[#0F172A]">
                           <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-[10px] font-black text-amber-900">
+                            <span className="px-2.5 py-0.5 rounded-md bg-amber-100 text-[10px] font-black text-amber-900">
                               {item.courier}
                             </span>
                             <span className="font-mono text-[#0F172A] font-black text-xs">{item.trackingNo}</span>
@@ -12063,7 +12063,7 @@ export default function AdminPage() {
                             onClick={() => {
                               setModalTrackingList(modalTrackingList.filter((_, i) => i !== idx));
                             }}
-                            className="p-1 hover:bg-neutral-200 rounded-full text-slate-400 hover:text-rose-600 transition-colors cursor-pointer border-0"
+                            className="p-1 hover:bg-neutral-200 rounded-md text-slate-400 hover:text-rose-600 transition-colors cursor-pointer border-0"
                             title="삭제"
                           >
                             <Trash2 size={13} />
@@ -12072,21 +12072,21 @@ export default function AdminPage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-xl text-[11px] font-bold text-neutral-400">
+                    <div className="text-center py-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-md text-[11px] font-bold text-neutral-400">
                       등록된 송장 번호가 없습니다. 아래에서 송장을 등록해 주세요.
                     </div>
                   )}
                 </div>
 
                 {/* Add Tracking Form */}
-                <div className="bg-[#f8f9fa] p-3.5 rounded-xl border border-neutral-200/80 space-y-3">
+                <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                     <div className="sm:col-span-4 space-y-1">
                       <label className="text-[10px] font-extrabold text-[#0F172A] block">택배사 선택</label>
                       <select
                         value={selectedCourier}
                         onChange={(e) => setSelectedCourier(e.target.value)}
-                        className="w-full bg-[#e2e8f0] border-0 rounded-xl px-3 py-2.5 text-xs text-[#0F172A] font-bold focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 cursor-pointer outline-none transition-all"
+                        className="w-full bg-[#e2e8f0] border-0 rounded-md px-3 py-2.5 text-xs text-[#0F172A] font-bold focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 cursor-pointer outline-none transition-all"
                       >
                         <option value="CJ대한통운">CJ대한통운</option>
                         <option value="한진택배">한진택배</option>
@@ -12104,7 +12104,7 @@ export default function AdminPage() {
                         placeholder="하이픈(-) 없이 입력"
                         value={inputTrackingNo}
                         onChange={(e) => setInputTrackingNo(e.target.value)}
-                        className="w-full bg-[#e2e8f0] border-0 rounded-xl px-3 py-2.5 text-xs text-[#0F172A] font-bold placeholder-neutral-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                        className="w-full bg-[#e2e8f0] border-0 rounded-md px-3 py-2.5 text-xs text-[#0F172A] font-bold placeholder-neutral-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                       />
                     </div>
 
@@ -12112,7 +12112,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={handleToAddTracking}
-                        className="w-full py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black rounded-xl transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1 border-0"
+                        className="w-full py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black rounded-md transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1 border-0"
                       >
                         <Plus size={14} />
                         추가
@@ -12124,7 +12124,7 @@ export default function AdminPage() {
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 active:scale-95"
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-md transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 active:scale-95"
                   >
                     <Truck size={15} />
                     송장 등록 및 배송중 상태 변경
@@ -12141,7 +12141,7 @@ export default function AdminPage() {
                 <button 
                   type="button"
                   onClick={() => setShowOrderModal(false)}
-                  className="px-6 py-2.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
+                  className="px-6 py-2.5 rounded-md bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
                 >
                   닫기
                 </button>
