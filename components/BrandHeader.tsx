@@ -83,8 +83,10 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
             </Link>
 
             {/* 점주메뉴: Always visible on both mobile and desktop */}
-            <Link
+            <a
               href="/portal"
+              target="_blank"
+              rel="noopener noreferrer"
               className={`inline-flex px-2.5 py-1.5 sm:px-4 sm:py-2 font-bold text-xs rounded-full transition-all border cursor-pointer whitespace-nowrap ${
                 isScrolled
                   ? "bg-neutral-800/90 text-neutral-200 hover:text-white border-neutral-700 hover:border-neutral-500"
@@ -92,7 +94,7 @@ export default function BrandHeader({ onConsultClick }: BrandHeaderProps) {
               }`}
             >
               점주메뉴
-            </Link>
+            </a>
 
             {/* Mobile Menu Button (더보기) */}
             <button

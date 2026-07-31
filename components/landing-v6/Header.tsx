@@ -89,8 +89,10 @@ export default function Header({
             </Link>
 
             {/* 점주메뉴: Always visible on both mobile and desktop */}
-            <Link
+            <a
               href="/portal"
+              target="_blank"
+              rel="noopener noreferrer"
               className={`inline-block text-xs font-bold transition-colors duration-200 px-2.5 py-1.5 sm:px-3 sm:py-1.5 border rounded-full whitespace-nowrap ${
                 isScrolled
                   ? "text-neutral-700 hover:text-neutral-950 border-neutral-300"
@@ -98,7 +100,7 @@ export default function Header({
               }`}
             >
               점주메뉴
-            </Link>
+            </a>
 
             {/* Mobile Menu Button (더보기) */}
             <button
@@ -169,13 +171,15 @@ export default function Header({
                 <span>브랜드홈페이지 바로가기</span>
                 <span>&rarr;</span>
               </Link>
-              <Link
+              <a
                 href="/portal"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="w-full text-center py-2 text-sm font-semibold text-neutral-300 dark:text-neutral-300 border border-neutral-700 dark:border-neutral-700 rounded-md hover:bg-neutral-800 transition-colors"
               >
                 점주메뉴 (점주 전용 포털)
-              </Link>
+              </a>
             </div>
           </div>
         </div>
