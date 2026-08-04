@@ -5070,7 +5070,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <strong className="text-3xl font-black text-[#1E1B18] block mb-1">
-                    {orders.length.toLocaleString()} <span className="text-sm font-bold text-neutral-400">건</span>
+                    {orders.filter(o => o.date === new Date().toISOString().split("T")[0]).length.toLocaleString()} <span className="text-sm font-bold text-neutral-400">건</span>
                   </strong>
                   <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600">
                     <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">+8.3%</span>
@@ -7380,7 +7380,7 @@ export default function AdminPage() {
                           
                           return (
                             <tr key={order.id} className="hover:bg-[#fff9fb] transition-colors">
-                              <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{idx + 1}</td>
+                              <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{filteredOrders.length - idx}</td>
                               <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{order.date}</td>
                               <td className="p-4 sm:p-5 font-black text-[#2d2026] whitespace-nowrap">{storeInfo.name}</td>
                               <td className="p-4 sm:p-5 font-semibold text-[#735965] whitespace-nowrap">{storeInfo.owner}</td>
