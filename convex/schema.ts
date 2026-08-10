@@ -117,7 +117,7 @@ export default defineSchema({
     deliveryDetailAddress: v.optional(v.string()),  // 배송지 상세주소
     recipientName: v.optional(v.string()),          // 받는 사람
     recipientPhone: v.optional(v.string()),         // 받는 사람 연락처
-  }),
+  }).index("by_order_id", ["id"]),
   materials: defineTable({
     title: v.string(),
     date: v.string(), // YYYY-MM-DD

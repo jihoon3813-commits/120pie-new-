@@ -17,6 +17,7 @@ import type * as deliveryCredentials from "../deliveryCredentials.js";
 import type * as discord from "../discord.js";
 import type * as floatings from "../floatings.js";
 import type * as gallery from "../gallery.js";
+import type * as http from "../http.js";
 import type * as inquiries from "../inquiries.js";
 import type * as instagram from "../instagram.js";
 import type * as materials from "../materials.js";
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   discord: typeof discord;
   floatings: typeof floatings;
   gallery: typeof gallery;
+  http: typeof http;
   inquiries: typeof inquiries;
   instagram: typeof instagram;
   materials: typeof materials;

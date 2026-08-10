@@ -1,6 +1,6 @@
-import { action } from "./_generated/server";
+import { action, internalAction } from "./_generated/server";
 import { v } from "convex/values";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 
 export const verifyAndSaveOrder = action({
   args: {
@@ -121,5 +121,58 @@ export const verifyAndSaveOrder = action({
       console.error("Payment verification failed with error: ", e);
       return { success: false, message: `서버 오류 발생: ${e.message || e}` };
     }
+  },
+});
+
+export const handlePortOneWebhook = internalAction({
+  args: {
+    paymentId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const impSecret = process.env.PORTONE_API_SECRET;
+    console.log(`[PortOne Webhook Handler] Processing paymentId: ${args.paymentId}`);
+
+    let amount: number | undefined = undefined;
+    let impUid: string = args.paymentId;
+    let isPaid = true;
+
+    if (impSecret) {
+      try {
+        const paymentResponse = await fetch(`https://api.portone.io/payments/${args.paymentId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `PortOne ${impSecret}`,
+          },
+        });
+
+        if (paymentResponse.ok) {
+          const paymentInfo = await paymentResponse.json();
+          if (paymentInfo.status && paymentInfo.status !== "PAID") {
+            console.warn(`[PortOne Webhook] Payment ${args.paymentId} status is not PAID: ${paymentInfo.status}`);
+            isPaid = false;
+          }
+          amount = paymentInfo.amount?.total;
+          if (paymentInfo.id) impUid = paymentInfo.id;
+        } else {
+          console.warn(`[PortOne Webhook] Fetch payment details failed with status ${paymentResponse.status}`);
+        }
+      } catch (err) {
+        console.error("[PortOne Webhook] Error querying PortOne API:", err);
+      }
+    }
+
+    if (!isPaid) {
+      return { success: false, message: "Payment status is not PAID" };
+    }
+
+    const res: any = await ctx.runMutation(internal.orders.processPaidWebhookOrder, {
+      paymentId: args.paymentId,
+      impUid: impUid,
+      amount: amount,
+      payMethod: "card",
+    });
+
+    return { success: true, res };
   },
 });

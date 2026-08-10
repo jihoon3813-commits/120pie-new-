@@ -1905,8 +1905,20 @@ export default function PortalPage() {
       localStorage.setItem("120_pending_order_store_id", activeStoreId || "owner");
       localStorage.setItem("120_pending_delivery_address", deliveryAddress);
       localStorage.setItem("120_pending_delivery_detail", deliveryDetailAddress);
-      localStorage.setItem("120_pending_recipient_name", recipientName);
-      localStorage.setItem("120_pending_recipient_phone", recipientPhone);
+      // 1. 사전 주문 DB 등록 (결제대기 상태로 미리 저장하여 결제 중 브라우저가 닫혀도 웹훅에서 수신 및 완결 가능하도록 원천 보장)
+      saveOrderMutation({
+        id: newOrderId,
+        date: new Date().toISOString().split("T")[0],
+        items: newOrderItems,
+        totalPrice: cartTotal,
+        status: "결제대기",
+        storeId: activeStoreId || "owner",
+        payMethod: "card",
+        deliveryAddress: deliveryAddress || undefined,
+        deliveryDetailAddress: deliveryDetailAddress || undefined,
+        recipientName: recipientName || undefined,
+        recipientPhone: recipientPhone || undefined,
+      }).catch((e) => console.error("사전 주문 등록 오류:", e));
 
       PortOne.requestPayment({
         storeId: storeId,

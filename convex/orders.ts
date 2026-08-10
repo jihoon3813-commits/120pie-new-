@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
@@ -47,13 +47,42 @@ export const createOrUpdate = mutation({
   handler: async (ctx, args) => {
     const existing = await ctx.db
       .query("orders")
-      .filter((q) => q.eq(q.field("id"), args.id))
+      .withIndex("by_order_id", (q) => q.eq("id", args.id))
       .first();
 
     const { ...fields } = args;
 
     if (existing) {
+      const prevStatus = existing.status;
       await ctx.db.patch(existing._id, fields);
+
+      // 결제대기 -> 결제완료 등 상태 전이 시 디스코드 알림 발송
+      if (prevStatus !== "결제완료" && args.status === "결제완료") {
+        let storeName = "";
+        if (args.storeId) {
+          const store = await ctx.db
+            .query("stores")
+            .filter((q) => q.eq(q.field("id"), args.storeId))
+            .first();
+          if (store) storeName = store.name;
+        }
+
+        await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
+          id: args.id,
+          date: args.date,
+          storeId: args.storeId,
+          storeName: storeName || undefined,
+          totalPrice: args.totalPrice,
+          items: args.items,
+          deliveryAddress: args.deliveryAddress,
+          deliveryDetailAddress: args.deliveryDetailAddress,
+          recipientName: args.recipientName,
+          recipientPhone: args.recipientPhone,
+          payMethod: args.payMethod,
+          status: args.status,
+        });
+      }
+
       return existing._id;
     } else {
       const newId = await ctx.db.insert("orders", fields);
@@ -65,27 +94,144 @@ export const createOrUpdate = mutation({
           .query("stores")
           .filter((q) => q.eq(q.field("id"), args.storeId))
           .first();
-        if (store) {
-          storeName = store.name;
-        }
+        if (store) storeName = store.name;
+      }
+
+      // 결제대기가 아닌 경우(즉시 결제완료 또는 무통장 입금대기) 디스코드 알림 발송
+      if (args.status !== "결제대기") {
+        await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
+          id: args.id,
+          date: args.date,
+          storeId: args.storeId,
+          storeName: storeName || undefined,
+          totalPrice: args.totalPrice,
+          items: args.items,
+          deliveryAddress: args.deliveryAddress,
+          deliveryDetailAddress: args.deliveryDetailAddress,
+          recipientName: args.recipientName,
+          recipientPhone: args.recipientPhone,
+          payMethod: args.payMethod,
+          status: args.status,
+        });
+      }
+
+      return newId;
+    }
+  },
+});
+
+// 웹훅을 통한 결제완료 비동기 처리 internalMutation
+export const processPaidWebhookOrder = internalMutation({
+  args: {
+    paymentId: v.string(),
+    impUid: v.optional(v.string()),
+    amount: v.optional(v.number()),
+    payMethod: v.optional(v.string()),
+    items: v.optional(
+      v.array(
+        v.object({
+          productName: v.string(),
+          quantity: v.number(),
+          price: v.number(),
+          selectedOption: v.optional(v.string()),
+        })
+      )
+    ),
+    storeId: v.optional(v.string()),
+    deliveryAddress: v.optional(v.string()),
+    deliveryDetailAddress: v.optional(v.string()),
+    recipientName: v.optional(v.string()),
+    recipientPhone: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("orders")
+      .withIndex("by_order_id", (q) => q.eq("id", args.paymentId))
+      .first();
+
+    const today = new Date().toISOString().split("T")[0];
+
+    if (existing) {
+      if (existing.status === "결제완료") {
+        return { updated: false, alreadyPaid: true };
+      }
+
+      await ctx.db.patch(existing._id, {
+        status: "결제완료",
+        impUid: args.impUid || existing.impUid,
+        payMethod: args.payMethod || existing.payMethod || "card",
+        totalPrice: args.amount !== undefined ? args.amount : existing.totalPrice,
+      });
+
+      let storeName = "";
+      const targetStoreId = existing.storeId || args.storeId;
+      if (targetStoreId) {
+        const store = await ctx.db
+          .query("stores")
+          .filter((q) => q.eq(q.field("id"), targetStoreId))
+          .first();
+        if (store) storeName = store.name;
       }
 
       await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
-        id: args.id,
-        date: args.date,
-        storeId: args.storeId,
+        id: existing.id,
+        date: existing.date || today,
+        storeId: targetStoreId,
         storeName: storeName || undefined,
-        totalPrice: args.totalPrice,
-        items: args.items,
+        totalPrice: args.amount !== undefined ? args.amount : existing.totalPrice,
+        items: existing.items,
+        deliveryAddress: existing.deliveryAddress,
+        deliveryDetailAddress: existing.deliveryDetailAddress,
+        recipientName: existing.recipientName,
+        recipientPhone: existing.recipientPhone,
+        payMethod: args.payMethod || "card",
+        status: "결제완료",
+      });
+
+      return { updated: true, orderId: existing._id };
+    } else {
+      const newOrderFields = {
+        id: args.paymentId,
+        date: today,
+        items: args.items || [{ productName: "포트원 신용카드 결제 자재", quantity: 1, price: args.amount || 0 }],
+        totalPrice: args.amount || 0,
+        status: "결제완료",
+        storeId: args.storeId || "owner",
+        impUid: args.impUid,
+        payMethod: args.payMethod || "card",
         deliveryAddress: args.deliveryAddress,
         deliveryDetailAddress: args.deliveryDetailAddress,
         recipientName: args.recipientName,
         recipientPhone: args.recipientPhone,
-        payMethod: args.payMethod,
-        status: args.status,
+      };
+
+      const newId = await ctx.db.insert("orders", newOrderFields);
+
+      let storeName = "";
+      if (args.storeId) {
+        const store = await ctx.db
+          .query("stores")
+          .filter((q) => q.eq(q.field("id"), args.storeId))
+          .first();
+        if (store) storeName = store.name;
+      }
+
+      await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
+        id: args.paymentId,
+        date: today,
+        storeId: args.storeId,
+        storeName: storeName || undefined,
+        totalPrice: args.amount || 0,
+        items: newOrderFields.items,
+        deliveryAddress: args.deliveryAddress,
+        deliveryDetailAddress: args.deliveryDetailAddress,
+        recipientName: args.recipientName,
+        recipientPhone: args.recipientPhone,
+        payMethod: "card",
+        status: "결제완료",
       });
 
-      return newId;
+      return { updated: true, orderId: newId };
     }
   },
 });
