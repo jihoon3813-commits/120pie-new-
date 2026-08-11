@@ -149,7 +149,13 @@ export const processPaidWebhookOrder = internalMutation({
       .withIndex("by_order_id", (q) => q.eq("id", args.paymentId))
       .first();
 
-    const today = new Date().toISOString().split("T")[0];
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const formattedNow = `${year}-${month}-${day} ${hours}:${minutes}`;
 
     if (existing) {
       if (existing.status === "결제완료") {
@@ -175,15 +181,15 @@ export const processPaidWebhookOrder = internalMutation({
 
       await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
         id: existing.id,
-        date: existing.date || today,
+        date: existing.date || formattedNow,
         storeId: targetStoreId,
         storeName: storeName || undefined,
         totalPrice: args.amount !== undefined ? args.amount : existing.totalPrice,
         items: existing.items,
         deliveryAddress: existing.deliveryAddress,
         deliveryDetailAddress: existing.deliveryDetailAddress,
-        recipientName: existing.recipientName,
-        recipientPhone: existing.recipientPhone,
+        recipientName: existing.recipientName || undefined,
+        recipientPhone: existing.recipientPhone || undefined,
         payMethod: args.payMethod || "card",
         status: "결제완료",
       });
@@ -192,7 +198,7 @@ export const processPaidWebhookOrder = internalMutation({
     } else {
       const newOrderFields = {
         id: args.paymentId,
-        date: today,
+        date: formattedNow,
         items: args.items || [{ productName: "포트원 신용카드 결제 자재", quantity: 1, price: args.amount || 0 }],
         totalPrice: args.amount || 0,
         status: "결제완료",
@@ -218,7 +224,7 @@ export const processPaidWebhookOrder = internalMutation({
 
       await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
         id: args.paymentId,
-        date: today,
+        date: formattedNow,
         storeId: args.storeId,
         storeName: storeName || undefined,
         totalPrice: args.amount || 0,

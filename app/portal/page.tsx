@@ -74,6 +74,37 @@ const DEFAULT_STATUS_COLORS: { [status: string]: string } = {
   "주문취소": "gray"
 };
 
+const formatOrderDate = (dateStr: string) => {
+  if (!dateStr) return "";
+  const trimmed = dateStr.trim();
+  if (/^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}$/.test(trimmed)) {
+    return trimmed;
+  }
+  if (trimmed.includes(" ") || trimmed.includes("T")) {
+    const clean = trimmed.replace("T", " ");
+    const parts = clean.split(" ");
+    const ymd = parts[0];
+    const timeParts = parts[1] ? parts[1].split(":") : ["00", "00"];
+    const hh = (timeParts[0] || "00").padStart(2, "0");
+    const mm = (timeParts[1] || "00").padStart(2, "0");
+    return `${ymd} ${hh}:${mm}`;
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return `${trimmed} 00:00`;
+  }
+  return trimmed;
+};
+
+const getFormattedCurrentDateTime = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
 // ==========================================
 // TYPES DEFINITIONS
 // ==========================================
@@ -1031,7 +1062,7 @@ export default function PortalPage() {
                 if (result.success) {
                   const newOrder: Order = {
                     id: paymentId,
-                    date: new Date().toISOString().split("T")[0],
+                    date: getFormattedCurrentDateTime(),
                     items: pendingItems,
                     totalPrice: pendingAmount,
                     status: "결제완료",
@@ -1824,7 +1855,7 @@ export default function PortalPage() {
       showCustomConfirm("발주 신청", "무통장입금으로 발주를 신청하시겠습니까?", () => {
         saveOrderMutation({
           id: newOrderId,
-          date: new Date().toISOString().split("T")[0],
+          date: getFormattedCurrentDateTime(),
           items: newOrderItems,
           totalPrice: cartTotal,
           status: "입금대기",
@@ -1838,7 +1869,7 @@ export default function PortalPage() {
           .then(() => {
             const newOrder: Order = {
               id: newOrderId,
-              date: new Date().toISOString().split("T")[0],
+              date: getFormattedCurrentDateTime(),
               items: newOrderItems,
               totalPrice: cartTotal,
               status: "입금대기",
@@ -1908,7 +1939,7 @@ export default function PortalPage() {
       // 1. 사전 주문 DB 등록 (결제대기 상태로 미리 저장하여 결제 중 브라우저가 닫혀도 웹훅에서 수신 및 완결 가능하도록 원천 보장)
       saveOrderMutation({
         id: newOrderId,
-        date: new Date().toISOString().split("T")[0],
+        date: getFormattedCurrentDateTime(),
         items: newOrderItems,
         totalPrice: cartTotal,
         status: "결제대기",
@@ -1952,7 +1983,7 @@ export default function PortalPage() {
               if (result.success) {
                 const newOrder: Order = {
                   id: newOrderId,
-                  date: new Date().toISOString().split("T")[0],
+                  date: getFormattedCurrentDateTime(),
                   items: newOrderItems,
                   totalPrice: cartTotal,
                   status: "결제완료",
@@ -3103,7 +3134,7 @@ export default function PortalPage() {
                             className="bg-[#F8FAFC] border-0 hover:bg-slate-100/80 p-4 rounded-lg cursor-pointer transition-all group"
                           >
                             <div className="flex justify-between items-center text-[10px] mb-2">
-                              <span className="text-slate-400 font-extrabold">{order.date}</span>
+                              <span className="text-slate-400 font-extrabold">{formatOrderDate(order.date)}</span>
                               <span className={`px-2.5 py-0.5 rounded-full font-black ${
                                 (() => {
                                   const colorKey = statusColors[order.status] || DEFAULT_STATUS_COLORS[order.status] || "pink";
@@ -3631,7 +3662,7 @@ export default function PortalPage() {
                             onClick={() => setSelectedOrder(order)}
                             className="hover:bg-amber-50/40 transition-colors cursor-pointer group"
                           >
-                            <td className="p-4 sm:p-5 text-slate-600 font-bold whitespace-nowrap">{order.date}</td>
+                            <td className="p-4 sm:p-5 text-slate-600 font-bold whitespace-nowrap">{formatOrderDate(order.date)}</td>
                             <td className="p-4 sm:p-5">
                               <span className="font-extrabold text-[#0F172A] block text-xs sm:text-sm">
                                 {order.items[0].productName} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ""}

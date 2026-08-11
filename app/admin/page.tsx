@@ -535,6 +535,37 @@ const getDatesInRange = (startStr: string, endStr: string) => {
   return dates.reverse();
 };
 
+const formatOrderDate = (dateStr: string) => {
+  if (!dateStr) return "";
+  const trimmed = dateStr.trim();
+  if (/^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}$/.test(trimmed)) {
+    return trimmed;
+  }
+  if (trimmed.includes(" ") || trimmed.includes("T")) {
+    const clean = trimmed.replace("T", " ");
+    const parts = clean.split(" ");
+    const ymd = parts[0];
+    const timeParts = parts[1] ? parts[1].split(":") : ["00", "00"];
+    const hh = (timeParts[0] || "00").padStart(2, "0");
+    const mm = (timeParts[1] || "00").padStart(2, "0");
+    return `${ymd} ${hh}:${mm}`;
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return `${trimmed} 00:00`;
+  }
+  return trimmed;
+};
+
+const getFormattedCurrentDateTime = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
 export default function AdminPage() {
   // Analytics State
   const [analyticsDateFilter, setAnalyticsDateFilter] = useState<string>("week");
@@ -1675,7 +1706,7 @@ export default function AdminPage() {
 
   // 발주 필터링 연산
   const getFilteredOrders = () => {
-    return orders.filter((order) => {
+    const list = orders.filter((order: Order) => {
       const storeInfo = stores.find(s => s.id === order.storeId) || {
         name: order.storeId === "owner" ? "본사 테스트" : "강남역삼점",
         owner: "홍길동",
@@ -1704,7 +1735,7 @@ export default function AdminPage() {
       if (orderDateFilterType !== "all") {
         const today = new Date();
         const getFormattedDate = (d: Date) => d.toISOString().split("T")[0];
-        const orderDateStr = order.date;
+        const orderDateOnly = order.date ? order.date.split(" ")[0].split("T")[0] : "";
         
         let start = "";
         let end = "";
@@ -1736,11 +1767,21 @@ export default function AdminPage() {
           end = orderEndDate;
         }
 
-        if (start && orderDateStr < start) return false;
-        if (end && orderDateStr > end) return false;
+        if (start && orderDateOnly < start) return false;
+        if (end && orderDateOnly > end) return false;
       }
 
       return true;
+    });
+
+    // 최신 신청일자/시간순 내림차순 정렬
+    return list.sort((a: Order, b: Order) => {
+      const dateA = a.date || "";
+      const dateB = b.date || "";
+      if (dateA !== dateB) {
+        return dateB.localeCompare(dateA);
+      }
+      return (b.id || "").localeCompare(a.id || "");
     });
   };
 
@@ -1767,7 +1808,7 @@ export default function AdminPage() {
       const payMethodStr = order.payMethod === "card" || order.payMethod === "CARD" ? "카드" : "현금";
       
       return [
-        order.date,
+        formatOrderDate(order.date),
         order.id,
         storeInfo.name,
         storeInfo.owner,
@@ -7350,7 +7391,7 @@ export default function AdminPage() {
                     <thead>
                       <tr className="bg-[#F8F9FD] border-b border-[#EEF0F5] text-[11px] font-extrabold text-neutral-400 uppercase tracking-wider">
                         <th className="p-4 sm:p-5 text-center" style={{ width: '60px' }}>순서</th>
-                        <th className="p-4 sm:p-5" style={{ width: '100px' }}>신청일자</th>
+                        <th className="p-4 sm:p-5" style={{ width: '140px' }}>신청일자</th>
                         <th className="p-4 sm:p-5" style={{ width: '130px' }}>가맹점명</th>
                         <th className="p-4 sm:p-5" style={{ width: '90px' }}>점주명</th>
                         <th className="p-4 sm:p-5" style={{ width: '120px' }}>연락처</th>
@@ -7381,7 +7422,7 @@ export default function AdminPage() {
                           return (
                             <tr key={order.id} className="hover:bg-[#fff9fb] transition-colors">
                               <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{filteredOrders.length - idx}</td>
-                              <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{order.date}</td>
+                              <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{formatOrderDate(order.date)}</td>
                               <td className="p-4 sm:p-5 font-black text-[#2d2026] whitespace-nowrap">{storeInfo.name}</td>
                               <td className="p-4 sm:p-5 font-semibold text-[#735965] whitespace-nowrap">{storeInfo.owner}</td>
                               <td className="p-4 sm:p-5 font-semibold text-[#735965] whitespace-nowrap">{storeInfo.phone}</td>
@@ -11939,11 +11980,11 @@ export default function AdminPage() {
                       <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center">
                         <div>
                           <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">주문 신청일</span>
-                          <strong className="text-[#0F172A] text-xs font-black">{selectedOrder.date}</strong>
+                          <strong className="text-[#0F172A] text-xs font-black">{formatOrderDate(selectedOrder.date)}</strong>
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleCopyToClipboard(selectedOrder.date, "신청일")}
+                          onClick={() => handleCopyToClipboard(formatOrderDate(selectedOrder.date), "신청일")}
                           className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-neutral-200/60 hover:bg-neutral-200 rounded-lg shrink-0 cursor-pointer border-0 transition-colors"
                           title="복사하기"
                         >
