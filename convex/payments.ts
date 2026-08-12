@@ -25,12 +25,22 @@ export const verifyAndSaveOrder = action({
     const impKey = process.env.PORTONE_API_KEY;
     const impSecret = process.env.PORTONE_API_SECRET;
 
+    const getKstFormattedDateTime = () => {
+      const kst = new Date(Date.now() + 9 * 60 * 60 * 1000);
+      const y = kst.getUTCFullYear();
+      const m = String(kst.getUTCMonth() + 1).padStart(2, "0");
+      const d = String(kst.getUTCDate()).padStart(2, "0");
+      const hh = String(kst.getUTCHours()).padStart(2, "0");
+      const mm = String(kst.getUTCMinutes()).padStart(2, "0");
+      return `${y}-${m}-${d} ${hh}:${mm}`;
+    };
+
     if (!impKey || !impSecret) {
       console.warn("PORTONE_API_KEY or PORTONE_API_SECRET env variable is missing. Bypassing check for development/testing.");
       
       // Fallback: If API Keys are not set, allow payment in sandbox/test mode
       const newOrderId = args.merchantUid;
-      const today = new Date().toISOString().split("T")[0];
+      const today = getKstFormattedDateTime();
 
       await ctx.runMutation(api.orders.createOrUpdate, {
         id: newOrderId,
@@ -98,7 +108,7 @@ export const verifyAndSaveOrder = action({
 
       // 4. Save order as "결제완료"
       const newOrderId = args.merchantUid;
-      const today = new Date().toISOString().split("T")[0];
+      const today = getKstFormattedDateTime();
 
       await ctx.runMutation(api.orders.createOrUpdate, {
         id: newOrderId,

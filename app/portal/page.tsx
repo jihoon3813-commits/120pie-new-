@@ -74,21 +74,37 @@ const DEFAULT_STATUS_COLORS: { [status: string]: string } = {
   "주문취소": "gray"
 };
 
-const formatOrderDate = (dateStr: string) => {
-  if (!dateStr) return "";
-  const trimmed = dateStr.trim();
+const formatOrderDate = (dateStr: string, creationTime?: number) => {
+  if (!dateStr && !creationTime) return "";
+  const trimmed = (dateStr || "").trim();
+
   if (/^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}$/.test(trimmed)) {
-    return trimmed;
-  }
-  if (trimmed.includes(" ") || trimmed.includes("T")) {
+    if (!trimmed.endsWith(" 00:00") || !creationTime) {
+      return trimmed;
+    }
+  } else if (trimmed.includes(" ") || trimmed.includes("T")) {
     const clean = trimmed.replace("T", " ");
     const parts = clean.split(" ");
     const ymd = parts[0];
     const timeParts = parts[1] ? parts[1].split(":") : ["00", "00"];
     const hh = (timeParts[0] || "00").padStart(2, "0");
     const mm = (timeParts[1] || "00").padStart(2, "0");
-    return `${ymd} ${hh}:${mm}`;
+    const formatted = `${ymd} ${hh}:${mm}`;
+    if (!formatted.endsWith(" 00:00") || !creationTime) {
+      return formatted;
+    }
   }
+
+  if (creationTime) {
+    const kst = new Date(creationTime + 9 * 60 * 60 * 1000);
+    const y = kst.getUTCFullYear();
+    const m = String(kst.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(kst.getUTCDate()).padStart(2, "0");
+    const hh = String(kst.getUTCHours()).padStart(2, "0");
+    const mm = String(kst.getUTCMinutes()).padStart(2, "0");
+    return `${y}-${m}-${d} ${hh}:${mm}`;
+  }
+
   if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
     return `${trimmed} 00:00`;
   }
@@ -752,6 +768,7 @@ export default function PortalPage() {
       const mappedOrders = myOrders.map((o: any) => ({
         id: o.id,
         date: o.date,
+        _creationTime: o._creationTime,
         items: o.items.map((it: any) => ({
           productName: it.productName,
           quantity: it.quantity,
@@ -3134,7 +3151,7 @@ export default function PortalPage() {
                             className="bg-[#F8FAFC] border-0 hover:bg-slate-100/80 p-4 rounded-lg cursor-pointer transition-all group"
                           >
                             <div className="flex justify-between items-center text-[10px] mb-2">
-                              <span className="text-slate-400 font-extrabold">{formatOrderDate(order.date)}</span>
+                              <span className="text-slate-400 font-extrabold">{formatOrderDate(order.date, (order as any)._creationTime)}</span>
                               <span className={`px-2.5 py-0.5 rounded-full font-black ${
                                 (() => {
                                   const colorKey = statusColors[order.status] || DEFAULT_STATUS_COLORS[order.status] || "pink";
@@ -3662,7 +3679,7 @@ export default function PortalPage() {
                             onClick={() => setSelectedOrder(order)}
                             className="hover:bg-amber-50/40 transition-colors cursor-pointer group"
                           >
-                            <td className="p-4 sm:p-5 text-slate-600 font-bold whitespace-nowrap">{formatOrderDate(order.date)}</td>
+                            <td className="p-4 sm:p-5 text-slate-600 font-bold whitespace-nowrap">{formatOrderDate(order.date, (order as any)._creationTime)}</td>
                             <td className="p-4 sm:p-5">
                               <span className="font-extrabold text-[#0F172A] block text-xs sm:text-sm">
                                 {order.items[0].productName} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ""}
@@ -4805,7 +4822,7 @@ export default function PortalPage() {
               <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <span className="text-xs font-black text-[#0F172A]">발주 자재 명세표</span>
-                  <span className="text-[10px] font-mono font-bold text-neutral-400">신청 일자: {selectedOrder.date}</span>
+                  <span className="text-[10px] font-mono font-bold text-neutral-400">신청 일자: {formatOrderDate(selectedOrder.date, (selectedOrder as any)._creationTime)}</span>
                 </div>
                 <div className="border border-neutral-200/90 rounded-md overflow-hidden bg-white shadow-2xs">
                   <div className="overflow-x-auto w-full [::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">

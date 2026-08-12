@@ -535,21 +535,37 @@ const getDatesInRange = (startStr: string, endStr: string) => {
   return dates.reverse();
 };
 
-const formatOrderDate = (dateStr: string) => {
-  if (!dateStr) return "";
-  const trimmed = dateStr.trim();
+const formatOrderDate = (dateStr: string, creationTime?: number) => {
+  if (!dateStr && !creationTime) return "";
+  const trimmed = (dateStr || "").trim();
+
   if (/^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}$/.test(trimmed)) {
-    return trimmed;
-  }
-  if (trimmed.includes(" ") || trimmed.includes("T")) {
+    if (!trimmed.endsWith(" 00:00") || !creationTime) {
+      return trimmed;
+    }
+  } else if (trimmed.includes(" ") || trimmed.includes("T")) {
     const clean = trimmed.replace("T", " ");
     const parts = clean.split(" ");
     const ymd = parts[0];
     const timeParts = parts[1] ? parts[1].split(":") : ["00", "00"];
     const hh = (timeParts[0] || "00").padStart(2, "0");
     const mm = (timeParts[1] || "00").padStart(2, "0");
-    return `${ymd} ${hh}:${mm}`;
+    const formatted = `${ymd} ${hh}:${mm}`;
+    if (!formatted.endsWith(" 00:00") || !creationTime) {
+      return formatted;
+    }
   }
+
+  if (creationTime) {
+    const kst = new Date(creationTime + 9 * 60 * 60 * 1000);
+    const y = kst.getUTCFullYear();
+    const m = String(kst.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(kst.getUTCDate()).padStart(2, "0");
+    const hh = String(kst.getUTCHours()).padStart(2, "0");
+    const mm = String(kst.getUTCMinutes()).padStart(2, "0");
+    return `${y}-${m}-${d} ${hh}:${mm}`;
+  }
+
   if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
     return `${trimmed} 00:00`;
   }
@@ -1808,7 +1824,7 @@ export default function AdminPage() {
       const payMethodStr = order.payMethod === "card" || order.payMethod === "CARD" ? "카드" : "현금";
       
       return [
-        formatOrderDate(order.date),
+        formatOrderDate(order.date, (order as any)._creationTime),
         order.id,
         storeInfo.name,
         storeInfo.owner,
@@ -7422,7 +7438,7 @@ export default function AdminPage() {
                           return (
                             <tr key={order.id} className="hover:bg-[#fff9fb] transition-colors">
                               <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{filteredOrders.length - idx}</td>
-                              <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{formatOrderDate(order.date)}</td>
+                              <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{formatOrderDate(order.date, (order as any)._creationTime)}</td>
                               <td className="p-4 sm:p-5 font-black text-[#2d2026] whitespace-nowrap">{storeInfo.name}</td>
                               <td className="p-4 sm:p-5 font-semibold text-[#735965] whitespace-nowrap">{storeInfo.owner}</td>
                               <td className="p-4 sm:p-5 font-semibold text-[#735965] whitespace-nowrap">{storeInfo.phone}</td>
@@ -11980,11 +11996,11 @@ export default function AdminPage() {
                       <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center">
                         <div>
                           <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">주문 신청일</span>
-                          <strong className="text-[#0F172A] text-xs font-black">{formatOrderDate(selectedOrder.date)}</strong>
+                          <strong className="text-[#0F172A] text-xs font-black">{formatOrderDate(selectedOrder.date, (selectedOrder as any)._creationTime)}</strong>
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleCopyToClipboard(formatOrderDate(selectedOrder.date), "신청일")}
+                          onClick={() => handleCopyToClipboard(formatOrderDate(selectedOrder.date, (selectedOrder as any)._creationTime), "신청일")}
                           className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-neutral-200/60 hover:bg-neutral-200 rounded-lg shrink-0 cursor-pointer border-0 transition-colors"
                           title="복사하기"
                         >

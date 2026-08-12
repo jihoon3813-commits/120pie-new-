@@ -2,6 +2,16 @@ import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
+const getKstFormattedDateTime = () => {
+  const kst = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  const y = kst.getUTCFullYear();
+  const m = String(kst.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(kst.getUTCDate()).padStart(2, "0");
+  const hh = String(kst.getUTCHours()).padStart(2, "0");
+  const mm = String(kst.getUTCMinutes()).padStart(2, "0");
+  return `${y}-${m}-${d} ${hh}:${mm}`;
+};
+
 // 모든 발주 주문 리스트 조회 (최근 주문이 위로 정렬)
 export const list = query({
   args: {},
@@ -54,6 +64,12 @@ export const createOrUpdate = mutation({
 
     if (existing) {
       const prevStatus = existing.status;
+
+      // 신청일자 시간정보 보존 (기존 DB에 시간정보가 포함되어 있다면 YYYY-MM-DD 단순일자로 덮어쓰지 않음)
+      if (existing.date && existing.date.includes(" ") && fields.date && !fields.date.includes(" ")) {
+        fields.date = existing.date;
+      }
+
       await ctx.db.patch(existing._id, fields);
 
       // 결제대기 -> 결제완료 등 상태 전이 시 디스코드 알림 발송
@@ -69,7 +85,7 @@ export const createOrUpdate = mutation({
 
         await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
           id: args.id,
-          date: args.date,
+          date: fields.date || args.date,
           storeId: args.storeId,
           storeName: storeName || undefined,
           totalPrice: args.totalPrice,
@@ -85,6 +101,9 @@ export const createOrUpdate = mutation({
 
       return existing._id;
     } else {
+      if (!fields.date || !fields.date.includes(" ")) {
+        fields.date = fields.date ? `${fields.date} 00:00` : getKstFormattedDateTime();
+      }
       const newId = await ctx.db.insert("orders", fields);
       
       // Look up store name
@@ -101,7 +120,7 @@ export const createOrUpdate = mutation({
       if (args.status !== "결제대기") {
         await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
           id: args.id,
-          date: args.date,
+          date: fields.date || args.date,
           storeId: args.storeId,
           storeName: storeName || undefined,
           totalPrice: args.totalPrice,
@@ -149,13 +168,7 @@ export const processPaidWebhookOrder = internalMutation({
       .withIndex("by_order_id", (q) => q.eq("id", args.paymentId))
       .first();
 
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const formattedNow = `${year}-${month}-${day} ${hours}:${minutes}`;
+    const formattedNow = getKstFormattedDateTime();
 
     if (existing) {
       if (existing.status === "결제완료") {
@@ -278,9 +291,14 @@ export const syncOrders = mutation({
         .filter((q) => q.eq(q.field("id"), ord.id))
         .first();
 
+      let finalDate = ord.date;
+      if (existing?.date && existing.date.includes(" ") && ord.date && !ord.date.includes(" ")) {
+        finalDate = existing.date;
+      }
+
       const fields = {
         id: ord.id,
-        date: ord.date,
+        date: finalDate,
         items: ord.items,
         totalPrice: ord.totalPrice,
         status: ord.status,
