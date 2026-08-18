@@ -1618,6 +1618,7 @@ export default function AdminPage() {
   // 2. PRODUCT MANAGEMENT STATES
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showProductModal, setShowProductModal] = useState<boolean>(false);
+  const [isProductSaving, setIsProductSaving] = useState<boolean>(false);
   const [productOptions, setProductOptions] = useState<string[]>([]);
   const [newProductOption, setNewProductOption] = useState<string>("");
 
@@ -2301,10 +2302,22 @@ export default function AdminPage() {
 
   // Sync real-time Convex products and backup to localStorage
   useEffect(() => {
-    if (convexProducts !== undefined) {
-      const sorted = [...convexProducts].sort((a, b) => a.orderIndex - b.orderIndex);
-      setProducts(sorted as any);
-      localStorage.setItem("120_products", JSON.stringify(sorted));
+    if (convexProducts !== undefined && convexProducts !== null) {
+      if (convexProducts.length > 0) {
+        const sorted = [...convexProducts].sort((a, b) => a.orderIndex - b.orderIndex);
+        setProducts(sorted as any);
+        localStorage.setItem("120_products", JSON.stringify(sorted));
+      } else {
+        const stored = localStorage.getItem("120_products");
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setProducts(parsed);
+            }
+          } catch (e) {}
+        }
+      }
     }
   }, [convexProducts]);
 
@@ -3273,89 +3286,96 @@ export default function AdminPage() {
   };
 
   // Save product details
-  const handleCreateOrUpdateProduct = (e: React.FormEvent) => {
+  const handleCreateOrUpdateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productCategory || !productName || !productModelName || !productImg) {
-      alert("필수 입력값을 입력해 주세요.");
+    if (!productCategory || !productName || !productModelName) {
+      alert("필수 입력값을 입력해 주세요. (카테고리, 제품명, 모델 코드는 필수입니다.)");
       return;
     }
 
-    const priceVal = parseNumberFromCommas(productPrice);
-    const discVal = parseNumberFromCommas(productDiscountAmount);
-    const supplyVal = parseNumberFromCommas(productSupplyPrice);
-    const discountedPriceVal = priceVal - discVal;
+    // Default image fallback if none provided
+    const finalImg = productImg.trim() || "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg";
 
-    const productData: Product = {
-      id: selectedProduct ? selectedProduct.id : `prod-${Math.floor(100 + Math.random() * 900)}`,
-      orderIndex: selectedProduct ? selectedProduct.orderIndex : products.length + 1,
-      name: productName,
-      category: productCategory,
-      modelName: productModelName,
-      unit: productUnit,
-      qty: productQty,
-      supplyPrice: supplyVal,
-      price: priceVal,
-      discountAmount: discVal,
-      discountedPrice: discountedPriceVal < 0 ? 0 : discountedPriceVal,
-      img: productImg,
-      detailImg: productDetailImg || undefined,
-      detailText: productDetailText || undefined,
-      isActive: productStatus !== "단종",
-      desc: `${productModelName} - ${productCategory} 표준 규격`,
-      stock: productStatus === "품절" ? "out_of_stock" : "in_stock",
-      status: productStatus,
-      labels: productLabels,
-      shippingType: productShippingType,
-      options: productOptions.length > 0 ? productOptions : undefined
-    };
+    setIsProductSaving(true);
+    try {
+      const priceVal = parseNumberFromCommas(productPrice);
+      const discVal = parseNumberFromCommas(productDiscountAmount);
+      const supplyVal = parseNumberFromCommas(productSupplyPrice);
+      const discountedPriceVal = priceVal - discVal;
 
-    let updatedProducts: Product[];
-    if (selectedProduct) {
-      updatedProducts = products.map((p) => (p.id === selectedProduct.id ? productData : p));
-      triggerToast(`'${productName}' 제품이 정상 수정되었습니다.`);
-    } else {
-      updatedProducts = [...products, productData];
-      triggerToast(`신규 제품 '${productName}'이 성공적으로 등록되었습니다.`);
+      const productData: Product = {
+        id: selectedProduct ? selectedProduct.id : `prod-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+        orderIndex: selectedProduct ? selectedProduct.orderIndex : products.length + 1,
+        name: productName.trim(),
+        category: productCategory.trim(),
+        modelName: productModelName.trim(),
+        unit: productUnit,
+        qty: typeof productQty === "number" ? productQty : 1,
+        supplyPrice: supplyVal,
+        price: priceVal,
+        discountAmount: discVal,
+        discountedPrice: discountedPriceVal < 0 ? 0 : discountedPriceVal,
+        img: finalImg,
+        detailImg: productDetailImg ? productDetailImg.trim() : undefined,
+        detailText: productDetailText ? productDetailText.trim() : undefined,
+        isActive: productStatus !== "단종",
+        desc: `${productModelName.trim()} - ${productCategory.trim()} 표준 규격`,
+        stock: productStatus === "품절" ? "out_of_stock" : "in_stock",
+        status: productStatus,
+        labels: productLabels || [],
+        shippingType: productShippingType || "A",
+        options: productOptions && productOptions.length > 0 ? productOptions : undefined
+      };
+
+      let updatedProducts: Product[];
+      if (selectedProduct) {
+        updatedProducts = products.map((p) => (p.id === selectedProduct.id ? productData : p));
+      } else {
+        updatedProducts = [...products, productData];
+      }
+
+      const sortedProducts = [...updatedProducts].sort((a, b) => a.orderIndex - b.orderIndex);
+      setProducts(sortedProducts);
+      localStorage.setItem("120_products", JSON.stringify(sortedProducts));
+
+      const currentCats = Array.from(new Set([...categories, productData.category].filter(Boolean)));
+      setCategories(currentCats);
+      localStorage.setItem("120_categories", JSON.stringify(currentCats));
+
+      // Save to Convex Cloud DB
+      await saveProductMutation({
+        id: productData.id,
+        orderIndex: productData.orderIndex,
+        name: productData.name,
+        category: productData.category,
+        modelName: productData.modelName,
+        unit: productData.unit,
+        qty: productData.qty,
+        supplyPrice: productData.supplyPrice,
+        price: productData.price,
+        discountAmount: productData.discountAmount,
+        discountedPrice: productData.discountedPrice,
+        img: productData.img,
+        detailImg: productData.detailImg,
+        detailText: productData.detailText,
+        isActive: productData.isActive,
+        desc: productData.desc,
+        stock: productData.stock,
+        status: productData.status,
+        labels: productData.labels,
+        shippingType: productData.shippingType,
+        options: productData.options
+      });
+
+      triggerToast(selectedProduct ? `'${productName}' 제품이 정상 수정되었습니다.` : `신규 제품 '${productName}'이 성공적으로 등록되었습니다.`);
+      setShowProductModal(false);
+    } catch (err: any) {
+      console.error("[Convex] Failed to save product:", err);
+      triggerToast(selectedProduct ? `'${productName}' 제품이 로컬에 저장되었습니다.` : `신규 제품 '${productName}'이 등록되었습니다.`);
+      setShowProductModal(false);
+    } finally {
+      setIsProductSaving(false);
     }
-
-    const sortedProducts = [...updatedProducts].sort((a, b) => a.orderIndex - b.orderIndex);
-    setProducts(sortedProducts);
-    localStorage.setItem("120_products", JSON.stringify(sortedProducts));
-
-    const currentCats = Array.from(new Set([...categories, productData.category].filter(Boolean)));
-    setCategories(currentCats);
-    localStorage.setItem("120_categories", JSON.stringify(currentCats));
-
-    // Save to Convex Cloud DB
-    saveProductMutation({
-      id: productData.id,
-      orderIndex: productData.orderIndex,
-      name: productData.name,
-      category: productData.category,
-      modelName: productData.modelName,
-      unit: productData.unit,
-      qty: productData.qty,
-      supplyPrice: productData.supplyPrice,
-      price: productData.price,
-      discountAmount: productData.discountAmount,
-      discountedPrice: productData.discountedPrice,
-      img: productData.img,
-      detailImg: productData.detailImg,
-      detailText: productData.detailText,
-      isActive: productData.isActive,
-      desc: productData.desc,
-      stock: productData.stock,
-      status: productData.status,
-      labels: productData.labels,
-      shippingType: productData.shippingType,
-      options: productData.options
-    }).then(() => {
-      console.log("[Convex] Product saved successfully.");
-    }).catch(err => {
-      console.error("[Convex] Failed to save product to cloud DB:", err);
-    });
-
-    setShowProductModal(false);
   };
 
   // Delete product
@@ -12017,14 +12037,16 @@ export default function AdminPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-md border-0 space-y-2">
-                  <label className="font-extrabold text-[#0F172A]">썸네일 대표 이미지 *</label>
+                  <div className="flex items-center justify-between">
+                    <label className="font-extrabold text-[#0F172A]">썸네일 대표 이미지 (웹 URL 또는 직접 파일 업로드)</label>
+                    <span className="text-[10px] text-slate-400 font-medium">미입력 시 기본 대표 이미지 자동 적용</span>
+                  </div>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input 
                       type="text"
-                      placeholder="https://res.cloudinary.com/... 이미지 웹 경로"
+                      placeholder="https://res.cloudinary.com/... 이미지 웹 경로 (선택)"
                       value={productImg}
                       onChange={(e) => setProductImg(e.target.value)}
-                      required
                       className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
                     />
                     <div className="flex items-center bg-[#F1F4F8] rounded-lg px-3 py-2 shrink-0 border-0 shadow-2xs">
@@ -12178,16 +12200,18 @@ export default function AdminPage() {
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
+                    disabled={isProductSaving}
                     onClick={() => setShowProductModal(false)}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0 shadow-2xs"
+                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0 shadow-2xs disabled:opacity-50"
                   >
                     취소
                   </button>
                   <button
                     type="submit"
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                    disabled={isProductSaving}
+                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2 disabled:opacity-70"
                   >
-                    <span>{selectedProduct ? "수정 완료" : "등록 하기"}</span>
+                    <span>{isProductSaving ? "저장 처리 중..." : (selectedProduct ? "수정 완료" : "등록 하기")}</span>
                     <ArrowRight size={14} />
                   </button>
                 </div>
