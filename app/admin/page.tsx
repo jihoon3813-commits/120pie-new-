@@ -108,6 +108,8 @@ interface StoreInfo {
   status: "승인" | "대기" | "보류" | "중지" | "취소"; // 가맹상태
   roadAddress: string; // 도로명주소
   detailAddress: string; // 상세주소
+  lat?: number; // 위도
+  lng?: number; // 경도
   regDate: string; // 가맹 등록일
   cancelDate?: string; // 가맹 해지일
   adoptionMenu: string[]; // 도입메뉴 (e.g. ["120pie", "egg120", "츄러스120"])
@@ -2935,27 +2937,45 @@ export default function AdminPage() {
       triggerToast(`신규 가맹점 '${storeName}'이 성공적으로 등록되었습니다.`);
     }
 
-    // Save to Convex Cloud DB
-    saveStoreMutation({
-      id: storeLoginId,
-      pw: storePw,
-      pwConfirm: storePwConfirm,
-      name: storeName,
-      owner: storeOwner,
-      phone: storePhone,
-      status: storeStatus,
-      roadAddress: storeRoadAddress,
-      detailAddress: storeDetailAddress,
-      regDate: storeRegDate || new Date().toISOString().split("T")[0],
-      cancelDate: storeCancelDate || undefined,
-      adoptionMenu: storeAdoptionMenu,
-      monthlySales: selectedStore ? selectedStore.monthlySales : 0,
-      partnerId: storePartnerId || undefined,
-    }).then(() => {
-      console.log("[Convex] Store created/updated successfully.");
-    }).catch((err) => {
-      console.error("[Convex] Failed to save store:", err);
-    });
+    // Save to Convex Cloud DB with geocoding
+    const saveToConvex = (lat?: number, lng?: number) => {
+      saveStoreMutation({
+        id: storeLoginId,
+        pw: storePw,
+        pwConfirm: storePwConfirm,
+        name: storeName,
+        owner: storeOwner,
+        phone: storePhone,
+        status: storeStatus,
+        roadAddress: storeRoadAddress,
+        detailAddress: storeDetailAddress,
+        lat: lat ?? selectedStore?.lat,
+        lng: lng ?? selectedStore?.lng,
+        regDate: storeRegDate || new Date().toISOString().split("T")[0],
+        cancelDate: storeCancelDate || undefined,
+        adoptionMenu: storeAdoptionMenu,
+        monthlySales: selectedStore ? selectedStore.monthlySales : 0,
+        partnerId: storePartnerId || undefined,
+      }).then(() => {
+        console.log("[Convex] Store created/updated successfully.");
+      }).catch((err) => {
+        console.error("[Convex] Failed to save store:", err);
+      });
+    };
+
+    if (typeof window !== "undefined" && window.naver && window.naver.maps && window.naver.maps.Service && storeRoadAddress) {
+      const cleanAddr = storeRoadAddress.split("(")[0].trim();
+      window.naver.maps.Service.geocode({ query: cleanAddr }, (status: any, response: any) => {
+        if (status === window.naver.maps.Service.Status.OK && response.v2?.addresses?.[0]) {
+          const item = response.v2.addresses[0];
+          saveToConvex(parseFloat(item.y), parseFloat(item.x));
+        } else {
+          saveToConvex();
+        }
+      });
+    } else {
+      saveToConvex();
+    }
 
     setStores(updatedStores);
     localStorage.setItem("120_stores", JSON.stringify(updatedStores));

@@ -1,253 +1,192 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const KAKAO_KEY = process.env.KAKAO_REST_API_KEY || "82b7d82dc6c6778e0ff608ef18b13b09";
+
+interface KakaoDoc {
+  id: string;
+  place_name: string;
+  category_name: string;
+  category_group_code: string;
+  phone: string;
+  address_name: string;
+  road_address_name: string;
+  x: string; // lng
+  y: string; // lat
+  place_url: string;
+}
+
+// 주소에서 시/도, 구/군, 동 파싱
+function parseAddress(addr: string) {
+  const parts = addr.trim().split(" ");
+  const sido = parts[0] || "서울특별시";
+  const sigungu = parts[1] || "";
+  const dong = parts.find((p) => p.endsWith("동") || p.endsWith("읍") || p.endsWith("면") || p.endsWith("가")) || parts[2] || "";
+  return { sido, sigungu, dong };
+}
+
+// 카테고리 매핑
+function mapCategory(catName: string, queryCat: string): string {
+  if (catName.includes("PC방")) return "PC방";
+  if (catName.includes("만화")) return "만화카페";
+  if (catName.includes("보드")) return "보드게임카페";
+  if (catName.includes("스터디")) return "스터디카페";
+  if (catName.includes("키즈")) return "키즈카페";
+  if (catName.includes("파티룸") || catName.includes("룸카페")) return "멀티방/파티룸";
+  if (queryCat && queryCat !== "전체") return queryCat;
+  return "카페/디저트";
+}
+
+async function fetchKakaoCategory(center: { lat: number; lng: number }, groupCode: string, radiusMeters: number, page: number): Promise<KakaoDoc[]> {
+  try {
+    const url = `https://dapi.kakao.com/v2/local/search/category.json?category_group_code=${groupCode}&x=${center.lng}&y=${center.lat}&radius=${radiusMeters}&size=15&page=${page}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `KakaoAK ${KAKAO_KEY}` },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.documents || [];
+  } catch {
+    return [];
+  }
+}
+
+async function fetchKakaoKeyword(center: { lat: number; lng: number }, query: string, radiusMeters: number, page: number): Promise<KakaoDoc[]> {
+  try {
+    const url = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(query)}&x=${center.lng}&y=${center.lat}&radius=${radiusMeters}&size=15&page=${page}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `KakaoAK ${KAKAO_KEY}` },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.documents || [];
+  } catch {
+    return [];
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const {
       bounds, // { sw: { lat, lng }, ne: { lat, lng } }
-      center, // { lat, lng }
+      center = { lat: 37.4981, lng: 127.0283 },
       categories = ["카페/디저트"],
-      sido = "서울특별시",
+      radius = 500,
     } = await req.json();
 
-    const results: any[] = [];
-    const seenNames = new Set<string>();
+    const cLat = center.lat || 37.4981;
+    const cLng = center.lng || 127.0283;
 
-    const minLat = bounds?.sw?.lat !== undefined ? bounds.sw.lat : (center?.lat ? center.lat - 0.005 : 37.498);
-    const maxLat = bounds?.ne?.lat !== undefined ? bounds.ne.lat : (center?.lat ? center.lat + 0.005 : 37.504);
-    const minLng = bounds?.sw?.lng !== undefined ? bounds.sw.lng : (center?.lng ? center.lng - 0.005 : 127.025);
-    const maxLng = bounds?.ne?.lng !== undefined ? bounds.ne.lng : (center?.lng ? center.lng + 0.005 : 127.032);
+    // 화면 영역 (Bounding Box)
+    const swLat = bounds?.sw?.lat !== undefined ? bounds.sw.lat : cLat - 0.004;
+    const swLng = bounds?.sw?.lng !== undefined ? bounds.sw.lng : cLng - 0.005;
+    const neLat = bounds?.ne?.lat !== undefined ? bounds.ne.lat : cLat + 0.004;
+    const neLng = bounds?.ne?.lng !== undefined ? bounds.ne.lng : cLng + 0.005;
 
-    // 1) Overpass 실시간 POI 엔진을 통해 현재 화면 영역(Bounding Box) 내의 실제 등록된 모든 카페 & 베이커리 & 샵 전수 추출
+    const fetchTasks: Promise<KakaoDoc[]>[] = [];
+
+    // 1) 카페/디저트 카테고리 검색
     if (categories.includes("카페/디저트") || categories.includes("전체")) {
-      try {
-        const query = `
-          [out:json][timeout:8];
-          (
-            node["amenity"="cafe"](${minLat},${minLng},${maxLat},${maxLng});
-            node["shop"="bakery"](${minLat},${minLng},${maxLat},${maxLng});
-            node["amenity"="fast_food"]["name"](${minLat},${minLng},${maxLat},${maxLng});
-            way["amenity"="cafe"](${minLat},${minLng},${maxLat},${maxLng});
-            way["shop"="bakery"](${minLat},${minLng},${maxLat},${maxLng});
-          );
-          out center 40;
-        `;
-
-        const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
-        const res = await fetch(url, {
-          headers: { "User-Agent": "120Pie-Commercial-Radar/1.0" },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          for (const el of data.elements || []) {
-            const name = el.tags?.name || el.tags?.["name:ko"] || el.tags?.brand || el.tags?.["name:en"];
-            if (name && !seenNames.has(name)) {
-              seenNames.add(name);
-              const elLat = el.lat || el.center?.lat;
-              const elLng = el.lon || el.center?.lon;
-
-              results.push({
-                name, // 🌟 100% 실제 등록된 매장명
-                category: "카페/디저트",
-                sido,
-                sigungu: "주요상권구",
-                dong: "역세권동",
-                roadAddress: `${sido} 중심대로 및 골목 ${el.tags?.["addr:street"] || el.tags?.["addr:housenumber"] || ""} 1층`,
-                lat: parseFloat(elLat.toFixed(6)),
-                lng: parseFloat(elLng.toFixed(6)),
-                phone: el.tags?.phone || "02-" + Math.floor(1000 + Math.random() * 9000) + "-" + Math.floor(1000 + Math.random() * 9000),
-                mobile: "010-" + Math.floor(1000 + Math.random() * 9000) + "-" + Math.floor(1000 + Math.random() * 9000),
-                status: "영업가능",
-                isContracted: false,
-                homepage: `https://map.naver.com/p/search/${encodeURIComponent(name)}`,
-                memo: `네이버/공공 POI 실제 등록 매장 (${name})`,
-              });
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Overpass Search Error:", err);
-      }
+      fetchTasks.push(fetchKakaoCategory({ lat: cLat, lng: cLng }, "CE7", radius, 1));
+      fetchTasks.push(fetchKakaoCategory({ lat: cLat, lng: cLng }, "CE7", radius, 2));
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "카페", radius, 1));
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "카페", radius, 2));
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "디저트", radius, 1));
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "베이커리", radius, 1));
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "스타벅스", radius, 1));
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "투썸플레이스", radius, 1));
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "커피빈", radius, 1));
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "소과당", radius, 1));
     }
 
-    // 2) 스크린샷 속 실제 매장들 (소과당, 015 COFFEE, 키이스케이프, 29펍2호점, 코드헌터, 웅카페 등) 좌표 정확 확정
-    // 강남역 로데오거리 상권인 경우
-    const isGangnamRodeo = minLat < 37.51 && maxLat > 37.495 && minLng < 127.035 && maxLng > 127.025;
-    if (isGangnamRodeo) {
-      const gangnamRealStores = [
-        {
-          name: "소과당 강남본점",
-          category: "카페/디저트",
-          sido: "서울특별시",
-          sigungu: "강남구",
-          dong: "역삼동",
-          roadAddress: "서울 강남구 강남대로96길 12 지천빌딩 1층",
-          lat: 37.49976,
-          lng: 127.02816, // 🌟 지천빌딩 '소과당' 글자 정중앙 위치!
-          phone: "02-538-8188",
-          mobile: "010-8844-3322",
-          status: "영업가능",
-          isContracted: false,
-          homepage: "https://map.naver.com/p/search/%EC%86%8C%EA%B3%BC%EB%8B%B9",
-          memo: "강남 지천빌딩 1층 실제 수제 팬케이크/디저트 카페",
-        },
-        {
-          name: "코드헌터 방탈출카페",
-          category: "카페/디저트",
-          sido: "서울특별시",
-          sigungu: "강남구",
-          dong: "역삼동",
-          roadAddress: "서울 강남구 강남대로96길 16 3층",
-          lat: 37.50012,
-          lng: 127.02842, // 코드헌터 건물 정중앙
-          phone: "02-558-1289",
-          mobile: "010-4491-0021",
-          status: "영업가능",
-          isContracted: false,
-          homepage: "https://map.naver.com/p/search/%EC%BD%94%EB%93%9C%ED%97%8C%ED%84%B0",
-          memo: "강남대로96길 샵인샵 타겟",
-        },
-        {
-          name: "키이스케이프 강남",
-          category: "카페/디저트",
-          sido: "서울특별시",
-          sigungu: "강남구",
-          dong: "역삼동",
-          roadAddress: "서울 강남구 강남대로96길 15 4층",
-          lat: 37.50062,
-          lng: 127.02885, // 키이스케이프 강남 건물 정중앙
-          phone: "02-538-8234",
-          mobile: "010-5928-1039",
-          status: "영업가능",
-          isContracted: false,
-          homepage: "https://map.naver.com/p/search/%ED%82%A4%EC%9D%B4%EC%8A%A4%EC%BC%80%EC%9D%B4%ED%94%84",
-          memo: "강남 테마 놀이공간 샵인샵",
-        },
-        {
-          name: "015 COFFEE",
-          category: "카페/디저트",
-          sido: "서울특별시",
-          sigungu: "강남구",
-          dong: "역삼동",
-          roadAddress: "서울 강남구 테헤란로1길 28 1층",
-          lat: 37.50095,
-          lng: 127.02895, // 015 COFFEE 건물 정중앙
-          phone: "02-556-0150",
-          mobile: "010-3344-5566",
-          status: "영업가능",
-          isContracted: false,
-          homepage: "https://map.naver.com/p/search/015%20COFFEE",
-          memo: "테헤란로1길 실제 로스터리 카페",
-        },
-        {
-          name: "피아노리브레 강남센터",
-          category: "카페/디저트",
-          sido: "서울특별시",
-          sigungu: "강남구",
-          dong: "역삼동",
-          roadAddress: "서울 강남구 강남대로96길 20 혜진빌딩 2층",
-          lat: 37.50048,
-          lng: 127.02945, // 피아노리브레 혜진빌딩 건물 정중앙
-          phone: "02-540-8890",
-          mobile: "010-6677-2233",
-          status: "영업가능",
-          isContracted: false,
-          homepage: "https://map.naver.com/p/search/%ED%84%B0%EC%95%84%EB%85%B8%EB%A6%AC%EB%B8%8C%EB%A0%88",
-          memo: "성인 피아노 & 커피 라운지",
-        },
-        {
-          name: "더블린테라스",
-          category: "카페/디저트",
-          sido: "서울특별시",
-          sigungu: "강남구",
-          dong: "역삼동",
-          roadAddress: "서울 강남구 테헤란로5길 31 1층",
-          lat: 37.50092,
-          lng: 127.02985, // 더블린테라스 건물 정중앙
-          phone: "02-568-1234",
-          mobile: "010-8819-2231",
-          status: "영업가능",
-          isContracted: false,
-          homepage: "https://map.naver.com/p/search/%EB%8D%94%EB%B8%94%EB%A6%B0%ED%85%8C%EB%9D%BC%EC%8A%A4",
-          memo: "브런치 & 디저트 카페",
-        },
-        {
-          name: "투썸플레이스 테헤란로점",
-          category: "카페/디저트",
-          sido: "서울특별시",
-          sigungu: "강남구",
-          dong: "역삼동",
-          roadAddress: "서울 강남구 테헤란로 115 1층",
-          lat: 37.49915,
-          lng: 127.02845, // 투썸플레이스 건물 정중앙
-          phone: "02-553-2388",
-          mobile: "010-4491-0021",
-          status: "영업가능",
-          isContracted: false,
-          homepage: "https://map.naver.com/p/search/%ED%88%AC%EC%8C%88%ED%94%8C%EB%A0%88%EC%9D%B4%EC%8A%A4",
-          memo: "투썸플레이스 매장",
-        },
-      ];
-
-      for (const st of gangnamRealStores) {
-        if (!seenNames.has(st.name)) {
-          seenNames.add(st.name);
-          results.push(st);
-        }
-      }
+    // 2) 선택된 개별 타겟 업종 키워드 검색
+    if (categories.includes("PC방")) {
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "PC방", radius, 1));
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "PC카페", radius, 1));
+    }
+    if (categories.includes("만화카페")) {
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "만화카페", radius, 1));
+    }
+    if (categories.includes("스터디카페")) {
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "스터디카페", radius, 1));
+    }
+    if (categories.includes("키즈카페")) {
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "키즈카페", radius, 1));
+    }
+    if (categories.includes("보드게임카페")) {
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "보드게임카페", radius, 1));
+    }
+    if (categories.includes("멀티방/파티룸")) {
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "파티룸", radius, 1));
+      fetchTasks.push(fetchKakaoKeyword({ lat: cLat, lng: cLng }, "룸카페", radius, 1));
     }
 
-    // 군포 송부로/부곡동 상권인 경우
-    const isGunpoSongbu = minLat < 37.33 && maxLat > 37.31 && minLng < 126.95 && maxLng > 126.93;
-    if (isGunpoSongbu) {
-      const gunpoRealStores = [
-        {
-          name: "웅카페",
-          category: "카페/디저트",
-          sido: "경기도",
-          sigungu: "군포시",
-          dong: "부곡동",
-          roadAddress: "경기 군포시 송부로273번안길 4-37 1층",
-          lat: 37.320421,
-          lng: 126.939185,
-          phone: "031-397-0847",
-          mobile: "010-8833-1928",
-          status: "영업가능",
-          isContracted: false,
-          homepage: "https://map.naver.com/p/search/%EA%B5%B0%ED%8F%AC%20%EC%9B%85%EC%B9%B4%ED%8E%98",
-          memo: "군포 송부로 동네 골목 실제 개인 카페",
-        },
-        {
-          name: "메가MGC커피 군포부곡점",
-          category: "카페/디저트",
-          sido: "경기도",
-          sigungu: "군포시",
-          dong: "부곡동",
-          roadAddress: "경기 군포시 송부로291번안길 3 청보빌딩 1층",
-          lat: 37.320145,
-          lng: 126.941238,
-          phone: "031-391-0410",
-          mobile: "010-7766-3344",
-          status: "영업가능",
-          isContracted: false,
-          homepage: "https://map.naver.com/p/search/%EB%A9%94%EA%B0%80MGC%EC%BB%A4%ED%94%BC%20%EA%B5%B0%ED%8F%AC%EB%B6%80%EA%B3%A1%EC%A0%90",
-          memo: "송부로 청보빌딩 1층 실제 테이크아웃 카페",
-        },
-      ];
+    const responses = await Promise.all(fetchTasks);
+    const allDocs = responses.flat();
 
-      for (const st of gunpoRealStores) {
-        if (!seenNames.has(st.name)) {
-          seenNames.add(st.name);
-          results.push(st);
-        }
+    const seenIds = new Set<string>();
+    const seenNames = new Set<string>();
+    const results: any[] = [];
+
+    // 제외할 순수 음식점/주점 카테고리
+    const excludeCategories = [
+      "음식점 > 한식",
+      "음식점 > 일식",
+      "음식점 > 중식",
+      "음식점 > 양식",
+      "음식점 > 술집",
+      "음식점 > 치킨",
+      "음식점 > 분식",
+      "음식점 > 육류,고기",
+      "음식점 > 해물,생선",
+    ];
+
+    for (const doc of allDocs) {
+      if (!doc || !doc.place_name || !doc.x || !doc.y) continue;
+      if (seenIds.has(doc.id) || seenNames.has(doc.place_name)) continue;
+
+      const catName = doc.category_name || "";
+      const isExcluded = excludeCategories.some((ex) => catName.startsWith(ex)) &&
+        !catName.includes("카페") && !catName.includes("디저트") && !catName.includes("베이커리");
+
+      if (isExcluded) continue;
+
+      const lat = parseFloat(parseFloat(doc.y).toFixed(6));
+      const lng = parseFloat(parseFloat(doc.x).toFixed(6));
+
+      // 엄격한 화면 영역(Bounding Box) 필터: 화면 밖 매장 제외
+      if (lat < swLat - 0.001 || lat > neLat + 0.001 || lng < swLng - 0.001 || lng > neLng + 0.001) {
+        continue;
       }
+
+      seenIds.add(doc.id);
+      seenNames.add(doc.place_name);
+
+      const rawAddr = doc.road_address_name || doc.address_name || "";
+      const { sido, sigungu, dong } = parseAddress(rawAddr);
+
+      const matchedCategory = mapCategory(doc.category_name, categories[0] || "카페/디저트");
+
+      results.push({
+        name: doc.place_name,
+        category: matchedCategory,
+        sido,
+        sigungu,
+        dong,
+        roadAddress: doc.road_address_name || doc.address_name || "주소 미등록",
+        lat,
+        lng,
+        phone: doc.phone || undefined,
+        homepage: `https://map.naver.com/p/search/${encodeURIComponent(doc.place_name)}`,
+        status: "영업가능",
+        isContracted: false,
+        memo: `실시간 발굴 매장 (${doc.category_name || matchedCategory})`,
+      });
     }
 
     return NextResponse.json({
       success: true,
       targets: results,
       count: results.length,
-      bounds: { minLat, maxLat, minLng, maxLng },
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

@@ -21,6 +21,8 @@ export const createOrUpdate = mutation({
     status: v.string(), // 가맹상태
     roadAddress: v.string(), // 도로명주소
     detailAddress: v.string(), // 상세주소
+    lat: v.optional(v.number()), // 위도
+    lng: v.optional(v.number()), // 경도
     regDate: v.string(), // 가맹 등록일
     cancelDate: v.optional(v.string()), // 가맹 해지일
     adoptionMenu: v.array(v.string()), // 도입메뉴
@@ -34,44 +36,55 @@ export const createOrUpdate = mutation({
       .filter((q) => q.eq(q.field("id"), args.id))
       .first();
 
+    const fields = {
+      pw: args.pw,
+      pwConfirm: args.pwConfirm,
+      name: args.name,
+      owner: args.owner,
+      phone: args.phone,
+      status: args.status,
+      roadAddress: args.roadAddress,
+      detailAddress: args.detailAddress,
+      lat: args.lat ?? (existing?.lat || undefined),
+      lng: args.lng ?? (existing?.lng || undefined),
+      regDate: args.regDate,
+      cancelDate: args.cancelDate,
+      adoptionMenu: args.adoptionMenu,
+      monthlySales: args.monthlySales,
+      partnerId: args.partnerId,
+    };
+
     if (existing) {
-      // Update existing store
-      await ctx.db.patch(existing._id, {
-        pw: args.pw,
-        pwConfirm: args.pwConfirm,
-        name: args.name,
-        owner: args.owner,
-        phone: args.phone,
-        status: args.status,
-        roadAddress: args.roadAddress,
-        detailAddress: args.detailAddress,
-        regDate: args.regDate,
-        cancelDate: args.cancelDate,
-        adoptionMenu: args.adoptionMenu,
-        monthlySales: args.monthlySales,
-        partnerId: args.partnerId,
-      });
+      await ctx.db.patch(existing._id, fields);
       return { success: true, action: "updated", storeId: args.id };
     } else {
-      // Insert new store
       await ctx.db.insert("stores", {
         id: args.id,
-        pw: args.pw,
-        pwConfirm: args.pwConfirm,
-        name: args.name,
-        owner: args.owner,
-        phone: args.phone,
-        status: args.status,
-        roadAddress: args.roadAddress,
-        detailAddress: args.detailAddress,
-        regDate: args.regDate,
-        cancelDate: args.cancelDate,
-        adoptionMenu: args.adoptionMenu,
-        monthlySales: args.monthlySales,
-        partnerId: args.partnerId,
+        ...fields,
       });
       return { success: true, action: "created", storeId: args.id };
     }
+  },
+});
+
+// Update store coordinates
+export const updateCoordinates = mutation({
+  args: {
+    id: v.string(),
+    lat: v.number(),
+    lng: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("stores")
+      .filter((q) => q.eq(q.field("id"), args.id))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { lat: args.lat, lng: args.lng });
+      return true;
+    }
+    return false;
   },
 });
 
@@ -109,8 +122,10 @@ export const seedStores = mutation({
           owner: "김지훈",
           phone: "010-3813-1200",
           status: "승인",
-          roadAddress: "경기 군포시 엘에스로 143 (금정동, 1층 1001호)",
-          detailAddress: "1층 1001호",
+          roadAddress: "서울 강남구 테헤란로 152 (역삼동, 강남파이낸스센터)",
+          detailAddress: "1층",
+          lat: 37.4981,
+          lng: 127.0283,
           regDate: "2026-05-01",
           cancelDate: "",
           adoptionMenu: ["120pie", "egg120", "츄러스120", "핫도그120", "120coffee"],
@@ -126,6 +141,8 @@ export const seedStores = mutation({
           status: "승인",
           roadAddress: "서울 마포구 양화로 160 (동교동)",
           detailAddress: "2층 201호",
+          lat: 37.5558,
+          lng: 126.9242,
           regDate: "2026-04-12",
           cancelDate: "",
           adoptionMenu: ["120pie", "egg120", "츄러스120"],
@@ -138,9 +155,11 @@ export const seedStores = mutation({
           name: "부산서면점",
           owner: "박수진",
           phone: "010-5182-9012",
-          status: "대기",
+          status: "승인",
           roadAddress: "부산 부산진구 중앙대로 730 (부전동)",
           detailAddress: "1층",
+          lat: 35.1578,
+          lng: 129.0592,
           regDate: "2026-05-20",
           cancelDate: "",
           adoptionMenu: ["120pie", "120coffee"],
@@ -152,6 +171,22 @@ export const seedStores = mutation({
         await ctx.db.insert("stores", store);
       }
       return { success: true, seeded: DEFAULT_STORES.length };
+    } else {
+      // Ensure existing stores have coordinates if missing
+      const DEFAULT_COORDS: Record<string, { lat: number; lng: number }> = {
+        "강남역삼점": { lat: 37.4981, lng: 127.0283 },
+        "홍대입구점": { lat: 37.5558, lng: 126.9242 },
+        "부산서면점": { lat: 35.1578, lng: 129.0592 },
+      };
+
+      for (const store of existingStores) {
+        if (!store.lat || !store.lng) {
+          const coord = DEFAULT_COORDS[store.name];
+          if (coord) {
+            await ctx.db.patch(store._id, { lat: coord.lat, lng: coord.lng });
+          }
+        }
+      }
     }
     return { success: false, alreadySeeded: true };
   },

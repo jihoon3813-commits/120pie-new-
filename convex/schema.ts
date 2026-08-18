@@ -59,6 +59,8 @@ export default defineSchema({
     status: v.string(), // 가맹상태 ("승인" | "대기" | "보류" | "중지" | "취소")
     roadAddress: v.string(), // 도로명주소
     detailAddress: v.string(), // 상세주소
+    lat: v.optional(v.number()), // 위도 (Latitude)
+    lng: v.optional(v.number()), // 경도 (Longitude)
     regDate: v.string(), // 가맹 등록일 (YYYY-MM-DD)
     cancelDate: v.optional(v.string()), // 가맹 해지일
     adoptionMenu: v.array(v.string()), // 도입 메뉴 브랜드 배열

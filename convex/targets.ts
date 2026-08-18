@@ -35,6 +35,67 @@ export const list = query({
   },
   handler: async (ctx, args) => {
     let targets = await ctx.db.query("commercialTargets").collect();
+    const realStores = await ctx.db.query("stores").collect();
+
+    // 1) 실제 가맹점 관리(stores 테이블)의 승인된 120PIE 공식 가맹점 목록 추출
+    const DEFAULT_COORDS: Record<string, { lat: number; lng: number }> = {
+      "강남역삼점": { lat: 37.4981, lng: 127.0283 },
+      "홍대입구점": { lat: 37.5558, lng: 126.9242 },
+      "부산서면점": { lat: 35.1578, lng: 129.0592 },
+      "경기분당점": { lat: 37.3852, lng: 127.1235 },
+      "대구동성로점": { lat: 35.8692, lng: 128.5968 },
+    };
+
+    const approvedFranchiseStores = realStores
+      .filter((s) => s.status === "승인")
+      .map((s) => {
+        const lat = s.lat ?? DEFAULT_COORDS[s.name]?.lat;
+        const lng = s.lng ?? DEFAULT_COORDS[s.name]?.lng;
+        return {
+          id: s.id,
+          name: s.name.startsWith("120PIE") ? s.name : `120PIE ${s.name}`,
+          originalName: s.name,
+          owner: s.owner,
+          phone: s.phone,
+          category: "120PIE 공식 가맹점",
+          roadAddress: s.roadAddress,
+          detailAddress: s.detailAddress,
+          lat,
+          lng,
+          isRealStore: true,
+          status: "승인",
+          isContracted: true,
+          adoptionMenu: s.adoptionMenu,
+          regDate: s.regDate,
+          monthlySales: s.monthlySales,
+        };
+      })
+      .filter((s) => typeof s.lat === "number" && typeof s.lng === "number");
+
+    // 2) 타겟 테이블 내 계약 체결 매장
+    const otherContracted = targets.filter((t) => t.isContracted);
+
+    // 3) 전체 500m 상권보호 기준점 목록 (실제 가맹점 우선)
+    const allProtectionCenters = [
+      ...approvedFranchiseStores.map((s) => ({
+        id: s.id,
+        name: s.name,
+        category: s.category,
+        roadAddress: s.roadAddress,
+        lat: s.lat as number,
+        lng: s.lng as number,
+        isRealStore: true,
+      })),
+      ...otherContracted.map((t) => ({
+        id: t._id,
+        name: t.name,
+        category: t.category,
+        roadAddress: t.roadAddress,
+        lat: t.lat,
+        lng: t.lng,
+        isRealStore: false,
+      })),
+    ];
 
     if (args.sido && args.sido !== "전체") {
       targets = targets.filter((t) => t.sido === args.sido);
@@ -46,10 +107,7 @@ export const list = query({
       targets = targets.filter((t) => t.status === args.status);
     }
 
-    // 1) 계약 체결(입점 완료)된 매장 목록 추출 (500m 보호 반경의 기준점들)
-    const contractedStores = targets.filter((t) => t.isContracted);
-
-    // 2) 각 매장별로 500m 이내 계약 매장이 있는지 실시간 거리 연산
+    // 4) 각 영업 타겟 매장별 500m 이내 실제 가맹점 또는 계약 매장 존재 여부 실시간 계산
     const results = targets.map((target) => {
       if (target.isContracted) {
         return {
@@ -60,15 +118,15 @@ export const list = query({
         };
       }
 
-      let closestContracted: (typeof contractedStores)[0] | null = null;
+      let closestCenter: (typeof allProtectionCenters)[0] | null = null;
       let minDistance = Infinity;
 
-      for (const cs of contractedStores) {
-        if (cs._id === target._id) continue;
-        const dist = getDistanceMeters(target.lat, target.lng, cs.lat, cs.lng);
+      for (const center of allProtectionCenters) {
+        if (center.id === target._id) continue;
+        const dist = getDistanceMeters(target.lat, target.lng, center.lat, center.lng);
         if (dist < minDistance) {
           minDistance = dist;
-          closestContracted = cs;
+          closestCenter = center;
         }
       }
 
@@ -77,12 +135,13 @@ export const list = query({
       return {
         ...target,
         isProtectedLocked,
-        protectingStore: isProtectedLocked && closestContracted
+        protectingStore: isProtectedLocked && closestCenter
           ? {
-              id: closestContracted._id,
-              name: closestContracted.name,
-              category: closestContracted.category,
-              roadAddress: closestContracted.roadAddress,
+              id: closestCenter.id,
+              name: closestCenter.name,
+              category: closestCenter.category,
+              roadAddress: closestCenter.roadAddress,
+              isRealStore: closestCenter.isRealStore,
             }
           : null,
         protectingDistance: minDistance !== Infinity ? minDistance : null,
@@ -223,20 +282,31 @@ export const deduplicateAndFixTargets = mutation({
     const all = await ctx.db.query("commercialTargets").collect();
     const seen = new Set<string>();
 
+    const PRECISE_GANGNAM_COORDS: Record<string, { lat: number; lng: number; roadAddress: string }> = {
+      "소과당 강남본점": { lat: 37.49976, lng: 127.02816, roadAddress: "서울 강남구 강남대로96길 12 지천빌딩 1층" },
+      "코드헌터 방탈출": { lat: 37.49995, lng: 127.02775, roadAddress: "서울 강남구 강남대로96길 11 3층" },
+      "코드헌터": { lat: 37.49995, lng: 127.02775, roadAddress: "서울 강남구 강남대로96길 11 3층" },
+      "키이스케이프 강남": { lat: 37.50058, lng: 127.02845, roadAddress: "서울 강남구 강남대로96길 15 4층" },
+      "015 COFFEE (강남로데오점)": { lat: 37.50085, lng: 127.02865, roadAddress: "서울 강남구 테헤란로1길 28 1층" },
+      "015 COFFEE": { lat: 37.50085, lng: 127.02865, roadAddress: "서울 강남구 테헤란로1길 28 1층" },
+      "커피빈 강남대로94길점": { lat: 37.49988, lng: 127.02685, roadAddress: "서울 강남구 강남대로 420 1층" },
+      "더블린테라스": { lat: 37.50055, lng: 127.02945, roadAddress: "서울 강남구 테헤란로5길 31 1층" },
+      "29펍2호점 UK Classic": { lat: 37.49935, lng: 127.02855, roadAddress: "서울 강남구 강남대로94길 15 지하1층" },
+      "놀숲 만화카페 강남역점": { lat: 37.49915, lng: 127.02735, roadAddress: "서울 강남구 강남대로96길 5 3층" },
+      "스타덤PC방 강남역본점": { lat: 37.49810, lng: 127.02830, roadAddress: "서울 강남구 테헤란로 105 지하1층" },
+    };
+
     for (const item of all) {
-      // '소과당' 포함 매장이거나 중복된 이름인 경우 정리
-      if (item.name.includes("소과당")) {
-        if (item.name === "소과당 강남본점") {
-          await ctx.db.patch(item._id, {
-            lat: 37.49976,
-            lng: 127.02816,
-            roadAddress: "서울 강남구 강남대로96길 12 지천빌딩 1층",
-          });
-        } else {
-          // 옛날 중복 명칭 삭제
-          await ctx.db.delete(item._id);
-        }
-      } else if (seen.has(item.name)) {
+      if (PRECISE_GANGNAM_COORDS[item.name]) {
+        const precise = PRECISE_GANGNAM_COORDS[item.name];
+        await ctx.db.patch(item._id, {
+          lat: precise.lat,
+          lng: precise.lng,
+          roadAddress: precise.roadAddress,
+        });
+      }
+
+      if (seen.has(item.name)) {
         await ctx.db.delete(item._id);
       } else {
         seen.add(item.name);
@@ -300,28 +370,7 @@ export const batchAddTargets = mutation({
  */
 export const replaceUncontractedTargets = mutation({
   args: {
-    items: v.array(
-      v.object({
-        name: v.string(),
-        category: v.string(),
-        sido: v.string(),
-        sigungu: v.string(),
-        dong: v.string(),
-        roadAddress: v.string(),
-        detailAddress: v.optional(v.string()),
-        lat: v.number(),
-        lng: v.number(),
-        phone: v.optional(v.string()),
-        mobile: v.optional(v.string()),
-        email: v.optional(v.string()),
-        instagram: v.optional(v.string()),
-        homepage: v.optional(v.string()),
-        status: v.string(),
-        isContracted: v.boolean(),
-        assignedPartnerName: v.optional(v.string()),
-        memo: v.optional(v.string()),
-      })
-    ),
+    items: v.array(v.any()),
   },
   handler: async (ctx, args) => {
     const now = new Date();
@@ -335,18 +384,38 @@ export const replaceUncontractedTargets = mutation({
       }
     }
 
-    // 2) 현재 화면 위치의 신규 매장들 등록
+    // 2) 현재 화면 위치의 신규 매장들 등록 (정확한 스키마 필드만 안전하게 추출)
     let count = 0;
     const contractedNames = new Set(existing.filter((t) => t.isContracted).map((t) => t.name));
 
-    for (const item of args.items) {
-      if (!contractedNames.has(item.name)) {
-        await ctx.db.insert("commercialTargets", {
-          ...item,
-          regDate: todayStr,
-        });
-        count++;
-      }
+    for (const raw of args.items) {
+      if (!raw || !raw.name || typeof raw.lat !== "number" || typeof raw.lng !== "number") continue;
+      if (contractedNames.has(raw.name)) continue;
+
+      await ctx.db.insert("commercialTargets", {
+        name: String(raw.name),
+        category: String(raw.category || "카페/디저트"),
+        sido: String(raw.sido || "전국"),
+        sigungu: String(raw.sigungu || ""),
+        dong: String(raw.dong || ""),
+        roadAddress: String(raw.roadAddress || "주소 미등록"),
+        detailAddress: raw.detailAddress ? String(raw.detailAddress) : undefined,
+        lat: Number(raw.lat),
+        lng: Number(raw.lng),
+        phone: raw.phone ? String(raw.phone) : undefined,
+        mobile: raw.mobile ? String(raw.mobile) : undefined,
+        email: raw.email ? String(raw.email) : undefined,
+        instagram: raw.instagram ? String(raw.instagram) : undefined,
+        homepage: raw.homepage ? String(raw.homepage) : undefined,
+        status: String(raw.status || "영업가능"),
+        isContracted: Boolean(raw.isContracted),
+        contractDate: raw.contractDate ? String(raw.contractDate) : undefined,
+        assignedPartnerId: raw.assignedPartnerId ? String(raw.assignedPartnerId) : undefined,
+        assignedPartnerName: raw.assignedPartnerName ? String(raw.assignedPartnerName) : undefined,
+        memo: raw.memo ? String(raw.memo) : undefined,
+        regDate: todayStr,
+      });
+      count++;
     }
 
     return { addedCount: count };
@@ -370,12 +439,11 @@ export const NATIONWIDE_TARGET_STORES = [
     lng: 126.9242,
     phone: "02-332-9182",
     mobile: "010-2918-3847",
-    status: "계약체결", // 🌟 계약체결 매장! (반경 500m 상권보호 발동)
-    isContracted: true,
-    contractDate: "2026-04-18",
+    status: "영업가능",
+    isContracted: false,
     assignedPartnerId: "partner2",
     assignedPartnerName: "김민수 (탑세일즈)",
-    memo: "홍대 젊은 층 대상 로제미트/콘치즈 파이 일 60개 이상 판매",
+    memo: "홍대 젊은 층 대상 로제미트/콘치즈 파이 샵인샵 유치 타겟",
     regDate: "2026-03-10",
   },
   {
@@ -556,9 +624,8 @@ export const NATIONWIDE_TARGET_STORES = [
     lng: 127.1235,
     phone: "031-705-8821",
     mobile: "010-5512-8833",
-    status: "계약체결", // 🌟 계약체결 매장!
-    isContracted: true,
-    contractDate: "2026-05-02",
+    status: "영업가능",
+    isContracted: false,
     assignedPartnerId: "partner1",
     assignedPartnerName: "이지훈 (제이파트너스)",
     regDate: "2026-04-20",
@@ -772,12 +839,11 @@ export const NATIONWIDE_TARGET_STORES = [
     phone: "02-553-1284",
     mobile: "010-3847-1928",
     email: "stardom_gn@naver.com",
-    status: "계약체결", // 🌟 계약 체결
-    isContracted: true,
-    contractDate: "2026-04-10",
+    status: "영업가능",
+    isContracted: false,
     assignedPartnerId: "partner1",
     assignedPartnerName: "이지훈 (제이파트너스)",
-    memo: "120겹파이 샵인샵 도입 완료, 월평균 40박스 발주 중",
+    memo: "강남역 대형 PC방 샵인샵 유치 타겟",
     regDate: "2026-03-15",
   },
   {
@@ -1069,9 +1135,8 @@ export const NATIONWIDE_TARGET_STORES = [
     lng: 129.0602,
     phone: "051-808-7719",
     mobile: "010-8822-1100",
-    status: "계약체결", // 🌟 계약체결 매장!
-    isContracted: true,
-    contractDate: "2026-05-08",
+    status: "영업가능",
+    isContracted: false,
     assignedPartnerId: "partner2",
     assignedPartnerName: "김민수 (탑세일즈)",
     regDate: "2026-04-15",

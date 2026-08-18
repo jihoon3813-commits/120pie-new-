@@ -123,6 +123,8 @@ const REGION_PRESETS = [
 export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps) {
   // 1. Convex Queries & Mutations
   const targets = useQuery(api.targets.list, {}) || [];
+  const convexStores = useQuery(api.stores.get) || [];
+  const updateStoreCoordinatesMutation = useMutation(api.stores.updateCoordinates);
   const seedTargetsMutation = useMutation(api.targets.seedTargets);
   const resetAndSeedTargetsMutation = useMutation(api.targets.resetAndSeedTargets);
   const toggleContractMutation = useMutation(api.targets.toggleContract);
@@ -136,6 +138,33 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     seedTargetsMutation().catch(() => {});
     deduplicateAndFixMutation().catch(() => {});
   }, []);
+
+  // 1-1. 실제 가맹점 관리(stores 테이블)의 승인된 120PIE 공식 가맹점 매핑
+  const DEFAULT_STORE_COORDS: Record<string, { lat: number; lng: number }> = {
+    "강남역삼점": { lat: 37.4981, lng: 127.0283 },
+    "홍대입구점": { lat: 37.5558, lng: 126.9242 },
+    "부산서면점": { lat: 35.1578, lng: 129.0592 },
+    "경기분당점": { lat: 37.3852, lng: 127.1235 },
+    "대구동성로점": { lat: 35.8692, lng: 128.5968 },
+  };
+
+  const approvedStores = useMemo(() => {
+    return convexStores
+      .filter((s: any) => s.status === "승인")
+      .map((s: any) => {
+        const lat = s.lat ?? DEFAULT_STORE_COORDS[s.name]?.lat;
+        const lng = s.lng ?? DEFAULT_STORE_COORDS[s.name]?.lng;
+        return {
+          ...s,
+          isRealStore: true,
+          isContracted: true,
+          lat,
+          lng,
+          category: "120PIE 공식 가맹점",
+          displayName: s.name.startsWith("120PIE") ? s.name : `120PIE ${s.name}`,
+        };
+      });
+  }, [convexStores]);
 
   // 2. 필터 및 UI 상태
   const [selectedSido, setSelectedSido] = useState<string>("전체");
@@ -221,9 +250,9 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     });
   }, [targets, selectedSido, selectedCategory, selectedStatusFilter, searchQuery]);
 
-  // 통계 지표
+  // 통계 지표 (실제 가맹점 수 + 발굴 타겟)
   const totalCount = targets.length;
-  const contractedCount = targets.filter((t: any) => t.isContracted).length;
+  const contractedCount = approvedStores.length + targets.filter((t: any) => t.isContracted).length;
   const protectedLockedCount = targets.filter((t: any) => !t.isContracted && t.isProtectedLocked).length;
   const availableTargetCount = targets.filter((t: any) => !t.isContracted && !t.isProtectedLocked).length;
 
@@ -330,7 +359,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
   // ====================================================
   // 3. 네이버 지도 상에 500m 원 및 3대 상태 핀 렌더링
-  //    (🌟 체결: 골드 / 🔒 입점불가: 어두운 자물쇠 / 🟢 영업가능: 녹색 통일)
+  //    (🌟 실제 120PIE 체결 가맹점: 골드 스타 / 🔒 입점불가: 어두운 자물쇠 / 🟢 영업가능: 녹색 통일)
   // ====================================================
   useEffect(() => {
     if (!naverMapRef.current || !window.naver || !window.naver.maps) return;
@@ -343,9 +372,9 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     markersRef.current = [];
     circlesRef.current = [];
 
-    // 1) [🌟 체결된 업장] 기준 반경 500m 원 (황금빛 상권보호 레이더 필드)
-    filteredTargets
-      .filter((t: any) => t.isContracted)
+    // 1) [🌟 120PIE 실제 공식 가맹점] 기준 반경 500m 원 (황금빛 상권보호 레이더 필드)
+    approvedStores
+      .filter((s: any) => typeof s.lat === "number" && typeof s.lng === "number")
       .forEach((cs: any) => {
         const circle = new naver.maps.Circle({
           map: naverMapRef.current,
@@ -361,7 +390,42 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
         circlesRef.current.push(circle);
       });
 
-    // 2) 3대 상태 마커 렌더링
+    // 2) [🌟 120PIE 공식 가맹점 마커 렌더링] (골드 펄스 스타 핀)
+    approvedStores
+      .filter((s: any) => typeof s.lat === "number" && typeof s.lng === "number")
+      .forEach((store: any) => {
+        const markerContent = `
+          <div style="position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 50; pointer-events: auto;">
+            <div style="position: absolute; top: -4px; width: 46px; height: 46px; background: rgba(254, 212, 34, 0.45); border-radius: 9999px; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+            <div style="width: 38px; height: 38px; border-radius: 9999px; background: linear-gradient(135deg, #FED422 0%, #F59E0B 100%); border: 3px solid #FFFFFF; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.7); display: flex; align-items: center; justify-content: center; color: #0F172A; font-weight: 900; font-size: 16px; z-index: 20;">
+              ⭐
+            </div>
+            <div style="margin-top: 4px; padding: 3px 9px; background: rgba(15, 23, 42, 0.95); border: 1.5px solid #F59E0B; border-radius: 6px; font-size: 11px; font-weight: 900; color: #FED422; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.4); z-index: 20;">
+              ${store.displayName} (공식 가맹점)
+            </div>
+          </div>
+        `;
+
+        const marker = new naver.maps.Marker({
+          position: new naver.maps.LatLng(store.lat, store.lng),
+          map: naverMapRef.current,
+          icon: {
+            content: markerContent,
+            size: new naver.maps.Size(180, 65),
+            anchor: new naver.maps.Point(0, 0),
+          },
+          zIndex: 100,
+        });
+
+        naver.maps.Event.addListener(marker, "click", () => {
+          setSelectedTarget(store);
+          naverMapRef.current.panTo(new naver.maps.LatLng(store.lat, store.lng), { duration: 300 });
+        });
+
+        markersRef.current.push(marker);
+      });
+
+    // 3) [타겟 매장 목록 렌더링] (영업가능 🟢 / 500m 락 🔒 / 기타 체결 🌟)
     filteredTargets.forEach((target: any) => {
       const isContracted = target.isContracted;
       const isLocked = target.isProtectedLocked;
@@ -369,38 +433,37 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
       let markerContent = "";
 
       if (isContracted) {
-        // 🌟 1. [체결된 업장]: 황금빛 120겹파이 펄스 마커 (아이콘 중심 19px 정렬)
+        // 🌟 [체결된 업장]
         markerContent = `
-          <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transform: translate(-50%, -19px);">
-            <div style="position: absolute; top: -3px; width: 44px; height: 44px; background: rgba(254, 212, 34, 0.45); border-radius: 9999px; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-            <div style="width: 38px; height: 38px; border-radius: 9999px; background: linear-gradient(135deg, #FED422 0%, #F59E0B 100%); border: 2.5px solid #FFFFFF; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.6); display: flex; align-items: center; justify-content: center; color: #0F172A; font-weight: 900; font-size: 15px; z-index: 10;">
-              ★
+          <div style="position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; pointer-events: auto; z-index: 50;">
+            <div style="width: 32px; height: 32px; border-radius: 9999px; background: linear-gradient(135deg, #FED422 0%, #F59E0B 100%); border: 2px solid #FFFFFF; box-shadow: 0 3px 10px rgba(217, 119, 6, 0.6); display: flex; align-items: center; justify-content: center; color: #0F172A; font-weight: 900; font-size: 14px;">
+              ⭐
             </div>
-            <div style="margin-top: 3px; padding: 2px 8px; background: rgba(15, 23, 42, 0.95); border: 1.5px solid #F59E0B; border-radius: 6px; font-size: 10px; font-weight: 900; color: #FED422; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 10;">
-              ${target.name} (체결 완료)
+            <div style="margin-top: 2px; padding: 1.5px 6px; background: #0F172A; border: 1px solid #F59E0B; border-radius: 4px; font-size: 10px; font-weight: 900; color: #FED422; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+              ${target.name}
             </div>
           </div>
         `;
       } else if (isLocked) {
-        // 🔒 2. [입점불가 업장]: 500m 보호 구역 내 위치하여 락이 걸린 어두운 자물쇠 마커 (아이콘 중심 14px 정렬)
+        // 🔒 [입점불가 업장]: 500m 보호 구역 내 위치하여 락이 걸린 자물쇠 마커
         markerContent = `
-          <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 0.65; transform: translate(-50%, -14px);">
-            <div style="width: 28px; height: 28px; border-radius: 9999px; background: #334155; border: 2px solid #64748B; box-shadow: 0 2px 6px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: #94A3B8; font-size: 12px;">
+          <div style="position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; pointer-events: auto; z-index: 20;">
+            <div style="width: 26px; height: 26px; border-radius: 9999px; background: #475569; border: 1.5px solid #94A3B8; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-size: 11px;">
               🔒
             </div>
-            <div style="margin-top: 3px; padding: 1px 6px; background: rgba(0,0,0,0.85); border: 1px solid #475569; border-radius: 4px; font-size: 9px; font-weight: bold; color: #94A3B8; white-space: nowrap;">
-              ${target.name} (입점불가 락)
+            <div style="margin-top: 2px; padding: 1.5px 6px; background: rgba(30, 41, 59, 0.92); border: 1px solid #64748B; border-radius: 4px; font-size: 9px; font-weight: bold; color: #E2E8F0; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.25);">
+              ${target.name}
             </div>
           </div>
         `;
       } else {
-        // 🟢 3. [영업가능 업장]: 선명한 에메랄드 녹색 핀으로 일괄 통일! (아이콘 중심 16px 정렬)
+        // 🟢 [영업가능 업장]: 선명한 에메랄드 녹색 핀
         markerContent = `
-          <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transform: translate(-50%, -16px);">
-            <div style="width: 32px; height: 32px; border-radius: 9999px; background: #10B981; border: 2px solid #FFFFFF; box-shadow: 0 3px 10px rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-weight: bold; font-size: 13px;">
-              📍
+          <div style="position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; pointer-events: auto; z-index: 30;">
+            <div style="width: 28px; height: 28px; border-radius: 9999px; background: #10B981; border: 2px solid #FFFFFF; box-shadow: 0 3px 10px rgba(16, 185, 129, 0.45); display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-weight: bold; font-size: 13px;">
+              ☕
             </div>
-            <div style="margin-top: 3px; padding: 2px 7px; background: rgba(15, 23, 42, 0.9); border: 1px solid #10B981; border-radius: 5px; font-size: 10px; font-weight: bold; color: #FFFFFF; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+            <div style="margin-top: 2px; padding: 2px 7px; background: #064E3B; border: 1px solid #10B981; border-radius: 5px; font-size: 10px; font-weight: bold; color: #FFFFFF; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
               ${target.name}
             </div>
           </div>
@@ -424,7 +487,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
       markersRef.current.push(marker);
     });
-  }, [filteredTargets, isNaverScriptLoaded]);
+  }, [filteredTargets, approvedStores, isNaverScriptLoaded]);
 
   // 지역 프리셋 이동
   const handleSelectPreset = (preset: (typeof REGION_PRESETS)[0]) => {
@@ -453,7 +516,8 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
   };
 
   // ====================================================
-  // [가망대상 발굴]: 복수(중복) 선택된 업종 일괄 발굴 실행
+  // ====================================================
+  // [가망대상 발굴]: 네이버 플레이스 등록 실존 매장 실시간 전수 발굴
   // ====================================================
   const handleExecuteDiscover = async () => {
     if (!naverMapRef.current) return;
@@ -478,6 +542,32 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
       };
     }
 
+    // 1) 네이버 리버스 지오코더로 현재 화면 중앙의 시/도, 시/군/구, 읍/면/동 정밀 파악
+    let currentSido = selectedSido !== "전체" ? selectedSido : "서울특별시";
+    let currentSigungu = "";
+    let currentDong = "";
+    let regionQuery = "";
+
+    if (window.naver && window.naver.maps && window.naver.maps.Service?.reverseGeocode) {
+      await new Promise<void>((resolve) => {
+        window.naver.maps.Service.reverseGeocode(
+          { coords: new window.naver.maps.LatLng(cLat, cLng) },
+          (status: any, response: any) => {
+            if (status === window.naver.maps.Service.Status.OK && response.v2?.results) {
+              const resObj = response.v2.results[0]?.region;
+              if (resObj) {
+                currentSido = resObj.area1?.name || currentSido;
+                currentSigungu = resObj.area2?.name || "";
+                currentDong = resObj.area3?.name || "";
+                regionQuery = `${currentSigungu} ${currentDong}`.trim() || currentSido;
+              }
+            }
+            resolve();
+          }
+        );
+      });
+    }
+
     try {
       const res = await fetch("/api/naver-place-search", {
         method: "POST",
@@ -486,21 +576,22 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
           bounds: boundsPayload,
           center: { lat: cLat, lng: cLng },
           categories: selectedDiscoverCats,
-          sido: selectedSido !== "전체" ? selectedSido : "서울특별시",
+          radius: 500,
         }),
       });
 
       const data = await res.json();
       if (data.success && data.targets && data.targets.length > 0) {
-        // 기존 위치의 미체결 매장 리셋 & 현재 위치의 새 발굴 매장으로 깔끔하게 교체 (체결 매장은 영구 보존)
+        // 기존 위치의 미체결 매장 리셋 & 현재 위치의 실시간 발굴 매장으로 교체 (체결 가맹점은 영구 보존)
         const addRes = await replaceUncontractedTargetsMutation({ items: data.targets });
         setSelectedCategory("전체");
 
+        const locationName = currentDong || currentSigungu || currentSido;
         triggerToast(
-          `🎯 현재 지도 화면에서 [${selectedDiscoverCats.join(", ")}] 매장 ${addRes.addedCount}개소를 발굴했습니다! (기존 위치 미체결 매장 자동 정리)`
+          `🎯 [${locationName}] 상권에서 실제 등록 매장 ${addRes.addedCount}개소를 발굴했습니다!`
         );
       } else {
-        triggerToast("해당 지도 범위의 매장 정보를 성공적으로 확인했습니다.");
+        triggerToast("해당 지역의 등록 매장 정보를 성공적으로 확인했습니다.");
       }
     } catch (err) {
       console.error(err);
@@ -1023,14 +1114,19 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
                       <span
                         className={`text-xs font-black px-2.5 py-1 rounded-md border flex items-center gap-1.5 ${
-                          selectedTarget.isContracted
-                            ? "bg-amber-50 text-amber-700 border-amber-300"
+                          selectedTarget.isRealStore || selectedTarget.isContracted
+                            ? "bg-amber-50 text-amber-800 border-amber-300"
                             : selectedTarget.isProtectedLocked
                             ? "bg-slate-100 text-slate-500 border-slate-300"
                             : "bg-emerald-50 text-emerald-700 border-emerald-300"
                         }`}
                       >
-                        {selectedTarget.isContracted ? (
+                        {selectedTarget.isRealStore ? (
+                          <>
+                            <Sparkles size={13} className="text-amber-600" />
+                            <span>120PIE 공식 가맹점 (본사 500m 상권보호 작동 중)</span>
+                          </>
+                        ) : selectedTarget.isContracted ? (
                           <>
                             <Sparkles size={13} className="text-amber-600" />
                             <span>120겹파이 체결된 업장 (500m 상권보호 발동)</span>
@@ -1061,14 +1157,20 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                       <div className="flex items-center gap-2">
                         <span
                           className={`text-[10px] font-black px-2 py-0.5 rounded border ${
-                            (CATEGORY_CONFIG[selectedTarget.category] || CATEGORY_CONFIG["기타 샵인샵"]).badgeBg
+                            selectedTarget.isRealStore
+                              ? "bg-amber-100 text-amber-900 border-amber-300 font-black"
+                              : (CATEGORY_CONFIG[selectedTarget.category] || CATEGORY_CONFIG["기타 샵인샵"]).badgeBg
                           }`}
                         >
-                          {selectedTarget.category}
+                          {selectedTarget.category || "120PIE 공식 가맹점"}
                         </span>
-                        <span className="text-xs text-slate-400 font-mono">{selectedTarget.dong}</span>
+                        <span className="text-xs text-slate-400 font-mono">
+                          {selectedTarget.dong || selectedTarget.roadAddress?.split(" ")[1] || ""}
+                        </span>
                       </div>
-                      <h3 className="text-lg font-black text-[#0F172A] mt-1.5">{selectedTarget.name}</h3>
+                      <h3 className="text-lg font-black text-[#0F172A] mt-1.5">
+                        {selectedTarget.displayName || selectedTarget.name}
+                      </h3>
                       <p className="text-xs text-slate-500 font-bold mt-1 flex items-start gap-1">
                         <MapPin size={13} className="shrink-0 mt-0.5 text-slate-400" />
                         <span>{selectedTarget.roadAddress} {selectedTarget.detailAddress || ""}</span>
@@ -1078,7 +1180,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     {/* 네이버 지도 / 플레이스 / 로드뷰 바로가기 */}
                     <div className="flex items-center gap-2">
                       <a
-                        href={`https://map.naver.com/p/search/${encodeURIComponent(selectedTarget.name)}`}
+                        href={`https://map.naver.com/p/search/${encodeURIComponent(selectedTarget.displayName || selectedTarget.name)}`}
                         target="_blank"
                         rel="noreferrer"
                         className="flex-1 py-2 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-black border border-emerald-200 flex items-center justify-center gap-1.5 transition-all"
@@ -1088,6 +1190,38 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         <ExternalLink size={11} />
                       </a>
                     </div>
+
+                    {/* 실제 가맹점 전용 마스터 카드 */}
+                    {selectedTarget.isRealStore && (
+                      <div className="bg-gradient-to-br from-amber-50/80 to-orange-50/80 border border-amber-200 rounded-lg p-4 space-y-2.5 text-xs shadow-2xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-amber-900">대표 점주명</span>
+                          <span className="font-black text-slate-900">{selectedTarget.owner} 점주</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-amber-900">가맹 등록일</span>
+                          <span className="font-mono text-slate-700">{selectedTarget.regDate}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-amber-900">가맹 상태</span>
+                          <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
+                            {selectedTarget.status} (정상 운영중)
+                          </span>
+                        </div>
+                        {selectedTarget.adoptionMenu && selectedTarget.adoptionMenu.length > 0 && (
+                          <div className="space-y-1.5 pt-2 border-t border-amber-200/60">
+                            <span className="font-bold text-amber-900">도입 메뉴 브랜드</span>
+                            <div className="flex flex-wrap gap-1">
+                              {selectedTarget.adoptionMenu.map((menu: string, idx: number) => (
+                                <span key={idx} className="px-2 py-0.5 rounded-full bg-white border border-amber-300 text-amber-800 text-[10px] font-bold shadow-2xs">
+                                  {menu}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* 상권보호 안내 알림 상자 */}
                     {selectedTarget.isProtectedLocked && selectedTarget.protectingStore && (
@@ -1113,52 +1247,56 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                           {selectedTarget.phone || "전화번호 미등록"}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between border-b border-neutral-200/60 pb-2">
-                        <span className="text-slate-500 font-bold flex items-center gap-1.5">
-                          <Smartphone size={13} className="text-slate-400" /> 대표자 핸드폰
-                        </span>
-                        <span className="font-mono font-black text-amber-700">
-                          {selectedTarget.mobile || "휴대폰 미등록"}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between border-b border-neutral-200/60 pb-2">
-                        <span className="text-slate-500 font-bold flex items-center gap-1.5">
-                          <Mail size={13} className="text-slate-400" /> 이메일
-                        </span>
-                        <span className="font-mono text-slate-700 truncate max-w-[160px]">
-                          {selectedTarget.email || "-"}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-500 font-bold flex items-center gap-1.5">
-                          <Share2 size={13} className="text-pink-500" /> SNS / 웹사이트
-                        </span>
-                        <div className="flex items-center gap-2">
-                          {selectedTarget.instagram && (
-                            <a
-                              href={selectedTarget.instagram}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-pink-600 font-bold hover:underline flex items-center gap-0.5"
-                            >
-                              인스타 <ExternalLink size={10} />
-                            </a>
-                          )}
-                          {selectedTarget.homepage && (
-                            <a
-                              href={selectedTarget.homepage}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-blue-600 font-bold hover:underline flex items-center gap-0.5"
-                            >
-                              웹사이트 <ExternalLink size={10} />
-                            </a>
-                          )}
-                          {!selectedTarget.instagram && !selectedTarget.homepage && (
-                            <span className="text-slate-400">-</span>
-                          )}
-                        </div>
-                      </div>
+                      {!selectedTarget.isRealStore && (
+                        <>
+                          <div className="flex items-center justify-between border-b border-neutral-200/60 pb-2">
+                            <span className="text-slate-500 font-bold flex items-center gap-1.5">
+                              <Smartphone size={13} className="text-slate-400" /> 대표자 핸드폰
+                            </span>
+                            <span className="font-mono font-black text-amber-700">
+                              {selectedTarget.mobile || "휴대폰 미등록"}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between border-b border-neutral-200/60 pb-2">
+                            <span className="text-slate-500 font-bold flex items-center gap-1.5">
+                              <Mail size={13} className="text-slate-400" /> 이메일
+                            </span>
+                            <span className="font-mono text-slate-700 truncate max-w-[160px]">
+                              {selectedTarget.email || "-"}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-slate-500 font-bold flex items-center gap-1.5">
+                              <Share2 size={13} className="text-pink-500" /> SNS / 웹사이트
+                            </span>
+                            <div className="flex items-center gap-2">
+                              {selectedTarget.instagram && (
+                                <a
+                                  href={selectedTarget.instagram}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-pink-600 font-bold hover:underline flex items-center gap-0.5"
+                                >
+                                  인스타 <ExternalLink size={10} />
+                                </a>
+                              )}
+                              {selectedTarget.homepage && (
+                                <a
+                                  href={selectedTarget.homepage}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-blue-600 font-bold hover:underline flex items-center gap-0.5"
+                                >
+                                  웹사이트 <ExternalLink size={10} />
+                                </a>
+                              )}
+                              {!selectedTarget.instagram && !selectedTarget.homepage && (
+                                <span className="text-slate-400">-</span>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {/* 영업 메모 */}
@@ -1173,41 +1311,54 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                   {/* 본사 어드민 관리 액션 버튼들 */}
                   {mode === "admin" && (
                     <div className="space-y-2 pt-3 border-t border-neutral-100">
-                      <button
-                        onClick={() => handleToggleContract(selectedTarget)}
-                        className={`w-full py-2.5 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-xs ${
-                          selectedTarget.isContracted
-                            ? "bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200"
-                            : "bg-[#FED422] hover:bg-amber-400 text-[#0F172A]"
-                        }`}
-                      >
-                        {selectedTarget.isContracted ? (
-                          <>
-                            <Unlock size={14} />
-                            <span>계약 해제하기 (500m 락 풀기)</span>
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles size={14} />
-                            <span>+ 계약 체결하기 (500m 상권보호 발동)</span>
-                          </>
-                        )}
-                      </button>
+                      {!selectedTarget.isRealStore ? (
+                        <>
+                          <button
+                            onClick={() => handleToggleContract(selectedTarget)}
+                            className={`w-full py-2.5 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-xs ${
+                              selectedTarget.isContracted
+                                ? "bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200"
+                                : "bg-[#FED422] hover:bg-amber-400 text-[#0F172A]"
+                            }`}
+                          >
+                            {selectedTarget.isContracted ? (
+                              <>
+                                <Unlock size={14} />
+                                <span>계약 해제하기 (500m 락 풀기)</span>
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles size={14} />
+                                <span>+ 계약 체결하기 (500m 상권보호 발동)</span>
+                              </>
+                            )}
+                          </button>
 
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleOpenForm(selectedTarget)}
-                          className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all border-0 cursor-pointer"
-                        >
-                          정보 수정
-                        </button>
-                        <button
-                          onClick={() => handleDeleteTarget(selectedTarget._id, selectedTarget.name)}
-                          className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-bold transition-all border border-rose-200 cursor-pointer"
-                        >
-                          삭제
-                        </button>
-                      </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleOpenForm(selectedTarget)}
+                              className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all border-0 cursor-pointer"
+                            >
+                              정보 수정
+                            </button>
+                            <button
+                              onClick={() => handleDeleteTarget(selectedTarget._id, selectedTarget.name)}
+                              className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-bold transition-all border border-rose-200 cursor-pointer"
+                            >
+                              삭제
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="p-3 bg-amber-50 rounded-lg border border-amber-200 text-center">
+                          <p className="text-xs font-black text-amber-900">
+                            🛡️ 본사 공인 120PIE 가맹점
+                          </p>
+                          <p className="text-[11px] text-amber-700 mt-0.5">
+                            반경 500m 내 모든 샵인샵 입점이 영구 보호됩니다.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1234,10 +1385,10 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
               <Building2 size={16} className="text-amber-500" />
-              <span>전국 대상 업종 매장 종합 대장 ({filteredTargets.length}개)</span>
+              <span>전국 대상 업종 매장 종합 대장 ({filteredTargets.length + approvedStores.length}개)</span>
             </h3>
             <span className="text-xs text-slate-400 font-bold">
-              체결 시 반경 500m 내 모든 매장은 입점불가 락 상태로 자동 전환됩니다.
+              120PIE 공식 가맹점 기준 반경 500m 내 모든 매장은 입점불가 락 상태로 자동 전환됩니다.
             </span>
           </div>
 
@@ -1256,6 +1407,67 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
+                {/* 🌟 120PIE 공식 체결 가맹점 목록 */}
+                {approvedStores.map((store: any) => (
+                  <tr
+                    key={store.id}
+                    onClick={() => {
+                      setSelectedTarget(store);
+                      if (naverMapRef.current && window.naver && window.naver.maps && store.lat && store.lng) {
+                        naverMapRef.current.panTo(new window.naver.maps.LatLng(store.lat, store.lng), { duration: 300 });
+                        naverMapRef.current.setZoom(16);
+                      }
+                    }}
+                    className="bg-amber-50/50 hover:bg-amber-100/50 transition-colors cursor-pointer border-b border-amber-200"
+                  >
+                    <td className="py-3.5 px-4">
+                      <div className="font-black text-[#0F172A] text-sm flex items-center gap-2">
+                        <span>⭐ {store.displayName}</span>
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                      </div>
+                      <span className="inline-block mt-0.5 text-[9px] font-black px-1.5 py-0.2 rounded border bg-amber-100 text-amber-900 border-amber-300">
+                        120PIE 공식 가맹점
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-3 font-bold text-slate-700">
+                      <div>{store.roadAddress?.split(" ")[0] || "전국"}</div>
+                      <div className="text-[11px] text-amber-700 font-bold">{store.owner} 점주</div>
+                    </td>
+                    <td className="py-3.5 px-3 text-slate-600 max-w-xs truncate font-medium">
+                      {store.roadAddress} {store.detailAddress || ""}
+                    </td>
+                    <td className="py-3.5 px-3">
+                      <div className="font-mono text-slate-800 font-bold">{store.phone || "-"}</div>
+                    </td>
+                    <td className="py-3.5 px-3 text-center">
+                      <span className="inline-block px-2.5 py-1 rounded bg-amber-500 text-slate-950 font-black text-[10px] shadow-2xs">
+                        ⭐ 공식 가맹점 (500m 보호)
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-3 text-center font-bold text-slate-600">
+                      본사 직속
+                    </td>
+                    <td className="py-3.5 px-3 text-center" onClick={(e) => e.stopPropagation()}>
+                      <a
+                        href={`https://map.naver.com/p/search/${encodeURIComponent(store.displayName || store.name)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-1.5 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 rounded inline-flex items-center gap-1 font-bold text-[11px]"
+                        title="네이버 플레이스에서 보기"
+                      >
+                        <Navigation size={12} />
+                        <span>플레이스</span>
+                      </a>
+                    </td>
+                    {mode === "admin" && (
+                      <td className="py-3.5 px-4 text-center">
+                        <span className="text-[11px] font-black text-amber-800 bg-amber-200/80 px-2 py-1 rounded">
+                          공식 가맹점
+                        </span>
+                      </td>
+                    )}
+                  </tr>
+                ))}
                 {filteredTargets.map((target: any) => {
                   const config = CATEGORY_CONFIG[target.category] || CATEGORY_CONFIG["기타 샵인샵"];
                   return (
