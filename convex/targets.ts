@@ -72,30 +72,16 @@ export const list = query({
       })
       .filter((s) => typeof s.lat === "number" && typeof s.lng === "number");
 
-    // 2) 타겟 테이블 내 계약 체결 매장
-    const otherContracted = targets.filter((t) => t.isContracted);
-
-    // 3) 전체 500m 상권보호 기준점 목록 (실제 가맹점 우선)
-    const allProtectionCenters = [
-      ...approvedFranchiseStores.map((s) => ({
-        id: s.id,
-        name: s.name,
-        category: s.category,
-        roadAddress: s.roadAddress,
-        lat: s.lat as number,
-        lng: s.lng as number,
-        isRealStore: true,
-      })),
-      ...otherContracted.map((t) => ({
-        id: t._id,
-        name: t.name,
-        category: t.category,
-        roadAddress: t.roadAddress,
-        lat: t.lat,
-        lng: t.lng,
-        isRealStore: false,
-      })),
-    ];
+    // 2) 전체 500m 상권보호 기준점 목록: 오직 실제 120PIE 승인 가맹점(stores 테이블)만 기준점으로 사용!
+    const allProtectionCenters = approvedFranchiseStores.map((s) => ({
+      id: s.id,
+      name: s.name,
+      category: s.category,
+      roadAddress: s.roadAddress,
+      lat: s.lat as number,
+      lng: s.lng as number,
+      isRealStore: true,
+    }));
 
     if (args.sido && args.sido !== "전체") {
       targets = targets.filter((t) => t.sido === args.sido);
@@ -312,6 +298,40 @@ export const deduplicateAndFixTargets = mutation({
         seen.add(item.name);
       }
     }
+  },
+});
+
+export const cleanUpContractedTargets = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const all = await ctx.db.query("commercialTargets").collect();
+    for (const item of all) {
+      if (item.isContracted) {
+        await ctx.db.patch(item._id, {
+          isContracted: false,
+          status: "영업가능",
+        });
+      }
+    }
+
+    const stores = await ctx.db.query("stores").collect();
+    const DEFAULT_COORDS: Record<string, { lat: number; lng: number }> = {
+      "강남역삼점": { lat: 37.4981, lng: 127.0283 },
+      "홍대입구점": { lat: 37.55689, lng: 126.92367 },
+      "부산서면점": { lat: 35.1578, lng: 129.0592 },
+    };
+
+    for (const store of stores) {
+      const coords = DEFAULT_COORDS[store.name];
+      if (coords) {
+        await ctx.db.patch(store._id, {
+          lat: coords.lat,
+          lng: coords.lng,
+        });
+      }
+    }
+
+    return { success: true };
   },
 });
 

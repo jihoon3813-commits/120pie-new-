@@ -250,11 +250,11 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     });
   }, [targets, selectedSido, selectedCategory, selectedStatusFilter, searchQuery]);
 
-  // 통계 지표 (실제 가맹점 수 + 발굴 타겟)
+  // 통계 지표 (실제 승인 가맹점 수 + 발굴 타겟)
   const totalCount = targets.length;
-  const contractedCount = approvedStores.length + targets.filter((t: any) => t.isContracted).length;
-  const protectedLockedCount = targets.filter((t: any) => !t.isContracted && t.isProtectedLocked).length;
-  const availableTargetCount = targets.filter((t: any) => !t.isContracted && !t.isProtectedLocked).length;
+  const contractedCount = approvedStores.length;
+  const protectedLockedCount = targets.filter((t: any) => t.isProtectedLocked).length;
+  const availableTargetCount = targets.filter((t: any) => !t.isProtectedLocked).length;
 
   // ====================================================
   // 1. 네이버 지도 SDK (v3) 스크립트 로드
@@ -427,24 +427,10 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
     // 3) [타겟 매장 목록 렌더링] (영업가능 🟢 / 500m 락 🔒 / 기타 체결 🌟)
     filteredTargets.forEach((target: any) => {
-      const isContracted = target.isContracted;
       const isLocked = target.isProtectedLocked;
-
       let markerContent = "";
 
-      if (isContracted) {
-        // 🌟 [체결된 업장]
-        markerContent = `
-          <div style="position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; pointer-events: auto; z-index: 50;">
-            <div style="width: 32px; height: 32px; border-radius: 9999px; background: linear-gradient(135deg, #FED422 0%, #F59E0B 100%); border: 2px solid #FFFFFF; box-shadow: 0 3px 10px rgba(217, 119, 6, 0.6); display: flex; align-items: center; justify-content: center; color: #0F172A; font-weight: 900; font-size: 14px;">
-              ⭐
-            </div>
-            <div style="margin-top: 2px; padding: 1.5px 6px; background: #0F172A; border: 1px solid #F59E0B; border-radius: 4px; font-size: 10px; font-weight: 900; color: #FED422; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
-              ${target.name}
-            </div>
-          </div>
-        `;
-      } else if (isLocked) {
+      if (isLocked) {
         // 🔒 [입점불가 업장]: 500m 보호 구역 내 위치하여 락이 걸린 자물쇠 마커
         markerContent = `
           <div style="position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; pointer-events: auto; z-index: 20;">
