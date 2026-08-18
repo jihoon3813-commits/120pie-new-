@@ -63,6 +63,7 @@ export default defineSchema({
     cancelDate: v.optional(v.string()), // 가맹 해지일
     adoptionMenu: v.array(v.string()), // 도입 메뉴 브랜드 배열
     monthlySales: v.number(), // 월매출
+    partnerId: v.optional(v.string()), // 유치 영업 파트너 ID (e.g. partner1)
   }),
   products: defineTable({
     id: v.string(), // e.g. "prod-1"
@@ -233,4 +234,56 @@ export default defineSchema({
     orderIndex: v.number(),
     isMain: v.optional(v.boolean()),
   }),
+  partners: defineTable({
+    id: v.string(), // 로그인 ID (e.g. partner1)
+    pw: v.string(), // 비밀번호
+    name: v.string(), // 파트너 이름 / 대표자명
+    phone: v.string(), // 연락처
+    email: v.optional(v.string()), // 이메일
+    companyName: v.optional(v.string()), // 상호명 / 소속
+    bankName: v.optional(v.string()), // 정산 은행명
+    accountNumber: v.optional(v.string()), // 계좌번호
+    accountHolder: v.optional(v.string()), // 예금주명
+    commissionPerBox: v.optional(v.number()), // 생지 박스당 수수료 (기본 8000원 VAT포함)
+    status: v.string(), // "활동중" | "대기" | "정지"
+    regDate: v.string(), // 등록일자 (YYYY-MM-DD)
+    memo: v.optional(v.string()), // 본사 메모
+  }).index("by_partner_id", ["id"]),
+  partnerSettlements: defineTable({
+    partnerId: v.string(), // 파트너 ID
+    yearMonth: v.string(), // 정산 년월 (YYYY-MM)
+    boxCount: v.number(), // 총 생지 주문 박스 수
+    commissionAmount: v.number(), // 총 수수료 (박스수 * 8000원)
+    status: v.string(), // "정산대기" | "정산확정" | "지급완료"
+    paidDate: v.optional(v.string()), // 실제 지급일자 (YYYY-MM-DD)
+    note: v.optional(v.string()), // 정산 메모
+  }).index("by_partner_yearMonth", ["partnerId", "yearMonth"])
+    .index("by_yearMonth", ["yearMonth"]),
+  commercialTargets: defineTable({
+    name: v.string(), // 매장명 (e.g. "스타덤PC방 강남역점")
+    category: v.string(), // 업종 (PC방, 만화카페, 스터디카페, 키즈카페, 보드게임카페, 멀티방, 카페/베이커리, 피트니스 등)
+    sido: v.string(), // 특별시/광역시/도 (e.g. "서울특별시", "경기도", "부산광역시")
+    sigungu: v.string(), // 시/군/구 (e.g. "강남구", "해운대구", "분당구")
+    dong: v.string(), // 읍/면/동 (e.g. "역삼동", "우동", "서현동")
+    roadAddress: v.string(), // 도로명 주소
+    detailAddress: v.optional(v.string()), // 상세주소 (층/호수)
+    lat: v.number(), // 위도 (Latitude)
+    lng: v.number(), // 경도 (Longitude)
+    phone: v.optional(v.string()), // 매장 대표번호
+    mobile: v.optional(v.string()), // 점주/대표자 휴대폰
+    email: v.optional(v.string()), // 이메일
+    instagram: v.optional(v.string()), // 인스타그램 계정/링크
+    homepage: v.optional(v.string()), // 웹사이트/네이버플레이스 링크
+    status: v.string(), // "영업가능" | "상담중" | "계약체결" | "보류"
+    isContracted: v.boolean(), // 계약 체결 여부 (true 시 반경 500m 상권보호 발동)
+    contractDate: v.optional(v.string()), // 계약 체결일자 (YYYY-MM-DD)
+    assignedPartnerId: v.optional(v.string()), // 담당 영업 파트너 ID (e.g. partner1)
+    assignedPartnerName: v.optional(v.string()), // 담당 영업 파트너 이름
+    memo: v.optional(v.string()), // 영업/상담 메모
+    regDate: v.string(), // 등록일자 (YYYY-MM-DD)
+  }).index("by_sido", ["sido"])
+    .index("by_category", ["category"])
+    .index("by_status", ["status"])
+    .index("by_isContracted", ["isContracted"])
+    .index("by_name", ["name"]),
 });

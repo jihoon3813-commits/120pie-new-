@@ -23,11 +23,13 @@ import type * as instagram from "../instagram.js";
 import type * as materials from "../materials.js";
 import type * as notices from "../notices.js";
 import type * as orders from "../orders.js";
+import type * as partners from "../partners.js";
 import type * as payments from "../payments.js";
 import type * as popups from "../popups.js";
 import type * as products from "../products.js";
 import type * as storeInquiries from "../storeInquiries.js";
 import type * as stores from "../stores.js";
+import type * as targets from "../targets.js";
 
 import type {
   ApiFromModules,
@@ -51,11 +53,13 @@ declare const fullApi: ApiFromModules<{
   materials: typeof materials;
   notices: typeof notices;
   orders: typeof orders;
+  partners: typeof partners;
   payments: typeof payments;
   popups: typeof popups;
   products: typeof products;
   storeInquiries: typeof storeInquiries;
   stores: typeof stores;
+  targets: typeof targets;
 }>;
 
 /**

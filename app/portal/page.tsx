@@ -672,40 +672,96 @@ export default function PortalPage() {
     }
   }, [convexStoreInquiries]);
 
+  // Sync Convex categories
+  useEffect(() => {
+    if (Array.isArray(convexProductCategories) && convexProductCategories.length > 0) {
+      setCategories((prev) => Array.from(new Set([...prev, ...convexProductCategories])));
+      try {
+        localStorage.setItem("120_categories", JSON.stringify(convexProductCategories));
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  }, [convexProductCategories]);
+
   // Sync Convex products to React state and localStorage (Precedence over mock seed)
   useEffect(() => {
     if (convexProducts !== undefined && convexProducts !== null) {
-      const mapped = convexProducts.map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        category: p.category,
-        price: p.discountedPrice !== undefined ? p.discountedPrice : p.price,
-        packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
-        img: p.img,
-        detailImg: p.detailImg,
-        detailText: p.detailText,
-        stock: p.stock || "in_stock",
-        desc: p.desc || "",
-        orderIndex: p.orderIndex || 99,
-        labels: p.labels || [],
-        shippingType: p.shippingType || "A",
-        options: p.options || [],
-        isActive: p.isActive !== false,
-        status: p.status || (p.isActive !== false ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종")
-      }))
-      .filter((p: any) => p.status !== "단종" && p.isActive !== false)
-      .sort((a: any, b: any) => a.orderIndex - b.orderIndex);
-      setProducts(mapped);
+      if (convexProducts.length > 0) {
+        const mapped = convexProducts.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          category: p.category,
+          price: p.discountedPrice !== undefined ? p.discountedPrice : p.price,
+          packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
+          img: p.img,
+          detailImg: p.detailImg,
+          detailText: p.detailText,
+          stock: p.stock || "in_stock",
+          desc: p.desc || "",
+          orderIndex: p.orderIndex || 99,
+          labels: p.labels || [],
+          shippingType: p.shippingType || "A",
+          options: p.options || [],
+          isActive: p.isActive !== false,
+          status: p.status || (p.isActive !== false ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종")
+        }))
+        .filter((p: any) => p.status !== "단종" && p.isActive !== false)
+        .sort((a: any, b: any) => a.orderIndex - b.orderIndex);
 
-      // Extract unique categories from actual active products dynamically
-      const uniqueCats = Array.from(new Set(mapped.map((p: any) => p.category).filter(Boolean))) as string[];
-      setCategories(uniqueCats);
-      
-      try {
-        localStorage.setItem("120_products", JSON.stringify(convexProducts));
-        localStorage.setItem("120_categories", JSON.stringify(uniqueCats));
-      } catch (e) {
-        console.warn(e);
+        setProducts(mapped);
+
+        // Extract unique categories from actual active products dynamically
+        const uniqueCats = Array.from(new Set(mapped.map((p: any) => p.category).filter(Boolean))) as string[];
+        if (uniqueCats.length > 0) {
+          setCategories((prev) => Array.from(new Set([...prev, ...uniqueCats])));
+        }
+        
+        try {
+          localStorage.setItem("120_products", JSON.stringify(convexProducts));
+          if (uniqueCats.length > 0) {
+            localStorage.setItem("120_categories", JSON.stringify(uniqueCats));
+          }
+        } catch (e) {
+          console.warn(e);
+        }
+      } else {
+        // If Convex products is empty, fallback to local storage
+        const stored = localStorage.getItem("120_products");
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              const mapped = parsed.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                category: p.category,
+                price: p.discountedPrice !== undefined ? p.discountedPrice : (p.price || 0),
+                packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
+                img: p.img || "",
+                detailImg: p.detailImg || "",
+                detailText: p.detailText || "",
+                stock: p.stock || "in_stock",
+                desc: p.desc || "",
+                orderIndex: p.orderIndex || 99,
+                labels: p.labels || [],
+                shippingType: p.shippingType || "A",
+                options: p.options || [],
+                isActive: p.isActive !== false,
+                status: p.status || (p.isActive !== false ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종")
+              }))
+              .filter((p: any) => p.status !== "단종" && p.isActive !== false)
+              .sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+
+              setProducts(mapped);
+
+              const uniqueCats = Array.from(new Set(mapped.map((p: any) => p.category).filter(Boolean))) as string[];
+              if (uniqueCats.length > 0) {
+                setCategories((prev) => Array.from(new Set([...prev, ...uniqueCats])));
+              }
+            }
+          } catch (e) {}
+        }
       }
     }
   }, [convexProducts]);
@@ -1282,7 +1338,41 @@ export default function PortalPage() {
         setPrs(parseSafely("120_prs", INITIAL_PR));
 
         setStores(parseSafely("120_stores", []));
-        setCategories(parseSafely("120_categories", []));
+        const storedCats = parseSafely("120_categories", []);
+        if (storedCats && storedCats.length > 0) {
+          setCategories((prev) => Array.from(new Set([...prev, ...storedCats])));
+        }
+
+        const storedPrRaw = localStorage.getItem("120_products");
+        if (storedPrRaw) {
+          try {
+            const parsed = JSON.parse(storedPrRaw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              const mapped = parsed.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                category: p.category,
+                price: p.discountedPrice !== undefined ? p.discountedPrice : (p.price || 0),
+                packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
+                img: p.img || "",
+                detailImg: p.detailImg || "",
+                detailText: p.detailText || "",
+                stock: p.stock || "in_stock",
+                desc: p.desc || "",
+                orderIndex: p.orderIndex || 99,
+                labels: p.labels || [],
+                shippingType: p.shippingType || "A",
+                options: p.options || [],
+                isActive: p.isActive !== false,
+                status: p.status || (p.isActive !== false ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종")
+              }))
+              .filter((p: any) => p.status !== "단종" && p.isActive !== false)
+              .sort((a: any, b: any) => a.orderIndex - b.orderIndex);
+
+              setProducts(mapped);
+            }
+          } catch (e) {}
+        }
         
         const bnr = localStorage.getItem("120_banners");
         if (bnr) {
@@ -2587,7 +2677,7 @@ export default function PortalPage() {
             }}
           ></div>
 
-          <div className="space-y-5 overflow-y-auto overflow-x-hidden relative z-10 w-full">
+          <div className="space-y-5 overflow-y-auto overflow-x-hidden no-scrollbar relative z-10 w-full">
             
             {/* Header Brand Logo (지정 로고 아이콘 적용 - 클릭 시 대시보드 이동) */}
             <button

@@ -62,9 +62,17 @@ import {
   ExternalLink,
   LayoutGrid,
   Grid3X3,
-  List
+  List,
+  Users,
+  DollarSign,
+  Wallet,
+  Percent,
+  Printer,
+  Award,
+  Crosshair
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
+import RadarMap from "@/app/components/RadarMap";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
 
 // ==========================================
@@ -104,6 +112,7 @@ interface StoreInfo {
   cancelDate?: string; // 가맹 해지일
   adoptionMenu: string[]; // 도입메뉴 (e.g. ["120pie", "egg120", "츄러스120"])
   monthlySales: number; // 월매출 (통계 호환용)
+  partnerId?: string; // 영업 파트너 ID
 }
 
 interface Product {
@@ -996,6 +1005,45 @@ export default function AdminPage() {
   const saveContractMutation = useMutation(api.contracts.createOrUpdate);
   const deleteContractMutation = useMutation(api.contracts.deleteContract);
   const updateContractStatusMutation = useMutation(api.contracts.updateStatus);
+
+  // Partners Query & Mutations
+  const convexPartners = useQuery(api.partners.get) || [];
+  const savePartnerMutation = useMutation(api.partners.createOrUpdate);
+  const deletePartnerMutation = useMutation(api.partners.deletePartner);
+  const assignStoreToPartnerMutation = useMutation(api.partners.assignStoreToPartner);
+  const allSettlements = useQuery(api.partners.getSettlements, {}) || [];
+  const updateSettlementStatusMutation = useMutation(api.partners.updateSettlementStatus);
+
+  // Partner Management States
+  const [partnerSubTab, setPartnerSubTab] = useState<"list" | "settlement">("list");
+  const [partnerSearchQuery, setPartnerSearchQuery] = useState<string>("");
+  const [isPartnerFormOpen, setIsPartnerFormOpen] = useState<boolean>(false);
+  const [isPartnerEditMode, setIsPartnerEditMode] = useState<boolean>(false);
+  const [selectedPartner, setSelectedPartner] = useState<any | null>(null);
+  const [partnerFormId, setPartnerFormId] = useState<string>("");
+  const [partnerFormPw, setPartnerFormPw] = useState<string>("");
+  const [partnerFormName, setPartnerFormName] = useState<string>("");
+  const [partnerFormPhone, setPartnerFormPhone] = useState<string>("");
+  const [partnerFormEmail, setPartnerFormEmail] = useState<string>("");
+  const [partnerFormCompanyName, setPartnerFormCompanyName] = useState<string>("");
+  const [partnerFormBankName, setPartnerFormBankName] = useState<string>("");
+  const [partnerFormAccountNumber, setPartnerFormAccountNumber] = useState<string>("");
+  const [partnerFormAccountHolder, setPartnerFormAccountHolder] = useState<string>("");
+  const [partnerFormCommission, setPartnerFormCommission] = useState<number>(8000);
+  const [partnerFormStatus, setPartnerFormStatus] = useState<string>("활동중");
+  const [partnerFormRegDate, setPartnerFormRegDate] = useState<string>("");
+  const [partnerFormMemo, setPartnerFormMemo] = useState<string>("");
+
+  // Settlement Management States (HQ Admin)
+  const [settlementFilterYearMonth, setSettlementFilterYearMonth] = useState<string>("전체");
+  const [selectedSettlementForModal, setSelectedSettlementForModal] = useState<any | null>(null);
+  const [settlementStatusEditTarget, setSettlementStatusEditTarget] = useState<any | null>(null);
+  const [settlementNewStatus, setSettlementNewStatus] = useState<string>("정산대기");
+  const [settlementPaidDate, setSettlementPaidDate] = useState<string>("");
+  const [settlementNote, setSettlementNote] = useState<string>("");
+
+  // 가맹점 관리에서 선택할 파트너 ID 상태
+  const [storePartnerId, setStorePartnerId] = useState<string>("");
 
   interface ContractFormType {
     ownerName: string;
@@ -2804,6 +2852,7 @@ export default function AdminPage() {
       setStoreRegDate(store.regDate);
       setStoreCancelDate(store.cancelDate || "");
       setStoreAdoptionMenu(store.adoptionMenu);
+      setStorePartnerId(store.partnerId || "");
     } else {
       setSelectedStore(null);
       setStoreLoginId("");
@@ -2818,6 +2867,7 @@ export default function AdminPage() {
       setStoreRegDate(new Date().toISOString().split("T")[0]);
       setStoreCancelDate("");
       setStoreAdoptionMenu([]);
+      setStorePartnerId("");
     }
     setShowStoreModal(true);
   };
@@ -2847,7 +2897,8 @@ export default function AdminPage() {
       regDate: storeRegDate || new Date().toISOString().split("T")[0],
       cancelDate: storeCancelDate || undefined,
       adoptionMenu: storeAdoptionMenu,
-      monthlySales: selectedStore ? selectedStore.monthlySales : 0
+      monthlySales: selectedStore ? selectedStore.monthlySales : 0,
+      partnerId: storePartnerId || undefined,
     };
 
     let updatedStores: StoreInfo[];
@@ -2879,7 +2930,8 @@ export default function AdminPage() {
       regDate: storeRegDate || new Date().toISOString().split("T")[0],
       cancelDate: storeCancelDate || undefined,
       adoptionMenu: storeAdoptionMenu,
-      monthlySales: selectedStore ? selectedStore.monthlySales : 0
+      monthlySales: selectedStore ? selectedStore.monthlySales : 0,
+      partnerId: storePartnerId || undefined,
     }).then(() => {
       console.log("[Convex] Store created/updated successfully.");
     }).catch((err) => {
@@ -2889,6 +2941,121 @@ export default function AdminPage() {
     setStores(updatedStores);
     localStorage.setItem("120_stores", JSON.stringify(updatedStores));
     setShowStoreModal(false);
+  };
+
+  // ==========================================
+  // Partner Management Handlers (HQ Admin)
+  // ==========================================
+  const handleOpenPartnerModal = (partner?: any) => {
+    if (partner) {
+      setIsPartnerEditMode(true);
+      setSelectedPartner(partner);
+      setPartnerFormId(partner.id);
+      setPartnerFormPw(partner.pw || "");
+      setPartnerFormName(partner.name || "");
+      setPartnerFormPhone(partner.phone || "");
+      setPartnerFormEmail(partner.email || "");
+      setPartnerFormCompanyName(partner.companyName || "");
+      setPartnerFormBankName(partner.bankName || "");
+      setPartnerFormAccountNumber(partner.accountNumber || "");
+      setPartnerFormAccountHolder(partner.accountHolder || "");
+      setPartnerFormCommission(partner.commissionPerBox || 8000);
+      setPartnerFormStatus(partner.status || "활동중");
+      setPartnerFormRegDate(partner.regDate || new Date().toISOString().split("T")[0]);
+      setPartnerFormMemo(partner.memo || "");
+    } else {
+      setIsPartnerEditMode(false);
+      setSelectedPartner(null);
+      setPartnerFormId(`partner_${Date.now().toString().slice(-4)}`);
+      setPartnerFormPw("partner1234");
+      setPartnerFormName("");
+      setPartnerFormPhone("");
+      setPartnerFormEmail("");
+      setPartnerFormCompanyName("");
+      setPartnerFormBankName("");
+      setPartnerFormAccountNumber("");
+      setPartnerFormAccountHolder("");
+      setPartnerFormCommission(8000);
+      setPartnerFormStatus("활동중");
+      setPartnerFormRegDate(new Date().toISOString().split("T")[0]);
+      setPartnerFormMemo("");
+    }
+    setIsPartnerFormOpen(true);
+  };
+
+  const handleSavePartner = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!partnerFormId || !partnerFormPw || !partnerFormName || !partnerFormPhone) {
+      alert("아이디, 비밀번호, 파트너명, 연락처는 필수 입력 항목입니다.");
+      return;
+    }
+
+    try {
+      await savePartnerMutation({
+        id: partnerFormId,
+        pw: partnerFormPw,
+        name: partnerFormName,
+        phone: partnerFormPhone,
+        email: partnerFormEmail || undefined,
+        companyName: partnerFormCompanyName || undefined,
+        bankName: partnerFormBankName || undefined,
+        accountNumber: partnerFormAccountNumber || undefined,
+        accountHolder: partnerFormAccountHolder || undefined,
+        commissionPerBox: partnerFormCommission || 8000,
+        status: partnerFormStatus,
+        regDate: partnerFormRegDate || new Date().toISOString().split("T")[0],
+        memo: partnerFormMemo || undefined,
+      });
+
+      triggerToast(isPartnerEditMode ? "파트너 정보가 수정되었습니다." : "새 파트너가 성공적으로 등록되었습니다.");
+      setIsPartnerFormOpen(false);
+    } catch (err) {
+      console.error(err);
+      alert("파트너 저장 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleDeletePartner = async (id: string, name: string) => {
+    if (!confirm(`정말로 '${name}' 파트너를 삭제하시겠습니까? 연결된 가맹점의 파트너 지정이 해제됩니다.`)) {
+      return;
+    }
+
+    try {
+      await deletePartnerMutation({ id });
+      triggerToast(`'${name}' 파트너가 삭제되었습니다.`);
+    } catch (err) {
+      console.error(err);
+      alert("파트너 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleOpenSettlementStatusModal = (settlement: any) => {
+    setSettlementStatusEditTarget(settlement);
+    setSettlementNewStatus(settlement.status || "정산대기");
+    setSettlementPaidDate(settlement.paidDate || new Date().toISOString().split("T")[0]);
+    setSettlementNote(settlement.note || "");
+  };
+
+  const handleSaveSettlementStatus = async () => {
+    if (!settlementStatusEditTarget) return;
+
+    try {
+      await updateSettlementStatusMutation({
+        partnerId: settlementStatusEditTarget.partnerId,
+        yearMonth: settlementStatusEditTarget.yearMonth,
+        boxCount: settlementStatusEditTarget.boxCount || 0,
+        commissionAmount: settlementStatusEditTarget.commissionAmount || 0,
+        status: settlementNewStatus,
+        paidDate: settlementNewStatus === "지급완료" ? settlementPaidDate : undefined,
+        note: settlementNote || undefined,
+      });
+
+      triggerToast("정산 상태 및 지급 정보가 업데이트되었습니다.");
+      setSettlementStatusEditTarget(null);
+    } catch (err) {
+      console.error(err);
+      alert("정산 상태 업데이트 중 오류가 발생했습니다.");
+    }
   };
 
   // Delete a store
@@ -3154,6 +3321,10 @@ export default function AdminPage() {
     const sortedProducts = [...updatedProducts].sort((a, b) => a.orderIndex - b.orderIndex);
     setProducts(sortedProducts);
     localStorage.setItem("120_products", JSON.stringify(sortedProducts));
+
+    const currentCats = Array.from(new Set([...categories, productData.category].filter(Boolean)));
+    setCategories(currentCats);
+    localStorage.setItem("120_categories", JSON.stringify(currentCats));
 
     // Save to Convex Cloud DB
     saveProductMutation({
@@ -4798,7 +4969,7 @@ export default function AdminPage() {
             }}
           ></div>
 
-          <div className="space-y-6 overflow-y-auto overflow-x-hidden relative z-10 w-full">
+          <div className="space-y-6 overflow-y-auto overflow-x-hidden no-scrollbar relative z-10 w-full">
             
             {/* Header Brand Logo (지정 로고 아이콘 적용 - 클릭 시 대시보드 이동) */}
             <button
@@ -4860,6 +5031,8 @@ export default function AdminPage() {
               {[
                 { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
                 { key: "store", label: "가맹점 관리", icon: Store },
+                { key: "partner", label: "파트너/정산 관리", icon: Users },
+                { key: "radar", label: "상권보호/영업타겟", icon: Crosshair },
                 { key: "contract", label: "가맹계약 관리", icon: FileText },
                 { key: "product", label: "제품 관리", icon: Package },
                 { key: "order", label: "주문/배송 관리", icon: ShoppingBag, badge: incomingOrdersCount > 0 ? incomingOrdersCount : undefined },
@@ -4942,7 +5115,7 @@ export default function AdminPage() {
               className="w-72 bg-[#0F141C] text-white h-full p-6 flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-200 border-r border-slate-800" 
               onClick={(e) => e.stopPropagation()} 
             >
-              <div className="space-y-6 overflow-y-auto">
+              <div className="space-y-6 overflow-y-auto overflow-x-hidden no-scrollbar">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                   <button
                     onClick={() => {
@@ -4979,6 +5152,8 @@ export default function AdminPage() {
                   {[
                     { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
                     { key: "store", label: "가맹점 관리", icon: Store },
+                    { key: "partner", label: "파트너/정산 관리", icon: Users },
+                    { key: "radar", label: "상권보호/영업타겟", icon: Crosshair },
                     { key: "contract", label: "가맹계약 관리", icon: FileText },
                     { key: "product", label: "제품 관리", icon: Package },
                     { key: "order", label: "주문/배송 관리", icon: ShoppingBag, badge: incomingOrdersCount > 0 ? incomingOrdersCount : undefined },
@@ -6763,6 +6938,368 @@ export default function AdminPage() {
                   </div>
                 )
               )}
+            </div>
+          )}
+
+          {/* ==========================================
+              MENU: PARTNER & SETTLEMENT MANAGEMENT
+             ========================================== */}
+          {currentMenu === "partner" && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Header and Controls bar */}
+              <div className="flex flex-col gap-4 bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-lg border-0 shadow-md">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                      <Users size={24} className="text-[#FED422]" />
+                      영업 파트너 및 수수료 정산 관리
+                    </h2>
+                    <p className="text-xs text-slate-400 font-bold mt-1">
+                      가맹점을 모집하는 영업 파트너를 직접 등록·관리하고, 패스트리 생지 주문 실적에 따른 월별 수수료(1박스당 8,000원)를 정산·지급합니다.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <Link
+                      href="/partner"
+                      target="_blank"
+                      className="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-2xs"
+                    >
+                      <ExternalLink size={14} />
+                      <span>파트너 포털 바로가기</span>
+                    </Link>
+                    <button
+                      onClick={() => handleOpenPartnerModal()}
+                      className="px-4 py-2.5 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] text-xs font-black rounded-lg transition-all flex items-center gap-1.5 shadow-md cursor-pointer border-0"
+                    >
+                      <Plus size={16} />
+                      <span>신규 파트너 등록</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Sub Tab Switcher */}
+                <div className="flex items-center gap-2 border-t border-neutral-100 pt-4">
+                  <button
+                    onClick={() => setPartnerSubTab("list")}
+                    className={`px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer border-0 ${
+                      partnerSubTab === "list"
+                        ? "bg-[#FED422] text-[#0F172A] shadow-xs"
+                        : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    }`}
+                  >
+                    1. 파트너 목록 및 계정 관리 ({convexPartners.length}명)
+                  </button>
+                  <button
+                    onClick={() => setPartnerSubTab("settlement")}
+                    className={`px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer border-0 ${
+                      partnerSubTab === "settlement"
+                        ? "bg-[#FED422] text-[#0F172A] shadow-xs"
+                        : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    }`}
+                  >
+                    2. 파트너 수수료 정산 및 지급 관리
+                  </button>
+                </div>
+              </div>
+
+              {/* TAB 1: 파트너 목록 및 계정 관리 */}
+              {partnerSubTab === "list" && (
+                <div className="space-y-6">
+                  {/* KPI Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-white rounded-lg p-5 border-0 shadow-md space-y-1">
+                      <span className="text-xs font-bold text-slate-400">총 등록 파트너</span>
+                      <div className="text-2xl font-black text-[#0F172A]">{convexPartners.length} 명</div>
+                      <span className="text-[11px] text-emerald-600 font-bold">
+                        활동중 {convexPartners.filter((p: any) => p.status === "활동중").length}명
+                      </span>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-5 border-0 shadow-md space-y-1">
+                      <span className="text-xs font-bold text-slate-400">유치 가맹점 총합</span>
+                      <div className="text-2xl font-black text-[#0F172A]">
+                        {convexPartners.reduce((sum: number, p: any) => sum + (p.storesCount || 0), 0)} 개점
+                      </div>
+                      <span className="text-[11px] text-blue-600 font-bold">파트너십 연계 매장</span>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-5 border-0 shadow-md space-y-1">
+                      <span className="text-xs font-bold text-slate-400">당월 패스트리 생지 주문</span>
+                      <div className="text-2xl font-black text-[#0F172A]">
+                        {convexPartners.reduce((sum: number, p: any) => sum + (p.currentMonthBoxes || 0), 0)} 박스
+                      </div>
+                      <span className="text-[11px] text-amber-600 font-bold">1박스당 8,000원 수수료</span>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-5 border-0 shadow-md space-y-1">
+                      <span className="text-xs font-bold text-slate-400">당월 총 발생 수수료</span>
+                      <div className="text-2xl font-black text-rose-600 font-mono">
+                        {convexPartners.reduce((sum: number, p: any) => sum + (p.currentMonthCommission || 0), 0).toLocaleString()} 원
+                      </div>
+                      <span className="text-[11px] text-slate-400 font-bold">익월 정산 대상</span>
+                    </div>
+                  </div>
+
+                  {/* Partner List Table */}
+                  <div className="bg-white rounded-lg border-0 shadow-md overflow-hidden">
+                    <div className="p-5 border-b border-neutral-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <h3 className="text-sm font-black text-[#0F172A]">등록된 영업 파트너 명단</h3>
+                      <div className="relative">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="text"
+                          value={partnerSearchQuery}
+                          onChange={(e) => setPartnerSearchQuery(e.target.value)}
+                          placeholder="파트너명 / 아이디 / 상호 검색"
+                          className="pl-8 pr-3 py-1.5 bg-[#F1F4F8] border-0 rounded-lg text-xs font-medium text-[#0F172A] w-52 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    {convexPartners.length === 0 ? (
+                      <div className="p-16 text-center text-slate-400 text-xs font-bold">
+                        등록된 영업 파트너가 없습니다. 상단의 '신규 파트너 등록' 버튼을 눌러 파트너를 추가하세요.
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead>
+                            <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
+                              <th className="py-3 px-4">파트너 정보</th>
+                              <th className="py-3 px-3">연락처 / 이메일</th>
+                              <th className="py-3 px-3">정산 입금 계좌</th>
+                              <th className="py-3 px-3 text-center">유치 가맹점</th>
+                              <th className="py-3 px-3 text-right">당월 생지 주문</th>
+                              <th className="py-3 px-3 text-right">당월 예상 수수료</th>
+                              <th className="py-3 px-3 text-center">상태</th>
+                              <th className="py-3 px-3">등록일</th>
+                              <th className="py-3 px-4 text-center">관리</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-neutral-100">
+                            {convexPartners
+                              .filter((p: any) => {
+                                const q = partnerSearchQuery.toLowerCase();
+                                return (
+                                  p.name.toLowerCase().includes(q) ||
+                                  p.id.toLowerCase().includes(q) ||
+                                  (p.companyName || "").toLowerCase().includes(q) ||
+                                  (p.phone || "").includes(q)
+                                );
+                              })
+                              .map((partner: any) => (
+                                <tr key={partner.id} className="hover:bg-slate-50/80 transition-colors">
+                                  <td className="py-3.5 px-4">
+                                    <div className="font-black text-[#0F172A] text-sm flex items-center gap-1.5">
+                                      <span>{partner.name}</span>
+                                      {partner.companyName && (
+                                        <span className="text-xs text-slate-400 font-normal">({partner.companyName})</span>
+                                      )}
+                                    </div>
+                                    <div className="text-[11px] font-mono text-blue-600 font-bold">
+                                      ID: {partner.id} (PW: {partner.pw})
+                                    </div>
+                                  </td>
+                                  <td className="py-3.5 px-3">
+                                    <div className="font-mono text-slate-700 font-bold">{partner.phone}</div>
+                                    <div className="text-[11px] text-slate-400">{partner.email || "-"}</div>
+                                  </td>
+                                  <td className="py-3.5 px-3">
+                                    <div className="font-bold text-slate-800">
+                                      {partner.bankName || "은행미등록"}{" "}
+                                      <span className="font-mono font-normal">{partner.accountNumber || "-"}</span>
+                                    </div>
+                                    <div className="text-[11px] text-slate-400">
+                                      예금주: {partner.accountHolder || partner.name}
+                                    </div>
+                                  </td>
+                                  <td className="py-3.5 px-3 text-center">
+                                    <span className="inline-block px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-black text-xs border border-blue-100">
+                                      {partner.storesCount || 0} 개점
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 px-3 text-right font-black text-amber-600 font-mono">
+                                    {partner.currentMonthBoxes || 0} 박스
+                                  </td>
+                                  <td className="py-3.5 px-3 text-right font-black text-[#0F172A] font-mono text-sm">
+                                    {(partner.currentMonthCommission || 0).toLocaleString()} 원
+                                  </td>
+                                  <td className="py-3.5 px-3 text-center">
+                                    <span
+                                      className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold ${
+                                        partner.status === "활동중"
+                                          ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                                          : partner.status === "대기"
+                                          ? "bg-amber-50 text-amber-600 border border-amber-200"
+                                          : "bg-slate-100 text-slate-500 border border-slate-200"
+                                      }`}
+                                    >
+                                      {partner.status}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 px-3 text-slate-400 font-mono">{partner.regDate}</td>
+                                  <td className="py-3.5 px-4 text-center">
+                                    <div className="flex items-center justify-center gap-1.5">
+                                      <button
+                                        onClick={() => window.open(`/partner?partnerId=${partner.id}`, '_blank')}
+                                        className="px-2.5 py-1 bg-amber-50 hover:bg-[#FED422] text-[#0F172A] rounded text-xs font-black transition-all border border-amber-200 cursor-pointer flex items-center gap-1"
+                                        title="해당 파트너 계정으로 로그인된 어드민 포털 열기"
+                                      >
+                                        <ExternalLink size={12} />
+                                        <span>어드민</span>
+                                      </button>
+                                      <button
+                                        onClick={() => handleOpenPartnerModal(partner)}
+                                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-bold transition-all border-0 cursor-pointer"
+                                      >
+                                        수정
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeletePartner(partner.id, partner.name)}
+                                        className="p-1 bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded transition-all border-0 cursor-pointer"
+                                        title="삭제"
+                                      >
+                                        <Trash2 size={14} />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: 파트너 수수료 정산 및 지급 관리 */}
+              {partnerSubTab === "settlement" && (
+                <div className="space-y-6">
+                  {/* Settlement Header Policy Banner */}
+                  <div className="p-5 rounded-lg bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <Award size={22} className="text-amber-600 shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="text-xs font-black text-amber-900">영업 파트너 수수료 정산 정책 가이드</h4>
+                        <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                          • 유치 가맹점이 발주한 <strong>패스트리 생지 1박스 당 8,000원(부가세포함)</strong>을 월 단위로 합산하여 정산합니다.<br />
+                          • 상태 흐름: <strong>[정산대기]</strong> → 실적 검토 후 <strong>[정산확정]</strong> → 실제 계좌 입금 후 <strong>[지급완료]</strong> 처리
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Settlements Table */}
+                  <div className="bg-white rounded-lg border-0 shadow-md overflow-hidden space-y-4 p-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-neutral-100">
+                      <h3 className="text-sm font-black text-[#0F172A]">월별 파트너 수수료 정산 대장</h3>
+                    </div>
+
+                    {allSettlements.length === 0 ? (
+                      <div className="py-16 text-center text-slate-400 text-xs font-bold">
+                        정산 내역이 없습니다.
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead>
+                            <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
+                              <th className="py-3 px-3">정산 년월</th>
+                              <th className="py-3 px-3">파트너 정보</th>
+                              <th className="py-3 px-3">정산 입금 계좌</th>
+                              <th className="py-3 px-3 text-center">유치 가맹점</th>
+                              <th className="py-3 px-3 text-right">생지 주문 박스 수</th>
+                              <th className="py-3 px-3 text-right">수수료 단가</th>
+                              <th className="py-3 px-3 text-right">총 정산 금액</th>
+                              <th className="py-3 px-3 text-center">정산 상태</th>
+                              <th className="py-3 px-3 text-center">지급일자</th>
+                              <th className="py-3 px-4 text-center">관리 / 명세서</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-neutral-100">
+                            {allSettlements.map((st: any, idx: number) => (
+                              <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="py-3.5 px-3 font-mono font-black text-[#0F172A]">{st.yearMonth}</td>
+                                <td className="py-3.5 px-3">
+                                  <div className="font-bold text-[#0F172A]">
+                                    {st.partnerName}{" "}
+                                    {st.companyName && <span className="text-slate-400 font-normal">({st.companyName})</span>}
+                                  </div>
+                                  <div className="text-[11px] text-slate-400 font-mono">{st.phone}</div>
+                                </td>
+                                <td className="py-3.5 px-3">
+                                  <div className="font-medium text-slate-800">
+                                    {st.bankName || "-"} {st.accountNumber || "-"}
+                                  </div>
+                                  <div className="text-[11px] text-slate-400">
+                                    예금주: {st.accountHolder || st.partnerName}
+                                  </div>
+                                </td>
+                                <td className="py-3.5 px-3 text-center font-bold text-slate-700">
+                                  {st.storeCount} 개점
+                                </td>
+                                <td className="py-3.5 px-3 text-right font-black text-amber-600 font-mono">
+                                  {st.boxCount} 박스
+                                </td>
+                                <td className="py-3.5 px-3 text-right text-slate-500 font-mono">
+                                  {(st.commissionUnit || 8000).toLocaleString()}원
+                                </td>
+                                <td className="py-3.5 px-3 text-right font-black text-rose-600 font-mono text-sm">
+                                  {(st.commissionAmount || 0).toLocaleString()} 원
+                                </td>
+                                <td className="py-3.5 px-3 text-center">
+                                  <span
+                                    className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold ${
+                                      st.status === "지급완료"
+                                        ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                                        : st.status === "정산확정"
+                                        ? "bg-blue-50 text-blue-600 border border-blue-200"
+                                        : "bg-amber-50 text-amber-600 border border-amber-200"
+                                    }`}
+                                  >
+                                    {st.status}
+                                  </span>
+                                </td>
+                                <td className="py-3.5 px-3 text-center font-mono text-slate-400">
+                                  {st.paidDate || "-"}
+                                </td>
+                                <td className="py-3.5 px-4 text-center">
+                                  <div className="flex items-center justify-center gap-1.5">
+                                    <button
+                                      onClick={() => handleOpenSettlementStatusModal(st)}
+                                      className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded text-xs font-bold transition-all border border-amber-200 cursor-pointer"
+                                    >
+                                      상태 변경
+                                    </button>
+                                    <button
+                                      onClick={() => setSelectedSettlementForModal(st)}
+                                      className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-bold transition-all border-0 cursor-pointer flex items-center gap-1"
+                                    >
+                                      <FileText size={12} />
+                                      <span>명세서</span>
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ==========================================
+              MENU: RADAR MAP & TARGET MANAGEMENT (500m 상권보호)
+             ========================================== */}
+          {currentMenu === "radar" && (
+            <div className="space-y-6 animate-fadeIn">
+              <RadarMap mode="admin" />
             </div>
           )}
 
@@ -11025,7 +11562,22 @@ export default function AdminPage() {
                       <option value="취소">취소 (정식 폐점 계약 해지)</option>
                     </select>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-extrabold text-[#0F172A]">유치 영업 파트너</label>
+                    <select 
+                      value={storePartnerId}
+                      onChange={(e) => setStorePartnerId(e.target.value)}
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:outline-none cursor-pointer transition-all shadow-2xs"
+                    >
+                      <option value="">-- 본사 직영 / 파트너 없음 --</option>
+                      {convexPartners.map((p: any) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} {p.companyName ? `(${p.companyName})` : ""} - {p.id}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 md:col-span-2">
                     <div className="flex flex-col gap-1.5">
                       <label className="font-extrabold text-[#0F172A]">가맹 등록일</label>
                       <input 
@@ -12202,6 +12754,410 @@ export default function AdminPage() {
                 >
                   닫기
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          MODAL: PARTNER CREATE / EDIT
+      ========================================== */}
+      {isPartnerFormOpen && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setIsPartnerFormOpen(false)}
+        >
+          <div 
+            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col font-sans"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-4 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-2">
+                <Users size={20} className="text-[#0F172A]" />
+                <h3 className="text-base font-black text-[#0F172A]">
+                  {isPartnerEditMode ? `영업 파트너 정보 수정 [${partnerFormName}]` : "영업 파트너 신규 등록"}
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                {isPartnerEditMode && (
+                  <button 
+                    type="button"
+                    onClick={() => window.open(`/partner?partnerId=${partnerFormId}`, '_blank')}
+                    className="px-3 py-1.5 bg-[#0F172A] hover:bg-slate-800 text-white rounded-lg text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-xs border-0"
+                    title="해당 파트너 계정으로 로그인된 어드민 포털 새 창 열기"
+                  >
+                    <ExternalLink size={13} className="text-[#FED422]" />
+                    <span>파트너 어드민 접속 (자동 로그인)</span>
+                  </button>
+                )}
+                <button 
+                  type="button"
+                  onClick={() => setIsPartnerFormOpen(false)} 
+                  className="w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSavePartner} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs bg-[#f9fafb]">
+              {/* 계정 정보 */}
+              <div className="bg-white rounded-lg p-4 border border-neutral-200 shadow-2xs space-y-3">
+                <h4 className="font-black text-slate-800 border-b border-neutral-100 pb-2 flex items-center gap-1.5">
+                  <span>🔑 파트너 로그인 계정 정보</span>
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">파트너 로그인 ID *</label>
+                    <input 
+                      type="text"
+                      value={partnerFormId}
+                      onChange={(e) => setPartnerFormId(e.target.value)}
+                      disabled={isPartnerEditMode}
+                      placeholder="예: partner1"
+                      required
+                      className="w-full bg-[#F1F4F8] disabled:opacity-70 border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">비밀번호 *</label>
+                    <input 
+                      type="text"
+                      value={partnerFormPw}
+                      onChange={(e) => setPartnerFormPw(e.target.value)}
+                      placeholder="접속 비밀번호"
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 기본 정보 */}
+              <div className="bg-white rounded-lg p-4 border border-neutral-200 shadow-2xs space-y-3">
+                <h4 className="font-black text-slate-800 border-b border-neutral-100 pb-2 flex items-center gap-1.5">
+                  <span>👤 파트너 기본 인적 / 영업 정보</span>
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">파트너명 (대표자) *</label>
+                    <input 
+                      type="text"
+                      value={partnerFormName}
+                      onChange={(e) => setPartnerFormName(e.target.value)}
+                      placeholder="예: 홍길동"
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">연락처 *</label>
+                    <input 
+                      type="text"
+                      value={partnerFormPhone}
+                      onChange={(e) => setPartnerFormPhone(e.target.value)}
+                      placeholder="010-0000-0000"
+                      required
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">소속 / 상호명 (선택)</label>
+                    <input 
+                      type="text"
+                      value={partnerFormCompanyName}
+                      onChange={(e) => setPartnerFormCompanyName(e.target.value)}
+                      placeholder="예: 제이에이전시"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">이메일 (선택)</label>
+                    <input 
+                      type="email"
+                      value={partnerFormEmail}
+                      onChange={(e) => setPartnerFormEmail(e.target.value)}
+                      placeholder="partner@example.com"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 정산 계좌 및 수수료 설정 */}
+              <div className="bg-white rounded-lg p-4 border border-neutral-200 shadow-2xs space-y-3">
+                <h4 className="font-black text-slate-800 border-b border-neutral-100 pb-2 flex items-center gap-1.5">
+                  <span>💳 정산 계좌 및 수수료 단가 설정</span>
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">은행명</label>
+                    <input 
+                      type="text"
+                      value={partnerFormBankName}
+                      onChange={(e) => setPartnerFormBankName(e.target.value)}
+                      placeholder="예: 국민은행"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">계좌번호</label>
+                    <input 
+                      type="text"
+                      value={partnerFormAccountNumber}
+                      onChange={(e) => setPartnerFormAccountNumber(e.target.value)}
+                      placeholder="'-' 포함 입력"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">예금주</label>
+                    <input 
+                      type="text"
+                      value={partnerFormAccountHolder}
+                      onChange={(e) => setPartnerFormAccountHolder(e.target.value)}
+                      placeholder="예금주 성명"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">생지 1박스당 수수료 (원, 부가세포함)</label>
+                    <input 
+                      type="number"
+                      value={partnerFormCommission}
+                      onChange={(e) => setPartnerFormCommission(Number(e.target.value))}
+                      placeholder="8000"
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">파트너 상태</label>
+                    <select
+                      value={partnerFormStatus}
+                      onChange={(e) => setPartnerFormStatus(e.target.value)}
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+                    >
+                      <option value="활동중">활동중</option>
+                      <option value="대기">대기</option>
+                      <option value="정지">정지</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="font-extrabold text-slate-700 block mb-1">등록일자</label>
+                    <input 
+                      type="date"
+                      value={partnerFormRegDate}
+                      onChange={(e) => setPartnerFormRegDate(e.target.value)}
+                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-extrabold text-slate-700 block mb-1">본사 관리 메모 (파트너에게 노출되지 않음)</label>
+                  <textarea
+                    rows={2}
+                    value={partnerFormMemo}
+                    onChange={(e) => setPartnerFormMemo(e.target.value)}
+                    placeholder="특이사항 및 담당 구역 등 메모"
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-none resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] text-xs font-black rounded-lg transition-all shadow-md cursor-pointer border-0 flex items-center justify-center gap-1.5"
+                >
+                  <CheckCircle2 size={16} />
+                  <span>{isPartnerEditMode ? "파트너 정보 수정 완료" : "신규 파트너 등록 완료"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          MODAL: SETTLEMENT STATUS EDIT (HQ ADMIN)
+      ========================================== */}
+      {settlementStatusEditTarget && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setSettlementStatusEditTarget(null)}
+        >
+          <div 
+            className="w-full max-w-md bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-2xl p-6 space-y-4 font-sans"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+              <h3 className="text-sm font-black text-[#0F172A] flex items-center gap-1.5">
+                <DollarSign size={18} className="text-amber-500" />
+                <span>정산 및 지급 상태 변경</span>
+              </h3>
+              <button 
+                onClick={() => setSettlementStatusEditTarget(null)}
+                className="text-slate-400 hover:text-slate-700"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="bg-[#F8FAFC] p-3.5 rounded-lg border border-neutral-200 text-xs space-y-1">
+              <div><strong>파트너:</strong> {settlementStatusEditTarget.partnerName} ({settlementStatusEditTarget.phone})</div>
+              <div><strong>정산 년월:</strong> {settlementStatusEditTarget.yearMonth}</div>
+              <div><strong>생지 수량 / 금액:</strong> {settlementStatusEditTarget.boxCount}박스 / {(settlementStatusEditTarget.commissionAmount || 0).toLocaleString()}원</div>
+              <div><strong>입금 계좌:</strong> {settlementStatusEditTarget.bankName} {settlementStatusEditTarget.accountNumber} ({settlementStatusEditTarget.accountHolder})</div>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="font-black text-slate-700 block mb-1">정산 상태 선택</label>
+                <select
+                  value={settlementNewStatus}
+                  onChange={(e) => setSettlementNewStatus(e.target.value)}
+                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+                >
+                  <option value="정산대기">정산대기 (실시간 합산 중)</option>
+                  <option value="정산확정">정산확정 (월마감 검토 완료)</option>
+                  <option value="지급완료">지급완료 (계좌 입금 처리 완료)</option>
+                </select>
+              </div>
+
+              {settlementNewStatus === "지급완료" && (
+                <div>
+                  <label className="font-black text-slate-700 block mb-1">실제 지급일자</label>
+                  <input
+                    type="date"
+                    value={settlementPaidDate}
+                    onChange={(e) => setSettlementPaidDate(e.target.value)}
+                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="font-black text-slate-700 block mb-1">정산 메모</label>
+                <input
+                  type="text"
+                  value={settlementNote}
+                  onChange={(e) => setSettlementNote(e.target.value)}
+                  placeholder="예: 5월 10일 국민은행 이체완료"
+                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setSettlementStatusEditTarget(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold transition-all border-0"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveSettlementStatus}
+                className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all border-0 shadow-xs cursor-pointer"
+              >
+                저장하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          MODAL: SETTLEMENT INVOICE PRINT (HQ ADMIN)
+      ========================================== */}
+      {selectedSettlementForModal && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setSelectedSettlementForModal(null)}
+        >
+          <div 
+            className="w-full max-w-2xl bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col font-sans text-slate-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-600">본사 가맹지원본부 파트너 정산 명세서</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Printer size={14} />
+                  <span>인쇄 / PDF 출력</span>
+                </button>
+                <button
+                  onClick={() => setSelectedSettlementForModal(null)}
+                  className="p-1.5 text-slate-500 hover:text-slate-800 rounded-lg"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-8 overflow-y-auto space-y-6 text-xs">
+              <div className="text-center border-b-2 border-slate-900 pb-4 space-y-1">
+                <h1 className="text-2xl font-black text-slate-900 tracking-tight">영업 파트너 수수료 정산 명세서</h1>
+                <p className="text-slate-500 font-mono font-bold">정산 대상 월: {selectedSettlementForModal.yearMonth}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 border border-slate-200 p-4 rounded-xl bg-slate-50">
+                <div className="space-y-1">
+                  <div><strong>파트너명:</strong> {selectedSettlementForModal.partnerName}</div>
+                  <div><strong>상호/소속:</strong> {selectedSettlementForModal.companyName || "-"}</div>
+                  <div><strong>연락처:</strong> {selectedSettlementForModal.phone}</div>
+                </div>
+                <div className="space-y-1">
+                  <div><strong>지급 은행:</strong> {selectedSettlementForModal.bankName || "-"}</div>
+                  <div><strong>계좌번호:</strong> {selectedSettlementForModal.accountNumber || "-"}</div>
+                  <div><strong>예금주:</strong> {selectedSettlementForModal.accountHolder || selectedSettlementForModal.partnerName}</div>
+                </div>
+              </div>
+
+              <table className="w-full text-left border-collapse border border-slate-300">
+                <thead>
+                  <tr className="bg-slate-100 border-b border-slate-300 font-bold">
+                    <th className="p-2.5 border-r border-slate-300">정산 항목</th>
+                    <th className="p-2.5 border-r border-slate-300 text-right">수량 (박스)</th>
+                    <th className="p-2.5 border-r border-slate-300 text-right">지급 단가</th>
+                    <th className="p-2.5 text-right">정산 금액 (VAT포함)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-slate-200">
+                    <td className="p-2.5 border-r border-slate-300 font-bold">
+                      유치 가맹점 패스트리 생지 주문 수수료
+                    </td>
+                    <td className="p-2.5 border-r border-slate-300 text-right font-mono font-bold">
+                      {selectedSettlementForModal.boxCount} 박스
+                    </td>
+                    <td className="p-2.5 border-r border-slate-300 text-right font-mono">
+                      {(selectedSettlementForModal.commissionUnit || 8000).toLocaleString()}원
+                    </td>
+                    <td className="p-2.5 text-right font-black font-mono text-sm">
+                      {(selectedSettlementForModal.commissionAmount || 0).toLocaleString()}원
+                    </td>
+                  </tr>
+                  <tr className="bg-slate-50 font-bold">
+                    <td colSpan={3} className="p-2.5 border-r border-slate-300 text-right">
+                      최종 정산 합계액
+                    </td>
+                    <td className="p-2.5 text-right font-black text-rose-600 text-base font-mono">
+                      {(selectedSettlementForModal.commissionAmount || 0).toLocaleString()}원
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div className="space-y-1 text-slate-500 text-[11px] leading-relaxed pt-2">
+                <p>• 정산 상태: <strong>{selectedSettlementForModal.status}</strong> {selectedSettlementForModal.paidDate ? `(지급완료일: ${selectedSettlementForModal.paidDate})` : ""}</p>
+                <p>• 발행처: 주식회사 120겹파이 가맹지원본부</p>
               </div>
             </div>
           </div>

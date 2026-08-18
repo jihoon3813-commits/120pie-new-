@@ -25,6 +25,7 @@ export const createOrUpdate = mutation({
     cancelDate: v.optional(v.string()), // 가맹 해지일
     adoptionMenu: v.array(v.string()), // 도입메뉴
     monthlySales: v.number(), // 월매출
+    partnerId: v.optional(v.string()), // 영업 파트너 ID
   },
   handler: async (ctx, args) => {
     // Check if store already exists by the logic ID
@@ -48,6 +49,7 @@ export const createOrUpdate = mutation({
         cancelDate: args.cancelDate,
         adoptionMenu: args.adoptionMenu,
         monthlySales: args.monthlySales,
+        partnerId: args.partnerId,
       });
       return { success: true, action: "updated", storeId: args.id };
     } else {
@@ -66,6 +68,7 @@ export const createOrUpdate = mutation({
         cancelDate: args.cancelDate,
         adoptionMenu: args.adoptionMenu,
         monthlySales: args.monthlySales,
+        partnerId: args.partnerId,
       });
       return { success: true, action: "created", storeId: args.id };
     }
