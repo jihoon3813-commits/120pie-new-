@@ -6,7 +6,7 @@ export const get = query({
   args: {},
   handler: async (ctx) => {
     const products = await ctx.db.query("products").collect();
-    return products.sort((a, b) => a.orderIndex - b.orderIndex);
+    return products.sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
   },
 });
 
@@ -38,7 +38,7 @@ export const createOrUpdate = mutation({
   handler: async (ctx, args) => {
     const existing = await ctx.db
       .query("products")
-      .filter((q) => q.eq(q.field("id"), args.id))
+      .withIndex("by_prod_id", (q) => q.eq("id", args.id))
       .first();
 
     const fields = {
@@ -90,6 +90,34 @@ export const createOrUpdate = mutation({
       const newId = await ctx.db.insert("products", fields);
       return newId;
     }
+  },
+});
+
+// 제품 목록 순서(orderIndex) 일괄 동기화 API
+export const updateOrder = mutation({
+  args: {
+    orderedIds: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const allProducts = await ctx.db.query("products").collect();
+    const productMap = new Map<string, typeof allProducts[0]>();
+    for (const p of allProducts) {
+      if (p.id) productMap.set(p.id, p);
+      productMap.set(p._id, p);
+      productMap.set(String(p._id), p);
+    }
+
+    for (let i = 0; i < args.orderedIds.length; i++) {
+      const prodId = args.orderedIds[i];
+      const existing = productMap.get(prodId);
+      if (existing) {
+        const targetIndex = i + 1;
+        if (existing.orderIndex !== targetIndex) {
+          await ctx.db.patch(existing._id, { orderIndex: targetIndex });
+        }
+      }
+    }
+    return true;
   },
 });
 
@@ -187,7 +215,7 @@ export const deleteProduct = mutation({
   handler: async (ctx, args) => {
     const existing = await ctx.db
       .query("products")
-      .filter((q) => q.eq(q.field("id"), args.id))
+      .withIndex("by_prod_id", (q) => q.eq("id", args.id))
       .first();
 
     if (existing) {

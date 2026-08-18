@@ -87,7 +87,8 @@ export default defineSchema({
     labels: v.optional(v.array(v.string())),
     shippingType: v.optional(v.string()), // "free" | "A" | "B" | "C"
     options: v.optional(v.array(v.string())),
-  }),
+  }).index("by_prod_id", ["id"])
+    .index("by_orderIndex", ["orderIndex"]),
   orders: defineTable({
     id: v.string(), // e.g. "ORD-20260525-01"
     date: v.string(), // YYYY-MM-DD

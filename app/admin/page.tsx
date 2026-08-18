@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
@@ -722,6 +722,7 @@ export default function AdminPage() {
   const saveProductMutation = useMutation(api.products.createOrUpdate);
   const deleteProductMutation = useMutation(api.products.deleteProduct);
   const syncProductsMutation = useMutation(api.products.syncProducts);
+  const updateProductOrderMutation = useMutation(api.products.updateOrder);
 
   const saveOrderMutation = useMutation(api.orders.createOrUpdate);
   const syncOrdersMutation = useMutation(api.orders.syncOrders);
@@ -1641,6 +1642,11 @@ export default function AdminPage() {
   // Product Search & Filter States
   const [adminProductSearch, setAdminProductSearch] = useState<string>("");
   const [adminProductCategoryFilter, setAdminProductCategoryFilter] = useState<string>("전체");
+
+  // Product Drag & Drop States
+  const [draggedProductId, setDraggedProductId] = useState<string | null>(null);
+  const [dragOverProductId, setDragOverProductId] = useState<string | null>(null);
+  const draggedProductRef = useRef<string | null>(null);
 
   // Category list settings
   const [showCategoryPanel, setShowCategoryPanel] = useState<boolean>(false);
@@ -3410,7 +3416,7 @@ export default function AdminPage() {
   };
 
   // Adjust product order (swap ▲ / ▼)
-  const handleAdjustProductOrder = (productId: string, direction: "up" | "down") => {
+  const handleAdjustProductOrder = async (productId: string, direction: "up" | "down") => {
     // We compute the current filtered products to find the target to swap with
     const currentList = products.filter((p) => {
       const matchesCategory =
@@ -3446,10 +3452,77 @@ export default function AdminPage() {
     updated[originalCurrentIdx].orderIndex = updated[originalTargetIdx].orderIndex;
     updated[originalTargetIdx].orderIndex = tempIndex;
 
-    const sortedUpdated = updated.sort((a, b) => a.orderIndex - b.orderIndex);
+    const sortedUpdated = updated
+      .sort((a, b) => a.orderIndex - b.orderIndex)
+      .map((p, idx) => ({ ...p, orderIndex: idx + 1 }));
     setProducts(sortedUpdated);
     localStorage.setItem("120_products", JSON.stringify(sortedUpdated));
     triggerToast("제품 전시 순서가 실시간으로 재정렬되었습니다.");
+
+    try {
+      await updateProductOrderMutation({ orderedIds: sortedUpdated.map((p) => p.id) });
+    } catch (err) {
+      console.error("[Convex] Failed to sync product order:", err);
+    }
+  };
+
+  // Drag & Drop handlers for Product Reordering
+  const handleProductDragStart = (e: React.DragEvent, id: string) => {
+    setDraggedProductId(id);
+    draggedProductRef.current = id;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", id);
+  };
+
+  const handleProductDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (dragOverProductId !== id) {
+      setDragOverProductId(id);
+    }
+  };
+
+  const handleProductDragLeave = (e: React.DragEvent) => {
+    // Only clear if needed
+  };
+
+  const handleProductDrop = async (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const sourceId = draggedProductRef.current || draggedProductId || e.dataTransfer.getData("text/plain");
+    setDraggedProductId(null);
+    setDragOverProductId(null);
+    draggedProductRef.current = null;
+
+    if (!sourceId || sourceId === targetId) return;
+
+    const sourceIdx = products.findIndex((p) => p.id === sourceId);
+    const targetIdx = products.findIndex((p) => p.id === targetId);
+    if (sourceIdx === -1 || targetIdx === -1) return;
+
+    const updated = [...products];
+    const [draggedItem] = updated.splice(sourceIdx, 1);
+    updated.splice(targetIdx, 0, draggedItem);
+
+    // Re-assign orderIndex 1..N
+    const reindexed = updated.map((p, idx) => ({ ...p, orderIndex: idx + 1 }));
+    setProducts(reindexed);
+    localStorage.setItem("120_products", JSON.stringify(reindexed));
+
+    triggerToast(`'${draggedItem.name}' 제품 순서가 변경되었습니다.`);
+
+    try {
+      await updateProductOrderMutation({ orderedIds: reindexed.map((p) => p.id) });
+    } catch (err) {
+      console.error("[Convex] Failed to sync product order:", err);
+    }
+  };
+
+  const handleProductDragEnd = () => {
+    setDraggedProductId(null);
+    setDragOverProductId(null);
+    draggedProductRef.current = null;
   };
 
   // ==========================================
@@ -7780,118 +7853,143 @@ export default function AdminPage() {
                           </td>
                         </tr>
                       ) : (
-                        filteredProducts.map((p) => (
-                          <tr key={p.id} className="hover:bg-[#F8F9FA] transition-colors">
-                            <td className="p-4 sm:p-5 text-center font-bold text-[#0F172A]">{p.orderIndex}</td>
-                            <td className="p-4 sm:p-5">
-                              {(() => {
-                                const status = p.status || (p.isActive ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종");
-                                const isUnavailable = status === "품절" || status === "단종";
-                                return (
-                                  <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-[#EEF0F5] shadow-2xs shrink-0 bg-white">
-                                    <img 
-                                      src={optimizeCloudinaryUrl(p.img)} 
-                                      alt="" 
-                                      className={`w-full h-full object-contain p-0.5 transition-all duration-300 ${
-                                        isUnavailable ? "brightness-50 grayscale" : ""
-                                      }`} 
-                                    />
-                                    {isUnavailable && (
-                                      <div className={`absolute inset-0 flex items-center justify-center text-[9px] font-black tracking-wider text-white select-none ${
-                                        status === "품절" ? "bg-orange-950/40" : "bg-neutral-950/50"
-                                      }`}>
-                                        {status}
-                                      </div>
-                                    )}
-                                  </div>
-                                );
-                              })()}
-                            </td>
-                            <td className="p-4 sm:p-5">
-                              <span className="bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[10px] border-0">
-                                {p.category}
-                              </span>
-                            </td>
-                            <td className="p-4 sm:p-5">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="font-bold text-[#0F172A] text-xs">{p.name}</span>
-                                {p.labels && p.labels.map((l) => {
-                                  let bgClass = "";
-                                  if (l === "BEST") bgClass = "bg-amber-50 text-amber-600 border border-amber-200";
-                                  else if (l === "추천") bgClass = "bg-indigo-50 text-indigo-600 border border-indigo-200";
-                                  else if (l === "신제품") bgClass = "bg-emerald-50 text-emerald-600 border border-emerald-200";
-                                  else bgClass = "bg-neutral-50 text-neutral-600 border border-neutral-200";
+                        filteredProducts.map((p) => {
+                          const isDragged = draggedProductId === p.id;
+                          const isDragOver = dragOverProductId === p.id;
+                          return (
+                            <tr 
+                              key={p.id} 
+                              draggable
+                              onDragStart={(e) => handleProductDragStart(e, p.id)}
+                              onDragOver={(e) => handleProductDragOver(e, p.id)}
+                              onDragLeave={handleProductDragLeave}
+                              onDrop={(e) => handleProductDrop(e, p.id)}
+                              onDragEnd={handleProductDragEnd}
+                              className={`transition-all select-none ${
+                                isDragged 
+                                  ? "opacity-30 bg-amber-100/60 scale-[0.99] border-y-2 border-dashed border-amber-300" 
+                                  : isDragOver 
+                                    ? "bg-amber-100/80 border-t-2 border-b-2 border-amber-500 shadow-md" 
+                                    : "hover:bg-[#F8F9FA]"
+                              }`}
+                            >
+                              <td className="p-4 sm:p-5 text-center font-bold text-[#0F172A] cursor-grab active:cursor-grabbing" title="드래그하여 순서 변경">
+                                <div className="flex items-center justify-center gap-1.5 text-slate-400 group-hover:text-[#0F172A]">
+                                  <GripVertical size={16} className="text-slate-400 hover:text-amber-600 transition-colors shrink-0" />
+                                  <span className="w-5 text-center font-black text-xs text-slate-700">{p.orderIndex}</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5">
+                                {(() => {
+                                  const status = p.status || (p.isActive ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종");
+                                  const isUnavailable = status === "품절" || status === "단종";
                                   return (
-                                    <span key={l} className={`text-[9px] font-black px-1.5 py-0.5 rounded border ${bgClass}`}>
-                                      {l}
+                                    <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-[#EEF0F5] shadow-2xs shrink-0 bg-white">
+                                      <img 
+                                        src={optimizeCloudinaryUrl(p.img)} 
+                                        alt="" 
+                                        draggable={false}
+                                        className={`w-full h-full object-contain p-0.5 transition-all duration-300 ${
+                                          isUnavailable ? "brightness-50 grayscale" : ""
+                                        }`} 
+                                      />
+                                      {isUnavailable && (
+                                        <div className={`absolute inset-0 flex items-center justify-center text-[9px] font-black tracking-wider text-white select-none ${
+                                          status === "품절" ? "bg-orange-950/40" : "bg-neutral-950/50"
+                                        }`}>
+                                          {status}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+                              </td>
+                              <td className="p-4 sm:p-5">
+                                <span className="bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-[10px] border-0">
+                                  {p.category}
+                                </span>
+                              </td>
+                              <td className="p-4 sm:p-5">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="font-bold text-[#0F172A] text-xs">{p.name}</span>
+                                  {p.labels && p.labels.map((l) => {
+                                    let bgClass = "";
+                                    if (l === "BEST") bgClass = "bg-amber-50 text-amber-600 border border-amber-200";
+                                    else if (l === "추천") bgClass = "bg-indigo-50 text-indigo-600 border border-indigo-200";
+                                    else if (l === "신제품") bgClass = "bg-emerald-50 text-emerald-600 border border-emerald-200";
+                                    else bgClass = "bg-neutral-50 text-neutral-600 border border-neutral-200";
+                                    return (
+                                      <span key={l} className={`text-[9px] font-black px-1.5 py-0.5 rounded border ${bgClass}`}>
+                                        {l}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                                <div className="text-[10px] text-slate-400 font-semibold mt-0.5">{p.modelName} ({p.qty}{p.unit})</div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600 font-bold">{(p.supplyPrice || 0).toLocaleString()} 원</td>
+                              <td className="p-4 sm:p-5">
+                                <div className="text-slate-400 font-bold line-through text-[10px]">{(p.price || 0).toLocaleString()} 원</div>
+                                <div className="text-[#0F172A] font-black text-xs">{(p.discountedPrice || 0).toLocaleString()} 원</div>
+                              </td>
+                              <td className="p-4 sm:p-5">
+                                {(() => {
+                                  const status = p.status || (p.isActive ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종");
+                                  let badgeClass = "bg-emerald-50 text-emerald-600 border-0";
+                                  if (status === "품절") {
+                                    badgeClass = "bg-orange-50 text-orange-500 border-0";
+                                  } else if (status === "단종") {
+                                    badgeClass = "bg-neutral-100 text-neutral-500 border-0";
+                                  }
+                                  return (
+                                    <span className={`px-2.5 py-1 rounded text-[10px] font-bold ${badgeClass}`}>
+                                      {status}
                                     </span>
                                   );
-                                })}
-                              </div>
-                              <div className="text-[10px] text-slate-400 font-semibold mt-0.5">{p.modelName} ({p.qty}{p.unit})</div>
-                            </td>
-                            <td className="p-4 sm:p-5 text-slate-600 font-bold">{(p.supplyPrice || 0).toLocaleString()} 원</td>
-                            <td className="p-4 sm:p-5">
-                              <div className="text-slate-400 font-bold line-through text-[10px]">{(p.price || 0).toLocaleString()} 원</div>
-                              <div className="text-[#0F172A] font-black text-xs">{(p.discountedPrice || 0).toLocaleString()} 원</div>
-                            </td>
-                            <td className="p-4 sm:p-5">
-                              {(() => {
-                                const status = p.status || (p.isActive ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종");
-                                let badgeClass = "bg-emerald-50 text-emerald-600 border-0";
-                                if (status === "품절") {
-                                  badgeClass = "bg-orange-50 text-orange-500 border-0";
-                                } else if (status === "단종") {
-                                  badgeClass = "bg-neutral-100 text-neutral-500 border-0";
-                                }
-                                return (
-                                  <span className={`px-2.5 py-1 rounded text-[10px] font-bold ${badgeClass}`}>
-                                    {status}
-                                  </span>
-                                );
-                              })()}
-                            </td>
-                            <td className="p-4 sm:p-5 text-center">
-                              <div className="flex items-center justify-center gap-1">
-                                <button
-                                  type="button"
-                                  onClick={() => handleAdjustProductOrder(p.id, "up")}
-                                  disabled={filteredProducts.findIndex((op) => op.id === p.id) === 0}
-                                  className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border-0 disabled:opacity-30 text-slate-600 font-bold transition-all text-[9px] cursor-pointer"
-                                  title="순서 위로"
-                                >
-                                  ▲
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleAdjustProductOrder(p.id, "down")}
-                                  disabled={filteredProducts.findIndex((op) => op.id === p.id) === filteredProducts.length - 1}
-                                  className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border-0 disabled:opacity-30 text-slate-600 font-bold transition-all text-[9px] cursor-pointer"
-                                  title="순서 아래로"
-                                >
-                                  ▼
-                                </button>
-                              </div>
-                            </td>
-                            <td className="p-4 sm:p-5 text-center">
-                              <div className="flex items-center justify-center gap-1.5">
-                                <button
-                                  onClick={() => handleOpenProductModal(p)}
-                                  className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border-0 text-[10px] font-extrabold transition-all cursor-pointer shadow-2xs"
-                                >
-                                  수정
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteProduct(p.id)}
-                                  className="p-1.5 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 border-0 transition-all cursor-pointer"
-                                  title="삭제"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
+                                })()}
+                              </td>
+                              <td className="p-4 sm:p-5 text-center">
+                                <div className="flex items-center justify-center gap-1" onDragStart={(e) => e.stopPropagation()}>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAdjustProductOrder(p.id, "up")}
+                                    disabled={filteredProducts.findIndex((op) => op.id === p.id) === 0}
+                                    className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border-0 disabled:opacity-30 text-slate-600 font-bold transition-all text-[9px] cursor-pointer"
+                                    title="순서 위로"
+                                  >
+                                    ▲
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAdjustProductOrder(p.id, "down")}
+                                    disabled={filteredProducts.findIndex((op) => op.id === p.id) === filteredProducts.length - 1}
+                                    className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border-0 disabled:opacity-30 text-slate-600 font-bold transition-all text-[9px] cursor-pointer"
+                                    title="순서 아래로"
+                                  >
+                                    ▼
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-center">
+                                <div className="flex items-center justify-center gap-1.5" onDragStart={(e) => e.stopPropagation()}>
+                                  <button
+                                    onClick={() => handleOpenProductModal(p)}
+                                    className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border-0 text-[10px] font-extrabold transition-all cursor-pointer shadow-2xs"
+                                  >
+                                    수정
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteProduct(p.id)}
+                                    className="p-1.5 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 border-0 transition-all cursor-pointer"
+                                    title="삭제"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
                       )}
                     </tbody>
                   </table>
