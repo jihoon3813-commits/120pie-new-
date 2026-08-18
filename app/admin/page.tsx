@@ -3293,11 +3293,23 @@ export default function AdminPage() {
       return;
     }
 
-    // Default image fallback if none provided
-    const finalImg = productImg.trim() || "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg";
-
     setIsProductSaving(true);
     try {
+      // Default image fallback if none provided
+      let finalImg = productImg.trim() || "https://res.cloudinary.com/dx7l09wwu/image/upload/f_auto,q_auto/v1779760050/%EB%A1%9C%EC%A0%9C%EB%AF%B8%ED%8A%B8%ED%8C%8C%EC%9D%B4_khogbn.jpg";
+      if (finalImg.startsWith("data:image")) {
+        try {
+          finalImg = await compressImageAsPng(finalImg, 400, 400);
+        } catch (e) {}
+      }
+
+      let finalDetailImg = productDetailImg ? productDetailImg.trim() : undefined;
+      if (finalDetailImg && finalDetailImg.startsWith("data:image")) {
+        try {
+          finalDetailImg = await compressImage(finalDetailImg, 800, 1200, 0.75);
+        } catch (e) {}
+      }
+
       const priceVal = parseNumberFromCommas(productPrice);
       const discVal = parseNumberFromCommas(productDiscountAmount);
       const supplyVal = parseNumberFromCommas(productSupplyPrice);
@@ -3310,13 +3322,13 @@ export default function AdminPage() {
         category: productCategory.trim(),
         modelName: productModelName.trim(),
         unit: productUnit,
-        qty: typeof productQty === "number" ? productQty : 1,
-        supplyPrice: supplyVal,
-        price: priceVal,
-        discountAmount: discVal,
-        discountedPrice: discountedPriceVal < 0 ? 0 : discountedPriceVal,
+        qty: typeof productQty === "number" && !isNaN(productQty) ? productQty : 1,
+        supplyPrice: typeof supplyVal === "number" && !isNaN(supplyVal) ? supplyVal : 0,
+        price: typeof priceVal === "number" && !isNaN(priceVal) ? priceVal : 0,
+        discountAmount: typeof discVal === "number" && !isNaN(discVal) ? discVal : 0,
+        discountedPrice: typeof discountedPriceVal === "number" && !isNaN(discountedPriceVal) && discountedPriceVal >= 0 ? discountedPriceVal : 0,
         img: finalImg,
-        detailImg: productDetailImg ? productDetailImg.trim() : undefined,
+        detailImg: finalDetailImg,
         detailText: productDetailText ? productDetailText.trim() : undefined,
         isActive: productStatus !== "단종",
         desc: `${productModelName.trim()} - ${productCategory.trim()} 표준 규격`,
@@ -3327,22 +3339,7 @@ export default function AdminPage() {
         options: productOptions && productOptions.length > 0 ? productOptions : undefined
       };
 
-      let updatedProducts: Product[];
-      if (selectedProduct) {
-        updatedProducts = products.map((p) => (p.id === selectedProduct.id ? productData : p));
-      } else {
-        updatedProducts = [...products, productData];
-      }
-
-      const sortedProducts = [...updatedProducts].sort((a, b) => a.orderIndex - b.orderIndex);
-      setProducts(sortedProducts);
-      localStorage.setItem("120_products", JSON.stringify(sortedProducts));
-
-      const currentCats = Array.from(new Set([...categories, productData.category].filter(Boolean)));
-      setCategories(currentCats);
-      localStorage.setItem("120_categories", JSON.stringify(currentCats));
-
-      // Save to Convex Cloud DB
+      // Save to Convex Cloud DB (Primary Source of Truth)
       await saveProductMutation({
         id: productData.id,
         orderIndex: productData.orderIndex,
@@ -3367,12 +3364,26 @@ export default function AdminPage() {
         options: productData.options
       });
 
+      let updatedProducts: Product[];
+      if (selectedProduct) {
+        updatedProducts = products.map((p) => (p.id === selectedProduct.id ? productData : p));
+      } else {
+        updatedProducts = [...products, productData];
+      }
+
+      const sortedProducts = [...updatedProducts].sort((a, b) => a.orderIndex - b.orderIndex);
+      setProducts(sortedProducts);
+      localStorage.setItem("120_products", JSON.stringify(sortedProducts));
+
+      const currentCats = Array.from(new Set([...categories, productData.category].filter(Boolean)));
+      setCategories(currentCats);
+      localStorage.setItem("120_categories", JSON.stringify(currentCats));
+
       triggerToast(selectedProduct ? `'${productName}' 제품이 정상 수정되었습니다.` : `신규 제품 '${productName}'이 성공적으로 등록되었습니다.`);
       setShowProductModal(false);
     } catch (err: any) {
       console.error("[Convex] Failed to save product:", err);
-      triggerToast(selectedProduct ? `'${productName}' 제품이 로컬에 저장되었습니다.` : `신규 제품 '${productName}'이 등록되었습니다.`);
-      setShowProductModal(false);
+      alert(`제품 저장 중 오류가 발생했습니다:\n${err?.message || err}`);
     } finally {
       setIsProductSaving(false);
     }
@@ -3590,9 +3601,13 @@ export default function AdminPage() {
     });
   };
 
-  // Compress image as PNG to preserve transparency (alpha channel) for product thumbnails (누끼)
-  const compressImageAsPng = (base64Str: string, maxWidth = 800, maxHeight = 800): Promise<string> => {
+  // Compress image with alpha transparency (WebP / PNG fallback) for product thumbnails (누끼)
+  const compressImageAsPng = (base64Str: string, maxWidth = 400, maxHeight = 400): Promise<string> => {
     return new Promise((resolve) => {
+      if (base64Str.startsWith("http://") || base64Str.startsWith("https://")) {
+        resolve(base64Str);
+        return;
+      }
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement("canvas");
@@ -3611,10 +3626,16 @@ export default function AdminPage() {
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         if (ctx) {
-          // Keep canvas transparent (no fillRect) so PNG alpha channel is preserved
           ctx.clearRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL("image/png"));
+          try {
+            const webp = canvas.toDataURL("image/webp", 0.8);
+            if (webp && webp.startsWith("data:image/webp")) {
+              resolve(webp);
+              return;
+            }
+          } catch (e) {}
+          resolve(canvas.toDataURL("image/jpeg", 0.8));
         } else {
           resolve(base64Str);
         }
@@ -4518,7 +4539,7 @@ export default function AdminPage() {
     reader.onloadend = async () => {
       if (typeof reader.result === "string") {
         try {
-          const compressed = await compressImageAsPng(reader.result, 800, 800);
+          const compressed = await compressImageAsPng(reader.result, 400, 400);
           setProductImg(compressed);
         } catch (err) {
           console.error("Product image compression error:", err);
@@ -4542,7 +4563,7 @@ export default function AdminPage() {
     reader.onloadend = async () => {
       if (typeof reader.result === "string") {
         try {
-          const compressed = await compressImage(reader.result, 1200, 8000, 0.85);
+          const compressed = await compressImage(reader.result, 800, 1200, 0.75);
           setProductDetailImg(compressed);
         } catch (err) {
           console.error("Product detail image compression error:", err);

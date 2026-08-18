@@ -41,14 +41,36 @@ export const createOrUpdate = mutation({
       .filter((q) => q.eq(q.field("id"), args.id))
       .first();
 
-    const { ...fields } = args;
+    const fields = {
+      id: args.id,
+      orderIndex: typeof args.orderIndex === "number" && !isNaN(args.orderIndex) ? args.orderIndex : 1,
+      name: args.name || "상품",
+      category: args.category || "냉동생지/자재",
+      modelName: args.modelName || `MODEL-${args.id}`,
+      unit: args.unit || "박스",
+      qty: typeof args.qty === "number" && !isNaN(args.qty) ? args.qty : 1,
+      supplyPrice: typeof args.supplyPrice === "number" && !isNaN(args.supplyPrice) ? args.supplyPrice : 0,
+      price: typeof args.price === "number" && !isNaN(args.price) ? args.price : 0,
+      discountAmount: typeof args.discountAmount === "number" && !isNaN(args.discountAmount) ? args.discountAmount : 0,
+      discountedPrice: typeof args.discountedPrice === "number" && !isNaN(args.discountedPrice) ? args.discountedPrice : 0,
+      img: args.img || "",
+      detailImg: args.detailImg || undefined,
+      detailText: args.detailText || undefined,
+      isActive: typeof args.isActive === "boolean" ? args.isActive : true,
+      desc: args.desc || "",
+      stock: args.stock || "in_stock",
+      status: args.status || "판매중",
+      labels: args.labels || [],
+      shippingType: args.shippingType || "A",
+      options: args.options || undefined,
+    };
 
     // 새로운 카테고리가 등록될 때 productCategories 테이블에 자동 추가하여 동기화
-    const categoryName = args.category.trim();
+    const categoryName = (args.category || "").trim();
     if (categoryName) {
       const catList = await ctx.db.query("productCategories").collect();
       if (catList.length > 0) {
-        const currentCats = catList[0].categories;
+        const currentCats = catList[0].categories || [];
         if (!currentCats.includes(categoryName)) {
           await ctx.db.patch(catList[0]._id, {
             categories: [...currentCats, categoryName]
