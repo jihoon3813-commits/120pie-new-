@@ -135,25 +135,22 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
   const deduplicateAndFixMutation = useMutation(api.targets.deduplicateAndFixTargets);
 
   useEffect(() => {
-    seedTargetsMutation().catch(() => {});
     deduplicateAndFixMutation().catch(() => {});
   }, []);
 
   // 1-1. 실제 가맹점 관리(stores 테이블)의 승인된 120PIE 공식 가맹점 매핑
   const DEFAULT_STORE_COORDS: Record<string, { lat: number; lng: number }> = {
-    "강남역삼점": { lat: 37.4981, lng: 127.0283 },
-    "홍대입구점": { lat: 37.5558, lng: 126.9242 },
-    "부산서면점": { lat: 35.1578, lng: 129.0592 },
-    "경기분당점": { lat: 37.3852, lng: 127.1235 },
-    "대구동성로점": { lat: 35.8692, lng: 128.5968 },
+    "강남역삼점": { lat: 37.500024, lng: 127.036509 },
+    "홍대입구점": { lat: 37.556890, lng: 126.923674 },
+    "부산서면점": { lat: 35.157764, lng: 129.059036 },
   };
 
   const approvedStores = useMemo(() => {
     return convexStores
       .filter((s: any) => s.status === "승인")
       .map((s: any) => {
-        const lat = s.lat ?? DEFAULT_STORE_COORDS[s.name]?.lat;
-        const lng = s.lng ?? DEFAULT_STORE_COORDS[s.name]?.lng;
+        const lat = typeof s.lat === "number" ? s.lat : DEFAULT_STORE_COORDS[s.name]?.lat;
+        const lng = typeof s.lng === "number" ? s.lng : DEFAULT_STORE_COORDS[s.name]?.lng;
         return {
           ...s,
           isRealStore: true,
@@ -161,9 +158,10 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
           lat,
           lng,
           category: "120PIE 공식 가맹점",
-          displayName: s.name.startsWith("120PIE") ? s.name : `120PIE ${s.name}`,
+          displayName: s.name.startsWith("120") || s.name.startsWith("카페") ? s.name : `120PIE ${s.name}`,
         };
-      });
+      })
+      .filter((s: any) => typeof s.lat === "number" && typeof s.lng === "number");
   }, [convexStores]);
 
   // 2. 필터 및 UI 상태

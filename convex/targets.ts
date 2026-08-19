@@ -305,41 +305,9 @@ export const cleanUpContractedTargets = mutation({
   args: {},
   handler: async (ctx) => {
     const all = await ctx.db.query("commercialTargets").collect();
-    const DUMMY_NAMES = new Set([
-      "스타덤PC방 강남역본점",
-      "긱스PC카페 홍대점",
-      "아이센스리그PC 분당서현점",
-      "포포PC방 서면본점"
-    ]);
-
     for (const item of all) {
-      if (DUMMY_NAMES.has(item.name)) {
-        await ctx.db.delete(item._id);
-      } else if (item.isContracted) {
-        await ctx.db.patch(item._id, {
-          isContracted: false,
-          status: "영업가능",
-        });
-      }
+      await ctx.db.delete(item._id);
     }
-
-    const stores = await ctx.db.query("stores").collect();
-    const DEFAULT_COORDS: Record<string, { lat: number; lng: number }> = {
-      "강남역삼점": { lat: 37.4981, lng: 127.0283 },
-      "홍대입구점": { lat: 37.55689, lng: 126.92367 },
-      "부산서면점": { lat: 35.1578, lng: 129.0592 },
-    };
-
-    for (const store of stores) {
-      const coords = DEFAULT_COORDS[store.name];
-      if (coords) {
-        await ctx.db.patch(store._id, {
-          lat: coords.lat,
-          lng: coords.lng,
-        });
-      }
-    }
-
     return { success: true };
   },
 });
