@@ -1207,11 +1207,6 @@ export const resetAndSeedTargets = mutation({
     for (const item of all) {
       await ctx.db.delete(item._id);
     }
-
-    for (const item of NATIONWIDE_TARGET_STORES) {
-      await ctx.db.insert("commercialTargets", item as any);
-    }
-
-    return { success: true, count: NATIONWIDE_TARGET_STORES.length };
+    return { success: true, count: 0 };
   },
 });

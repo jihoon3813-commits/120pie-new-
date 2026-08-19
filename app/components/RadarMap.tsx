@@ -33,7 +33,8 @@ import {
   ChevronDown,
   Target,
   CheckSquare,
-  Square
+  Square,
+  RotateCcw
 } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -495,14 +496,15 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     }
   };
 
-  // 전국 데이터 리셋
-  const handleResetNationwideSeed = async () => {
-    if (!confirm("전국 주요 상권의 실제 샵인샵 매장 데이터베이스를 최신 마스터 상태로 재동기화하시겠습니까?")) return;
+  // 발굴된 가망 매장 목록 초기화 (실제 공식 가맹점만 표시)
+  const handleClearDiscoveredTargets = async () => {
+    if (!confirm("발굴된 가망 매장 목록을 모두 초기화하고 등록된 실제 공식 가맹점만 표시하시겠습니까?")) return;
     try {
       await resetAndSeedTargetsMutation();
-      triggerToast("전국 대상 업종 매장 데이터가 성공적으로 동기화되었습니다!");
+      setSelectedTarget(approvedStores[0] || null);
+      triggerToast("발굴 목록이 초기화되었습니다. 등록된 실제 가맹점만 표시됩니다.");
     } catch (err) {
-      alert("동기화 중 오류가 발생했습니다.");
+      alert("초기화 중 오류가 발생했습니다.");
     }
   };
 
@@ -893,12 +895,12 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                 </button>
 
                 <button
-                  onClick={handleResetNationwideSeed}
+                  onClick={handleClearDiscoveredTargets}
                   className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200"
-                  title="전국 마스터 매장 데이터 전체 자동 동기화"
+                  title="현재 발굴된 가망 매장 목록을 모두 지우고 실제 공식 가맹점만 표시합니다"
                 >
-                  <Compass size={13} />
-                  <span>전국 데이터 동기화</span>
+                  <RotateCcw size={13} />
+                  <span>발굴 목록 초기화</span>
                 </button>
                 <button
                   onClick={() => handleOpenForm()}
