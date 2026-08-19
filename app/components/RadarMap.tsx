@@ -314,10 +314,10 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
       return;
     }
 
-    const initialCenter = new window.naver.maps.LatLng(37.4981, 127.0283);
+    const initialCenter = new window.naver.maps.LatLng(37.54, 126.98);
     const mapOptions = {
       center: initialCenter,
-      zoom: 16,
+      zoom: 11,
       zoomControl: true,
       zoomControlOptions: {
         position: window.naver.maps.Position.TOP_RIGHT,
