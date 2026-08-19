@@ -175,6 +175,13 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [selectedTarget, setSelectedTarget] = useState<any | null>(null);
 
+  // 🌟 공식 가맹점 자동 기본 선택 (초기 로드 시 우측 카드에 즉시 상세 정보 표출)
+  useEffect(() => {
+    if (!selectedTarget && approvedStores.length > 0) {
+      setSelectedTarget(approvedStores[0]);
+    }
+  }, [approvedStores, selectedTarget]);
+
   // 🎯 가망대상 발굴 중복(멀티) 선택 모달 상태
   const [isDiscoverModalOpen, setIsDiscoverModalOpen] = useState<boolean>(false);
   const [selectedDiscoverCats, setSelectedDiscoverCats] = useState<string[]>([
@@ -903,6 +910,47 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                   <span>신규 매장 추가</span>
                 </button>
               </>
+            )}
+
+            {/* 🌟 120PIE 실제 공식 가맹점 빠른 조회 바 */}
+            {approvedStores.length > 0 && (
+              <div className="w-full flex flex-wrap items-center justify-between gap-3 p-3 bg-gradient-to-r from-amber-50 to-amber-100/60 border border-amber-300/80 rounded-xl shadow-xs mt-2">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="text-xs font-black text-amber-950 flex items-center gap-1.5 shrink-0 bg-white/90 px-2.5 py-1 rounded-lg border border-amber-200 shadow-xs">
+                    <Sparkles size={14} className="text-amber-600" />
+                    <span>120PIE 승인 가맹점 ({approvedStores.length}개소):</span>
+                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {approvedStores.map((store: any) => {
+                      const isSelected = selectedTarget && (selectedTarget.id === store.id || selectedTarget._id === store._id || selectedTarget.name === store.name);
+                      return (
+                        <button
+                          key={store.id || store._id}
+                          onClick={() => {
+                            setSelectedTarget(store);
+                            if (naverMapRef.current && window.naver && window.naver.maps) {
+                              naverMapRef.current.panTo(new window.naver.maps.LatLng(store.lat, store.lng), { duration: 400 });
+                              naverMapRef.current.setZoom(16);
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
+                            isSelected
+                              ? "bg-[#0F172A] text-[#FED422] ring-2 ring-[#FED422] shadow-md"
+                              : "bg-white hover:bg-amber-100/90 text-slate-800 border border-amber-200 hover:border-amber-400"
+                          }`}
+                        >
+                          <span>⭐</span>
+                          <span>{store.displayName}</span>
+                          <span className="text-[10px] text-slate-500 font-bold">({store.owner} 점주)</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <span className="text-[11px] text-amber-800 font-bold hidden sm:inline-block">
+                  💡 클릭 시 지도 중심 이동 & 우측 패널에 가맹점 상세 카드가 즉시 표출됩니다.
+                </span>
+              </div>
             )}
 
             {/* 뷰 모드 토글 */}
