@@ -141,9 +141,24 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
   // 1-1. 실제 가맹점 관리(stores 테이블)의 승인된 120PIE 공식 가맹점 매핑
   const DEFAULT_STORE_COORDS: Record<string, { lat: number; lng: number }> = {
-    "강남역삼점": { lat: 37.500024, lng: 127.036509 },
+    "120겹파이 DESSERT": { lat: 37.608765, lng: 127.061682 },
+    "카페101": { lat: 37.538593, lng: 126.660898 },
+    "120겹 파이 파주운정점": { lat: 37.734477, lng: 126.750681 },
+    "120겹 파이 원주혁신도시점": { lat: 37.329411, lng: 127.988081 },
+    "120겹 파이 영종하늘도시점": { lat: 37.489996, lng: 126.551790 },
+    "120겹파이 안암점(카페데일리)": { lat: 37.586727, lng: 127.029811 },
+    "120겹 파이 잠실점": { lat: 37.503810, lng: 127.096802 },
+    "120겹파이 향동점(다색냥)": { lat: 37.598769, lng: 126.889374 },
+    "120겹 파이 AK플라자 금정점": { lat: 37.372850, lng: 126.944923 },
+    "120겹파이 잼인브라운점": { lat: 37.481984, lng: 127.014575 },
+    "120겹파이 카페멈점": { lat: 37.258486, lng: 126.958029 },
+    "120겹파이 더네이버커피점": { lat: 37.519959, lng: 126.912230 },
     "홍대입구점": { lat: 37.556890, lng: 126.923674 },
+    "120겹파이 홍대입구점": { lat: 37.556890, lng: 126.923674 },
+    "강남역삼점": { lat: 37.500024, lng: 127.036509 },
+    "120겹파이 강남역삼점": { lat: 37.500024, lng: 127.036509 },
     "부산서면점": { lat: 35.157764, lng: 129.059036 },
+    "120겹파이 부산서면점": { lat: 35.157764, lng: 129.059036 },
   };
 
   const approvedStores = useMemo(() => {
@@ -194,6 +209,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
   // 3. 네이버 지도 인스턴스 & 상태
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const naverMapRef = useRef<any>(null);
+  const [mapInstance, setMapInstance] = useState<any>(null);
   const markersRef = useRef<any[]>([]);
   const circlesRef = useRef<any[]>([]);
   const [isNaverScriptLoaded, setIsNaverScriptLoaded] = useState<boolean>(false);
@@ -351,6 +367,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     });
 
     naverMapRef.current = map;
+    setMapInstance(map);
   }, [isNaverScriptLoaded, viewMode, isFullscreen]);
 
   // 전체화면 토글
@@ -368,7 +385,8 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
   //    (🌟 실제 120PIE 체결 가맹점: 골드 스타 / 🔒 입점불가: 어두운 자물쇠 / 🟢 영업가능: 녹색 통일)
   // ====================================================
   useEffect(() => {
-    if (!naverMapRef.current || !window.naver || !window.naver.maps) return;
+    const currentMap = mapInstance || naverMapRef.current;
+    if (!currentMap || !window.naver || !window.naver.maps) return;
 
     const naver = window.naver;
 
@@ -383,7 +401,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
       .filter((s: any) => typeof s.lat === "number" && typeof s.lng === "number")
       .forEach((cs: any) => {
         const circle = new naver.maps.Circle({
-          map: naverMapRef.current,
+          map: currentMap,
           center: new naver.maps.LatLng(cs.lat, cs.lng),
           radius: 500,
           fillColor: "#FED422",
@@ -414,7 +432,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
         const marker = new naver.maps.Marker({
           position: new naver.maps.LatLng(store.lat, store.lng),
-          map: naverMapRef.current,
+          map: currentMap,
           icon: {
             content: markerContent,
             size: new naver.maps.Size(180, 65),
@@ -425,7 +443,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
         naver.maps.Event.addListener(marker, "click", () => {
           setSelectedTarget(store);
-          naverMapRef.current.panTo(new naver.maps.LatLng(store.lat, store.lng), { duration: 300 });
+          currentMap.panTo(new naver.maps.LatLng(store.lat, store.lng), { duration: 300 });
         });
 
         markersRef.current.push(marker);
@@ -464,7 +482,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
       const marker = new naver.maps.Marker({
         position: new naver.maps.LatLng(target.lat, target.lng),
-        map: naverMapRef.current,
+        map: currentMap,
         icon: {
           content: markerContent,
           size: new naver.maps.Size(160, 60),
@@ -474,12 +492,12 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
       naver.maps.Event.addListener(marker, "click", () => {
         setSelectedTarget(target);
-        naverMapRef.current.panTo(new naver.maps.LatLng(target.lat, target.lng), { duration: 300 });
+        currentMap.panTo(new naver.maps.LatLng(target.lat, target.lng), { duration: 300 });
       });
 
       markersRef.current.push(marker);
     });
-  }, [filteredTargets, approvedStores, isNaverScriptLoaded]);
+  }, [mapInstance, filteredTargets, approvedStores, isNaverScriptLoaded]);
 
   // 지역 프리셋 이동
   const handleSelectPreset = (preset: (typeof REGION_PRESETS)[0]) => {
@@ -1086,9 +1104,8 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
                   <span className="text-xs font-black text-slate-900">NAVER MAP 500m RADAR</span>
                 </div>
-                <span className="text-slate-300 text-xs">|</span>
-                <span className="text-[11px] text-slate-600 font-bold font-mono">
-                  실제 매장 {filteredTargets.length}개 표기 중
+                <span className="text-[11px] text-slate-700 font-bold font-mono">
+                  ⭐ 공식 가맹점 {approvedStores.length}개소 표기 중 {filteredTargets.length > 0 ? `| 🎯 발굴 매장 ${filteredTargets.length}개` : ""}
                 </span>
               </div>
 
