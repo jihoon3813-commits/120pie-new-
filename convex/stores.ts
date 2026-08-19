@@ -387,3 +387,65 @@ export const seedStores = mutation({
     return { success: true, count: AUTHENTIC_STORES.length };
   },
 });
+
+// Batch sync stores from client (admin localStorage -> Convex DB)
+export const syncStoresBatch = mutation({
+  args: {
+    stores: v.array(
+      v.object({
+        id: v.string(),
+        pw: v.optional(v.string()),
+        pwConfirm: v.optional(v.string()),
+        name: v.string(),
+        owner: v.optional(v.string()),
+        phone: v.optional(v.string()),
+        status: v.optional(v.string()),
+        roadAddress: v.optional(v.string()),
+        detailAddress: v.optional(v.string()),
+        lat: v.optional(v.number()),
+        lng: v.optional(v.number()),
+        regDate: v.optional(v.string()),
+        cancelDate: v.optional(v.string()),
+        adoptionMenu: v.optional(v.array(v.string())),
+        monthlySales: v.optional(v.number()),
+        partnerId: v.optional(v.string()),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db.query("stores").collect();
+    const existingMap = new Map(existing.map((s) => [s.id, s]));
+
+    for (const store of args.stores) {
+      if (!store.id || !store.name) continue;
+      const ex = existingMap.get(store.id);
+      const fields = {
+        pw: store.pw || "1234",
+        pwConfirm: store.pwConfirm || "1234",
+        name: store.name,
+        owner: store.owner || "",
+        phone: store.phone || "",
+        status: store.status || "승인",
+        roadAddress: store.roadAddress || "",
+        detailAddress: store.detailAddress || "",
+        lat: store.lat ?? ex?.lat,
+        lng: store.lng ?? ex?.lng,
+        regDate: store.regDate || new Date().toISOString().split("T")[0],
+        cancelDate: store.cancelDate || "",
+        adoptionMenu: store.adoptionMenu || ["120pie"],
+        monthlySales: store.monthlySales || 0,
+        partnerId: store.partnerId,
+      };
+
+      if (ex) {
+        await ctx.db.patch(ex._id, fields);
+      } else {
+        await ctx.db.insert("stores", {
+          id: store.id,
+          ...fields,
+        });
+      }
+    }
+    return { success: true, count: args.stores.length };
+  },
+});

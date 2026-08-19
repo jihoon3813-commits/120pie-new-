@@ -161,8 +161,37 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     "120겹파이 부산서면점": { lat: 35.157764, lng: 129.059036 },
   };
 
+  const [localStoresCache, setLocalStoresCache] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("120_stores");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setLocalStoresCache(parsed);
+          }
+        }
+      } catch (e) {}
+    }
+  }, []);
+
+  const mergedStores = useMemo(() => {
+    const fromConvex = convexStores || [];
+    const fromLocal = localStoresCache || [];
+    const map = new Map<string, any>();
+    fromLocal.forEach((s: any) => {
+      if (s && s.name) map.set(s.id || s.name, s);
+    });
+    fromConvex.forEach((s: any) => {
+      if (s && s.name) map.set(s.id || s.name, s);
+    });
+    return Array.from(map.values());
+  }, [convexStores, localStoresCache]);
+
   const approvedStores = useMemo(() => {
-    return convexStores
+    return mergedStores
       .filter((s: any) => s && s.name && s.status !== "중지" && s.status !== "취소")
       .map((s: any) => {
         const lat = typeof s.lat === "number" ? s.lat : DEFAULT_STORE_COORDS[s.name]?.lat;
@@ -171,14 +200,13 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
           ...s,
           isRealStore: true,
           isContracted: true,
-          lat,
-          lng,
+          lat: typeof lat === "number" ? lat : 37.5,
+          lng: typeof lng === "number" ? lng : 127.0,
           category: "120PIE 공식 가맹점",
           displayName: s.name.startsWith("120") || s.name.startsWith("카페") ? s.name : `120PIE ${s.name}`,
         };
-      })
-      .filter((s: any) => typeof s.lat === "number" && typeof s.lng === "number");
-  }, [convexStores]);
+      });
+  }, [mergedStores]);
 
   // 2. 필터 및 UI 상태
   const [selectedSido, setSelectedSido] = useState<string>("전체");

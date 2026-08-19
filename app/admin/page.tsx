@@ -963,6 +963,23 @@ export default function AdminPage() {
     }
   }, [convexInstagram, seedInstagramMutation]);
 
+  const syncStoresBatchMutation = useMutation(api.stores.syncStoresBatch);
+
+  // Sync any stores in localStorage that aren't yet on Convex Cloud
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("120_stores");
+        if (raw) {
+          const localStores = JSON.parse(raw);
+          if (Array.isArray(localStores) && localStores.length > 0) {
+            syncStoresBatchMutation({ stores: localStores }).catch(() => {});
+          }
+        }
+      } catch (e) {}
+    }
+  }, [syncStoresBatchMutation]);
+
   useEffect(() => {
     if (convexStores) {
       if (convexStores.length === 0) {
@@ -970,8 +987,23 @@ export default function AdminPage() {
           console.log("[Convex] Seed stores completed.");
         });
       } else {
-        setStores(convexStores as any[]);
-        localStorage.setItem("120_stores", JSON.stringify(convexStores));
+        let merged = [...convexStores];
+        try {
+          const raw = localStorage.getItem("120_stores");
+          if (raw) {
+            const local = JSON.parse(raw);
+            if (Array.isArray(local)) {
+              const existingIds = new Set(convexStores.map((s: any) => s.id));
+              local.forEach((s: any) => {
+                if (s && s.id && !existingIds.has(s.id)) {
+                  merged.push(s);
+                }
+              });
+            }
+          }
+        } catch (e) {}
+        setStores(merged as any[]);
+        localStorage.setItem("120_stores", JSON.stringify(merged));
       }
     }
   }, [convexStores, seedStoresMutation]);
