@@ -274,9 +274,55 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     setTimeout(() => setToastMsg(null), 3500);
   };
 
+  // 🎯 [실시간 500m 상권보호 레이더 판정]
+  // 19개 실제 가맹점 기준 반경 500m 이내에 위치한 가망 매장은 실시간으로 🔒 [입점불가 업장]으로 자동 잠금 판정!
+  const targetsWithProtection = useMemo(() => {
+    const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+      const R = 6371e3;
+      const phi1 = (lat1 * Math.PI) / 180;
+      const phi2 = (lat2 * Math.PI) / 180;
+      const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+      const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+      const a =
+        Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+        Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    };
+
+    return targets.map((t: any) => {
+      if (t.isContracted) {
+        return { ...t, isProtectedLocked: false, protectingStore: null, protectingDistance: 0 };
+      }
+
+      let isProtectedLocked = false;
+      let protectingStore: any = null;
+      let minDistance = Infinity;
+
+      for (const store of approvedStores) {
+        if (typeof store.lat === "number" && typeof store.lng === "number" && typeof t.lat === "number" && typeof t.lng === "number") {
+          const dist = calcDistance(t.lat, t.lng, store.lat, store.lng);
+          if (dist < minDistance) {
+            minDistance = dist;
+            if (dist <= 500) {
+              isProtectedLocked = true;
+              protectingStore = store;
+            }
+          }
+        }
+      }
+
+      return {
+        ...t,
+        isProtectedLocked: isProtectedLocked || Boolean(t.isProtectedLocked),
+        protectingStore: protectingStore || t.protectingStore,
+        protectingDistance: minDistance !== Infinity ? Math.round(minDistance) : null,
+      };
+    });
+  }, [targets, approvedStores]);
+
   // 필터링된 타겟 데이터
   const filteredTargets = useMemo(() => {
-    return targets.filter((t: any) => {
+    return targetsWithProtection.filter((t: any) => {
       const matchSido = selectedSido === "전체" || t.sido === selectedSido;
       const matchCategory = selectedCategory === "전체" || t.category === selectedCategory;
       const matchQuery =
@@ -292,19 +338,19 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
         matchStatus = !t.isContracted && !t.isProtectedLocked;
       } else if (selectedStatusFilter === "계약체결") {
         matchStatus = t.isContracted;
-      } else if (selectedStatusFilter === "상권보호락") {
+      } else if (selectedStatusFilter === "상권보호락" || selectedStatusFilter === "입점불가") {
         matchStatus = !t.isContracted && t.isProtectedLocked;
       }
 
       return matchSido && matchCategory && matchQuery && matchStatus;
     });
-  }, [targets, selectedSido, selectedCategory, selectedStatusFilter, searchQuery]);
+  }, [targetsWithProtection, selectedSido, selectedCategory, selectedStatusFilter, searchQuery]);
 
   // 통계 지표 (실제 승인 가맹점 수 + 발굴 타겟)
-  const totalCount = targets.length;
+  const totalCount = targetsWithProtection.length;
   const contractedCount = approvedStores.length;
-  const protectedLockedCount = targets.filter((t: any) => t.isProtectedLocked).length;
-  const availableTargetCount = targets.filter((t: any) => !t.isProtectedLocked).length;
+  const protectedLockedCount = targetsWithProtection.filter((t: any) => t.isProtectedLocked).length;
+  const availableTargetCount = targetsWithProtection.filter((t: any) => !t.isProtectedLocked).length;
 
   // ====================================================
   // 1. 네이버 지도 SDK (v3) 스크립트 로드
