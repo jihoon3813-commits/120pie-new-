@@ -163,7 +163,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
   const approvedStores = useMemo(() => {
     return convexStores
-      .filter((s: any) => s.status === "승인")
+      .filter((s: any) => s && s.name && s.status !== "중지" && s.status !== "취소")
       .map((s: any) => {
         const lat = typeof s.lat === "number" ? s.lat : DEFAULT_STORE_COORDS[s.name]?.lat;
         const lng = typeof s.lng === "number" ? s.lng : DEFAULT_STORE_COORDS[s.name]?.lng;
@@ -930,47 +930,6 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
               </>
             )}
 
-            {/* 🌟 120PIE 실제 공식 가맹점 빠른 조회 바 */}
-            {approvedStores.length > 0 && (
-              <div className="w-full flex flex-wrap items-center justify-between gap-3 p-3 bg-gradient-to-r from-amber-50 to-amber-100/60 border border-amber-300/80 rounded-xl shadow-xs mt-2">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="text-xs font-black text-amber-950 flex items-center gap-1.5 shrink-0 bg-white/90 px-2.5 py-1 rounded-lg border border-amber-200 shadow-xs">
-                    <Sparkles size={14} className="text-amber-600" />
-                    <span>120PIE 승인 가맹점 ({approvedStores.length}개소):</span>
-                  </span>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {approvedStores.map((store: any) => {
-                      const isSelected = selectedTarget && (selectedTarget.id === store.id || selectedTarget._id === store._id || selectedTarget.name === store.name);
-                      return (
-                        <button
-                          key={store.id || store._id}
-                          onClick={() => {
-                            setSelectedTarget(store);
-                            if (naverMapRef.current && window.naver && window.naver.maps) {
-                              naverMapRef.current.panTo(new window.naver.maps.LatLng(store.lat, store.lng), { duration: 400 });
-                              naverMapRef.current.setZoom(16);
-                            }
-                          }}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
-                            isSelected
-                              ? "bg-[#0F172A] text-[#FED422] ring-2 ring-[#FED422] shadow-md"
-                              : "bg-white hover:bg-amber-100/90 text-slate-800 border border-amber-200 hover:border-amber-400"
-                          }`}
-                        >
-                          <span>⭐</span>
-                          <span>{store.displayName}</span>
-                          <span className="text-[10px] text-slate-500 font-bold">({store.owner} 점주)</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <span className="text-[11px] text-amber-800 font-bold hidden sm:inline-block">
-                  💡 클릭 시 지도 중심 이동 & 우측 패널에 가맹점 상세 카드가 즉시 표출됩니다.
-                </span>
-              </div>
-            )}
-
             {/* 뷰 모드 토글 */}
             <div className="flex items-center bg-[#F1F4F8] rounded-lg p-1">
               <button
@@ -1000,6 +959,51 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
             </div>
           </div>
         </div>
+
+        {/* 🌟 120PIE 실제 공식 가맹점 깔끔한 전체 그리드 바 */}
+        {approvedStores.length > 0 && (
+          <div className="w-full bg-gradient-to-r from-amber-50/90 to-amber-100/50 border border-amber-200/90 rounded-xl p-3.5 shadow-xs space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-1 bg-amber-500 text-white text-[11px] font-black rounded-md flex items-center gap-1 shadow-xs">
+                  <Sparkles size={13} />
+                  <span>120PIE 공식 등록 가맹점 ({approvedStores.length}개소)</span>
+                </span>
+                <span className="text-[11px] text-amber-900/80 font-bold hidden sm:inline-block">
+                  💡 가맹점을 클릭하면 해당 위치로 지도가 즉시 이동하며 500m 보호 구역이 펼쳐집니다.
+                </span>
+              </div>
+            </div>
+
+            {/* 보기 좋게 줄바꿈(Wrap)되는 가맹점 칩 목록 */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              {approvedStores.map((store: any) => {
+                const isSelected = selectedTarget && (selectedTarget.id === store.id || selectedTarget._id === store._id || selectedTarget.name === store.name);
+                return (
+                  <button
+                    key={store.id || store._id}
+                    onClick={() => {
+                      setSelectedTarget(store);
+                      const currentMap = mapInstance || naverMapRef.current;
+                      if (currentMap && window.naver && window.naver.maps) {
+                        currentMap.panTo(new window.naver.maps.LatLng(store.lat, store.lng), { duration: 400 });
+                        currentMap.setZoom(16);
+                      }
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer border ${
+                      isSelected
+                        ? "bg-[#0F172A] text-[#FED422] border-[#0F172A] shadow-md ring-2 ring-[#FED422]"
+                        : "bg-white hover:bg-amber-100 text-slate-800 border-amber-200 shadow-2xs hover:border-amber-400"
+                    }`}
+                  >
+                    <span>⭐</span>
+                    <span>{store.displayName}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* 하단: 정밀 다차원 필터 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
