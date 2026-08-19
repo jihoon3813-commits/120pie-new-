@@ -6871,7 +6871,12 @@ export default function AdminPage() {
               <div className="flex flex-col gap-4 bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-lg border-0 shadow-md space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h2 className="text-xl font-black text-[#0F172A] tracking-tight">가맹점 관리 및 상세 설정</h2>
+                    <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2 flex-wrap">
+                      <span>가맹점 관리 및 상세 설정</span>
+                      <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full border border-emerald-300 shadow-2xs">
+                        총 {stores.length}개소 등록
+                      </span>
+                    </h2>
                     <p className="text-xs text-slate-400 font-bold mt-1">
                       신규 가맹 매장을 등록하고 계정, 연락처, 도로명 주소, 도입 패키지 모듈을 통합 관제합니다.
                     </p>
@@ -6914,19 +6919,22 @@ export default function AdminPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Status Tabs */}
                     <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-lg shadow-2xs border-0">
-                      {["전체", "승인", "대기", "보류", "중지"].map((st) => (
-                        <button
-                          key={st}
-                          onClick={() => setStoreStatusFilter(st)}
-                          className={`px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border-0 cursor-pointer ${
-                            storeStatusFilter === st
-                              ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
-                              : "text-slate-600 hover:text-[#0F172A]"
-                          }`}
-                        >
-                          {st}
-                        </button>
-                      ))}
+                      {["전체", "승인", "대기", "보류", "중지"].map((st) => {
+                        const count = st === "전체" ? stores.length : stores.filter((s) => s.status === st).length;
+                        return (
+                          <button
+                            key={st}
+                            onClick={() => setStoreStatusFilter(st)}
+                            className={`px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border-0 cursor-pointer ${
+                              storeStatusFilter === st
+                                ? "bg-[#FED422] text-[#0F172A] shadow-2xs font-black"
+                                : "text-slate-600 hover:text-[#0F172A]"
+                            }`}
+                          >
+                            {st} ({count})
+                          </button>
+                        );
+                      })}
                     </div>
 
                     {/* View Mode Toggle (1열 보기 / 2열 보기 / 3열 보기, 기본: 3열 보기) */}
