@@ -6434,11 +6434,11 @@ export default function AdminPage() {
                           </button>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                          {renderTableAmountInput("depositMembershipFee", "가입비", 1100000)}
-                          {renderTableAmountInput("depositEduFee", "오픈교육비", 2200000)}
-                          {renderTableAmountInput("depositSupportFee", "오픈지원비", 1700000)}
-                          {renderTableAmountInput("depositGuaranteeFee", "계약이행보증금", 1000000)}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {renderAmountInput("depositMembershipFee", "가입비 (부가세 포함)", 1100000, "일금일백일십만원(￦1,100,000)")}
+                          {renderAmountInput("depositEduFee", "오픈교육비 (부가세 포함)", 2200000, "일금이백이십만원(￦2,200,000)")}
+                          {renderAmountInput("depositSupportFee", "오픈지원비 (부가세 포함)", 1700000, "일금일백칠십만원(￦1,700,000)")}
+                          {renderAmountInput("depositGuaranteeFee", "계약이행보증금 (부가세 없음)", 1000000, "일금일백만원(￦1,000,000)")}
                           
                           <div className="md:col-span-2 flex items-center justify-between border-t border-slate-200/60 pt-3 mt-1">
                             <span className="font-extrabold text-[#0F172A]">예치가맹금 합계</span>
@@ -6479,9 +6479,9 @@ export default function AdminPage() {
                             교육비 전체 기본적용
                           </button>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                          {renderTableAmountInput("eduOpenFee", "오픈교육 (최초가맹금에 포함)", 2200000)}
-                          {renderTableAmountInput("eduNewFee", "신입교육 (1인 기준)", 220000)}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {renderAmountInput("eduOpenFee", "오픈교육 (최초가맹금에 포함)", 2200000, "일금이백이십만원(￦2,200,000)")}
+                          {renderAmountInput("eduNewFee", "신입교육 (1인 기준)", 220000, "일금이십이만원(￦220,000)")}
                         </div>
                       </div>
 
