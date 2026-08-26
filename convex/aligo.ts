@@ -21,13 +21,21 @@ export const sendSms = action({
       params.append("receiver", args.receiver);
       params.append("msg", args.msg);
       
-      // Auto-detect message type based on Korean character byte length
-      // Usually, SMS is up to 90 bytes. In JS, if string length > 80 characters, use LMS.
-      const isLms = args.msg.length > 80;
+      // Calculate EUC-KR byte length for accurate SMS (<=90 bytes) vs LMS (>90 bytes) switching
+      let byteLen = 0;
+      for (let i = 0; i < args.msg.length; i++) {
+        const code = args.msg.charCodeAt(i);
+        // ASCII characters (alphanumeric, simple symbols) = 1 byte, Korean/Non-ASCII = 2 bytes
+        byteLen += code > 127 ? 2 : 1;
+      }
+
+      const isLms = byteLen > 90;
       params.append("msg_type", isLms ? "LMS" : "SMS");
       
       if (isLms) {
-        params.append("title", "[120겹파이 알림]");
+        // LMS requires a title (max 40 bytes)
+        const firstLine = args.msg.split("\n")[0].replace(/[\[\]]/g, "").trim();
+        params.append("title", firstLine ? `[120겹파이] ${firstLine.slice(0, 20)}` : "[120겹파이 안내]");
       }
 
       if (args.isTest) {
