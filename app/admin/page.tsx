@@ -6338,18 +6338,15 @@ export default function AdminPage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-slate-600 mb-1">가맹점 규모 (㎡) <span className="text-red-500">*</span></label>
-                          <div className="relative">
-                            <input
-                              type="number"
-                              required
-                              value={contractForm.storeSize || ""}
-                              onChange={(e) => setContractForm({ ...contractForm, storeSize: parseFloat(e.target.value) || 0 })}
-                              className="w-full px-3.5 py-2.5 pr-8 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
-                              placeholder="33"
-                            />
-                            <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold">㎡</span>
-                          </div>
+                          <label className="block text-xs font-bold text-slate-600 mb-1">가맹점 규모 <span className="text-red-500">*</span></label>
+                          <input
+                            type="number"
+                            required
+                            value={contractForm.storeSize || ""}
+                            onChange={(e) => setContractForm({ ...contractForm, storeSize: parseFloat(e.target.value) || 0 })}
+                            className="w-full px-3.5 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
+                            placeholder="33"
+                          />
                         </div>
                         <div>
                           <label className="block text-xs font-bold text-slate-600 mb-1">영업 지역 <span className="text-red-500">*</span></label>
@@ -6661,7 +6658,7 @@ export default function AdminPage() {
                           <button
                             type="button"
                             onClick={() => {
-                              const summaryText = `계약구분: ${selectedContract.contractType || "신규"}\n가맹사업자명: ${selectedContract.ownerName}\n생년월일: ${selectedContract.ownerBirth}\n연락처: ${selectedContract.ownerPhone}\n가맹점명: ${selectedContract.storeName}\n주소: ${selectedContract.storeAddress}\n규모: ${selectedContract.storeSize}㎡\n영업지역: ${selectedContract.businessArea}`;
+                              const summaryText = `계약구분: ${selectedContract.contractType || "신규"}\n가맹사업자명: ${selectedContract.ownerName}\n생년월일: ${selectedContract.ownerBirth}\n연락처: ${selectedContract.ownerPhone}\n가맹점명: ${selectedContract.storeName}\n주소: ${selectedContract.storeAddress}\n규모: ${selectedContract.storeSize}\n영업지역: ${selectedContract.businessArea}`;
                               handleCopyText(summaryText, "인적 정보 일괄");
                             }}
                             className="text-[10px] text-slate-700 font-extrabold border-0 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg transition-all cursor-pointer shadow-2xs"
@@ -6677,7 +6674,7 @@ export default function AdminPage() {
                           {renderDetailRow("가맹사업자 연락처", selectedContract.ownerPhone)}
                           {renderDetailRow("가맹점 명칭", selectedContract.storeName)}
                           {renderDetailRow("가맹점 주소", selectedContract.storeAddress)}
-                          {renderDetailRow("가맹점 규모", `${selectedContract.storeSize} ㎡`)}
+                          {renderDetailRow("가맹점 규모", `${selectedContract.storeSize}`)}
                           {renderDetailRow("영업 지역", selectedContract.businessArea)}
                         </div>
                       </div>
