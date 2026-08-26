@@ -192,13 +192,13 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           </div>
 
           {/* Comprehensive 3-Category Fee Table */}
-          <div className="w-full max-w-full overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-2xs">
-            <table className="w-full text-xs text-left border-collapse table-fixed min-w-[380px]">
+          <div className="w-full rounded-xl border border-slate-200 bg-white shadow-2xs overflow-hidden">
+            <table className="w-full text-xs text-left border-collapse table-fixed">
               <colgroup>
                 <col className="w-[18%]" />
                 <col className="w-[28%]" />
-                <col className="w-[26%]" />
-                <col className="w-[16%]" />
+                <col className="w-[24%]" />
+                <col className="w-[18%]" />
                 <col className="w-[12%]" />
               </colgroup>
               <thead className="bg-slate-100 font-black text-slate-800 text-[10px] sm:text-[11px]">
@@ -253,9 +253,11 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                   <td className="p-2 text-center text-[11px] text-slate-500 font-bold">반환불가</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-blue-50/30">
-                  <td className="p-2 border-r border-slate-200 text-blue-950 font-black pl-3 flex items-center justify-between">
-                    <span>계약이행보증금</span>
-                    <span className="text-[10px] bg-blue-100 text-blue-800 px-1 rounded font-bold">환급형</span>
+                  <td className="p-2 border-r border-slate-200 text-blue-950 font-black pl-3">
+                    <div className="flex items-center justify-between">
+                      <span>계약이행보증금</span>
+                      <span className="text-[10px] bg-blue-100 text-blue-800 px-1 rounded font-bold">환급형</span>
+                    </div>
                   </td>
                   <td className="p-2 border-r border-slate-200 text-right pr-3 font-black text-blue-900">
                     <span className={highlightClass}>{formatMoney(contract.depositGuaranteeFee)}</span> 원
@@ -556,7 +558,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
               <span className="text-slate-300 hidden sm:inline">|</span>
               <span>예금주 : {HEADQUARTERS_INFO.depositAccountHolder}</span>
             </div>
-            <div className="w-full max-w-full overflow-x-auto rounded-lg border border-slate-200 mt-2 bg-white">
+            <div className="w-full rounded-lg border border-slate-200 mt-2 bg-white overflow-hidden">
               <table className="w-full text-xs text-left border-collapse table-fixed">
                 <colgroup>
                   <col className="w-[50%]" />
@@ -570,27 +572,29 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                 </thead>
                 <tbody>
                   <tr className="border-b border-slate-100">
-                    <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold truncate pl-3">가입비 (가맹비)</td>
+                    <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold pl-3">가입비 (가맹비)</td>
                     <td className="p-2 text-right font-bold pr-3 text-slate-900">
                       <span className={highlightClass}>{formatMoney(contract.depositMembershipFee)}</span> 원
                     </td>
                   </tr>
                   <tr className="border-b border-slate-100">
-                    <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold truncate pl-3">오픈교육비</td>
+                    <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold pl-3">오픈교육비</td>
                     <td className="p-2 text-right font-bold pr-3 text-slate-900">
                       <span className={highlightClass}>{formatMoney(contract.depositEduFee)}</span> 원
                     </td>
                   </tr>
                   <tr className="border-b border-slate-100">
-                    <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold truncate pl-3">오픈지원비</td>
+                    <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold pl-3">오픈지원비</td>
                     <td className="p-2 text-right font-bold pr-3 text-slate-900">
                       <span className={highlightClass}>{formatMoney(contract.depositSupportFee)}</span> 원
                     </td>
                   </tr>
                   <tr className="border-b border-slate-100 bg-blue-50/30">
-                    <td className="p-2 border-r border-slate-200 text-blue-950 font-semibold truncate pl-3 flex items-center justify-between">
-                      <span>계약이행보증금</span>
-                      <span className="text-[10px] bg-blue-100 text-blue-800 px-1 rounded font-bold">환급형</span>
+                    <td className="p-2 border-r border-slate-200 text-blue-950 font-semibold pl-3">
+                      <div className="flex items-center justify-between">
+                        <span>계약이행보증금</span>
+                        <span className="text-[10px] bg-blue-100 text-blue-800 px-1 rounded font-bold">환급형</span>
+                      </div>
                     </td>
                     <td className="p-2 text-right font-bold pr-3 text-blue-900">
                       <span className={highlightClass}>{formatMoney(contract.depositGuaranteeFee)}</span> 원
