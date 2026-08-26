@@ -1220,6 +1220,13 @@ export default function AdminPage() {
   const saveContractMutation = useMutation(api.contracts.createOrUpdate);
   const deleteContractMutation = useMutation(api.contracts.deleteContract);
   const updateContractStatusMutation = useMutation(api.contracts.updateStatus);
+  const markContractSentMutation = useMutation(api.contracts.markSent);
+
+  // Contract SMS modal states
+  const [isContractSmsModalOpen, setIsContractSmsModalOpen] = useState<boolean>(false);
+  const [contractSmsMsg, setContractSmsMsg] = useState<string>("");
+  const [contractSmsSender, setContractSmsSender] = useState<string>("");
+  const [isSendingContractSms, setIsSendingContractSms] = useState<boolean>(false);
 
   // Partners Query & Mutations
   const convexPartners = useQuery(api.partners.get) || [];
@@ -1490,6 +1497,80 @@ export default function AdminPage() {
         console.error("상태 업데이트 실패:", err);
         triggerToast("상태 업데이트에 실패했습니다.");
       });
+  };
+
+  const handleOpenContractSmsModal = (targetContract?: any) => {
+    const target = targetContract || selectedContract;
+    if (!target) return;
+    
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://120pie.com";
+    const signUrl = `${origin}/contract/${target._id}`;
+    
+    const defaultMsg = `[120겹파이] 가맹계약서 전자서명 안내\n\n${target.ownerName} 가맹사업자님, 120겹파이(${target.storeName || "가맹점"}) 공식 가맹계약서가 발행되었습니다.\n\n아래 링크를 통해 계약서 전문을 확인하시고 전자서명을 완료해 주시기 바랍니다.\n\n🔗 계약서 확인 및 전자서명:\n${signUrl}\n\n문의사항: 1566-3594`;
+    
+    const senderPhone = testSenderPhone || (smsSettings?.consultation?.admin?.sender) || "1566-3594";
+    
+    setContractSmsMsg(defaultMsg);
+    setContractSmsSender(senderPhone);
+    setIsContractSmsModalOpen(true);
+  };
+
+  const handleSendContractSms = async () => {
+    if (!selectedContract) return;
+    if (!smsSettings || !smsSettings.aligoKey || !smsSettings.aligoUserId) {
+      alert("알리고 API Key와 User ID가 설정되어 있지 않습니다. [SMS 설정] 탭에서 알리고 정보를 먼저 등록해 주세요.");
+      return;
+    }
+    if (!selectedContract.ownerPhone) {
+      alert("가맹사업자 연락처가 등록되어 있지 않습니다.");
+      return;
+    }
+    if (!contractSmsSender) {
+      alert("발신 번호를 입력해 주세요.");
+      return;
+    }
+
+    try {
+      setIsSendingContractSms(true);
+      const formattedSender = contractSmsSender.replace(/[^0-9]/g, "");
+      const formattedReceiver = selectedContract.ownerPhone.replace(/[^0-9]/g, "");
+
+      const response = await sendSmsAction({
+        key: smsSettings.aligoKey,
+        userId: smsSettings.aligoUserId,
+        sender: formattedSender,
+        receiver: formattedReceiver,
+        msg: contractSmsMsg,
+        isTest: smsSettings.aligoTestMode !== false,
+      });
+
+      if (response.success) {
+        const now = new Date();
+        const sentTimeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+        
+        await markContractSentMutation({
+          id: selectedContract._id,
+          sentAt: sentTimeStr,
+        });
+
+        setSelectedContract((prev: any) => prev ? { ...prev, status: "계약서 발송완료", sentAt: sentTimeStr } : prev);
+        setIsContractSmsModalOpen(false);
+        triggerToast("가맹계약서 안내 문자가 성공적으로 발송되었습니다.");
+        
+        if (smsSettings.aligoTestMode !== false) {
+          alert("전자계약서 안내 문자 발송 성공! (테스트 모드 활성화 상태)");
+        } else {
+          alert("가맹사업자 휴대폰으로 전자계약서 서명 링크 문자가 성공적으로 발송되었습니다!");
+        }
+      } else {
+        alert(`문자 발송 실패: ${response.message || response.error || "알 수 없는 오류"}`);
+      }
+    } catch (err: any) {
+      console.error("SMS send error:", err);
+      alert(`발송 오류: ${err.message || err}`);
+    } finally {
+      setIsSendingContractSms(false);
+    }
   };
 
   const handleContractSubmit = (e: React.FormEvent) => {
@@ -6604,18 +6685,54 @@ export default function AdminPage() {
                       </div>
                       
                       {/* Action buttons */}
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenContractSmsModal(selectedContract)}
+                          className="px-3.5 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1.5"
+                          title="가맹사업자에게 전자계약서 서명 링크 SMS 발송"
+                        >
+                          <Send size={13} />
+                          <span>전자계약서 문자 발송</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => window.open(`/contract/${selectedContract._id}`, '_blank')}
+                          className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1.5"
+                          title="전자계약서 전문 열기"
+                        >
+                          <ExternalLink size={13} className="text-amber-400" />
+                          <span>계약서 열기</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyText(`${window.location.origin}/contract/${selectedContract._id}`, "전자계약서 서명 링크")}
+                          className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1.5"
+                          title="서명 링크 복사"
+                        >
+                          <Copy size={13} />
+                          <span>링크 복사</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => window.open(`/contract/${selectedContract._id}`, '_blank')}
+                          className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1.5"
+                          title="계약서 인쇄 및 PDF 출력"
+                        >
+                          <Printer size={13} />
+                          <span>인쇄/PDF</span>
+                        </button>
                         <button
                           type="button"
                           onClick={handleStartEditContract}
-                          className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
+                          className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
                         >
                           수정
                         </button>
                         <button
                           type="button"
                           onClick={handleDeleteContractConfirm}
-                          className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
+                          className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
                         >
                           삭제
                         </button>
@@ -6782,13 +6899,55 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      {/* Section 4: 최종 서명 계약서 첨부 */}
+                      {/* Section 4: 전자서명 및 최종 서명 계약서 */}
                       <div className="bg-white border-0 rounded-lg overflow-hidden shadow-2xs">
-                        <div className="bg-[#F8F9FA] border-b border-slate-100 px-4 py-3">
-                          <span className="text-xs font-black text-[#0F172A]">4. 계약 서명 완료 파일</span>
+                        <div className="bg-[#F8F9FA] border-b border-slate-100 px-4 py-3 flex items-center justify-between">
+                          <span className="text-xs font-black text-[#0F172A]">4. 전자서명 및 계약 서명 파일</span>
+                          {selectedContract.sentAt && (
+                            <span className="text-[11px] text-amber-700 font-bold">
+                              문자 발송일시: {selectedContract.sentAt}
+                            </span>
+                          )}
                         </div>
-                        <div className="p-4 space-y-3.5 text-xs text-[#2d2026]">
-                          {selectedContract.fileName ? (
+                        <div className="p-4 space-y-4 text-xs text-[#2d2026]">
+                          {/* Case 1: Digital Electronic Signature Exists */}
+                          {selectedContract.signatureImage ? (
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-emerald-50/70 border border-emerald-200 p-4 rounded-xl shadow-2xs">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                  <CheckCircle2 size={22} />
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-black text-emerald-950 text-xs">자체 전자계약 서명 완료</span>
+                                    <span className="text-[10px] bg-emerald-200 text-emerald-900 font-extrabold px-2 py-0.5 rounded-full">법적 효력 발생</span>
+                                  </div>
+                                  <p className="text-[11px] text-emerald-800 font-bold mt-0.5">
+                                    서명 체결일시 : {selectedContract.signedAt || "완료"}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3 shrink-0">
+                                <div className="bg-white px-2 py-1 rounded-lg border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img 
+                                    src={selectedContract.signatureImage} 
+                                    alt="가맹점사업자 전자서명" 
+                                    className="h-8 object-contain max-w-[80px]"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => window.open(`/contract/${selectedContract._id}`, '_blank')}
+                                  className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                                >
+                                  <ExternalLink size={14} />
+                                  공식 계약서 보기 / 인쇄
+                                </button>
+                              </div>
+                            </div>
+                          ) : selectedContract.fileName ? (
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F8F9FA] border-0 p-3.5 rounded-md shadow-2xs">
                               <div className="flex items-center gap-2">
                                 <FileText size={20} className="text-slate-600" />
@@ -6817,8 +6976,21 @@ export default function AdminPage() {
                               </div>
                             </div>
                           ) : (
-                            <div className="text-center py-4 bg-slate-50 rounded-md text-slate-400 font-bold border-0">
-                              등록된 최종 서명 계약서가 없습니다.
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-amber-50/60 border border-amber-200/80 rounded-xl">
+                              <div className="flex items-center gap-2.5">
+                                <AlertCircle size={18} className="text-amber-600 shrink-0" />
+                                <span className="text-xs text-amber-900 font-bold">
+                                  아직 가맹사업자의 전자서명이 완료되지 않았습니다.
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenContractSmsModal(selectedContract)}
+                                className="px-3.5 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer shrink-0"
+                              >
+                                <Send size={13} />
+                                전자계약서 문자 발송
+                              </button>
                             </div>
                           )}
                           
@@ -13538,6 +13710,115 @@ export default function AdminPage() {
               <div className="space-y-1 text-slate-500 text-[11px] leading-relaxed pt-2">
                 <p>• 정산 상태: <strong>{selectedSettlementForModal.status}</strong> {selectedSettlementForModal.paidDate ? `(지급완료일: ${selectedSettlementForModal.paidDate})` : ""}</p>
                 <p>• 발행처: 주식회사 120겹파이 가맹지원본부</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          MODAL: CONTRACT SMS SEND
+      ========================================== */}
+      {isContractSmsModalOpen && selectedContract && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => !isSendingContractSms && setIsContractSmsModalOpen(false)}
+        >
+          <div 
+            className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-2xl overflow-hidden shadow-2xl flex flex-col font-sans"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-4 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-2">
+                <Send size={18} className="text-[#0F172A]" />
+                <h3 className="text-base font-black text-[#0F172A]">
+                  가맹계약서 전자서명 링크 문자 발송
+                </h3>
+              </div>
+              <button 
+                type="button"
+                onClick={() => !isSendingContractSms && setIsContractSmsModalOpen(false)} 
+                className="w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4 text-xs bg-[#f9fafb]">
+              {/* Receiver Info */}
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-500">수신자 (가맹사업자)</span>
+                  <span className="font-black text-[#0F172A]">{selectedContract.ownerName}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-500">가맹점명</span>
+                  <span className="font-extrabold text-[#0F172A]">{selectedContract.storeName}</span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className="font-bold text-slate-500">수신 휴대폰 번호</span>
+                  <span className="font-mono font-black text-amber-700 text-sm">{selectedContract.ownerPhone}</span>
+                </div>
+              </div>
+
+              {/* Sender Info */}
+              <div>
+                <label className="block text-xs font-black text-slate-700 mb-1">
+                  발신 번호 (알리고에 등록된 대표번호)
+                </label>
+                <input
+                  type="text"
+                  value={contractSmsSender}
+                  onChange={(e) => setContractSmsSender(e.target.value)}
+                  placeholder="1566-3594"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              {/* Message Content */}
+              <div>
+                <label className="block text-xs font-black text-slate-700 mb-1">
+                  발송 메시지 내용 미리보기
+                </label>
+                <textarea
+                  rows={8}
+                  value={contractSmsMsg}
+                  onChange={(e) => setContractSmsMsg(e.target.value)}
+                  className="w-full p-3.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-medium text-slate-800 focus:outline-none focus:border-amber-500 resize-none leading-relaxed"
+                />
+                <span className="text-[11px] text-slate-400 block mt-1">
+                  * 80자 이상 시 장문(LMS)으로 자동 전환되어 알리고를 통해 발송됩니다.
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  disabled={isSendingContractSms}
+                  onClick={() => setIsContractSmsModalOpen(false)}
+                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold rounded-xl transition-all cursor-pointer border-0"
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  disabled={isSendingContractSms}
+                  onClick={handleSendContractSms}
+                  className="px-5 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black rounded-xl transition-all flex items-center gap-2 shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  {isSendingContractSms ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-[#0F172A] border-t-transparent rounded-full animate-spin" />
+                      <span>문자 전송 중...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={14} />
+                      <span>전자계약서 문자 발송</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>

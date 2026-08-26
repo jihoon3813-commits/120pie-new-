@@ -217,6 +217,13 @@ export default defineSchema({
     fileUrl: v.optional(v.string()), // 최종 계약 서명한 파일 URL (Base64 Data URL)
     fileName: v.optional(v.string()), // 업로드된 실제 파일명
     contractType: v.optional(v.string()), // 계약 구분 ("신규" | "갱신" | "양수")
+    signatureImage: v.optional(v.string()), // 전자서명 이미지 (Base64 PNG)
+    signedAt: v.optional(v.string()), // 전자서명 완료 일시 (YYYY-MM-DD HH:mm:ss)
+    sentAt: v.optional(v.string()), // 전자계약서 문자 발송 일시 (YYYY-MM-DD HH:mm:ss)
+    signerIp: v.optional(v.string()), // 서명자 IP / 기기 정보
+    agreeTerms: v.optional(v.boolean()), // 약관 및 특약 동의 여부
+    agreePrivacy: v.optional(v.boolean()), // 정보공개서 숙고기간 확인 여부
+    agreeSupplies: v.optional(v.boolean()), // 구입강제품목 공급가격 확인 여부
   }),
   deliveryCredentials: defineTable({
     noticeId: v.string(), // 공지사항 ID ("NOT-XXX")
