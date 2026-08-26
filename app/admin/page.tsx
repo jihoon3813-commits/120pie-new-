@@ -6416,17 +6416,20 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* 2-Column Layout: Left = Live Document, Right = Connected Inputs */}
+                    {/* 2-Column Layout: Left = Live Document (Independent Scroll), Right = Connected Inputs (Independent Scroll) */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                      {/* Left: Contract Document Viewer (7 cols on LG+) */}
-                      <div className="lg:col-span-7 bg-slate-100/70 p-3 sm:p-6 rounded-2xl border border-slate-200/80 shadow-inner">
-                        <div className="flex items-center justify-between mb-3 px-1">
+                      {/* Left: Contract Document Viewer with INDEPENDENT SCROLLBAR */}
+                      <div 
+                        id="contract-document-scroll-container" 
+                        className="lg:col-span-7 bg-slate-100/70 p-3 sm:p-6 rounded-2xl border border-slate-200/80 shadow-inner h-[calc(100vh-220px)] min-h-[550px] overflow-y-auto pr-2 scroll-smooth"
+                      >
+                        <div className="flex items-center justify-between mb-3 px-1 sticky top-0 bg-slate-100/95 py-1 z-10 backdrop-blur-xs">
                           <span className="text-xs font-black text-slate-700 flex items-center gap-1.5">
                             <FileText size={15} className="text-amber-600" />
                             120겹파이 공식 가맹계약서 실시간 원문
                           </span>
                           <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                            노란 음영 = 실시간 입력 연동
+                            ★ 우측 입력란 클릭 시 해당 조항으로 자동 이동
                           </span>
                         </div>
                         <FranchiseContractDocument
@@ -6435,13 +6438,13 @@ export default function AdminPage() {
                         />
                       </div>
 
-                      {/* Right: Input Panel with Visual Arrow Badges (5 cols on LG+) */}
-                      <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-4 max-h-[calc(100vh-80px)] overflow-y-auto pr-1">
+                      {/* Right: Input Panel with INDEPENDENT SCROLLBAR & Generous Bottom Padding */}
+                      <div className="lg:col-span-5 space-y-4 h-[calc(100vh-220px)] min-h-[550px] overflow-y-auto pr-2 pb-36">
                         {/* Help & Fast Action Banner */}
                         <div className="p-3.5 bg-gradient-to-r from-amber-400 to-amber-300 rounded-xl text-slate-900 shadow-2xs flex items-center justify-between">
                           <div>
-                            <h4 className="font-black text-xs">계약 정보 입력 패널</h4>
-                            <p className="text-[10px] font-bold text-amber-950 mt-0.5">화살표(←)가 가리키는 계약서 조항을 확인하세요.</p>
+                            <h4 className="font-black text-xs">계약 정보 실시간 입력 패널</h4>
+                            <p className="text-[10px] font-bold text-amber-950 mt-0.5">입력란 클릭 시 좌측 계약서 조항으로 자동 스크롤됩니다.</p>
                           </div>
                           <button
                             type="button"
@@ -6453,7 +6456,16 @@ export default function AdminPage() {
                         </div>
 
                         {/* 1. 계약 구분 */}
-                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                        <div 
+                          onClick={() => {
+                            const container = document.getElementById("contract-document-scroll-container");
+                            const target = document.getElementById("doc-cover");
+                            if (container && target) {
+                              container.scrollTo({ top: 0, behavior: "smooth" });
+                            }
+                          }}
+                          className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2 cursor-pointer hover:border-amber-300 transition-colors"
+                        >
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
                               <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 표지</span>
@@ -6502,6 +6514,14 @@ export default function AdminPage() {
                                 required
                                 placeholder="예: 홍길동"
                                 value={contractForm.ownerName}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-1");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => setContractForm(prev => ({ ...prev, ownerName: e.target.value }))}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
@@ -6515,6 +6535,14 @@ export default function AdminPage() {
                                 required
                                 placeholder="예: 120겹파이 강남본점"
                                 value={contractForm.storeName}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-8");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => setContractForm(prev => ({ ...prev, storeName: e.target.value }))}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
@@ -6537,6 +6565,14 @@ export default function AdminPage() {
                                 type="date"
                                 required
                                 value={contractForm.contractStart}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-11");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => {
                                   const start = e.target.value;
                                   if (start) {
@@ -6556,6 +6592,14 @@ export default function AdminPage() {
                                 type="date"
                                 required
                                 value={contractForm.contractEnd}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-11");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => setContractForm(prev => ({ ...prev, contractEnd: e.target.value }))}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
@@ -6581,6 +6625,14 @@ export default function AdminPage() {
                                 type="text"
                                 placeholder="도로명 주소를 검색하세요"
                                 value={contractRoadAddress}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-12");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => {
                                   setContractRoadAddress(e.target.value);
                                   const full = [e.target.value, contractDetailAddress].filter(Boolean).join(" ");
@@ -6601,6 +6653,14 @@ export default function AdminPage() {
                               type="text"
                               placeholder="상세주소 (예: 101호, 1층)"
                               value={contractDetailAddress}
+                              onFocus={() => {
+                                const container = document.getElementById("contract-document-scroll-container");
+                                const target = document.getElementById("doc-clause-12");
+                                if (container && target) {
+                                  const offset = target.offsetTop - container.offsetTop - 20;
+                                  container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                }
+                              }}
                               onChange={(e) => {
                                 setContractDetailAddress(e.target.value);
                                 const full = [contractRoadAddress, e.target.value].filter(Boolean).join(" ");
@@ -6620,6 +6680,14 @@ export default function AdminPage() {
                                   type="text"
                                   placeholder="33"
                                   value={contractForm.storeSize}
+                                  onFocus={() => {
+                                    const container = document.getElementById("contract-document-scroll-container");
+                                    const target = document.getElementById("doc-clause-12");
+                                    if (container && target) {
+                                      const offset = target.offsetTop - container.offsetTop - 20;
+                                      container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                    }
+                                  }}
                                   onChange={(e) => setContractForm(prev => ({ ...prev, storeSize: e.target.value }))}
                                   className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg pl-3 pr-8 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                                 />
@@ -6637,6 +6705,14 @@ export default function AdminPage() {
                                 type="text"
                                 placeholder="예: 가맹점 반경 500m 내"
                                 value={contractForm.businessArea}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-13");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => setContractForm(prev => ({ ...prev, businessArea: e.target.value }))}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
@@ -6659,6 +6735,14 @@ export default function AdminPage() {
                               <input
                                 type="text"
                                 value={formatPriceInput(contractForm.supervisionFee)}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-15");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => handlePriceChange("supervisionFee", e.target.value)}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
@@ -6668,6 +6752,14 @@ export default function AdminPage() {
                               <input
                                 type="text"
                                 value={formatPriceInput(contractForm.initialFranchiseFee)}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-15");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => handlePriceChange("initialFranchiseFee", e.target.value)}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
@@ -6683,6 +6775,14 @@ export default function AdminPage() {
                                 <input
                                   type="text"
                                   value={formatPriceInput(contractForm.depositMembershipFee)}
+                                  onFocus={() => {
+                                    const container = document.getElementById("contract-document-scroll-container");
+                                    const target = document.getElementById("doc-clause-15");
+                                    if (container && target) {
+                                      const offset = target.offsetTop - container.offsetTop - 20;
+                                      container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                    }
+                                  }}
                                   onChange={(e) => handlePriceChange("depositMembershipFee", e.target.value)}
                                   className="w-full bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs font-bold text-right text-slate-900 outline-none"
                                 />
@@ -6692,6 +6792,14 @@ export default function AdminPage() {
                                 <input
                                   type="text"
                                   value={formatPriceInput(contractForm.depositEduFee)}
+                                  onFocus={() => {
+                                    const container = document.getElementById("contract-document-scroll-container");
+                                    const target = document.getElementById("doc-clause-15");
+                                    if (container && target) {
+                                      const offset = target.offsetTop - container.offsetTop - 20;
+                                      container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                    }
+                                  }}
                                   onChange={(e) => handlePriceChange("depositEduFee", e.target.value)}
                                   className="w-full bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs font-bold text-right text-slate-900 outline-none"
                                 />
@@ -6701,6 +6809,14 @@ export default function AdminPage() {
                                 <input
                                   type="text"
                                   value={formatPriceInput(contractForm.depositSupportFee)}
+                                  onFocus={() => {
+                                    const container = document.getElementById("contract-document-scroll-container");
+                                    const target = document.getElementById("doc-clause-15");
+                                    if (container && target) {
+                                      const offset = target.offsetTop - container.offsetTop - 20;
+                                      container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                    }
+                                  }}
                                   onChange={(e) => handlePriceChange("depositSupportFee", e.target.value)}
                                   className="w-full bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs font-bold text-right text-slate-900 outline-none"
                                 />
@@ -6710,6 +6826,14 @@ export default function AdminPage() {
                                 <input
                                   type="text"
                                   value={formatPriceInput(contractForm.depositGuaranteeFee)}
+                                  onFocus={() => {
+                                    const container = document.getElementById("contract-document-scroll-container");
+                                    const target = document.getElementById("doc-clause-15");
+                                    if (container && target) {
+                                      const offset = target.offsetTop - container.offsetTop - 20;
+                                      container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                    }
+                                  }}
                                   onChange={(e) => handlePriceChange("depositGuaranteeFee", e.target.value)}
                                   className="w-full bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs font-bold text-right text-slate-900 outline-none"
                                 />
@@ -6739,6 +6863,14 @@ export default function AdminPage() {
                               <input
                                 type="text"
                                 value={formatPriceInput(contractForm.royaltyFee)}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-17");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => handlePriceChange("royaltyFee", e.target.value)}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
@@ -6748,6 +6880,14 @@ export default function AdminPage() {
                               <input
                                 type="text"
                                 value={formatPriceInput(contractForm.guaranteeFee)}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-18");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => handlePriceChange("guaranteeFee", e.target.value)}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
@@ -6757,6 +6897,14 @@ export default function AdminPage() {
                               <input
                                 type="text"
                                 value={formatPriceInput(contractForm.initialSupplyFee)}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-29");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => handlePriceChange("initialSupplyFee", e.target.value)}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
@@ -6766,6 +6914,14 @@ export default function AdminPage() {
                               <input
                                 type="text"
                                 value={formatPriceInput(contractForm.penaltyFee)}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-39");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => handlePriceChange("penaltyFee", e.target.value)}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
@@ -6792,6 +6948,14 @@ export default function AdminPage() {
                                 placeholder="예: 1981-11-15"
                                 maxLength={10}
                                 value={contractForm.ownerBirth}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-sign");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => {
                                   const formatted = formatAutoBirth(e.target.value);
                                   setContractForm(prev => ({ ...prev, ownerBirth: formatted }));
@@ -6809,6 +6973,14 @@ export default function AdminPage() {
                                 placeholder="예: 010-4322-3813"
                                 maxLength={13}
                                 value={contractForm.ownerPhone}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-sign");
+                                  if (container && target) {
+                                    const offset = target.offsetTop - container.offsetTop - 20;
+                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                  }
+                                }}
                                 onChange={(e) => {
                                   const formatted = formatAutoPhone(e.target.value);
                                   setContractForm(prev => ({ ...prev, ownerPhone: formatted }));
@@ -6820,7 +6992,7 @@ export default function AdminPage() {
                         </div>
 
                         {/* Action Button at bottom of right panel */}
-                        <div className="pt-1">
+                        <div className="pt-2 pb-6">
                           <button
                             type="submit"
                             className="w-full py-3.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-sm font-black rounded-xl transition-all cursor-pointer border-0 shadow-md flex items-center justify-center gap-2 active:scale-[0.98]"
@@ -6835,8 +7007,8 @@ export default function AdminPage() {
                 ) : selectedContract ? (
                   /* LIVE CONTRACT DOCUMENT VIEWER */
                   <div className="space-y-6 animate-fadeIn">
-                    {/* Header Action Bar */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 bg-white sticky top-0 z-20 py-1">
+                    {/* Header Action Bar (Clean static header) */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 bg-white py-1">
                       <div>
                         <div className="flex items-center gap-3 flex-wrap">
                           <h3 className="text-lg font-black text-[#0F172A]">{selectedContract.ownerName} 가맹사업자</h3>
