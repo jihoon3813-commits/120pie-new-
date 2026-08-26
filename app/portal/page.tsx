@@ -441,6 +441,19 @@ export default function PortalPage() {
 
   const [currentMenu, setCurrentMenu] = useState<string>("dashboard");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const mainContentRef = useRef<HTMLElement | null>(null);
+
+  // 메뉴 변경 시 메인 화면 및 윈도우 스크롤을 항상 최상단(top=0)으로 즉시 초기화
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      mainContentRef.current.scrollTop = 0;
+    }
+  }, [currentMenu]);
+
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
@@ -2951,7 +2964,7 @@ export default function PortalPage() {
         )}
 
         {/* MAIN CONTENT AREA (100% Full Width Screen Layout like Admin) */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 overflow-y-auto w-full max-w-full">
+        <main ref={mainContentRef} className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 overflow-y-auto w-full max-w-full">
           <div className="w-full max-w-full space-y-6">
           
           {/* MENU CONTENT: 1. DASHBOARD */}
