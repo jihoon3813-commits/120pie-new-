@@ -226,7 +226,7 @@ export default function QuickInquiryBar({ isFixed = true }: QuickInquiryBarProps
         <input
           type="tel"
           inputMode="tel"
-          pattern="[0-9]*"
+          pattern="[0-9-]*"
           placeholder="연락처"
           value={phone}
           onChange={(e) => handlePhoneChange(e.target.value)}

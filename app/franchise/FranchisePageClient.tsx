@@ -2302,7 +2302,7 @@ export default function FranchisePageClient() {
                     <input
                       type="tel"
                       inputMode="tel"
-                      pattern="[0-9]*"
+                      pattern="[0-9-]*"
                       name="phone"
                       maxLength={13}
                       placeholder="연락처를 입력하세요"

@@ -186,7 +186,7 @@ export default function ConsultationForm({
               required
               type="tel"
               inputMode="tel"
-              pattern="[0-9]*"
+              pattern="[0-9-]*"
               value={form.phone}
               onChange={(val) => update("phone", val)}
               placeholder="010-0000-0000"

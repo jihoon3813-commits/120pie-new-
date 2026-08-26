@@ -236,7 +236,7 @@ export default function RightSideInquiryBanner() {
                 <input
                   type="tel"
                   inputMode="tel"
-                  pattern="[0-9]*"
+                  pattern="[0-9-]*"
                   placeholder="연락처 (예: 010-0000-0000)"
                   value={phone}
                   onChange={handlePhoneChange}
