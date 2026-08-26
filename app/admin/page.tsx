@@ -6292,10 +6292,10 @@ export default function AdminPage() {
           )}
 
           {currentMenu === "contract" && (
-            <div className="flex flex-col lg:flex-row gap-6 h-auto min-h-[calc(100vh-140px)] animate-fadeIn w-full min-w-0">
-              {/* LEFT SIDEBAR: CONTRACTOR LIST */}
-              <div className="w-full lg:w-80 bg-white border border-[#f2ccd7] rounded-lg p-4 flex flex-col shadow-sm shrink-0">
-                <div className="mb-4">
+            <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 h-[calc(100vh-120px)] max-h-[calc(100vh-120px)] overflow-hidden animate-fadeIn w-full min-w-0">
+              {/* LEFT SIDEBAR: CONTRACTOR LIST (Fixed height with its own internal scroll) */}
+              <div className="w-full lg:w-80 h-full bg-white border border-[#f2ccd7] rounded-xl p-4 flex flex-col shadow-sm shrink-0 overflow-hidden">
+                <div className="mb-3 shrink-0">
                   <h3 className="text-lg font-extrabold text-[#2d2026] mb-1">가맹계약 관리</h3>
                   <p className="text-xs text-[#735965] font-bold">계약자 목록을 조회하고 새 계약 정보를 등록할 수 있습니다.</p>
                 </div>
@@ -6310,14 +6310,14 @@ export default function AdminPage() {
                     setIsContractFormOpen(true);
                     setSelectedContract(null);
                   }}
-                  className="w-full py-2.5 mb-4 rounded-md bg-[#bf3e67] hover:bg-[#a03153] text-white font-extrabold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                  className="w-full py-2.5 mb-3 rounded-lg bg-[#bf3e67] hover:bg-[#a03153] text-white font-extrabold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0"
                 >
                   <Plus size={16} />
                   <span>계약정보 신규 등록</span>
                 </button>
                 
                 {/* Search Contractor */}
-                <div className="relative mb-4">
+                <div className="relative mb-3 shrink-0">
                   <input
                     type="text"
                     placeholder="계약자명 검색..."
@@ -6325,13 +6325,13 @@ export default function AdminPage() {
                     onChange={(e) => {
                       setContractSearchQuery(e.target.value);
                     }}
-                    className="w-full pl-9 pr-4 py-2.5 border-0 rounded-md text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs placeholder-slate-400"
+                    className="w-full pl-9 pr-4 py-2 border-0 rounded-lg text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs placeholder-slate-400"
                   />
-                  <Search size={14} className="absolute left-3 top-3.5 text-slate-400" />
+                  <Search size={14} className="absolute left-3 top-3 text-slate-400" />
                 </div>
                 
                 {/* Contractor List Scroll */}
-                <div className="flex-1 space-y-2">
+                <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-0">
                   {filteredContracts.length === 0 ? (
                     <div className="text-center py-8 text-xs text-slate-400 font-bold">
                       등록된 계약자가 없습니다.
@@ -6376,7 +6376,7 @@ export default function AdminPage() {
               </div>
               
               {/* RIGHT CONTENT: DETAIL VIEW OR FORM */}
-              <div className="flex-1 bg-white border-0 rounded-lg p-6 flex flex-col shadow-xs min-w-0 w-full">
+              <div className="flex-1 h-full bg-white border-0 rounded-xl p-4 sm:p-6 flex flex-col shadow-xs min-w-0 w-full overflow-hidden">
                 {isContractFormOpen ? (
                   /* LIVE CONTRACT DOCUMENT EDITOR (DIRECT COMPARISON & RIGHT INPUT PANEL) */
                   <form onSubmit={handleContractSubmit} className="space-y-6 animate-fadeIn">
@@ -6499,179 +6499,161 @@ export default function AdminPage() {
                           </span>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
-                                점주 성명 <span className="text-rose-500">*</span>
-                              </label>
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">성명 (점주명)</label>
                               <input
                                 type="text"
-                                required
-                                placeholder="예: 홍길동"
                                 value={contractForm.ownerName}
                                 onChange={(e) => setContractForm(prev => ({ ...prev, ownerName: e.target.value }))}
-                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white"
+                                placeholder="홍길동"
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
-                                가맹점 명칭 <span className="text-rose-500">*</span>
-                              </label>
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">가맹점 상호 (매장명)</label>
                               <input
                                 type="text"
-                                required
-                                placeholder="예: 120겹파이 강남본점"
                                 value={contractForm.storeName}
                                 onChange={(e) => setContractForm(prev => ({ ...prev, storeName: e.target.value }))}
-                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white"
+                                placeholder="강남본점"
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
-                                생년월일 (자동 하이픈)
-                              </label>
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">생년월일 (6자리 또는 8자리)</label>
                               <input
                                 type="text"
-                                placeholder="예: 1981-11-15"
-                                maxLength={10}
                                 value={contractForm.ownerBirth}
-                                onChange={(e) => {
-                                  const formatted = formatAutoBirth(e.target.value);
-                                  setContractForm(prev => ({ ...prev, ownerBirth: formatted }));
-                                }}
-                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                                onChange={(e) => setContractForm(prev => ({ ...prev, ownerBirth: formatAutoBirth(e.target.value) }))}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white"
+                                placeholder="1990-01-01"
+                                maxLength={10}
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
-                                연락처 (자동 하이픈) <span className="text-rose-500">*</span>
-                              </label>
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">휴대폰 번호</label>
                               <input
                                 type="text"
-                                required
-                                placeholder="예: 010-4322-3813"
-                                maxLength={13}
                                 value={contractForm.ownerPhone}
-                                onChange={(e) => {
-                                  const formatted = formatAutoPhone(e.target.value);
-                                  setContractForm(prev => ({ ...prev, ownerPhone: formatted }));
-                                }}
-                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                                onChange={(e) => setContractForm(prev => ({ ...prev, ownerPhone: formatAutoPhone(e.target.value) }))}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white"
+                                placeholder="010-1234-5678"
+                                maxLength={13}
                               />
                             </div>
                           </div>
                         </div>
 
-                        {/* 3. 계약 기간 */}
+                        {/* 3. 계약 기간 (자동 계산) */}
                         <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
-                          <span className="text-xs font-black text-slate-900 block">
-                            3. 계약 기간 (2년 자동)
-                          </span>
-                          <div className="grid grid-cols-2 gap-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900">
+                              3. 계약 기간 (기본 2년 자동세팅)
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const today = new Date();
+                                const startStr = today.toISOString().split("T")[0];
+                                const endYear = today.getFullYear() + 2;
+                                const endStr = `${endYear}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+                                setContractForm(prev => ({ ...prev, contractStart: startStr, contractEnd: endStr }));
+                              }}
+                              className="text-[10px] text-amber-700 bg-amber-50 hover:bg-amber-100 font-bold px-2 py-0.5 rounded border border-amber-200"
+                            >
+                              오늘부터 2년
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">계약 시작일</label>
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">계약 개시일</label>
                               <input
                                 type="date"
-                                required
                                 value={contractForm.contractStart}
                                 onChange={(e) => {
                                   const start = e.target.value;
+                                  let end = contractForm.contractEnd;
                                   if (start) {
-                                    const [y, m, d] = start.split("-");
-                                    const end = `${Number(y) + 2}-${m}-${d}`;
-                                    setContractForm(prev => ({ ...prev, contractStart: start, contractEnd: end }));
-                                  } else {
-                                    setContractForm(prev => ({ ...prev, contractStart: start }));
+                                    const d = new Date(start);
+                                    if (!isNaN(d.getTime())) {
+                                      d.setFullYear(d.getFullYear() + 2);
+                                      d.setDate(d.getDate() - 1);
+                                      end = d.toISOString().split("T")[0];
+                                    }
                                   }
+                                  setContractForm(prev => ({ ...prev, contractStart: start, contractEnd: end }));
                                 }}
-                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white"
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">계약 종료일 (2년)</label>
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">계약 만료일 (종료일)</label>
                               <input
                                 type="date"
-                                required
                                 value={contractForm.contractEnd}
                                 onChange={(e) => setContractForm(prev => ({ ...prev, contractEnd: e.target.value }))}
-                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white"
                               />
                             </div>
                           </div>
                         </div>
 
-                        {/* 4. 주소 / 규모 / 지역 */}
+                        {/* 4. 사업장 주소 / 규모 / 영업지역 */}
                         <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
                           <span className="text-xs font-black text-slate-900 block">
-                            4. 가맹점 주소, 규모 및 영업지역
+                            4. 사업장 소재지 및 영업지역
                           </span>
-
-                          <div className="space-y-1.5">
-                            <label className="block text-[11px] font-extrabold text-slate-600">
-                              가맹점 소재지(주소) <span className="text-rose-500">*</span>
-                            </label>
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                placeholder="도로명 주소를 검색하세요"
-                                value={contractRoadAddress}
-                                onChange={(e) => {
-                                  setContractRoadAddress(e.target.value);
-                                  const full = [e.target.value, contractDetailAddress].filter(Boolean).join(" ");
-                                  setContractForm(prev => ({ ...prev, storeAddress: full }));
-                                }}
-                                className="flex-1 bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => openDaumPostcode("contract")}
-                                className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shrink-0 flex items-center gap-1"
-                              >
-                                <Search size={13} />
-                                <span>주소 검색</span>
-                              </button>
-                            </div>
-                            <input
-                              type="text"
-                              placeholder="상세주소 (예: 101호, 1층)"
-                              value={contractDetailAddress}
-                              onChange={(e) => {
-                                setContractDetailAddress(e.target.value);
-                                const full = [contractRoadAddress, e.target.value].filter(Boolean).join(" ");
-                                setContractForm(prev => ({ ...prev, storeAddress: full }));
-                              }}
-                              className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
-                            />
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2.5 pt-1">
+                          <div className="space-y-2">
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
-                                매장 규모 (면적)
-                              </label>
-                              <div className="relative">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">기본 도로명 주소 (다음 우편번호 검색)</label>
+                              <div className="flex gap-2">
                                 <input
                                   type="text"
-                                  placeholder="33"
-                                  value={contractForm.storeSize}
-                                  onChange={(e) => setContractForm(prev => ({ ...prev, storeSize: e.target.value }))}
-                                  className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg pl-3 pr-8 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                                  readOnly
+                                  value={contractRoadAddress}
+                                  placeholder="우편번호 검색 버튼을 클릭하세요"
+                                  className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none cursor-pointer"
+                                  onClick={() => openDaumPostcode("contract")}
                                 />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500 pointer-events-none">
-                                  ㎡
-                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => openDaumPostcode("contract")}
+                                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg shrink-0 transition-all"
+                                >
+                                  주소 검색
+                                </button>
                               </div>
                             </div>
-
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
-                                배타적 영업지역
-                              </label>
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">상세 주소 (층/호수 등 직접 입력)</label>
                               <input
                                 type="text"
-                                placeholder="예: 가맹점 반경 500m 내"
-                                value={contractForm.businessArea}
-                                onChange={(e) => setContractForm(prev => ({ ...prev, businessArea: e.target.value }))}
-                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                                value={contractDetailAddress}
+                                onChange={(e) => setContractDetailAddress(e.target.value)}
+                                placeholder="예: 101동 102호 (상세주소)"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white"
                               />
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                              <div>
+                                <label className="text-[11px] font-bold text-slate-600 block mb-1">점포 전용면적 (㎡ 또는 평수)</label>
+                                <input
+                                  type="text"
+                                  value={contractForm.storeSize}
+                                  onChange={(e) => setContractForm(prev => ({ ...prev, storeSize: e.target.value }))}
+                                  placeholder="예: 33㎡ (약 10평)"
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[11px] font-bold text-slate-600 block mb-1">독점 영업보장 지역</label>
+                                <input
+                                  type="text"
+                                  value={contractForm.businessArea}
+                                  onChange={(e) => setContractForm(prev => ({ ...prev, businessArea: e.target.value }))}
+                                  placeholder="예: 서울 강남구 역삼동 반경 500m"
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -6934,12 +6916,12 @@ export default function AdminPage() {
                     </div>
                   </form>
                 ) : selectedContract ? (
-                  /* LIVE CONTRACT DOCUMENT VIEWER */
-                  <div className="space-y-6 animate-fadeIn">
-                    {/* Header Action Bar (Clean static header) */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 bg-white py-1">
+                  /* LIVE CONTRACT DOCUMENT VIEWER (FIXED TOP ACTION BAR + SCROLLABLE DOCUMENT BODY) */
+                  <div className="flex flex-col h-full overflow-hidden space-y-3.5 animate-fadeIn min-h-0">
+                    {/* Header Action Bar (Clean STATIC top bar, NEVER scrolls away) */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200 bg-white shrink-0">
                       <div>
-                        <div className="flex items-center gap-3 flex-wrap">
+                        <div className="flex items-center gap-2.5 flex-wrap">
                           <h3 className="text-lg font-black text-[#0F172A]">{selectedContract.ownerName} 가맹사업자</h3>
                           <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
                             {selectedContract.storeName || "가맹점명 미정"}
@@ -6954,11 +6936,11 @@ export default function AdminPage() {
                             {selectedContract.status}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-400 font-bold mt-1">등록일시: {selectedContract.createdAt}</p>
+                        <p className="text-[11px] text-slate-400 font-bold mt-0.5">등록일시: {selectedContract.createdAt}</p>
                       </div>
                       
                       {/* Action buttons */}
-                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                         <button
                           type="button"
                           onClick={() => handleOpenContractSmsModal(selectedContract)}
@@ -7014,114 +6996,117 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* Official Document Viewer */}
-                    <div className="bg-slate-100/70 p-4 sm:p-8 rounded-2xl border border-slate-200/80 shadow-inner">
-                      <FranchiseContractDocument
-                        contract={selectedContract}
-                        isEditable={false}
-                      />
-                    </div>
-
-                    {/* Bottom Status & File Management Widget */}
-                    <div className="p-5 bg-white border border-slate-200 rounded-xl space-y-4 shadow-xs text-xs">
-                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <span className="font-black text-[#0F172A] text-sm">계약 서명 및 첨부파일 관리</span>
-                        <span className="text-[11px] font-bold text-slate-500">
-                          {selectedContract.signatureImage ? "전자서명 체결 완료" : "전자서명 대기 중"}
-                        </span>
+                    {/* SCROLLABLE DOCUMENT BODY (Document Viewer + File Management) */}
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden pr-1 sm:pr-2 space-y-6 scroll-smooth pb-12 rounded-xl min-h-0">
+                      {/* Official Document Viewer */}
+                      <div className="bg-slate-100/70 p-3 sm:p-6 rounded-2xl border border-slate-200/80 shadow-inner">
+                        <FranchiseContractDocument
+                          contract={selectedContract}
+                          isEditable={false}
+                        />
                       </div>
 
-                      {selectedContract.signatureImage ? (
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-emerald-50 border border-emerald-200 p-4 rounded-xl">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
-                              <CheckCircle2 size={22} />
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-black text-emerald-950 text-xs">전자서명 체결 완료</span>
-                                <span className="text-[10px] bg-emerald-200 text-emerald-900 font-extrabold px-2 py-0.5 rounded-full">법적 효력 발생</span>
-                              </div>
-                              <p className="text-[11px] text-emerald-800 font-bold mt-0.5">
-                                서명 체결일시 : {selectedContract.signedAt || "완료"}
-                              </p>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => window.open(`/contract/${selectedContract._id}`, '_blank')}
-                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer border-0"
-                          >
-                            <Printer size={14} />
-                            공식 계약서 인쇄 / PDF 출력
-                          </button>
+                      {/* Bottom Status & File Management Widget */}
+                      <div className="p-4 sm:p-5 bg-white border border-slate-200 rounded-xl space-y-4 shadow-xs text-xs">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <span className="font-black text-[#0F172A] text-sm">계약 서명 및 첨부파일 관리</span>
+                          <span className="text-[11px] font-bold text-slate-500">
+                            {selectedContract.signatureImage ? "전자서명 체결 완료" : "전자서명 대기 중"}
+                          </span>
                         </div>
-                      ) : (
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                          <div className="flex items-center gap-2.5">
-                            <AlertCircle size={18} className="text-amber-600 shrink-0" />
-                            <span className="text-xs text-amber-900 font-bold">
-                              가맹사업자의 전자서명이 대기 중입니다. [전자계약서 문자 발송]을 눌러 링크를 전송하세요.
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenContractSmsModal(selectedContract)}
-                            className="px-3.5 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer shrink-0 border-0"
-                          >
-                            <Send size={13} />
-                            전자계약서 문자 발송
-                          </button>
-                        </div>
-                      )}
 
-                      {/* PDF Upload / Replace Option */}
-                      <div className="pt-2 flex items-center justify-between gap-3 text-slate-600">
-                        <span className="text-[11px] font-bold text-slate-500">외부 서명본 PDF 파일 업로드:</span>
-                        <div>
-                          <input
-                            type="file"
-                            accept=".pdf"
-                            id="admin-pdf-upload"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (!file) return;
-                              if (file.type !== "application/pdf") {
-                                alert("PDF 파일만 업로드할 수 있습니다.");
-                                return;
-                              }
-                              if (file.size > 20 * 1024 * 1024) {
-                                alert("파일 크기는 최대 20MB 이하여야 합니다.");
-                                return;
-                              }
-                              const reader = new FileReader();
-                              reader.onloadend = () => {
-                                const result = reader.result;
-                                if (typeof result === "string") {
-                                  updateContractStatusMutation({
-                                    id: selectedContract._id,
-                                    status: "계약서 서명완료",
-                                    fileUrl: result,
-                                    fileName: file.name
-                                  }).then(() => {
-                                    triggerToast("계약서 PDF가 업로드되었습니다.");
-                                  }).catch((err) => {
-                                    console.error(err);
-                                    alert("업로드 중 오류가 발생했습니다.");
-                                  });
+                        {selectedContract.signatureImage ? (
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-emerald-50 border border-emerald-200 p-4 rounded-xl">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                                <CheckCircle2 size={22} />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-black text-emerald-950 text-xs">전자서명 체결 완료</span>
+                                  <span className="text-[10px] bg-emerald-200 text-emerald-900 font-extrabold px-2 py-0.5 rounded-full">법적 효력 발생</span>
+                                </div>
+                                <p className="text-[11px] text-emerald-800 font-bold mt-0.5">
+                                  서명 체결일시 : {selectedContract.signedAt || "완료"}
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => window.open(`/contract/${selectedContract._id}`, '_blank')}
+                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer border-0"
+                            >
+                              <Printer size={14} />
+                              공식 계약서 인쇄 / PDF 출력
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                            <div className="flex items-center gap-2.5">
+                              <AlertCircle size={18} className="text-amber-600 shrink-0" />
+                              <span className="text-xs text-amber-900 font-bold">
+                                가맹사업자의 전자서명이 대기 중입니다. [전자계약서 문자 발송]을 눌러 링크를 전송하세요.
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenContractSmsModal(selectedContract)}
+                              className="px-3.5 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer shrink-0 border-0"
+                            >
+                              <Send size={13} />
+                              전자계약서 문자 발송
+                            </button>
+                          </div>
+                        )}
+
+                        {/* PDF Upload / Replace Option */}
+                        <div className="pt-2 flex items-center justify-between gap-3 text-slate-600">
+                          <span className="text-[11px] font-bold text-slate-500">외부 서명본 PDF 파일 업로드:</span>
+                          <div>
+                            <input
+                              type="file"
+                              accept=".pdf"
+                              id="admin-pdf-upload"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                if (file.type !== "application/pdf") {
+                                  alert("PDF 파일만 업로드할 수 있습니다.");
+                                  return;
                                 }
-                              };
-                              reader.readAsDataURL(file);
-                            }}
-                          />
-                          <label
-                            htmlFor="admin-pdf-upload"
-                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-2xs"
-                          >
-                            <Upload size={13} />
-                            <span>{selectedContract.fileName ? "계약서 파일 재등록" : "PDF 계약서 수동 등록"}</span>
-                          </label>
+                                if (file.size > 20 * 1024 * 1024) {
+                                  alert("파일 크기는 최대 20MB 이하여야 합니다.");
+                                  return;
+                                }
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  const result = reader.result;
+                                  if (typeof result === "string") {
+                                    updateContractStatusMutation({
+                                      id: selectedContract._id,
+                                      status: "계약서 서명완료",
+                                      fileUrl: result,
+                                      fileName: file.name
+                                    }).then(() => {
+                                      triggerToast("계약서 PDF가 업로드되었습니다.");
+                                    }).catch((err) => {
+                                      console.error(err);
+                                      alert("업로드 중 오류가 발생했습니다.");
+                                    });
+                                  }
+                                };
+                                reader.readAsDataURL(file);
+                              }}
+                            />
+                            <label
+                              htmlFor="admin-pdf-upload"
+                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-2xs"
+                            >
+                              <Upload size={13} />
+                              <span>{selectedContract.fileName ? "계약서 파일 재등록" : "PDF 계약서 수동 등록"}</span>
+                            </label>
+                          </div>
                         </div>
                       </div>
                     </div>
