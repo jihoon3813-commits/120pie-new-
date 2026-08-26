@@ -6293,95 +6293,97 @@ export default function AdminPage() {
 
           {currentMenu === "contract" && (
             <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 h-[calc(100vh-120px)] max-h-[calc(100vh-120px)] overflow-hidden animate-fadeIn w-full min-w-0">
-              {/* LEFT SIDEBAR: CONTRACTOR LIST (Fixed height with its own internal scroll) */}
-              <div className="w-full lg:w-80 h-full bg-white border border-[#f2ccd7] rounded-xl p-4 flex flex-col shadow-sm shrink-0 overflow-hidden">
-                <div className="mb-3 shrink-0">
-                  <h3 className="text-lg font-extrabold text-[#2d2026] mb-1">가맹계약 관리</h3>
-                  <p className="text-xs text-[#735965] font-bold">계약자 목록을 조회하고 새 계약 정보를 등록할 수 있습니다.</p>
-                </div>
-                
-                <button
-                  type="button"
-                  onClick={() => {
-                    setContractForm(getInitialContractForm());
-                    setContractRoadAddress("");
-                    setContractDetailAddress("");
-                    setIsContractEditMode(false);
-                    setIsContractFormOpen(true);
-                    setSelectedContract(null);
-                  }}
-                  className="w-full py-2.5 mb-3 rounded-lg bg-[#bf3e67] hover:bg-[#a03153] text-white font-extrabold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0"
-                >
-                  <Plus size={16} />
-                  <span>계약정보 신규 등록</span>
-                </button>
-                
-                {/* Search Contractor */}
-                <div className="relative mb-3 shrink-0">
-                  <input
-                    type="text"
-                    placeholder="계약자명 검색..."
-                    value={contractSearchQuery.trim() === "" ? "" : contractSearchQuery}
-                    onChange={(e) => {
-                      setContractSearchQuery(e.target.value);
+              {/* LEFT SIDEBAR: CONTRACTOR LIST (Hidden in Edit/Create Mode to maximize workspace) */}
+              {!isContractFormOpen && (
+                <div className="w-full lg:w-80 h-full bg-white border border-[#f2ccd7] rounded-xl p-4 flex flex-col shadow-sm shrink-0 overflow-hidden animate-fadeIn">
+                  <div className="mb-3 shrink-0">
+                    <h3 className="text-lg font-extrabold text-[#2d2026] mb-1">가맹계약 관리</h3>
+                    <p className="text-xs text-[#735965] font-bold">계약자 목록을 조회하고 새 계약 정보를 등록할 수 있습니다.</p>
+                  </div>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setContractForm(getInitialContractForm());
+                      setContractRoadAddress("");
+                      setContractDetailAddress("");
+                      setIsContractEditMode(false);
+                      setIsContractFormOpen(true);
+                      setSelectedContract(null);
                     }}
-                    className="w-full pl-9 pr-4 py-2 border-0 rounded-lg text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs placeholder-slate-400"
-                  />
-                  <Search size={14} className="absolute left-3 top-3 text-slate-400" />
+                    className="w-full py-2.5 mb-3 rounded-lg bg-[#bf3e67] hover:bg-[#a03153] text-white font-extrabold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0"
+                  >
+                    <Plus size={16} />
+                    <span>계약정보 신규 등록</span>
+                  </button>
+                  
+                  {/* Search Contractor */}
+                  <div className="relative mb-3 shrink-0">
+                    <input
+                      type="text"
+                      placeholder="계약자명 검색..."
+                      value={contractSearchQuery.trim() === "" ? "" : contractSearchQuery}
+                      onChange={(e) => {
+                        setContractSearchQuery(e.target.value);
+                      }}
+                      className="w-full pl-9 pr-4 py-2 border-0 rounded-lg text-xs focus:outline-none bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs placeholder-slate-400"
+                    />
+                    <Search size={14} className="absolute left-3 top-3 text-slate-400" />
+                  </div>
+                  
+                  {/* Contractor List Scroll */}
+                  <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-0">
+                    {filteredContracts.length === 0 ? (
+                      <div className="text-center py-8 text-xs text-slate-400 font-bold">
+                        등록된 계약자가 없습니다.
+                      </div>
+                    ) : (
+                      filteredContracts.map((c) => {
+                        let statusBg = "bg-blue-50 text-blue-600 border-0";
+                        if (c.status === "계약서 발송완료") statusBg = "bg-amber-50 text-amber-600 border-0";
+                        else if (c.status === "계약서 서명완료") statusBg = "bg-emerald-50 text-emerald-600 border-0";
+                        else if (c.status === "계약서 진행취소") statusBg = "bg-neutral-100 text-neutral-500 border-0";
+                        
+                        const isSelected = selectedContract?._id === c._id;
+                        return (
+                          <button
+                            key={c._id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedContract(c);
+                              setIsContractFormOpen(false);
+                            }}
+                            className={`w-full text-left p-3.5 rounded-md border-0 transition-all flex flex-col gap-1.5 ${
+                              isSelected
+                                ? "bg-slate-200/90 text-[#0F172A] shadow-xs font-black"
+                                : "bg-[#F8F9FA] text-slate-700 hover:bg-slate-100"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span className="font-extrabold text-sm text-[#0F172A]">{c.ownerName}</span>
+                              <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${statusBg}`}>
+                                {c.status}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between text-[11px] text-slate-500 font-semibold">
+                              <span>{c.storeName || "가맹점명 미정"}</span>
+                              <span>{c.createdAt.split(" ")[0]}</span>
+                            </div>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
                 </div>
-                
-                {/* Contractor List Scroll */}
-                <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-0">
-                  {filteredContracts.length === 0 ? (
-                    <div className="text-center py-8 text-xs text-slate-400 font-bold">
-                      등록된 계약자가 없습니다.
-                    </div>
-                  ) : (
-                    filteredContracts.map((c) => {
-                      let statusBg = "bg-blue-50 text-blue-600 border-0";
-                      if (c.status === "계약서 발송완료") statusBg = "bg-amber-50 text-amber-600 border-0";
-                      else if (c.status === "계약서 서명완료") statusBg = "bg-emerald-50 text-emerald-600 border-0";
-                      else if (c.status === "계약서 진행취소") statusBg = "bg-neutral-100 text-neutral-500 border-0";
-                      
-                      const isSelected = selectedContract?._id === c._id;
-                      return (
-                        <button
-                          key={c._id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedContract(c);
-                            setIsContractFormOpen(false);
-                          }}
-                          className={`w-full text-left p-3.5 rounded-md border-0 transition-all flex flex-col gap-1.5 ${
-                            isSelected
-                              ? "bg-slate-200/90 text-[#0F172A] shadow-xs font-black"
-                              : "bg-[#F8F9FA] text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between w-full">
-                            <span className="font-extrabold text-sm text-[#0F172A]">{c.ownerName}</span>
-                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${statusBg}`}>
-                              {c.status}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between text-[11px] text-slate-500 font-semibold">
-                            <span>{c.storeName || "가맹점명 미정"}</span>
-                            <span>{c.createdAt.split(" ")[0]}</span>
-                          </div>
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
+              )}
               
               {/* RIGHT CONTENT: DETAIL VIEW OR FORM */}
               <div className="flex-1 h-full bg-white border-0 rounded-xl p-4 sm:p-6 flex flex-col shadow-xs min-w-0 w-full overflow-hidden">
                 {isContractFormOpen ? (
                   /* LIVE CONTRACT DOCUMENT EDITOR (DIRECT COMPARISON & RIGHT INPUT PANEL) */
-                  <form onSubmit={handleContractSubmit} className="space-y-6 animate-fadeIn">
+                  <form onSubmit={handleContractSubmit} className="space-y-4 animate-fadeIn h-full flex flex-col overflow-hidden">
                     {/* Top Static Action Header - No sticky bar covering document */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 bg-white">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 bg-white shrink-0">
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-base font-black text-[#0F172A]">
@@ -6391,12 +6393,12 @@ export default function AdminPage() {
                             실시간 계약서 원문 대조 & 우측 입력 패널
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500 font-bold mt-1">
-                          우측 입력란의 화살표(←) 가이드를 확인하여 입력하시면, 좌측 공식 계약서 원문에 실시간으로 반영됩니다.
+                        <p className="text-xs text-slate-500 font-bold mt-0.5">
+                          우측 입력란에 입력하시면, 좌측 공식 계약서 원문에 실시간으로 반영됩니다.
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2.5 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         <button
                           type="button"
                           onClick={() => {
@@ -6405,13 +6407,13 @@ export default function AdminPage() {
                               setSelectedContract(contracts[0]);
                             }
                           }}
-                          className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
+                          className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
                         >
-                          취소
+                          취소 / 목록으로
                         </button>
                         <button
                           type="submit"
-                          className="px-5 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all cursor-pointer border-0 shadow-xs flex items-center gap-1.5"
+                          className="px-5 py-2 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all cursor-pointer border-0 shadow-xs flex items-center gap-1.5"
                         >
                           <Save size={14} />
                           <span>{isContractEditMode ? "수정 완료" : "가맹계약서 저장하기"}</span>
@@ -6419,10 +6421,10 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* 2-Column Layout: Left = Live Document (Independent Scroll), Right = Connected Inputs (Independent Scroll) */}
-                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 sm:gap-5 items-start">
+                    {/* 2-Column Layout: Left (50%) = Live Document (Independent Scroll), Right (50%) = Connected Inputs (Independent Scroll) */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start flex-1 min-h-0 overflow-hidden">
                       {/* Left: Contract Document Viewer with Clean Static Header & Non-overlapping Scroll Container */}
-                      <div className="xl:col-span-6 2xl:col-span-7 flex flex-col h-[calc(100vh-220px)] min-h-[550px] bg-slate-100/70 p-2 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-inner overflow-hidden min-w-0">
+                      <div className="flex flex-col h-full bg-slate-100/70 p-2 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-inner overflow-hidden min-w-0">
                         {/* Static Header Bar - OUTSIDE scroll area so text never overlaps or shines through */}
                         <div className="flex items-center justify-between mb-2 px-2 py-1 shrink-0 bg-slate-200/70 rounded-lg sm:rounded-xl border border-slate-300/60">
                           <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
@@ -6447,7 +6449,7 @@ export default function AdminPage() {
                       </div>
 
                       {/* Right: Input Panel with INDEPENDENT SCROLLBAR & Generous Bottom Padding */}
-                      <div className="xl:col-span-6 2xl:col-span-5 space-y-3.5 h-[calc(100vh-220px)] min-h-[550px] overflow-y-auto overflow-x-hidden pr-1 sm:pr-1.5 pb-36 min-w-0">
+                      <div className="space-y-3.5 h-full overflow-y-auto overflow-x-hidden pr-1 sm:pr-2 pb-36 min-w-0">
                         {/* Help & Fast Action Banner */}
                         <div className="p-3.5 bg-gradient-to-r from-amber-400 to-amber-300 rounded-xl text-slate-900 shadow-2xs flex items-center justify-between">
                           <div>

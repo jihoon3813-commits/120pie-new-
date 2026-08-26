@@ -544,32 +544,41 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
             <div className="w-full rounded-lg border border-slate-200 mt-1.5 bg-white overflow-hidden">
               <table className="w-full text-xs text-left border-collapse table-fixed">
                 <colgroup>
-                  <col style={{ width: "46%" }} />
-                  <col style={{ width: "54%" }} />
+                  <col style={{ width: "40%" }} />
+                  <col style={{ width: "60%" }} />
                 </colgroup>
                 <thead className="bg-slate-100 font-bold text-slate-700 text-[10px] sm:text-[11px]">
                   <tr>
                     <th className="p-1.5 sm:p-2 border-b border-r border-slate-200 text-slate-800 font-black pl-2">예치가맹금 내역</th>
-                    <th className="p-1.5 sm:p-2 border-b border-slate-200 text-right pr-2 text-slate-800 font-black">금액 (원, VAT포함)</th>
+                    <th className="p-1.5 sm:p-2 border-b border-slate-200 text-right pr-2 sm:pr-3 text-slate-800 font-black">금액 (원, VAT포함)</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-slate-100">
                     <td className="p-1.5 border-r border-slate-200 text-slate-700 font-semibold pl-2 text-[10px] sm:text-xs break-keep">가입비 (가맹비)</td>
-                    <td className="p-1.5 text-right font-bold pr-2 text-slate-900 text-[10px] sm:text-xs">
-                      <span className={highlightClass}>{formatMoney(contract.depositMembershipFee)}</span> 원
+                    <td className="p-1.5 text-right font-bold pr-2 sm:pr-3 text-slate-900 text-[10px] sm:text-xs">
+                      <div className="flex items-center justify-end gap-1 whitespace-nowrap">
+                        <span className={highlightClass}>{formatMoney(contract.depositMembershipFee)}</span>
+                        <span>원</span>
+                      </div>
                     </td>
                   </tr>
                   <tr className="border-b border-slate-100">
                     <td className="p-1.5 border-r border-slate-200 text-slate-700 font-semibold pl-2 text-[10px] sm:text-xs break-keep">오픈교육비</td>
-                    <td className="p-1.5 text-right font-bold pr-2 text-slate-900 text-[10px] sm:text-xs">
-                      <span className={highlightClass}>{formatMoney(contract.depositEduFee)}</span> 원
+                    <td className="p-1.5 text-right font-bold pr-2 sm:pr-3 text-slate-900 text-[10px] sm:text-xs">
+                      <div className="flex items-center justify-end gap-1 whitespace-nowrap">
+                        <span className={highlightClass}>{formatMoney(contract.depositEduFee)}</span>
+                        <span>원</span>
+                      </div>
                     </td>
                   </tr>
                   <tr className="border-b border-slate-100">
                     <td className="p-1.5 border-r border-slate-200 text-slate-700 font-semibold pl-2 text-[10px] sm:text-xs break-keep">오픈지원비</td>
-                    <td className="p-1.5 text-right font-bold pr-2 text-slate-900 text-[10px] sm:text-xs">
-                      <span className={highlightClass}>{formatMoney(contract.depositSupportFee)}</span> 원
+                    <td className="p-1.5 text-right font-bold pr-2 sm:pr-3 text-slate-900 text-[10px] sm:text-xs">
+                      <div className="flex items-center justify-end gap-1 whitespace-nowrap">
+                        <span className={highlightClass}>{formatMoney(contract.depositSupportFee)}</span>
+                        <span>원</span>
+                      </div>
                     </td>
                   </tr>
                   <tr className="border-b border-slate-100 bg-blue-50/30">
@@ -579,19 +588,27 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                         <span className="text-[8px] sm:text-[9px] bg-blue-100 text-blue-800 px-1 rounded font-bold shrink-0">환급형</span>
                       </div>
                     </td>
-                    <td className="p-1.5 text-right font-bold pr-2 text-blue-900 text-[10px] sm:text-xs">
-                      <span className={highlightClass}>{formatMoney(contract.depositGuaranteeFee)}</span> 원
+                    <td className="p-1.5 text-right font-bold pr-2 sm:pr-3 text-blue-900 text-[10px] sm:text-xs">
+                      <div className="flex items-center justify-end gap-1 whitespace-nowrap">
+                        <span className={highlightClass}>{formatMoney(contract.depositGuaranteeFee)}</span>
+                        <span>원</span>
+                      </div>
                     </td>
                   </tr>
                   <tr className="bg-amber-50/90 font-black text-slate-900">
                     <td className="p-1.5 border-r border-slate-200 font-black pl-2 text-amber-950 text-[10px] sm:text-xs break-keep">예치가맹금 합계</td>
-                    <td className="p-1.5 text-right text-amber-950 font-black pr-2 text-[10px] sm:text-xs">
-                      {formatMoney(
-                        (Number(contract.depositMembershipFee) || 0) +
-                        (Number(contract.depositEduFee) || 0) +
-                        (Number(contract.depositSupportFee) || 0) +
-                        (Number(contract.depositGuaranteeFee) || 0)
-                      )} 원
+                    <td className="p-1.5 text-right text-amber-950 font-black pr-2 sm:pr-3 text-[10px] sm:text-xs">
+                      <div className="flex items-center justify-end gap-1 whitespace-nowrap">
+                        <span>
+                          {formatMoney(
+                            (Number(contract.depositMembershipFee) || 0) +
+                            (Number(contract.depositEduFee) || 0) +
+                            (Number(contract.depositSupportFee) || 0) +
+                            (Number(contract.depositGuaranteeFee) || 0)
+                          )}
+                        </span>
+                        <span>원</span>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
