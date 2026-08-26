@@ -1182,6 +1182,18 @@ export default function PortalPage() {
                   // Clear cart and triggers
                   clearCart();
                   triggerToast("발주 주문 및 결제가 완료되었습니다!");
+
+                  // SMS 발송 연동 (모바일 리디렉션 결제완료)
+                  const targetRecipientPhone = localStorage.getItem("120_pending_recipient_phone") || recipientPhone || "";
+                  const activeStore = (stores || []).find((s: any) => s.id === pendingStoreId);
+                  const storeName = activeStore?.name || "가맹점";
+                  triggerSmsSend("order_card", {
+                    storeName: storeName,
+                    orderId: paymentId,
+                    amount: pendingAmount.toLocaleString(),
+                    phone: targetRecipientPhone || activeStore?.phone || "",
+                  });
+
                   setCurrentMenu("history");
                 } else {
                   showCustomAlert("결제 검증 오류", `결제 검증 실패: ${result.message}`);
@@ -1471,10 +1483,10 @@ export default function PortalPage() {
 
       // 1. 고객용 발송 (Customer-facing)
       if (eventConfig.customer && eventConfig.customer.isActive) {
-        let customerPhone = variables.phone || "";
+        let customerPhone = variables.phone || recipientPhone || profilePhone || "";
         if (!customerPhone) {
           const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
-          customerPhone = activeStore?.phone || "010-3813-1200";
+          customerPhone = activeStore?.phone || "";
         }
         
         let msg = eventConfig.customer.template;
@@ -1485,27 +1497,31 @@ export default function PortalPage() {
         const formattedSender = eventConfig.customer.sender.replace(/[^0-9]/g, "");
         const formattedReceiver = customerPhone.replace(/[^0-9]/g, "");
 
-        console.log(`[SMS Customer Trigger] Category: ${category} | From: ${eventConfig.customer.sender} | To: ${customerPhone}`);
-        console.log(`[SMS Customer Content]:\n${msg}`);
-
-        if (hasAligoCreds) {
-          const response = await sendSmsAction({
-            key: smsSettings.aligoKey,
-            userId: smsSettings.aligoUserId,
-            sender: formattedSender,
-            receiver: formattedReceiver,
-            msg: msg,
-            isTest: smsSettings.aligoTestMode !== false
-          });
-          console.log("[Aligo Customer Response]:", response);
-          if (response.success) {
-            triggerToast("고객용 SMS 발송 완료");
-          } else {
-            console.error("[Aligo Customer API Failure]:", response.error || response.message);
-          }
+        if (!formattedReceiver || formattedReceiver.length < 8) {
+          console.warn(`[SMS Skip] 신청자(고객) 연락처가 누락되었거나 유효하지 않습니다: ${customerPhone}`);
         } else {
-          // Simulation fallback
-          alert(`[고객용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${eventConfig.customer.sender}\n받는사람(고객): ${customerPhone}\n\n내용:\n${msg}`);
+          console.log(`[SMS Customer Trigger] Category: ${category} | From: ${eventConfig.customer.sender} | To: ${customerPhone}`);
+          console.log(`[SMS Customer Content]:\n${msg}`);
+
+          if (hasAligoCreds) {
+            const response = await sendSmsAction({
+              key: smsSettings.aligoKey,
+              userId: smsSettings.aligoUserId,
+              sender: formattedSender,
+              receiver: formattedReceiver,
+              msg: msg,
+              isTest: smsSettings.aligoTestMode !== false
+            });
+            console.log("[Aligo Customer Response]:", response);
+            if (response.success) {
+              triggerToast("신청자(점주) 주문 알림 SMS 발송 완료");
+            } else {
+              console.error("[Aligo Customer API Failure]:", response.error || response.message);
+            }
+          } else {
+            // Simulation fallback
+            alert(`[고객용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${eventConfig.customer.sender}\n받는사람(고객): ${customerPhone}\n\n내용:\n${msg}`);
+          }
         }
       }
 
@@ -2017,11 +2033,13 @@ export default function PortalPage() {
 
             // SMS 발송 연동 (주문완료 - 무통장입금)
             const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
-            const storeName = activeStore?.name || "강남역삼점";
+            const storeName = activeStore?.name || "가맹점";
+            const targetPhone = recipientPhone || profilePhone || activeStore?.phone || "";
             triggerSmsSend("order_cash", {
               storeName: storeName,
               orderId: newOrderId,
-              amount: String(cartTotal)
+              amount: cartTotal.toLocaleString(),
+              phone: targetPhone
             });
 
             setCurrentMenu("history");
@@ -2064,6 +2082,8 @@ export default function PortalPage() {
       localStorage.setItem("120_pending_order_store_id", activeStoreId || "owner");
       localStorage.setItem("120_pending_delivery_address", deliveryAddress);
       localStorage.setItem("120_pending_delivery_detail", deliveryDetailAddress);
+      localStorage.setItem("120_pending_recipient_name", recipientName);
+      localStorage.setItem("120_pending_recipient_phone", recipientPhone || activeStore?.phone || "");
       // 1. 사전 주문 DB 등록 (결제대기 상태로 미리 저장하여 결제 중 브라우저가 닫혀도 웹훅에서 수신 및 완결 가능하도록 원천 보장)
       saveOrderMutation({
         id: newOrderId,
@@ -2128,11 +2148,13 @@ export default function PortalPage() {
 
                 // SMS 발송 연동 (주문완료 - 신용카드)
                 const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
-                const storeName = activeStore?.name || "강남역삼점";
+                const storeName = activeStore?.name || "가맹점";
+                const targetPhone = recipientPhone || profilePhone || activeStore?.phone || "";
                 triggerSmsSend("order_card", {
                   storeName: storeName,
                   orderId: newOrderId,
-                  amount: String(cartTotal)
+                  amount: cartTotal.toLocaleString(),
+                  phone: targetPhone
                 });
 
                 setCurrentMenu("history");
