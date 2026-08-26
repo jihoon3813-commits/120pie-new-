@@ -1370,6 +1370,20 @@ export default function AdminPage() {
   }, [contracts, selectedContract]);
 
   // Formatting and Change handlers for Contract Form
+  const formatAutoPhone = (val: string): string => {
+    const raw = (val || "").replace(/[^0-9]/g, "");
+    if (raw.length <= 3) return raw;
+    if (raw.length <= 7) return `${raw.slice(0, 3)}-${raw.slice(3)}`;
+    return `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
+  };
+
+  const formatAutoBirth = (val: string): string => {
+    const raw = (val || "").replace(/[^0-9]/g, "");
+    if (raw.length <= 4) return raw;
+    if (raw.length <= 6) return `${raw.slice(0, 4)}-${raw.slice(4)}`;
+    return `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+  };
+
   const formatPriceInput = (val: any) => {
     if (val === "" || val === undefined || val === null) return "";
     const num = Number(val);
@@ -6361,20 +6375,21 @@ export default function AdminPage() {
               {/* RIGHT CONTENT: DETAIL VIEW OR FORM */}
               <div className="flex-1 bg-white border-0 rounded-lg p-6 flex flex-col shadow-xs min-w-0 w-full">
                 {isContractFormOpen ? (
-                  /* LIVE CONTRACT DOCUMENT EDITOR (DIRECT COMPARISON & INPUT) */
+                  /* LIVE CONTRACT DOCUMENT EDITOR (DIRECT COMPARISON & RIGHT INPUT PANEL) */
                   <form onSubmit={handleContractSubmit} className="space-y-6 animate-fadeIn">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 bg-white sticky top-0 z-20 py-1">
+                    {/* Top Static Action Header - No sticky bar covering document */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 bg-white">
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-base font-black text-[#0F172A]">
                             {isContractEditMode ? "120겹파이 가맹계약서 수정" : "120겹파이 가맹계약서 신규 작성"}
                           </h3>
                           <span className="text-[11px] font-black text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
-                            실시간 계약서 양식 인라인 입력
+                            실시간 계약서 원문 대조 & 우측 입력 패널
                           </span>
                         </div>
                         <p className="text-xs text-slate-500 font-bold mt-1">
-                          공식 가맹계약서 서식(제1조~제47조, 별첨)에 직접 값을 입력하고 비교하며 저장합니다.
+                          우측 입력란의 화살표(←) 가이드를 확인하여 입력하시면, 좌측 공식 계약서 원문에 실시간으로 반영됩니다.
                         </p>
                       </div>
 
@@ -6401,56 +6416,420 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* The Live Document Editor */}
-                    <div className="bg-slate-100/70 p-4 sm:p-8 rounded-2xl border border-slate-200/80 shadow-inner">
-                      <FranchiseContractDocument
-                        isEditable={true}
-                        contract={contractForm as any}
-                        onUpdateField={(field, val) => setContractForm(prev => ({ ...prev, [field]: val }))}
-                        onOpenAddressSearch={() => openDaumPostcode("contract")}
-                        roadAddress={contractRoadAddress}
-                        detailAddress={contractDetailAddress}
-                        onChangeRoadAddress={(val) => setContractRoadAddress(val)}
-                        onChangeDetailAddress={(val) => setContractDetailAddress(val)}
-                        onApplyFeeDefaults={() => {
-                          setContractForm(prev => ({
-                            ...prev,
-                            supervisionFee: 3300000,
-                            initialFranchiseFee: 5000000,
-                            depositMembershipFee: 1100000,
-                            depositEduFee: 2200000,
-                            depositSupportFee: 1700000,
-                            depositGuaranteeFee: 1000000,
-                            depositTotalFee: 6000000,
-                            royaltyFee: 150000,
-                            guaranteeFee: 1000000,
-                            eduOpenFee: 2200000,
-                            eduNewFee: 220000,
-                            initialSupplyFee: 4400000,
-                            reFranchiseFee: 1100000,
-                            penaltyFee: 1000000,
-                          }));
-                          triggerToast("표준 가맹금 및 예치금 기본값이 적용되었습니다.");
-                        }}
-                      />
-                    </div>
+                    {/* 2-Column Layout: Left = Live Document, Right = Connected Inputs */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                      {/* Left: Contract Document Viewer (7 cols on LG+) */}
+                      <div className="lg:col-span-7 bg-slate-100/70 p-3 sm:p-6 rounded-2xl border border-slate-200/80 shadow-inner">
+                        <div className="flex items-center justify-between mb-3 px-1">
+                          <span className="text-xs font-black text-slate-700 flex items-center gap-1.5">
+                            <FileText size={15} className="text-amber-600" />
+                            120겹파이 공식 가맹계약서 실시간 원문
+                          </span>
+                          <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                            노란 음영 = 실시간 입력 연동
+                          </span>
+                        </div>
+                        <FranchiseContractDocument
+                          contract={contractForm as any}
+                          highlightInputs={true}
+                        />
+                      </div>
 
-                    {/* Bottom Save Bar */}
-                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
-                      <button
-                        type="button"
-                        onClick={() => setIsContractFormOpen(false)}
-                        className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors border-0 cursor-pointer shadow-2xs"
-                      >
-                        취소
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-6 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all cursor-pointer border-0 shadow-xs flex items-center gap-1.5"
-                      >
-                        <Save size={14} />
-                        <span>{isContractEditMode ? "수정 완료" : "가맹계약서 저장하기"}</span>
-                      </button>
+                      {/* Right: Input Panel with Visual Arrow Badges (5 cols on LG+) */}
+                      <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-4 max-h-[calc(100vh-80px)] overflow-y-auto pr-1">
+                        {/* Help & Fast Action Banner */}
+                        <div className="p-3.5 bg-gradient-to-r from-amber-400 to-amber-300 rounded-xl text-slate-900 shadow-2xs flex items-center justify-between">
+                          <div>
+                            <h4 className="font-black text-xs">계약 정보 입력 패널</h4>
+                            <p className="text-[10px] font-bold text-amber-950 mt-0.5">화살표(←)가 가리키는 계약서 조항을 확인하세요.</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleApplyAllDefaults}
+                            className="px-2.5 py-1.5 bg-slate-900 hover:bg-black text-amber-400 text-[11px] font-black rounded-lg transition-all border-0 cursor-pointer shrink-0 shadow-2xs"
+                          >
+                            표준단가 일괄적용
+                          </button>
+                        </div>
+
+                        {/* 1. 계약 구분 */}
+                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 표지</span>
+                              <span>1. 계약 구분</span>
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            {["신규", "갱신", "양수"].map((type) => (
+                              <label
+                                key={type}
+                                className={`flex items-center justify-center gap-1.5 p-2 rounded-lg border text-xs font-extrabold cursor-pointer transition-all ${
+                                  contractForm.contractType === type
+                                    ? "bg-amber-50 border-amber-400 text-amber-950 font-black"
+                                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                                }`}
+                              >
+                                <input
+                                  type="radio"
+                                  name="sideContractType"
+                                  value={type}
+                                  checked={contractForm.contractType === type}
+                                  onChange={(e) => setContractForm(prev => ({ ...prev, contractType: e.target.value }))}
+                                  className="hidden"
+                                />
+                                <span>{type} 계약</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 2. 계약당사자 & 가맹점 명칭 */}
+                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 제1조 / 제8조</span>
+                              <span>2. 가맹사업자명 & 가맹점 명칭</span>
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
+                                가맹사업자(을) 성명 <span className="text-rose-500">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                placeholder="예: 홍길동"
+                                value={contractForm.ownerName}
+                                onChange={(e) => setContractForm(prev => ({ ...prev, ownerName: e.target.value }))}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
+                                가맹점 명칭 <span className="text-rose-500">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                placeholder="예: 120겹파이 강남본점"
+                                value={contractForm.storeName}
+                                onChange={(e) => setContractForm(prev => ({ ...prev, storeName: e.target.value }))}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 3. 계약 기간 (2년) */}
+                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 제11조</span>
+                              <span>3. 계약 기간 (2년 자동)</span>
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2.5">
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">계약 시작일</label>
+                              <input
+                                type="date"
+                                required
+                                value={contractForm.contractStart}
+                                onChange={(e) => {
+                                  const start = e.target.value;
+                                  if (start) {
+                                    const [y, m, d] = start.split("-");
+                                    const end = `${Number(y) + 2}-${m}-${d}`;
+                                    setContractForm(prev => ({ ...prev, contractStart: start, contractEnd: end }));
+                                  } else {
+                                    setContractForm(prev => ({ ...prev, contractStart: start }));
+                                  }
+                                }}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">계약 종료일 (2년)</label>
+                              <input
+                                type="date"
+                                required
+                                value={contractForm.contractEnd}
+                                onChange={(e) => setContractForm(prev => ({ ...prev, contractEnd: e.target.value }))}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 4. 가맹점 주소 & 매장 규모 & 영업지역 */}
+                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 제12조 / 제13조</span>
+                              <span>4. 가맹점 주소, 규모 및 영업지역</span>
+                            </span>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="block text-[11px] font-extrabold text-slate-600">
+                              가맹점 소재지(주소) <span className="text-rose-500">*</span>
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                placeholder="도로명 주소를 검색하세요"
+                                value={contractRoadAddress}
+                                onChange={(e) => {
+                                  setContractRoadAddress(e.target.value);
+                                  const full = [e.target.value, contractDetailAddress].filter(Boolean).join(" ");
+                                  setContractForm(prev => ({ ...prev, storeAddress: full }));
+                                }}
+                                className="flex-1 bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => openDaumPostcode("contract")}
+                                className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shrink-0 flex items-center gap-1"
+                              >
+                                <Search size={13} />
+                                <span>주소 검색</span>
+                              </button>
+                            </div>
+                            <input
+                              type="text"
+                              placeholder="상세주소 (예: 101호, 1층)"
+                              value={contractDetailAddress}
+                              onChange={(e) => {
+                                setContractDetailAddress(e.target.value);
+                                const full = [contractRoadAddress, e.target.value].filter(Boolean).join(" ");
+                                setContractForm(prev => ({ ...prev, storeAddress: full }));
+                              }}
+                              className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2.5 pt-1">
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
+                                매장 규모 (면적)
+                              </label>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  placeholder="33"
+                                  value={contractForm.storeSize}
+                                  onChange={(e) => setContractForm(prev => ({ ...prev, storeSize: e.target.value }))}
+                                  className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg pl-3 pr-8 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500 pointer-events-none">
+                                  ㎡
+                                </span>
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
+                                배타적 영업지역
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="예: 가맹점 반경 500m 내"
+                                value={contractForm.businessArea}
+                                onChange={(e) => setContractForm(prev => ({ ...prev, businessArea: e.target.value }))}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 5. 가맹금 및 예치가맹금 (자동 자릿수 콤마) */}
+                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 제14조 / 제15조</span>
+                              <span>5. 가맹금 및 예치가맹금 (원)</span>
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2.5">
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">공사감리비</label>
+                              <input
+                                type="text"
+                                value={formatPriceInput(contractForm.supervisionFee)}
+                                onChange={(e) => handlePriceChange("supervisionFee", e.target.value)}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">최초가맹금</label>
+                              <input
+                                type="text"
+                                value={formatPriceInput(contractForm.initialFranchiseFee)}
+                                onChange={(e) => handlePriceChange("initialFranchiseFee", e.target.value)}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          {/* 예치가맹금 4개 세부항목 */}
+                          <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+                            <span className="font-extrabold text-slate-700 block text-[11px]">예치가맹금 세부 내역 (자동 합산)</span>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[10px] text-slate-500 font-bold mb-0.5">가입비</label>
+                                <input
+                                  type="text"
+                                  value={formatPriceInput(contractForm.depositMembershipFee)}
+                                  onChange={(e) => handlePriceChange("depositMembershipFee", e.target.value)}
+                                  className="w-full bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs font-bold text-right text-slate-900 outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] text-slate-500 font-bold mb-0.5">오픈교육비</label>
+                                <input
+                                  type="text"
+                                  value={formatPriceInput(contractForm.depositEduFee)}
+                                  onChange={(e) => handlePriceChange("depositEduFee", e.target.value)}
+                                  className="w-full bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs font-bold text-right text-slate-900 outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] text-slate-500 font-bold mb-0.5">오픈지원비</label>
+                                <input
+                                  type="text"
+                                  value={formatPriceInput(contractForm.depositSupportFee)}
+                                  onChange={(e) => handlePriceChange("depositSupportFee", e.target.value)}
+                                  className="w-full bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs font-bold text-right text-slate-900 outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] text-slate-500 font-bold mb-0.5">계약이행보증금</label>
+                                <input
+                                  type="text"
+                                  value={formatPriceInput(contractForm.depositGuaranteeFee)}
+                                  onChange={(e) => handlePriceChange("depositGuaranteeFee", e.target.value)}
+                                  className="w-full bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs font-bold text-right text-slate-900 outline-none"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center pt-1.5 border-t border-slate-200 font-black text-amber-950">
+                              <span className="text-[11px]">예치가맹금 합계</span>
+                              <span className="text-xs text-amber-900 font-black">
+                                {Number(contractForm.depositTotalFee || 0).toLocaleString()} 원
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 6. 로열티 & 보증금 & 교육비 & 위약금 (자동 자릿수 콤마) */}
+                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 제17조 ~ 제41조</span>
+                              <span>6. 로열티, 교육비 및 부대비용</span>
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2.5">
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">월 로열티 (제17조)</label>
+                              <input
+                                type="text"
+                                value={formatPriceInput(contractForm.royaltyFee)}
+                                onChange={(e) => handlePriceChange("royaltyFee", e.target.value)}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">계약이행보증금 (제18조)</label>
+                              <input
+                                type="text"
+                                value={formatPriceInput(contractForm.guaranteeFee)}
+                                onChange={(e) => handlePriceChange("guaranteeFee", e.target.value)}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">초도물품비 (제29조)</label>
+                              <input
+                                type="text"
+                                value={formatPriceInput(contractForm.initialSupplyFee)}
+                                onChange={(e) => handlePriceChange("initialSupplyFee", e.target.value)}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">위약금 (제40조)</label>
+                              <input
+                                type="text"
+                                value={formatPriceInput(contractForm.penaltyFee)}
+                                onChange={(e) => handlePriceChange("penaltyFee", e.target.value)}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 7. 점주 서명정보 (생년월일, 연락처 자동하이픈) */}
+                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 서명란</span>
+                              <span>7. 가맹사업자(을) 서명 인적사항</span>
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2.5">
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
+                                생년월일 (자동 하이픈)
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="예: 1981-11-15"
+                                maxLength={10}
+                                value={contractForm.ownerBirth}
+                                onChange={(e) => {
+                                  const formatted = formatAutoBirth(e.target.value);
+                                  setContractForm(prev => ({ ...prev, ownerBirth: formatted }));
+                                }}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">
+                                연락처 (자동 하이픈) <span className="text-rose-500">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                placeholder="예: 010-4322-3813"
+                                maxLength={13}
+                                value={contractForm.ownerPhone}
+                                onChange={(e) => {
+                                  const formatted = formatAutoPhone(e.target.value);
+                                  setContractForm(prev => ({ ...prev, ownerPhone: formatted }));
+                                }}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Button at bottom of right panel */}
+                        <div className="pt-1">
+                          <button
+                            type="submit"
+                            className="w-full py-3.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-sm font-black rounded-xl transition-all cursor-pointer border-0 shadow-md flex items-center justify-center gap-2 active:scale-[0.98]"
+                          >
+                            <Save size={16} />
+                            <span>{isContractEditMode ? "계약서 수정 완료하기" : "가맹계약서 최종 저장하기"}</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </form>
                 ) : selectedContract ? (
