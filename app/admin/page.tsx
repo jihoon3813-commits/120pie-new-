@@ -6418,24 +6418,29 @@ export default function AdminPage() {
 
                     {/* 2-Column Layout: Left = Live Document (Independent Scroll), Right = Connected Inputs (Independent Scroll) */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                      {/* Left: Contract Document Viewer with INDEPENDENT SCROLLBAR */}
-                      <div 
-                        id="contract-document-scroll-container" 
-                        className="lg:col-span-7 bg-slate-100/70 p-3 sm:p-6 rounded-2xl border border-slate-200/80 shadow-inner h-[calc(100vh-220px)] min-h-[550px] overflow-y-auto pr-2 scroll-smooth"
-                      >
-                        <div className="flex items-center justify-between mb-3 px-1 sticky top-0 bg-slate-100/95 py-1 z-10 backdrop-blur-xs">
-                          <span className="text-xs font-black text-slate-700 flex items-center gap-1.5">
+                      {/* Left: Contract Document Viewer with Clean Static Header & Non-overlapping Scroll Container */}
+                      <div className="lg:col-span-7 flex flex-col h-[calc(100vh-220px)] min-h-[550px] bg-slate-100/70 p-3 sm:p-4 rounded-2xl border border-slate-200/80 shadow-inner overflow-hidden">
+                        {/* Static Header Bar - OUTSIDE scroll area so text never overlaps or shines through */}
+                        <div className="flex items-center justify-between mb-2.5 px-2 py-1.5 shrink-0 bg-slate-200/70 rounded-xl border border-slate-300/60">
+                          <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
                             <FileText size={15} className="text-amber-600" />
                             120겹파이 공식 가맹계약서 실시간 원문
                           </span>
-                          <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                            ★ 우측 입력란 클릭 시 해당 조항으로 자동 이동
+                          <span className="text-[11px] font-bold text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded-md border border-amber-300 shadow-2xs">
+                            ★ 우측 입력란 클릭 시 해당 조항 자동 이동
                           </span>
                         </div>
-                        <FranchiseContractDocument
-                          contract={contractForm as any}
-                          highlightInputs={true}
-                        />
+
+                        {/* Pure Scroll Container for Document */}
+                        <div 
+                          id="contract-document-scroll-container" 
+                          className="flex-1 overflow-y-auto overflow-x-hidden pr-1.5 scroll-smooth rounded-xl"
+                        >
+                          <FranchiseContractDocument
+                            contract={contractForm as any}
+                            highlightInputs={true}
+                          />
+                        </div>
                       </div>
 
                       {/* Right: Input Panel with INDEPENDENT SCROLLBAR & Generous Bottom Padding */}
