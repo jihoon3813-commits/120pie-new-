@@ -890,7 +890,8 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
             ② ‘갑’의 교육훈련은 다음 표와 같이 구분하여 실시한다. (단위:원, vat포함)
           </p>
 
-          <div className="rounded-lg border border-slate-200 overflow-hidden bg-white shadow-2xs">
+          {/* 1. PC 및 인쇄용 3열 테이블 (sm 이상) */}
+          <div className="hidden sm:block rounded-lg border border-slate-200 overflow-hidden bg-white shadow-2xs">
             <table className="w-full text-xs text-left border-collapse">
               <thead className="bg-slate-100 font-bold text-slate-700 text-[11px]">
                 <tr>
@@ -917,6 +918,41 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          {/* 2. 모바일 전용 반응형 리스트 (스마트폰에서 교육비 금액 100% 선명 노출) */}
+          <div className="block sm:hidden rounded-xl border border-slate-200 bg-white overflow-hidden divide-y divide-slate-100 text-xs shadow-2xs print:hidden">
+            <div className="p-3 flex items-center justify-between gap-2">
+              <div>
+                <span className="font-bold text-slate-800 block">오픈교육</span>
+                <span className="text-[10px] text-slate-400">실시시기 : 오픈 전</span>
+              </div>
+              <div className="text-right">
+                <span className="font-black text-slate-900 block">{formatMoney(contract.eduOpenFee ?? contract.depositEduFee)} 원</span>
+                <span className="text-[9.5px] text-slate-400 block">(최초가맹금에 포함)</span>
+              </div>
+            </div>
+
+            <div className="p-3 flex items-center justify-between gap-2">
+              <div>
+                <span className="font-bold text-slate-800 block">신입교육</span>
+                <span className="text-[10px] text-slate-400">실시시기 : 신입직원 채용 시</span>
+              </div>
+              <div className="text-right">
+                <span className="font-black text-slate-900 block">{formatMoney(contract.eduNewFee)} 원</span>
+                <span className="text-[9.5px] text-slate-400 block">(1인 기준)</span>
+              </div>
+            </div>
+
+            <div className="p-3 flex items-center justify-between gap-2 bg-slate-50/50">
+              <div>
+                <span className="font-bold text-slate-800 block">특별교육</span>
+                <span className="text-[10px] text-slate-400">실시시기 : 사업자 요청 시</span>
+              </div>
+              <div className="text-right">
+                <span className="font-bold text-slate-600">별도 협의</span>
+              </div>
+            </div>
           </div>
 
           <p className="text-left break-keep leading-relaxed pt-1">
@@ -1295,7 +1331,8 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
             </span>
           </div>
           <div className="p-3.5 sm:p-4 bg-[#F8FAFC] border border-slate-200 rounded-xl space-y-3">
-            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+            {/* 1. PC 및 인쇄용 테이블 (sm 이상) */}
+            <div className="hidden sm:block overflow-hidden rounded-lg border border-slate-200 bg-white">
               <table className="w-full text-xs text-left border-collapse table-fixed">
                 <colgroup>
                   <col style={{ width: "36%" }} />
@@ -1329,6 +1366,34 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                 </tbody>
               </table>
             </div>
+
+            {/* 2. 모바일 전용 반응형 카드 뷰 (스마트폰에서 모든 정보 100% 선명 노출) */}
+            <div className="block sm:hidden rounded-xl border border-slate-200 bg-white overflow-hidden divide-y divide-slate-100 text-xs shadow-2xs print:hidden">
+              <div className="p-2.5 flex items-center justify-between gap-2">
+                <span className="font-bold text-slate-500 shrink-0">영업표지 명칭</span>
+                <span className="font-black text-[#0F172A] text-right">120겹파이 (120PIE)</span>
+              </div>
+              <div className="p-2.5 flex flex-col gap-0.5">
+                <span className="font-bold text-slate-500">등록번호(출원번호)</span>
+                <span className="font-extrabold text-slate-800 break-all">{HEADQUARTERS_INFO.trademarkNumber}</span>
+              </div>
+              <div className="p-2.5 flex items-center justify-between gap-2">
+                <span className="font-bold text-slate-500 shrink-0">등록결정 연월일</span>
+                <span className="font-bold text-slate-800 text-right">{HEADQUARTERS_INFO.trademarkDecisionDate}</span>
+              </div>
+              <div className="p-2.5 flex items-center justify-between gap-2">
+                <span className="font-bold text-slate-500 shrink-0">존속기간 만료일</span>
+                <span className="font-bold text-slate-800 text-right">{HEADQUARTERS_INFO.trademarkExpireDate}</span>
+              </div>
+              <div className="p-2.5 flex flex-col gap-0.5">
+                <span className="font-bold text-slate-500">지정상품 / 서비스업</span>
+                <span className="font-bold text-slate-800 break-keep">{HEADQUARTERS_INFO.trademarkClass}</span>
+              </div>
+              <div className="p-2.5 flex items-center justify-between gap-2 bg-slate-50/50">
+                <span className="font-bold text-slate-500 shrink-0">등록권리자</span>
+                <span className="font-black text-[#0F172A] text-right">{HEADQUARTERS_INFO.companyName}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1346,6 +1411,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           <div className="p-3.5 sm:p-4 bg-[#F8FAFC] border border-slate-200 rounded-xl space-y-3">
             <p className="text-xs text-slate-700 break-keep">
               본 서식[별첨3]은 가맹사업거래의 공정화에 관한 법률에 의거하여 가맹계약서의 내용에 포함되며 ‘을’은 ‘갑’으로부터 본 서식[별첨3]을 제공받았음을 확인합니다.
+              <span className="block sm:hidden text-[10.5px] text-amber-700 font-bold mt-1">※ 아래 표를 좌우(↔)로 밀어서 전체 품목 및 공급가격을 확인하실 수 있습니다.</span>
             </p>
 
             <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
