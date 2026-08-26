@@ -160,6 +160,209 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           <span>{HEADQUARTERS_INFO.companyName}</span>
         </div>
 
+        {/* ==================== EXECUTIVE SUMMARY : 납부 비용 총괄표 ==================== */}
+        <div id="doc-cost-summary" className="bg-gradient-to-br from-amber-50/90 via-orange-50/40 to-slate-50 p-4 sm:p-6 rounded-2xl border-2 border-amber-300 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-200/80 pb-3">
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2.5 py-0.5 bg-amber-500 text-slate-950 font-black rounded-md text-[11px]">
+                  핵심 요약
+                </span>
+                <h2 className="text-base font-black text-[#0F172A]">
+                  가맹점사업자 납부 비용 및 예치금 총괄표
+                </h2>
+              </div>
+              <p className="text-xs text-slate-600 font-bold mt-1">
+                가맹계약에 따라 ‘을’(가맹점사업자)이 부담하여야 할 일체의 비용과 환급 내역입니다.
+              </p>
+            </div>
+            <div className="text-right sm:text-right shrink-0 bg-white/95 px-3.5 py-1.5 rounded-xl border border-amber-300 shadow-2xs">
+              <span className="text-[10px] font-bold text-slate-500 block">초기 총 개설 납부액</span>
+              <span className="text-sm font-black text-amber-950">
+                {formatMoney(
+                  (Number(contract.depositMembershipFee) || 0) +
+                  (Number(contract.depositEduFee) || 0) +
+                  (Number(contract.depositSupportFee) || 0) +
+                  (Number(contract.depositGuaranteeFee) || 0) +
+                  (Number(contract.supervisionFee) || 0) +
+                  (Number(contract.initialSupplyFee) || 0)
+                )} 원 <span className="text-[10px] font-bold text-slate-500">(VAT포함)</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Comprehensive 3-Category Fee Table */}
+          <div className="w-full max-w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xs">
+            <table className="w-full text-xs text-left border-collapse table-fixed">
+              <thead className="bg-slate-100 font-black text-slate-800 text-[11px]">
+                <tr>
+                  <th className="p-2.5 border-b border-r border-slate-200 w-[18%] text-center">납부 구분</th>
+                  <th className="p-2.5 border-b border-r border-slate-200 w-[24%]">세부 항목</th>
+                  <th className="p-2.5 border-b border-r border-slate-200 w-[24%] text-right pr-3">납부 금액</th>
+                  <th className="p-2.5 border-b border-r border-slate-200 w-[18%] text-center">납부 시기 / 계좌</th>
+                  <th className="p-2.5 border-b border-slate-200 w-[16%] text-center">반환 여부</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Category 1: 초기 개설 비용 (일시납) */}
+                <tr className="bg-slate-50/70 border-b border-slate-200">
+                  <td rowSpan={6} className="p-2.5 border-r border-slate-200 text-center font-black text-amber-950 bg-amber-50/50 align-middle">
+                    <span className="block font-black">1. 초기 개설</span>
+                    <span className="text-[10px] text-amber-800 font-bold block">(계약/오픈 시 1회)</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold pl-3">
+                    가입비 (가맹비) <span className="text-[10px] text-slate-400 font-normal">제15조</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-bold text-slate-900">
+                    <span className={highlightClass}>{formatMoney(contract.depositMembershipFee)}</span> 원
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-slate-600">
+                    계약체결일 (예치계좌)
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-slate-500 font-bold">반환불가</td>
+                </tr>
+                <tr className="border-b border-slate-100">
+                  <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold pl-3">
+                    오픈교육비 <span className="text-[10px] text-slate-400 font-normal">제15조, 제19조</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-bold text-slate-900">
+                    <span className={highlightClass}>{formatMoney(contract.depositEduFee)}</span> 원
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-slate-600">
+                    계약체결일 (예치계좌)
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-slate-500 font-bold">반환불가</td>
+                </tr>
+                <tr className="border-b border-slate-100">
+                  <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold pl-3">
+                    오픈지원비 <span className="text-[10px] text-slate-400 font-normal">제15조</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-bold text-slate-900">
+                    <span className={highlightClass}>{formatMoney(contract.depositSupportFee)}</span> 원
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-slate-600">
+                    계약체결일 (예치계좌)
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-slate-500 font-bold">반환불가</td>
+                </tr>
+                <tr className="border-b border-slate-100 bg-blue-50/30">
+                  <td className="p-2 border-r border-slate-200 text-blue-950 font-black pl-3 flex items-center justify-between">
+                    <span>계약이행보증금</span>
+                    <span className="text-[10px] bg-blue-100 text-blue-800 px-1 rounded font-bold">환급형</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-black text-blue-900">
+                    <span className={highlightClass}>{formatMoney(contract.depositGuaranteeFee)}</span> 원
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-blue-900 font-bold">
+                    계약체결일 (예치계좌)
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-blue-700 font-black">
+                    100% 전액환급
+                  </td>
+                </tr>
+                <tr className="border-b border-slate-100">
+                  <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold pl-3">
+                    공사감리비 <span className="text-[10px] text-slate-400 font-normal">제14조</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-bold text-slate-900">
+                    <span className={highlightClass}>{formatMoney(contract.supervisionFee)}</span> 원
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-slate-600">
+                    시공 착공 시
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-slate-500 font-bold">반환불가</td>
+                </tr>
+                <tr className="border-b-2 border-slate-300">
+                  <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold pl-3">
+                    초도물품비 <span className="text-[10px] text-slate-400 font-normal">제29조</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-bold text-slate-900">
+                    <span className={highlightClass}>{formatMoney(contract.initialSupplyFee)}</span> 원
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-slate-600">
+                    오픈 전 납품 시
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-slate-500 font-bold">반환불가</td>
+                </tr>
+
+                {/* Category 2: 운영 중 정기 납부 비용 (월납) */}
+                <tr className="bg-amber-50/40 border-b border-slate-200">
+                  <td rowSpan={2} className="p-2.5 border-r border-slate-200 text-center font-black text-slate-900 bg-slate-100/60 align-middle">
+                    <span className="block font-black">2. 운영 정기</span>
+                    <span className="text-[10px] text-slate-500 font-bold block">(월납 / 수시)</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-amber-950 font-black pl-3">
+                    계속가맹금 (월 로열티) <span className="text-[10px] text-slate-400 font-normal">제17조</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-black text-amber-950">
+                    월 <span className={highlightClass}>{formatMoney(contract.royaltyFee)}</span> 원
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-slate-700 font-bold">
+                    매월 1일 (자동이체)
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-slate-500 font-bold">반환불가</td>
+                </tr>
+                <tr className="border-b-2 border-slate-300">
+                  <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold pl-3">
+                    신입직원 추가교육비 <span className="text-[10px] text-slate-400 font-normal">제19조</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-bold text-slate-700">
+                    <span className={highlightClass}>{formatMoney(contract.eduNewFee || 220000)}</span> 원 (1인)
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-slate-600">
+                    직원 채용 신청 시
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-slate-500 font-bold">반환불가</td>
+                </tr>
+
+                {/* Category 3: 조건부 비용 및 보증금 환급 */}
+                <tr className="bg-slate-50/50 border-b border-slate-200">
+                  <td rowSpan={3} className="p-2.5 border-r border-slate-200 text-center font-black text-slate-900 bg-slate-100/60 align-middle">
+                    <span className="block font-black">3. 갱신 / 종료</span>
+                    <span className="text-[10px] text-slate-500 font-bold block">(조건부 발생)</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold pl-3">
+                    재가맹비 <span className="text-[10px] text-slate-400 font-normal">제39조</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-bold text-slate-900">
+                    <span className={highlightClass}>{formatMoney(contract.reFranchiseFee)}</span> 원
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-slate-600">
+                    2년 후 갱신 체결 시
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-slate-500 font-bold">반환불가</td>
+                </tr>
+                <tr className="border-b border-slate-200">
+                  <td className="p-2 border-r border-slate-200 text-rose-950 font-semibold pl-3">
+                    계약해지 위약금 <span className="text-[10px] text-slate-400 font-normal">제40조</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-bold text-rose-700">
+                    <span className={highlightClass}>{formatMoney(contract.penaltyFee)}</span> 원
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-rose-700">
+                    중대한 귀책 해지 시
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-slate-500 font-bold">손해배상 예정</td>
+                </tr>
+                <tr className="bg-emerald-50/50">
+                  <td className="p-2 border-r border-slate-200 text-emerald-950 font-black pl-3">
+                    ★ 계약이행보증금 환급 <span className="text-[10px] text-slate-400 font-normal">제18조</span>
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-right pr-3 font-black text-emerald-800">
+                    + <span className={highlightClass}>{formatMoney(contract.guaranteeFee)}</span> 원
+                  </td>
+                  <td className="p-2 border-r border-slate-200 text-center text-[11px] text-emerald-800 font-bold">
+                    계약 정상 종료 후 30일 내
+                  </td>
+                  <td className="p-2 text-center text-[11px] text-emerald-800 font-black">
+                    전액 환급
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* 제1조 */}
         <section id="doc-clause-1" className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">

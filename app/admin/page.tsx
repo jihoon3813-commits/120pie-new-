@@ -6720,67 +6720,53 @@ export default function AdminPage() {
                           </div>
                         </div>
 
-                        {/* 5. 가맹금 및 예치가맹금 (자동 자릿수 콤마) */}
-                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
+                        {/* 5. 초기 개설 일시납 비용 (계약 및 오픈 시) */}
+                        <div className="p-3.5 bg-white rounded-xl border-2 border-amber-300 shadow-2xs space-y-3">
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
-                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 제14조 / 제15조</span>
-                              <span>5. 가맹금 및 예치가맹금 (원)</span>
+                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 총괄표 / 제14·15·29조</span>
+                              <span>5. 초기 개설 일시납 비용</span>
+                            </span>
+                            <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+                              계약/오픈 1회 납부
                             </span>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-2.5">
+                          {/* Live Total Initial Payment Calculator Banner */}
+                          <div className="p-2.5 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/5 rounded-lg border border-amber-300 flex items-center justify-between">
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">공사감리비</label>
-                              <input
-                                type="text"
-                                value={formatPriceInput(contractForm.supervisionFee)}
-                                onFocus={() => {
-                                  const container = document.getElementById("contract-document-scroll-container");
-                                  const target = document.getElementById("doc-clause-15");
-                                  if (container && target) {
-                                    const offset = target.offsetTop - container.offsetTop - 20;
-                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
-                                  }
-                                }}
-                                onChange={(e) => handlePriceChange("supervisionFee", e.target.value)}
-                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
-                              />
+                              <span className="text-[11px] font-bold text-slate-600 block">초기 총 개설 납부액 (합계)</span>
+                              <span className="text-[10px] text-slate-500">예치금 4종 + 감리비 + 초도물품비</span>
                             </div>
-                            <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">최초가맹금</label>
-                              <input
-                                type="text"
-                                value={formatPriceInput(contractForm.initialFranchiseFee)}
-                                onFocus={() => {
-                                  const container = document.getElementById("contract-document-scroll-container");
-                                  const target = document.getElementById("doc-clause-15");
-                                  if (container && target) {
-                                    const offset = target.offsetTop - container.offsetTop - 20;
-                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
-                                  }
-                                }}
-                                onChange={(e) => handlePriceChange("initialFranchiseFee", e.target.value)}
-                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
-                              />
-                            </div>
+                            <span className="text-sm font-black text-amber-950">
+                              {(
+                                (Number(contractForm.depositMembershipFee) || 0) +
+                                (Number(contractForm.depositEduFee) || 0) +
+                                (Number(contractForm.depositSupportFee) || 0) +
+                                (Number(contractForm.depositGuaranteeFee) || 0) +
+                                (Number(contractForm.supervisionFee) || 0) +
+                                (Number(contractForm.initialSupplyFee) || 0)
+                              ).toLocaleString()} 원
+                            </span>
                           </div>
 
                           {/* 예치가맹금 4개 세부항목 */}
                           <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
-                            <span className="font-extrabold text-slate-700 block text-[11px]">예치가맹금 세부 내역 (자동 합산)</span>
+                            <div className="flex items-center justify-between">
+                              <span className="font-extrabold text-slate-700 block text-[11px]">예치가맹금 세부 내역 (하나은행 예치)</span>
+                              <span className="text-[10px] text-blue-700 font-bold">보증금은 계약 종료 시 100% 환급</span>
+                            </div>
                             <div className="grid grid-cols-2 gap-2">
                               <div>
-                                <label className="block text-[10px] text-slate-500 font-bold mb-0.5">가입비</label>
+                                <label className="block text-[10px] text-slate-500 font-bold mb-0.5">가입비 (가맹비)</label>
                                 <input
                                   type="text"
                                   value={formatPriceInput(contractForm.depositMembershipFee)}
                                   onFocus={() => {
                                     const container = document.getElementById("contract-document-scroll-container");
-                                    const target = document.getElementById("doc-clause-15");
+                                    const target = document.getElementById("doc-cost-summary");
                                     if (container && target) {
-                                      const offset = target.offsetTop - container.offsetTop - 20;
-                                      container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                      container.scrollTo({ top: target.offsetTop - container.offsetTop - 20, behavior: "smooth" });
                                     }
                                   }}
                                   onChange={(e) => handlePriceChange("depositMembershipFee", e.target.value)}
@@ -6794,10 +6780,9 @@ export default function AdminPage() {
                                   value={formatPriceInput(contractForm.depositEduFee)}
                                   onFocus={() => {
                                     const container = document.getElementById("contract-document-scroll-container");
-                                    const target = document.getElementById("doc-clause-15");
+                                    const target = document.getElementById("doc-cost-summary");
                                     if (container && target) {
-                                      const offset = target.offsetTop - container.offsetTop - 20;
-                                      container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                      container.scrollTo({ top: target.offsetTop - container.offsetTop - 20, behavior: "smooth" });
                                     }
                                   }}
                                   onChange={(e) => handlePriceChange("depositEduFee", e.target.value)}
@@ -6811,10 +6796,9 @@ export default function AdminPage() {
                                   value={formatPriceInput(contractForm.depositSupportFee)}
                                   onFocus={() => {
                                     const container = document.getElementById("contract-document-scroll-container");
-                                    const target = document.getElementById("doc-clause-15");
+                                    const target = document.getElementById("doc-cost-summary");
                                     if (container && target) {
-                                      const offset = target.offsetTop - container.offsetTop - 20;
-                                      container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                      container.scrollTo({ top: target.offsetTop - container.offsetTop - 20, behavior: "smooth" });
                                     }
                                   }}
                                   onChange={(e) => handlePriceChange("depositSupportFee", e.target.value)}
@@ -6822,73 +6806,53 @@ export default function AdminPage() {
                                 />
                               </div>
                               <div>
-                                <label className="block text-[10px] text-slate-500 font-bold mb-0.5">계약이행보증금</label>
+                                <label className="block text-[10px] text-blue-700 font-bold mb-0.5">계약이행보증금 (환급형)</label>
                                 <input
                                   type="text"
                                   value={formatPriceInput(contractForm.depositGuaranteeFee)}
                                   onFocus={() => {
                                     const container = document.getElementById("contract-document-scroll-container");
-                                    const target = document.getElementById("doc-clause-15");
+                                    const target = document.getElementById("doc-cost-summary");
                                     if (container && target) {
-                                      const offset = target.offsetTop - container.offsetTop - 20;
-                                      container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                      container.scrollTo({ top: target.offsetTop - container.offsetTop - 20, behavior: "smooth" });
                                     }
                                   }}
-                                  onChange={(e) => handlePriceChange("depositGuaranteeFee", e.target.value)}
-                                  className="w-full bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs font-bold text-right text-slate-900 outline-none"
+                                  onChange={(e) => {
+                                    handlePriceChange("depositGuaranteeFee", e.target.value);
+                                    handlePriceChange("guaranteeFee", e.target.value);
+                                  }}
+                                  className="w-full bg-blue-50/50 border border-blue-200 rounded-md px-2 py-1.5 text-xs font-bold text-right text-blue-900 outline-none"
                                 />
                               </div>
                             </div>
                             <div className="flex justify-between items-center pt-1.5 border-t border-slate-200 font-black text-amber-950">
-                              <span className="text-[11px]">예치가맹금 합계</span>
+                              <span className="text-[11px]">예치가맹금 4종 소계</span>
                               <span className="text-xs text-amber-900 font-black">
-                                {Number(contractForm.depositTotalFee || 0).toLocaleString()} 원
+                                {(
+                                  (Number(contractForm.depositMembershipFee) || 0) +
+                                  (Number(contractForm.depositEduFee) || 0) +
+                                  (Number(contractForm.depositSupportFee) || 0) +
+                                  (Number(contractForm.depositGuaranteeFee) || 0)
+                                ).toLocaleString()} 원
                               </span>
                             </div>
                           </div>
-                        </div>
 
-                        {/* 6. 로열티 & 보증금 & 교육비 & 위약금 (자동 자릿수 콤마) */}
-                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
-                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 제17조 ~ 제41조</span>
-                              <span>6. 로열티, 교육비 및 부대비용</span>
-                            </span>
-                          </div>
-
+                          {/* 기타 초기 시설/물품비 */}
                           <div className="grid grid-cols-2 gap-2.5">
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">월 로열티 (제17조)</label>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">공사감리비 (제14조)</label>
                               <input
                                 type="text"
-                                value={formatPriceInput(contractForm.royaltyFee)}
+                                value={formatPriceInput(contractForm.supervisionFee)}
                                 onFocus={() => {
                                   const container = document.getElementById("contract-document-scroll-container");
-                                  const target = document.getElementById("doc-clause-17");
+                                  const target = document.getElementById("doc-clause-14");
                                   if (container && target) {
-                                    const offset = target.offsetTop - container.offsetTop - 20;
-                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                    container.scrollTo({ top: target.offsetTop - container.offsetTop - 20, behavior: "smooth" });
                                   }
                                 }}
-                                onChange={(e) => handlePriceChange("royaltyFee", e.target.value)}
-                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">계약이행보증금 (제18조)</label>
-                              <input
-                                type="text"
-                                value={formatPriceInput(contractForm.guaranteeFee)}
-                                onFocus={() => {
-                                  const container = document.getElementById("contract-document-scroll-container");
-                                  const target = document.getElementById("doc-clause-18");
-                                  if (container && target) {
-                                    const offset = target.offsetTop - container.offsetTop - 20;
-                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
-                                  }
-                                }}
-                                onChange={(e) => handlePriceChange("guaranteeFee", e.target.value)}
+                                onChange={(e) => handlePriceChange("supervisionFee", e.target.value)}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
                             </div>
@@ -6901,16 +6865,97 @@ export default function AdminPage() {
                                   const container = document.getElementById("contract-document-scroll-container");
                                   const target = document.getElementById("doc-clause-29");
                                   if (container && target) {
-                                    const offset = target.offsetTop - container.offsetTop - 20;
-                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                    container.scrollTo({ top: target.offsetTop - container.offsetTop - 20, behavior: "smooth" });
                                   }
                                 }}
                                 onChange={(e) => handlePriceChange("initialSupplyFee", e.target.value)}
                                 className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
                               />
                             </div>
+                          </div>
+                        </div>
+
+                        {/* 6. 운영 중 정기 납부 비용 (월납) */}
+                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 제17조 / 제19조</span>
+                              <span>6. 운영 중 정기 납부 비용</span>
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                              월 정기 납부
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2.5">
                             <div>
-                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">위약금 (제40조)</label>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">월 계속가맹금 (로열티)</label>
+                              <input
+                                type="text"
+                                value={formatPriceInput(contractForm.royaltyFee)}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-17");
+                                  if (container && target) {
+                                    container.scrollTo({ top: target.offsetTop - container.offsetTop - 20, behavior: "smooth" });
+                                  }
+                                }}
+                                onChange={(e) => handlePriceChange("royaltyFee", e.target.value)}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                              <span className="text-[10px] text-slate-400 font-bold block mt-0.5 text-right">매월 1일 자동이체</span>
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">신입교육비 (1인 기준)</label>
+                              <input
+                                type="text"
+                                value={formatPriceInput(contractForm.eduNewFee || 220000)}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-19");
+                                  if (container && target) {
+                                    container.scrollTo({ top: target.offsetTop - container.offsetTop - 20, behavior: "smooth" });
+                                  }
+                                }}
+                                onChange={(e) => handlePriceChange("eduNewFee", e.target.value)}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                              <span className="text-[10px] text-slate-400 font-bold block mt-0.5 text-right">직원 채용 시 선택</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 7. 갱신 / 해지 조건부 비용 */}
+                        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 제39조 / 제40조</span>
+                              <span>7. 갱신 및 해지 조건부 비용</span>
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                              조건부 발생
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2.5">
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-slate-600 mb-1">재가맹비 (2년 갱신 시)</label>
+                              <input
+                                type="text"
+                                value={formatPriceInput(contractForm.reFranchiseFee || 1100000)}
+                                onFocus={() => {
+                                  const container = document.getElementById("contract-document-scroll-container");
+                                  const target = document.getElementById("doc-clause-39");
+                                  if (container && target) {
+                                    container.scrollTo({ top: target.offsetTop - container.offsetTop - 20, behavior: "smooth" });
+                                  }
+                                }}
+                                onChange={(e) => handlePriceChange("reFranchiseFee", e.target.value)}
+                                className="w-full bg-[#F8FAFC] border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 text-right focus:bg-white focus:ring-2 focus:ring-amber-400 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-extrabold text-rose-600 mb-1">계약해지 위약금 (제40조)</label>
                               <input
                                 type="text"
                                 value={formatPriceInput(contractForm.penaltyFee)}
@@ -6918,8 +6963,7 @@ export default function AdminPage() {
                                   const container = document.getElementById("contract-document-scroll-container");
                                   const target = document.getElementById("doc-clause-39");
                                   if (container && target) {
-                                    const offset = target.offsetTop - container.offsetTop - 20;
-                                    container.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+                                    container.scrollTo({ top: target.offsetTop - container.offsetTop - 20, behavior: "smooth" });
                                   }
                                 }}
                                 onChange={(e) => handlePriceChange("penaltyFee", e.target.value)}
@@ -6927,14 +6971,19 @@ export default function AdminPage() {
                               />
                             </div>
                           </div>
+
+                          <div className="p-2 bg-emerald-50 rounded-lg border border-emerald-200 text-[11px] text-emerald-800 flex items-center justify-between font-bold">
+                            <span>★ 계약이행보증금 환급 보장</span>
+                            <span className="font-black text-emerald-900">1,000,000 원 (계약 종료 시 100% 환급)</span>
+                          </div>
                         </div>
 
-                        {/* 7. 점주 서명정보 (생년월일, 연락처 자동하이픈) */}
+                        {/* 8. 점주 서명정보 (생년월일, 연락처 자동하이픈) */}
                         <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
                               <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[10px]">← 서명란</span>
-                              <span>7. 가맹사업자(을) 서명 인적사항</span>
+                              <span>8. 가맹사업자(을) 서명 인적사항</span>
                             </span>
                           </div>
 
