@@ -1307,36 +1307,43 @@ export default function AdminPage() {
   const [contractRoadAddress, setContractRoadAddress] = useState<string>("");
   const [contractDetailAddress, setContractDetailAddress] = useState<string>("");
   
-  const initialContractForm: ContractFormType = {
-    ownerName: "",
-    ownerBirth: "",
-    ownerPhone: "",
-    storeAddress: "",
-    storeName: "",
-    storeSize: "",
-    businessArea: "",
-    contractStart: "",
-    contractEnd: "",
-    supervisionFee: "",
-    initialFranchiseFee: "",
-    depositMembershipFee: "",
-    depositEduFee: "",
-    depositSupportFee: "",
-    depositGuaranteeFee: "",
-    depositTotalFee: "",
-    royaltyFee: "",
-    guaranteeFee: "",
-    eduOpenFee: "",
-    eduNewFee: "",
-    initialSupplyFee: "",
-    reFranchiseFee: "",
-    penaltyFee: "",
-    status: "기본정보 등록",
-    fileUrl: "",
-    fileName: "",
-    contractType: "신규",
+  const getInitialContractForm = (): ContractFormType => {
+    const now = new Date();
+    const startStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const endYear = now.getFullYear() + 2;
+    const endStr = `${endYear}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+    return {
+      ownerName: "",
+      ownerBirth: "",
+      ownerPhone: "",
+      storeAddress: "",
+      storeName: "",
+      storeSize: "33",
+      businessArea: "가맹점 반경 500m 내",
+      contractStart: startStr,
+      contractEnd: endStr,
+      supervisionFee: 3300000,
+      initialFranchiseFee: 5000000,
+      depositMembershipFee: 1100000,
+      depositEduFee: 2200000,
+      depositSupportFee: 1700000,
+      depositGuaranteeFee: 1000000,
+      depositTotalFee: 6000000,
+      royaltyFee: 150000,
+      guaranteeFee: 1000000,
+      eduOpenFee: 2200000,
+      eduNewFee: 220000,
+      initialSupplyFee: 4400000,
+      reFranchiseFee: 1100000,
+      penaltyFee: 1000000,
+      status: "기본정보 등록",
+      fileUrl: "",
+      fileName: "",
+      contractType: "신규",
+    };
   };
-  const [contractForm, setContractForm] = useState<ContractFormType>(initialContractForm);
+  const [contractForm, setContractForm] = useState<ContractFormType>(getInitialContractForm());
 
   // Contract Search State & Derived List
   const [contractSearchQuery, setContractSearchQuery] = useState<string>(" ");
@@ -1591,32 +1598,51 @@ export default function AdminPage() {
     // Combine road address and detail address
     const combinedAddress = `${contractRoadAddress} ${contractDetailAddress}`.trim();
     if (!combinedAddress) {
-      alert("가맹점 주소를 검색하여 입력해 주세요.");
+      alert("가맹점 주소를 입력하거나 주소 검색 버튼을 눌러주세요.");
+      return;
+    }
+
+    if (!contractForm.ownerName.trim()) {
+      alert("가맹사업자명을 입력해 주세요.");
+      return;
+    }
+    if (!contractForm.ownerPhone.trim()) {
+      alert("가맹사업자 연락처를 입력해 주세요.");
+      return;
+    }
+    if (!contractForm.storeName.trim()) {
+      alert("가맹점 명칭을 입력해 주세요.");
       return;
     }
     
     const sanitizeNumber = (val: any) => {
       if (val === "" || val === undefined || val === null) return 0;
-      return Number(val);
+      const parsed = Number(val);
+      return isNaN(parsed) ? 0 : parsed;
     };
 
-    const submitData = {
-      ownerName: contractForm.ownerName,
-      ownerBirth: contractForm.ownerBirth,
-      ownerPhone: contractForm.ownerPhone,
+    const submitData: any = {
+      ownerName: contractForm.ownerName.trim(),
+      ownerBirth: contractForm.ownerBirth.trim() || "-",
+      ownerPhone: contractForm.ownerPhone.trim(),
       storeAddress: combinedAddress,
-      storeName: contractForm.storeName,
+      storeName: contractForm.storeName.trim(),
       storeSize: sanitizeNumber(contractForm.storeSize),
-      businessArea: contractForm.businessArea,
-      contractStart: contractForm.contractStart,
-      contractEnd: contractForm.contractEnd,
+      businessArea: contractForm.businessArea.trim() || "가맹점 반경 500m 내",
+      contractStart: contractForm.contractStart || getFormattedDateTime().split(" ")[0],
+      contractEnd: contractForm.contractEnd || "",
       supervisionFee: sanitizeNumber(contractForm.supervisionFee),
       initialFranchiseFee: sanitizeNumber(contractForm.initialFranchiseFee),
       depositMembershipFee: sanitizeNumber(contractForm.depositMembershipFee),
       depositEduFee: sanitizeNumber(contractForm.depositEduFee),
       depositSupportFee: sanitizeNumber(contractForm.depositSupportFee),
       depositGuaranteeFee: sanitizeNumber(contractForm.depositGuaranteeFee),
-      depositTotalFee: sanitizeNumber(contractForm.depositTotalFee),
+      depositTotalFee: sanitizeNumber(contractForm.depositTotalFee) || (
+        sanitizeNumber(contractForm.depositMembershipFee) +
+        sanitizeNumber(contractForm.depositEduFee) +
+        sanitizeNumber(contractForm.depositSupportFee) +
+        sanitizeNumber(contractForm.depositGuaranteeFee)
+      ),
       royaltyFee: sanitizeNumber(contractForm.royaltyFee),
       guaranteeFee: sanitizeNumber(contractForm.guaranteeFee),
       eduOpenFee: sanitizeNumber(contractForm.eduOpenFee),
@@ -1625,14 +1651,25 @@ export default function AdminPage() {
       reFranchiseFee: sanitizeNumber(contractForm.reFranchiseFee),
       penaltyFee: sanitizeNumber(contractForm.penaltyFee),
       status: contractForm.status || "기본정보 등록",
-      fileUrl: contractForm.fileUrl || "",
-      fileName: contractForm.fileName || "",
       contractType: contractForm.contractType || "신규",
-      id: isContractEditMode && selectedContract ? selectedContract._id : undefined,
       createdAt: isContractEditMode && selectedContract ? selectedContract.createdAt : getFormattedDateTime(),
     };
+
+    if (contractForm.fileUrl) submitData.fileUrl = contractForm.fileUrl;
+    if (contractForm.fileName) submitData.fileName = contractForm.fileName;
+
+    if (isContractEditMode && selectedContract) {
+      submitData.id = selectedContract._id;
+      if (selectedContract.signatureImage) submitData.signatureImage = selectedContract.signatureImage;
+      if (selectedContract.signedAt) submitData.signedAt = selectedContract.signedAt;
+      if (selectedContract.sentAt) submitData.sentAt = selectedContract.sentAt;
+      if (selectedContract.signerIp) submitData.signerIp = selectedContract.signerIp;
+      if (selectedContract.agreeTerms !== undefined) submitData.agreeTerms = selectedContract.agreeTerms;
+      if (selectedContract.agreePrivacy !== undefined) submitData.agreePrivacy = selectedContract.agreePrivacy;
+      if (selectedContract.agreeSupplies !== undefined) submitData.agreeSupplies = selectedContract.agreeSupplies;
+    }
     
-    saveContractMutation(submitData as any)
+    saveContractMutation(submitData)
       .then((res) => {
         triggerToast(isContractEditMode ? "계약 정보가 수정되었습니다." : "신규 계약 정보가 등록되었습니다.");
         setIsContractFormOpen(false);
@@ -1640,6 +1677,10 @@ export default function AdminPage() {
           const newOrUpdated = { ...submitData, _id: res.contractId };
           setSelectedContract(newOrUpdated as any);
         }
+      })
+      .catch((err) => {
+        console.error("계약 정보 저장 실패:", err);
+        alert(`계약 정보 저장 중 오류가 발생했습니다: ${err.message || err}`);
       });
   };
 
@@ -6243,7 +6284,7 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    setContractForm(initialContractForm);
+                    setContractForm(getInitialContractForm());
                     setContractRoadAddress("");
                     setContractDetailAddress("");
                     setIsContractEditMode(false);
@@ -6397,10 +6438,10 @@ export default function AdminPage() {
                             <input
                               type="text"
                               required
-                              readOnly
                               value={contractRoadAddress}
-                              className="flex-1 px-3.5 py-2.5 border-0 rounded-md text-xs bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs"
-                              placeholder="주소 검색 버튼을 눌러 도로명 주소를 입력하세요."
+                              onChange={(e) => setContractRoadAddress(e.target.value)}
+                              className="flex-1 px-3.5 py-2.5 border-0 rounded-md text-xs bg-[#F8F9FA] text-[#0F172A] font-bold shadow-2xs focus:outline-none"
+                              placeholder="주소 검색 버튼을 누르거나 도로명 주소를 직접 입력하세요."
                             />
                             <button
                               type="button"
