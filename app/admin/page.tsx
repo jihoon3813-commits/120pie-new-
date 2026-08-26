@@ -1411,8 +1411,8 @@ export default function AdminPage() {
     });
   };
 
-  // Resizable Splitter State for Contract Editor (Default: 62% Preview, 38% Input)
-  const [contractSplitRatio, setContractSplitRatio] = useState(62);
+  // Resizable Splitter State for Contract Editor (Default: 60% Preview, 40% Input)
+  const [contractSplitRatio, setContractSplitRatio] = useState(60);
   const [isDraggingSplitter, setIsDraggingSplitter] = useState(false);
   const splitContainerRef = useRef<HTMLDivElement>(null);
 
@@ -1422,7 +1422,7 @@ export default function AdminPage() {
       if (!splitContainerRef.current) return;
       const rect = splitContainerRef.current.getBoundingClientRect();
       const newRatio = ((e.clientX - rect.left) / rect.width) * 100;
-      if (newRatio >= 35 && newRatio <= 75) {
+      if (newRatio >= 35 && newRatio <= 68) {
         setContractSplitRatio(Math.round(newRatio * 10) / 10);
       }
     };
@@ -6490,8 +6490,8 @@ export default function AdminPage() {
                           e.preventDefault();
                           setIsDraggingSplitter(true);
                         }}
-                        onDoubleClick={() => setContractSplitRatio(62)}
-                        title="좌우로 드래그하여 영역 크기를 조절하세요 (더블클릭 시 기본 62:38 복원)"
+                        onDoubleClick={() => setContractSplitRatio(60)}
+                        title="좌우로 드래그하여 영역 크기를 조절하세요 (더블클릭 시 기본 60:40 복원)"
                         className="hidden lg:flex flex-col items-center justify-center w-3.5 hover:w-3.5 group cursor-col-resize z-20 shrink-0 select-none py-4 mx-0.5"
                       >
                         <div 
@@ -6509,10 +6509,9 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      {/* Right: Input Panel with INDEPENDENT SCROLLBAR & Generous Bottom Padding */}
+                      {/* Right: Input Panel (Takes 100% of remaining width flexibly with its own scrollbar) */}
                       <div 
-                        style={{ width: `${100 - contractSplitRatio}%` }}
-                        className="space-y-3.5 h-full overflow-y-auto overflow-x-hidden pl-1 sm:pl-2 pr-1 sm:pr-2 pb-36 min-w-[280px] shrink-0"
+                        className="flex-1 min-w-[260px] shrink space-y-3.5 h-full overflow-y-auto overflow-x-hidden pl-1.5 sm:pl-2.5 pr-2 sm:pr-3.5 pb-36"
                       >
                         {/* Help & Fast Action Banner */}
                         <div className="p-3.5 bg-gradient-to-r from-amber-400 to-amber-300 rounded-xl text-slate-900 shadow-2xs flex items-center justify-between">
