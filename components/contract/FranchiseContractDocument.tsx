@@ -83,16 +83,16 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
     : "font-black text-[#0F172A]";
 
   return (
-    <div className={`w-full max-w-4xl mx-auto bg-white text-[#1E293B] font-sans leading-relaxed text-[13px] print:text-[11px] print:max-w-none print:w-full print:p-0 ${isPrintMode ? "p-0" : "p-6 sm:p-12 shadow-sm rounded-2xl border border-slate-200"}`}>
+    <div className={`w-full max-w-full overflow-hidden bg-white text-[#1E293B] font-sans leading-relaxed text-[13px] print:text-[11px] print:max-w-none print:w-full print:p-0 ${isPrintMode ? "p-0" : "p-4 sm:p-10 shadow-sm rounded-2xl border border-slate-200"}`}>
       
       {/* ==================== COVER PAGE ==================== */}
-      <div id="doc-cover" className="min-h-[700px] print:min-h-[900px] flex flex-col justify-between border-b-2 border-dashed border-slate-200 pb-16 mb-16 print:border-b-0 print:pb-0 print:mb-0 print:break-after-page">
+      <div id="doc-cover" className="min-h-[650px] print:min-h-[900px] flex flex-col justify-between border-b-2 border-dashed border-slate-200 pb-12 mb-12 print:border-b-0 print:pb-0 print:mb-0 print:break-after-page">
         <div className="flex justify-between items-start text-xs font-black tracking-widest text-slate-500 border-b border-slate-200 pb-2">
           <span>대 / 외 / 비</span>
           <span>120겹파이 (주)고우웰라이프</span>
         </div>
 
-        <div className="my-auto text-center space-y-8 py-8">
+        <div className="my-auto text-center space-y-7 py-6">
           {/* Security Notice Box */}
           <div className="max-w-xl mx-auto p-4 bg-slate-50 border border-slate-200 rounded-lg text-left text-[11px] text-slate-600 space-y-1">
             <p className="font-extrabold text-slate-800">※ 본 계약서의 보안 및 무단복제 금지</p>
@@ -117,17 +117,17 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           </div>
 
           {/* Main Title */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <h1 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight">
               120겹파이 가맹계약서
             </h1>
-            <p className="text-lg font-bold text-amber-700">
+            <p className="text-base sm:text-lg font-bold text-amber-700">
               외식 프랜차이즈 가맹사업 표준계약서
             </p>
           </div>
 
           {/* Parties Summary Box */}
-          <div className="max-w-md mx-auto mt-8 bg-[#F8FAFC] border border-slate-200 rounded-xl p-5 text-left text-xs space-y-2">
+          <div className="max-w-md mx-auto mt-6 bg-[#F8FAFC] border border-slate-200 rounded-xl p-4 sm:p-5 text-left text-xs space-y-2">
             <div className="flex justify-between items-center py-1 border-b border-slate-100">
               <span className="font-bold text-slate-500 shrink-0">가맹본부 (갑)</span>
               <span className="font-extrabold text-[#0F172A] text-right">{HEADQUARTERS_INFO.companyName} (대표이사 {HEADQUARTERS_INFO.ceoName})</span>
@@ -313,7 +313,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
         </section>
 
         {/* 제14조 : 점포의 설비 및 감리비 */}
-        <section className="space-y-2">
+        <section id="doc-clause-14" className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
             <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제14조</span>
             <span>점포의 설비 및 공사감리</span>
@@ -323,8 +323,8 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           </p>
         </section>
 
-        {/* 제15조 ~ 제18조 : 가맹금 및 정기 납입금 */}
-        <section id="doc-clause-15" className="space-y-3 bg-[#F8FAFC] p-5 rounded-xl border border-slate-200">
+        {/* 제15조 : 최초가맹금 및 예치가맹금 */}
+        <section id="doc-clause-15" className="space-y-3 bg-[#F8FAFC] p-4 sm:p-5 rounded-xl border border-slate-200 w-full max-w-full overflow-hidden">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
             <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제15조</span>
             <span>최초가맹금 및 예치가맹금</span>
@@ -338,45 +338,45 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
             ② ‘을’은 계약체결일에 최초가맹금과 계약이행보증금을 ‘갑’이 지정하는 아래 금융회사에 예치하여야 한다.
           </p>
 
-          <div className="bg-white p-3.5 rounded-lg border border-slate-200 text-xs space-y-2">
-            <p className="font-extrabold text-slate-800 break-keep">
+          <div className="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 text-xs space-y-2.5 w-full max-w-full overflow-hidden">
+            <p className="font-extrabold text-slate-800 break-keep text-[11px] sm:text-xs">
               * 예치금융회사 : <span className="text-blue-700">{HEADQUARTERS_INFO.depositBank}</span> | 계좌번호 : <span className="text-blue-700">{HEADQUARTERS_INFO.depositAccount}</span> | 예금주 : {HEADQUARTERS_INFO.depositAccountHolder}
             </p>
-            <div className="rounded border border-slate-200 mt-2">
+            <div className="w-full max-w-full overflow-hidden rounded-lg border border-slate-200 mt-2 bg-white">
               <table className="w-full text-xs text-left border-collapse table-fixed">
                 <thead className="bg-slate-100 font-bold text-slate-700">
                   <tr>
-                    <th className="p-2 border-b border-r border-slate-200 w-1/2">예치가맹금 내역</th>
-                    <th className="p-2 border-b border-slate-200 text-right w-1/2 pr-3">금액 (원)</th>
+                    <th className="p-2.5 border-b border-r border-slate-200 w-[50%] text-slate-800 font-black">예치가맹금 내역</th>
+                    <th className="p-2.5 border-b border-slate-200 text-right w-[50%] pr-3 text-slate-800 font-black">금액 (원)</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-slate-100">
-                    <td className="p-2 border-r border-slate-200 text-slate-600">가입비</td>
+                    <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold truncate pl-3">가입비</td>
                     <td className="p-2 text-right font-medium pr-3">
                       <span className={highlightClass}>{formatMoney(contract.depositMembershipFee)}</span>
                     </td>
                   </tr>
                   <tr className="border-b border-slate-100">
-                    <td className="p-2 border-r border-slate-200 text-slate-600">오픈교육비</td>
+                    <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold truncate pl-3">오픈교육비</td>
                     <td className="p-2 text-right font-medium pr-3">
                       <span className={highlightClass}>{formatMoney(contract.depositEduFee)}</span>
                     </td>
                   </tr>
                   <tr className="border-b border-slate-100">
-                    <td className="p-2 border-r border-slate-200 text-slate-600">오픈지원비</td>
+                    <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold truncate pl-3">오픈지원비</td>
                     <td className="p-2 text-right font-medium pr-3">
                       <span className={highlightClass}>{formatMoney(contract.depositSupportFee)}</span>
                     </td>
                   </tr>
                   <tr className="border-b border-slate-100">
-                    <td className="p-2 border-r border-slate-200 text-slate-600">계약이행보증금</td>
+                    <td className="p-2 border-r border-slate-200 text-slate-700 font-semibold truncate pl-3">계약이행보증금</td>
                     <td className="p-2 text-right font-medium pr-3">
                       <span className={highlightClass}>{formatMoney(contract.depositGuaranteeFee)}</span>
                     </td>
                   </tr>
-                  <tr className="bg-amber-50 font-black text-slate-900">
-                    <td className="p-2 border-r border-slate-200">합계</td>
+                  <tr className="bg-amber-50/80 font-black text-slate-900">
+                    <td className="p-2 border-r border-slate-200 font-black pl-3">합계</td>
                     <td className="p-2 text-right text-amber-900 font-black pr-3">
                       {formatMoney(
                         (Number(contract.depositMembershipFee) || 0) +
@@ -437,7 +437,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           <p className="text-left break-keep leading-relaxed">
             ‘갑’의 교육훈련은 다음 표와 같이 구분하여 실시하며 성실히 이수하여야 한다.
           </p>
-          <div className="overflow-hidden rounded-lg border border-slate-200">
+          <div className="w-full max-w-full overflow-hidden rounded-lg border border-slate-200">
             <table className="w-full text-xs text-left border-collapse table-fixed">
               <thead className="bg-slate-100 font-bold text-slate-700">
                 <tr>
@@ -556,12 +556,12 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
             {/* 가맹본부 (갑) */}
-            <div className="relative p-5 bg-[#F8FAFC] border border-slate-200 rounded-xl space-y-2 text-xs">
+            <div className="relative p-4 sm:p-5 bg-[#F8FAFC] border border-slate-200 rounded-xl space-y-2 text-xs overflow-hidden">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-2">
                 <span className="font-black text-[#0F172A] text-sm">[가맹본부 (갑)]</span>
                 <span className="text-[10px] text-slate-500 font-bold">법인인감 날인</span>
               </div>
-              <div className="space-y-1 text-slate-700">
+              <div className="space-y-1 text-slate-700 pr-16">
                 <p><span className="font-bold text-slate-500 w-20 inline-block">상 호 :</span> {HEADQUARTERS_INFO.companyName}</p>
                 <p><span className="font-bold text-slate-500 w-20 inline-block">대표자 :</span> {HEADQUARTERS_INFO.ceoName}</p>
                 <p><span className="font-bold text-slate-500 w-20 inline-block">사업자번호 :</span> {HEADQUARTERS_INFO.bizNumber}</p>
@@ -570,20 +570,20 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
               </div>
 
               {/* Official Seal Stamp Floating on CEO name */}
-              <div className="absolute right-4 bottom-4">
-                <OfficialSealStamp size={88} />
+              <div className="absolute right-3 bottom-3">
+                <OfficialSealStamp size={80} />
               </div>
             </div>
 
             {/* 가맹사업자 (을) */}
-            <div className="relative p-5 bg-[#F8FAFC] border border-slate-200 rounded-xl space-y-2 text-xs">
+            <div className="relative p-4 sm:p-5 bg-[#F8FAFC] border border-slate-200 rounded-xl space-y-2 text-xs overflow-hidden">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-2">
                 <span className="font-black text-[#0F172A] text-sm">[가맹점사업자 (을)]</span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${contract.signatureImage ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>
                   {contract.signatureImage ? "전자서명 완료" : "서명 대기"}
                 </span>
               </div>
-              <div className="space-y-1 text-slate-700">
+              <div className="space-y-1 text-slate-700 pr-16">
                 <p>
                   <span className="font-bold text-slate-500 w-20 inline-block">성 명 :</span>
                   <span className={highlightClass}>{contract.ownerName || "-"}</span>
@@ -608,17 +608,17 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
               {/* Customer Signature Display */}
               {contract.signatureImage ? (
-                <div className="absolute right-4 bottom-4 flex flex-col items-center">
+                <div className="absolute right-3 bottom-3 flex flex-col items-center">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={contract.signatureImage}
                     alt="가맹사업자 전자서명"
-                    className="w-24 h-14 object-contain filter drop-shadow-xs"
+                    className="w-20 h-12 object-contain filter drop-shadow-xs"
                   />
                   <span className="text-[9px] text-emerald-700 font-bold mt-0.5">전자서명 날인</span>
                 </div>
               ) : (
-                <div className="absolute right-4 bottom-4 w-24 h-14 border border-dashed border-slate-300 rounded-lg flex items-center justify-center text-[10px] text-slate-400 font-bold bg-white/60">
+                <div className="absolute right-3 bottom-3 w-20 h-12 border border-dashed border-slate-300 rounded-lg flex items-center justify-center text-[10px] text-slate-400 font-bold bg-white/60">
                   (인 / 서명)
                 </div>
               )}
