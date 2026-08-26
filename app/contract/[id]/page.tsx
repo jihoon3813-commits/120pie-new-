@@ -38,6 +38,7 @@ export default function ContractSigningPage() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSignModalOpen, setIsSignModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   if (contract === undefined) {
     return (
@@ -112,7 +113,7 @@ export default function ContractSigningPage() {
       });
 
       setIsSignModalOpen(false);
-      alert("🎉 120겹파이 가맹계약 전자서명이 성공적으로 완료되었습니다!");
+      setIsSuccessModalOpen(true);
     } catch (err: any) {
       console.error("Sign error:", err);
       setErrorMessage(err.message || "서명 처리 중 오류가 발생했습니다. 다시 시도해 주세요.");
@@ -352,6 +353,75 @@ export default function ContractSigningPage() {
                     <span>서명 완료 및 계약 체결</span>
                   </>
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== 전자서명 완료 축하 모달 (Success Modal) ==================== */}
+      {isSuccessModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn">
+          <div 
+            className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100 overflow-hidden text-center p-6 sm:p-8 space-y-5 animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Success Badge */}
+            <div className="relative mx-auto w-20 h-20">
+              <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-25" />
+              <div className="relative w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                <CheckCircle2 size={42} strokeWidth={2.5} />
+              </div>
+            </div>
+
+            {/* Title & Subtitle */}
+            <div className="space-y-1.5">
+              <div className="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 font-extrabold text-[11px] rounded-full border border-emerald-200 mb-1">
+                전자계약 체결 완료
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
+                가맹계약 전자서명 완료!
+              </h2>
+              <p className="text-xs sm:text-[13px] text-slate-500 leading-relaxed break-keep">
+                <strong>{contract.ownerName}</strong> 점주님, <strong>{contract.storeName}</strong>의 공식 가맹계약이 성공적으로 체결되었습니다.
+              </p>
+            </div>
+
+            {/* Contract Summary Box */}
+            <div className="bg-[#F8FAFC] p-4 rounded-2xl border border-slate-200/80 text-left text-xs space-y-2">
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200/60">
+                <span className="text-slate-500 font-bold">가맹점 명칭</span>
+                <span className="font-black text-[#0F172A]">{contract.storeName}</span>
+              </div>
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200/60">
+                <span className="text-slate-500 font-bold">가맹사업자</span>
+                <span className="font-black text-[#0F172A]">{contract.ownerName}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 font-bold">서명 체결일시</span>
+                <span className="font-extrabold text-emerald-700">{contract.signedAt || "방금 전"}</span>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="space-y-2.5 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSuccessModalOpen(false);
+                  setTimeout(() => handlePrint(), 300);
+                }}
+                className="w-full py-3.5 bg-gradient-to-r from-[#FED422] to-amber-400 hover:from-amber-400 hover:to-amber-500 text-[#0F172A] font-black text-sm rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0"
+              >
+                <Printer size={16} />
+                <span>공식 계약서 PDF 인쇄 / 다운로드</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsSuccessModalOpen(false)}
+                className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer border-0"
+              >
+                계약서 전문 확인하기
               </button>
             </div>
           </div>
