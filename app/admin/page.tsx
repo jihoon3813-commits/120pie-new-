@@ -6719,10 +6719,10 @@ export default function AdminPage() {
                                         type="text"
                                         value={formatPriceInput(contractForm.depositMembershipFee)}
                                         onChange={(e) => handlePriceChange("depositMembershipFee", e.target.value)}
-                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-4 sm:pr-4.5"
+                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-2 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7 sm:pr-8"
                                         placeholder="0"
                                       />
-                                      <span className="absolute right-1 text-[9px] sm:text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                      <span className="absolute right-2 sm:right-2.5 text-[11px] sm:text-xs font-bold text-slate-400 pointer-events-none">원</span>
                                     </div>
                                   </td>
                                 </tr>
@@ -6736,10 +6736,10 @@ export default function AdminPage() {
                                         type="text"
                                         value={formatPriceInput(contractForm.depositEduFee)}
                                         onChange={(e) => handlePriceChange("depositEduFee", e.target.value)}
-                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-4 sm:pr-4.5"
+                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-2 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7 sm:pr-8"
                                         placeholder="0"
                                       />
-                                      <span className="absolute right-1 text-[9px] sm:text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                      <span className="absolute right-2 sm:right-2.5 text-[11px] sm:text-xs font-bold text-slate-400 pointer-events-none">원</span>
                                     </div>
                                   </td>
                                 </tr>
@@ -6753,10 +6753,10 @@ export default function AdminPage() {
                                         type="text"
                                         value={formatPriceInput(contractForm.depositSupportFee)}
                                         onChange={(e) => handlePriceChange("depositSupportFee", e.target.value)}
-                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-4 sm:pr-4.5"
+                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-2 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7 sm:pr-8"
                                         placeholder="0"
                                       />
-                                      <span className="absolute right-1 text-[9px] sm:text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                      <span className="absolute right-2 sm:right-2.5 text-[11px] sm:text-xs font-bold text-slate-400 pointer-events-none">원</span>
                                     </div>
                                   </td>
                                 </tr>
@@ -6776,10 +6776,10 @@ export default function AdminPage() {
                                           handlePriceChange("depositGuaranteeFee", e.target.value);
                                           handlePriceChange("guaranteeFee", e.target.value);
                                         }}
-                                        className="w-full min-w-0 bg-blue-50/30 border border-blue-200 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-black text-right text-blue-950 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs pr-4 sm:pr-4.5"
+                                        className="w-full min-w-0 bg-blue-50/30 border border-blue-200 rounded px-2 py-1 text-xs font-black text-right text-blue-950 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs pr-7 sm:pr-8"
                                         placeholder="0"
                                       />
-                                      <span className="absolute right-1 text-[9px] sm:text-[10px] font-bold text-blue-400 pointer-events-none">원</span>
+                                      <span className="absolute right-2 sm:right-2.5 text-[11px] sm:text-xs font-bold text-blue-500 pointer-events-none">원</span>
                                     </div>
                                   </td>
                                 </tr>
@@ -6793,10 +6793,10 @@ export default function AdminPage() {
                                         type="text"
                                         value={formatPriceInput(contractForm.supervisionFee)}
                                         onChange={(e) => handlePriceChange("supervisionFee", e.target.value)}
-                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-4 sm:pr-4.5"
+                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-2 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7 sm:pr-8"
                                         placeholder="0"
                                       />
-                                      <span className="absolute right-1 text-[9px] sm:text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                      <span className="absolute right-2 sm:right-2.5 text-[11px] sm:text-xs font-bold text-slate-400 pointer-events-none">원</span>
                                     </div>
                                   </td>
                                 </tr>
@@ -6810,10 +6810,10 @@ export default function AdminPage() {
                                         type="text"
                                         value={formatPriceInput(contractForm.initialSupplyFee)}
                                         onChange={(e) => handlePriceChange("initialSupplyFee", e.target.value)}
-                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-4 sm:pr-4.5"
+                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-2 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7 sm:pr-8"
                                         placeholder="0"
                                       />
-                                      <span className="absolute right-1 text-[9px] sm:text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                      <span className="absolute right-2 sm:right-2.5 text-[11px] sm:text-xs font-bold text-slate-400 pointer-events-none">원</span>
                                     </div>
                                   </td>
                                 </tr>
@@ -6834,10 +6834,10 @@ export default function AdminPage() {
                                         type="text"
                                         value={formatPriceInput(contractForm.royaltyFee)}
                                         onChange={(e) => handlePriceChange("royaltyFee", e.target.value)}
-                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-4 sm:pr-4.5"
+                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-2 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7 sm:pr-8"
                                         placeholder="0"
                                       />
-                                      <span className="absolute right-1 text-[9px] sm:text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                      <span className="absolute right-2 sm:right-2.5 text-[11px] sm:text-xs font-bold text-slate-400 pointer-events-none">원</span>
                                     </div>
                                   </td>
                                 </tr>
@@ -6851,10 +6851,10 @@ export default function AdminPage() {
                                         type="text"
                                         value={formatPriceInput(contractForm.eduNewFee)}
                                         onChange={(e) => handlePriceChange("eduNewFee", e.target.value)}
-                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-4 sm:pr-4.5"
+                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-2 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7 sm:pr-8"
                                         placeholder="0"
                                       />
-                                      <span className="absolute right-1 text-[9px] sm:text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                      <span className="absolute right-2 sm:right-2.5 text-[11px] sm:text-xs font-bold text-slate-400 pointer-events-none">원</span>
                                     </div>
                                   </td>
                                 </tr>
@@ -6875,10 +6875,10 @@ export default function AdminPage() {
                                         type="text"
                                         value={formatPriceInput(contractForm.reFranchiseFee)}
                                         onChange={(e) => handlePriceChange("reFranchiseFee", e.target.value)}
-                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-4 sm:pr-4.5"
+                                        className="w-full min-w-0 bg-white border border-slate-300 rounded px-2 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7 sm:pr-8"
                                         placeholder="0"
                                       />
-                                      <span className="absolute right-1 text-[9px] sm:text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                      <span className="absolute right-2 sm:right-2.5 text-[11px] sm:text-xs font-bold text-slate-400 pointer-events-none">원</span>
                                     </div>
                                   </td>
                                 </tr>
@@ -6892,10 +6892,10 @@ export default function AdminPage() {
                                         type="text"
                                         value={formatPriceInput(contractForm.penaltyFee)}
                                         onChange={(e) => handlePriceChange("penaltyFee", e.target.value)}
-                                        className="w-full min-w-0 bg-white border border-rose-300 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs font-black text-right text-rose-700 outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 shadow-2xs pr-4 sm:pr-4.5"
+                                        className="w-full min-w-0 bg-white border border-rose-300 rounded px-2 py-1 text-xs font-black text-right text-rose-700 outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 shadow-2xs pr-7 sm:pr-8"
                                         placeholder="0"
                                       />
-                                      <span className="absolute right-1 text-[9px] sm:text-[10px] font-bold text-rose-400 pointer-events-none">원</span>
+                                      <span className="absolute right-2 sm:right-2.5 text-[11px] sm:text-xs font-bold text-rose-500 pointer-events-none">원</span>
                                     </div>
                                   </td>
                                 </tr>
