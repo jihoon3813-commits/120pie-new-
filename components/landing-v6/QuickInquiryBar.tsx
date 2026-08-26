@@ -40,12 +40,35 @@ export default function QuickInquiryBar({ isFixed = true }: QuickInquiryBarProps
   }, [isFixed]);
 
   const formatPhoneNumber = (value: string) => {
-    const raw = value.replace(/[^\d]/g, "");
-    if (raw.length < 4) return raw;
-    if (raw.length < 8) {
-      return `${raw.slice(0, 3)}-${raw.slice(3)}`;
+    if (!value) return "";
+    const clean = value.replace(/[^\d]/g, "");
+    
+    // 1. 전국 대표번호 (15xx, 16xx, 18xx 등 8자리 번호)
+    if (/^(15|16|18|17)\d+/.test(clean) && !clean.startsWith("0")) {
+      if (clean.length <= 4) return clean;
+      return `${clean.slice(0, 4)}-${clean.slice(4, 8)}`;
     }
-    return `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
+
+    // 2. 서울 지역번호 (02)
+    if (clean.startsWith("02")) {
+      if (clean.length <= 2) return clean;
+      if (clean.length <= 5) return `${clean.slice(0, 2)}-${clean.slice(2)}`;
+      if (clean.length <= 9) return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5, 9)}`;
+      return `${clean.slice(0, 2)}-${clean.slice(2, 6)}-${clean.slice(6, 10)}`;
+    }
+
+    // 3. 050 안심번호 (12자리: 0504-xxxx-xxxx 등)
+    if (clean.startsWith("050") && clean.length > 11) {
+      return `${clean.slice(0, 4)}-${clean.slice(4, 8)}-${clean.slice(8, 12)}`;
+    }
+
+    // 4. 일반 이동전화 및 지역번호 (010, 031, 042, 070 등)
+    if (clean.length <= 3) return clean;
+    if (clean.length <= 6) return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+    if (clean.length <= 10) {
+      return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6, 10)}`;
+    }
+    return `${clean.slice(0, 3)}-${clean.slice(3, 7)}-${clean.slice(7, 11)}`;
   };
 
   const handlePhoneChange = (val: string) => {

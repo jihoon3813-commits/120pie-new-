@@ -244,10 +244,27 @@ export default function BrandFranchisePage() {
   const sendSmsAction = useAction(api.aligo.sendSms);
 
   const formatPhoneNumber = (val: string) => {
-    const raw = val.replace(/[^\d]/g, "");
-    if (raw.length <= 3) return raw;
-    if (raw.length <= 7) return `${raw.slice(0, 3)}-${raw.slice(3)}`;
-    return `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
+    if (!val) return "";
+    const clean = val.replace(/[^\d]/g, "");
+    if (/^(15|16|18|17)\d+/.test(clean) && !clean.startsWith("0")) {
+      if (clean.length <= 4) return clean;
+      return `${clean.slice(0, 4)}-${clean.slice(4, 8)}`;
+    }
+    if (clean.startsWith("02")) {
+      if (clean.length <= 2) return clean;
+      if (clean.length <= 5) return `${clean.slice(0, 2)}-${clean.slice(2)}`;
+      if (clean.length <= 9) return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5, 9)}`;
+      return `${clean.slice(0, 2)}-${clean.slice(2, 6)}-${clean.slice(6, 10)}`;
+    }
+    if (clean.startsWith("050") && clean.length > 11) {
+      return `${clean.slice(0, 4)}-${clean.slice(4, 8)}-${clean.slice(8, 12)}`;
+    }
+    if (clean.length <= 3) return clean;
+    if (clean.length <= 6) return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+    if (clean.length <= 10) {
+      return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6, 10)}`;
+    }
+    return `${clean.slice(0, 3)}-${clean.slice(3, 7)}-${clean.slice(7, 11)}`;
   };
 
   const handleInquirySubmit = async (e: React.FormEvent) => {
