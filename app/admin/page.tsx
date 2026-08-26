@@ -1411,6 +1411,32 @@ export default function AdminPage() {
     });
   };
 
+  // Resizable Splitter State for Contract Editor (Default: 62% Preview, 38% Input)
+  const [contractSplitRatio, setContractSplitRatio] = useState(62);
+  const [isDraggingSplitter, setIsDraggingSplitter] = useState(false);
+  const splitContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isDraggingSplitter) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!splitContainerRef.current) return;
+      const rect = splitContainerRef.current.getBoundingClientRect();
+      const newRatio = ((e.clientX - rect.left) / rect.width) * 100;
+      if (newRatio >= 35 && newRatio <= 75) {
+        setContractSplitRatio(Math.round(newRatio * 10) / 10);
+      }
+    };
+    const handleMouseUp = () => {
+      setIsDraggingSplitter(false);
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDraggingSplitter]);
+
   const handleApplyAllDefaults = () => {
     setContractForm((prev) => ({
       ...prev,
@@ -6421,19 +6447,29 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* 2-Column Layout: Left (50%) = Live Document (Independent Scroll), Right (50%) = Connected Inputs (Independent Scroll) */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start flex-1 min-h-0 overflow-hidden">
-                      {/* Left: Contract Document Viewer with Clean Static Header & Non-overlapping Scroll Container */}
-                      <div className="flex flex-col h-full bg-slate-100/70 p-2 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-inner overflow-hidden min-w-0">
-                        {/* Static Header Bar - OUTSIDE scroll area so text never overlaps or shines through */}
+                    {/* Resizable 2-Column Split Layout: Left = Live Document (Default: wider 62%), Right = Connected Inputs (Default: 38%) */}
+                    <div 
+                      ref={splitContainerRef}
+                      className={`flex flex-col lg:flex-row items-stretch flex-1 min-h-0 overflow-hidden w-full relative ${
+                        isDraggingSplitter ? "select-none cursor-col-resize" : ""
+                      }`}
+                    >
+                      {/* Left: Contract Document Viewer (Wider by default, resizable) */}
+                      <div 
+                        style={{ width: `${contractSplitRatio}%` }}
+                        className="flex flex-col h-full bg-slate-100/70 p-2 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-inner overflow-hidden min-w-[320px] shrink-0"
+                      >
+                        {/* Static Header Bar - OUTSIDE scroll area */}
                         <div className="flex items-center justify-between mb-2 px-2 py-1 shrink-0 bg-slate-200/70 rounded-lg sm:rounded-xl border border-slate-300/60">
                           <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
                             <FileText size={14} className="text-amber-600 shrink-0" />
                             <span className="truncate">120겹파이 공식 가맹계약서 실시간 원문</span>
                           </span>
-                          <span className="text-[10px] sm:text-[11px] font-bold text-amber-900 bg-amber-100/90 px-1.5 py-0.5 rounded border border-amber-300 shadow-2xs shrink-0">
-                            실시간 연동
-                          </span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-[10px] sm:text-[11px] font-bold text-amber-900 bg-amber-100/90 px-1.5 py-0.5 rounded border border-amber-300 shadow-2xs">
+                              미리보기 {Math.round(contractSplitRatio)}%
+                            </span>
+                          </div>
                         </div>
 
                         {/* Pure Scroll Container for Document */}
@@ -6448,8 +6484,36 @@ export default function AdminPage() {
                         </div>
                       </div>
 
+                      {/* Resizable Splitter Divider (Drag left/right to resize) */}
+                      <div
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setIsDraggingSplitter(true);
+                        }}
+                        onDoubleClick={() => setContractSplitRatio(62)}
+                        title="좌우로 드래그하여 영역 크기를 조절하세요 (더블클릭 시 기본 62:38 복원)"
+                        className="hidden lg:flex flex-col items-center justify-center w-3.5 hover:w-3.5 group cursor-col-resize z-20 shrink-0 select-none py-4 mx-0.5"
+                      >
+                        <div 
+                          className={`w-1.5 h-full rounded-full transition-all flex items-center justify-center ${
+                            isDraggingSplitter 
+                              ? "bg-amber-500 ring-4 ring-amber-300/60 shadow-md" 
+                              : "bg-slate-300/80 group-hover:bg-amber-500 group-hover:ring-2 group-hover:ring-amber-200"
+                          }`}
+                        >
+                          <div className="w-1 h-7 bg-slate-400 group-hover:bg-white rounded-full flex flex-col justify-around items-center py-1">
+                            <span className="w-0.5 h-0.5 bg-slate-600 group-hover:bg-amber-950 rounded-full"></span>
+                            <span className="w-0.5 h-0.5 bg-slate-600 group-hover:bg-amber-950 rounded-full"></span>
+                            <span className="w-0.5 h-0.5 bg-slate-600 group-hover:bg-amber-950 rounded-full"></span>
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Right: Input Panel with INDEPENDENT SCROLLBAR & Generous Bottom Padding */}
-                      <div className="space-y-3.5 h-full overflow-y-auto overflow-x-hidden pr-1 sm:pr-2 pb-36 min-w-0">
+                      <div 
+                        style={{ width: `${100 - contractSplitRatio}%` }}
+                        className="space-y-3.5 h-full overflow-y-auto overflow-x-hidden pl-1 sm:pl-2 pr-1 sm:pr-2 pb-36 min-w-[280px] shrink-0"
+                      >
                         {/* Help & Fast Action Banner */}
                         <div className="p-3.5 bg-gradient-to-r from-amber-400 to-amber-300 rounded-xl text-slate-900 shadow-2xs flex items-center justify-between">
                           <div>
