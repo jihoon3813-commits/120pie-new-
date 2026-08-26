@@ -288,7 +288,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                   신입직원 추가교육비 <span className="text-[10px] text-slate-400 font-normal">제19조</span>
                 </td>
                 <td className="p-1.5 border-r border-slate-200 text-right pr-2 sm:pr-3 font-bold text-slate-700">
-                  <span className={highlightClass}>{formatMoney(contract.eduNewFee || 220000)}</span> 원 <span className="text-[9px] text-slate-500">(1인)</span>
+                  <span className={highlightClass}>{formatMoney(contract.eduNewFee)}</span> 원 <span className="text-[9px] text-slate-500">(1인)</span>
                 </td>
                 <td className="p-1.5 border-slate-200 text-center text-[10px] text-slate-500 font-normal leading-tight break-keep">
                   직원 채용 신청 시
@@ -433,7 +433,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                 <span className="text-[10px] text-slate-400">직원 채용 신청 시</span>
               </div>
               <div className="text-right">
-                <span className="text-xs font-black text-slate-900">{formatMoney(contract.eduNewFee || 220000)} 원</span>
+                <span className="text-xs font-black text-slate-900">{formatMoney(contract.eduNewFee)} 원</span>
               </div>
             </div>
           </div>
@@ -903,12 +903,12 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                 <tr className="border-b border-slate-100">
                   <td className="p-2 border-r border-slate-200 font-bold text-slate-800">오픈교육</td>
                   <td className="p-2 border-r border-slate-200 text-center text-slate-600">오픈 전</td>
-                  <td className="p-2 text-right pr-3 font-bold text-slate-900">{formatMoney(contract.eduOpenFee || 2200000)} 원 (최초가맹금에 포함)</td>
+                  <td className="p-2 text-right pr-3 font-bold text-slate-900">{formatMoney(contract.eduOpenFee ?? contract.depositEduFee)} 원 (최초가맹금에 포함)</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-2 border-r border-slate-200 font-bold text-slate-800">신입교육</td>
                   <td className="p-2 border-r border-slate-200 text-center text-slate-600">신입직원 채용 시</td>
-                  <td className="p-2 text-right pr-3 font-bold text-slate-900">{formatMoney(contract.eduNewFee || 220000)} 원 (1인 기준)</td>
+                  <td className="p-2 text-right pr-3 font-bold text-slate-900">{formatMoney(contract.eduNewFee)} 원 (1인 기준)</td>
                 </tr>
                 <tr>
                   <td className="p-2 border-r border-slate-200 font-bold text-slate-800">특별교육</td>
