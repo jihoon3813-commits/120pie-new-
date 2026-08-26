@@ -6707,15 +6707,11 @@ export default function AdminPage() {
 
                           {/* Editable Cost Summary Table */}
                           <div className="overflow-hidden rounded-xl border border-slate-200 w-full max-w-full">
-                            <table className="w-full text-xs text-left border-collapse table-fixed">
-                              <colgroup>
-                                <col style={{ width: "42%" }} />
-                                <col style={{ width: "58%" }} />
-                              </colgroup>
+                            <table className="w-full text-xs text-left border-collapse" style={{ tableLayout: "auto" }}>
                               <thead className="bg-slate-100 font-bold text-slate-700 text-[11px]">
                                 <tr>
-                                  <th style={{ width: "42%" }} className="p-2 border-b border-r border-slate-200 pl-2 sm:pl-2.5">비용 항목</th>
-                                  <th style={{ width: "58%" }} className="p-2 border-b border-slate-200 text-right pr-2 sm:pr-2.5">납부 금액</th>
+                                  <th className="p-2 border-b border-r border-slate-200 pl-2 sm:pl-2.5">비용 항목</th>
+                                  <th className="p-2 border-b border-slate-200 text-right pr-2 sm:pr-2.5 whitespace-nowrap">납부 금액</th>
                                 </tr>
                               </thead>
                               <tbody>
