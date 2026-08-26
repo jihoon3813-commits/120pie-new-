@@ -192,22 +192,22 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           </div>
 
           {/* Comprehensive 3-Category Fee Table */}
-          <div className="w-full max-w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xs">
-            <table className="w-full text-xs text-left border-collapse table-fixed">
+          <div className="w-full max-w-full overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-2xs">
+            <table className="w-full text-xs text-left border-collapse table-fixed min-w-[380px]">
               <colgroup>
                 <col className="w-[18%]" />
+                <col className="w-[28%]" />
                 <col className="w-[26%]" />
-                <col className="w-[24%]" />
-                <col className="w-[18%]" />
-                <col className="w-[14%]" />
+                <col className="w-[16%]" />
+                <col className="w-[12%]" />
               </colgroup>
-              <thead className="bg-slate-100 font-black text-slate-800 text-[11px]">
+              <thead className="bg-slate-100 font-black text-slate-800 text-[10px] sm:text-[11px]">
                 <tr>
-                  <th className="p-2.5 border-b border-r border-slate-200 text-center">납부 구분</th>
-                  <th className="p-2.5 border-b border-r border-slate-200 pl-3">세부 항목</th>
-                  <th className="p-2.5 border-b border-r border-slate-200 text-right pr-3">납부 금액</th>
-                  <th className="p-2.5 border-b border-r border-slate-200 text-center">납부 시기 / 계좌</th>
-                  <th className="p-2.5 border-b border-slate-200 text-center">반환 여부</th>
+                  <th className="p-2 border-b border-r border-slate-200 text-center">납부 구분</th>
+                  <th className="p-2 border-b border-r border-slate-200 pl-2.5">세부 항목</th>
+                  <th className="p-2 border-b border-r border-slate-200 text-right pr-2.5">납부 금액</th>
+                  <th className="p-2 border-b border-r border-slate-200 text-center">납부 시기</th>
+                  <th className="p-2 border-b border-slate-200 text-center">반환</th>
                 </tr>
               </thead>
               <tbody>
