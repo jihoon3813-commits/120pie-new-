@@ -1555,10 +1555,11 @@ export default function AdminPage() {
     const target = targetContract || selectedContract;
     if (!target) return;
     
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://120pie.com";
-    const signUrl = `${origin}/contract/${target._id}`;
+    const rawOrigin = typeof window !== "undefined" ? window.location.origin : "https://120pie.com";
+    const baseUrl = (rawOrigin && !rawOrigin.includes("localhost") && !rawOrigin.includes("127.0.0.1")) ? rawOrigin : "https://120pie.com";
+    const signUrl = `${baseUrl}/contract/${target._id}`;
     
-    const defaultMsg = `[120겹파이] 가맹계약서 전자서명 안내\n\n${target.ownerName} 가맹사업자님, 120겹파이(${target.storeName || "가맹점"}) 공식 가맹계약서가 발행되었습니다.\n\n아래 링크를 통해 계약서 전문을 확인하시고 전자서명을 완료해 주시기 바랍니다.\n\n🔗 계약서 확인 및 전자서명:\n${signUrl}\n\n문의사항: 1566-3594`;
+    const defaultMsg = `[120겹파이] 가맹계약서 전자서명 안내\n\n${target.ownerName} 가맹사업자님, 120겹파이(${target.storeName || "가맹점"}) 공식 가맹계약서가 발행되었습니다.\n\n아래 링크를 통해 계약서 전문을 확인하시고 전자서명을 완료해 주시기 바랍니다.\n\n▶ 계약서 확인 및 전자서명:\n${signUrl}\n\n문의사항: 1566-3594`;
     
     const senderPhone = testSenderPhone || (smsSettings?.consultation?.admin?.sender) || "1566-3594";
     
@@ -7010,7 +7011,11 @@ export default function AdminPage() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleCopyText(`${window.location.origin}/contract/${selectedContract._id}`, "전자계약서 서명 링크")}
+                          onClick={() => {
+                            const rawOrigin = typeof window !== "undefined" ? window.location.origin : "https://120pie.com";
+                            const baseUrl = (rawOrigin && !rawOrigin.includes("localhost") && !rawOrigin.includes("127.0.0.1")) ? rawOrigin : "https://120pie.com";
+                            handleCopyText(`${baseUrl}/contract/${selectedContract._id}`, "전자계약서 서명 링크");
+                          }}
                           className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-lg transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1.5"
                           title="서명 링크 복사"
                         >
