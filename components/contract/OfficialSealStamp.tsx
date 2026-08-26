@@ -1,89 +1,33 @@
 import React from "react";
+import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 
 interface OfficialSealStampProps {
   size?: number;
   className?: string;
 }
 
-export const OfficialSealStamp: React.FC<OfficialSealStampProps> = ({ size = 76, className = "" }) => {
+const SEAL_IMAGE_URL = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1787726674/edited-photo_98_fsgw57.png";
+
+export const OfficialSealStamp: React.FC<OfficialSealStampProps> = ({ size = 88, className = "" }) => {
+  const optimizedUrl = optimizeCloudinaryUrl(SEAL_IMAGE_URL);
+
   return (
     <div 
       className={`inline-flex items-center justify-center select-none pointer-events-none ${className}`}
       style={{ width: size, height: size }}
-      title="(주)고우웰라이프 직인"
+      title="(주)고우웰라이프 대표이사 직인"
     >
-      <svg
-        viewBox="0 0 100 100"
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={optimizedUrl}
+        alt="(주)고우웰라이프 대표이사 직인"
         width={size}
         height={size}
-        className="transform -rotate-6 filter drop-shadow-xs"
-      >
-        {/* Outer Circle */}
-        <circle
-          cx="50"
-          cy="50"
-          r="46"
-          fill="none"
-          stroke="#DC2626"
-          strokeWidth="3.5"
-          strokeDasharray="98 2"
-        />
-        {/* Inner Circle */}
-        <circle
-          cx="50"
-          cy="50"
-          r="42"
-          fill="none"
-          stroke="#DC2626"
-          strokeWidth="1.2"
-        />
-        
-        {/* Top Arc Text: (주)고우웰라이프 */}
-        <path
-          id="sealTopPath"
-          d="M 18,50 A 32,32 0 0,1 82,50"
-          fill="none"
-        />
-        <text
-          fill="#DC2626"
-          fontSize="10"
-          fontWeight="900"
-          letterSpacing="1.2"
-          textAnchor="middle"
-        >
-          <textPath href="#sealTopPath" startOffset="50%">
-            (주)고우웰라이프
-          </textPath>
-        </text>
-
-        {/* Center Text: 대표이사 / 이사근 */}
-        <g fill="#DC2626" textAnchor="middle">
-          <text x="50" y="47" fontSize="10.5" fontWeight="900" letterSpacing="1">
-            대표이사
-          </text>
-          <text x="50" y="63" fontSize="13.5" fontWeight="900" letterSpacing="2">
-            이사근
-          </text>
-        </g>
-
-        {/* Bottom Arc Text: 가맹사업본부 직인 */}
-        <path
-          id="sealBottomPath"
-          d="M 82,50 A 32,32 0 0,1 18,50"
-          fill="none"
-        />
-        <text
-          fill="#DC2626"
-          fontSize="8.5"
-          fontWeight="800"
-          letterSpacing="2"
-          textAnchor="middle"
-        >
-          <textPath href="#sealBottomPath" startOffset="50%">
-            직인
-          </textPath>
-        </text>
-      </svg>
+        className="w-full h-full object-contain filter contrast-125 saturate-200 drop-shadow-xs transform -rotate-3"
+        style={{
+          filter: "contrast(1.3) saturate(2.2) brightness(0.95)",
+        }}
+      />
     </div>
   );
 };

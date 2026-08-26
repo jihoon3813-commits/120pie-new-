@@ -17,8 +17,6 @@ import {
   Store, 
   Calendar, 
   User, 
-  Phone,
-  Copy,
   Share2,
   Check
 } from "lucide-react";
@@ -34,10 +32,7 @@ export default function ContractSigningPage() {
   const signContractMutation = useMutation(api.contracts.signContract);
 
   // Signing state
-  const [agreeTerms, setAgreeTerms] = useState(false);
-  const [agreePrivacy, setAgreePrivacy] = useState(false);
-  const [agreeSupplies, setAgreeSupplies] = useState(false);
-  const [birthVerification, setBirthVerification] = useState("");
+  const [agreePrivacy, setAgreePrivacy] = useState(true);
   const [signatureData, setSignatureData] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -72,13 +67,6 @@ export default function ContractSigningPage() {
 
   const isSigned = contract.status === "계약서 서명완료" || Boolean(contract.signatureImage);
 
-  const handleAllAgreeToggle = () => {
-    const nextState = !(agreeTerms && agreePrivacy && agreeSupplies);
-    setAgreeTerms(nextState);
-    setAgreePrivacy(nextState);
-    setAgreeSupplies(nextState);
-  };
-
   const handleCopyLink = () => {
     if (typeof window !== "undefined") {
       navigator.clipboard.writeText(window.location.href);
@@ -97,26 +85,13 @@ export default function ContractSigningPage() {
     e.preventDefault();
     setErrorMessage("");
 
-    if (!agreeTerms || !agreePrivacy || !agreeSupplies) {
-      setErrorMessage("모든 필수 약관에 동의해 주셔야 계약 체결이 가능합니다.");
+    if (!agreePrivacy) {
+      setErrorMessage("개인정보 제공 및 계약 체결 동의에 체크해 주세요.");
       return;
     }
 
-    // Clean up ownerBirth from contract for comparison
-    const targetBirth = contract.ownerBirth.replace(/[^0-9]/g, "");
-    const inputBirth = birthVerification.replace(/[^0-9]/g, "");
-
-    // If contract has birth info, verify last 6 digits or full match
-    if (targetBirth && inputBirth) {
-      const match = targetBirth.endsWith(inputBirth) || targetBirth.startsWith(inputBirth) || targetBirth === inputBirth;
-      if (!match) {
-        setErrorMessage("입력하신 생년월일이 가맹사업자 등록 정보와 일치하지 않습니다.");
-        return;
-      }
-    }
-
     if (!signatureData) {
-      setErrorMessage("서명 패드에 정자로 직접 서명해 주세요.");
+      setErrorMessage("서명 패드에 정자로 서명해 주세요.");
       return;
     }
 
@@ -150,7 +125,7 @@ export default function ContractSigningPage() {
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 print:hidden">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-400 flex items-center justify-center text-[#0F172A] font-black text-sm shadow-xs">
+            <div className="w-8 h-8 rounded-lg bg-[#FED422] flex items-center justify-center text-[#0F172A] font-black text-sm shadow-xs">
               120
             </div>
             <div>
@@ -163,7 +138,7 @@ export default function ContractSigningPage() {
             <button
               type="button"
               onClick={handleCopyLink}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all cursor-pointer border-0"
             >
               {copiedLink ? <Check size={14} className="text-emerald-600" /> : <Share2 size={14} />}
               <span className="hidden sm:inline">{copiedLink ? "링크 복사됨" : "링크 복사"}</span>
@@ -171,7 +146,7 @@ export default function ContractSigningPage() {
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-[#0F172A] bg-amber-300 hover:bg-amber-400 rounded-lg transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-[#0F172A] bg-[#FED422] hover:bg-[#e5be1f] rounded-lg transition-all shadow-xs cursor-pointer border-0"
             >
               <Printer size={14} />
               <span>인쇄 / PDF</span>
@@ -200,7 +175,7 @@ export default function ContractSigningPage() {
               <button
                 type="button"
                 onClick={handlePrint}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-xs cursor-pointer"
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-xs cursor-pointer border-0"
               >
                 <Printer size={14} />
                 공식 계약서 PDF 출력
@@ -212,9 +187,9 @@ export default function ContractSigningPage() {
                 <FileCheck size={22} />
               </div>
               <div>
-                <h2 className="text-sm font-black text-amber-950">가맹계약서 확인 및 전자서명 요청</h2>
+                <h2 className="text-sm font-black text-amber-950">가맹계약서 확인 및 전자서명</h2>
                 <p className="text-xs text-amber-800 mt-0.5">
-                  계약서 조항을 꼼꼼히 확인하신 후 하단의 서명란에 전자서명을 진행해 주세요.
+                  계약서 조항을 확인하신 후 하단에 전자서명을 진행해 주시면 체결이 완료됩니다.
                 </p>
               </div>
             </div>
@@ -239,7 +214,7 @@ export default function ContractSigningPage() {
             <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
               <Calendar size={13} /> 계약기간
             </span>
-            <p className="font-extrabold text-[#0F172A]">{contract.contractStart} ~</p>
+            <p className="font-extrabold text-[#0F172A]">{contract.contractStart} ~ {contract.contractEnd}</p>
           </div>
           <div className="space-y-1">
             <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
@@ -259,93 +234,44 @@ export default function ContractSigningPage() {
           <div className="bg-white p-6 sm:p-8 rounded-2xl border-2 border-amber-300 shadow-lg space-y-6 print:hidden">
             <div className="border-b border-slate-200 pb-4">
               <span className="inline-flex items-center gap-1 text-xs font-black text-amber-700 uppercase tracking-wider mb-1">
-                <Lock size={13} /> Step-by-Step Electronic Signature
+                <Lock size={13} /> Electronic Signature
               </span>
               <h3 className="text-xl font-black text-[#0F172A]">가맹계약 체결 및 전자서명</h3>
               <p className="text-xs text-slate-500 mt-1">
-                아래 필수 확인 항목에 동의하시고 정자로 서명해 주시면 법적 효력을 갖는 전자계약이 체결됩니다.
+                위 계약서 내용을 모두 확인하셨으면 아래 동의 및 서명을 진행해 주세요.
               </p>
             </div>
 
             <form onSubmit={handleSignSubmit} className="space-y-6">
-              {/* Step 1: 필수 약관 동의 */}
-              <div className="space-y-3 bg-[#F8FAFC] p-4 sm:p-5 rounded-xl border border-slate-200">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                  <span className="text-xs font-black text-[#0F172A]">필수 약관 및 고지사항 동의</span>
-                  <button
-                    type="button"
-                    onClick={handleAllAgreeToggle}
-                    className="text-xs font-black text-amber-700 hover:text-amber-800 underline cursor-pointer"
-                  >
-                    전체 동의하기
-                  </button>
-                </div>
-
-                <div className="space-y-2.5 text-xs text-slate-700">
-                  <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={agreeTerms}
-                      onChange={(e) => setAgreeTerms(e.target.checked)}
-                      className="w-4 h-4 mt-0.5 accent-amber-500 cursor-pointer rounded"
-                    />
-                    <span>
-                      <strong className="text-amber-800">[필수]</strong> 가맹계약서 전문(제1조~제47조) 및 영업조건(로열티, 위약금, 영업지역 등)을 모두 확인하고 이에 전적으로 동의합니다.
-                    </span>
-                  </label>
-
-                  <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={agreePrivacy}
-                      onChange={(e) => setAgreePrivacy(e.target.checked)}
-                      className="w-4 h-4 mt-0.5 accent-amber-500 cursor-pointer rounded"
-                    />
-                    <span>
-                      <strong className="text-amber-800">[필수]</strong> 「가맹사업거래의 공정화에 관한 법률」에 따라 정보공개서 및 가맹계약서를 사전(14일 이전)에 제공받아 충분한 숙고기간을 거쳤음을 확인합니다.
-                    </span>
-                  </label>
-
-                  <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={agreeSupplies}
-                      onChange={(e) => setAgreeSupplies(e.target.checked)}
-                      className="w-4 h-4 mt-0.5 accent-amber-500 cursor-pointer rounded"
-                    />
-                    <span>
-                      <strong className="text-amber-800">[필수]</strong> [별첨3] 구입강제품목 공급가격 및 공급가격 결정기준을 제공받아 투명하게 안내받았음을 확인합니다.
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Step 2: 본인 확인 */}
-              <div className="space-y-2">
-                <label className="block text-xs font-black text-slate-700">
-                  가맹사업자 본인확인 (생년월일 6자리) <span className="text-red-500">*</span>
-                </label>
-                <div className="relative max-w-xs">
+              {/* 개인정보 제공 및 계약 체결 동의 */}
+              <div className="bg-[#F8FAFC] p-4 sm:p-5 rounded-xl border border-slate-200">
+                <label className="flex items-start gap-3 cursor-pointer select-none">
                   <input
-                    type="text"
-                    required
-                    maxLength={10}
-                    placeholder="예: 850312"
-                    value={birthVerification}
-                    onChange={(e) => setBirthVerification(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-[#F8FAFC] border border-slate-300 rounded-lg text-xs font-bold text-[#0F172A] focus:outline-none focus:border-amber-500"
+                    type="checkbox"
+                    checked={agreePrivacy}
+                    onChange={(e) => setAgreePrivacy(e.target.checked)}
+                    className="w-5 h-5 mt-0.5 accent-amber-500 cursor-pointer rounded shrink-0"
                   />
-                </div>
-                <span className="text-[11px] text-slate-400 block">
-                  계약서에 등록된 생년월일과 대조하여 본인 여부를 안전하게 확인합니다.
-                </span>
+                  <div className="text-xs text-slate-800 leading-relaxed">
+                    <strong className="text-amber-800 font-black">[필수]</strong> 
+                    <span className="font-extrabold ml-1">가맹계약서 확인 및 개인정보 수집·이용 동의</span>
+                    <p className="text-slate-500 text-[11px] mt-1">
+                      본인은 120겹파이 가맹계약서 전문(제1조~제47조) 및 별첨 내용을 모두 확인하였으며, 계약 체결 및 전자서명 관리를 위한 개인정보 수집·이용에 동의합니다.
+                    </p>
+                  </div>
+                </label>
               </div>
 
-              {/* Step 3: 전자서명 캔버스 */}
+              {/* 전자서명 캔버스 */}
               <div className="space-y-2">
-                <label className="block text-xs font-black text-slate-700">
-                  가맹사업자 전자서명 <span className="text-red-500">*</span>
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-black text-slate-700">
+                    가맹사업자(을) 서명 <span className="text-red-500">*</span>
+                  </label>
+                  <span className="text-[11px] text-slate-400">
+                    아래 영역에 직접 서명해 주세요
+                  </span>
+                </div>
                 <SignaturePad onSave={(sig) => setSignatureData(sig)} />
               </div>
 
@@ -360,8 +286,8 @@ export default function ContractSigningPage() {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting || !signatureData}
-                className="w-full py-4 bg-gradient-to-r from-amber-400 to-[#FED422] hover:from-amber-500 hover:to-[#e5be1f] text-[#0F172A] text-sm font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                disabled={isSubmitting || !signatureData || !agreePrivacy}
+                className="w-full py-4 bg-gradient-to-r from-amber-400 to-[#FED422] hover:from-amber-500 hover:to-[#e5be1f] text-[#0F172A] text-sm font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0"
               >
                 {isSubmitting ? (
                   <>

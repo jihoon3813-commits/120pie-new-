@@ -3,6 +3,7 @@
 import React from "react";
 import { OfficialSealStamp } from "./OfficialSealStamp";
 import { OFFICIAL_SUPPLIES_LIST, HEADQUARTERS_INFO } from "./contractData";
+import { Search, Sparkles } from "lucide-react";
 
 export interface FranchiseContractData {
   _id?: string;
@@ -42,26 +43,64 @@ export interface FranchiseContractData {
   signedAt?: string;
 }
 
+export const formatContractPhone = (val: string): string => {
+  const raw = (val || "").replace(/[^0-9]/g, "");
+  if (raw.length <= 3) return raw;
+  if (raw.length <= 7) return `${raw.slice(0, 3)}-${raw.slice(3)}`;
+  if (raw.length <= 11) return `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
+  return `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
+};
+
+export const formatContractBirth = (val: string): string => {
+  const raw = (val || "").replace(/[^0-9]/g, "");
+  if (raw.length <= 4) return raw;
+  if (raw.length <= 6) return `${raw.slice(0, 4)}-${raw.slice(4)}`;
+  return `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+};
+
 interface FranchiseContractDocumentProps {
   contract: FranchiseContractData;
   isPrintMode?: boolean;
+  isEditable?: boolean;
+  onUpdateField?: (field: keyof FranchiseContractData, value: any) => void;
+  onOpenAddressSearch?: () => void;
+  roadAddress?: string;
+  detailAddress?: string;
+  onChangeRoadAddress?: (val: string) => void;
+  onChangeDetailAddress?: (val: string) => void;
+  onApplyFeeDefaults?: () => void;
 }
 
 export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps> = ({
   contract,
   isPrintMode = false,
+  isEditable = false,
+  onUpdateField,
+  onOpenAddressSearch,
+  roadAddress = "",
+  detailAddress = "",
+  onChangeRoadAddress,
+  onChangeDetailAddress,
+  onApplyFeeDefaults,
 }) => {
   const contractType = contract.contractType || "신규";
   const createdDate = contract.createdAt ? contract.createdAt.split(" ")[0] : new Date().toISOString().split("T")[0];
   const [createdY, createdM, createdD] = createdDate.split("-");
 
-  // Number to Korean currency helper
-  const formatMoney = (amount: number) => {
-    return (amount || 0).toLocaleString();
+  const formatMoney = (amount: number | string) => {
+    const num = Number(amount) || 0;
+    return num.toLocaleString();
+  };
+
+  const handleFieldChange = (field: keyof FranchiseContractData, val: any) => {
+    if (onUpdateField) {
+      onUpdateField(field, val);
+    }
   };
 
   return (
     <div className={`w-full max-w-4xl mx-auto bg-white text-[#1E293B] font-sans leading-relaxed text-[13px] print:text-[11px] print:max-w-none print:w-full print:p-0 ${isPrintMode ? "p-0" : "p-6 sm:p-12 shadow-md rounded-2xl border border-slate-200/80"}`}>
+      
       {/* ==================== COVER PAGE ==================== */}
       <div className="min-h-[700px] print:min-h-[900px] flex flex-col justify-between border-b-2 border-dashed border-slate-200 pb-16 mb-16 print:border-b-0 print:pb-0 print:mb-0 print:break-after-page">
         <div className="flex justify-between items-start text-xs font-black tracking-widest text-slate-500 border-b border-slate-200 pb-2">
@@ -69,7 +108,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           <span>120겹파이 (주)고우웰라이프</span>
         </div>
 
-        <div className="my-auto text-center space-y-8 py-12">
+        <div className="my-auto text-center space-y-8 py-8">
           {/* Security Notice Box */}
           <div className="max-w-xl mx-auto p-4 bg-slate-50 border border-slate-200 rounded-lg text-left text-[11px] text-slate-600 space-y-1">
             <p className="font-extrabold text-slate-800">※ 본 계약서의 보안 및 무단복제 금지</p>
@@ -80,17 +119,37 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
           {/* Contract Type Indicator */}
           <div className="inline-flex items-center gap-6 px-6 py-2.5 bg-amber-50 border border-amber-200 rounded-full text-xs font-extrabold text-[#0F172A]">
-            <span className="flex items-center gap-1.5">
-              신규 {contractType === "신규" ? "■" : "□"}
-            </span>
-            <span className="text-slate-300">/</span>
-            <span className="flex items-center gap-1.5">
-              갱신 {contractType === "갱신" ? "■" : "□"}
-            </span>
-            <span className="text-slate-300">/</span>
-            <span className="flex items-center gap-1.5">
-              양수 {contractType === "양수" ? "■" : "□"}
-            </span>
+            {isEditable ? (
+              <div className="flex items-center gap-6">
+                {["신규", "갱신", "양수"].map((type) => (
+                  <label key={type} className="flex items-center gap-1.5 cursor-pointer select-none">
+                    <input
+                      type="radio"
+                      name="docContractType"
+                      value={type}
+                      checked={contractType === type}
+                      onChange={(e) => handleFieldChange("contractType", e.target.value)}
+                      className="w-4 h-4 accent-amber-500 cursor-pointer"
+                    />
+                    <span>{type}</span>
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <>
+                <span className="flex items-center gap-1.5">
+                  신규 {contractType === "신규" ? "■" : "□"}
+                </span>
+                <span className="text-slate-300">/</span>
+                <span className="flex items-center gap-1.5">
+                  갱신 {contractType === "갱신" ? "■" : "□"}
+                </span>
+                <span className="text-slate-300">/</span>
+                <span className="flex items-center gap-1.5">
+                  양수 {contractType === "양수" ? "■" : "□"}
+                </span>
+              </>
+            )}
           </div>
 
           {/* Main Title */}
@@ -105,21 +164,21 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
           {/* Parties Summary Box */}
           <div className="max-w-md mx-auto mt-8 bg-[#F8FAFC] border border-slate-200 rounded-xl p-5 text-left text-xs space-y-2">
-            <div className="flex justify-between py-1 border-b border-slate-100">
+            <div className="flex justify-between items-center py-1 border-b border-slate-100">
               <span className="font-bold text-slate-500">가맹본부 (갑)</span>
               <span className="font-extrabold text-[#0F172A]">{HEADQUARTERS_INFO.companyName} (대표이사 {HEADQUARTERS_INFO.ceoName})</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-100">
+            <div className="flex justify-between items-center py-1 border-b border-slate-100">
               <span className="font-bold text-slate-500">가맹사업자 (을)</span>
-              <span className="font-extrabold text-[#0F172A]">{contract.ownerName || "가맹점사업자"}</span>
+              <span className="font-extrabold text-[#0F172A]">{contract.ownerName || (isEditable ? "가맹사업자명을 입력하세요" : "-")}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-100">
+            <div className="flex justify-between items-center py-1 border-b border-slate-100">
               <span className="font-bold text-slate-500">가맹점 명칭</span>
-              <span className="font-extrabold text-[#0F172A]">{contract.storeName || "가맹점명"}</span>
+              <span className="font-extrabold text-[#0F172A]">{contract.storeName || (isEditable ? "가맹점명을 입력하세요" : "-")}</span>
             </div>
-            <div className="flex justify-between py-1">
+            <div className="flex justify-between items-center py-1">
               <span className="font-bold text-slate-500">계약 기간</span>
-              <span className="font-extrabold text-[#0F172A]">{contract.contractStart} ~ {contract.contractEnd}</span>
+              <span className="font-extrabold text-[#0F172A]">{contract.contractStart || "YYYY-MM-DD"} ~ {contract.contractEnd || "YYYY-MM-DD"}</span>
             </div>
           </div>
         </div>
@@ -131,7 +190,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
       {/* ==================== CONTRACT BODY ==================== */}
       <div className="space-y-8 print:space-y-6">
-        {/* Header decoration */}
+        {/* Header decoration for Print */}
         <div className="hidden print:flex justify-between items-center text-[10px] text-slate-400 border-b border-slate-200 pb-1 mb-4">
           <span>120겹파이 가맹계약서</span>
           <span>{HEADQUARTERS_INFO.companyName}</span>
@@ -140,18 +199,31 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
         {/* 제1조 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第1條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제1조</span>
             <span>계약의 목적</span>
           </h2>
-          <p className="text-justify leading-relaxed">
-            가맹본부 <strong>{HEADQUARTERS_INFO.companyName}</strong>(이하 ‘갑’이라 한다.)와 가맹점사업자 <strong className="text-amber-800 bg-amber-50 px-1 py-0.5 rounded">{contract.ownerName}</strong>(이하 ‘을’이라 한다.)은 ‘갑’의 외식 프랜차이즈사업 ‘120겹파이’ 경영에 관하여 다음과 같이 가맹계약을 체결한다.
-          </p>
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-1.5">
+            <span>가맹본부 <strong>{HEADQUARTERS_INFO.companyName}</strong>(이하 ‘갑’이라 한다.)와 가맹점사업자</span>
+            {isEditable ? (
+              <input
+                type="text"
+                required
+                placeholder="가맹사업자명 (예: 홍길동)"
+                value={contract.ownerName}
+                onChange={(e) => handleFieldChange("ownerName", e.target.value)}
+                className="px-2.5 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-black text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-amber-500 w-44 inline-block"
+              />
+            ) : (
+              <strong className="text-amber-800 bg-amber-50 px-1 py-0.5 rounded">{contract.ownerName || "가맹점사업자"}</strong>
+            )}
+            <span>(이하 ‘을’이라 한다.)은 ‘갑’의 외식 프랜차이즈사업 ‘120겹파이’ 경영에 관하여 다음과 같이 가맹계약을 체결한다.</span>
+          </div>
         </section>
 
         {/* 제2조 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第2條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제2조</span>
             <span>용어의 정의</span>
           </h2>
           <p className="text-justify">이 계약서에서 사용된 용어는 다음 각 호와 같은 의미를 갖는다.</p>
@@ -170,7 +242,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
         {/* 제3조 ~ 제7조 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第3條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제3조</span>
             <span>계약당사자의 지위</span>
           </h2>
           <p className="text-justify leading-relaxed">
@@ -180,7 +252,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第4條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제4조</span>
             <span>신의성실의 원칙</span>
           </h2>
           <p className="text-justify leading-relaxed">
@@ -190,7 +262,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第5條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제5조</span>
             <span>‘갑’의 준수사항</span>
           </h2>
           <p className="text-justify leading-relaxed">
@@ -200,7 +272,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第6條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제6조</span>
             <span>‘을’의 준수사항</span>
           </h2>
           <p className="text-justify leading-relaxed">
@@ -210,7 +282,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第7條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제7조</span>
             <span>불공정거래행위의 금지</span>
           </h2>
           <p className="text-justify leading-relaxed">
@@ -218,20 +290,34 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           </p>
         </section>
 
-        {/* 제8조 ~ 제10조 */}
+        {/* 제8조 : 가맹점의 표시 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第8條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제8조</span>
             <span>가맹점의 표시</span>
           </h2>
-          <p className="text-justify leading-relaxed">
-            ‘을’의 가맹점 명칭은 <strong className="text-amber-800 bg-amber-50 px-1 py-0.5 rounded">120겹파이 {contract.storeName}</strong>(으)로 하며, ‘갑’의 사전 서면 승인 없이 임의로 변경할 수 없다.
-          </p>
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-1.5">
+            <span>‘을’의 가맹점 명칭은</span>
+            {isEditable ? (
+              <input
+                type="text"
+                required
+                placeholder="가맹점명 (예: 120겹파이 역삼역점)"
+                value={contract.storeName}
+                onChange={(e) => handleFieldChange("storeName", e.target.value)}
+                className="px-2.5 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-black text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-amber-500 w-56 inline-block"
+              />
+            ) : (
+              <strong className="text-amber-800 bg-amber-50 px-1 py-0.5 rounded">{contract.storeName || "가맹점명"}</strong>
+            )}
+            <span>(으)로 하며, ‘갑’의 사전 서면 승인 없이 임의로 변경할 수 없다.</span>
+          </div>
         </section>
 
+        {/* 제9조 ~ 제10조 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第9條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제9조</span>
             <span>가맹점운영권의 부여</span>
           </h2>
           <p className="text-justify leading-relaxed">
@@ -241,7 +327,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第10條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제10조</span>
             <span>지식재산권의 확보</span>
           </h2>
           <p className="text-justify leading-relaxed">
@@ -250,66 +336,204 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
         </section>
 
         {/* 제11조 : 계약기간 */}
-        <section className="space-y-2 bg-amber-50/50 p-3.5 rounded-xl border border-amber-200/70">
+        <section className="space-y-2 bg-amber-50/50 p-4 rounded-xl border border-amber-200/70">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第11條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제11조</span>
             <span>계약의 발효일과 계약기간</span>
           </h2>
-          <p className="text-justify leading-relaxed">
-            ① 이 계약은 <strong className="text-amber-900 underline">{contract.contractStart}</strong>부터 발효되며 그 기간은 계약 발효일로부터 <strong className="text-amber-900 underline">{contract.contractEnd}</strong>까지 <strong>2년간</strong>으로 한다.
-          </p>
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-2">
+            <span>① 이 계약은</span>
+            {isEditable ? (
+              <div className="inline-flex items-center gap-1.5">
+                <input
+                  type="date"
+                  required
+                  value={contract.contractStart}
+                  onChange={(e) => {
+                    const startVal = e.target.value;
+                    handleFieldChange("contractStart", startVal);
+                    if (startVal) {
+                      const d = new Date(startVal);
+                      d.setFullYear(d.getFullYear() + 2);
+                      const endStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                      handleFieldChange("contractEnd", endStr);
+                    }
+                  }}
+                  className="px-2.5 py-1 bg-white border border-amber-300 rounded text-xs font-bold text-[#0F172A] focus:outline-none"
+                />
+                <span>부터 발효되며 그 기간은 계약 발효일로부터</span>
+                <input
+                  type="date"
+                  required
+                  value={contract.contractEnd}
+                  onChange={(e) => handleFieldChange("contractEnd", e.target.value)}
+                  className="px-2.5 py-1 bg-white border border-amber-300 rounded text-xs font-bold text-[#0F172A] focus:outline-none"
+                />
+                <span>까지 <strong>2년간</strong>으로 한다.</span>
+              </div>
+            ) : (
+              <>
+                <strong className="text-amber-900 underline">{contract.contractStart || "YYYY-MM-DD"}</strong>
+                <span>부터 발효되며 그 기간은 계약 발효일로부터</span>
+                <strong className="text-amber-900 underline">{contract.contractEnd || "YYYY-MM-DD"}</strong>
+                <span>까지 <strong>2년간</strong>으로 한다.</span>
+              </>
+            )}
+          </div>
           <p className="text-justify text-xs text-slate-600">
             ② ‘을’은 가맹계약 체결 후 3개월 안에 가맹점을 오픈하여야 한다.
           </p>
         </section>
 
-        {/* 제12조 ~ 제14조 : 점포 및 영업지역 */}
-        <section className="space-y-2">
+        {/* 제12조 : 점포 선정 및 규모 */}
+        <section className="space-y-3 bg-[#F8FAFC] p-4 rounded-xl border border-slate-200">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第12條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제12조</span>
             <span>가맹점의 장소 선정 및 규모</span>
           </h2>
-          <p className="text-justify leading-relaxed">
-            ‘을’의 가맹점 소재지는 <strong className="text-amber-800 bg-amber-50 px-1 py-0.5 rounded">{contract.storeAddress}</strong>에 위치하며, 매장 규모는 <strong className="text-amber-800 bg-amber-50 px-1 py-0.5 rounded">{contract.storeSize}</strong>로 확정한다.
-          </p>
+          {isEditable ? (
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-600">가맹점 소재지(주소) *</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    required
+                    value={roadAddress}
+                    onChange={(e) => onChangeRoadAddress && onChangeRoadAddress(e.target.value)}
+                    placeholder="주소 검색 버튼을 누르거나 도로명 주소를 입력하세요"
+                    className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-[#0F172A] focus:outline-none focus:border-amber-500"
+                  />
+                  {onOpenAddressSearch && (
+                    <button
+                      type="button"
+                      onClick={onOpenAddressSearch}
+                      className="px-4 py-2 bg-[#FED422] text-[#0F172A] text-xs font-black rounded-lg transition-all cursor-pointer border-0 flex items-center gap-1 shrink-0"
+                    >
+                      <Search size={14} />
+                      주소 검색
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  value={detailAddress}
+                  onChange={(e) => onChangeDetailAddress && onChangeDetailAddress(e.target.value)}
+                  placeholder="상세 주소 (예: 1층 102호)"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-[#0F172A] focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <label className="text-xs font-bold text-slate-600">매장 규모 :</label>
+                <div className="relative w-36">
+                  <input
+                    type="number"
+                    required
+                    value={contract.storeSize || ""}
+                    onChange={(e) => handleFieldChange("storeSize", parseFloat(e.target.value) || 0)}
+                    placeholder="33"
+                    className="w-full px-3 py-1.5 pr-8 bg-white border border-slate-300 rounded-lg text-xs font-black text-[#0F172A] focus:outline-none focus:border-amber-500"
+                  />
+                  <span className="absolute right-3 top-2 text-xs font-bold text-slate-500 pointer-events-none">㎡</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-justify leading-relaxed">
+              ‘을’의 가맹점 소재지는 <strong className="text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded">{contract.storeAddress || "가맹점 주소"}</strong>에 위치하며, 매장 규모는 <strong className="text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded">{contract.storeSize} ㎡</strong>로 확정한다.
+            </p>
+          )}
         </section>
 
-        <section className="space-y-2 bg-amber-50/50 p-3.5 rounded-xl border border-amber-200/70">
+        {/* 제13조 : 영업지역의 보호 */}
+        <section className="space-y-2 bg-amber-50/50 p-4 rounded-xl border border-amber-200/70">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第13條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제13조</span>
             <span>영업지역의 보호</span>
           </h2>
-          <p className="text-justify leading-relaxed">
-            ① ‘을’의 영업지역은 <strong className="text-amber-900 underline">{contract.businessArea}</strong>(별첨[1] 참조)로 정하며, ‘갑’은 계약기간 중 ‘을’의 영업지역 내에 동일한 업종의 직영점이나 타 가맹점을 개설하지 아니한다.
-          </p>
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-1.5">
+            <span>① ‘을’의 영업지역은</span>
+            {isEditable ? (
+              <input
+                type="text"
+                required
+                placeholder="영업지역 (예: 가맹점 반경 500m 내)"
+                value={contract.businessArea}
+                onChange={(e) => handleFieldChange("businessArea", e.target.value)}
+                className="px-2.5 py-1 bg-white border border-amber-300 rounded text-xs font-black text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-amber-500 w-64 inline-block"
+              />
+            ) : (
+              <strong className="text-amber-900 underline">{contract.businessArea || "가맹점 반경 500m 내"}</strong>
+            )}
+            <span>(별첨[1] 참조)로 정하며, ‘갑’은 계약기간 중 ‘을’의 영업지역 내에 동일한 업종의 직영점이나 타 가맹점을 개설하지 아니한다.</span>
+          </div>
           <p className="text-justify text-xs text-slate-600">
             ② ‘갑’은 계약기간 중 또는 갱신 과정에서 상권의 급격한 변동 등 정당한 사유 없이 ‘을’의 영업지역을 축소할 수 없다.
           </p>
         </section>
 
+        {/* 제14조 : 점포의 설비 및 감리비 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第14條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제14조</span>
             <span>점포의 설비 및 공사감리</span>
           </h2>
-          <p className="text-justify leading-relaxed">
-            ① 점포설비(인테리어)는 가맹사업의 통일성을 위해 ‘갑’이 정한 사양에 따라 시공하며, 공사의 감리를 진행하는 경우 ‘을’은 공사감리비 <strong>{formatMoney(contract.supervisionFee)}원</strong>(부가가치세 포함)을 ‘갑’에게 지급한다.
-          </p>
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-1.5">
+            <span>① 점포설비(인테리어)는 가맹사업의 통일성을 위해 ‘갑’이 정한 사양에 따라 시공하며, 공사의 감리를 진행하는 경우 ‘을’은 공사감리비</span>
+            {isEditable ? (
+              <input
+                type="number"
+                value={contract.supervisionFee || 0}
+                onChange={(e) => handleFieldChange("supervisionFee", Number(e.target.value) || 0)}
+                className="w-32 px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-black text-right text-[#0F172A]"
+              />
+            ) : (
+              <strong>{formatMoney(contract.supervisionFee)}</strong>
+            )}
+            <span>원(부가가치세 포함)을 ‘갑’에게 지급한다.</span>
+          </div>
         </section>
 
         {/* 제15조 ~ 제18조 : 가맹금 및 정기 납입금 */}
-        <section className="space-y-3 bg-[#F8FAFC] p-4 rounded-xl border border-slate-200">
-          <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第15條</span>
-            <span>최초가맹금 및 예치가맹금</span>
-          </h2>
-          <p className="text-justify leading-relaxed">
-            ① ‘을’이 ‘갑’에 지급하여야 할 최초가맹금은 일금 <strong>{formatMoney(contract.initialFranchiseFee)}원</strong>(부가가치세 포함)으로 한다.
-          </p>
-          <p className="text-justify leading-relaxed">
+        <section className="space-y-3 bg-[#F8FAFC] p-5 rounded-xl border border-slate-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
+              <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제15조</span>
+              <span>최초가맹금 및 예치가맹금</span>
+            </h2>
+            {isEditable && onApplyFeeDefaults && (
+              <button
+                type="button"
+                onClick={onApplyFeeDefaults}
+                className="px-3 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-black rounded-lg transition-all flex items-center gap-1 cursor-pointer border-0 shadow-2xs"
+              >
+                <Sparkles size={13} />
+                표준 가맹금 기본값 일괄적용
+              </button>
+            )}
+          </div>
+
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-1.5">
+            <span>① ‘을’이 ‘갑’에 지급하여야 할 최초가맹금은 일금</span>
+            {isEditable ? (
+              <input
+                type="number"
+                value={contract.initialFranchiseFee || 0}
+                onChange={(e) => handleFieldChange("initialFranchiseFee", Number(e.target.value) || 0)}
+                className="w-32 px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-black text-right text-[#0F172A]"
+              />
+            ) : (
+              <strong>{formatMoney(contract.initialFranchiseFee)}</strong>
+            )}
+            <span>원(부가가치세 포함)으로 한다.</span>
+          </div>
+
+          <p className="text-justify leading-relaxed text-xs text-slate-700">
             ② ‘을’은 계약체결일에 최초가맹금과 계약이행보증금을 ‘갑’이 지정하는 아래 금융회사에 예치하여야 한다.
           </p>
-          <div className="bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-1.5">
+
+          <div className="bg-white p-3.5 rounded-lg border border-slate-200 text-xs space-y-2">
             <p className="font-extrabold text-slate-800">
               * 예치금융회사 : <span className="text-blue-700">{HEADQUARTERS_INFO.depositBank}</span> | 계좌번호 : <span className="text-blue-700">{HEADQUARTERS_INFO.depositAccount}</span> | 예금주 : {HEADQUARTERS_INFO.depositAccountHolder}
             </p>
@@ -318,29 +542,80 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                 <thead className="bg-slate-100 font-bold text-slate-700">
                   <tr>
                     <th className="p-2 border-b border-r border-slate-200">예치가맹금 내역</th>
-                    <th className="p-2 border-b border-slate-200 text-right">금액 (원)</th>
+                    <th className="p-2 border-b border-slate-200 text-right w-44">금액 (원)</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-slate-100">
                     <td className="p-2 border-r border-slate-200 text-slate-600">가입비</td>
-                    <td className="p-2 text-right font-medium">{formatMoney(contract.depositMembershipFee)}</td>
+                    <td className="p-2 text-right font-medium">
+                      {isEditable ? (
+                        <input
+                          type="number"
+                          value={contract.depositMembershipFee || 0}
+                          onChange={(e) => handleFieldChange("depositMembershipFee", Number(e.target.value) || 0)}
+                          className="w-32 px-2 py-0.5 bg-slate-50 border border-slate-300 rounded text-xs font-bold text-right text-[#0F172A]"
+                        />
+                      ) : (
+                        formatMoney(contract.depositMembershipFee)
+                      )}
+                    </td>
                   </tr>
                   <tr className="border-b border-slate-100">
                     <td className="p-2 border-r border-slate-200 text-slate-600">오픈교육비</td>
-                    <td className="p-2 text-right font-medium">{formatMoney(contract.depositEduFee)}</td>
+                    <td className="p-2 text-right font-medium">
+                      {isEditable ? (
+                        <input
+                          type="number"
+                          value={contract.depositEduFee || 0}
+                          onChange={(e) => handleFieldChange("depositEduFee", Number(e.target.value) || 0)}
+                          className="w-32 px-2 py-0.5 bg-slate-50 border border-slate-300 rounded text-xs font-bold text-right text-[#0F172A]"
+                        />
+                      ) : (
+                        formatMoney(contract.depositEduFee)
+                      )}
+                    </td>
                   </tr>
                   <tr className="border-b border-slate-100">
                     <td className="p-2 border-r border-slate-200 text-slate-600">오픈지원비</td>
-                    <td className="p-2 text-right font-medium">{formatMoney(contract.depositSupportFee)}</td>
+                    <td className="p-2 text-right font-medium">
+                      {isEditable ? (
+                        <input
+                          type="number"
+                          value={contract.depositSupportFee || 0}
+                          onChange={(e) => handleFieldChange("depositSupportFee", Number(e.target.value) || 0)}
+                          className="w-32 px-2 py-0.5 bg-slate-50 border border-slate-300 rounded text-xs font-bold text-right text-[#0F172A]"
+                        />
+                      ) : (
+                        formatMoney(contract.depositSupportFee)
+                      )}
+                    </td>
                   </tr>
                   <tr className="border-b border-slate-100">
                     <td className="p-2 border-r border-slate-200 text-slate-600">계약이행보증금</td>
-                    <td className="p-2 text-right font-medium">{formatMoney(contract.depositGuaranteeFee)}</td>
+                    <td className="p-2 text-right font-medium">
+                      {isEditable ? (
+                        <input
+                          type="number"
+                          value={contract.depositGuaranteeFee || 0}
+                          onChange={(e) => handleFieldChange("depositGuaranteeFee", Number(e.target.value) || 0)}
+                          className="w-32 px-2 py-0.5 bg-slate-50 border border-slate-300 rounded text-xs font-bold text-right text-[#0F172A]"
+                        />
+                      ) : (
+                        formatMoney(contract.depositGuaranteeFee)
+                      )}
+                    </td>
                   </tr>
                   <tr className="bg-amber-50 font-black text-slate-900">
                     <td className="p-2 border-r border-slate-200">합계</td>
-                    <td className="p-2 text-right text-amber-900">{formatMoney(contract.depositTotalFee)}</td>
+                    <td className="p-2 text-right text-amber-900 font-black">
+                      {formatMoney(
+                        (Number(contract.depositMembershipFee) || 0) +
+                        (Number(contract.depositEduFee) || 0) +
+                        (Number(contract.depositSupportFee) || 0) +
+                        (Number(contract.depositGuaranteeFee) || 0)
+                      )} 원
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -348,9 +623,10 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           </div>
         </section>
 
+        {/* 제16조 : 가맹금의 반환 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第16條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제16조</span>
             <span>가맹금의 반환</span>
           </h2>
           <p className="text-justify leading-relaxed">
@@ -358,33 +634,57 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           </p>
         </section>
 
-        <section className="space-y-2 bg-amber-50/50 p-3.5 rounded-xl border border-amber-200/70">
+        {/* 제17조 : 로열티 */}
+        <section className="space-y-2 bg-amber-50/50 p-4 rounded-xl border border-amber-200/70">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第17條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제17조</span>
             <span>계속가맹금 (로열티)</span>
           </h2>
-          <p className="text-justify leading-relaxed">
-            ① ‘을’은 상호, 상표의 사용 및 경영지원에 대한 대가로 로열티 월 <strong>{formatMoney(contract.royaltyFee)}원</strong>(부가가치세 포함)을 매월 1일에 ‘갑’에게 지급한다.
-          </p>
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-1.5">
+            <span>① ‘을’은 상호, 상표의 사용 및 경영지원에 대한 대가로 로열티 월</span>
+            {isEditable ? (
+              <input
+                type="number"
+                value={contract.royaltyFee || 0}
+                onChange={(e) => handleFieldChange("royaltyFee", Number(e.target.value) || 0)}
+                className="w-28 px-2 py-1 bg-white border border-amber-300 rounded text-xs font-black text-right text-[#0F172A]"
+              />
+            ) : (
+              <strong>{formatMoney(contract.royaltyFee)}</strong>
+            )}
+            <span>원(부가가치세 포함)을 매월 1일에 ‘갑’에게 지급한다.</span>
+          </div>
           <p className="text-justify text-xs text-slate-600">
             ② ‘을’은 가맹점 영업개시 후 10일 이내에 ‘갑’의 계좌({HEADQUARTERS_INFO.royaltyBank} {HEADQUARTERS_INFO.royaltyAccount}, 예금주: {HEADQUARTERS_INFO.royaltyAccountHolder})로 자동이체를 신청하여야 한다.
           </p>
         </section>
 
+        {/* 제18조 : 계약이행보증금 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第18條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제18조</span>
             <span>계약이행보증금</span>
           </h2>
-          <p className="text-justify leading-relaxed">
-            ‘을’은 채무액 또는 손해배상액의 지급을 담보하기 위하여 계약이행보증금으로 <strong>{formatMoney(contract.guaranteeFee)}원</strong>(부가가치세 없음)을 ‘갑’에게 지급하며, 계약 정상 종료 시 잔여 채무를 정산한 후 30일 이내에 환급한다.
-          </p>
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-1.5">
+            <span>‘을’은 채무액 또는 손해배상액의 지급을 담보하기 위하여 계약이행보증금으로</span>
+            {isEditable ? (
+              <input
+                type="number"
+                value={contract.guaranteeFee || 0}
+                onChange={(e) => handleFieldChange("guaranteeFee", Number(e.target.value) || 0)}
+                className="w-28 px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-black text-right text-[#0F172A]"
+              />
+            ) : (
+              <strong>{formatMoney(contract.guaranteeFee)}</strong>
+            )}
+            <span>원(부가가치세 없음)을 ‘갑’에게 지급하며, 계약 정상 종료 시 잔여 채무를 정산한 후 30일 이내에 환급한다.</span>
+          </div>
         </section>
 
         {/* 제19조 : 교육 및 훈련 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第19條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제19조</span>
             <span>교육 및 훈련</span>
           </h2>
           <p className="text-justify leading-relaxed">
@@ -403,12 +703,12 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                 <tr className="border-b border-slate-100">
                   <td className="p-2 border-r border-slate-200 font-bold">오픈교육</td>
                   <td className="p-2 border-r border-slate-200 text-slate-600">오픈 전</td>
-                  <td className="p-2 font-medium">{formatMoney(contract.eduOpenFee)} (최초가맹금에 포함)</td>
+                  <td className="p-2 font-medium">{formatMoney(contract.eduOpenFee || 2200000)} (최초가맹금에 포함)</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-2 border-r border-slate-200 font-bold">신입교육</td>
                   <td className="p-2 border-r border-slate-200 text-slate-600">신입직원 채용 시</td>
-                  <td className="p-2 font-medium">{formatMoney(contract.eduNewFee)} (1인 기준)</td>
+                  <td className="p-2 font-medium">{formatMoney(contract.eduNewFee || 220000)} (1인 기준)</td>
                 </tr>
                 <tr>
                   <td className="p-2 border-r border-slate-200 font-bold">특별교육</td>
@@ -420,10 +720,10 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           </div>
         </section>
 
-        {/* 제20조 ~ 제28조 요약 및 필수항목 */}
+        {/* 제20조 ~ 제28조 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第20條 ~ 第28條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제20조 ~ 제28조</span>
             <span>계약 수정, 경영지도 및 광고·판촉</span>
           </h2>
           <p className="text-justify leading-relaxed text-slate-700">
@@ -434,18 +734,29 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
         {/* 제29조 : 초도상품 및 초도물품 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第29條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제29조</span>
             <span>초도상품 및 초도물품</span>
           </h2>
-          <p className="text-justify leading-relaxed">
-            ‘을’은 원활한 개점을 위하여 ‘갑’으로부터 공급받는 초도물품 비용으로 <strong>{formatMoney(contract.initialSupplyFee)}원</strong>(부가가치세 포함)을 지급하고 오픈 준비에 만전을 기한다.
-          </p>
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-1.5">
+            <span>‘을’은 원활한 개점을 위하여 ‘갑’으로부터 공급받는 초도물품 비용으로</span>
+            {isEditable ? (
+              <input
+                type="number"
+                value={contract.initialSupplyFee || 0}
+                onChange={(e) => handleFieldChange("initialSupplyFee", Number(e.target.value) || 0)}
+                className="w-32 px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-black text-right text-[#0F172A]"
+              />
+            ) : (
+              <strong>{formatMoney(contract.initialSupplyFee)}</strong>
+            )}
+            <span>원(부가가치세 포함)을 지급하고 오픈 준비에 만전을 기한다.</span>
+          </div>
         </section>
 
-        {/* 제30조 ~ 제38조 : 물품공급, 운영, 보험 */}
+        {/* 제30조 ~ 제38조 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第30條 ~ 第38條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제30조 ~ 제38조</span>
             <span>원·부재료 조달, 운영준수 및 보험</span>
           </h2>
           <p className="text-justify leading-relaxed text-slate-700">
@@ -453,24 +764,46 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           </p>
         </section>
 
-        {/* 제39조 ~ 제41조 : 갱신, 해지, 위약금 */}
-        <section className="space-y-2 bg-amber-50/50 p-3.5 rounded-xl border border-amber-200/70">
+        {/* 제39조 ~ 제41조 */}
+        <section className="space-y-2 bg-amber-50/50 p-4 rounded-xl border border-amber-200/70">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第39條 ~ 第41條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제39조 ~ 제41조</span>
             <span>계약의 갱신, 해지 및 위약금</span>
           </h2>
-          <p className="text-justify leading-relaxed">
-            ① 계약 만료 180일 전부터 90일 전까지 서면 통지가 없는 경우 종전 조건으로 2년간 자동 갱신되며, 재가맹 시 재가맹비는 <strong>{formatMoney(contract.reFranchiseFee)}원</strong>(부가가치세 포함)으로 한다.
-          </p>
-          <p className="text-justify leading-relaxed">
-            ② ‘을’의 중대한 귀책사유(무단휴업, 영업비밀 유출, 레시피 무단변형 등)로 인하여 계약이 중도 해지되는 경우 ‘을’은 위약금 <strong>{formatMoney(contract.penaltyFee)}원</strong>을 ‘갑’에게 지급하여야 하며, 이는 손해배상액의 예정으로서의 성격을 갖는다.
-          </p>
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-1.5">
+            <span>① 계약 만료 180일 전부터 90일 전까지 서면 통지가 없는 경우 종전 조건으로 2년간 자동 갱신되며, 재가맹 시 재가맹비는</span>
+            {isEditable ? (
+              <input
+                type="number"
+                value={contract.reFranchiseFee || 0}
+                onChange={(e) => handleFieldChange("reFranchiseFee", Number(e.target.value) || 0)}
+                className="w-28 px-2 py-1 bg-white border border-amber-300 rounded text-xs font-black text-right text-[#0F172A]"
+              />
+            ) : (
+              <strong>{formatMoney(contract.reFranchiseFee)}</strong>
+            )}
+            <span>원(부가가치세 포함)으로 한다.</span>
+          </div>
+          <div className="text-justify leading-relaxed flex flex-wrap items-center gap-1.5 mt-1">
+            <span>② ‘을’의 중대한 귀책사유로 인하여 계약이 중도 해지되는 경우 ‘을’은 위약금</span>
+            {isEditable ? (
+              <input
+                type="number"
+                value={contract.penaltyFee || 0}
+                onChange={(e) => handleFieldChange("penaltyFee", Number(e.target.value) || 0)}
+                className="w-28 px-2 py-1 bg-white border border-amber-300 rounded text-xs font-black text-right text-[#0F172A]"
+              />
+            ) : (
+              <strong>{formatMoney(contract.penaltyFee)}</strong>
+            )}
+            <span>원을 ‘갑’에게 지급하여야 하며, 이는 손해배상액의 예정으로서의 성격을 갖는다.</span>
+          </div>
         </section>
 
-        {/* 제42조 ~ 제46조 : 비밀유지, 손해배상, 분쟁해결 */}
+        {/* 제42조 ~ 제46조 */}
         <section className="space-y-2">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第42條 ~ 第46條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제42조 ~ 제46조</span>
             <span>비밀유지, 지연이자 및 분쟁해결</span>
           </h2>
           <p className="text-justify leading-relaxed text-slate-700">
@@ -478,10 +811,10 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
           </p>
         </section>
 
-        {/* 제47조 : 정보공개서 및 가맹계약서 수령확인 */}
+        {/* 제47조 */}
         <section className="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
           <h2 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">第47條</span>
+            <span className="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[11px]">제47조</span>
             <span>정보공개서 및 가맹계약서의 수령일 확인</span>
           </h2>
           <p className="text-justify leading-relaxed">
@@ -520,7 +853,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
               {/* Official Seal Stamp Floating on CEO name */}
               <div className="absolute right-4 bottom-4">
-                <OfficialSealStamp size={78} />
+                <OfficialSealStamp size={88} />
               </div>
             </div>
 
@@ -533,11 +866,70 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
                 </span>
               </div>
               <div className="space-y-1 text-slate-700">
-                <p><span className="font-bold text-slate-500 w-20 inline-block">성 명 :</span> <strong className="text-[#0F172A]">{contract.ownerName}</strong></p>
-                <p><span className="font-bold text-slate-500 w-20 inline-block">생년월일 :</span> {contract.ownerBirth}</p>
-                <p><span className="font-bold text-slate-500 w-20 inline-block">가맹점명 :</span> {contract.storeName}</p>
-                <p><span className="font-bold text-slate-500 w-20 inline-block">주 소 :</span> {contract.storeAddress}</p>
-                <p><span className="font-bold text-slate-500 w-20 inline-block">연락처 :</span> {contract.ownerPhone}</p>
+                <p>
+                  <span className="font-bold text-slate-500 w-20 inline-block">성 명 :</span>
+                  {isEditable ? (
+                    <input
+                      type="text"
+                      required
+                      placeholder="성명 (홍길동)"
+                      value={contract.ownerName}
+                      onChange={(e) => handleFieldChange("ownerName", e.target.value)}
+                      className="px-2 py-0.5 bg-white border border-slate-300 rounded text-xs font-black text-[#0F172A] w-36"
+                    />
+                  ) : (
+                    <strong className="text-[#0F172A]">{contract.ownerName || "-"}</strong>
+                  )}
+                </p>
+                <p>
+                  <span className="font-bold text-slate-500 w-20 inline-block">생년월일 :</span>
+                  {isEditable ? (
+                    <input
+                      type="text"
+                      required
+                      placeholder="1981-11-15"
+                      value={contract.ownerBirth}
+                      onChange={(e) => handleFieldChange("ownerBirth", formatContractBirth(e.target.value))}
+                      className="px-2 py-0.5 bg-white border border-slate-300 rounded text-xs font-bold text-[#0F172A] w-36"
+                    />
+                  ) : (
+                    <span>{contract.ownerBirth || "-"}</span>
+                  )}
+                </p>
+                <p>
+                  <span className="font-bold text-slate-500 w-20 inline-block">가맹점명 :</span>
+                  {isEditable ? (
+                    <input
+                      type="text"
+                      required
+                      placeholder="120겹파이 역삼역점"
+                      value={contract.storeName}
+                      onChange={(e) => handleFieldChange("storeName", e.target.value)}
+                      className="px-2 py-0.5 bg-white border border-slate-300 rounded text-xs font-bold text-[#0F172A] w-48"
+                    />
+                  ) : (
+                    <span>{contract.storeName || "-"}</span>
+                  )}
+                </p>
+                <p>
+                  <span className="font-bold text-slate-500 w-20 inline-block">주 소 :</span>
+                  <span>{contract.storeAddress || (isEditable ? `${roadAddress} ${detailAddress}`.trim() || "-" : "-")}</span>
+                </p>
+                <p>
+                  <span className="font-bold text-slate-500 w-20 inline-block">연락처 :</span>
+                  {isEditable ? (
+                    <input
+                      type="text"
+                      required
+                      placeholder="010-4322-3813"
+                      value={contract.ownerPhone}
+                      onChange={(e) => handleFieldChange("ownerPhone", formatContractPhone(e.target.value))}
+                      className="px-2 py-0.5 bg-white border border-slate-300 rounded text-xs font-bold text-[#0F172A] w-36"
+                    />
+                  ) : (
+                    <span>{contract.ownerPhone || "-"}</span>
+                  )}
+                </p>
               </div>
 
               {/* Customer Signature Display */}
@@ -572,7 +964,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
             </p>
             <div className="p-3.5 bg-white border border-amber-200 rounded-lg">
               <span className="block text-[11px] font-bold text-slate-400 mb-1">약정 영업지역</span>
-              <span className="text-sm font-black text-[#0F172A]">{contract.businessArea}</span>
+              <span className="text-sm font-black text-[#0F172A]">{contract.businessArea || "가맹점 반경 500m 내"}</span>
             </div>
             <p className="text-[11px] text-slate-500 italic">
               ※ 본 영업지역 내에서는 타 직영점 및 가맹점의 추가 개설이 엄격히 제한됩니다.
@@ -661,7 +1053,7 @@ export const FranchiseContractDocument: React.FC<FranchiseContractDocumentProps>
 
             <div className="flex items-center justify-between text-xs font-bold text-slate-700 pt-2">
               <span>[갑] 상호 : {HEADQUARTERS_INFO.companyName} (인)</span>
-              <span>[을] 성명 : {contract.ownerName} ({contract.signatureImage ? "서명완료" : "인"})</span>
+              <span>[을] 성명 : {contract.ownerName || "-"} ({contract.signatureImage ? "서명완료" : "인"})</span>
             </div>
           </div>
         </div>
