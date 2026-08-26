@@ -1326,15 +1326,15 @@ export default function AdminPage() {
       contractStart: startStr,
       contractEnd: endStr,
       supervisionFee: 0,
-      initialFranchiseFee: 1100000,
+      initialFranchiseFee: 2200000,
       depositMembershipFee: 550000,
-      depositEduFee: 0,
+      depositEduFee: 1100000,
       depositSupportFee: 550000,
       depositGuaranteeFee: 0,
-      depositTotalFee: 1100000,
+      depositTotalFee: 2200000,
       royaltyFee: 0,
       guaranteeFee: 0,
-      eduOpenFee: 0,
+      eduOpenFee: 1100000,
       eduNewFee: 0,
       initialSupplyFee: 1100000,
       reFranchiseFee: 0,
@@ -1415,21 +1415,21 @@ export default function AdminPage() {
     setContractForm((prev) => ({
       ...prev,
       supervisionFee: 0,
-      initialFranchiseFee: 1100000,
+      initialFranchiseFee: 2200000,
       depositMembershipFee: 550000,
-      depositEduFee: 0,
+      depositEduFee: 1100000,
       depositSupportFee: 550000,
       depositGuaranteeFee: 0,
-      depositTotalFee: 1100000,
+      depositTotalFee: 2200000,
       royaltyFee: 0,
       guaranteeFee: 0,
-      eduOpenFee: 0,
+      eduOpenFee: 1100000,
       eduNewFee: 0,
       initialSupplyFee: 1100000,
       reFranchiseFee: 0,
       penaltyFee: 0,
     }));
-    triggerToast("표준 계약 금액(가입비 55만, 오픈지원비 55만, 초도물품 110만)이 적용되었습니다.");
+    triggerToast("표준 계약 금액(가입비 55만, 교육비 110만, 지원비 55만, 초도물품 110만)이 적용되었습니다.");
   };
 
   const handleApplyIndividualDefault = (field: string, val: number) => {
@@ -6709,13 +6709,13 @@ export default function AdminPage() {
                           <div className="overflow-hidden rounded-xl border border-slate-200">
                             <table className="w-full text-xs text-left border-collapse table-fixed">
                               <colgroup>
-                                <col className="w-[42%]" />
-                                <col className="w-[58%]" />
+                                <col style={{ width: "38%" }} />
+                                <col style={{ width: "62%" }} />
                               </colgroup>
                               <thead className="bg-slate-100 font-bold text-slate-700 text-[11px]">
                                 <tr>
-                                  <th className="p-2 border-b border-r border-slate-200 pl-2.5">비용 항목</th>
-                                  <th className="p-2 border-b border-slate-200 text-right pr-2.5">납부 금액 (원)</th>
+                                  <th style={{ width: "38%" }} className="p-2 border-b border-r border-slate-200 pl-2.5">비용 항목</th>
+                                  <th style={{ width: "62%" }} className="p-2 border-b border-slate-200 text-right pr-2.5">납부 금액</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -6729,82 +6729,108 @@ export default function AdminPage() {
                                   <td className="p-1.5 pl-2.5 border-r border-slate-200 text-slate-700 font-semibold">
                                     가입비 (가맹비)
                                   </td>
-                                  <td className="p-1 pr-1.5">
-                                    <input
-                                      type="text"
-                                      value={formatPriceInput(contractForm.depositMembershipFee)}
-                                      onChange={(e) => handlePriceChange("depositMembershipFee", e.target.value)}
-                                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded px-2 py-1 text-xs font-bold text-right text-slate-900 outline-none focus:bg-white focus:border-amber-400"
-                                    />
+                                  <td className="p-1.5 pr-2">
+                                    <div className="relative flex items-center">
+                                      <input
+                                        type="text"
+                                        value={formatPriceInput(contractForm.depositMembershipFee)}
+                                        onChange={(e) => handlePriceChange("depositMembershipFee", e.target.value)}
+                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7"
+                                        placeholder="0"
+                                      />
+                                      <span className="absolute right-2 text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                    </div>
                                   </td>
                                 </tr>
                                 <tr className="border-b border-slate-100">
                                   <td className="p-1.5 pl-2.5 border-r border-slate-200 text-slate-700 font-semibold">
                                     오픈교육비
                                   </td>
-                                  <td className="p-1 pr-1.5">
-                                    <input
-                                      type="text"
-                                      value={formatPriceInput(contractForm.depositEduFee)}
-                                      onChange={(e) => handlePriceChange("depositEduFee", e.target.value)}
-                                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded px-2 py-1 text-xs font-bold text-right text-slate-900 outline-none focus:bg-white focus:border-amber-400"
-                                    />
+                                  <td className="p-1.5 pr-2">
+                                    <div className="relative flex items-center">
+                                      <input
+                                        type="text"
+                                        value={formatPriceInput(contractForm.depositEduFee)}
+                                        onChange={(e) => handlePriceChange("depositEduFee", e.target.value)}
+                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7"
+                                        placeholder="0"
+                                      />
+                                      <span className="absolute right-2 text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                    </div>
                                   </td>
                                 </tr>
                                 <tr className="border-b border-slate-100">
                                   <td className="p-1.5 pl-2.5 border-r border-slate-200 text-slate-700 font-semibold">
                                     오픈지원비
                                   </td>
-                                  <td className="p-1 pr-1.5">
-                                    <input
-                                      type="text"
-                                      value={formatPriceInput(contractForm.depositSupportFee)}
-                                      onChange={(e) => handlePriceChange("depositSupportFee", e.target.value)}
-                                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded px-2 py-1 text-xs font-bold text-right text-slate-900 outline-none focus:bg-white focus:border-amber-400"
-                                    />
+                                  <td className="p-1.5 pr-2">
+                                    <div className="relative flex items-center">
+                                      <input
+                                        type="text"
+                                        value={formatPriceInput(contractForm.depositSupportFee)}
+                                        onChange={(e) => handlePriceChange("depositSupportFee", e.target.value)}
+                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7"
+                                        placeholder="0"
+                                      />
+                                      <span className="absolute right-2 text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                    </div>
                                   </td>
                                 </tr>
                                 <tr className="border-b border-slate-100 bg-blue-50/20">
-                                  <td className="p-1.5 pl-2.5 border-r border-slate-200 text-blue-950 font-semibold flex items-center justify-between">
-                                    <span>계약이행보증금</span>
-                                    <span className="text-[9px] bg-blue-100 text-blue-800 px-1 rounded font-bold">환급형</span>
+                                  <td className="p-1.5 pl-2.5 border-r border-slate-200 text-blue-950 font-semibold">
+                                    <div className="flex items-center justify-between">
+                                      <span>계약이행보증금</span>
+                                      <span className="text-[9px] bg-blue-100 text-blue-800 px-1 rounded font-bold">환급형</span>
+                                    </div>
                                   </td>
-                                  <td className="p-1 pr-1.5">
-                                    <input
-                                      type="text"
-                                      value={formatPriceInput(contractForm.depositGuaranteeFee)}
-                                      onChange={(e) => {
-                                        handlePriceChange("depositGuaranteeFee", e.target.value);
-                                        handlePriceChange("guaranteeFee", e.target.value);
-                                      }}
-                                      className="w-full bg-blue-50/40 border border-blue-200 rounded px-2 py-1 text-xs font-bold text-right text-blue-950 outline-none focus:bg-white focus:border-blue-400"
-                                    />
+                                  <td className="p-1.5 pr-2">
+                                    <div className="relative flex items-center">
+                                      <input
+                                        type="text"
+                                        value={formatPriceInput(contractForm.depositGuaranteeFee)}
+                                        onChange={(e) => {
+                                          handlePriceChange("depositGuaranteeFee", e.target.value);
+                                          handlePriceChange("guaranteeFee", e.target.value);
+                                        }}
+                                        className="w-full bg-blue-50/30 border border-blue-200 rounded px-2.5 py-1 text-xs font-black text-right text-blue-950 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs pr-7"
+                                        placeholder="0"
+                                      />
+                                      <span className="absolute right-2 text-[10px] font-bold text-blue-400 pointer-events-none">원</span>
+                                    </div>
                                   </td>
                                 </tr>
                                 <tr className="border-b border-slate-100">
                                   <td className="p-1.5 pl-2.5 border-r border-slate-200 text-slate-700 font-semibold">
                                     공사감리비
                                   </td>
-                                  <td className="p-1 pr-1.5">
-                                    <input
-                                      type="text"
-                                      value={formatPriceInput(contractForm.supervisionFee)}
-                                      onChange={(e) => handlePriceChange("supervisionFee", e.target.value)}
-                                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded px-2 py-1 text-xs font-bold text-right text-slate-900 outline-none focus:bg-white focus:border-amber-400"
-                                    />
+                                  <td className="p-1.5 pr-2">
+                                    <div className="relative flex items-center">
+                                      <input
+                                        type="text"
+                                        value={formatPriceInput(contractForm.supervisionFee)}
+                                        onChange={(e) => handlePriceChange("supervisionFee", e.target.value)}
+                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7"
+                                        placeholder="0"
+                                      />
+                                      <span className="absolute right-2 text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                    </div>
                                   </td>
                                 </tr>
                                 <tr className="border-b-2 border-slate-300">
                                   <td className="p-1.5 pl-2.5 border-r border-slate-200 text-slate-700 font-semibold">
                                     초도물품비
                                   </td>
-                                  <td className="p-1 pr-1.5">
-                                    <input
-                                      type="text"
-                                      value={formatPriceInput(contractForm.initialSupplyFee)}
-                                      onChange={(e) => handlePriceChange("initialSupplyFee", e.target.value)}
-                                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded px-2 py-1 text-xs font-bold text-right text-slate-900 outline-none focus:bg-white focus:border-amber-400"
-                                    />
+                                  <td className="p-1.5 pr-2">
+                                    <div className="relative flex items-center">
+                                      <input
+                                        type="text"
+                                        value={formatPriceInput(contractForm.initialSupplyFee)}
+                                        onChange={(e) => handlePriceChange("initialSupplyFee", e.target.value)}
+                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7"
+                                        placeholder="0"
+                                      />
+                                      <span className="absolute right-2 text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                    </div>
                                   </td>
                                 </tr>
 
@@ -6818,26 +6844,34 @@ export default function AdminPage() {
                                   <td className="p-1.5 pl-2.5 border-r border-slate-200 text-slate-700 font-semibold">
                                     월 계속가맹금 (로열티)
                                   </td>
-                                  <td className="p-1 pr-1.5">
-                                    <input
-                                      type="text"
-                                      value={formatPriceInput(contractForm.royaltyFee)}
-                                      onChange={(e) => handlePriceChange("royaltyFee", e.target.value)}
-                                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded px-2 py-1 text-xs font-bold text-right text-slate-900 outline-none focus:bg-white focus:border-amber-400"
-                                    />
+                                  <td className="p-1.5 pr-2">
+                                    <div className="relative flex items-center">
+                                      <input
+                                        type="text"
+                                        value={formatPriceInput(contractForm.royaltyFee)}
+                                        onChange={(e) => handlePriceChange("royaltyFee", e.target.value)}
+                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7"
+                                        placeholder="0"
+                                      />
+                                      <span className="absolute right-2 text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                    </div>
                                   </td>
                                 </tr>
                                 <tr className="border-b-2 border-slate-300">
                                   <td className="p-1.5 pl-2.5 border-r border-slate-200 text-slate-700 font-semibold">
                                     신입교육비 (1인당)
                                   </td>
-                                  <td className="p-1 pr-1.5">
-                                    <input
-                                      type="text"
-                                      value={formatPriceInput(contractForm.eduNewFee)}
-                                      onChange={(e) => handlePriceChange("eduNewFee", e.target.value)}
-                                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded px-2 py-1 text-xs font-bold text-right text-slate-900 outline-none focus:bg-white focus:border-amber-400"
-                                    />
+                                  <td className="p-1.5 pr-2">
+                                    <div className="relative flex items-center">
+                                      <input
+                                        type="text"
+                                        value={formatPriceInput(contractForm.eduNewFee)}
+                                        onChange={(e) => handlePriceChange("eduNewFee", e.target.value)}
+                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7"
+                                        placeholder="0"
+                                      />
+                                      <span className="absolute right-2 text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                    </div>
                                   </td>
                                 </tr>
 
@@ -6851,26 +6885,34 @@ export default function AdminPage() {
                                   <td className="p-1.5 pl-2.5 border-r border-slate-200 text-slate-700 font-semibold">
                                     재가맹비 (2년 갱신)
                                   </td>
-                                  <td className="p-1 pr-1.5">
-                                    <input
-                                      type="text"
-                                      value={formatPriceInput(contractForm.reFranchiseFee)}
-                                      onChange={(e) => handlePriceChange("reFranchiseFee", e.target.value)}
-                                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded px-2 py-1 text-xs font-bold text-right text-slate-900 outline-none focus:bg-white focus:border-amber-400"
-                                    />
+                                  <td className="p-1.5 pr-2">
+                                    <div className="relative flex items-center">
+                                      <input
+                                        type="text"
+                                        value={formatPriceInput(contractForm.reFranchiseFee)}
+                                        onChange={(e) => handlePriceChange("reFranchiseFee", e.target.value)}
+                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs font-black text-right text-slate-900 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs pr-7"
+                                        placeholder="0"
+                                      />
+                                      <span className="absolute right-2 text-[10px] font-bold text-slate-400 pointer-events-none">원</span>
+                                    </div>
                                   </td>
                                 </tr>
                                 <tr>
                                   <td className="p-1.5 pl-2.5 border-r border-slate-200 text-rose-600 font-semibold">
                                     계약해지 위약금
                                   </td>
-                                  <td className="p-1 pr-1.5">
-                                    <input
-                                      type="text"
-                                      value={formatPriceInput(contractForm.penaltyFee)}
-                                      onChange={(e) => handlePriceChange("penaltyFee", e.target.value)}
-                                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded px-2 py-1 text-xs font-bold text-right text-rose-700 outline-none focus:bg-white focus:border-rose-400"
-                                    />
+                                  <td className="p-1.5 pr-2">
+                                    <div className="relative flex items-center">
+                                      <input
+                                        type="text"
+                                        value={formatPriceInput(contractForm.penaltyFee)}
+                                        onChange={(e) => handlePriceChange("penaltyFee", e.target.value)}
+                                        className="w-full bg-white border border-rose-300 rounded px-2.5 py-1 text-xs font-black text-right text-rose-700 outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 shadow-2xs pr-7"
+                                        placeholder="0"
+                                      />
+                                      <span className="absolute right-2 text-[10px] font-bold text-rose-400 pointer-events-none">원</span>
+                                    </div>
                                   </td>
                                 </tr>
                               </tbody>
