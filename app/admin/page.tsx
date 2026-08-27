@@ -2155,6 +2155,7 @@ export default function AdminPage() {
   // 발주 필터링 및 통합검색, 엑셀 내보내기 헬퍼 상태
   const [orderSearchKeyword, setOrderSearchKeyword] = useState<string>("");
   const [orderDateFilterType, setOrderDateFilterType] = useState<string>("all"); // all, today, yesterday, week, month, prev_month, custom
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all"); // all, 결제완료, 입금대기, 결제대기, 배송준비중, 배송중, 배송완료, 주문취소 등
   const [orderStartDate, setOrderStartDate] = useState<string>("");
   const [orderEndDate, setOrderEndDate] = useState<string>("");
 
@@ -2234,6 +2235,14 @@ export default function AdminPage() {
 
         if (start && orderDateOnly < start) return false;
         if (end && orderDateOnly > end) return false;
+      }
+
+      // 3. 진행상태 필터
+      if (orderStatusFilter !== "all") {
+        const currentStatus = order.status || "대기";
+        if (currentStatus !== orderStatusFilter) {
+          return false;
+        }
       }
 
       return true;
@@ -8578,7 +8587,7 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              {/* 검색 및 기간 필터 영역 */}
+              {/* 검색 및 기간/상태 필터 영역 */}
               <div className="bg-white border border-[#EEF0F5] rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* 통합 검색 */}
@@ -8611,27 +8620,83 @@ export default function AdminPage() {
                     </select>
                   </div>
 
-                  {/* 직접 지정 달력 폼 (custom일 때만 노출) */}
-                  {orderDateFilterType === "custom" && (
-                    <div className="space-y-1.5 animate-fadeIn">
-                      <label className="text-[11px] font-extrabold text-[#0F172A] block">직접 기간 선택</label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="date"
-                          value={orderStartDate}
-                          onChange={(e) => setOrderStartDate(e.target.value)}
-                          className="flex-1 bg-[#F8F9FD] border border-[#E2E8F0] rounded-lg px-3 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none"
-                        />
-                        <span className="text-slate-400 font-bold text-xs">~</span>
-                        <input
-                          type="date"
-                          value={orderEndDate}
-                          onChange={(e) => setOrderEndDate(e.target.value)}
-                          className="flex-1 bg-[#F8F9FD] border border-[#E2E8F0] rounded-lg px-3 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none"
-                        />
-                      </div>
+                  {/* 진행상태 필터 셀렉트 */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-extrabold text-[#0F172A] block">진행상태 필터</label>
+                    <select
+                      value={orderStatusFilter}
+                      onChange={(e) => setOrderStatusFilter(e.target.value)}
+                      className="w-full bg-[#F8F9FD] border border-[#E2E8F0] rounded-lg px-4 py-3 text-xs text-[#0F172A] font-bold focus:outline-none focus:border-[#F5AC00] cursor-pointer"
+                    >
+                      <option value="all">전체 진행상태</option>
+                      <option value="결제완료">결제완료</option>
+                      <option value="입금대기">입금대기</option>
+                      <option value="배송준비중">배송준비중</option>
+                      <option value="배송중">배송중</option>
+                      <option value="배송완료">배송완료</option>
+                      <option value="결제대기">결제대기</option>
+                      <option value="주문완료">주문완료</option>
+                      <option value="주문취소">주문취소</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* 직접 지정 달력 폼 (custom일 때만 노출) */}
+                {orderDateFilterType === "custom" && (
+                  <div className="space-y-1.5 pt-2 border-t border-slate-100 animate-fadeIn">
+                    <label className="text-[11px] font-extrabold text-[#0F172A] block">직접 기간 선택</label>
+                    <div className="flex items-center gap-2 max-w-md">
+                      <input
+                        type="date"
+                        value={orderStartDate}
+                        onChange={(e) => setOrderStartDate(e.target.value)}
+                        className="flex-1 bg-[#F8F9FD] border border-[#E2E8F0] rounded-lg px-3 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none"
+                      />
+                      <span className="text-slate-400 font-bold text-xs">~</span>
+                      <input
+                        type="date"
+                        value={orderEndDate}
+                        onChange={(e) => setOrderEndDate(e.target.value)}
+                        className="flex-1 bg-[#F8F9FD] border border-[#E2E8F0] rounded-lg px-3 py-2.5 text-xs font-bold text-[#0F172A] focus:outline-none"
+                      />
                     </div>
-                  )}
+                  </div>
+                )}
+
+                {/* 상태별 원클릭 퀵 탭 버튼 */}
+                <div className="flex items-center gap-1.5 flex-wrap pt-3 border-t border-slate-100">
+                  <span className="text-[11px] font-black text-slate-500 mr-1 shrink-0">상태 퀵 필터:</span>
+                  {[
+                    { key: "all", label: "전체", count: orders.length },
+                    { key: "결제완료", label: "결제완료", count: orders.filter(o => o.status === "결제완료").length },
+                    { key: "입금대기", label: "입금대기", count: orders.filter(o => o.status === "입금대기").length },
+                    { key: "배송준비중", label: "배송준비중", count: orders.filter(o => o.status === "배송준비중").length },
+                    { key: "배송중", label: "배송중", count: orders.filter(o => o.status === "배송중").length },
+                    { key: "배송완료", label: "배송완료", count: orders.filter(o => o.status === "배송완료").length },
+                    { key: "결제대기", label: "결제대기", count: orders.filter(o => o.status === "결제대기").length },
+                    { key: "주문취소", label: "주문취소", count: orders.filter(o => o.status === "주문취소").length },
+                  ].map(tab => {
+                    const isSelected = orderStatusFilter === tab.key;
+                    return (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => setOrderStatusFilter(tab.key)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 border cursor-pointer ${
+                          isSelected
+                            ? "bg-[#0F172A] text-[#FED422] border-[#0F172A] shadow-xs"
+                            : "bg-[#F8F9FD] text-slate-600 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        <span>{tab.label}</span>
+                        <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                          isSelected ? "bg-[#FED422] text-[#0F172A]" : "bg-slate-200 text-slate-700"
+                        }`}>
+                          {tab.count}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
