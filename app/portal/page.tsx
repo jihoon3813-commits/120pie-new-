@@ -1507,8 +1507,9 @@ export default function PortalPage() {
           msg = msg.replace(new RegExp(`{${key}}`, "g"), val);
         });
 
-        const formattedSender = eventConfig.customer.sender.replace(/[^0-9]/g, "");
+        const rawCustomerSender = (eventConfig.customer.sender || "1566-3594").replace(/[^0-9]/g, "");
         const formattedReceiver = customerPhone.replace(/[^0-9]/g, "");
+        const formattedSender = (rawCustomerSender === formattedReceiver) ? "15663594" : rawCustomerSender;
 
         if (!formattedReceiver || formattedReceiver.length < 8) {
           console.warn(`[SMS Skip] 신청자(고객) 연락처가 누락되었거나 유효하지 않습니다: ${customerPhone}`);
@@ -1547,30 +1548,41 @@ export default function PortalPage() {
             msg = msg.replace(new RegExp(`{${key}}`, "g"), val);
           });
 
-          const formattedSender = eventConfig.admin.sender.replace(/[^0-9]/g, "");
-          const formattedReceiver = adminReceivers.map((num: string) => num.replace(/[^0-9]/g, "")).join(",");
+          const baseSender = (eventConfig.admin.sender || "1566-3594").replace(/[^0-9]/g, "");
 
-          console.log(`[SMS Admin Trigger] Category: ${category} | From: ${eventConfig.admin.sender} | To: ${adminReceivers.join(", ")}`);
-          console.log(`[SMS Admin Content]:\n${msg}`);
+          for (const rawAdminPhone of adminReceivers) {
+            const formattedReceiver = rawAdminPhone.replace(/[^0-9]/g, "");
+            if (!formattedReceiver || formattedReceiver.length < 8) continue;
 
-          if (hasAligoCreds) {
-            const response = await sendSmsAction({
-              key: smsSettings.aligoKey,
-              userId: smsSettings.aligoUserId,
-              sender: formattedSender,
-              receiver: formattedReceiver,
-              msg: msg,
-              isTest: smsSettings.aligoTestMode !== false
-            });
-            console.log("[Aligo Admin Response]:", response);
-            if (response.success) {
-              triggerToast("관리자용 SMS 발송 완료");
+            // 발신번호와 수신번호가 동일할 경우 통신사 차단 방지를 위해 대표번호로 대체
+            const formattedSender = (baseSender === formattedReceiver) ? "15663594" : baseSender;
+
+            console.log(`[SMS Admin Trigger] Category: ${category} | From: ${formattedSender} | To: ${formattedReceiver}`);
+            console.log(`[SMS Admin Content]:\n${msg}`);
+
+            if (hasAligoCreds) {
+              try {
+                const response = await sendSmsAction({
+                  key: smsSettings.aligoKey,
+                  userId: smsSettings.aligoUserId,
+                  sender: formattedSender,
+                  receiver: formattedReceiver,
+                  msg: msg,
+                  isTest: smsSettings.aligoTestMode !== false
+                });
+                console.log(`[Aligo Admin Response to ${formattedReceiver}]:`, response);
+                if (response.success) {
+                  triggerToast(`관리자(${formattedReceiver}) 알림 SMS 발송 완료`);
+                } else {
+                  console.error(`[Aligo Admin API Failure to ${formattedReceiver}]:`, response.error || response.message);
+                }
+              } catch (smsErr) {
+                console.error(`[Aligo Admin Error to ${formattedReceiver}]:`, smsErr);
+              }
             } else {
-              console.error("[Aligo Admin API Failure]:", response.error || response.message);
+              // Simulation fallback
+              alert(`[관리자용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${formattedSender}\n받는사람(관리자): ${formattedReceiver}\n\n내용:\n${msg}`);
             }
-          } else {
-            // Simulation fallback
-            alert(`[관리자용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${eventConfig.admin.sender}\n받는사람(관리자): ${adminReceivers.join(", ")}\n\n내용:\n${msg}`);
           }
         }
       }

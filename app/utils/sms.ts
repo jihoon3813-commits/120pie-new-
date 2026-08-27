@@ -26,8 +26,9 @@ export const triggerConsultationSms = async (
       Object.entries(variables).forEach(([key, val]) => {
         msg = msg.replace(new RegExp(`{${key}}`, "g"), val);
       });
-      const formattedSender = eventConfig.customer.sender.replace(/[^0-9]/g, "");
+      const rawCustomerSender = (eventConfig.customer.sender || "1566-3594").replace(/[^0-9]/g, "");
       const formattedReceiver = phone.replace(/[^0-9]/g, "");
+      const formattedSender = (rawCustomerSender === formattedReceiver) ? "15663594" : rawCustomerSender;
 
       if (hasAligoCreds) {
         await sendSmsAction({
@@ -40,7 +41,7 @@ export const triggerConsultationSms = async (
         }).catch((err: any) => console.error("Consultation customer SMS error", err));
       } else {
         // Simulation fallback
-        alert(`[고객용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${eventConfig.customer.sender}\n받는사람(고객): ${phone}\n\n내용:\n${msg}`);
+        alert(`[고객용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${formattedSender}\n받는사람(고객): ${formattedReceiver}\n\n내용:\n${msg}`);
       }
     }
 
@@ -52,21 +53,26 @@ export const triggerConsultationSms = async (
         Object.entries(variables).forEach(([key, val]) => {
           msg = msg.replace(new RegExp(`{${key}}`, "g"), val);
         });
-        const formattedSender = eventConfig.admin.sender.replace(/[^0-9]/g, "");
-        const formattedReceiver = adminReceivers.map((num: string) => num.replace(/[^0-9]/g, "")).join(",");
+        const baseSender = (eventConfig.admin.sender || "1566-3594").replace(/[^0-9]/g, "");
 
-        if (hasAligoCreds) {
-          await sendSmsAction({
-            key: smsSettings.aligoKey,
-            userId: smsSettings.aligoUserId,
-            sender: formattedSender,
-            receiver: formattedReceiver,
-            msg: msg,
-            isTest: smsSettings.aligoTestMode !== false
-          }).catch((err: any) => console.error("Consultation admin SMS error", err));
-        } else {
-          // Simulation fallback
-          alert(`[관리자용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${eventConfig.admin.sender}\n받는사람(관리자): ${adminReceivers.join(", ")}\n\n내용:\n${msg}`);
+        for (const rawAdminPhone of adminReceivers) {
+          const formattedReceiver = rawAdminPhone.replace(/[^0-9]/g, "");
+          if (!formattedReceiver || formattedReceiver.length < 8) continue;
+          const formattedSender = (baseSender === formattedReceiver) ? "15663594" : baseSender;
+
+          if (hasAligoCreds) {
+            await sendSmsAction({
+              key: smsSettings.aligoKey,
+              userId: smsSettings.aligoUserId,
+              sender: formattedSender,
+              receiver: formattedReceiver,
+              msg: msg,
+              isTest: smsSettings.aligoTestMode !== false
+            }).catch((err: any) => console.error("Consultation admin SMS error", err));
+          } else {
+            // Simulation fallback
+            alert(`[관리자용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${formattedSender}\n받는사람(관리자): ${formattedReceiver}\n\n내용:\n${msg}`);
+          }
         }
       }
     }
