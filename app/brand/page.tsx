@@ -93,9 +93,9 @@ const SLIDE_BANNERS = [
 ];
 
 const VERTICAL_BANNER = {
-  title: "7월 신메뉴 공식 출시",
-  desc: "바삭함과 달콤함의 극치",
-  img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1787899315/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_28%EC%9D%BC_%EC%98%A4%ED%9B%84_03_41_38_vw0csj.png",
+  title: "9월 출시 예정 120 페이스트리 스프",
+  desc: "스프와 즐기는 120겹의 특별함",
+  img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1787902541/120_%EC%8A%A4%ED%94%84_3%EC%A2%85_4_eovcz0.png",
 };
 
 const HORIZONTAL_BANNER = {
