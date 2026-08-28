@@ -72,7 +72,7 @@ export const createOrUpdate = mutation({
 
       await ctx.db.patch(existing._id, fields);
 
-      // 결제대기 -> 결제완료 등 상태 전이 시 디스코드 알림 발송
+      // 결제대기 -> 결제완료 등 상태 전이 시 디스코드 알림 및 SMS 발송
       if (prevStatus !== "결제완료" && args.status === "결제완료") {
         let storeName = "";
         if (args.storeId) {
@@ -97,6 +97,16 @@ export const createOrUpdate = mutation({
           payMethod: args.payMethod,
           status: args.status,
         });
+
+        await ctx.scheduler.runAfter(0, internal.aligo.sendEventSmsInternal, {
+          eventKey: "order_card",
+          variables: {
+            storeName: storeName || args.storeId || "가맹점",
+            orderId: args.id,
+            amount: Number(args.totalPrice).toLocaleString(),
+          },
+          customerPhone: args.recipientPhone || undefined,
+        });
       }
 
       return existing._id;
@@ -116,7 +126,7 @@ export const createOrUpdate = mutation({
         if (store) storeName = store.name;
       }
 
-      // 결제대기가 아닌 경우(즉시 결제완료 또는 무통장 입금대기) 디스코드 알림 발송
+      // 결제대기가 아닌 경우(즉시 결제완료 또는 무통장 입금대기) 디스코드 알림 및 SMS 발송
       if (args.status !== "결제대기") {
         await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
           id: args.id,
@@ -131,6 +141,17 @@ export const createOrUpdate = mutation({
           recipientPhone: args.recipientPhone,
           payMethod: args.payMethod,
           status: args.status,
+        });
+
+        const smsEventKey = args.status === "입금대기" || args.payMethod === "cash" || args.payMethod === "bank" ? "order_cash" : "order_card";
+        await ctx.scheduler.runAfter(0, internal.aligo.sendEventSmsInternal, {
+          eventKey: smsEventKey,
+          variables: {
+            storeName: storeName || args.storeId || "가맹점",
+            orderId: args.id,
+            amount: Number(args.totalPrice).toLocaleString(),
+          },
+          customerPhone: args.recipientPhone || undefined,
         });
       }
 
@@ -207,6 +228,16 @@ export const processPaidWebhookOrder = internalMutation({
         status: "결제완료",
       });
 
+      await ctx.scheduler.runAfter(0, internal.aligo.sendEventSmsInternal, {
+        eventKey: "order_card",
+        variables: {
+          storeName: storeName || targetStoreId || "가맹점",
+          orderId: existing.id,
+          amount: Number(args.amount !== undefined ? args.amount : existing.totalPrice).toLocaleString(),
+        },
+        customerPhone: existing.recipientPhone || args.recipientPhone || undefined,
+      });
+
       return { updated: true, orderId: existing._id };
     } else {
       const newOrderFields = {
@@ -248,6 +279,16 @@ export const processPaidWebhookOrder = internalMutation({
         recipientPhone: args.recipientPhone,
         payMethod: "card",
         status: "결제완료",
+      });
+
+      await ctx.scheduler.runAfter(0, internal.aligo.sendEventSmsInternal, {
+        eventKey: "order_card",
+        variables: {
+          storeName: storeName || args.storeId || "가맹점",
+          orderId: args.paymentId,
+          amount: Number(args.amount || 0).toLocaleString(),
+        },
+        customerPhone: args.recipientPhone || undefined,
       });
 
       return { updated: true, orderId: newId };

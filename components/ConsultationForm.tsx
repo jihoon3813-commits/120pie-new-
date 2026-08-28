@@ -26,7 +26,7 @@ export default function ConsultationForm({
 }: {
   onSuccessClose?: () => void;
 }) {
-  const sendSmsAction = useAction(api.aligo.sendSms);
+  const sendEventSmsAction = useAction(api.aligo.sendEventSms);
   const addInquiry = useMutation(api.inquiries.add);
 
   const [form, setForm] = useState(initialForm);
@@ -111,49 +111,30 @@ export default function ConsultationForm({
       console.error("Failed to save inquiry to Convex DB:", dbErr);
     }
 
-    // 2. SMS 발송 연동
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("120_sms_settings");
-      if (stored) {
-        try {
-          const smsSettings = JSON.parse(stored);
-          const eventConfig = smsSettings.consultation;
-          if (eventConfig && smsSettings.aligoKey && smsSettings.aligoUserId) {
-            let msg = eventConfig.message || "창업 상담이 성공적으로 신청되었습니다.";
-            msg = msg
-              .replace(/{name}/g, form.name)
-              .replace(/{phone}/g, form.phone)
-              .replace(/{region}/g, form.region || "미지정")
-              .replace(/{storeStatus}/g, form.storeStatus || "미지정");
-
-            sendSmsAction({
-              key: smsSettings.aligoKey,
-              userId: smsSettings.aligoUserId,
-              sender: (smsSettings.senderPhone || "18995685").replace(/[^0-9]/g, ""),
-              receiver: form.phone.replace(/[^0-9]/g, ""),
-              msg,
-              isTest: smsSettings.aligoTestMode !== false,
-            }).catch(console.error);
-
-            if (smsSettings.adminPhones && Array.isArray(smsSettings.adminPhones)) {
-              for (const adminPhone of smsSettings.adminPhones) {
-                if (adminPhone) {
-                  sendSmsAction({
-                    key: smsSettings.aligoKey,
-                    userId: smsSettings.aligoUserId,
-                    sender: (smsSettings.senderPhone || "18995685").replace(/[^0-9]/g, ""),
-                    receiver: adminPhone.replace(/[^0-9]/g, ""),
-                    msg: `[120PIE 상담신청]\n이름: ${form.name}\n연락처: ${form.phone}\n지역: ${form.region || "미지정"}\n상태: ${form.storeStatus || "미지정"}`,
-                    isTest: smsSettings.aligoTestMode !== false,
-                  }).catch(console.error);
-                }
-              }
-            }
-          }
-        } catch (smsErr) {
-          console.error("Failed to process SMS trigger:", smsErr);
+    // 2. SMS 발송 연동 (Convex DB 연동 및 본사/고객 자동 발송)
+    try {
+      let localSettings: any = null;
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("120_sms_settings");
+        if (stored) {
+          try {
+            localSettings = JSON.parse(stored);
+          } catch (e) {}
         }
       }
+
+      await sendEventSmsAction({
+        eventKey: "consultation",
+        variables: {
+          name: form.name,
+          phone: form.phone,
+          storeType: `${form.region || "미지정"} / ${form.storeStatus || "미지정"}`,
+        },
+        customerPhone: form.phone,
+        overrideSettings: localSettings || undefined,
+      });
+    } catch (smsErr) {
+      console.error("Failed to process SMS trigger:", smsErr);
     }
 
     setIsSubmitting(false);

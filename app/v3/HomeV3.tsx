@@ -1114,7 +1114,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   const convexPopup = useQuery(api.popups.get, { targetPage: "landing" });
   const convexFloating = useQuery(api.floatings.get);
   const addInquiry = useMutation(api.inquiries.add);
-  const sendSmsAction = useAction(api.aligo.sendSms);
+  const sendSmsAction = useAction(api.aligo.sendEventSms);
 
   // Dynamic Popup & Floating data loading synced with Convex (fallback to localStorage if not yet loaded)
   useEffect(() => {

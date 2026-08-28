@@ -948,6 +948,10 @@ export default function AdminPage() {
   const convexStores = useQuery(api.stores.get);
   const saveStoreMutation = useMutation(api.stores.createOrUpdate);
   const deleteStoreMutation = useMutation(api.stores.deleteStore);
+
+  // SMS Settings Convex Hooks
+  const convexSmsSettings = useQuery(api.smsSettings.get);
+  const saveSmsSettingsMutation = useMutation(api.smsSettings.save);
   const seedStoresMutation = useMutation(api.stores.seedStores);
 
   // Instagram Convex Hooks
@@ -1628,7 +1632,7 @@ export default function AdminPage() {
           alert("가맹사업자 휴대폰으로 전자계약서 서명 링크 문자가 성공적으로 발송되었습니다!");
         }
       } else {
-        alert(`문자 발송 실패: ${response.message || response.error || "알 수 없는 오류"}`);
+        alert(`문자 발송 실패: ${(response as any).message || (response as any).error || "알 수 없는 오류"}`);
       }
     } catch (err: any) {
       console.error("SMS send error:", err);
@@ -2408,69 +2412,69 @@ export default function AdminPage() {
       const DEFAULT_SMS_SETTINGS = {
         aligoKey: "",
         aligoUserId: "",
-        aligoTestMode: true,
+        aligoTestMode: false,
         store_reg: {
           customer: {
             isActive: true,
-            sender: "02-120-1200",
+            sender: "010-2666-0883",
             template: "[120겹파이] 가맹점 등록 신청이 완료되었습니다. 본사 검토 후 연락드리겠습니다. ID: {storeId}, 가맹점명: {storeName}."
           },
           admin: {
             isActive: true,
-            sender: "02-120-1200",
-            receivers: ["010-3813-1200"],
+            sender: "010-2666-0883",
+            receivers: ["010-4322-3813", "010-9114-4358"],
             template: "[120겹파이] 신규 가맹점 등록 신청이 접수되었습니다. ID: {storeId}, 가맹점명: {storeName}, 점주명: {owner}, 연락처: {phone}."
           }
         },
         order_card: {
           customer: {
             isActive: true,
-            sender: "02-120-1200",
+            sender: "010-2666-0883",
             template: "[120겹파이] 카드 결제 자재 주문이 정상 완료되었습니다. 주문ID: {orderId}, 결제금액: {amount}원. 신속하게 배송해 드리겠습니다."
           },
           admin: {
             isActive: true,
-            sender: "02-120-1200",
-            receivers: ["010-3813-1200"],
+            sender: "010-2666-0883",
+            receivers: ["010-4322-3813", "010-9114-4358"],
             template: "[120겹파이] {storeName} 가맹점의 카드 결제 자재 발주가 완료되었습니다. 주문ID: {orderId}, 금액: {amount}원."
           }
         },
         order_cash: {
           customer: {
             isActive: true,
-            sender: "02-120-1200",
+            sender: "010-2666-0883",
             template: "[120겹파이] 무통장입금 자재 주문이 접수되었습니다. 주문ID: {orderId}, 입금예정금액: {amount}원. K뱅크 700-120-270001 (주)고우웰라이프. 입금 확인 시 배송이 개시됩니다."
           },
           admin: {
             isActive: true,
-            sender: "02-120-1200",
-            receivers: ["010-3813-1200"],
+            sender: "010-2666-0883",
+            receivers: ["010-4322-3813", "010-9114-4358"],
             template: "[120겹파이] {storeName} 가맹점의 무통장입금 자재 발주가 신청되었습니다. 주문ID: {orderId}, 금액: {amount}원. 입금 확인이 필요합니다."
           }
         },
         consultation: {
           customer: {
             isActive: true,
-            sender: "02-120-1200",
+            sender: "010-2666-0883",
             template: "[120겹파이] 무료 가맹 상담 신청이 정상 접수되었습니다. 빠른 시간 내에 전문 컨설턴트가 연락드리겠습니다. 신청자: {name}님."
           },
           admin: {
             isActive: true,
-            sender: "02-120-1200",
-            receivers: ["010-3813-1200"],
+            sender: "010-2666-0883",
+            receivers: ["010-4322-3813", "010-9114-4358"],
             template: "[120겹파이] 홈페이지에 새로운 상담문의가 접수되었습니다. 이름: {name}, 연락처: {phone}, 점포유형: {storeType}."
           }
         },
         inquiry_1to1: {
           customer: {
             isActive: true,
-            sender: "02-120-1200",
+            sender: "010-2666-0883",
             template: "[120겹파이] 1:1 문의가 성공적으로 접수되었습니다. 담당 부서 확인 후 빠르게 답변드리겠습니다. 문의유형: {category}, 제목: {title}."
           },
           admin: {
             isActive: true,
-            sender: "02-120-1200",
-            receivers: ["010-3813-1200"],
+            sender: "010-2666-0883",
+            receivers: ["010-4322-3813", "010-9114-4358"],
             template: "[120겹파이] {storeName} 가맹점에서 새로운 1:1 문의를 등록했습니다. 제목: {title}, 유형: {category}."
           }
         }
@@ -2484,7 +2488,7 @@ export default function AdminPage() {
         }
       });
       setSmsSettings(healedSms);
-      setTestSenderPhone(healedSms.store_reg?.admin?.sender || "02-120-1200");
+      setTestSenderPhone(healedSms.store_reg?.admin?.sender || "010-2666-0883");
 
       // Seeds
       const st = loadState("120_stores", DEFAULT_STORES);
@@ -2653,6 +2657,22 @@ export default function AdminPage() {
       }
     }
   }, [convexBanners, updateBannersMutation]);
+
+  // [Migration] Automatic sync/migration of SMS settings between Convex Cloud DB and LocalStorage
+  useEffect(() => {
+    if (convexSmsSettings) {
+      setSmsSettings(convexSmsSettings);
+      localStorage.setItem("120_sms_settings", JSON.stringify(convexSmsSettings));
+      if (convexSmsSettings.store_reg?.admin?.sender) {
+        setTestSenderPhone(convexSmsSettings.store_reg.admin.sender);
+      }
+    } else if (convexSmsSettings === null && smsSettings && (smsSettings.aligoKey || smsSettings.order_card)) {
+      console.log("[Migration] Moving local SMS settings to Convex cloud DB...");
+      saveSmsSettingsMutation({ settings: smsSettings }).catch((err) => {
+        console.error("[Migration] Failed to migrate SMS settings:", err);
+      });
+    }
+  }, [convexSmsSettings]);
 
   // [Migration] Automatic migration from LocalStorage to Convex Cloud DB
   useEffect(() => {
@@ -4662,10 +4682,16 @@ export default function AdminPage() {
     triggerToast("이용약관, 개인정보처리방침 및 환불정책이 성공적으로 저장되었습니다!");
   };
 
-  const handleUpdateSmsSettings = (e: React.FormEvent) => {
+  const handleUpdateSmsSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem("120_sms_settings", JSON.stringify(smsSettings));
-    triggerToast("실시간 SMS 알림 연동 및 문구 설정이 저장되었습니다.");
+    try {
+      await saveSmsSettingsMutation({ settings: smsSettings });
+      triggerToast("실시간 SMS 알림 연동 및 문구 설정이 클라우드 DB에 성공적으로 저장되었습니다!");
+    } catch (err: any) {
+      console.error("SMS 설정 DB 저장 오류:", err);
+      triggerToast("SMS 설정이 로컬에 저장되었습니다 (DB 동기화 확인 요망).");
+    }
   };
 
   const handleTestSendSms = async () => {
@@ -4703,7 +4729,7 @@ export default function AdminPage() {
           alert("테스트 문자가 실제로 성공적으로 발송되었습니다!");
         }
       } else {
-        alert(`발송 실패: ${response.message || response.error || "알 수 없는 오류"}`);
+        alert(`발송 실패: ${(response as any).message || (response as any).error || "알 수 없는 오류"}`);
       }
     } catch (e: any) {
       console.error(e);

@@ -241,7 +241,7 @@ export default function BrandFranchisePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const addInquiry = useMutation(api.inquiries.add);
-  const sendSmsAction = useAction(api.aligo.sendSms);
+  const sendSmsAction = useAction(api.aligo.sendEventSms);
 
   const formatPhoneNumber = (val: string) => {
     if (!val) return "";

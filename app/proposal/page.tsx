@@ -32,7 +32,7 @@ export default function ProposalDeck() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const addInquiryMutation = useMutation(api.inquiries.add);
-  const sendSmsAction = useAction(api.aligo.sendSms);
+  const sendSmsAction = useAction(api.aligo.sendEventSms);
 
   const formatPhoneNumber = (value: string) => {
     const raw = value.replace(/[^\d]/g, "");

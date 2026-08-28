@@ -296,4 +296,8 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_isContracted", ["isContracted"])
     .index("by_name", ["name"]),
+  smsSettings: defineTable({
+    settings: v.any(),
+    updatedAt: v.optional(v.string()),
+  }),
 });

@@ -46,7 +46,7 @@ export default function ModernWebProposal() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const addInquiryMutation = useMutation(api.inquiries.add);
-  const sendSmsAction = useAction(api.aligo.sendSms);
+  const sendSmsAction = useAction(api.aligo.sendEventSms);
   const totalSlides = 12;
 
   const formatPhoneNumber = (value: string) => {

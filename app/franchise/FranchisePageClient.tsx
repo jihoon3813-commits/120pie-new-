@@ -121,7 +121,7 @@ export default function FranchisePageClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const addInquiry = useMutation(api.inquiries.add);
-  const sendSmsAction = useAction(api.aligo.sendSms);
+  const sendSmsAction = useAction(api.aligo.sendEventSms);
 
   // Load theme dynamically from browser environment
   useEffect(() => {

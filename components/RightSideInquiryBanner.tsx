@@ -42,7 +42,7 @@ export default function RightSideInquiryBanner() {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const addInquiry = useMutation(api.inquiries.add);
-  const sendSmsAction = useAction(api.aligo.sendSms);
+  const sendSmsAction = useAction(api.aligo.sendEventSms);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

@@ -27,6 +27,7 @@ import type * as partners from "../partners.js";
 import type * as payments from "../payments.js";
 import type * as popups from "../popups.js";
 import type * as products from "../products.js";
+import type * as smsSettings from "../smsSettings.js";
 import type * as storeInquiries from "../storeInquiries.js";
 import type * as stores from "../stores.js";
 import type * as targets from "../targets.js";
@@ -57,6 +58,7 @@ declare const fullApi: ApiFromModules<{
   payments: typeof payments;
   popups: typeof popups;
   products: typeof products;
+  smsSettings: typeof smsSettings;
   storeInquiries: typeof storeInquiries;
   stores: typeof stores;
   targets: typeof targets;

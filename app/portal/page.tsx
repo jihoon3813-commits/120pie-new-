@@ -574,6 +574,7 @@ export default function PortalPage() {
   const updateOrderStatusMutation = useMutation(api.orders.updateStatus);
   const verifyAndSaveOrderAction = useAction(api.payments.verifyAndSaveOrder);
   const sendSmsAction = useAction(api.aligo.sendSms);
+  const sendEventSmsAction = useAction(api.aligo.sendEventSms);
 
 
 
@@ -1477,113 +1478,40 @@ export default function PortalPage() {
     }
   };
 
-  // Unified Aligo SMS sending function supporting customer/admin separation
+  // Unified Aligo SMS sending function supporting customer/admin separation via Convex & DB
   const triggerSmsSend = async (category: string, variables: Record<string, string>) => {
-    if (typeof window === "undefined") return;
-    const stored = localStorage.getItem("120_sms_settings");
-    if (!stored) return;
-    
     try {
-      const smsSettings = JSON.parse(stored);
-      const eventConfig = smsSettings[category];
-      if (!eventConfig) {
-        console.log(`[SMS Send Skip] Category '${category}' not found.`);
-        return;
+      let customerPhone = variables.phone || recipientPhone || profilePhone || "";
+      if (!customerPhone) {
+        const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+        customerPhone = activeStore?.phone || "";
       }
 
-      // Check if Aligo settings exist
-      const hasAligoCreds = smsSettings.aligoKey && smsSettings.aligoUserId;
-
-      // 1. 고객용 발송 (Customer-facing)
-      if (eventConfig.customer && eventConfig.customer.isActive) {
-        let customerPhone = variables.phone || recipientPhone || profilePhone || "";
-        if (!customerPhone) {
-          const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
-          customerPhone = activeStore?.phone || "";
-        }
-        
-        let msg = eventConfig.customer.template;
-        Object.entries(variables).forEach(([key, val]) => {
-          msg = msg.replace(new RegExp(`{${key}}`, "g"), val);
-        });
-
-        const rawCustomerSender = (eventConfig.customer.sender || "1566-3594").replace(/[^0-9]/g, "");
-        const formattedReceiver = customerPhone.replace(/[^0-9]/g, "");
-        const formattedSender = (rawCustomerSender === formattedReceiver) ? "15663594" : rawCustomerSender;
-
-        if (!formattedReceiver || formattedReceiver.length < 8) {
-          console.warn(`[SMS Skip] 신청자(고객) 연락처가 누락되었거나 유효하지 않습니다: ${customerPhone}`);
-        } else {
-          console.log(`[SMS Customer Trigger] Category: ${category} | From: ${eventConfig.customer.sender} | To: ${customerPhone}`);
-          console.log(`[SMS Customer Content]:\n${msg}`);
-
-          if (hasAligoCreds) {
-            const response = await sendSmsAction({
-              key: smsSettings.aligoKey,
-              userId: smsSettings.aligoUserId,
-              sender: formattedSender,
-              receiver: formattedReceiver,
-              msg: msg,
-              isTest: smsSettings.aligoTestMode !== false
-            });
-            console.log("[Aligo Customer Response]:", response);
-            if (response.success) {
-              triggerToast("신청자(점주) 주문 알림 SMS 발송 완료");
-            } else {
-              console.error("[Aligo Customer API Failure]:", response.error || response.message);
-            }
-          } else {
-            // Simulation fallback
-            alert(`[고객용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${eventConfig.customer.sender}\n받는사람(고객): ${customerPhone}\n\n내용:\n${msg}`);
-          }
+      let localSettings: any = null;
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("120_sms_settings");
+        if (stored) {
+          try {
+            localSettings = JSON.parse(stored);
+          } catch (e) {}
         }
       }
 
-      // 2. 관리자용 발송 (Admin-facing)
-      if (eventConfig.admin && eventConfig.admin.isActive) {
-        const adminReceivers = eventConfig.admin.receivers || [];
-        if (adminReceivers.length > 0) {
-          let msg = eventConfig.admin.template;
-          Object.entries(variables).forEach(([key, val]) => {
-            msg = msg.replace(new RegExp(`{${key}}`, "g"), val);
-          });
+      console.log(`[Portal triggerSmsSend] Dispatching event SMS for ${category}...`);
+      const res = await sendEventSmsAction({
+        eventKey: category,
+        variables: { ...variables, phone: customerPhone },
+        customerPhone: customerPhone,
+        overrideSettings: localSettings || undefined,
+      });
 
-          const baseSender = (eventConfig.admin.sender || "1566-3594").replace(/[^0-9]/g, "");
-
-          for (const rawAdminPhone of adminReceivers) {
-            const formattedReceiver = rawAdminPhone.replace(/[^0-9]/g, "");
-            if (!formattedReceiver || formattedReceiver.length < 8) continue;
-
-            // 발신번호와 수신번호가 동일할 경우 통신사 차단 방지를 위해 대표번호로 대체
-            const formattedSender = (baseSender === formattedReceiver) ? "15663594" : baseSender;
-
-            console.log(`[SMS Admin Trigger] Category: ${category} | From: ${formattedSender} | To: ${formattedReceiver}`);
-            console.log(`[SMS Admin Content]:\n${msg}`);
-
-            if (hasAligoCreds) {
-              try {
-                const response = await sendSmsAction({
-                  key: smsSettings.aligoKey,
-                  userId: smsSettings.aligoUserId,
-                  sender: formattedSender,
-                  receiver: formattedReceiver,
-                  msg: msg,
-                  isTest: smsSettings.aligoTestMode !== false
-                });
-                console.log(`[Aligo Admin Response to ${formattedReceiver}]:`, response);
-                if (response.success) {
-                  triggerToast(`관리자(${formattedReceiver}) 알림 SMS 발송 완료`);
-                } else {
-                  console.error(`[Aligo Admin API Failure to ${formattedReceiver}]:`, response.error || response.message);
-                }
-              } catch (smsErr) {
-                console.error(`[Aligo Admin Error to ${formattedReceiver}]:`, smsErr);
-              }
-            } else {
-              // Simulation fallback
-              alert(`[관리자용 SMS 발송 - 시뮬레이션]\n\n보낸사람: ${formattedSender}\n받는사람(관리자): ${formattedReceiver}\n\n내용:\n${msg}`);
-            }
-          }
+      console.log(`[Portal triggerSmsSend result]:`, res);
+      if (res && res.success) {
+        if ((res.adminSentCount ?? 0) > 0) {
+          triggerToast(`본사 관리자(${res.adminSentCount}명) 발주 알림 문자 발송 완료`);
+        }
+        if (res.customerSent) {
+          triggerToast("점주님께 발주 확인 문자가 발송되었습니다.");
         }
       }
     } catch (e) {

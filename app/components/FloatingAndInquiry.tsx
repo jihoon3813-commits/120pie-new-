@@ -150,7 +150,7 @@ export default function FloatingAndInquiry({
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const addInquiry = useMutation(api.inquiries.add);
-  const sendSmsAction = useAction(api.aligo.sendSms);
+  const sendSmsAction = useAction(api.aligo.sendEventSms);
   const convexFloating = useQuery(api.floatings.get);
 
   // Sync forced open state from parent

@@ -37,7 +37,7 @@ export default function ContactForm({
     if (onClose) onClose();
   });
 
-  const sendSmsAction = useAction(api.aligo.sendSms);
+  const sendEventSmsAction = useAction(api.aligo.sendEventSms);
   const addInquiry = useMutation(api.inquiries.add);
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState("");
@@ -100,67 +100,30 @@ export default function ContactForm({
       return;
     }
 
-    // SMS 발송 연동
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("120_sms_settings");
-      if (stored) {
-        try {
-          const smsSettings = JSON.parse(stored);
-          const eventConfig = smsSettings.consultation;
-          if (eventConfig) {
-            const hasAligoCreds = smsSettings.aligoKey && smsSettings.aligoUserId;
-
-            // 1. 고객용 발송
-            if (eventConfig.customer && eventConfig.customer.isActive) {
-              let msg = eventConfig.customer.template;
-              msg = msg.replace(/{name}/g, form.name);
-              msg = msg.replace(/{phone}/g, form.phone);
-              msg = msg.replace(/{storeType}/g, form.storeStatus);
-
-              const formattedSender = eventConfig.customer.sender.replace(/[^0-9]/g, "");
-              const formattedReceiver = form.phone.replace(/[^0-9]/g, "");
-
-              if (hasAligoCreds) {
-                sendSmsAction({
-                  key: smsSettings.aligoKey,
-                  userId: smsSettings.aligoUserId,
-                  sender: formattedSender,
-                  receiver: formattedReceiver,
-                  msg: msg,
-                  isTest: smsSettings.aligoTestMode !== false,
-                }).catch(console.error);
-              }
-            }
-
-            // 2. 관리자용 발송
-            if (eventConfig.admin && eventConfig.admin.isActive) {
-              const adminReceivers = eventConfig.admin.receivers || [];
-              if (adminReceivers.length > 0) {
-                let msg = eventConfig.admin.template;
-                msg = msg.replace(/{name}/g, form.name);
-                msg = msg.replace(/{phone}/g, form.phone);
-                msg = msg.replace(/{storeType}/g, form.storeStatus);
-
-                const formattedSender = eventConfig.admin.sender.replace(/[^0-9]/g, "");
-                const formattedReceiver = adminReceivers.map((num: string) => num.replace(/[^0-9]/g, "")).join(",");
-
-                if (hasAligoCreds) {
-                  sendSmsAction({
-                    key: smsSettings.aligoKey,
-                    userId: smsSettings.aligoUserId,
-                    sender: formattedSender,
-                    receiver: formattedReceiver,
-                    msg: msg,
-                    isTest: smsSettings.aligoTestMode !== false,
-                  }).catch(console.error);
-                }
-              }
-            }
-          }
-        } catch (e) {
-          console.error("SMS 설정 파싱 에러:", e);
+    // SMS 발송 연동 (Convex DB 연동 및 본사/고객 자동 발송)
+    try {
+      let localSettings: any = null;
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("120_sms_settings");
+        if (stored) {
+          try {
+            localSettings = JSON.parse(stored);
+          } catch (e) {}
         }
       }
+
+      await sendEventSmsAction({
+        eventKey: "consultation",
+        variables: {
+          name: form.name,
+          phone: form.phone,
+          storeType: form.storeStatus || "미지정",
+        },
+        customerPhone: form.phone,
+        overrideSettings: localSettings || undefined,
+      });
+    } catch (e) {
+      console.error("SMS 발송 처리 에러:", e);
     }
 
     // Tracking and Conversions
