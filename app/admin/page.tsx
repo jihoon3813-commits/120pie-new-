@@ -2176,25 +2176,26 @@ export default function AdminPage() {
 
   // 발주 필터링 연산
   const getFilteredOrders = () => {
-    const list = orders.filter((order: Order) => {
-      const storeInfo = stores.find(s => s.id === order.storeId) || {
+    const list = (orders || []).filter((order: Order) => {
+      if (!order) return false;
+      const storeInfo = (stores || []).find(s => s && s.id === order.storeId) || {
         name: order.storeId === "owner" ? "본사 테스트" : "강남역삼점",
         owner: "홍길동",
         phone: "010-1234-5678",
         roadAddress: "서울시 강남구 테헤란로 123",
         detailAddress: "1층",
       };
-      const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`;
+      const storeAddress = `${storeInfo.roadAddress || ""} ${storeInfo.detailAddress || ""}`.trim();
 
       // 1. 통합검색 (주문번호, 가맹점명, 점주명, 연락처, 주소, 주문 품목)
       if (orderSearchKeyword.trim() !== "") {
         const query = orderSearchKeyword.toLowerCase();
-        const matchesId = order.id.toLowerCase().includes(query);
-        const matchesStoreName = storeInfo.name.toLowerCase().includes(query);
-        const matchesOwner = storeInfo.owner.toLowerCase().includes(query);
-        const matchesPhone = storeInfo.phone.toLowerCase().includes(query);
+        const matchesId = (order.id || "").toLowerCase().includes(query);
+        const matchesStoreName = (storeInfo.name || "").toLowerCase().includes(query);
+        const matchesOwner = (storeInfo.owner || "").toLowerCase().includes(query);
+        const matchesPhone = (storeInfo.phone || "").toLowerCase().includes(query);
         const matchesAddress = storeAddress.toLowerCase().includes(query);
-        const matchesItems = order.items.some(it => it.productName.toLowerCase().includes(query));
+        const matchesItems = Array.isArray(order.items) && order.items.some(it => (it?.productName || "").toLowerCase().includes(query));
         
         if (!matchesId && !matchesStoreName && !matchesOwner && !matchesPhone && !matchesAddress && !matchesItems) {
           return false;
@@ -2254,12 +2255,12 @@ export default function AdminPage() {
 
     // 최신 신청일자/시간순 내림차순 정렬
     return list.sort((a: Order, b: Order) => {
-      const dateA = a.date || "";
-      const dateB = b.date || "";
+      const dateA = a?.date || "";
+      const dateB = b?.date || "";
       if (dateA !== dateB) {
         return dateB.localeCompare(dateA);
       }
-      return (b.id || "").localeCompare(a.id || "");
+      return (b?.id || "").localeCompare(a?.id || "");
     });
   };
 
@@ -2274,28 +2275,28 @@ export default function AdminPage() {
 
     const headers = ["신청일자", "주문번호", "가맹점명", "점주명", "연락처", "주소", "주문품목", "결제대금", "결제방식", "진행상태"];
     const rows = filteredOrders.map((order) => {
-      const storeInfo = stores.find(s => s.id === order.storeId) || {
+      const storeInfo = (stores || []).find(s => s && s.id === order.storeId) || {
         name: order.storeId === "owner" ? "본사 테스트" : "강남역삼점",
         owner: "홍길동",
         phone: "010-1234-5678",
         roadAddress: "서울시 강남구 테헤란로 123",
         detailAddress: "1층",
       };
-      const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`;
-      const itemDetails = order.items.map(it => `${it.productName}(${it.quantity}개)`).join(" / ");
+      const storeAddress = `${storeInfo.roadAddress || ""} ${storeInfo.detailAddress || ""}`.trim();
+      const itemDetails = (Array.isArray(order.items) ? order.items : []).map(it => `${it?.productName || ""}(${it?.quantity || 0}개)`).join(" / ");
       const payMethodStr = order.payMethod === "card" || order.payMethod === "CARD" ? "카드" : "현금";
       
       return [
         formatOrderDate(order.date, (order as any)._creationTime),
-        order.id,
-        storeInfo.name,
-        storeInfo.owner,
-        storeInfo.phone,
+        order.id || "",
+        storeInfo.name || "",
+        storeInfo.owner || "",
+        storeInfo.phone || "",
         `"${storeAddress.replace(/"/g, '""')}"`,
         `"${itemDetails.replace(/"/g, '""')}"`,
-        order.totalPrice,
+        order.totalPrice || 0,
         payMethodStr,
-        order.status
+        order.status || ""
       ];
     });
 
@@ -2783,43 +2784,43 @@ export default function AdminPage() {
   useEffect(() => {
     const syncStates = () => {
       if (typeof window !== "undefined") {
-        const i = localStorage.getItem("120_inquiries");
-        const n = localStorage.getItem("120_notices");
-        const t = localStorage.getItem("120_trainings");
-        const p = localStorage.getItem("120_prs");
-        
-        const st = localStorage.getItem("120_stores");
-        const cat = localStorage.getItem("120_categories");
-        const bnr = localStorage.getItem("120_banners");
+        const safeParse = (key: string, setter: (val: any) => void) => {
+          try {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed !== undefined && parsed !== null) {
+                setter(parsed);
+              }
+            }
+          } catch (e) {
+            // Ignore malformed localStorage json
+          }
+        };
 
-        if (i) setInquiries(JSON.parse(i));
-        if (n) setNotices(JSON.parse(n));
-        if (t) setTrainings(JSON.parse(t));
-        if (p) setPrs(JSON.parse(p));
-        
-        if (st) setStores(JSON.parse(st));
-        if (cat) setCategories(JSON.parse(cat));
-        if (bnr) setBanner(JSON.parse(bnr));
-
-        const lab = localStorage.getItem("120_labels");
-        if (lab) setLabels(JSON.parse(lab));
-
-        const ds = localStorage.getItem("120_delivery_statuses");
-        if (ds) setDeliveryStatuses(JSON.parse(ds));
+        safeParse("120_inquiries", setInquiries);
+        safeParse("120_notices", setNotices);
+        safeParse("120_trainings", setTrainings);
+        safeParse("120_prs", setPrs);
+        safeParse("120_stores", setStores);
+        safeParse("120_categories", setCategories);
+        safeParse("120_banners", setBanner);
+        safeParse("120_labels", setLabels);
+        safeParse("120_delivery_statuses", setDeliveryStatuses);
 
         const ps = localStorage.getItem("120_shipping_settings");
         if (ps && !showPolicyPanel) {
           try {
             const parsed = JSON.parse(ps);
-            setShippingPolicy(parsed.shippingPolicy || "");
-            setReturnPolicy(parsed.returnPolicy || "");
-            setShippingFeeA(parsed.shippingFeeA || "3,000");
-            setShippingFeeB(parsed.shippingFeeB || "4,000");
-            setShippingFeeC(parsed.shippingFeeC || "5,000");
-            setShippingFeeBox(parsed.shippingFeeBox || "6,000");
-          } catch (e) {
-            console.error(e);
-          }
+            if (parsed) {
+              setShippingPolicy(parsed.shippingPolicy || "");
+              setReturnPolicy(parsed.returnPolicy || "");
+              setShippingFeeA(parsed.shippingFeeA || "3,000");
+              setShippingFeeB(parsed.shippingFeeB || "4,000");
+              setShippingFeeC(parsed.shippingFeeC || "5,000");
+              setShippingFeeBox(parsed.shippingFeeBox || "6,000");
+            }
+          } catch (e) {}
         }
       }
     };
@@ -3880,18 +3881,19 @@ export default function AdminPage() {
   // Adjust product order (swap ▲ / ▼)
   const handleAdjustProductOrder = async (productId: string, direction: "up" | "down") => {
     // We compute the current filtered products to find the target to swap with
-    const currentList = products.filter((p) => {
+    const currentList = (products || []).filter((p) => {
+      if (!p) return false;
       const matchesCategory =
         adminProductCategoryFilter === "전체" || p.category === adminProductCategoryFilter;
 
-      const searchKeyword = adminProductSearch.trim().toLowerCase();
+      const searchKeyword = (adminProductSearch || "").trim().toLowerCase();
       const matchesSearch =
         searchKeyword === "" ||
-        p.name.toLowerCase().includes(searchKeyword) ||
-        p.modelName.toLowerCase().includes(searchKeyword);
+        (p.name || "").toLowerCase().includes(searchKeyword) ||
+        (p.modelName || "").toLowerCase().includes(searchKeyword);
 
       return matchesCategory && matchesSearch;
-    }).sort((a, b) => a.orderIndex - b.orderIndex);
+    }).sort((a, b) => (a?.orderIndex || 0) - (b?.orderIndex || 0));
 
     const currentIndex = currentList.findIndex((op) => op.id === productId);
     if (currentIndex === -1) return;
@@ -5364,15 +5366,16 @@ export default function AdminPage() {
   }
 
   // Product Real-time Filtered List Calculation
-  const filteredProducts = products.filter((p) => {
+  const filteredProducts = (products || []).filter((p) => {
+    if (!p) return false;
     const matchesCategory =
       adminProductCategoryFilter === "전체" || p.category === adminProductCategoryFilter;
 
-    const searchKeyword = adminProductSearch.trim().toLowerCase();
+    const searchKeyword = (adminProductSearch || "").trim().toLowerCase();
     const matchesSearch =
       searchKeyword === "" ||
-      p.name.toLowerCase().includes(searchKeyword) ||
-      p.modelName.toLowerCase().includes(searchKeyword);
+      (p.name || "").toLowerCase().includes(searchKeyword) ||
+      (p.modelName || "").toLowerCase().includes(searchKeyword);
 
     return matchesCategory && matchesSearch;
   });
@@ -6462,7 +6465,7 @@ export default function AdminPage() {
                             </div>
                             <div className="flex items-center justify-between text-[11px] text-slate-500 font-semibold">
                               <span>{c.storeName || "가맹점명 미정"}</span>
-                              <span>{c.createdAt.split(" ")[0]}</span>
+                              <span>{c.createdAt ? c.createdAt.split(" ")[0] : "-"}</span>
                             </div>
                           </button>
                         );
@@ -7575,7 +7578,7 @@ export default function AdminPage() {
                           </div>
 
                           {/* Adoption Menu Badges */}
-                          {store.adoptionMenu && store.adoptionMenu.length > 0 && (
+                          {Array.isArray(store.adoptionMenu) && store.adoptionMenu.length > 0 && (
                             <div className="flex items-center gap-1.5 flex-wrap pt-1">
                               <span className="text-[10px] font-bold text-slate-400 mr-1">도입 메뉴:</span>
                               {store.adoptionMenu.map((m) => {
@@ -7786,12 +7789,14 @@ export default function AdminPage() {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-neutral-100">
-                            {convexPartners
+                            {(convexPartners || [])
                               .filter((p: any) => {
-                                const q = partnerSearchQuery.toLowerCase();
+                                if (!p) return false;
+                                const q = (partnerSearchQuery || "").trim().toLowerCase();
+                                if (!q) return true;
                                 return (
-                                  p.name.toLowerCase().includes(q) ||
-                                  p.id.toLowerCase().includes(q) ||
+                                  (p.name || "").toLowerCase().includes(q) ||
+                                  (p.id || "").toLowerCase().includes(q) ||
                                   (p.companyName || "").toLowerCase().includes(q) ||
                                   (p.phone || "").includes(q)
                                 );
@@ -8693,14 +8698,14 @@ export default function AdminPage() {
                 <div className="flex items-center gap-1.5 flex-wrap pt-3 border-t border-slate-100">
                   <span className="text-[11px] font-black text-slate-500 mr-1 shrink-0">상태 퀵 필터:</span>
                   {[
-                    { key: "all", label: "전체", count: orders.length },
-                    { key: "결제완료", label: "결제완료", count: orders.filter(o => o.status === "결제완료").length },
-                    { key: "입금대기", label: "입금대기", count: orders.filter(o => o.status === "입금대기").length },
-                    { key: "배송준비중", label: "배송준비중", count: orders.filter(o => o.status === "배송준비중").length },
-                    { key: "배송중", label: "배송중", count: orders.filter(o => o.status === "배송중").length },
-                    { key: "배송완료", label: "배송완료", count: orders.filter(o => o.status === "배송완료").length },
-                    { key: "결제대기", label: "결제대기", count: orders.filter(o => o.status === "결제대기").length },
-                    { key: "주문취소", label: "주문취소", count: orders.filter(o => o.status === "주문취소").length },
+                    { key: "all", label: "전체", count: (orders || []).length },
+                    { key: "결제완료", label: "결제완료", count: (orders || []).filter(o => o && o.status === "결제완료").length },
+                    { key: "입금대기", label: "입금대기", count: (orders || []).filter(o => o && o.status === "입금대기").length },
+                    { key: "배송준비중", label: "배송준비중", count: (orders || []).filter(o => o && o.status === "배송준비중").length },
+                    { key: "배송중", label: "배송중", count: (orders || []).filter(o => o && o.status === "배송중").length },
+                    { key: "배송완료", label: "배송완료", count: (orders || []).filter(o => o && o.status === "배송완료").length },
+                    { key: "결제대기", label: "결제대기", count: (orders || []).filter(o => o && o.status === "결제대기").length },
+                    { key: "주문취소", label: "주문취소", count: (orders || []).filter(o => o && o.status === "주문취소").length },
                   ].map(tab => {
                     const isSelected = orderStatusFilter === tab.key;
                     return (
@@ -8752,17 +8757,18 @@ export default function AdminPage() {
                         </tr>
                       ) : (
                         filteredOrders.map((order, idx) => {
-                          const storeInfo = stores.find(s => s.id === order.storeId) || {
+                          const storeInfo = (stores || []).find(s => s && s.id === order.storeId) || {
                             name: order.storeId === "owner" ? "본사 테스트" : "강남역삼점",
                             owner: "김지훈",
                             phone: "010-3813-1200",
                             roadAddress: "경기 군포시 엘에스로 143 (금정동, 1층 1001호)",
                             detailAddress: "",
                           };
-                          const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`.trim();
+                          const storeAddress = `${storeInfo.roadAddress || ""} ${storeInfo.detailAddress || ""}`.trim();
+                          const orderItems = Array.isArray(order.items) ? order.items : [];
                           
                           return (
-                            <tr key={order.id} className="hover:bg-[#fff9fb] transition-colors">
+                            <tr key={order.id || idx} className="hover:bg-[#fff9fb] transition-colors">
                               <td className="p-4 sm:p-5 text-center font-bold text-[#bf3e67]">{filteredOrders.length - idx}</td>
                               <td className="p-4 sm:p-5 text-[#735965] font-semibold whitespace-nowrap">{formatOrderDate(order.date, (order as any)._creationTime)}</td>
                               <td className="p-4 sm:p-5 font-black text-[#2d2026] whitespace-nowrap">{storeInfo.name}</td>
@@ -8770,14 +8776,20 @@ export default function AdminPage() {
                               <td className="p-4 sm:p-5 font-semibold text-[#735965] whitespace-nowrap">{storeInfo.phone}</td>
                               <td className="p-4 sm:p-5 font-semibold text-[#735965] max-w-[220px] truncate" title={storeAddress}>{storeAddress}</td>
                               <td className="p-4 sm:p-5">
-                                <span className="font-bold text-[#2d2026] block leading-tight">
-                                  {order.items[0]?.productName || "기본 품목"} {order.items.length > 1 ? `외 ${order.items.length - 1}건` : ""}
-                                </span>
-                                <span className="text-[10px] text-[#735965] block font-semibold mt-0.5 max-w-[175px] truncate" title={order.items.map(item => `${item.productName} ${item.quantity}개`).join(", ")}>
-                                  {order.items.map(item => `${item.productName} ${item.quantity}개`).join(", ")}
-                                </span>
+                                {orderItems.length > 0 ? (
+                                  <>
+                                    <span className="font-bold text-[#2d2026] block leading-tight">
+                                      {orderItems[0]?.productName || "기본 품목"} {orderItems.length > 1 ? `외 ${orderItems.length - 1}건` : ""}
+                                    </span>
+                                    <span className="text-[10px] text-[#735965] block font-semibold mt-0.5 max-w-[175px] truncate" title={orderItems.map(item => `${item?.productName || ""} ${item?.quantity || 0}개`).join(", ")}>
+                                      {orderItems.map(item => `${item?.productName || ""} ${item?.quantity || 0}개`).join(", ")}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span className="font-bold text-[#2d2026] block leading-tight">-</span>
+                                )}
                               </td>
-                              <td className="p-4 sm:p-5 font-bold text-[#2d2026] text-right whitespace-nowrap">{order.totalPrice.toLocaleString()} 원</td>
+                              <td className="p-4 sm:p-5 font-bold text-[#2d2026] text-right whitespace-nowrap">{(order.totalPrice || 0).toLocaleString()} 원</td>
                               <td className="p-4 sm:p-5 text-center whitespace-nowrap">
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
                                   order.payMethod === "card" || order.payMethod === "CARD"
@@ -8790,12 +8802,12 @@ export default function AdminPage() {
                               <td className="p-4 sm:p-5 text-center whitespace-nowrap">
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${
                                   (() => {
-                                    const colorKey = statusColors[order.status] || DEFAULT_STATUS_COLORS[order.status] || "pink";
+                                    const colorKey = (order.status && statusColors[order.status]) || (order.status && DEFAULT_STATUS_COLORS[order.status]) || "pink";
                                     const preset = COLOR_PRESETS[colorKey as keyof typeof COLOR_PRESETS] || COLOR_PRESETS.pink;
                                     return `${preset.bg} ${preset.text} ${preset.border}`;
                                   })()
                                 }`}>
-                                  {order.status}
+                                  {order.status || "대기"}
                                 </span>
                               </td>
                               <td className="p-4 sm:p-5 text-center whitespace-nowrap">
@@ -13376,7 +13388,7 @@ export default function AdminPage() {
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
                   <div className="flex items-center gap-2">
                     <Package size={16} className="text-blue-500" />
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">발주 신청 품목 및 정산 내역 ({selectedOrder.items.length})</span>
+                    <span className="text-xs font-black text-[#0F172A] tracking-tight">발주 신청 품목 및 정산 내역 ({(selectedOrder.items || []).length})</span>
                   </div>
                   <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
                     품목 목록
@@ -13395,14 +13407,14 @@ export default function AdminPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-neutral-100">
-                        {selectedOrder.items.map((item, idx) => (
+                        {(selectedOrder.items || []).map((item, idx) => (
                           <tr key={idx} className="hover:bg-neutral-50 font-medium">
                             <td className="px-4 py-3 font-black text-[#0F172A] leading-tight break-words text-[11px] sm:text-xs" style={{ wordBreak: 'break-word' }}>
-                              {item.productName}
+                              {item?.productName || "품목"}
                             </td>
-                            <td className="px-3 py-3 text-right text-slate-500 text-[11px] font-bold">{item.price.toLocaleString()}</td>
-                            <td className="px-3 py-3 text-center font-black text-[#0F172A] text-[11px]">{item.quantity}</td>
-                            <td className="px-4 py-3 text-right font-black text-[#0F172A] text-[11px]">{(item.price * item.quantity).toLocaleString()} 원</td>
+                            <td className="px-3 py-3 text-right text-slate-500 text-[11px] font-bold">{(item?.price || 0).toLocaleString()}</td>
+                            <td className="px-3 py-3 text-center font-black text-[#0F172A] text-[11px]">{item?.quantity || 0}</td>
+                            <td className="px-4 py-3 text-right font-black text-[#0F172A] text-[11px]">{((item?.price || 0) * (item?.quantity || 0)).toLocaleString()} 원</td>
                           </tr>
                         ))}
                       </tbody>
@@ -13429,7 +13441,7 @@ export default function AdminPage() {
                     <span className="text-[10px] text-neutral-400 font-bold block mb-0.5">결제 수단 정보: <strong className="text-[#0F172A] font-black">{selectedOrder.payMethod === "card" || selectedOrder.payMethod === "CARD" ? "카드결제" : "현금 입금 진행"}</strong></span>
                     <span className="text-[10px] text-neutral-400 font-bold block mb-0.5">총 결제 합계액 (부가세 포함)</span>
                     <strong className="text-lg font-black text-amber-500">
-                      {selectedOrder.totalPrice.toLocaleString()} 원
+                      {(selectedOrder.totalPrice || 0).toLocaleString()} 원
                     </strong>
                   </div>
                 </div>
