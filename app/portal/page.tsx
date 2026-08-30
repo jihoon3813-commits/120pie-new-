@@ -1820,7 +1820,7 @@ export default function PortalPage() {
       }
     });
     
-    const boxFee = totalBoxQty > 0 ? (Math.floor(totalBoxQty / 10) + 1) * shippingFeeBox : 0;
+    const boxFee = totalBoxQty > 0 ? Math.ceil(totalBoxQty / 10) * shippingFeeBox : 0;
     
     return maxStandardFee + boxFee;
   };
@@ -1887,7 +1887,7 @@ export default function PortalPage() {
     });
 
     const boxQty = groups["BOX"].items.reduce((sum, item) => sum + item.quantity, 0);
-    const calculatedBoxFee = boxQty > 0 ? (Math.floor(boxQty / 10) + 1) * shippingFeeBox : 0;
+    const calculatedBoxFee = boxQty > 0 ? Math.ceil(boxQty / 10) * shippingFeeBox : 0;
     groups["BOX"].feeLabel = boxQty > 0 ? `${calculatedBoxFee.toLocaleString()}원` : "";
 
     let maxStandardType = "";

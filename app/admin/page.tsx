@@ -8435,6 +8435,7 @@ export default function AdminPage() {
                         <th className="p-4 sm:p-5">이미지</th>
                         <th className="p-4 sm:p-5">카테고리</th>
                         <th className="p-4 sm:p-5">제품명 / 모델명</th>
+                        <th className="p-4 sm:p-5">배송 정책</th>
                         <th className="p-4 sm:p-5">공급가</th>
                         <th className="p-4 sm:p-5">판매가 (할인적용가)</th>
                         <th className="p-4 sm:p-5">상태</th>
@@ -8445,7 +8446,7 @@ export default function AdminPage() {
                     <tbody className="divide-y divide-slate-100 text-xs">
                       {filteredProducts.length === 0 ? (
                         <tr>
-                          <td colSpan={9} className="p-8 text-center text-slate-400 font-bold">
+                          <td colSpan={10} className="p-8 text-center text-slate-400 font-bold">
                             {isProductFiltering
                               ? "검색 및 필터 조건에 부합하는 제품이 없습니다."
                               : "등록된 자재 제품이 존재하지 않습니다."}
@@ -8525,6 +8526,31 @@ export default function AdminPage() {
                                   })}
                                 </div>
                                 <div className="text-[10px] text-slate-400 font-semibold mt-0.5">{p.modelName} ({p.qty}{p.unit})</div>
+                              </td>
+                              <td className="p-4 sm:p-5">
+                                {(() => {
+                                  const sType = p.shippingType || "A";
+                                  if (sType === "BOX") {
+                                    return (
+                                      <span className="bg-amber-50 text-amber-800 border border-amber-300 font-extrabold px-2 py-0.5 rounded text-[10px] inline-flex items-center gap-1 shadow-2xs whitespace-nowrap">
+                                        🧊 BOX단위 ({shippingFeeBox}원)
+                                      </span>
+                                    );
+                                  }
+                                  if (sType === "free") {
+                                    return (
+                                      <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-2 py-0.5 rounded text-[10px] inline-flex items-center gap-1 whitespace-nowrap">
+                                        🎁 무료배송
+                                      </span>
+                                    );
+                                  }
+                                  const feeMap: Record<string, string> = { A: shippingFeeA, B: shippingFeeB, C: shippingFeeC };
+                                  return (
+                                    <span className="bg-blue-50 text-blue-700 border border-blue-200 font-bold px-2 py-0.5 rounded text-[10px] inline-flex items-center gap-1 whitespace-nowrap">
+                                      📦 {sType}타입 ({feeMap[sType] || "3,000"}원)
+                                    </span>
+                                  );
+                                })()}
                               </td>
                               <td className="p-4 sm:p-5 text-slate-600 font-bold">{(p.supplyPrice || 0).toLocaleString()} 원</td>
                               <td className="p-4 sm:p-5">
@@ -12800,6 +12826,31 @@ export default function AdminPage() {
                       <option value="단종">단종 (가맹점 노출안됨)</option>
                     </select>
                   </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-md border-0 space-y-1">
+                  <label className="font-extrabold text-[#0F172A] flex items-center justify-between">
+                    <span>🚚 배송비 정책 선택 *</span>
+                    <span className="text-[10px] text-amber-600 font-bold">박스단위/기본/무료</span>
+                  </label>
+                  <select
+                    value={productShippingType}
+                    onChange={(e) => setProductShippingType(e.target.value as "free" | "A" | "B" | "C" | "BOX")}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-xs text-[#0F172A] font-bold focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all outline-none shadow-2xs"
+                  >
+                    <option value="BOX">🧊 BOX단위 배송 (박스당 비례 부과 / 10박스당 {shippingFeeBox}원)</option>
+                    <option value="A">📦 A타입 기본 배송 (기본 {shippingFeeA}원)</option>
+                    <option value="B">📦 B타입 기본 배송 (기본 {shippingFeeB}원)</option>
+                    <option value="C">📦 C타입 기본 배송 (기본 {shippingFeeC}원)</option>
+                    <option value="free">🎁 무료 배송 (배송비 0원)</option>
+                  </select>
+                  <p className="text-[11px] text-slate-600 font-bold bg-white p-2.5 rounded-md border border-slate-200/80 leading-relaxed mt-1">
+                    {productShippingType === "BOX" && `🧊 [박스단위 배송] 냉동생지 등 부피/중량 화물로, 주문 수량 10박스당 ${shippingFeeBox}원씩 비례하여 배송비가 부과됩니다. (1~10박스: ${shippingFeeBox}원, 11~20박스: 2배...)`}
+                    {productShippingType === "A" && `📦 [A타입 기본 배송] 일반 식자재/부자재 기본 배송비(${shippingFeeA}원)가 적용됩니다.`}
+                    {productShippingType === "B" && `📦 [B타입 배송] 중량/부피 화물 B타입 배송비(${shippingFeeB}원)가 적용됩니다.`}
+                    {productShippingType === "C" && `📦 [C타입 배송] 특수 화물 C타입 배송비(${shippingFeeC}원)가 적용됩니다.`}
+                    {productShippingType === "free" && `🎁 [무료 배송] 점주 발주 시 배송비가 추가되지 않는 무료배송 품목입니다.`}
+                  </p>
                 </div>
               </div>
 
