@@ -75,12 +75,16 @@ export const createOrUpdate = mutation({
       // 결제대기 -> 결제완료 등 상태 전이 시 디스코드 알림 및 SMS 발송
       if (prevStatus !== "결제완료" && args.status === "결제완료") {
         let storeName = "";
+        let storePhone = "";
         if (args.storeId) {
           const store = await ctx.db
             .query("stores")
             .filter((q) => q.eq(q.field("id"), args.storeId))
             .first();
-          if (store) storeName = store.name;
+          if (store) {
+            storeName = store.name;
+            storePhone = store.phone || "";
+          }
         }
 
         await ctx.scheduler.runAfter(0, internal.discord.notifyOrder, {
@@ -93,7 +97,7 @@ export const createOrUpdate = mutation({
           deliveryAddress: args.deliveryAddress,
           deliveryDetailAddress: args.deliveryDetailAddress,
           recipientName: args.recipientName,
-          recipientPhone: args.recipientPhone,
+          recipientPhone: args.recipientPhone || storePhone || undefined,
           payMethod: args.payMethod,
           status: args.status,
         });
@@ -105,7 +109,7 @@ export const createOrUpdate = mutation({
             orderId: args.id,
             amount: Number(args.totalPrice).toLocaleString(),
           },
-          customerPhone: args.recipientPhone || undefined,
+          customerPhone: args.recipientPhone || storePhone || undefined,
         });
       }
 
@@ -116,14 +120,18 @@ export const createOrUpdate = mutation({
       }
       const newId = await ctx.db.insert("orders", fields);
       
-      // Look up store name
+      // Look up store name & phone
       let storeName = "";
+      let storePhone = "";
       if (args.storeId) {
         const store = await ctx.db
           .query("stores")
           .filter((q) => q.eq(q.field("id"), args.storeId))
           .first();
-        if (store) storeName = store.name;
+        if (store) {
+          storeName = store.name;
+          storePhone = store.phone || "";
+        }
       }
 
       // 결제대기가 아닌 경우(즉시 결제완료 또는 무통장 입금대기) 디스코드 알림 및 SMS 발송
@@ -138,7 +146,7 @@ export const createOrUpdate = mutation({
           deliveryAddress: args.deliveryAddress,
           deliveryDetailAddress: args.deliveryDetailAddress,
           recipientName: args.recipientName,
-          recipientPhone: args.recipientPhone,
+          recipientPhone: args.recipientPhone || storePhone || undefined,
           payMethod: args.payMethod,
           status: args.status,
         });
@@ -151,7 +159,7 @@ export const createOrUpdate = mutation({
             orderId: args.id,
             amount: Number(args.totalPrice).toLocaleString(),
           },
-          customerPhone: args.recipientPhone || undefined,
+          customerPhone: args.recipientPhone || storePhone || undefined,
         });
       }
 

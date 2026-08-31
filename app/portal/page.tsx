@@ -1197,17 +1197,6 @@ export default function PortalPage() {
                   clearCart();
                   triggerToast("발주 주문 및 결제가 완료되었습니다!");
 
-                  // SMS 발송 연동 (모바일 리디렉션 결제완료)
-                  const targetRecipientPhone = localStorage.getItem("120_pending_recipient_phone") || recipientPhone || "";
-                  const activeStore = (stores || []).find((s: any) => s.id === pendingStoreId);
-                  const storeName = activeStore?.name || "가맹점";
-                  triggerSmsSend("order_card", {
-                    storeName: storeName,
-                    orderId: paymentId,
-                    amount: pendingAmount.toLocaleString(),
-                    phone: targetRecipientPhone || activeStore?.phone || "",
-                  });
-
                   setCurrentMenu("history");
                 } else {
                   showCustomAlert("결제 검증 오류", `결제 검증 실패: ${result.message}`);
@@ -1984,17 +1973,6 @@ export default function PortalPage() {
               `무통장입금 발주 신청이 완료되었습니다.\n\n[입금 계좌]\nK뱅크 700-120-270001\n예금주: (주)고우웰라이프\n입금액: ${cartTotal.toLocaleString()}원\n\n입금 확인 후 배송이 시작됩니다.`
             );
 
-            // SMS 발송 연동 (주문완료 - 무통장입금)
-            const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
-            const storeName = activeStore?.name || "가맹점";
-            const targetPhone = recipientPhone || profilePhone || activeStore?.phone || "";
-            triggerSmsSend("order_cash", {
-              storeName: storeName,
-              orderId: newOrderId,
-              amount: cartTotal.toLocaleString(),
-              phone: targetPhone
-            });
-
             setCurrentMenu("history");
           })
           .catch((err) => {
@@ -2098,17 +2076,6 @@ export default function PortalPage() {
 
                 clearCart();
                 triggerToast("발주 주문 및 결제가 완료되었습니다!");
-
-                // SMS 발송 연동 (주문완료 - 신용카드)
-                const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
-                const storeName = activeStore?.name || "가맹점";
-                const targetPhone = recipientPhone || profilePhone || activeStore?.phone || "";
-                triggerSmsSend("order_card", {
-                  storeName: storeName,
-                  orderId: newOrderId,
-                  amount: cartTotal.toLocaleString(),
-                  phone: targetPhone
-                });
 
                 setCurrentMenu("history");
               } else {

@@ -236,6 +236,14 @@ async function handleEventSms(
         ? eventConfig.admin.receivers
         : ["010-4322-3813", "010-9114-4358"];
 
+      const uniqueReceivers = Array.from(
+        new Set(
+          rawReceivers
+            .map((r: string) => (r || "").replace(/[^0-9]/g, ""))
+            .filter((p: string) => p && p.length >= 8)
+        )
+      );
+
       let msg = eventConfig.admin.template || "";
       Object.entries(args.variables).forEach(([k, v]) => {
         msg = msg.replace(new RegExp(`{${k}}`, "g"), v || "");
@@ -243,10 +251,7 @@ async function handleEventSms(
 
       const baseSender = (eventConfig.admin.sender || "010-2666-0883").replace(/[^0-9]/g, "");
 
-      for (const r of rawReceivers) {
-        const adminPhone = (r || "").replace(/[^0-9]/g, "");
-        if (!adminPhone || adminPhone.length < 8) continue;
-
+      for (const adminPhone of uniqueReceivers) {
         const formattedSender = (baseSender === adminPhone) ? "15663594" : (baseSender || "01026660883");
 
         try {
