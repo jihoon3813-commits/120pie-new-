@@ -9,7 +9,7 @@ export default function Hero() {
   const [width, setWidth] = useState(0);
 
   const desktopSlides = [
-    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1788178669/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_31%EC%9D%BC_%EC%98%A4%ED%9B%84_09_15_30_2_edai7l.png",
+    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1788179887/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_31%EC%9D%BC_%EC%98%A4%ED%9B%84_09_37_31_aklovp.png",
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785389600/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_30%EC%9D%BC_%EC%98%A4%ED%9B%84_01_13_42_w82s3d.png",
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784390648/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_01_00_36_1_zvi0sz.png",
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784446300/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%ED%9B%84_04_29_55_m9k7xo.png"
