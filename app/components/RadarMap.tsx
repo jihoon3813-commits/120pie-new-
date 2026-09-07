@@ -2037,77 +2037,82 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                 </div>
               </div>
 
-              {/* 📱 모바일 전용 지도 상단 미니 범례 (lg:hidden) */}
-              <div className="lg:hidden absolute top-3 left-3 right-3 z-20 flex items-center justify-between gap-1.5 pointer-events-none">
-                <div className="px-2.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-300 shadow-md pointer-events-auto flex items-center gap-1.5 text-[11px] font-black text-[#0F172A]">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                  <span>500m 상권 레이더</span>
+              {/* 📱 모바일 전용 지도 상단 미니 범례 (측정 모드가 아닐 때만 노출) */}
+              {!isMeasureMode && (
+                <div className="lg:hidden absolute top-3 left-3 right-3 z-20 flex items-center justify-between gap-1.5 pointer-events-none">
+                  <div className="px-2.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-300 shadow-md pointer-events-auto flex items-center gap-1.5 text-[11px] font-black text-[#0F172A]">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>500m 상권 레이더</span>
+                  </div>
+
+                  <div className="px-2.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-300 shadow-md pointer-events-auto flex items-center gap-2 text-[10px] font-black">
+                    <span className="flex items-center gap-1 text-emerald-700">🟢 영업가능</span>
+                    <span className="flex items-center gap-1 text-amber-700">🌟 가맹점</span>
+                    <span className="flex items-center gap-1 text-slate-500">🔒 락</span>
+                  </div>
                 </div>
+              )}
 
-                <div className="px-2.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-300 shadow-md pointer-events-auto flex items-center gap-2 text-[10px] font-black">
-                  <span className="flex items-center gap-1 text-emerald-700">🟢 영업가능</span>
-                  <span className="flex items-center gap-1 text-amber-700">🌟 가맹점</span>
-                  <span className="flex items-center gap-1 text-slate-500">🔒 락</span>
+              {/* 📱 60대 맞춤 모바일 전용 지도 하단 엄지 플로팅 액션 바 (측정 패널 오픈 시 숨김) */}
+              {!isMeasurePanelOpen && (
+                <div className="lg:hidden absolute bottom-3 left-2.5 right-2.5 z-30 flex items-center gap-1.5 pointer-events-auto">
+                  <button
+                    type="button"
+                    onClick={handleMoveToMyLocation}
+                    className="h-11 px-3 bg-white/95 active:bg-blue-50 text-blue-700 font-black rounded-xl border-2 border-blue-200 shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0 whitespace-nowrap"
+                    title="현재 스마트폰 GPS 위치로 지도 이동"
+                  >
+                    <LocateFixed size={17} className="text-blue-600 animate-pulse shrink-0" />
+                    <span>내 위치</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsDiscoverModalOpen(true)}
+                    disabled={isDiscovering}
+                    className="h-11 flex-1 min-w-0 px-2 bg-gradient-to-r from-rose-500 via-amber-500 to-amber-400 text-white font-black rounded-xl shadow-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer border-2 border-white whitespace-nowrap"
+                  >
+                    <Target size={17} className={isDiscovering ? "animate-spin shrink-0" : "shrink-0"} />
+                    <span className="truncate">{isDiscovering ? "발굴 중..." : "🎯 가망 매장 발굴"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleToggleMeasureMode}
+                    className={`h-11 px-3 font-black rounded-xl shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer border-2 shrink-0 whitespace-nowrap ${
+                      isMeasureMode
+                        ? "bg-indigo-600 text-white border-indigo-400 animate-pulse"
+                        : "bg-white/95 active:bg-slate-100 text-slate-800 border-slate-200"
+                    }`}
+                    title="반경 500m 거리 측정"
+                  >
+                    <Ruler size={16} className="shrink-0" />
+                    <span>{isMeasureMode ? "측정중" : "500m"}</span>
+                  </button>
                 </div>
-              </div>
+              )}
 
-              {/* 📱 60대 맞춤 모바일 전용 지도 하단 엄지 플로팅 액션 바 (lg:hidden) */}
-              <div className="lg:hidden absolute bottom-3 left-2.5 right-2.5 z-30 flex items-center gap-1.5 pointer-events-auto">
-                <button
-                  type="button"
-                  onClick={handleMoveToMyLocation}
-                  className="h-11 px-3 bg-white/95 active:bg-blue-50 text-blue-700 font-black rounded-xl border-2 border-blue-200 shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0 whitespace-nowrap"
-                  title="현재 스마트폰 GPS 위치로 지도 이동"
-                >
-                  <LocateFixed size={17} className="text-blue-600 animate-pulse shrink-0" />
-                  <span>내 위치</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsDiscoverModalOpen(true)}
-                  disabled={isDiscovering}
-                  className="h-11 flex-1 min-w-0 px-2 bg-gradient-to-r from-rose-500 via-amber-500 to-amber-400 text-white font-black rounded-xl shadow-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer border-2 border-white whitespace-nowrap"
-                >
-                  <Target size={17} className={isDiscovering ? "animate-spin shrink-0" : "shrink-0"} />
-                  <span className="truncate">{isDiscovering ? "발굴 중..." : "🎯 가망 매장 발굴"}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleToggleMeasureMode}
-                  className={`h-11 px-3 font-black rounded-xl shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer border-2 shrink-0 whitespace-nowrap ${
-                    isMeasureMode
-                      ? "bg-indigo-600 text-white border-indigo-400 animate-pulse"
-                      : "bg-white/95 active:bg-slate-100 text-slate-800 border-slate-200"
-                  }`}
-                  title="반경 500m 거리 측정"
-                >
-                  <Ruler size={16} className="shrink-0" />
-                  <span>{isMeasureMode ? "측정중" : "500m"}</span>
-                </button>
-              </div>
-
-              {/* 📏 측정 모드 상단 안내 배너 */}
+              {/* 📏 측정 모드 상단 일체형 슬림 제어 바 (상단 범례와 겹치지 않고 지도 시야 확보) */}
               {isMeasureMode && (
-                <div className="absolute top-16 left-4 right-4 z-20 pointer-events-auto">
-                  <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 backdrop-blur-md border border-indigo-400/50 shadow-xl text-white flex flex-wrap items-center justify-between gap-3 text-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-white shrink-0">
-                        📏
-                      </div>
-                      <div>
-                        <span className="font-black text-indigo-300">500m 반경 측정기 작동 중:</span>{" "}
-                        <span className="text-slate-200">
-                          지도 위를 <strong>클릭</strong>하거나 <strong>보라색 측정 핀을 드래그</strong>하세요.
+                <div className="absolute top-3 left-2.5 right-2.5 z-30 pointer-events-auto">
+                  <div className="px-3 py-2 rounded-xl bg-slate-900/95 backdrop-blur-md border border-indigo-400/50 shadow-2xl text-white flex items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-base shrink-0">📏</span>
+                      <div className="min-w-0">
+                        <span className="font-black text-indigo-300 text-xs whitespace-nowrap">
+                          {measureRadius}m 측정기
+                        </span>
+                        <span className="hidden sm:inline text-slate-300 text-[11px] ml-1.5">
+                          지도 클릭 또는 보라색 핀 드래그
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       {/* 반경 선택 탭 */}
                       <div className="flex items-center bg-slate-800 rounded-lg p-0.5 border border-slate-700">
                         <button
+                          type="button"
                           onClick={() => setMeasureRadius(300)}
                           className={`px-2 py-1 rounded text-[11px] font-bold transition-all border-0 cursor-pointer ${
                             measureRadius === 300 ? "bg-indigo-600 text-white font-black" : "text-slate-400 hover:text-white"
@@ -2116,26 +2121,29 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                           300m
                         </button>
                         <button
+                          type="button"
                           onClick={() => setMeasureRadius(500)}
                           className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all border-0 cursor-pointer ${
                             measureRadius === 500 ? "bg-indigo-600 text-white font-black" : "text-slate-400 hover:text-white"
                           }`}
                         >
-                          500m (기본)
+                          500m
                         </button>
                         <button
+                          type="button"
                           onClick={() => setMeasureRadius(1000)}
                           className={`px-2 py-1 rounded text-[11px] font-bold transition-all border-0 cursor-pointer ${
                             measureRadius === 1000 ? "bg-indigo-600 text-white font-black" : "text-slate-400 hover:text-white"
                           }`}
                         >
-                          1,000m
+                          1km
                         </button>
                       </div>
 
                       <button
+                        type="button"
                         onClick={handleToggleMeasureMode}
-                        className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-black transition-all border-0 cursor-pointer flex items-center gap-1"
+                        className="h-7 px-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-lg text-xs font-black transition-all border-0 cursor-pointer flex items-center gap-1 shrink-0"
                       >
                         <X size={13} />
                         <span>종료</span>
@@ -2145,16 +2153,16 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                 </div>
               )}
 
-              {/* 📏 500m 상권 측정 분석 플로팅 패널 (세로 최대 높이 & 전체 리스트 & 카테고리 구분) */}
+              {/* 📏 500m 상권 측정 분석 플로팅 패널 (모바일: 하단 시트 스타일로 지도 뷰 확보, 데스크톱: 좌측 플로팅) */}
               {measurePoint && isMeasurePanelOpen && measureAnalysis && (
-                <div className="absolute top-14 sm:top-16 bottom-4 left-4 z-30 pointer-events-auto w-84 sm:w-96 md:w-[410px] max-w-[calc(100%-2rem)] flex flex-col bg-white/95 backdrop-blur-md rounded-2xl border border-indigo-200 shadow-2xl overflow-hidden transition-all animate-in fade-in slide-in-from-top-2">
+                <div className="absolute bottom-2 left-2.5 right-2.5 max-h-[55vh] sm:max-h-[60vh] lg:top-16 lg:bottom-4 lg:left-4 lg:right-auto lg:w-[400px] lg:max-h-none z-30 pointer-events-auto flex flex-col bg-white/95 backdrop-blur-md rounded-2xl border border-indigo-200 shadow-2xl overflow-hidden transition-all animate-in fade-in slide-in-from-bottom-2 lg:slide-in-from-top-2">
                   {/* 패널 헤더 */}
-                  <div className="shrink-0 px-4 py-3 bg-gradient-to-r from-indigo-900 to-slate-900 text-white flex items-center justify-between shadow-xs">
+                  <div className="shrink-0 px-3.5 py-2.5 bg-gradient-to-r from-indigo-900 to-slate-900 text-white flex items-center justify-between shadow-xs">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-base shrink-0">📏</span>
                       <div className="min-w-0">
                         <h4 className="text-xs font-black text-white leading-tight truncate">
-                          반경 {measureRadius}m 상권 정밀 진단
+                          반경 {measureRadius}m 상권 진단
                         </h4>
                         <span className="text-[10px] text-indigo-300 font-medium truncate block">
                           {measurePoint.sourceName ? `기준: ${measurePoint.sourceName}` : "지도 지정 위치"}
@@ -2163,6 +2171,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <button
+                        type="button"
                         onClick={() => {
                           setMeasurePoint(null);
                           setMeasureCategoryFilter("전체");
@@ -2174,6 +2183,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         <RotateCcw size={13} />
                       </button>
                       <button
+                        type="button"
                         onClick={() => setIsMeasurePanelOpen(false)}
                         className="p-1 text-slate-300 hover:text-white hover:bg-white/10 rounded transition-all border-0 cursor-pointer"
                         title="패널 닫기"
@@ -2184,11 +2194,11 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                   </div>
 
                   {/* 패널 상단 요약 (주소 + 안전/침범 카드) - shrink-0 */}
-                  <div className="shrink-0 p-3 space-y-2 text-xs bg-slate-50/70 border-b border-slate-200">
+                  <div className="shrink-0 p-2.5 space-y-1.5 text-xs bg-slate-50/70 border-b border-slate-200">
                     {/* 중심 좌표 & 주소 */}
-                    <div className="bg-white border border-slate-200/80 rounded-lg p-2.5 space-y-0.5 shadow-2xs">
+                    <div className="bg-white border border-slate-200/80 rounded-lg p-2 space-y-0.5 shadow-2xs">
                       <div className="flex items-start gap-1.5 text-slate-800 font-bold">
-                        <MapPin size={13} className="text-indigo-600 shrink-0 mt-0.5" />
+                        <MapPin size={12} className="text-indigo-600 shrink-0 mt-0.5" />
                         <span className="break-all text-[11px] leading-tight font-black">
                           {measurePoint.address || "주소 정보를 불러오는 중입니다..."}
                         </span>
@@ -2200,23 +2210,23 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
                     {/* 🚨 상권보호 침범 / ✅ 안전 판정 카드 */}
                     {measureAnalysis.isStoreConflict ? (
-                      <div className="p-2.5 bg-gradient-to-br from-rose-50 to-red-50 border border-rose-200 rounded-xl space-y-1 text-rose-900 shadow-2xs">
+                      <div className="p-2 bg-gradient-to-br from-rose-50 to-red-50 border border-rose-200 rounded-xl space-y-0.5 text-rose-900 shadow-2xs">
                         <div className="flex items-center gap-1.5 font-black text-rose-700 text-xs">
-                          <AlertTriangle size={14} />
-                          <span>⚠️ 상권보호 중복 침범 (신규 영업 불가)</span>
+                          <AlertTriangle size={13} />
+                          <span>⚠️ 상권보호 침범 (신규 영업 불가)</span>
                         </div>
-                        <p className="text-[10.5px] leading-snug text-rose-800 font-medium">
+                        <p className="text-[10px] leading-snug text-rose-800 font-medium">
                           가맹점 <strong>[{measureAnalysis.closestStore?.displayName}]</strong>과 거리{" "}
-                          <strong className="text-rose-950 font-mono font-black">{measureAnalysis.minStoreDistance}m</strong> (500m 보호구역 내 <strong>{measureAnalysis.overlapDistance}m</strong> 침범)
+                          <strong className="text-rose-950 font-mono font-black">{measureAnalysis.minStoreDistance}m</strong> ({measureRadius}m 보호구역 내 <strong>{measureAnalysis.overlapDistance}m</strong> 침범)
                         </p>
                       </div>
                     ) : (
-                      <div className="p-2.5 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl space-y-1 text-emerald-900 shadow-2xs">
+                      <div className="p-2 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl space-y-0.5 text-emerald-900 shadow-2xs">
                         <div className="flex items-center gap-1.5 font-black text-emerald-700 text-xs">
-                          <CheckCircle2 size={14} />
+                          <CheckCircle2 size={13} />
                           <span>✅ 상권보호 안전 구역 (신규 영업 가능)</span>
                         </div>
-                        <p className="text-[10.5px] leading-snug text-emerald-800 font-medium">
+                        <p className="text-[10px] leading-snug text-emerald-800 font-medium">
                           최근접 가맹점 <strong>[{measureAnalysis.closestStore?.displayName || "없음"}]</strong>과 거리{" "}
                           <strong className="text-emerald-950 font-mono font-black">{measureAnalysis.minStoreDistance}m</strong> (안심 여유: <strong>{measureAnalysis.safeMargin}m</strong>)
                         </p>
@@ -2225,10 +2235,10 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                   </div>
 
                   {/* 타겟 헤더 & 카테고리 탭 & 검색 - shrink-0 */}
-                  <div className="shrink-0 px-3.5 pt-2.5 pb-2 bg-white border-b border-slate-100 space-y-2">
+                  <div className="shrink-0 px-3 pt-2 pb-1.5 bg-white border-b border-slate-100 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="font-black text-slate-800 text-[11px] flex items-center gap-1.5">
-                        <Target size={13} className="text-indigo-600" />
+                        <Target size={12} className="text-indigo-600" />
                         <span>반경 {measureRadius}m 내 발굴 타겟</span>
                         <span className="px-1.5 py-0.2 rounded-full bg-indigo-50 text-indigo-700 font-mono font-black text-[10px] border border-indigo-200">
                           {displayedNearbyTargets.length}개 / 전체 {measureAnalysis.totalNearbyTargets}개
@@ -2237,6 +2247,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
                       {measureCategoryFilter !== "전체" && (
                         <button
+                          type="button"
                           onClick={() => setMeasureCategoryFilter("전체")}
                           className="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold underline cursor-pointer border-0 bg-transparent"
                         >
@@ -2245,12 +2256,13 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                       )}
                     </div>
 
-                    {/* 카테고리 필터 버튼들 (탭 형태 - 완벽한 카테고리 구분) */}
+                    {/* 카테고리 필터 버튼들 (스크롤바 숨김) */}
                     {measureAnalysis.totalNearbyTargets > 0 && (
-                      <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[10px] scrollbar-thin">
+                      <div className="flex items-center gap-1 overflow-x-auto pb-0.5 text-[10px] scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                         <button
+                          type="button"
                           onClick={() => setMeasureCategoryFilter("전체")}
-                          className={`px-2.5 py-1 rounded-lg font-black shrink-0 transition-all border cursor-pointer ${
+                          className={`px-2 py-0.5 rounded-lg font-black shrink-0 transition-all border cursor-pointer ${
                             measureCategoryFilter === "전체"
                               ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
                               : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200"
@@ -2264,15 +2276,16 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                           const CatIcon = config?.icon || Building2;
                           return (
                             <button
+                              type="button"
                               key={cat}
                               onClick={() => setMeasureCategoryFilter(isSelected ? "전체" : cat)}
-                              className={`px-2 py-1 rounded-lg font-bold shrink-0 transition-all flex items-center gap-1 border cursor-pointer ${
+                              className={`px-2 py-0.5 rounded-lg font-bold shrink-0 transition-all flex items-center gap-1 border cursor-pointer ${
                                 isSelected
                                   ? "bg-slate-900 text-white border-slate-900 shadow-2xs font-black ring-1 ring-slate-800"
                                   : `${config.badgeBg} hover:brightness-95`
                               }`}
                             >
-                              <CatIcon size={11} className={isSelected ? "text-amber-400" : ""} />
+                              <CatIcon size={10} className={isSelected ? "text-amber-400" : ""} />
                               <span>{cat}</span>
                               <span className={`font-mono font-black ${isSelected ? "text-amber-300" : ""}`}>{count}</span>
                             </button>
@@ -2284,7 +2297,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     {/* 빠른 검색창 (매장명 검색) */}
                     {measureAnalysis.totalNearbyTargets > 5 && (
                       <div className="relative">
-                        <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                           type="text"
                           value={measureSearchTerm}
@@ -2294,18 +2307,19 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         />
                         {measureSearchTerm && (
                           <button
+                            type="button"
                             onClick={() => setMeasureSearchTerm("")}
                             className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 border-0 bg-transparent cursor-pointer p-0.5"
                           >
-                            <X size={12} />
+                            <X size={11} />
                           </button>
                         )}
                       </div>
                     )}
                   </div>
 
-                  {/* 🌟 반경 내 전체 매장 스크롤 리스트 (세로 최대치 활용: flex-1 min-h-0) */}
-                  <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-2 bg-slate-50/50">
+                  {/* 🌟 반경 내 전체 매장 스크롤 리스트 (스크롤바 숨김 + 슬림 패딩) */}
+                  <div className="flex-1 min-h-0 overflow-y-auto p-2.5 space-y-1.5 bg-slate-50/50 scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     {displayedNearbyTargets.length > 0 ? (
                       displayedNearbyTargets.map((target: any) => {
                         const config = CATEGORY_CONFIG[target.category] || CATEGORY_CONFIG["기타 샵인샵"];
@@ -2321,7 +2335,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                                 naverMapRef.current.panTo(new window.naver.maps.LatLng(target.lat, target.lng), { duration: 250 });
                               }
                             }}
-                            className={`p-2.5 rounded-xl border transition-all cursor-pointer bg-white ${
+                            className={`p-2 rounded-xl border transition-all cursor-pointer bg-white ${
                               isSelected
                                 ? "border-indigo-500 ring-2 ring-indigo-200 shadow-md bg-indigo-50/30"
                                 : "border-slate-200 hover:border-indigo-300 hover:shadow-xs"
@@ -2330,24 +2344,24 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                             <div className="flex items-start justify-between gap-2">
                               {/* 좌측: 카테고리 뱃지 & 매장명 & 주소 */}
                               <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                                <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
                                   {/* 업종 뱃지 */}
-                                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black border ${config.badgeBg}`}>
+                                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-black border ${config.badgeBg}`}>
                                     <CatIcon size={10} />
                                     <span>{target.category || "기타 샵인샵"}</span>
                                   </span>
 
                                   {/* 상권 상태 뱃지 */}
                                   {target.isContracted ? (
-                                    <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-black text-[9px]">
+                                    <span className="px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 font-black text-[9px]">
                                       🌟 체결
                                     </span>
                                   ) : target.isProtectedLocked ? (
-                                    <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200 font-bold text-[9px]">
+                                    <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 border border-slate-200 font-bold text-[9px]">
                                       🔒 500m 락
                                     </span>
                                   ) : (
-                                    <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-black text-[9px]">
+                                    <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-black text-[9px]">
                                       🟢 영업 가능
                                     </span>
                                   )}
@@ -2356,14 +2370,14 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                                 <div className="font-black text-slate-900 text-xs truncate">
                                   {target.name}
                                 </div>
-                                <div className="text-[10px] text-slate-500 truncate mt-0.5">
+                                <div className="text-[10px] text-slate-500 truncate">
                                   {target.roadAddress || "주소 미등록"}
                                 </div>
                               </div>
 
                               {/* 우측: 거리 및 네이버 링크 */}
-                              <div className="shrink-0 flex flex-col items-end gap-1.5">
-                                <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono font-black text-[10px]">
+                              <div className="shrink-0 flex flex-col items-end gap-1">
+                                <span className="px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono font-black text-[10px]">
                                   {target.distFromMeasure}m
                                 </span>
                                 <a
@@ -2371,7 +2385,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                                   target="_blank"
                                   rel="noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="text-[10px] text-emerald-600 hover:text-emerald-700 font-bold flex items-center gap-0.5 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200"
+                                  className="text-[9px] text-emerald-600 hover:text-emerald-700 font-bold flex items-center gap-0.5 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 no-underline"
                                   title="네이버 플레이스에서 확인"
                                 >
                                   <Navigation size={10} />
@@ -2383,13 +2397,14 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         );
                       })
                     ) : (
-                      <div className="py-12 text-center text-slate-400 text-xs">
-                        <AlertCircle size={24} className="mx-auto mb-2 text-slate-300" />
-                        <p className="font-bold">조건에 맞는 발굴 매장이 없습니다.</p>
+                      <div className="py-6 text-center text-slate-400 text-xs">
+                        <AlertCircle size={22} className="mx-auto mb-1.5 text-slate-300" />
+                        <p className="font-bold text-xs">조건에 맞는 발굴 매장이 없습니다.</p>
                         {measureCategoryFilter !== "전체" && (
                           <button
+                            type="button"
                             onClick={() => setMeasureCategoryFilter("전체")}
-                            className="mt-2 text-[11px] text-indigo-600 font-black underline cursor-pointer bg-transparent border-0"
+                            className="mt-1.5 text-[11px] text-indigo-600 font-black underline cursor-pointer bg-transparent border-0"
                           >
                             전체 카테고리 보기
                           </button>
@@ -2400,8 +2415,9 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
                   {/* 패널 하단 액션 (관리자 모드일 때만) */}
                   {mode === "admin" && (
-                    <div className="shrink-0 p-3 bg-white border-t border-slate-200">
+                    <div className="shrink-0 p-2.5 bg-white border-t border-slate-200">
                       <button
+                        type="button"
                         onClick={handleRegisterFromMeasure}
                         className="w-full py-2 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-xs border-0 cursor-pointer"
                       >
