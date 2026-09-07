@@ -42,7 +42,11 @@ import {
   Check,
   Crosshair,
   MessageSquare,
-  Copy
+  Copy,
+  Smartphone,
+  Monitor,
+  Maximize2,
+  Lock
 } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -292,6 +296,20 @@ export default function PartnerPortalPage() {
       return matchQuery && matchStatus;
     });
   }, [partnerConsultations, consultationSearch, consultationStatusFilter]);
+
+  // 🌟 전용 분양 사이트 실시간 인터랙티브 미리보기 모달 상태
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState<boolean>(false);
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isPreviewModalOpen) {
+        setIsPreviewModalOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isPreviewModalOpen]);
 
   const handleCopyBranchLink = () => {
     const url = typeof window !== "undefined" ? `${window.location.origin}/${partnerId}` : `https://120pie.com/${partnerId}`;
@@ -700,61 +718,177 @@ export default function PartnerPortalPage() {
                   </div>
                 </div>
 
-                {/* 🌟 내 전용 분양 사이트 URL 홍보 배너 카드 (대시보드로 배치) */}
-                <div className="bg-gradient-to-r from-amber-500 via-[#FED422] to-amber-400 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-[#0F172A] shadow-md space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <span className="bg-[#0F172A] text-[#FED422] text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-2xs">
-                        MY BRANCH LANDING URL
-                      </span>
-                      <h3 className="text-lg sm:text-xl font-black mt-1.5 flex items-center gap-2">
-                        <span>내 전용 분양 사이트</span>
-                        <span className="text-xs font-bold text-slate-800">
-                          (이 링크로 접수된 상담은 내 실적으로 자동 귀속)
+                {/* 🌟 VIP 파트너 전용 분양 사이트 & 실시간 미리보기 쇼케이스 */}
+                <div className="bg-gradient-to-br from-[#0B101D] via-[#111827] to-[#0A0E1A] rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-amber-500/30 shadow-2xl relative overflow-hidden text-white">
+                  {/* 미세 앰비언트 글로우 조명 효과 */}
+                  <div className="absolute -top-24 -right-24 w-80 h-80 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10">
+                    {/* 좌측: 전용 분양 사이트 설명 및 주요 액션 (7열) */}
+                    <div className="lg:col-span-7 space-y-4">
+                      {/* 상단 뱃지 */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="bg-[#FED422] text-[#0F172A] text-[10px] sm:text-[11px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm flex items-center gap-1.5">
+                          <Sparkles size={12} className="text-[#0F172A]" />
+                          <span>VIP PARTNER EXCLUSIVE · 공식 전용 분양 사이트</span>
                         </span>
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={handleCopyBranchLink}
-                        className="px-3.5 py-2 bg-[#0F172A] hover:bg-slate-800 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer border-0 transition-all"
-                      >
-                        <Copy size={13} />
-                        <span>분양 링크 복사</span>
-                      </button>
-                      <a
-                        href={`/${partnerId}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="px-3.5 py-2 bg-white/95 hover:bg-white active:scale-95 text-[#0F172A] rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm no-underline border border-amber-300 transition-all"
-                      >
-                        <ExternalLink size={13} />
-                        <span>사이트 열기</span>
-                      </a>
-                    </div>
-                  </div>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] sm:text-[11px] font-black">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                          <span>실시간 분양 채널 정상 가동 중</span>
+                        </span>
+                      </div>
 
-                  {/* 링크 주소 표시 바 */}
-                  <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-xl px-3.5 py-2.5 border border-amber-300/80">
-                    <span className="text-slate-400 font-mono text-xs font-bold shrink-0">URL:</span>
-                    <span className="font-mono font-black text-xs sm:text-sm text-slate-900 select-all truncate flex-1">
-                      {typeof window !== "undefined" ? `${window.location.origin}/${partnerId}` : `https://120pie.com/${partnerId}`}
-                    </span>
-                  </div>
+                      {/* 타이틀 & 설명 */}
+                      <div>
+                        <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2 flex-wrap">
+                          <span>{currentPartner?.name} 파트너님 전용 분양 웹사이트</span>
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-300 font-medium mt-1.5 leading-relaxed">
+                          예비 창업자나 점주가 이 고유 링크로 접속하여 남긴 창업/샵인샵 상담은 본사 배정 없이 <strong className="text-amber-300 font-bold">100% {currentPartner?.name} 파트너님의 실적으로 자동 귀속</strong>됩니다.
+                        </p>
+                      </div>
 
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-amber-950 font-bold leading-relaxed">
-                    <p>
-                      💡 위 분양 링크를 카카오톡, 블로그, 인스타그램, 문자 등에 적극 홍보하세요. 방문자가 이 링크를 통해 남긴 창업/샵인샵 상담은 즉시 실적으로 접수됩니다.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentMenu("consultation")}
-                      className="inline-flex items-center gap-1 text-slate-900 font-black underline hover:text-black cursor-pointer bg-transparent border-0 shrink-0 text-xs"
-                    >
-                      <span>상담 문의 내역 확인 ({partnerConsultations.length}건)</span>
-                      <ChevronRight size={13} />
-                    </button>
+                      {/* URL 복사 바 (다크 글래스모피즘 & 원터치 복사) */}
+                      <div className="bg-slate-900/90 border border-amber-500/40 rounded-xl p-2.5 sm:p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-inner">
+                        <div className="flex items-center gap-2 min-w-0 flex-1 px-1">
+                          <Lock size={13} className="text-amber-400 shrink-0" />
+                          <span className="text-[11px] font-mono text-slate-400 shrink-0 font-bold">URL:</span>
+                          <span className="font-mono font-black text-xs sm:text-sm text-amber-300 truncate select-all">
+                            {typeof window !== "undefined" ? `${window.location.origin}/${partnerId}` : `https://120pie.com/${partnerId}`}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleCopyBranchLink}
+                          className="px-3.5 py-2 bg-[#FED422] hover:bg-amber-400 active:scale-95 text-[#0F172A] rounded-lg text-xs font-black flex items-center justify-center gap-1.5 shadow-md cursor-pointer border-0 transition-all shrink-0 whitespace-nowrap"
+                        >
+                          <Copy size={13} />
+                          <span>분양 링크 복사</span>
+                        </button>
+                      </div>
+
+                      {/* 3대 핵심 분양 혜택 칩 */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-[11px]">
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-2.5 flex items-center gap-2">
+                          <ShieldCheck size={16} className="text-amber-400 shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-black text-slate-200 truncate">상단 안심 인증 배너</p>
+                            <p className="text-[10px] text-slate-400 truncate">공식 전담 파트너 명시</p>
+                          </div>
+                        </div>
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-2.5 flex items-center gap-2">
+                          <Phone size={16} className="text-emerald-400 shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-black text-slate-200 truncate">파트너 직통전화 연동</p>
+                            <p className="text-[10px] text-slate-400 truncate">{currentPartner?.phone || "원터치 연결"}</p>
+                          </div>
+                        </div>
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-2.5 flex items-center gap-2">
+                          <Sparkles size={16} className="text-purple-400 shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-black text-slate-200 truncate">실적 100% 자동 귀속</p>
+                            <p className="text-[10px] text-slate-400 truncate">실시간 상담 접수 알림</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 액션 버튼 그룹 */}
+                      <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setIsPreviewModalOpen(true)}
+                          className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-95 text-white font-black text-xs rounded-xl shadow-lg flex items-center gap-1.5 cursor-pointer border-0 transition-all"
+                        >
+                          <Eye size={14} />
+                          <span>사이트 미리보기 체험</span>
+                        </button>
+                        <a
+                          href={`/${partnerId}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 hover:text-white font-black text-xs rounded-xl border border-slate-600/80 flex items-center gap-1.5 no-underline transition-all shadow-sm"
+                        >
+                          <ExternalLink size={13} />
+                          <span>새 창으로 실제 열기</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => setCurrentMenu("consultation")}
+                          className="px-3.5 py-2.5 text-xs text-amber-300 hover:text-amber-200 font-black flex items-center gap-1 cursor-pointer bg-transparent border-0 underline"
+                        >
+                          <span>접수 상담 ({partnerConsultations.length}건) 보기</span>
+                          <ChevronRight size={13} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 우측: 고급스러운 디바이스 실시간 미니 브라우저 목업 (5열) */}
+                    <div className="lg:col-span-5 flex flex-col items-center">
+                      <div
+                        onClick={() => setIsPreviewModalOpen(true)}
+                        className="w-full max-w-[420px] bg-slate-950 rounded-2xl border-2 border-slate-700 shadow-2xl overflow-hidden cursor-pointer group transition-all transform hover:-translate-y-1 hover:border-amber-400/80 hover:shadow-amber-500/20"
+                        title="클릭 시 실시간 인터랙티브 전체화면 미리보기가 열립니다"
+                      >
+                        {/* 브라우저 크롬 상단 탭 바 */}
+                        <div className="bg-slate-900 px-3.5 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-rose-500/90" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/90" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/90" />
+                          </div>
+
+                          {/* 미니 주소창 */}
+                          <div className="flex-1 max-w-[240px] bg-slate-950/80 border border-slate-700/80 rounded-md px-2.5 py-0.5 text-[10px] font-mono text-slate-400 flex items-center justify-between truncate">
+                            <span className="flex items-center gap-1 truncate text-slate-300">
+                              <Lock size={9} className="text-emerald-400 shrink-0" />
+                              <span className="truncate">120pie.com/{partnerId}</span>
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1 text-[10px] font-black text-amber-400">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                            <span className="hidden sm:inline">PREVIEW</span>
+                          </div>
+                        </div>
+
+                        {/* 브라우저 화면 뷰포트 (미니 iframe 프리뷰) */}
+                        <div className="relative w-full h-[220px] sm:h-[250px] bg-neutral-950 overflow-hidden select-none">
+                          <iframe
+                            src={`/${partnerId}`}
+                            title="전용 분양 사이트 실시간 미니 프리뷰"
+                            className="w-full h-full pointer-events-none border-0 bg-neutral-950"
+                            tabIndex={-1}
+                            loading="lazy"
+                          />
+
+                          {/* 호버 시 나타나는 세련된 글래스 오버레이 */}
+                          <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-2 backdrop-blur-[2px]">
+                            <span className="px-3.5 py-1.5 bg-[#FED422] text-[#0F172A] rounded-xl text-xs font-black shadow-xl flex items-center gap-1.5">
+                              <Maximize2 size={13} />
+                              <span>실시간 화면 크게 보기</span>
+                            </span>
+                            <span className="text-[11px] text-slate-300 font-bold">
+                              PC / 모바일 전환 체험 가능
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 목업 하단 정보 바 */}
+                        <div className="bg-slate-900/90 px-3 py-1.5 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 font-bold">
+                          <span className="flex items-center gap-1">
+                            <Sparkles size={11} className="text-amber-400" />
+                            <span>파트너 전담 안심 채널 적용됨</span>
+                          </span>
+                          <span className="text-amber-300 group-hover:underline flex items-center gap-0.5">
+                            클릭하여 체험 <ChevronRight size={11} />
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 목업 하단 바닥 반사 조명 */}
+                      <div className="w-3/5 h-2 bg-amber-500/20 rounded-full blur-md mt-2" />
+                    </div>
                   </div>
                 </div>
 
@@ -2199,6 +2333,154 @@ export default function PartnerPortalPage() {
                 메모 저장
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          전용 분양 사이트 인터랙티브 실시간 미리보기 모달 (PC / 모바일 반응형 시뮬레이터)
+      ========================================== */}
+      {isPreviewModalOpen && (
+        <div
+          className="fixed inset-0 z-[300] bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-2 sm:p-4 animate-in fade-in select-none"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsPreviewModalOpen(false);
+          }}
+        >
+          {/* 모달 상단 컨트롤 툴바 */}
+          <div className="w-full max-w-5xl flex items-center justify-between gap-3 mb-2 sm:mb-3 px-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-8 h-8 rounded-xl bg-[#FED422] text-[#0F172A] flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
+                ✨
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-sm sm:text-base font-black text-white truncate flex items-center gap-2">
+                  <span>{currentPartner?.name} 파트너님 전용 분양 사이트 실시간 미리보기</span>
+                  <span className="text-[10px] font-mono text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/40 hidden sm:inline">
+                    /{partnerId}
+                  </span>
+                </h3>
+                <p className="text-[11px] text-slate-400 font-medium truncate hidden sm:block">
+                  실제 방문자가 접속했을 때의 화면입니다. 스크롤 및 상담 신청 버튼 작동을 직접 테스트해보세요.
+                </p>
+              </div>
+            </div>
+
+            {/* 디바이스 전환 (PC vs 모바일) & 액션 버튼 */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* 디바이스 토글 버튼 */}
+              <div className="flex items-center bg-slate-900 border border-slate-700 p-1 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice("desktop")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer border-0 ${
+                    previewDevice === "desktop"
+                      ? "bg-[#FED422] text-[#0F172A] shadow-sm"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Monitor size={14} />
+                  <span className="hidden sm:inline">PC 화면</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice("mobile")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer border-0 ${
+                    previewDevice === "mobile"
+                      ? "bg-[#FED422] text-[#0F172A] shadow-sm"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Smartphone size={14} />
+                  <span className="hidden sm:inline">모바일 화면</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleCopyBranchLink}
+                className="hidden md:flex px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-black items-center gap-1.5 border border-slate-700 cursor-pointer transition-all active:scale-95"
+                title="분양 링크 복사"
+              >
+                <Copy size={13} />
+                <span>링크 복사</span>
+              </button>
+
+              <a
+                href={`/${partnerId}`}
+                target="_blank"
+                rel="noreferrer"
+                className="hidden sm:flex px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-black items-center gap-1.5 border border-slate-700 no-underline transition-all active:scale-95"
+                title="새 탭으로 열기"
+              >
+                <ExternalLink size={13} />
+                <span>새 창</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setIsPreviewModalOpen(false)}
+                className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer border border-slate-700 transition-all active:scale-95"
+                title="닫기 (ESC)"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* 디바이스 뷰포트 영역 */}
+          <div className="flex-1 w-full max-w-5xl flex items-center justify-center overflow-hidden p-1">
+            {previewDevice === "desktop" ? (
+              /* 💻 PC 브라우저 프레임 */
+              <div className="w-full h-full max-h-[80vh] bg-slate-900 rounded-2xl border-2 border-slate-700 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+                {/* 브라우저 상단 주소 바 */}
+                <div className="bg-slate-900 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-full bg-rose-500/80" />
+                    <span className="w-3 h-3 rounded-full bg-amber-500/80" />
+                    <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                  </div>
+                  <div className="flex-1 max-w-md bg-slate-950 border border-slate-800 rounded-lg px-3 py-1 text-xs font-mono text-slate-300 flex items-center gap-2 truncate">
+                    <Lock size={12} className="text-emerald-400 shrink-0" />
+                    <span className="text-slate-400">https://</span>
+                    <span className="font-bold text-amber-300 truncate">120pie.com/{partnerId}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[11px] font-bold text-slate-400 hidden sm:inline">실시간 인터랙티브 모드</span>
+                  </div>
+                </div>
+                {/* 인터랙티브 iframe */}
+                <div className="flex-1 w-full h-full bg-neutral-950 overflow-hidden relative select-text">
+                  <iframe
+                    src={`/${partnerId}`}
+                    title="120겹파이 전용 분양 사이트 데스크톱 미리보기"
+                    className="w-full h-full border-0 bg-neutral-950"
+                  />
+                </div>
+              </div>
+            ) : (
+              /* 📱 스마트폰 (모바일) 프레임 */
+              <div className="w-[375px] sm:w-[390px] h-[82vh] max-h-[780px] bg-slate-950 rounded-[48px] p-3 border-4 border-slate-700 shadow-2xl flex flex-col relative animate-in zoom-in-95">
+                {/* 다이나믹 아일랜드 노치 */}
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 w-28 h-5 bg-slate-900 rounded-full z-20 flex items-center justify-center pointer-events-none">
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-950 mr-2" />
+                  <div className="w-2 h-2 rounded-full bg-blue-950/80" />
+                </div>
+
+                {/* 스마트폰 내부 스크린 */}
+                <div className="flex-1 w-full h-full rounded-[38px] overflow-hidden bg-neutral-950 pt-6 relative flex flex-col select-text">
+                  <iframe
+                    src={`/${partnerId}`}
+                    title="120겹파이 전용 분양 사이트 모바일 미리보기"
+                    className="w-full h-full border-0 bg-neutral-950"
+                  />
+                </div>
+
+                {/* 하단 홈 인디케이터 바 */}
+                <div className="w-32 h-1 bg-slate-600 rounded-full mx-auto mt-2 shrink-0 pointer-events-none" />
+              </div>
+            )}
           </div>
         </div>
       )}
