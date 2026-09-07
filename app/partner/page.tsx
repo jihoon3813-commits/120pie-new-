@@ -364,7 +364,7 @@ export default function PartnerPortalPage() {
             <p className="text-[11px] text-slate-500">
               파트너 신규 등록 및 계정 발급은 <strong>본사 가맹지원본부</strong>를 통해 진행됩니다.
             </p>
-            <div className="text-[11px] text-amber-300/80 font-mono">
+            <div className="text-[11px] text-amber-300/80">
               테스트 계정: partner1 / partner1234
             </div>
           </div>
@@ -398,29 +398,21 @@ export default function PartnerPortalPage() {
       )}
 
       {/* TOP GLOBAL HEADER (본사 어드민과 동일한 화이트 헤더) */}
-      <header className="h-16 bg-white border-b border-neutral-200/90 px-5 sm:px-8 flex items-center justify-between z-40 sticky top-0 shadow-2xs">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-slate-500 hover:text-[#0F172A] rounded-lg hover:bg-slate-100 border-0 cursor-pointer"
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-          
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FED422] to-amber-500 flex items-center justify-center text-[#0F172A] shadow-xs">
-              <Building2 size={16} />
-            </div>
-            <div>
-              <h1 className="font-black text-sm sm:text-base text-[#0F172A] tracking-tight flex items-center gap-2">
-                120겹파이 <span className="bg-[#FED422] text-[#0F172A] text-[10px] font-black px-2 py-0.5 rounded-md font-mono">PARTNER</span>
-              </h1>
-            </div>
+      <header className="h-16 bg-white border-b border-neutral-200/90 px-4 sm:px-8 flex items-center justify-between z-40 sticky top-0 shadow-2xs">
+        {/* 좌측: 타이틀 텍스트 (모바일에서는 동그란 아이콘 숨김) */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden sm:flex w-8 h-8 rounded-full bg-gradient-to-tr from-[#FED422] to-amber-500 items-center justify-center text-[#0F172A] shadow-xs">
+            <Building2 size={16} />
+          </div>
+          <div>
+            <h1 className="font-black text-base sm:text-base text-[#0F172A] tracking-tight flex items-center gap-2">
+              120겹파이 <span className="bg-[#FED422] text-[#0F172A] text-[10px] font-black px-2 py-0.5 rounded-md">PARTNER</span>
+            </h1>
           </div>
         </div>
 
-        {/* Header Right Status & Logout */}
-        <div className="flex items-center gap-4">
+        {/* 우측: 데스크탑 정보 + 데스크탑 전용 로그아웃 + 모바일 더보기(햄버거) 아이콘 */}
+        <div className="flex items-center gap-2 sm:gap-4">
           <div className="hidden sm:flex flex-col text-right">
             <div className="text-xs font-black text-[#0F172A] flex items-center justify-end gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -429,17 +421,27 @@ export default function PartnerPortalPage() {
                 <span className="text-slate-400 font-medium">({currentPartner.companyName})</span>
               )}
             </div>
-            <span className="text-[11px] text-amber-600 font-bold font-mono">
+            <span className="text-[11px] text-amber-600 font-bold">
               패스트리 생지 8,000원 / 박스
             </span>
           </div>
 
+          {/* 데스크탑 로그아웃 버튼 (모바일에서는 더보기 드로어 안으로 이동) */}
           <button
             onClick={handleLogout}
-            className="px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 text-xs font-bold transition-all border border-slate-200 hover:border-rose-200 flex items-center gap-1.5 cursor-pointer"
+            className="hidden sm:flex px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 text-xs font-bold transition-all border border-slate-200 hover:border-rose-200 items-center gap-1.5 cursor-pointer"
           >
             <LogOut size={14} />
-            <span className="hidden sm:inline">로그아웃</span>
+            <span>로그아웃</span>
+          </button>
+
+          {/* 📱 모바일 우측 더보기 아이콘 (햄버거 메뉴) */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 text-slate-600 hover:text-[#0F172A] rounded-xl hover:bg-slate-100 border border-slate-200/80 bg-slate-50 flex items-center justify-center cursor-pointer transition-colors"
+            title="더보기 메뉴 열기"
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </header>
@@ -473,7 +475,7 @@ export default function PartnerPortalPage() {
               </div>
               <h4 className="font-black text-sm text-white truncate w-full">{currentPartner?.name}</h4>
               <p className="text-[11px] text-slate-400 truncate w-full mt-0.5">{currentPartner?.companyName || "공식 영업 파트너"}</p>
-              <span className="mt-2 bg-[#FED422] text-[#0F172A] text-[10px] font-black px-3 py-0.5 rounded-md shadow-xs font-mono">
+              <span className="mt-2 bg-[#FED422] text-[#0F172A] text-[10px] font-black px-3 py-0.5 rounded-md shadow-xs">
                 #PARTNER-PRO
               </span>
             </div>
@@ -531,10 +533,18 @@ export default function PartnerPortalPage() {
               onClick={(e) => e.stopPropagation()} 
             >
               <div className="space-y-6 overflow-y-auto no-scrollbar">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                  <span className="font-black text-sm text-white">파트너 메뉴 바로가기</span>
-                  <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 text-slate-400 hover:text-white">
-                    <X size={20} />
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-[#FED422] text-[#0F172A] flex items-center justify-center font-black text-xs">
+                      {currentPartner?.name ? currentPartner.name.slice(0, 1) : "P"}
+                    </div>
+                    <div>
+                      <h4 className="font-black text-xs text-white leading-tight">{currentPartner?.name || "영업 파트너"}</h4>
+                      <p className="text-[10px] text-slate-400 font-bold">{currentPartner?.companyName || "120Partner"}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 text-slate-400 hover:text-white border-0 bg-transparent cursor-pointer">
+                    <X size={18} />
                   </button>
                 </div>
 
@@ -569,134 +579,148 @@ export default function PartnerPortalPage() {
                     );
                   })}
                 </nav>
+
+                {/* 📱 더보기 메뉴 안의 로그아웃 버튼 */}
+                <div className="border-t border-slate-800 pt-4 mt-2">
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-xs font-black text-rose-400 hover:text-white bg-rose-500/10 hover:bg-rose-500/20 transition-all border border-rose-500/20 cursor-pointer"
+                  >
+                    <LogOut size={16} />
+                    <span>로그아웃</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         )}
 
         {/* MAIN WORKSPACE CONTENT CANVAS (Full Width Responsive like HQ Admin) */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto w-full max-w-full bg-[#F4F6F8]">
-          <div className="space-y-6 w-full max-w-full">
+        <main className="flex-1 min-w-0 p-3.5 sm:p-6 lg:p-8 pb-24 lg:pb-8 overflow-y-auto w-full max-w-full bg-[#F4F6F8]">
+          <div className="space-y-4 sm:space-y-6 w-full max-w-full">
 
             {/* ==========================================
                 1) 대시보드 뷰
             ========================================== */}
             {currentMenu === "dashboard" && (
-              <div className="space-y-6">
-                {/* 웰컴 화이트 카드 배너 */}
-                <div className="bg-white rounded-lg p-6 sm:p-8 border-0 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="space-y-1.5">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 border border-amber-200 text-amber-700 text-xs font-black">
-                      <Sparkles size={14} className="text-amber-500" />
+              <div className="space-y-4 sm:space-y-6">
+                {/* 웰컴 화이트 카드 배너 (모바일 최적화) */}
+                <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  <div className="space-y-1 sm:space-y-1.5">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-black">
+                      <Sparkles size={13} className="text-amber-500" />
                       <span>영업 파트너 전용 대시보드</span>
                     </div>
-                    <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
+                    <h2 className="text-lg sm:text-2xl font-black text-[#0F172A] tracking-tight">
                       {currentPartner?.name} 파트너님, 환영합니다!
                     </h2>
-                    <p className="text-xs text-slate-400 font-bold">
-                      유치 가맹점의 실시간 재료 발주 실적과 이번 달 예상 정산 수수료를 한눈에 확인하세요.
+                    <p className="text-xs text-slate-400 font-bold leading-relaxed">
+                      유치 가맹점 실시간 발주 실적과 이번 달 예상 정산 수수료를 한눈에 확인하세요.
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-3 shrink-0 pt-1 sm:pt-0">
                     <button
                       onClick={() => setCurrentMenu("stores")}
-                      className="px-4 py-2.5 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] font-black text-xs rounded-lg shadow-sm transition-all flex items-center gap-2 cursor-pointer border-0"
+                      className="px-2.5 sm:px-4 py-2.5 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] font-black text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 active:scale-95 whitespace-nowrap"
                     >
-                      <Store size={15} />
-                      <span>유치 가맹점 보기</span>
+                      <Store size={14} className="shrink-0" />
+                      <span className="whitespace-nowrap tracking-tight">유치가맹점</span>
                     </button>
                     <button
                       onClick={() => setCurrentMenu("settlement")}
-                      className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg border border-slate-200 transition-all flex items-center gap-2 cursor-pointer"
+                      className="px-2.5 sm:px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 whitespace-nowrap"
                     >
-                      <CreditCard size={15} />
-                      <span>정산 관리</span>
+                      <CreditCard size={14} className="shrink-0" />
+                      <span className="whitespace-nowrap tracking-tight">정산관리</span>
                     </button>
                   </div>
                 </div>
 
-                {/* 4대 주요 지표 카드 (본사 어드민 스타일 화이트 카드) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* 4대 주요 지표 카드 (모바일 2x2 격자 그리드 배치) */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                   {/* 카드 1: 당월 예상 수수료 */}
-                  <div className="bg-white rounded-lg p-5 border-0 shadow-md space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-400">이번 달 예상 수수료</span>
-                      <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-                        <DollarSign size={18} />
+                  <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col justify-between space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-400 truncate">이번 달 예상 수수료</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold shrink-0">
+                        <DollarSign size={16} />
                       </div>
                     </div>
-                    <div className="text-2xl font-black text-rose-600 font-mono tracking-tight">
-                      {currentMonthEstimatedCommission.toLocaleString()} <span className="text-sm font-bold text-slate-600 font-sans">원</span>
+                    <div className="text-base sm:text-2xl font-black text-rose-600 tracking-tight my-0.5">
+                      {currentMonthEstimatedCommission.toLocaleString()} <span className="text-[11px] sm:text-sm font-bold text-slate-600 font-sans">원</span>
                     </div>
-                    <span className="text-[11px] text-amber-600 font-bold">
+                    <span className="text-[10px] sm:text-[11px] text-amber-600 font-bold truncate">
                       생지 {currentMonthDoughBoxes}박스 × 8,000원
                     </span>
                   </div>
 
                   {/* 카드 2: 유치 가맹점 수 */}
-                  <div className="bg-white rounded-lg p-5 border-0 shadow-md space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-400">내가 유치한 가맹점</span>
-                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                        <Store size={18} />
+                  <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col justify-between space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-400 truncate">내가 유치한 가맹점</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0">
+                        <Store size={16} />
                       </div>
                     </div>
-                    <div className="text-2xl font-black text-[#0F172A] tracking-tight">
-                      {myStores.length} <span className="text-sm font-bold text-slate-400 font-sans">개점</span>
+                    <div className="text-base sm:text-2xl font-black text-[#0F172A] tracking-tight my-0.5">
+                      {myStores.length} <span className="text-[11px] sm:text-sm font-bold text-slate-400 font-sans">개점</span>
                     </div>
-                    <span className="text-[11px] text-emerald-600 font-bold">
-                      승인 영업점 {myStores.filter((s: any) => s.status === "승인").length}개소
+                    <span className="text-[10px] sm:text-[11px] text-emerald-600 font-bold truncate">
+                      승인 {myStores.filter((s: any) => s.status === "승인").length}개소
                     </span>
                   </div>
 
                   {/* 카드 3: 당월 생지 주문 박스 수 */}
-                  <div className="bg-white rounded-lg p-5 border-0 shadow-md space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-400">당월 패스트리 생지 주문</span>
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-                        <Package size={18} />
+                  <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col justify-between space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-400 truncate">당월 생지 주문</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shrink-0">
+                        <Package size={16} />
                       </div>
                     </div>
-                    <div className="text-2xl font-black text-[#0F172A] font-mono tracking-tight">
-                      {currentMonthDoughBoxes} <span className="text-sm font-bold text-slate-400 font-sans">박스</span>
+                    <div className="text-base sm:text-2xl font-black text-[#0F172A] tracking-tight my-0.5">
+                      {currentMonthDoughBoxes} <span className="text-[11px] sm:text-sm font-bold text-slate-400 font-sans">박스</span>
                     </div>
-                    <span className="text-[11px] text-blue-600 font-bold">
-                      총 {currentMonthOrders.length}건 발주 발생
+                    <span className="text-[10px] sm:text-[11px] text-blue-600 font-bold truncate">
+                      총 {currentMonthOrders.length}건 발주
                     </span>
                   </div>
 
                   {/* 카드 4: 누적 수수료 합계 */}
-                  <div className="bg-white rounded-lg p-5 border-0 shadow-md space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-400">누적 수수료 총액</span>
-                      <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-                        <TrendingUp size={18} />
+                  <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col justify-between space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-400 truncate">누적 수수료 총액</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold shrink-0">
+                        <TrendingUp size={16} />
                       </div>
                     </div>
-                    <div className="text-2xl font-black text-[#0F172A] font-mono tracking-tight">
-                      {totalCumulativeCommission.toLocaleString()} <span className="text-sm font-bold text-slate-400 font-sans">원</span>
+                    <div className="text-base sm:text-2xl font-black text-[#0F172A] tracking-tight my-0.5 truncate">
+                      {totalCumulativeCommission.toLocaleString()} <span className="text-[11px] sm:text-sm font-bold text-slate-400 font-sans">원</span>
                     </div>
-                    <span className="text-[11px] text-purple-600 font-bold">
-                      누적 생지 {totalDoughBoxes}박스 달성
+                    <span className="text-[10px] sm:text-[11px] text-purple-600 font-bold truncate">
+                      누적 {totalDoughBoxes}박스
                     </span>
                   </div>
                 </div>
 
                 {/* 최근 주문 내역 & 공지사항 2분할 */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                   {/* 최근 가맹점 재료 주문 내역 (2칸) */}
-                  <div className="lg:col-span-2 bg-white rounded-lg p-6 border-0 shadow-md space-y-4">
+                  <div className="lg:col-span-2 bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs sm:shadow-md space-y-3 sm:space-y-4">
                     <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
-                      <h3 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
-                        <Package size={17} className="text-amber-500" />
-                        <span>최근 유치 가맹점 재료 발주 내역</span>
+                      <h3 className="text-xs sm:text-sm font-black text-[#0F172A] flex items-center gap-2">
+                        <Package size={16} className="text-amber-500" />
+                        <span>최근 가맹점 재료 발주 내역</span>
                       </h3>
                       <button
                         onClick={() => setCurrentMenu("stores")}
-                        className="text-xs text-slate-500 hover:text-[#0F172A] font-bold flex items-center gap-1 cursor-pointer border-0 bg-transparent"
+                        className="text-[11px] sm:text-xs text-slate-500 hover:text-[#0F172A] font-bold flex items-center gap-1 cursor-pointer border-0 bg-transparent"
                       >
-                        전체 보기 <ChevronRight size={14} />
+                        전체 보기 <ChevronRight size={13} />
                       </button>
                     </div>
 
@@ -705,50 +729,85 @@ export default function PartnerPortalPage() {
                         유치 가맹점의 재료 주문 내역이 없습니다.
                       </div>
                     ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left text-xs">
-                          <thead>
-                            <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
-                              <th className="py-3 px-3">주문일시</th>
-                              <th className="py-3 px-3">가맹점명</th>
-                              <th className="py-3 px-3">주문 품목</th>
-                              <th className="py-3 px-3 text-right">생지 박스수</th>
-                              <th className="py-3 px-3 text-right">발생 수수료</th>
-                              <th className="py-3 px-3 text-center">상태</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-neutral-100">
-                            {myOrders.slice(0, 5).map((ord: any) => (
-                              <tr key={ord.id} className="hover:bg-slate-50 transition-colors">
-                                <td className="py-3.5 px-3 font-mono text-slate-500">{ord.date}</td>
-                                <td className="py-3.5 px-3 font-black text-[#0F172A]">{ord.storeName}</td>
-                                <td className="py-3.5 px-3 text-slate-600 max-w-[180px] truncate">
-                                  {ord.items && ord.items.length > 0
-                                    ? `${ord.items[0].productName} ${ord.items.length > 1 ? `외 ${ord.items.length - 1}건` : ""}`
-                                    : "자재 주문"}
-                                </td>
-                                <td className="py-3.5 px-3 text-right font-black text-amber-600 font-mono">
-                                  {ord.pastryDoughBoxes} 박스
-                                </td>
-                                <td className="py-3.5 px-3 text-right font-black text-rose-600 font-mono">
+                      <>
+                        {/* 📱 모바일 전용 카드형 리스트 (sm:hidden) */}
+                        <div className="sm:hidden space-y-2">
+                          {myOrders.slice(0, 5).map((ord: any) => (
+                            <div key={ord.id} className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/70 space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <span className="font-black text-xs text-[#0F172A]">{ord.storeName}</span>
+                                <span
+                                  className={`inline-block px-2 py-0.2 rounded text-[9px] font-bold border ${
+                                    (STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).bg
+                                  } ${(STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).text} ${
+                                    (STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).border
+                                  }`}
+                                >
+                                  {ord.status}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between text-[11px] text-slate-500">
+                                <span className="text-slate-400 text-[10px]">{ord.date}</span>
+                                <span className="truncate max-w-[140px] text-right">
+                                  {ord.items && ord.items.length > 0 ? ord.items[0].productName : "자재 주문"}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between pt-1.5 border-t border-slate-200/60 text-xs">
+                                <span className="font-bold text-amber-700 text-[11px]">{ord.pastryDoughBoxes} 박스</span>
+                                <span className="font-black text-rose-600 text-[11px]">
                                   +{(ord.commission || 0).toLocaleString()}원
-                                </td>
-                                <td className="py-3.5 px-3 text-center">
-                                  <span
-                                    className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${
-                                      (STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).bg
-                                    } ${(STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).text} ${
-                                      (STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).border
-                                    }`}
-                                  >
-                                    {ord.status}
-                                  </span>
-                                </td>
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* 💻 태블릿/데스크탑 전용 정밀 테이블 (hidden sm:block) */}
+                        <div className="hidden sm:block overflow-x-auto">
+                          <table className="w-full text-left text-xs">
+                            <thead>
+                              <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
+                                <th className="py-3 px-3">주문일시</th>
+                                <th className="py-3 px-3">가맹점명</th>
+                                <th className="py-3 px-3">주문 품목</th>
+                                <th className="py-3 px-3 text-right">생지 박스수</th>
+                                <th className="py-3 px-3 text-right">발생 수수료</th>
+                                <th className="py-3 px-3 text-center">상태</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                            </thead>
+                            <tbody className="divide-y divide-neutral-100">
+                              {myOrders.slice(0, 5).map((ord: any) => (
+                                <tr key={ord.id} className="hover:bg-slate-50 transition-colors">
+                                  <td className="py-3.5 px-3 text-slate-500 tabular-nums">{ord.date}</td>
+                                  <td className="py-3.5 px-3 font-black text-[#0F172A]">{ord.storeName}</td>
+                                  <td className="py-3.5 px-3 text-slate-600 max-w-[180px] truncate">
+                                    {ord.items && ord.items.length > 0
+                                      ? `${ord.items[0].productName} ${ord.items.length > 1 ? `외 ${ord.items.length - 1}건` : ""}`
+                                      : "자재 주문"}
+                                  </td>
+                                  <td className="py-3.5 px-3 text-right font-black text-amber-600 tabular-nums">
+                                    {ord.pastryDoughBoxes} 박스
+                                  </td>
+                                  <td className="py-3.5 px-3 text-right font-black text-rose-600 tabular-nums">
+                                    +{(ord.commission || 0).toLocaleString()}원
+                                  </td>
+                                  <td className="py-3.5 px-3 text-center">
+                                    <span
+                                      className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${
+                                        (STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).bg
+                                      } ${(STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).text} ${
+                                        (STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).border
+                                      }`}
+                                    >
+                                      {ord.status}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </>
                     )}
                   </div>
 
@@ -782,7 +841,7 @@ export default function PartnerPortalPage() {
                             >
                               {n.tag}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-mono">{n.date}</span>
+                            <span className="text-[10px] text-slate-400">{n.date}</span>
                           </div>
                           <h4 className="text-xs font-bold text-slate-800 line-clamp-1 group-hover:text-amber-600 transition-colors">
                             {n.title}
@@ -799,33 +858,33 @@ export default function PartnerPortalPage() {
                 2) 가맹점 관리 뷰
             ========================================== */}
             {currentMenu === "stores" && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-lg p-6 border-0 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-4 sm:space-y-6">
+                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                   <div>
-                    <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
-                      <Store size={22} className="text-amber-500" />
+                    <h2 className="text-lg sm:text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                      <Store size={20} className="text-amber-500" />
                       유치 가맹점 관리
                     </h2>
                     <p className="text-xs text-slate-400 font-bold mt-1">
-                      {currentPartner?.name} 파트너님이 직접 유치한 가맹점 목록 및 가맹점별 재료 주문 내역을 확인합니다.
+                      {currentPartner?.name} 파트너님이 직접 유치한 가맹점 목록 및 재료 발주 내역입니다.
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="relative flex-1 sm:flex-initial">
                       <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                       <input
                         type="text"
                         value={storeSearchQuery}
                         onChange={(e) => setStoreSearchQuery(e.target.value)}
-                        placeholder="가맹점명 / 점주명 검색"
-                        className="pl-8 pr-3 py-2 bg-[#F1F4F8] border-0 rounded-lg text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 w-44 sm:w-56 outline-none"
+                        placeholder="가맹점/점주명 검색"
+                        className="w-full sm:w-52 pl-8 pr-3 py-2 bg-[#F1F4F8] border-0 rounded-xl text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
                       />
                     </div>
                     <select
                       value={storeStatusFilter}
                       onChange={(e) => setStoreStatusFilter(e.target.value)}
-                      className="px-3 py-2 bg-[#F1F4F8] border-0 rounded-lg text-xs font-bold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none cursor-pointer"
+                      className="px-3 py-2 bg-[#F1F4F8] border-0 rounded-xl text-xs font-bold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none cursor-pointer shrink-0"
                     >
                       <option value="전체">전체 상태</option>
                       <option value="승인">승인 (영업중)</option>
@@ -836,71 +895,120 @@ export default function PartnerPortalPage() {
                   </div>
                 </div>
 
-                {/* 가맹점 테이블 */}
-                <div className="bg-white rounded-lg border-0 shadow-md overflow-hidden">
+                {/* 가맹점 테이블 & 모바일 카드 */}
+                <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs sm:shadow-md overflow-hidden">
                   {filteredStores.length === 0 ? (
                     <div className="py-20 text-center text-slate-400 text-xs font-bold">
                       유치한 가맹점 정보가 없습니다. 본사에서 가맹점 파트너 매핑을 확인해 주세요.
                     </div>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
-                        <thead>
-                          <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
-                            <th className="py-3.5 px-4">가맹점명 / 주소</th>
-                            <th className="py-3.5 px-3">점주명</th>
-                            <th className="py-3.5 px-3">연락처</th>
-                            <th className="py-3.5 px-3 text-center">가맹상태</th>
-                            <th className="py-3.5 px-3">등록일자</th>
-                            <th className="py-3.5 px-3 text-right">당월 생지 주문</th>
-                            <th className="py-3.5 px-3 text-right">누적 생지 주문</th>
-                            <th className="py-3.5 px-4 text-center">재료 주문내역</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-neutral-100">
-                          {filteredStores.map((store: any) => (
-                            <tr key={store.id} className="hover:bg-slate-50 transition-colors">
-                              <td className="py-4 px-4">
-                                <div className="font-black text-[#0F172A] text-sm">{store.name}</div>
-                                <div className="text-[11px] text-slate-400 truncate max-w-xs">{store.roadAddress}</div>
-                              </td>
-                              <td className="py-4 px-3 text-slate-800 font-bold">{store.owner}</td>
-                              <td className="py-4 px-3 text-slate-500 font-mono">{store.phone}</td>
-                              <td className="py-4 px-3 text-center">
-                                <span
-                                  className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold border ${
-                                    (STATUS_BADGES[store.status] || STATUS_BADGES["대기"]).bg
-                                  } ${(STATUS_BADGES[store.status] || STATUS_BADGES["대기"]).text} ${
-                                    (STATUS_BADGES[store.status] || STATUS_BADGES["대기"]).border
-                                  }`}
-                                >
-                                  {store.status}
+                    <>
+                      {/* 📱 모바일 가맹점 카드 리스트 (sm:hidden) */}
+                      <div className="sm:hidden p-3 space-y-2.5">
+                        {filteredStores.map((store: any) => (
+                          <div key={store.id} className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/70 space-y-2.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <div className="font-black text-sm text-[#0F172A] truncate">{store.name}</div>
+                                <div className="text-[11px] text-slate-400 truncate mt-0.5">{store.roadAddress || "주소 미등록"}</div>
+                              </div>
+                              <span
+                                className={`inline-block px-2 py-0.5 rounded text-[9px] font-extrabold border shrink-0 ${
+                                  (STATUS_BADGES[store.status] || STATUS_BADGES["대기"]).bg
+                                } ${(STATUS_BADGES[store.status] || STATUS_BADGES["대기"]).text} ${
+                                  (STATUS_BADGES[store.status] || STATUS_BADGES["대기"]).border
+                                }`}
+                              >
+                                {store.status}
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 text-xs bg-white p-2.5 rounded-lg border border-slate-200/60">
+                              <div>
+                                <span className="text-[10px] text-slate-400 block font-medium">점주명 / 연락처</span>
+                                <span className="font-bold text-slate-800 text-[11px]">{store.owner}</span>
+                                <span className="text-[10px] text-slate-500 block">{store.phone}</span>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-[10px] text-slate-400 block font-medium">당월 생지 주문</span>
+                                <span className="font-black text-amber-600 text-xs">{store.monthDoughBoxes || 0} 박스</span>
+                                <span className="text-[10px] text-slate-400 block">
+                                  누적 {store.totalDoughBoxes || 0}박스
                                 </span>
-                              </td>
-                              <td className="py-4 px-3 text-slate-400 font-mono">{store.regDate}</td>
-                              <td className="py-4 px-3 text-right font-black text-amber-600 font-mono">
-                                {store.monthDoughBoxes || 0} 박스
-                                <div className="text-[10px] text-slate-400 font-normal">
-                                  (+{((store.monthDoughBoxes || 0) * 8000).toLocaleString()}원)
-                                </div>
-                              </td>
-                              <td className="py-4 px-3 text-right font-black text-[#0F172A] font-mono text-sm">
-                                {store.totalDoughBoxes || 0} 박스
-                              </td>
-                              <td className="py-4 px-4 text-center">
-                                <button
-                                  onClick={() => setSelectedStoreForOrders(store)}
-                                  className="px-3 py-1.5 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-2xs inline-flex items-center gap-1.5"
-                                >
-                                  <FileText size={13} />
-                                  <span>주문 내역 보기</span>
-                                </button>
-                              </td>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => setSelectedStoreForOrders(store)}
+                              className="w-full py-2 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-2xs flex items-center justify-center gap-1.5 active:scale-95"
+                            >
+                              <FileText size={13} />
+                              <span>재료 발주 내역 보기</span>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* 💻 데스크탑 가맹점 테이블 (hidden sm:block) */}
+                      <div className="hidden sm:block overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead>
+                            <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
+                              <th className="py-3.5 px-4">가맹점명 / 주소</th>
+                              <th className="py-3.5 px-3">점주명</th>
+                              <th className="py-3.5 px-3">연락처</th>
+                              <th className="py-3.5 px-3 text-center">가맹상태</th>
+                              <th className="py-3.5 px-3">등록일자</th>
+                              <th className="py-3.5 px-3 text-right">당월 생지 주문</th>
+                              <th className="py-3.5 px-3 text-right">누적 생지 주문</th>
+                              <th className="py-3.5 px-4 text-center">재료 주문내역</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          </thead>
+                          <tbody className="divide-y divide-neutral-100">
+                            {filteredStores.map((store: any) => (
+                              <tr key={store.id} className="hover:bg-slate-50 transition-colors">
+                                <td className="py-4 px-4">
+                                  <div className="font-black text-[#0F172A] text-sm">{store.name}</div>
+                                  <div className="text-[11px] text-slate-400 truncate max-w-xs">{store.roadAddress}</div>
+                                </td>
+                                <td className="py-4 px-3 text-slate-800 font-bold">{store.owner}</td>
+                                <td className="py-4 px-3 text-slate-500">{store.phone}</td>
+                                <td className="py-4 px-3 text-center">
+                                  <span
+                                    className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold border ${
+                                      (STATUS_BADGES[store.status] || STATUS_BADGES["대기"]).bg
+                                    } ${(STATUS_BADGES[store.status] || STATUS_BADGES["대기"]).text} ${
+                                      (STATUS_BADGES[store.status] || STATUS_BADGES["대기"]).border
+                                    }`}
+                                  >
+                                    {store.status}
+                                  </span>
+                                </td>
+                                <td className="py-4 px-3 text-slate-400">{store.regDate}</td>
+                                <td className="py-4 px-3 text-right font-black text-amber-600 tabular-nums">
+                                  {store.monthDoughBoxes || 0} 박스
+                                  <div className="text-[10px] text-slate-400 font-normal">
+                                    (+{((store.monthDoughBoxes || 0) * 8000).toLocaleString()}원)
+                                  </div>
+                                </td>
+                                <td className="py-4 px-3 text-right font-black text-[#0F172A] text-sm tabular-nums">
+                                  {store.totalDoughBoxes || 0} 박스
+                                </td>
+                                <td className="py-4 px-4 text-center">
+                                  <button
+                                    onClick={() => setSelectedStoreForOrders(store)}
+                                    className="px-3 py-1.5 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-2xs inline-flex items-center gap-1.5"
+                                  >
+                                    <FileText size={13} />
+                                    <span>주문 내역 보기</span>
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -919,11 +1027,11 @@ export default function PartnerPortalPage() {
                 3) 정산 관리 뷰
             ========================================== */}
             {currentMenu === "settlement" && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-lg p-6 border-0 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-4 sm:space-y-6">
+                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                   <div>
-                    <h2 className="text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
-                      <CreditCard size={22} className="text-amber-500" />
+                    <h2 className="text-lg sm:text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                      <CreditCard size={20} className="text-amber-500" />
                       월별 수수료 정산 관리
                     </h2>
                     <p className="text-xs text-slate-400 font-bold mt-1">
@@ -931,101 +1039,151 @@ export default function PartnerPortalPage() {
                     </p>
                   </div>
 
-                  <div className="px-4 py-2 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-800 font-bold flex items-center gap-2">
-                    <Award size={16} className="text-amber-600" />
-                    <span>패스트리 생지 1박스 당 8,000원 (VAT포함) 정산</span>
+                  <div className="px-3.5 py-2 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 font-bold flex items-center gap-2 self-start sm:self-auto">
+                    <Award size={15} className="text-amber-600 shrink-0" />
+                    <span className="text-[11px] sm:text-xs">패스트리 생지 1박스 당 8,000원 (VAT포함)</span>
                   </div>
                 </div>
 
                 {/* 등록된 정산 계좌 카드 */}
-                <div className="bg-white rounded-lg p-5 border-0 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-                      <Wallet size={22} />
+                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold shrink-0">
+                      <Wallet size={20} />
                     </div>
-                    <div>
-                      <span className="text-[11px] text-slate-400 font-bold">수수료 입금 등록 계좌</span>
-                      <div className="text-sm font-black text-[#0F172A]">
+                    <div className="min-w-0">
+                      <span className="text-[10px] sm:text-[11px] text-slate-400 font-bold block">수수료 입금 등록 계좌</span>
+                      <div className="text-xs sm:text-sm font-black text-[#0F172A] truncate">
                         {currentPartner?.bankName || "은행 미등록"}{" "}
-                        <span className="font-mono text-amber-600">{currentPartner?.accountNumber || "-"}</span>{" "}
-                        (예금주: {currentPartner?.accountHolder || currentPartner?.name || "-"})
+                        <span className="text-amber-600 font-bold">{currentPartner?.accountNumber || "-"}</span>{" "}
+                        <span className="text-slate-500 font-normal">({currentPartner?.accountHolder || currentPartner?.name || "-"})</span>
                       </div>
                     </div>
                   </div>
 
                   <button
                     onClick={() => setCurrentMenu("settings")}
-                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition-all cursor-pointer self-start md:self-auto"
+                    className="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 transition-all cursor-pointer text-center"
                   >
                     계좌정보 변경
                   </button>
                 </div>
 
-                {/* 월별 정산 내역 테이블 */}
-                <div className="bg-white rounded-lg border-0 shadow-md overflow-hidden p-6 space-y-4">
-                  <h3 className="text-sm font-black text-[#0F172A]">월별 정산 명세 내역</h3>
+                {/* 월별 정산 내역 테이블 & 모바일 카드 */}
+                <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs sm:shadow-md overflow-hidden p-4 sm:p-6 space-y-3 sm:space-y-4">
+                  <h3 className="text-xs sm:text-sm font-black text-[#0F172A]">월별 정산 명세 내역</h3>
 
                   {settlements.length === 0 ? (
                     <div className="py-16 text-center text-slate-400 text-xs font-bold">
                       정산 내역이 없습니다.
                     </div>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
-                        <thead>
-                          <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
-                            <th className="py-3.5 px-3">정산 년월</th>
-                            <th className="py-3.5 px-3">유치 가맹점 수</th>
-                            <th className="py-3.5 px-3 text-right">생지 주문 박스 수</th>
-                            <th className="py-3.5 px-3 text-right">수수료 단가</th>
-                            <th className="py-3.5 px-3 text-right">총 정산 수수료</th>
-                            <th className="py-3.5 px-3 text-center">정산 상태</th>
-                            <th className="py-3.5 px-3 text-center">지급일자</th>
-                            <th className="py-3.5 px-4 text-center">명세서</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-neutral-100">
-                          {settlements.map((st: any, idx: number) => (
-                            <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                              <td className="py-4 px-3 font-mono font-black text-[#0F172A]">{st.yearMonth}</td>
-                              <td className="py-4 px-3 font-bold text-slate-700">{st.storeCount} 개점</td>
-                              <td className="py-4 px-3 text-right font-black text-amber-600 font-mono">
-                                {st.boxCount} 박스
-                              </td>
-                              <td className="py-4 px-3 text-right text-slate-500 font-mono">
-                                {(st.commissionUnit || 8000).toLocaleString()}원
-                              </td>
-                              <td className="py-4 px-3 text-right font-black text-rose-600 font-mono text-sm">
-                                {(st.commissionAmount || 0).toLocaleString()} 원
-                              </td>
-                              <td className="py-4 px-3 text-center">
-                                <span
-                                  className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold border ${
-                                    (STATUS_BADGES[st.status] || STATUS_BADGES["대기"]).bg
-                                  } ${(STATUS_BADGES[st.status] || STATUS_BADGES["대기"]).text} ${
-                                    (STATUS_BADGES[st.status] || STATUS_BADGES["대기"]).border
-                                  }`}
-                                >
-                                  {st.status}
+                    <>
+                      {/* 📱 모바일 정산 카드 리스트 (sm:hidden) */}
+                      <div className="sm:hidden space-y-2.5">
+                        {settlements.map((st: any, idx: number) => (
+                          <div key={idx} className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/70 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="font-black text-sm text-[#0F172A]">{st.yearMonth}</span>
+                              <span
+                                className={`inline-block px-2 py-0.5 rounded text-[9px] font-extrabold border ${
+                                  (STATUS_BADGES[st.status] || STATUS_BADGES["대기"]).bg
+                                } ${(STATUS_BADGES[st.status] || STATUS_BADGES["대기"]).text} ${
+                                  (STATUS_BADGES[st.status] || STATUS_BADGES["대기"]).border
+                                }`}
+                              >
+                                {st.status}
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 text-xs bg-white p-2.5 rounded-lg border border-slate-200/60">
+                              <div>
+                                <span className="text-[10px] text-slate-400 block font-medium">유치 가맹점</span>
+                                <span className="font-bold text-slate-800">{st.storeCount} 개점</span>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-[10px] text-slate-400 block font-medium">생지 주문 박스</span>
+                                <span className="font-black text-amber-600">{st.boxCount} 박스</span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-1 text-xs">
+                              <div>
+                                <span className="text-[10px] text-slate-400 block">총 정산 수수료</span>
+                                <span className="font-black text-rose-600 text-sm">
+                                  {(st.commissionAmount || 0).toLocaleString()}원
                                 </span>
-                              </td>
-                              <td className="py-4 px-3 text-center text-slate-400 font-mono">
-                                {st.paidDate || "-"}
-                              </td>
-                              <td className="py-4 px-4 text-center">
-                                <button
-                                  onClick={() => setSelectedSettlement(st)}
-                                  className="px-3 py-1 bg-slate-100 hover:bg-[#FED422] text-slate-700 hover:text-[#0F172A] rounded-md text-xs font-black border border-slate-200 transition-all cursor-pointer inline-flex items-center gap-1"
-                                >
-                                  <FileText size={12} />
-                                  <span>명세서 보기</span>
-                                </button>
-                              </td>
+                              </div>
+                              <button
+                                onClick={() => setSelectedSettlement(st)}
+                                className="px-3 py-1.5 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-2xs inline-flex items-center gap-1 active:scale-95"
+                              >
+                                <FileText size={12} />
+                                <span>명세서 보기</span>
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* 💻 데스크탑 정산 테이블 (hidden sm:block) */}
+                      <div className="hidden sm:block overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead>
+                            <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
+                              <th className="py-3.5 px-3">정산 년월</th>
+                              <th className="py-3.5 px-3">유치 가맹점 수</th>
+                              <th className="py-3.5 px-3 text-right">생지 주문 박스 수</th>
+                              <th className="py-3.5 px-3 text-right">수수료 단가</th>
+                              <th className="py-3.5 px-3 text-right">총 정산 수수료</th>
+                              <th className="py-3.5 px-3 text-center">정산 상태</th>
+                              <th className="py-3.5 px-3 text-center">지급일자</th>
+                              <th className="py-3.5 px-4 text-center">명세서</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          </thead>
+                          <tbody className="divide-y divide-neutral-100">
+                            {settlements.map((st: any, idx: number) => (
+                              <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                                <td className="py-4 px-3 font-black text-[#0F172A] tabular-nums">{st.yearMonth}</td>
+                                <td className="py-4 px-3 font-bold text-slate-700">{st.storeCount} 개점</td>
+                                <td className="py-4 px-3 text-right font-black text-amber-600 tabular-nums">
+                                  {st.boxCount} 박스
+                                </td>
+                                <td className="py-4 px-3 text-right text-slate-500 tabular-nums">
+                                  {(st.commissionUnit || 8000).toLocaleString()}원
+                                </td>
+                                <td className="py-4 px-3 text-right font-black text-rose-600 text-sm tabular-nums">
+                                  {(st.commissionAmount || 0).toLocaleString()} 원
+                                </td>
+                                <td className="py-4 px-3 text-center">
+                                  <span
+                                    className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold border ${
+                                      (STATUS_BADGES[st.status] || STATUS_BADGES["대기"]).bg
+                                    } ${(STATUS_BADGES[st.status] || STATUS_BADGES["대기"]).text} ${
+                                      (STATUS_BADGES[st.status] || STATUS_BADGES["대기"]).border
+                                    }`}
+                                  >
+                                    {st.status}
+                                  </span>
+                                </td>
+                                <td className="py-4 px-3 text-center text-slate-400 tabular-nums">
+                                  {st.paidDate || "-"}
+                                </td>
+                                <td className="py-4 px-4 text-center">
+                                  <button
+                                    onClick={() => setSelectedSettlement(st)}
+                                    className="px-3 py-1 bg-slate-100 hover:bg-[#FED422] text-slate-700 hover:text-[#0F172A] rounded-md text-xs font-black border border-slate-200 transition-all cursor-pointer inline-flex items-center gap-1"
+                                  >
+                                    <FileText size={12} />
+                                    <span>명세서 보기</span>
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -1065,7 +1223,7 @@ export default function PartnerPortalPage() {
                           {n.title}
                         </h3>
                       </div>
-                      <div className="flex items-center gap-4 text-[11px] text-slate-400 font-mono shrink-0">
+                      <div className="flex items-center gap-4 text-[11px] text-slate-400 shrink-0">
                         <span>{n.date}</span>
                         <span>조회 {n.views || 0}</span>
                       </div>
@@ -1109,7 +1267,7 @@ export default function PartnerPortalPage() {
                               className="w-full bg-gradient-to-t from-amber-500 to-[#FED422] rounded-t-lg transition-all duration-500 group-hover:brightness-105 shadow-xs"
                             ></div>
                           </div>
-                          <span className="text-[10px] text-slate-500 font-bold font-mono truncate w-full text-center">
+                          <span className="text-[10px] text-slate-500 font-bold truncate w-full text-center">
                             {st.yearMonth.slice(5)}월
                           </span>
                         </div>
@@ -1120,9 +1278,9 @@ export default function PartnerPortalPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {monthlyStats.map((st: any, idx: number) => (
                       <div key={idx} className="p-4 rounded-lg bg-[#F8FAFC] border border-neutral-200/80 space-y-1">
-                        <div className="text-[11px] font-mono font-bold text-slate-400">{st.yearMonth}</div>
+                        <div className="text-[11px] font-bold text-slate-400">{st.yearMonth}</div>
                         <div className="text-sm font-black text-[#0F172A]">{st.boxCount} 박스</div>
-                        <div className="text-xs font-black text-rose-600 font-mono">
+                        <div className="text-xs font-black text-rose-600">
                           +{st.commission.toLocaleString()}원
                         </div>
                       </div>
@@ -1158,7 +1316,7 @@ export default function PartnerPortalPage() {
                           <span className="text-[10px] font-black px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
                             {m.type === "training" ? "교육자료" : "홍보자료"}
                           </span>
-                          <span className="text-[10px] text-slate-400 font-mono">{m.format} · {m.size}</span>
+                          <span className="text-[10px] text-slate-400">{m.format} · {m.size}</span>
                         </div>
                         <h3 className="text-sm font-black text-[#0F172A] line-clamp-1 group-hover:text-amber-600 transition-colors">
                           {m.title}
@@ -1415,8 +1573,8 @@ export default function PartnerPortalPage() {
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-2.5">
                           <div className="flex items-center gap-2.5">
-                            <span className="font-mono text-xs font-black text-[#0F172A]">{ord.id}</span>
-                            <span className="text-xs text-slate-400 font-mono">{ord.date}</span>
+                            <span className="text-xs font-black text-[#0F172A]">{ord.id}</span>
+                            <span className="text-xs text-slate-400">{ord.date}</span>
                           </div>
                           <div className="flex items-center gap-3">
                             <span
@@ -1428,7 +1586,7 @@ export default function PartnerPortalPage() {
                             >
                               {ord.status}
                             </span>
-                            <span className="text-xs font-black text-[#0F172A]">
+                            <span className="text-xs font-black text-[#0F172A] tabular-nums">
                               주문총액 {(ord.totalPrice || 0).toLocaleString()}원
                             </span>
                           </div>
@@ -1450,7 +1608,7 @@ export default function PartnerPortalPage() {
                                     </span>
                                   )}
                                 </div>
-                                <div className="text-slate-500 font-mono font-bold">
+                                <div className="text-slate-500 font-bold tabular-nums">
                                   {item.quantity}개 / 박스 · {(item.price * item.quantity).toLocaleString()}원
                                 </div>
                               </div>
@@ -1459,8 +1617,8 @@ export default function PartnerPortalPage() {
 
                         {/* 합계 */}
                         <div className="flex items-center justify-between pt-1 text-xs font-bold text-slate-700 bg-amber-50/60 p-2.5 rounded-md border border-amber-100">
-                          <span>패스트리 생지 합계: <strong className="text-amber-700 font-mono">{ord.pastryDoughBoxes}박스</strong></span>
-                          <span>발생 파트너 수수료: <strong className="text-rose-600 font-mono text-sm">+{((ord.commission || 0)).toLocaleString()}원</strong></span>
+                          <span>패스트리 생지 합계: <strong className="text-amber-700 font-bold">{ord.pastryDoughBoxes}박스</strong></span>
+                          <span>발생 파트너 수수료: <strong className="text-rose-600 font-bold text-sm tabular-nums">+{((ord.commission || 0)).toLocaleString()}원</strong></span>
                         </div>
                       </div>
                     ))}
@@ -1516,7 +1674,7 @@ export default function PartnerPortalPage() {
             <div className="p-8 overflow-y-auto space-y-6 text-xs bg-white">
               <div className="text-center border-b-2 border-slate-900 pb-4 space-y-1">
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight">파트너 수수료 정산 명세서</h1>
-                <p className="text-slate-500 font-mono font-bold">대상 년월: {selectedSettlement.yearMonth}</p>
+                <p className="text-slate-500 font-bold">대상 년월: {selectedSettlement.yearMonth}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 border border-slate-200 p-4 rounded-xl bg-slate-50">
@@ -1546,13 +1704,13 @@ export default function PartnerPortalPage() {
                     <td className="p-2.5 border-r border-slate-300 font-bold">
                       유치 가맹점 패스트리 생지 주문 수수료
                     </td>
-                    <td className="p-2.5 border-r border-slate-300 text-right font-mono font-bold">
+                    <td className="p-2.5 border-r border-slate-300 text-right font-bold tabular-nums">
                       {selectedSettlement.boxCount} 박스
                     </td>
-                    <td className="p-2.5 border-r border-slate-300 text-right font-mono">
+                    <td className="p-2.5 border-r border-slate-300 text-right tabular-nums">
                       {(selectedSettlement.commissionUnit || 8000).toLocaleString()}원
                     </td>
-                    <td className="p-2.5 text-right font-black font-mono text-sm">
+                    <td className="p-2.5 text-right font-black text-sm tabular-nums">
                       {(selectedSettlement.commissionAmount || 0).toLocaleString()}원
                     </td>
                   </tr>
@@ -1560,7 +1718,7 @@ export default function PartnerPortalPage() {
                     <td colSpan={3} className="p-2.5 border-r border-slate-300 text-right">
                       최종 실지급액
                     </td>
-                    <td className="p-2.5 text-right font-black text-rose-600 text-base font-mono">
+                    <td className="p-2.5 text-right font-black text-rose-600 text-base tabular-nums">
                       {(selectedSettlement.commissionAmount || 0).toLocaleString()}원
                     </td>
                   </tr>
@@ -1595,7 +1753,7 @@ export default function PartnerPortalPage() {
                   {selectedNotice.tag}
                 </span>
                 <h3 className="text-base font-black text-[#0F172A]">{selectedNotice.title}</h3>
-                <span className="text-[10px] text-slate-400 font-mono">{selectedNotice.date}</span>
+                <span className="text-[10px] text-slate-400">{selectedNotice.date}</span>
               </div>
               <button
                 onClick={() => setSelectedNotice(null)}
@@ -1620,6 +1778,54 @@ export default function PartnerPortalPage() {
           </div>
         </div>
       )}
+
+      {/* 📱 모바일 전용 하단 고정 네비게이션 바 */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-neutral-200/90 px-2 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        {[
+          { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
+          { key: "stores", label: "가맹점", icon: Store, badge: myStores.length },
+          { key: "radar", label: "상권레이더", icon: Crosshair },
+          { key: "settlement", label: "정산관리", icon: CreditCard },
+        ].map(({ key, label, icon: Icon, badge }) => {
+          const isActive = currentMenu === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setCurrentMenu(key)}
+              className={`flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all relative border-0 bg-transparent cursor-pointer ${
+                isActive ? "text-[#0F172A] font-black" : "text-slate-400 font-bold hover:text-slate-600"
+              }`}
+            >
+              <div className="relative">
+                <div
+                  className={`w-9 h-7 rounded-lg flex items-center justify-center transition-all ${
+                    isActive ? "bg-[#FED422] text-[#0F172A] shadow-xs scale-105" : ""
+                  }`}
+                >
+                  <Icon size={18} />
+                </div>
+                {badge !== undefined && badge > 0 && (
+                  <span className="absolute -top-1 -right-1.5 bg-rose-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                    {badge}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] mt-0.5 tracking-tight">{label}</span>
+            </button>
+          );
+        })}
+
+        {/* 전체 메뉴 토글 버튼 */}
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          className="flex-1 flex flex-col items-center justify-center py-1 text-slate-400 font-bold hover:text-slate-600 rounded-xl transition-all border-0 bg-transparent cursor-pointer"
+        >
+          <div className="w-9 h-7 flex items-center justify-center">
+            <Menu size={18} />
+          </div>
+          <span className="text-[10px] mt-0.5 tracking-tight">전체메뉴</span>
+        </button>
+      </nav>
     </div>
   );
 }
