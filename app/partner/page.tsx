@@ -700,6 +700,64 @@ export default function PartnerPortalPage() {
                   </div>
                 </div>
 
+                {/* 🌟 내 전용 분양 사이트 URL 홍보 배너 카드 (대시보드로 배치) */}
+                <div className="bg-gradient-to-r from-amber-500 via-[#FED422] to-amber-400 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-[#0F172A] shadow-md space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="bg-[#0F172A] text-[#FED422] text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-2xs">
+                        MY BRANCH LANDING URL
+                      </span>
+                      <h3 className="text-lg sm:text-xl font-black mt-1.5 flex items-center gap-2">
+                        <span>내 전용 분양 사이트</span>
+                        <span className="text-xs font-bold text-slate-800">
+                          (이 링크로 접수된 상담은 내 실적으로 자동 귀속)
+                        </span>
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleCopyBranchLink}
+                        className="px-3.5 py-2 bg-[#0F172A] hover:bg-slate-800 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer border-0 transition-all"
+                      >
+                        <Copy size={13} />
+                        <span>분양 링크 복사</span>
+                      </button>
+                      <a
+                        href={`/${partnerId}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-3.5 py-2 bg-white/95 hover:bg-white active:scale-95 text-[#0F172A] rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm no-underline border border-amber-300 transition-all"
+                      >
+                        <ExternalLink size={13} />
+                        <span>사이트 열기</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* 링크 주소 표시 바 */}
+                  <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-xl px-3.5 py-2.5 border border-amber-300/80">
+                    <span className="text-slate-400 font-mono text-xs font-bold shrink-0">URL:</span>
+                    <span className="font-mono font-black text-xs sm:text-sm text-slate-900 select-all truncate flex-1">
+                      {typeof window !== "undefined" ? `${window.location.origin}/${partnerId}` : `https://120pie.com/${partnerId}`}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-amber-950 font-bold leading-relaxed">
+                    <p>
+                      💡 위 분양 링크를 카카오톡, 블로그, 인스타그램, 문자 등에 적극 홍보하세요. 방문자가 이 링크를 통해 남긴 창업/샵인샵 상담은 즉시 실적으로 접수됩니다.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentMenu("consultation")}
+                      className="inline-flex items-center gap-1 text-slate-900 font-black underline hover:text-black cursor-pointer bg-transparent border-0 shrink-0 text-xs"
+                    >
+                      <span>상담 문의 내역 확인 ({partnerConsultations.length}건)</span>
+                      <ChevronRight size={13} />
+                    </button>
+                  </div>
+                </div>
+
                 {/* 4대 주요 지표 카드 (모바일 2x2 격자 그리드 배치) */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                   {/* 카드 1: 당월 예상 수수료 */}
@@ -1079,54 +1137,6 @@ export default function PartnerPortalPage() {
             ========================================== */}
             {currentMenu === "consultation" && (
               <div className="space-y-4 sm:space-y-6">
-                {/* 🌟 내 전용 분양 사이트 URL 홍보 배너 카드 */}
-                <div className="bg-gradient-to-r from-amber-500 via-[#FED422] to-amber-400 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-[#0F172A] shadow-md space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <span className="bg-[#0F172A] text-[#FED422] text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-2xs">
-                        MY BRANCH LANDING URL
-                      </span>
-                      <h3 className="text-lg sm:text-xl font-black mt-1.5 flex items-center gap-2">
-                        <span>내 전용 분양 사이트</span>
-                        <span className="text-xs font-bold text-slate-800">
-                          (이 링크로 접수된 상담은 내 실적으로 자동 귀속)
-                        </span>
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={handleCopyBranchLink}
-                        className="px-3.5 py-2 bg-[#0F172A] hover:bg-slate-800 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer border-0 transition-all"
-                      >
-                        <Copy size={13} />
-                        <span>분양 링크 복사</span>
-                      </button>
-                      <a
-                        href={`/${partnerId}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="px-3.5 py-2 bg-white/95 hover:bg-white active:scale-95 text-[#0F172A] rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm no-underline border border-amber-300 transition-all"
-                      >
-                        <ExternalLink size={13} />
-                        <span>사이트 열기</span>
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* 링크 주소 표시 바 */}
-                  <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-xl px-3.5 py-2.5 border border-amber-300/80">
-                    <span className="text-slate-400 font-mono text-xs font-bold shrink-0">URL:</span>
-                    <span className="font-mono font-black text-xs sm:text-sm text-slate-900 select-all truncate flex-1">
-                      {typeof window !== "undefined" ? `${window.location.origin}/${partnerId}` : `https://120pie.com/${partnerId}`}
-                    </span>
-                  </div>
-
-                  <p className="text-[11px] text-amber-950 font-bold leading-relaxed">
-                    💡 위 분양 링크를 카카오톡, 블로그, 인스타그램, 문자 등에 적극 홍보하세요. 방문자가 이 링크를 통해 남긴 창업/샵인샵 상담은 즉시 이 화면에 접수됩니다.
-                  </p>
-                </div>
-
                 {/* 상담 목록 상단 검색 & 필터 헤더 */}
                 <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                   <div>
@@ -1138,11 +1148,20 @@ export default function PartnerPortalPage() {
                       </span>
                     </h2>
                     <p className="text-xs text-slate-400 font-bold mt-1">
-                      내 전용 분양 페이지를 통해 접수된 예비 창업자 및 점주들의 실시간 상담 신청 목록입니다.
+                      내 전용 분양 페이지(/{partnerId})를 통해 접수된 예비 창업자 및 점주들의 실시간 상담 신청 목록입니다.
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+                    <button
+                      type="button"
+                      onClick={handleCopyBranchLink}
+                      className="px-3 py-2 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-900 border border-amber-300 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all shrink-0"
+                      title="내 전용 분양 링크 복사"
+                    >
+                      <Copy size={13} />
+                      <span>분양 링크 복사</span>
+                    </button>
                     <div className="relative flex-1 sm:flex-initial">
                       <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                       <input
