@@ -2052,14 +2052,14 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
               </div>
 
               {/* 📱 60대 맞춤 모바일 전용 지도 하단 엄지 플로팅 액션 바 (lg:hidden) */}
-              <div className="lg:hidden absolute bottom-4 left-3 right-3 z-30 flex items-center justify-between gap-2 pointer-events-auto">
+              <div className="lg:hidden absolute bottom-3 left-2.5 right-2.5 z-30 flex items-center gap-1.5 pointer-events-auto">
                 <button
                   type="button"
                   onClick={handleMoveToMyLocation}
-                  className="px-3.5 py-3 bg-white/95 active:bg-blue-50 text-blue-700 font-black rounded-2xl border-2 border-blue-200 shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0"
+                  className="h-11 px-3 bg-white/95 active:bg-blue-50 text-blue-700 font-black rounded-xl border-2 border-blue-200 shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0 whitespace-nowrap"
                   title="현재 스마트폰 GPS 위치로 지도 이동"
                 >
-                  <LocateFixed size={18} className="text-blue-600 animate-pulse" />
+                  <LocateFixed size={17} className="text-blue-600 animate-pulse shrink-0" />
                   <span>내 위치</span>
                 </button>
 
@@ -2067,23 +2067,23 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                   type="button"
                   onClick={() => setIsDiscoverModalOpen(true)}
                   disabled={isDiscovering}
-                  className="flex-1 py-3 px-3 bg-gradient-to-r from-rose-500 via-amber-500 to-amber-400 text-white font-black rounded-2xl shadow-xl text-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer border-2 border-white"
+                  className="h-11 flex-1 min-w-0 px-2 bg-gradient-to-r from-rose-500 via-amber-500 to-amber-400 text-white font-black rounded-xl shadow-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer border-2 border-white whitespace-nowrap"
                 >
-                  <Target size={18} className={isDiscovering ? "animate-spin" : ""} />
-                  <span>{isDiscovering ? "발굴 중..." : "🎯 가망 매장 발굴하기"}</span>
+                  <Target size={17} className={isDiscovering ? "animate-spin shrink-0" : "shrink-0"} />
+                  <span className="truncate">{isDiscovering ? "발굴 중..." : "🎯 가망 매장 발굴"}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleToggleMeasureMode}
-                  className={`px-3 py-3 font-black rounded-2xl shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer border-2 shrink-0 ${
+                  className={`h-11 px-3 font-black rounded-xl shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer border-2 shrink-0 whitespace-nowrap ${
                     isMeasureMode
                       ? "bg-indigo-600 text-white border-indigo-400 animate-pulse"
                       : "bg-white/95 active:bg-slate-100 text-slate-800 border-slate-200"
                   }`}
                   title="반경 500m 거리 측정"
                 >
-                  <Ruler size={16} />
+                  <Ruler size={16} className="shrink-0" />
                   <span>{isMeasureMode ? "측정중" : "500m"}</span>
                 </button>
               </div>
@@ -2517,45 +2517,55 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
               } space-y-3.5 pl-0 lg:pl-2`}
             >
               {/* 상단 탭 헤더 */}
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl text-xs font-bold w-full">
                   <button
+                    type="button"
                     onClick={() => setListTab("contracted")}
-                    className={`flex-1 py-2 px-2 rounded-lg transition-all border-0 cursor-pointer flex items-center justify-center gap-1.5 text-xs ${
+                    className={`flex-1 py-2 px-1 rounded-lg transition-all border-0 cursor-pointer flex items-center justify-center gap-1 text-xs whitespace-nowrap ${
                       listTab === "contracted"
                         ? "bg-[#FED422] text-[#0F172A] font-black shadow-xs"
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
-                    <span>⭐ 계약체결</span>
+                    <span>⭐ 체결</span>
                     <span className="px-1.5 py-0.2 text-[10px] rounded-full bg-slate-900/10 font-mono font-black">
                       {contractedList.length}
                     </span>
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => setListTab("uncontracted")}
-                    className={`flex-1 py-2 px-2 rounded-lg transition-all border-0 cursor-pointer flex items-center justify-center gap-1.5 text-xs ${
+                    className={`flex-1 py-2 px-1 rounded-lg transition-all border-0 cursor-pointer flex items-center justify-center gap-1 text-xs whitespace-nowrap ${
                       listTab === "uncontracted"
                         ? "bg-emerald-600 text-white font-black shadow-xs"
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
-                    <span>🟢 미체결 타겟</span>
-                    <span className="px-1.5 py-0.2 text-[10px] rounded-full bg-emerald-950/20 font-mono font-black">
+                    <span>🟢 미체결</span>
+                    <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-mono font-black ${
+                      listTab === "uncontracted" ? "bg-white/20 text-white" : "bg-emerald-950/20 text-slate-800"
+                    }`}>
                       {uncontractedList.length}
                     </span>
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => setListTab("all")}
-                    className={`py-2 px-2.5 rounded-lg transition-all border-0 cursor-pointer text-xs ${
+                    className={`py-2 px-2.5 rounded-lg transition-all border-0 cursor-pointer text-xs whitespace-nowrap flex items-center justify-center gap-1 shrink-0 ${
                       listTab === "all"
                         ? "bg-slate-800 text-white font-black shadow-xs"
                         : "text-slate-500 hover:text-slate-800 font-bold"
                     }`}
                   >
-                    <span>전체 ({contractedList.length + uncontractedList.length})</span>
+                    <span>전체</span>
+                    <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-mono font-black ${
+                      listTab === "all" ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700"
+                    }`}>
+                      {contractedList.length + uncontractedList.length}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -2641,9 +2651,28 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                             </span>
                           </div>
 
-                          <span className="text-[11px] text-slate-400 font-mono shrink-0">
-                            {item.dong || item.roadAddress?.split(" ")[1] || ""}
-                          </span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-[11px] text-slate-400 font-mono">
+                              {item.dong || item.roadAddress?.split(" ")[1] || ""}
+                            </span>
+                            {mode === "admin" && !isRealStore && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleContract(item);
+                                }}
+                                className={`px-2 py-0.5 rounded text-[10px] font-black border cursor-pointer ${
+                                  isContracted
+                                    ? "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100"
+                                    : "bg-[#FED422] text-[#0F172A] border-amber-400 hover:bg-amber-400"
+                                }`}
+                                title={isContracted ? "계약 해제하기" : "계약 체결하기"}
+                              >
+                                {isContracted ? "해제" : "체결"}
+                              </button>
+                            )}
+                          </div>
                         </div>
 
                         {/* 매장명 */}
@@ -2663,80 +2692,82 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         </p>
 
                         {/* 하단 연락처 & 빠른 액션 버튼들 */}
-                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px]" onClick={(e) => e.stopPropagation()}>
-                          <div className="font-mono font-bold text-slate-700 truncate">
-                            {item.phone || item.mobile || "연락처 미등록"}
+                        <div className="pt-2 border-t border-slate-100 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                          {/* 연락처 행 */}
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="font-mono font-bold text-slate-700 flex items-center gap-1.5">
+                              <Phone size={12} className="text-slate-400 shrink-0" />
+                              <span>{item.phone || item.mobile || "연락처 미등록"}</span>
+                            </div>
+                            {item.distance !== undefined && (
+                              <span className="text-[11px] font-bold text-slate-400">
+                                {item.distance >= 1000 ? `${(item.distance / 1000).toFixed(1)}km` : `${item.distance}m`}
+                              </span>
+                            )}
                           </div>
 
-                          <div className="flex items-center gap-1 shrink-0">
+                          {/* 4분할 균등 액션 버튼 그리드 (화면 밖으로 삐져나가지 않는 4열 균등 그리드) */}
+                          <div className="grid grid-cols-4 gap-1.5 w-full">
                             <a
                               href={`https://map.naver.com/p/search/${encodeURIComponent(item.displayName || item.name)}`}
                               target="_blank"
                               rel="noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="p-1.5 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 rounded inline-flex items-center gap-0.5 font-bold text-[10px] border border-emerald-200"
+                              className="h-8 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center gap-1 font-bold text-[11px] border border-emerald-200 no-underline active:scale-95 whitespace-nowrap"
                               title="네이버 플레이스 보기"
                             >
-                              <Navigation size={11} />
+                              <Navigation size={12} className="shrink-0" />
                               <span>플레이스</span>
                             </a>
 
-                            {/* 📱 모바일 전용 원터치 전화 & 지도보기 버튼 */}
-                            {(item.phone || item.mobile) && (
+                            {(item.phone || item.mobile) ? (
                               <a
                                 href={`tel:${(item.mobile || item.phone).replace(/[^0-9]/g, "")}`}
                                 onClick={(e) => e.stopPropagation()}
-                                className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-md inline-flex items-center gap-1 font-black text-[11px] shadow-2xs no-underline"
+                                className="h-8 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg flex items-center justify-center gap-1 font-black text-[11px] shadow-xs no-underline whitespace-nowrap"
                                 title="매장으로 바로 전화 걸기"
                               >
-                                <Phone size={11} />
+                                <Phone size={12} className="shrink-0" />
                                 <span>전화</span>
                               </a>
-                            )}
-
-                            {isMobile && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedTarget(item);
-                                  setMobileTab("map");
-                                  if (naverMapRef.current && window.naver?.maps && item.lat && item.lng) {
-                                    naverMapRef.current.panTo(new window.naver.maps.LatLng(item.lat, item.lng), { duration: 300 });
-                                    naverMapRef.current.setZoom(16);
-                                  }
-                                }}
-                                className="px-2 py-1 bg-[#FED422] hover:bg-amber-400 active:scale-95 text-[#0F172A] rounded-md inline-flex items-center gap-1 font-black text-[11px] shadow-2xs border-0 cursor-pointer"
-                                title="지도에서 위치 보기"
-                              >
-                                <MapPin size={11} />
-                                <span>지도보기</span>
-                              </button>
+                            ) : (
+                              <span className="h-8 bg-slate-100 text-slate-400 rounded-lg flex items-center justify-center gap-1 font-medium text-[11px] border border-slate-200 whitespace-nowrap cursor-not-allowed">
+                                <Phone size={12} className="shrink-0 opacity-40" />
+                                <span>전화없음</span>
+                              </span>
                             )}
 
                             <button
-                              onClick={() => handleStartMeasureAt(item.lat, item.lng, item.roadAddress, item.displayName || item.name)}
-                              className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded inline-flex items-center gap-0.5 font-bold text-[10px] border border-indigo-200 cursor-pointer"
-                              title="500m 상권 측정"
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedTarget(item);
+                                if (isMobile) setMobileTab("map");
+                                if (naverMapRef.current && window.naver?.maps && item.lat && item.lng) {
+                                  naverMapRef.current.panTo(new window.naver.maps.LatLng(item.lat, item.lng), { duration: 300 });
+                                  naverMapRef.current.setZoom(16);
+                                }
+                              }}
+                              className="h-8 bg-[#FED422] hover:bg-amber-400 active:scale-95 text-[#0F172A] rounded-lg flex items-center justify-center gap-1 font-black text-[11px] shadow-xs border-0 cursor-pointer whitespace-nowrap"
+                              title="지도에서 위치 보기"
                             >
-                              <Ruler size={11} />
-                              <span>500m 측정</span>
+                              <MapPin size={12} className="shrink-0" />
+                              <span>지도보기</span>
                             </button>
 
-                            {mode === "admin" && !isRealStore && (
-                              <button
-                                onClick={() => handleToggleContract(item)}
-                                className={`p-1.5 rounded inline-flex items-center gap-0.5 font-black text-[10px] border cursor-pointer ${
-                                  isContracted
-                                    ? "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100"
-                                    : "bg-[#FED422] text-[#0F172A] border-amber-400 hover:bg-amber-400"
-                                }`}
-                                title={isContracted ? "계약 해제하기" : "계약 체결하기"}
-                              >
-                                {isContracted ? <Unlock size={11} /> : <Sparkles size={11} />}
-                                <span>{isContracted ? "해제" : "체결"}</span>
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (isMobile) setMobileTab("map");
+                                handleStartMeasureAt(item.lat, item.lng, item.roadAddress, item.displayName || item.name);
+                              }}
+                              className="h-8 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center gap-1 font-bold text-[11px] border border-indigo-200 cursor-pointer active:scale-95 whitespace-nowrap"
+                              title="500m 상권 측정"
+                            >
+                              <Ruler size={12} className="shrink-0" />
+                              <span>500m</span>
+                            </button>
                           </div>
                         </div>
                       </div>
