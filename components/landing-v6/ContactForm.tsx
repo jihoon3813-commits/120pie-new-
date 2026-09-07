@@ -86,6 +86,15 @@ export default function ContactForm({
         .filter(Boolean)
         .join("\n");
 
+      let referralPartnerId: string | undefined = undefined;
+      let referralPartnerName: string | undefined = undefined;
+      let referralPartnerCompany: string | undefined = undefined;
+      if (typeof window !== "undefined") {
+        referralPartnerId = localStorage.getItem("120_referral_partner_id") || undefined;
+        referralPartnerName = localStorage.getItem("120_referral_partner_name") || undefined;
+        referralPartnerCompany = localStorage.getItem("120_referral_partner_company") || undefined;
+      }
+
       await addInquiry({
         name: form.name.trim(),
         phone: form.phone.trim(),
@@ -93,6 +102,9 @@ export default function ContactForm({
         existingStoreName: form.storeName.trim() || "",
         message: formattedMessage || "상담 신청",
         regDate: new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" }),
+        partnerId: referralPartnerId,
+        partnerName: referralPartnerName,
+        partnerCompany: referralPartnerCompany,
       });
     } catch (dbErr) {
       console.error("Failed to save inquiry to Convex DB:", dbErr);

@@ -211,13 +211,25 @@ export default function FloatingAndInquiry({
     }
 
     try {
+      let referralPartnerId: string | undefined = undefined;
+      let referralPartnerName: string | undefined = undefined;
+      let referralPartnerCompany: string | undefined = undefined;
+      if (typeof window !== "undefined") {
+        referralPartnerId = localStorage.getItem("120_referral_partner_id") || undefined;
+        referralPartnerName = localStorage.getItem("120_referral_partner_name") || undefined;
+        referralPartnerCompany = localStorage.getItem("120_referral_partner_company") || undefined;
+      }
+
       await addInquiry({
         name: formData.name,
         phone: formData.phone,
         storeType: formData.storeType,
         existingStoreName: formData.existingStoreName || "",
         message: formData.message || "",
-        regDate: new Date().toISOString().split("T")[0]
+        regDate: new Date().toISOString().split("T")[0],
+        partnerId: referralPartnerId,
+        partnerName: referralPartnerName,
+        partnerCompany: referralPartnerCompany,
       });
       triggerConsultationSms(sendSmsAction, formData.name, formData.phone, formData.storeType);
       setFormSubmitted(true);

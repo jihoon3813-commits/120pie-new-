@@ -37,7 +37,12 @@ export default defineSchema({
     existingStoreName: v.optional(v.string()),
     message: v.optional(v.string()),
     regDate: v.string(),
-  }),
+    partnerId: v.optional(v.string()), // 유치/분양 파트너 ID (e.g. partner1)
+    partnerName: v.optional(v.string()), // 파트너 이름 (e.g. 김영업)
+    partnerCompany: v.optional(v.string()), // 파트너 상호명 (e.g. 와우프랜차이즈에이전시)
+    status: v.optional(v.string()), // 상담 상태 ("대기" | "상담중" | "계약완료" | "보류")
+    partnerMemo: v.optional(v.string()), // 파트너 개별 상담 메모
+  }).index("by_partner_id", ["partnerId"]),
   gallery: defineTable({
     name: v.string(),
     category: v.string(),

@@ -40,7 +40,9 @@ import {
   Wallet,
   ShieldCheck,
   Check,
-  Crosshair
+  Crosshair,
+  MessageSquare,
+  Copy
 } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -109,9 +111,14 @@ export default function PartnerPortalPage() {
   ) || [];
   const notices = useQuery(api.notices.list) || [];
   const materials = useQuery(api.materials.list, {}) || [];
+  const partnerConsultations = useQuery(
+    api.inquiries.listByPartner,
+    partnerId ? { partnerId } : "skip"
+  ) || [];
 
   const updateProfileMutation = useMutation(api.partners.updatePartnerProfile);
   const seedPartnersMutation = useMutation(api.partners.seedPartners);
+  const updateConsultationStatusMutation = useMutation(api.inquiries.updateStatus);
 
   // 5. 초기 로그인 세션 복구 및 URL 파라미터 자동 로그인 검사
   useEffect(() => {
@@ -263,6 +270,58 @@ export default function PartnerPortalPage() {
     });
   }, [myStores, storeSearchQuery, storeStatusFilter]);
 
+  // 상담문의 관리 상태 및 핸들러
+  const [consultationSearch, setConsultationSearch] = useState<string>("");
+  const [consultationStatusFilter, setConsultationStatusFilter] = useState<string>("전체");
+  const [editingMemoId, setEditingMemoId] = useState<string | null>(null);
+  const [editingMemoText, setEditingMemoText] = useState<string>("");
+
+  const filteredConsultations = useMemo(() => {
+    return partnerConsultations.filter((inq: any) => {
+      const q = consultationSearch.toLowerCase();
+      const matchQuery =
+        !q ||
+        (inq.name && inq.name.toLowerCase().includes(q)) ||
+        (inq.phone && inq.phone.includes(q)) ||
+        (inq.storeType && inq.storeType.toLowerCase().includes(q)) ||
+        (inq.existingStoreName && inq.existingStoreName.toLowerCase().includes(q)) ||
+        (inq.message && inq.message.toLowerCase().includes(q));
+      const matchStatus =
+        consultationStatusFilter === "전체" ||
+        (inq.status || "대기") === consultationStatusFilter;
+      return matchQuery && matchStatus;
+    });
+  }, [partnerConsultations, consultationSearch, consultationStatusFilter]);
+
+  const handleCopyBranchLink = () => {
+    const url = typeof window !== "undefined" ? `${window.location.origin}/${partnerId}` : `https://120pie.com/${partnerId}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      triggerToast("내 전용 분양 링크가 복사되었습니다!");
+    } else {
+      triggerToast(url);
+    }
+  };
+
+  const handleConsultationStatusChange = async (id: any, newStatus: string) => {
+    try {
+      await updateConsultationStatusMutation({ _id: id, status: newStatus });
+      triggerToast(`상담 상태가 '${newStatus}'(으)로 변경되었습니다.`);
+    } catch (e) {
+      alert("상태 변경 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleSaveConsultationMemo = async (id: any) => {
+    try {
+      await updateConsultationStatusMutation({ _id: id, partnerMemo: editingMemoText });
+      setEditingMemoId(null);
+      triggerToast("상담 메모가 저장되었습니다.");
+    } catch (e) {
+      alert("메모 저장 중 오류가 발생했습니다.");
+    }
+  };
+
   if (isInitializing) {
     return (
       <div className="min-h-screen bg-[#F4F6F8] flex items-center justify-center text-[#0F172A]">
@@ -379,6 +438,7 @@ export default function PartnerPortalPage() {
   const menuItems = [
     { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
     { key: "stores", label: "가맹점 관리", icon: Store, badge: myStores.length },
+    { key: "consultation", label: "상담문의 관리", icon: MessageSquare, badge: partnerConsultations.length },
     { key: "radar", label: "상권보호 레이더", icon: Crosshair },
     { key: "settlement", label: "정산 관리", icon: CreditCard },
     { key: "notice", label: "공지사항", icon: Megaphone, badge: notices.length },
@@ -1001,6 +1061,290 @@ export default function PartnerPortalPage() {
                                   >
                                     <FileText size={13} />
                                     <span>주문 내역 보기</span>
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ==========================================
+                2-2) 유치 상담문의 관리 뷰 (내 전용 분양 사이트 유입 상담)
+            ========================================== */}
+            {currentMenu === "consultation" && (
+              <div className="space-y-4 sm:space-y-6">
+                {/* 🌟 내 전용 분양 사이트 URL 홍보 배너 카드 */}
+                <div className="bg-gradient-to-r from-amber-500 via-[#FED422] to-amber-400 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-[#0F172A] shadow-md space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="bg-[#0F172A] text-[#FED422] text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-2xs">
+                        MY BRANCH LANDING URL
+                      </span>
+                      <h3 className="text-lg sm:text-xl font-black mt-1.5 flex items-center gap-2">
+                        <span>내 전용 분양 사이트</span>
+                        <span className="text-xs font-bold text-slate-800">
+                          (이 링크로 접수된 상담은 내 실적으로 자동 귀속)
+                        </span>
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleCopyBranchLink}
+                        className="px-3.5 py-2 bg-[#0F172A] hover:bg-slate-800 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer border-0 transition-all"
+                      >
+                        <Copy size={13} />
+                        <span>분양 링크 복사</span>
+                      </button>
+                      <a
+                        href={`/${partnerId}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-3.5 py-2 bg-white/95 hover:bg-white active:scale-95 text-[#0F172A] rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm no-underline border border-amber-300 transition-all"
+                      >
+                        <ExternalLink size={13} />
+                        <span>사이트 열기</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* 링크 주소 표시 바 */}
+                  <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-xl px-3.5 py-2.5 border border-amber-300/80">
+                    <span className="text-slate-400 font-mono text-xs font-bold shrink-0">URL:</span>
+                    <span className="font-mono font-black text-xs sm:text-sm text-slate-900 select-all truncate flex-1">
+                      {typeof window !== "undefined" ? `${window.location.origin}/${partnerId}` : `https://120pie.com/${partnerId}`}
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] text-amber-950 font-bold leading-relaxed">
+                    💡 위 분양 링크를 카카오톡, 블로그, 인스타그램, 문자 등에 적극 홍보하세요. 방문자가 이 링크를 통해 남긴 창업/샵인샵 상담은 즉시 이 화면에 접수됩니다.
+                  </p>
+                </div>
+
+                {/* 상담 목록 상단 검색 & 필터 헤더 */}
+                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                      <MessageSquare size={20} className="text-amber-500" />
+                      <span>유치 상담문의 관리</span>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono">
+                        총 {partnerConsultations.length}건
+                      </span>
+                    </h2>
+                    <p className="text-xs text-slate-400 font-bold mt-1">
+                      내 전용 분양 페이지를 통해 접수된 예비 창업자 및 점주들의 실시간 상담 신청 목록입니다.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="relative flex-1 sm:flex-initial">
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        value={consultationSearch}
+                        onChange={(e) => setConsultationSearch(e.target.value)}
+                        placeholder="신청자명/연락처 검색"
+                        className="w-full sm:w-52 pl-8 pr-3 py-2 bg-[#F1F4F8] border-0 rounded-xl text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
+                      />
+                    </div>
+                    <select
+                      value={consultationStatusFilter}
+                      onChange={(e) => setConsultationStatusFilter(e.target.value)}
+                      className="px-3 py-2 bg-[#F1F4F8] border-0 rounded-xl text-xs font-bold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none cursor-pointer shrink-0"
+                    >
+                      <option value="전체">전체 상태</option>
+                      <option value="대기">대기</option>
+                      <option value="상담중">상담중</option>
+                      <option value="계약완료">계약완료</option>
+                      <option value="보류">보류</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* 상담 목록 테이블 (데스크톱) & 모바일 카드 뷰 */}
+                <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs sm:shadow-md overflow-hidden">
+                  {filteredConsultations.length === 0 ? (
+                    <div className="py-20 text-center text-slate-400 text-xs font-bold space-y-2">
+                      <MessageSquare size={32} className="mx-auto text-slate-300" />
+                      <p>접수된 분양 상담 내역이 없습니다.</p>
+                      <p className="text-[11px] text-slate-400">내 전용 분양 링크를 홍보하여 첫 번째 상담을 유치해 보세요!</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* 📱 모바일 전용 상담 카드 리스트 (sm:hidden) */}
+                      <div className="sm:hidden p-3 space-y-3">
+                        {filteredConsultations.map((inq: any) => (
+                          <div key={inq._id} className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/70 space-y-2.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="text-[10px] text-slate-400 font-mono block mb-0.5">{inq.regDate}</span>
+                                <h4 className="font-black text-sm text-[#0F172A]">{inq.name}</h4>
+                              </div>
+                              <select
+                                value={inq.status || "대기"}
+                                onChange={(e) => handleConsultationStatusChange(inq._id, e.target.value)}
+                                className={`text-[11px] font-black px-2.5 py-1 rounded-lg border cursor-pointer ${
+                                  inq.status === "계약완료"
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                                    : inq.status === "상담중"
+                                    ? "bg-blue-50 text-blue-700 border-blue-300"
+                                    : inq.status === "보류"
+                                    ? "bg-slate-100 text-slate-500 border-slate-300"
+                                    : "bg-amber-50 text-amber-800 border-amber-300"
+                                }`}
+                              >
+                                <option value="대기">대기</option>
+                                <option value="상담중">상담중</option>
+                                <option value="계약완료">계약완료</option>
+                                <option value="보류">보류</option>
+                              </select>
+                            </div>
+
+                            <div className="text-xs space-y-1 bg-white p-2.5 rounded-lg border border-slate-200/60">
+                              <div className="flex items-center justify-between">
+                                <span className="text-slate-400 font-medium">연락처:</span>
+                                <div className="flex items-center gap-1.5 font-mono font-bold text-slate-800">
+                                  <span>{inq.phone}</span>
+                                  <a
+                                    href={`tel:${inq.phone.replace(/[^0-9]/g, "")}`}
+                                    className="px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px] font-bold no-underline"
+                                  >
+                                    전화
+                                  </a>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-slate-400 font-medium">도입유형:</span>
+                                <span className="font-bold text-slate-700">{inq.storeType}</span>
+                              </div>
+                              {inq.existingStoreName && (
+                                <div className="flex items-center justify-between">
+                                  <span className="text-slate-400 font-medium">기존매장명:</span>
+                                  <span className="font-bold text-slate-700">{inq.existingStoreName}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {inq.message && (
+                              <div className="text-[11px] text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200/60">
+                                <span className="font-bold text-slate-400 block mb-0.5">상담 문의내용:</span>
+                                <p className="whitespace-pre-line leading-relaxed">{inq.message}</p>
+                              </div>
+                            )}
+
+                            {/* 파트너 메모 영역 */}
+                            <div className="pt-1 flex items-center justify-between gap-2">
+                              <div className="text-[11px] text-slate-500 truncate flex-1">
+                                {inq.partnerMemo ? (
+                                  <span>📝 {inq.partnerMemo}</span>
+                                ) : (
+                                  <span className="text-slate-400 italic">등록된 상담 메모가 없습니다.</span>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingMemoId(inq._id);
+                                  setEditingMemoText(inq.partnerMemo || "");
+                                }}
+                                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-bold border-0 cursor-pointer shrink-0"
+                              >
+                                {inq.partnerMemo ? "메모 수정" : "+ 메모"}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* 💻 데스크톱 테이블 뷰 (hidden sm:block) */}
+                      <div className="hidden sm:block overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="bg-[#F8F9FD] border-b border-[#EEF0F5] text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                              <th className="p-4 w-24">신청일</th>
+                              <th className="p-4 w-28">고객명</th>
+                              <th className="p-4 w-40">연락처</th>
+                              <th className="p-4 w-36">도입 희망유형</th>
+                              <th className="p-4">문의내용 및 파트너 메모</th>
+                              <th className="p-4 w-28 text-center">진행상태</th>
+                              <th className="p-4 w-20 text-center">관리</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#EEF0F5] text-xs">
+                            {filteredConsultations.map((inq: any) => (
+                              <tr key={inq._id} className="hover:bg-[#FFFDF5] transition-colors">
+                                <td className="p-4 text-slate-500 font-mono font-medium whitespace-nowrap">{inq.regDate}</td>
+                                <td className="p-4 font-black text-[#0F172A] whitespace-nowrap">{inq.name}</td>
+                                <td className="p-4 font-mono font-bold text-slate-700 whitespace-nowrap">
+                                  <div className="flex items-center gap-1.5">
+                                    <span>{inq.phone}</span>
+                                    <a
+                                      href={`tel:${inq.phone.replace(/[^0-9]/g, "")}`}
+                                      className="p-1 text-emerald-600 hover:bg-emerald-50 rounded no-underline"
+                                      title="전화 걸기"
+                                    >
+                                      <Phone size={12} />
+                                    </a>
+                                  </div>
+                                </td>
+                                <td className="p-4 whitespace-nowrap">
+                                  <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[11px]">
+                                    {inq.storeType}
+                                  </span>
+                                  {inq.existingStoreName && (
+                                    <span className="block text-[10px] text-slate-400 mt-0.5 truncate max-w-[130px]">
+                                      {inq.existingStoreName}
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="p-4 max-w-sm">
+                                  <div className="space-y-1">
+                                    <p className="text-slate-800 font-medium line-clamp-2" title={inq.message}>
+                                      {inq.message || "-"}
+                                    </p>
+                                    {inq.partnerMemo && (
+                                      <p className="text-[11px] text-indigo-700 bg-indigo-50/70 px-2 py-0.5 rounded border border-indigo-100 line-clamp-1">
+                                        📝 {inq.partnerMemo}
+                                      </p>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="p-4 text-center whitespace-nowrap">
+                                  <select
+                                    value={inq.status || "대기"}
+                                    onChange={(e) => handleConsultationStatusChange(inq._id, e.target.value)}
+                                    className={`text-[11px] font-black px-2.5 py-1 rounded-lg border cursor-pointer outline-none ${
+                                      inq.status === "계약완료"
+                                        ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                                        : inq.status === "상담중"
+                                        ? "bg-blue-50 text-blue-700 border-blue-300"
+                                        : inq.status === "보류"
+                                        ? "bg-slate-100 text-slate-500 border-slate-300"
+                                        : "bg-amber-50 text-amber-800 border-amber-300"
+                                    }`}
+                                  >
+                                    <option value="대기">대기</option>
+                                    <option value="상담중">상담중</option>
+                                    <option value="계약완료">계약완료</option>
+                                    <option value="보류">보류</option>
+                                  </select>
+                                </td>
+                                <td className="p-4 text-center whitespace-nowrap">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingMemoId(inq._id);
+                                      setEditingMemoText(inq.partnerMemo || "");
+                                    }}
+                                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold border-0 cursor-pointer transition-all"
+                                  >
+                                    메모
                                   </button>
                                 </td>
                               </tr>
@@ -1779,13 +2123,75 @@ export default function PartnerPortalPage() {
         </div>
       )}
 
+      {/* ==========================================
+          MODAL 4: 상담 관리 메모 수정 모달
+      ========================================== */}
+      {editingMemoId && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setEditingMemoId(null)}
+        >
+          <div 
+            className="w-full max-w-lg bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-5 border-b border-neutral-200 flex items-center justify-between bg-slate-50">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700">
+                  <MessageSquare size={16} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">상담 내역 메모 작성</h3>
+                  <p className="text-[11px] text-slate-500">고객과의 상담 진행 상황 및 특이사항을 기록하세요.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingMemoId(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 border-0 cursor-pointer bg-transparent rounded-lg"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-3 bg-white">
+              <textarea
+                value={editingMemoText}
+                onChange={(e) => setEditingMemoText(e.target.value)}
+                placeholder="예: 3/7 1차 유선 상담 완료. 매장 평수 15평 샵인샵 희망. 익월 2차 미팅 예정."
+                rows={5}
+                className="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 leading-relaxed resize-none"
+              />
+              <p className="text-[11px] text-slate-400">
+                * 작성된 메모는 파트너 관리자 화면에서만 확인 가능하며 안전하게 저장됩니다.
+              </p>
+            </div>
+
+            <div className="p-4 border-t border-neutral-200 bg-slate-50 flex justify-end gap-2">
+              <button
+                onClick={() => setEditingMemoId(null)}
+                className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl cursor-pointer"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSaveConsultationMemo}
+                className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl border-0 cursor-pointer shadow-xs"
+              >
+                메모 저장
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 📱 모바일 전용 하단 고정 네비게이션 바 */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-neutral-200/90 px-2 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-neutral-200/90 px-1 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
         {[
           { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
+          { key: "consultation", label: "상담관리", icon: MessageSquare, badge: partnerConsultations.length },
           { key: "stores", label: "가맹점", icon: Store, badge: myStores.length },
           { key: "radar", label: "상권레이더", icon: Crosshair },
-          { key: "settlement", label: "정산관리", icon: CreditCard },
+          { key: "settlement", label: "정산", icon: CreditCard },
         ].map(({ key, label, icon: Icon, badge }) => {
           const isActive = currentMenu === key;
           return (

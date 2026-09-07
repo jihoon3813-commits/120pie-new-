@@ -1285,6 +1285,10 @@ export default function AdminPage() {
   // 가맹점 관리에서 선택할 파트너 ID 상태
   const [storePartnerId, setStorePartnerId] = useState<string>("");
 
+  // 상담문의 파트너 구분 필터 및 상태 변경 뮤테이션
+  const [consultationPartnerFilter, setConsultationPartnerFilter] = useState<string>("전체");
+  const updateConsultationStatusMutation = useMutation(api.inquiries.updateStatus);
+
   interface ContractFormType {
     ownerName: string;
     ownerBirth: string;
@@ -9044,9 +9048,34 @@ export default function AdminPage() {
           {currentMenu === "consultation" && (
             <div className="space-y-6">
               
-              <div>
-                <h2 className="text-xl font-bold text-[#2d2026]">홈페이지 창업 상담문의 관리</h2>
-                <p className="text-xs text-[#735965] font-bold mt-1">홈페이지 랜딩페이지를 통해 접수된 예비 창업자들의 상담 신청 내역을 조회하고 관리합니다.</p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-[#2d2026]">홈페이지 창업 상담문의 관리</h2>
+                  <p className="text-xs text-[#735965] font-bold mt-1">홈페이지 랜딩페이지 및 각 영업 파트너별 전용 분양 사이트를 통해 접수된 상담 내역을 조회하고 관리합니다.</p>
+                </div>
+
+                {/* 파트너 구분 필터 */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-500 whitespace-nowrap">유치 채널:</span>
+                  <select
+                    value={consultationPartnerFilter}
+                    onChange={(e) => setConsultationPartnerFilter(e.target.value)}
+                    className="bg-white border border-slate-200 text-xs font-bold text-slate-800 rounded-xl px-3 py-2 focus:outline-none focus:border-amber-400 shadow-2xs cursor-pointer"
+                  >
+                    <option value="전체">전체 채널 (본사 + 전체 파트너)</option>
+                    <option value="hq">🏢 본사 직속 유입</option>
+                    <option value="all_partners">🌟 파트너 유치 전체</option>
+                    {convexPartners && convexPartners.length > 0 && (
+                      <optgroup label="개별 파트너 선택">
+                        {convexPartners.map((p: any) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name} {p.companyName ? `(${p.companyName})` : `(${p.id})`}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </select>
+                </div>
               </div>
 
               {/* Consultation Inquiries list */}
@@ -9056,24 +9085,52 @@ export default function AdminPage() {
                     <thead>
                       <tr className="bg-[#F8F9FD] border-b border-[#EEF0F5] text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
                         <th className="p-4 sm:p-5 w-24">신청일</th>
+                        <th className="p-4 sm:p-5 w-36">유치 구분 (파트너)</th>
                         <th className="p-4 sm:p-5 w-24">고객명</th>
                         <th className="p-4 sm:p-5 w-44">연락처</th>
-                        <th className="p-4 sm:p-5 w-40">도입 희망 유형</th>
+                        <th className="p-4 sm:p-5 w-32">도입 희망 유형</th>
                         <th className="p-4 sm:p-5">상세 문의 내용</th>
-                        <th className="p-4 sm:p-5 w-28 text-center">액션</th>
+                        <th className="p-4 sm:p-5 w-28 text-center">진행 상태</th>
+                        <th className="p-4 sm:p-5 w-20 text-center">액션</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EEF0F5] text-xs">
                       {consultations.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="p-8 text-center text-slate-400 font-bold">접수된 창업 상담문의가 존재하지 않습니다.</td>
+                          <td colSpan={8} className="p-8 text-center text-slate-400 font-bold">접수된 창업 상담문의가 존재하지 않습니다.</td>
                         </tr>
                       ) : (
                         [...consultations]
+                          .filter((inq) => {
+                            if (consultationPartnerFilter === "전체") return true;
+                            if (consultationPartnerFilter === "hq") return !inq.partnerId;
+                            if (consultationPartnerFilter === "all_partners") return !!inq.partnerId;
+                            return inq.partnerId === consultationPartnerFilter;
+                          })
                           .sort((a, b) => b.regDate.localeCompare(a.regDate) || (b._creationTime || 0) - (a._creationTime || 0))
                           .map((inq) => (
                             <tr key={inq._id} className="hover:bg-[#fff9fb] transition-colors">
                               <td className="p-4 sm:p-5 text-slate-500 font-semibold whitespace-nowrap">{inq.regDate}</td>
+                              <td className="p-4 sm:p-5 whitespace-nowrap">
+                                {inq.partnerId ? (
+                                  <div className="inline-flex flex-col">
+                                    <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-300 font-bold text-[11px] inline-flex items-center gap-1">
+                                      <span>🌟</span>
+                                      <span>{inq.partnerName || inq.partnerId}</span>
+                                    </span>
+                                    {inq.partnerCompany && (
+                                      <span className="text-[10px] text-slate-400 font-medium pl-1 mt-0.5">
+                                        {inq.partnerCompany}
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 font-bold text-[11px] inline-flex items-center gap-1 border border-slate-200">
+                                    <span>🏢</span>
+                                    <span>본사 직속</span>
+                                  </span>
+                                )}
+                              </td>
                               <td className="p-4 sm:p-5 font-bold text-[#0F172A] whitespace-nowrap">{inq.name}</td>
                               <td className="p-4 sm:p-5 text-slate-600 font-semibold whitespace-nowrap">
                                 <div className="flex items-center gap-1.5">
@@ -9088,7 +9145,7 @@ export default function AdminPage() {
                                   </button>
                                 </div>
                               </td>
-                              <td className="p-4 sm:p-5">
+                              <td className="p-4 sm:p-5 whitespace-nowrap">
                                 <span className="bg-slate-100 text-slate-700 font-extrabold px-2.5 py-1 rounded-lg text-[11px] border-0 shadow-2xs whitespace-nowrap">
                                   {inq.storeType}
                                 </span>
@@ -9106,6 +9163,41 @@ export default function AdminPage() {
                                     </button>
                                   )}
                                 </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-center whitespace-nowrap">
+                                <select
+                                  value={inq.status || "대기"}
+                                  onChange={async (e) => {
+                                    const nextStatus = e.target.value;
+                                    try {
+                                      await updateConsultationStatusMutation({
+                                        _id: inq._id,
+                                        status: nextStatus,
+                                      });
+                                      setConsultations((prev) =>
+                                        prev.map((item) =>
+                                          item._id === inq._id ? { ...item, status: nextStatus } : item
+                                        )
+                                      );
+                                    } catch (err) {
+                                      console.error("상태 변경 실패:", err);
+                                    }
+                                  }}
+                                  className={`text-[11px] font-black px-2.5 py-1 rounded-lg border-0 cursor-pointer shadow-2xs ${
+                                    (inq.status || "대기") === "대기"
+                                      ? "bg-amber-100 text-amber-800"
+                                      : (inq.status || "대기") === "상담중"
+                                      ? "bg-blue-100 text-blue-800"
+                                      : (inq.status || "대기") === "계약완료"
+                                      ? "bg-emerald-100 text-emerald-800"
+                                      : "bg-slate-100 text-slate-600"
+                                  }`}
+                                >
+                                  <option value="대기">대기</option>
+                                  <option value="상담중">상담중</option>
+                                  <option value="계약완료">계약완료</option>
+                                  <option value="보류">보류</option>
+                                </select>
                               </td>
                               <td className="p-4 sm:p-5 text-center">
                                 <button
@@ -9125,6 +9217,87 @@ export default function AdminPage() {
                 </div>
               </div>
 
+            </div>
+          )}
+
+          {/* Consultation Detail Modal */}
+          {selectedConsultation && (
+            <div 
+              className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+              onClick={() => setSelectedConsultation(null)}
+            >
+              <div 
+                className="w-full max-w-lg bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="p-5 border-b border-neutral-200 flex items-center justify-between bg-slate-50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 font-black">
+                      <MessageSquare size={16} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900">상담 신청 상세 내역</h3>
+                      <p className="text-[11px] text-slate-500">접수일: {selectedConsultation.regDate}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedConsultation(null)}
+                    className="p-1.5 text-slate-400 hover:text-slate-700 border-0 cursor-pointer bg-transparent rounded-lg"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className="p-6 space-y-4 text-xs bg-white">
+                  <div className="grid grid-cols-2 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">신청 고객명</span>
+                      <strong className="text-sm text-slate-900">{selectedConsultation.name}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">연락처</span>
+                      <strong className="text-sm text-slate-900">{selectedConsultation.phone}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">희망 유형</span>
+                      <span className="inline-block mt-0.5 px-2 py-0.5 rounded bg-white border border-slate-200 font-bold text-slate-700 text-[11px]">
+                        {selectedConsultation.storeType}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">유치 파트너</span>
+                      <span className="inline-block mt-0.5 px-2 py-0.5 rounded bg-amber-50 border border-amber-200 font-bold text-amber-900 text-[11px]">
+                        {selectedConsultation.partnerName ? `🌟 ${selectedConsultation.partnerName}` : "🏢 본사 직속"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-500 block mb-1">상세 문의 내용</label>
+                    <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl whitespace-pre-wrap leading-relaxed text-slate-800">
+                      {selectedConsultation.message || "작성된 상세 문의 내용이 없습니다."}
+                    </div>
+                  </div>
+
+                  {selectedConsultation.partnerMemo && (
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-500 block mb-1">파트너 작성 상담 메모</label>
+                      <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-xl whitespace-pre-wrap leading-relaxed text-slate-700 text-[11px]">
+                        {selectedConsultation.partnerMemo}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4 border-t border-neutral-200 bg-slate-50 flex justify-end">
+                  <button
+                    onClick={() => setSelectedConsultation(null)}
+                    className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl border-0 cursor-pointer shadow-xs"
+                  >
+                    닫기
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
