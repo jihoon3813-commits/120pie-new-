@@ -3156,48 +3156,55 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
       ==================================================== */}
       {isDiscoverModalOpen && (
         <div
-          className="fixed inset-0 z-[350] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[350] bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-hidden"
           onClick={() => setIsDiscoverModalOpen(false)}
         >
           <div
-            className="w-full max-w-xl bg-white border border-neutral-200 rounded-2xl overflow-hidden shadow-2xl flex flex-col font-sans"
+            className="w-full max-w-lg bg-white border border-neutral-200 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[88dvh] sm:max-h-[85vh] my-auto font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-5 bg-gradient-to-r from-rose-500 via-amber-500 to-amber-400 text-white flex justify-between items-center shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                  <Target size={20} className="text-white" />
+            {/* 헤더 */}
+            <div className="px-4 py-3 sm:px-5 sm:py-3.5 bg-gradient-to-r from-rose-500 via-amber-500 to-amber-400 text-white flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm shrink-0">
+                  <Target size={18} className="text-white" />
                 </div>
-                <div>
-                  <h3 className="text-base font-black text-white">가망대상 발굴 업종 선택 (중복 가능)</h3>
-                  <p className="text-[11px] text-white/90 font-bold">
-                    현재 네이버 지도 화면 영역 내에서 발굴할 업종들을 자유롭게 선택하세요
+                <div className="min-w-0">
+                  <h3 className="text-sm sm:text-base font-black text-white leading-tight truncate">
+                    가망대상 발굴 업종 선택 (중복 가능)
+                  </h3>
+                  <p className="text-[10px] sm:text-[11px] text-white/90 font-medium leading-tight truncate">
+                    현재 지도 영역 내에서 발굴할 업종들을 선택하세요
                   </p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsDiscoverModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all flex items-center justify-center border-0 cursor-pointer"
+                className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all flex items-center justify-center border-0 cursor-pointer shrink-0 ml-2"
               >
-                <X size={16} />
+                <X size={15} />
               </button>
             </div>
 
-            <div className="p-6 space-y-4 text-xs bg-[#f9fafb]">
-              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
-                <span className="font-extrabold text-slate-700">
+            {/* 본문 (세로 스크롤바 완전 숨김 + 컴팩트 레이아웃) */}
+            <div className="p-3.5 sm:p-5 flex flex-col flex-1 min-h-0 bg-[#f9fafb] gap-2.5">
+              {/* 선택 카운터 & 전체 선택/해제 */}
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-2 shrink-0">
+                <span className="font-extrabold text-slate-700 text-xs">
                   선택된 업종: <strong className="text-rose-600 font-black">{selectedDiscoverCats.length}개</strong>
                 </span>
                 <button
                   type="button"
                   onClick={toggleAllDiscoverCats}
-                  className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 font-black rounded-lg border border-neutral-300 transition-all cursor-pointer flex items-center gap-1"
+                  className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-lg border border-neutral-300 transition-all cursor-pointer text-xs flex items-center gap-1"
                 >
                   {selectedDiscoverCats.length === DISCOVER_OPTIONS.length ? "전체 해제" : "전체 선택"}
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[380px] overflow-y-auto pr-1">
+              {/* 항목 리스트 (슬림 컴팩트 박스 + 스크롤바 숨김) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 overflow-y-auto flex-1 min-h-0 scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {DISCOVER_OPTIONS.map((opt) => {
                   const isChecked = selectedDiscoverCats.includes(opt.id);
                   const Icon = opt.icon;
@@ -3205,52 +3212,49 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     <div
                       key={opt.id}
                       onClick={() => toggleDiscoverCat(opt.id)}
-                      className={`p-3.5 rounded-xl border-2 transition-all cursor-pointer flex items-start gap-3 select-none ${
+                      className={`py-2 px-2.5 rounded-lg border transition-all cursor-pointer flex items-center gap-2 select-none ${
                         isChecked
-                          ? "bg-amber-50/80 border-amber-500 shadow-sm"
-                          : "bg-white border-neutral-200 hover:border-slate-300 text-slate-600"
+                          ? "bg-amber-50/90 border-amber-400 shadow-xs"
+                          : "bg-white border-slate-200 hover:border-slate-300 text-slate-600"
                       }`}
                     >
-                      <div className="mt-0.5">
+                      <div className="shrink-0">
                         {isChecked ? (
-                          <CheckSquare size={18} className="text-amber-600" />
+                          <CheckSquare size={16} className="text-amber-600" />
                         ) : (
-                          <Square size={18} className="text-slate-300" />
+                          <Square size={16} className="text-slate-300" />
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <Icon size={14} className={isChecked ? "text-amber-700" : "text-slate-400"} />
-                          <span className={`font-black text-xs ${isChecked ? "text-amber-950" : "text-slate-700"}`}>
-                            {opt.name}
-                          </span>
+                      <Icon size={14} className={isChecked ? "text-amber-700 shrink-0" : "text-slate-400 shrink-0"} />
+                      <div className="min-w-0 flex-1">
+                        <div className={`font-black text-xs truncate ${isChecked ? "text-amber-950" : "text-slate-700"}`}>
+                          {opt.name}
                         </div>
-                        <p className="text-[11px] text-slate-400 font-bold mt-1 truncate">{opt.desc}</p>
+                        <p className="text-[10px] text-slate-400 font-medium truncate leading-tight">{opt.desc}</p>
                       </div>
                     </div>
                   );
                 })}
               </div>
 
-              <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800 space-y-1">
-                <div className="font-black flex items-center gap-1.5 text-xs text-emerald-700">
-                  <CheckCircle2 size={14} />
-                  <span>녹색 핀(🟢) 일괄 통일 안내:</span>
-                </div>
-                <p className="text-[11px] leading-relaxed font-bold">
-                  발굴된 모든 영업가능 매장은 지도 위에 선명한 <strong>녹색 핀</strong>으로 통일되어 표시됩니다. (체결 매장은 골드 핀 🌟)
-                </p>
+              {/* 핀 안내 박스 (슬림) */}
+              <div className="px-3 py-2 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-800 flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold shrink-0">
+                <CheckCircle2 size={13} className="text-emerald-600 shrink-0" />
+                <span className="truncate">
+                  발굴 매장은 지도에 <strong>녹색 핀(🟢)</strong>으로 통일 표시됩니다. (체결: 골드 🌟)
+                </span>
               </div>
 
-              <div className="pt-2">
+              {/* 하단 발굴 시작 버튼 (항상 화면 하단에 안정적으로 노출) */}
+              <div className="pt-1 shrink-0">
                 <button
                   type="button"
                   onClick={handleExecuteDiscover}
                   disabled={isDiscovering || selectedDiscoverCats.length === 0}
-                  className="w-full py-3.5 bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 disabled:opacity-50 text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer border-0 flex items-center justify-center gap-2 active:scale-98"
+                  className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 disabled:opacity-50 text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-md cursor-pointer border-0 flex items-center justify-center gap-1.5 active:scale-98"
                 >
-                  <Target size={16} />
-                  <span>
+                  <Target size={16} className={isDiscovering ? "animate-spin shrink-0" : "shrink-0"} />
+                  <span className="truncate">
                     {isDiscovering ? "네이버 지도 화면 전수 발굴 중..." : `선택한 ${selectedDiscoverCats.length}개 업종 실시간 발굴 시작`}
                   </span>
                 </button>
