@@ -1625,14 +1625,27 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleMoveToMyLocation}
-            className="px-3 py-2 bg-blue-50 active:bg-blue-100 text-blue-700 text-xs font-black rounded-xl border border-blue-200 flex items-center gap-1.5 shadow-2xs shrink-0 cursor-pointer"
-          >
-            <LocateFixed size={15} className="text-blue-600" />
-            <span>내 위치</span>
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsDiscoverModalOpen(true)}
+              disabled={isDiscovering}
+              className="px-2.5 py-2 bg-gradient-to-r from-rose-500 via-amber-500 to-amber-400 active:opacity-90 text-white text-xs font-black rounded-xl border border-rose-400 flex items-center gap-1 shadow-xs shrink-0 cursor-pointer active:scale-95"
+              title="현재 지도 화면에서 가망 매장 발굴"
+            >
+              <Target size={14} className={isDiscovering ? "animate-spin shrink-0" : "shrink-0"} />
+              <span>가망발굴</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleMoveToMyLocation}
+              className="px-2.5 py-2 bg-blue-50 active:bg-blue-100 text-blue-700 text-xs font-black rounded-xl border border-blue-200 flex items-center gap-1 shadow-2xs shrink-0 cursor-pointer"
+              title="내 현재 위치로 이동"
+            >
+              <LocateFixed size={14} className="text-blue-600 shrink-0" />
+              <span>내 위치</span>
+            </button>
+          </div>
         </div>
 
         {/* 모바일 뷰 전환 탭: [🗺️ 상권 지도] vs [📋 매장 목록 (XX개)] */}
@@ -2053,8 +2066,8 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                 </div>
               )}
 
-              {/* 📱 60대 맞춤 모바일 전용 지도 하단 엄지 플로팅 액션 바 (측정 패널 오픈 시 숨김) */}
-              {!isMeasurePanelOpen && (
+              {/* 📱 60대 맞춤 모바일 전용 지도 하단 엄지 플로팅 액션 바 (측정 분석 패널 오픈 시에만 가림) */}
+              {!(measurePoint && isMeasurePanelOpen && measureAnalysis) && (
                 <div className="lg:hidden absolute bottom-3 left-2.5 right-2.5 z-30 flex items-center gap-1.5 pointer-events-auto">
                   <button
                     type="button"
