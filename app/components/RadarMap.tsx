@@ -237,6 +237,28 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [selectedTarget, setSelectedTarget] = useState<any | null>(null);
 
+  // 📱 모바일 환경 감지 및 모바일 전용 탭 ('map' | 'list')
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [mobileTab, setMobileTab] = useState<"map" | "list">("map");
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // 모바일 탭이 지도로 전환될 때 네이버 지도 리사이즈 트리거
+  useEffect(() => {
+    if (mobileTab === "map" && naverMapRef.current && window.naver?.maps) {
+      setTimeout(() => {
+        window.naver.maps.Event.trigger(naverMapRef.current, "resize");
+      }, 100);
+    }
+  }, [mobileTab]);
+
   // 📏 2분할 뷰 좌/우 열 너비 조절 (기본 58%, 30%~75%)
   const [splitRatio, setSplitRatio] = useState<number>(58);
   const [isResizing, setIsResizing] = useState<boolean>(false);
@@ -1101,6 +1123,32 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     }
   };
 
+  // 📍 스마트폰 GPS 기준 내 현재 위치로 지도 이동 & 500m 상권 반경 측정
+  const handleMoveToMyLocation = () => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      alert("이 기기/브라우저에서는 위치 정보를 지원하지 않습니다.");
+      return;
+    }
+    triggerToast("📍 현재 내 위치를 확인하는 중입니다...");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = parseFloat(position.coords.latitude.toFixed(6));
+        const lng = parseFloat(position.coords.longitude.toFixed(6));
+        if (naverMapRef.current && window.naver && window.naver.maps) {
+          const center = new window.naver.maps.LatLng(lat, lng);
+          naverMapRef.current.setCenter(center);
+          naverMapRef.current.setZoom(15);
+          triggerToast("📍 현재 내 위치로 이동했습니다.");
+          handleStartMeasureAt(lat, lng, "내 현재 위치", "내 위치 (500m 상권)");
+        }
+      },
+      (err) => {
+        alert("현재 위치 정보를 가져올 수 없습니다. 스마트폰 브라우저 설정에서 위치 권한(GPS)을 켜주세요.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
   // 측정 지점에서 신규 가망 타겟 등록 모달 열기
   const handleRegisterFromMeasure = () => {
     if (!measurePoint) return;
@@ -1563,10 +1611,110 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
         </div>
       )}
 
+      {/* 📱 60대 맞춤 모바일 전용 간편 헤더 & 컨트롤 바 (lg:hidden) */}
+      <div className="lg:hidden bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 space-y-3">
+        {/* 상단 타이틀 & 원터치 내 위치 버튼 */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-8 h-8 rounded-xl bg-[#FED422] flex items-center justify-center text-[#0F172A] font-black text-sm shadow-xs shrink-0">
+              🎯
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-sm font-black text-[#0F172A] tracking-tight truncate">500m 상권보호 레이더</h2>
+              <p className="text-[10px] text-slate-400 font-bold truncate">가망 매장을 터치하여 전화 및 상권을 확인하세요</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleMoveToMyLocation}
+            className="px-3 py-2 bg-blue-50 active:bg-blue-100 text-blue-700 text-xs font-black rounded-xl border border-blue-200 flex items-center gap-1.5 shadow-2xs shrink-0 cursor-pointer"
+          >
+            <LocateFixed size={15} className="text-blue-600" />
+            <span>내 위치</span>
+          </button>
+        </div>
+
+        {/* 모바일 뷰 전환 탭: [🗺️ 상권 지도] vs [📋 매장 목록 (XX개)] */}
+        <div className="flex items-center bg-slate-100 p-1 rounded-xl">
+          <button
+            type="button"
+            onClick={() => setMobileTab("map")}
+            className={`flex-1 py-2.5 rounded-lg text-xs font-black transition-all border-0 flex items-center justify-center gap-1.5 cursor-pointer ${
+              mobileTab === "map"
+                ? "bg-[#FED422] text-[#0F172A] shadow-xs"
+                : "text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <span>🗺️ 상권 지도</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab("list")}
+            className={`flex-1 py-2.5 rounded-lg text-xs font-black transition-all border-0 flex items-center justify-center gap-1.5 cursor-pointer ${
+              mobileTab === "list"
+                ? "bg-[#FED422] text-[#0F172A] shadow-xs"
+                : "text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <span>📋 매장 목록</span>
+            <span className="px-1.5 py-0.5 rounded-full bg-slate-900/10 text-[10px] font-black">
+              {filteredTargets.length + approvedStores.length}
+            </span>
+          </button>
+        </div>
+
+        {/* 빠른 검색창 */}
+        <div className="relative">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="매장명, 동이름 (예: 스타벅스, 역삼동)"
+            className="w-full h-9 pl-9 pr-8 bg-[#F1F4F8] border-0 rounded-lg text-xs font-bold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 p-1 border-0 bg-transparent cursor-pointer"
+            >
+              <X size={13} />
+            </button>
+          )}
+        </div>
+
+        {/* 간편 필터 칩 */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-[11px] no-scrollbar">
+          {[
+            { id: "전체", label: "전체", count: totalCount + approvedStores.length },
+            { id: "영업가능", label: "🟢 영업가능", count: availableTargetCount },
+            { id: "계약체결", label: "🌟 체결가맹점", count: contractedCount },
+            { id: "상권보호락", label: "🔒 입점불가", count: protectedLockedCount },
+          ].map((chip) => {
+            const isSelected = selectedStatusFilter === chip.id;
+            return (
+              <button
+                key={chip.id}
+                type="button"
+                onClick={() => setSelectedStatusFilter(chip.id)}
+                className={`px-2.5 py-1 rounded-full font-bold whitespace-nowrap transition-all border shrink-0 cursor-pointer ${
+                  isSelected
+                    ? "bg-[#0F172A] text-[#FED422] border-[#0F172A] font-black"
+                    : "bg-white text-slate-600 border-slate-200"
+                }`}
+              >
+                {chip.label} ({chip.count})
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* ====================================================
-          TOP HERO & KPI BANNER
+          TOP HERO & KPI BANNER (💻 데스크탑 전용 hidden lg:flex)
       ==================================================== */}
-      <div className="bg-white rounded-lg p-6 border-0 shadow-md flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="hidden lg:flex bg-white rounded-lg p-6 border-0 shadow-md flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-black">
@@ -1618,9 +1766,9 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
       </div>
 
       {/* ====================================================
-          CONTROL & FILTER BAR
+          CONTROL & FILTER BAR (💻 데스크탑 전용 hidden lg:block)
       ==================================================== */}
-      <div className="bg-white rounded-lg p-5 border-0 shadow-md space-y-4">
+      <div className="hidden lg:block bg-white rounded-lg p-5 border-0 shadow-md space-y-4">
         {/* 상단: 액션 버튼 & 뷰 모드 토글 */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-4">
           <div className="flex items-center gap-2">
@@ -1795,12 +1943,14 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
           {/* 좌측 영역 (지도 및 지도 하단 매장 정보) */}
           <div
             style={
-              !isFullscreen && viewMode === "split"
+              !isFullscreen && viewMode === "split" && !isMobile
                 ? { width: `${splitRatio}%` }
                 : undefined
             }
             className={
-              isFullscreen
+              isMobile && mobileTab === "list"
+                ? "hidden"
+                : isFullscreen
                 ? "flex-1 w-full h-full flex flex-col relative"
                 : viewMode === "map"
                 ? "w-full space-y-4 relative"
@@ -1812,13 +1962,15 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
               className={`bg-slate-100 rounded-2xl overflow-hidden shadow-2xl relative border border-slate-300 flex flex-col ${
                 isFullscreen
                   ? "flex-1 w-full h-full min-h-[600px]"
+                  : isMobile
+                  ? "h-[calc(100vh-220px)] min-h-[500px]"
                   : viewMode === "map"
                   ? "h-[calc(100vh-140px)] min-h-[720px] lg:h-[840px]"
                   : "h-[540px] sm:h-[580px]"
               }`}
             >
-              {/* Map Top Floating Header & Legend */}
-              <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+              {/* Map Top Floating Header & Legend (💻 데스크탑 전용 hidden lg:flex) */}
+              <div className="hidden lg:flex absolute top-4 left-4 right-4 z-20 flex-wrap items-center justify-between gap-2 pointer-events-none">
                 <div className="px-3.5 py-2 rounded-lg bg-white/95 backdrop-blur-md border border-slate-300 shadow-md pointer-events-auto flex items-center gap-3">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
@@ -1883,6 +2035,57 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     <span>{isFullscreen ? "축소" : "전체화면"}</span>
                   </button>
                 </div>
+              </div>
+
+              {/* 📱 모바일 전용 지도 상단 미니 범례 (lg:hidden) */}
+              <div className="lg:hidden absolute top-3 left-3 right-3 z-20 flex items-center justify-between gap-1.5 pointer-events-none">
+                <div className="px-2.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-300 shadow-md pointer-events-auto flex items-center gap-1.5 text-[11px] font-black text-[#0F172A]">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                  <span>500m 상권 레이더</span>
+                </div>
+
+                <div className="px-2.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-300 shadow-md pointer-events-auto flex items-center gap-2 text-[10px] font-black">
+                  <span className="flex items-center gap-1 text-emerald-700">🟢 영업가능</span>
+                  <span className="flex items-center gap-1 text-amber-700">🌟 가맹점</span>
+                  <span className="flex items-center gap-1 text-slate-500">🔒 락</span>
+                </div>
+              </div>
+
+              {/* 📱 60대 맞춤 모바일 전용 지도 하단 엄지 플로팅 액션 바 (lg:hidden) */}
+              <div className="lg:hidden absolute bottom-4 left-3 right-3 z-30 flex items-center justify-between gap-2 pointer-events-auto">
+                <button
+                  type="button"
+                  onClick={handleMoveToMyLocation}
+                  className="px-3.5 py-3 bg-white/95 active:bg-blue-50 text-blue-700 font-black rounded-2xl border-2 border-blue-200 shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0"
+                  title="현재 스마트폰 GPS 위치로 지도 이동"
+                >
+                  <LocateFixed size={18} className="text-blue-600 animate-pulse" />
+                  <span>내 위치</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsDiscoverModalOpen(true)}
+                  disabled={isDiscovering}
+                  className="flex-1 py-3 px-3 bg-gradient-to-r from-rose-500 via-amber-500 to-amber-400 text-white font-black rounded-2xl shadow-xl text-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer border-2 border-white"
+                >
+                  <Target size={18} className={isDiscovering ? "animate-spin" : ""} />
+                  <span>{isDiscovering ? "발굴 중..." : "🎯 가망 매장 발굴하기"}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleToggleMeasureMode}
+                  className={`px-3 py-3 font-black rounded-2xl shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer border-2 shrink-0 ${
+                    isMeasureMode
+                      ? "bg-indigo-600 text-white border-indigo-400 animate-pulse"
+                      : "bg-white/95 active:bg-slate-100 text-slate-800 border-slate-200"
+                  }`}
+                  title="반경 500m 거리 측정"
+                >
+                  <Ruler size={16} />
+                  <span>{isMeasureMode ? "측정중" : "500m"}</span>
+                </button>
               </div>
 
               {/* 📏 측정 모드 상단 안내 배너 */}
@@ -2221,8 +2424,8 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
               <div ref={mapContainerRef} className="flex-1 w-full h-full min-h-[460px] z-10" />
             </div>
 
-            {/* 📍 2분할 뷰일 때 지도 바로 밑에 표출되는 매장 상세 카드 */}
-            {!isFullscreen && viewMode === "split" && (
+            {/* 📍 2분할 뷰일 때 지도 바로 밑에 표출되는 매장 상세 카드 (💻 데스크탑 전용 !isMobile) */}
+            {!isFullscreen && viewMode === "split" && !isMobile && (
               <div className="space-y-4">
                 {selectedTarget ? (
                   renderStoreDetailCard(selectedTarget, () => setSelectedTarget(null))
@@ -2305,11 +2508,13 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
             </div>
           )}
 
-          {/* 우측 영역: 2분할 뷰일 때 (100 - splitRatio)% 너비의 탭 세로 스크롤 매장 리스트 */}
-          {!isFullscreen && viewMode === "split" && (
+          {/* 우측 영역: 2분할 뷰일 때 (100 - splitRatio)% 너비의 탭 세로 스크롤 매장 리스트 (모바일에서는 목록 탭 선택 시 가로 100%로 단독 표출) */}
+          {!isFullscreen && viewMode === "split" && (!isMobile || mobileTab === "list") && (
             <div
-              style={{ width: `${100 - splitRatio}%` }}
-              className="w-full lg:min-w-[320px] bg-white rounded-2xl border border-slate-200 shadow-md p-4 sm:p-5 flex flex-col h-[calc(100vh-140px)] min-h-[720px] lg:h-[1180px] space-y-3.5 pl-0 lg:pl-2"
+              style={!isMobile ? { width: `${100 - splitRatio}%` } : undefined}
+              className={`w-full lg:min-w-[320px] bg-white rounded-2xl border border-slate-200 shadow-md p-4 sm:p-5 flex flex-col ${
+                isMobile ? "min-h-[550px]" : "h-[calc(100vh-140px)] min-h-[720px] lg:h-[1180px]"
+              } space-y-3.5 pl-0 lg:pl-2`}
             >
               {/* 상단 탭 헤더 */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -2468,12 +2673,46 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                               href={`https://map.naver.com/p/search/${encodeURIComponent(item.displayName || item.name)}`}
                               target="_blank"
                               rel="noreferrer"
+                              onClick={(e) => e.stopPropagation()}
                               className="p-1.5 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 rounded inline-flex items-center gap-0.5 font-bold text-[10px] border border-emerald-200"
                               title="네이버 플레이스 보기"
                             >
                               <Navigation size={11} />
                               <span>플레이스</span>
                             </a>
+
+                            {/* 📱 모바일 전용 원터치 전화 & 지도보기 버튼 */}
+                            {(item.phone || item.mobile) && (
+                              <a
+                                href={`tel:${(item.mobile || item.phone).replace(/[^0-9]/g, "")}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-md inline-flex items-center gap-1 font-black text-[11px] shadow-2xs no-underline"
+                                title="매장으로 바로 전화 걸기"
+                              >
+                                <Phone size={11} />
+                                <span>전화</span>
+                              </a>
+                            )}
+
+                            {isMobile && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedTarget(item);
+                                  setMobileTab("map");
+                                  if (naverMapRef.current && window.naver?.maps && item.lat && item.lng) {
+                                    naverMapRef.current.panTo(new window.naver.maps.LatLng(item.lat, item.lng), { duration: 300 });
+                                    naverMapRef.current.setZoom(16);
+                                  }
+                                }}
+                                className="px-2 py-1 bg-[#FED422] hover:bg-amber-400 active:scale-95 text-[#0F172A] rounded-md inline-flex items-center gap-1 font-black text-[11px] shadow-2xs border-0 cursor-pointer"
+                                title="지도에서 위치 보기"
+                              >
+                                <MapPin size={11} />
+                                <span>지도보기</span>
+                              </button>
+                            )}
 
                             <button
                               onClick={() => handleStartMeasureAt(item.lat, item.lng, item.roadAddress, item.displayName || item.name)}
@@ -2509,6 +2748,148 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
           )}
         </div>
       </div>
+
+      {/* 📱 60대 맞춤 모바일 전용 매장 상세 바텀 시트 (하단 슬라이드 팝업) */}
+      {isMobile && selectedTarget && (
+        <div
+          className="fixed inset-x-0 bottom-16 z-[120] bg-white rounded-t-3xl shadow-[0_-12px_45px_rgba(0,0,0,0.35)] border-t-2 border-amber-300 p-5 max-h-[82vh] overflow-y-auto animate-in slide-in-from-bottom duration-200 font-sans select-none"
+        >
+          {/* 손잡이 & 닫기 버튼 */}
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto -mt-1 mb-1"></div>
+            <button
+              onClick={() => setSelectedTarget(null)}
+              className="text-slate-400 hover:text-slate-800 p-1 rounded-full hover:bg-slate-100 border-0 bg-transparent cursor-pointer"
+            >
+              <X size={22} />
+            </button>
+          </div>
+
+          <div className="space-y-3.5 pt-2">
+            {/* 매장명 & 카테고리 */}
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`text-[11px] font-black px-2.5 py-1 rounded-md border ${
+                  selectedTarget.isRealStore
+                    ? "bg-amber-100 text-amber-900 border-amber-300"
+                    : selectedTarget.isContracted
+                    ? "bg-amber-50 text-amber-800 border-amber-300"
+                    : selectedTarget.isProtectedLocked
+                    ? "bg-slate-100 text-slate-600 border-slate-300"
+                    : "bg-emerald-50 text-emerald-800 border-emerald-300"
+                }`}>
+                  {selectedTarget.category || "120PIE 공식 가맹점"}
+                </span>
+                <span className="text-xs text-slate-500 font-bold">
+                  {selectedTarget.dong || selectedTarget.roadAddress?.split(" ")[1] || ""}
+                </span>
+              </div>
+              <h3 className="text-xl font-black text-[#0F172A] mt-1 tracking-tight">
+                {selectedTarget.displayName || selectedTarget.name}
+              </h3>
+              <p className="text-xs text-slate-600 font-bold mt-1 flex items-start gap-1">
+                <MapPin size={14} className="shrink-0 mt-0.5 text-slate-400" />
+                <span>{selectedTarget.roadAddress} {selectedTarget.detailAddress || ""}</span>
+              </p>
+            </div>
+
+            {/* 60대 파트너를 위한 핵심 상태 배너 */}
+            {selectedTarget.isRealStore || selectedTarget.isContracted ? (
+              <div className="p-3.5 bg-amber-50 border-2 border-amber-300 rounded-2xl space-y-1">
+                <div className="flex items-center gap-1.5 text-amber-900 font-black text-sm">
+                  <Sparkles size={17} className="text-amber-600" />
+                  <span>🌟 120겹파이 공식 가맹점 (계약완료)</span>
+                </div>
+                <p className="text-xs text-amber-800 font-bold leading-relaxed">
+                  반경 500m 상권이 독점 보호되고 있는 정식 가맹점입니다.
+                </p>
+              </div>
+            ) : selectedTarget.isProtectedLocked ? (
+              <div className="p-3.5 bg-rose-50 border-2 border-rose-300 rounded-2xl space-y-1">
+                <div className="flex items-center gap-1.5 text-rose-800 font-black text-sm">
+                  <Lock size={17} className="text-rose-600" />
+                  <span>🔒 입점 계약 불가 (500m 보호구역)</span>
+                </div>
+                <p className="text-xs text-rose-700 font-bold leading-relaxed">
+                  {selectedTarget.protectingStore?.name ? `[${selectedTarget.protectingStore.name}] 매장과 ` : ""}
+                  거리 <strong>{selectedTarget.protectingDistance}m</strong>로 500m 보호 반경 안에 있어 추가 입점이 제한됩니다.
+                </p>
+              </div>
+            ) : (
+              <div className="p-3.5 bg-emerald-50 border-2 border-emerald-400 rounded-2xl space-y-1">
+                <div className="flex items-center gap-1.5 text-emerald-900 font-black text-sm">
+                  <CheckCircle2 size={17} className="text-emerald-600" />
+                  <span>🟢 즉시 계약 가능 매장! (선점 추천)</span>
+                </div>
+                <p className="text-xs text-emerald-800 font-bold leading-relaxed">
+                  {selectedTarget.protectingDistance
+                    ? `가장 가까운 120겹파이 가맹점과 ${selectedTarget.protectingDistance}m 떨어져 있어 500m 상권보호에 전혀 걸리지 않는 안심 영업 대상입니다.`
+                    : "주변 500m 내에 겹치는 가맹점이 없어 안심하고 120겹파이 샵인샵 계약을 제안하실 수 있습니다."}
+                </p>
+              </div>
+            )}
+
+            {/* 원터치 전화 바로걸기 버튼 (가장 중요) */}
+            {(selectedTarget.phone || selectedTarget.mobile) ? (
+              <a
+                href={`tel:${(selectedTarget.mobile || selectedTarget.phone).replace(/[^0-9]/g, "")}`}
+                className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white rounded-2xl text-base font-black flex items-center justify-center gap-2.5 shadow-lg no-underline cursor-pointer border-0"
+              >
+                <Phone size={20} className="animate-bounce" />
+                <span>매장 전화 바로 걸기 ({selectedTarget.mobile || selectedTarget.phone})</span>
+              </a>
+            ) : (
+              <div className="w-full py-3 px-4 bg-slate-100 text-slate-400 rounded-xl text-xs font-bold text-center">
+                등록된 전화번호가 없습니다.
+              </div>
+            )}
+
+            {/* 네이버 지도 길찾기 & 주소 복사 버튼 */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <a
+                href={`https://map.naver.com/p/search/${encodeURIComponent(selectedTarget.displayName || selectedTarget.name)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="py-3 px-3 rounded-xl bg-slate-100 active:bg-slate-200 text-[#0F172A] text-xs font-black border border-slate-200 flex items-center justify-center gap-1.5 no-underline"
+              >
+                <Navigation size={15} className="text-emerald-600" />
+                <span>네이버 지도 길찾기</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (navigator.clipboard) {
+                    navigator.clipboard.writeText(`${selectedTarget.roadAddress} ${selectedTarget.detailAddress || ""}`);
+                    triggerToast("주소가 복사되었습니다.");
+                  }
+                }}
+                className="py-3 px-3 rounded-xl bg-slate-100 active:bg-slate-200 text-slate-700 text-xs font-black border border-slate-200 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span>주소 복사</span>
+              </button>
+            </div>
+
+            {/* 500m 반경 확인 버튼 */}
+            <button
+              type="button"
+              onClick={() => {
+                handleStartMeasureAt(
+                  selectedTarget.lat,
+                  selectedTarget.lng,
+                  selectedTarget.roadAddress,
+                  selectedTarget.displayName || selectedTarget.name
+                );
+                setSelectedTarget(null);
+              }}
+              className="w-full py-2.5 bg-indigo-50 active:bg-indigo-100 text-indigo-700 text-xs font-black rounded-xl border border-indigo-200 flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Ruler size={14} />
+              <span>지도에서 이 매장 기준 500m 반경 확인하기</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ====================================================
           DATA GRID / TABLE VIEW (데이터 대장 뷰 전용)

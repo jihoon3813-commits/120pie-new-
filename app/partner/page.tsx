@@ -599,7 +599,7 @@ export default function PartnerPortalPage() {
         )}
 
         {/* MAIN WORKSPACE CONTENT CANVAS (Full Width Responsive like HQ Admin) */}
-        <main className="flex-1 min-w-0 p-3.5 sm:p-6 lg:p-8 pb-24 lg:pb-8 overflow-y-auto w-full max-w-full bg-[#F4F6F8]">
+        <main className={`flex-1 min-w-0 pb-24 lg:pb-8 overflow-y-auto w-full max-w-full bg-[#F4F6F8] ${currentMenu === "radar" ? "p-1.5 sm:p-6 lg:p-8" : "p-3.5 sm:p-6 lg:p-8"}`}>
           <div className="space-y-4 sm:space-y-6 w-full max-w-full">
 
             {/* ==========================================
