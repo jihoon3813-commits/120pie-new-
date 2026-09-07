@@ -23,6 +23,7 @@ import {
   Unlock,
   CheckCircle2,
   AlertTriangle,
+  AlertCircle,
   Maximize2,
   Minimize2,
   Crosshair,
@@ -277,14 +278,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     };
   }, [isResizing]);
 
-  // 🌟 공식 가맹점 자동 기본 선택 (컴포넌트 최초 마운트 시 1회만 실행)
-  const hasInitialSelectedRef = useRef<boolean>(false);
-  useEffect(() => {
-    if (!hasInitialSelectedRef.current && approvedStores.length > 0) {
-      setSelectedTarget(approvedStores[0]);
-      hasInitialSelectedRef.current = true;
-    }
-  }, [approvedStores]);
+  // 🌟 상권 레이더 초기 로드 시 우측 모달이 자동으로 뜨지 않도록 기본 선택 비활성화
 
   // 🎯 가망대상 발굴 중복(멀티) 선택 모달 상태
   const [isDiscoverModalOpen, setIsDiscoverModalOpen] = useState<boolean>(false);
@@ -346,6 +340,8 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     sourceName?: string;
   } | null>(null);
   const [isMeasurePanelOpen, setIsMeasurePanelOpen] = useState<boolean>(true);
+  const [measureCategoryFilter, setMeasureCategoryFilter] = useState<string>("전체");
+  const [measureSearchTerm, setMeasureSearchTerm] = useState<string>("");
 
   // 측정 오버레이 Ref
   const measureMarkerRef = useRef<any>(null);
@@ -455,6 +451,20 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
       totalNearbyTargets: nearbyTargets.length,
     };
   }, [measurePoint, measureRadius, approvedStores, targetsWithProtection]);
+
+  // 📏 측정 패널 내 카테고리/검색어 필터링된 타겟 목록 (전체 목록 지원)
+  const displayedNearbyTargets = useMemo(() => {
+    if (!measureAnalysis?.nearbyTargets) return [];
+    return measureAnalysis.nearbyTargets.filter((t: any) => {
+      const matchCat =
+        measureCategoryFilter === "전체" || (t.category || "기타 샵인샵") === measureCategoryFilter;
+      const matchSearch =
+        !measureSearchTerm.trim() ||
+        t.name?.toLowerCase().includes(measureSearchTerm.toLowerCase()) ||
+        t.roadAddress?.toLowerCase().includes(measureSearchTerm.toLowerCase());
+      return matchCat && matchSearch;
+    });
+  }, [measureAnalysis?.nearbyTargets, measureCategoryFilter, measureSearchTerm]);
 
   // 필터링된 타겟 데이터
   const filteredTargets = useMemo(() => {
@@ -1621,35 +1631,34 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
           </div>
 
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
-            {mode === "admin" && (
-              <>
-                {/* 🎯 [가망대상 발굴] 복수 선택 모달 오픈 버튼 */}
-                <button
-                  onClick={() => setIsDiscoverModalOpen(true)}
-                  disabled={isDiscovering}
-                  className="px-4 py-2 bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white rounded-lg text-xs font-black transition-all flex items-center gap-2 cursor-pointer border-0 shadow-md active:scale-95"
-                  title="현재 지도 화면에서 발굴할 업종(카페, PC방 등 중복 가능)을 선택하여 전수 발굴합니다"
-                >
-                  <Target size={15} className={isDiscovering ? "animate-spin" : ""} />
-                  <span>{isDiscovering ? "실시간 발굴 중..." : "가망대상 발굴"}</span>
-                </button>
+            {/* 🎯 [가망대상 발굴] 복수 선택 모달 오픈 버튼 */}
+            <button
+              onClick={() => setIsDiscoverModalOpen(true)}
+              disabled={isDiscovering}
+              className="px-4 py-2 bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white rounded-lg text-xs font-black transition-all flex items-center gap-2 cursor-pointer border-0 shadow-md active:scale-95"
+              title="현재 지도 화면에서 발굴할 업종(카페, PC방 등 중복 가능)을 선택하여 전수 발굴합니다"
+            >
+              <Target size={15} className={isDiscovering ? "animate-spin" : ""} />
+              <span>{isDiscovering ? "실시간 발굴 중..." : "가망대상 발굴"}</span>
+            </button>
 
-                <button
-                  onClick={handleClearDiscoveredTargets}
-                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200"
-                  title="현재 발굴된 가망 매장 목록을 모두 지우고 실제 공식 가맹점만 표시합니다"
-                >
-                  <RotateCcw size={13} />
-                  <span>발굴 목록 초기화</span>
-                </button>
-                <button
-                  onClick={() => handleOpenForm()}
-                  className="px-4 py-2 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all flex items-center gap-1.5 shadow-sm border-0 cursor-pointer"
-                >
-                  <Plus size={15} />
-                  <span>신규 매장 추가</span>
-                </button>
-              </>
+            <button
+              onClick={handleClearDiscoveredTargets}
+              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200"
+              title="현재 발굴된 가망 매장 목록을 모두 지우고 실제 공식 가맹점만 표시합니다"
+            >
+              <RotateCcw size={13} />
+              <span>발굴 목록 초기화</span>
+            </button>
+
+            {mode === "admin" && (
+              <button
+                onClick={() => handleOpenForm()}
+                className="px-4 py-2 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all flex items-center gap-1.5 shadow-sm border-0 cursor-pointer"
+              >
+                <Plus size={15} />
+                <span>신규 매장 추가</span>
+              </button>
             )}
 
             {/* 뷰 모드 토글 */}
@@ -1854,17 +1863,15 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                   </button>
 
                   {/* 지도 내 빠른 발굴 버튼 */}
-                  {mode === "admin" && (
-                    <button
-                      onClick={() => setIsDiscoverModalOpen(true)}
-                      disabled={isDiscovering}
-                      className="px-3 py-2 rounded-lg bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white border border-rose-400 shadow-md font-black text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
-                      title="현재 보고 계신 네이버 지도 위치의 업종을 선택하여 발굴합니다"
-                    >
-                      <Target size={14} className={isDiscovering ? "animate-spin" : ""} />
-                      <span>{isDiscovering ? "발굴중" : "가망발굴"}</span>
-                    </button>
-                  )}
+                  <button
+                    onClick={() => setIsDiscoverModalOpen(true)}
+                    disabled={isDiscovering}
+                    className="px-3 py-2 rounded-lg bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white border border-rose-400 shadow-md font-black text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                    title="현재 보고 계신 네이버 지도 위치의 업종을 선택하여 발굴합니다"
+                  >
+                    <Target size={14} className={isDiscovering ? "animate-spin" : ""} />
+                    <span>{isDiscovering ? "발굴중" : "가망발굴"}</span>
+                  </button>
 
                   {/* 전체화면 토글 버튼 */}
                   <button
@@ -1935,25 +1942,29 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                 </div>
               )}
 
-              {/* 📏 500m 상권 측정 분석 플로팅 패널 */}
+              {/* 📏 500m 상권 측정 분석 플로팅 패널 (세로 최대 높이 & 전체 리스트 & 카테고리 구분) */}
               {measurePoint && isMeasurePanelOpen && measureAnalysis && (
-                <div className="absolute top-28 left-4 z-30 pointer-events-auto w-84 sm:w-96 max-w-[calc(100%-2rem)] bg-white/95 backdrop-blur-md rounded-xl border border-indigo-200 shadow-2xl overflow-hidden transition-all animate-in fade-in slide-in-from-top-2">
+                <div className="absolute top-14 sm:top-16 bottom-4 left-4 z-30 pointer-events-auto w-84 sm:w-96 md:w-[410px] max-w-[calc(100%-2rem)] flex flex-col bg-white/95 backdrop-blur-md rounded-2xl border border-indigo-200 shadow-2xl overflow-hidden transition-all animate-in fade-in slide-in-from-top-2">
                   {/* 패널 헤더 */}
-                  <div className="px-4 py-3 bg-gradient-to-r from-indigo-900 to-slate-900 text-white flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-base">📏</span>
-                      <div>
-                        <h4 className="text-xs font-black text-white leading-tight">
+                  <div className="shrink-0 px-4 py-3 bg-gradient-to-r from-indigo-900 to-slate-900 text-white flex items-center justify-between shadow-xs">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-base shrink-0">📏</span>
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-black text-white leading-tight truncate">
                           반경 {measureRadius}m 상권 정밀 진단
                         </h4>
-                        <span className="text-[10px] text-indigo-300 font-medium">
+                        <span className="text-[10px] text-indigo-300 font-medium truncate block">
                           {measurePoint.sourceName ? `기준: ${measurePoint.sourceName}` : "지도 지정 위치"}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 shrink-0">
                       <button
-                        onClick={() => setMeasurePoint(null)}
+                        onClick={() => {
+                          setMeasurePoint(null);
+                          setMeasureCategoryFilter("전체");
+                          setMeasureSearchTerm("");
+                        }}
                         className="p-1 text-slate-300 hover:text-white hover:bg-white/10 rounded transition-all border-0 cursor-pointer"
                         title="측정 핀 초기화"
                       >
@@ -1969,126 +1980,233 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     </div>
                   </div>
 
-                  {/* 패널 내용 */}
-                  <div className="p-4 space-y-3.5 text-xs max-h-[440px] overflow-y-auto">
+                  {/* 패널 상단 요약 (주소 + 안전/침범 카드) - shrink-0 */}
+                  <div className="shrink-0 p-3 space-y-2 text-xs bg-slate-50/70 border-b border-slate-200">
                     {/* 중심 좌표 & 주소 */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 space-y-1">
+                    <div className="bg-white border border-slate-200/80 rounded-lg p-2.5 space-y-0.5 shadow-2xs">
                       <div className="flex items-start gap-1.5 text-slate-800 font-bold">
-                        <MapPin size={14} className="text-indigo-600 shrink-0 mt-0.5" />
-                        <span className="break-all">{measurePoint.address || "주소 정보를 불러오는 중입니다..."}</span>
+                        <MapPin size={13} className="text-indigo-600 shrink-0 mt-0.5" />
+                        <span className="break-all text-[11px] leading-tight font-black">
+                          {measurePoint.address || "주소 정보를 불러오는 중입니다..."}
+                        </span>
                       </div>
-                      <div className="text-[10px] text-slate-400 font-mono pl-5">
+                      <div className="text-[9px] text-slate-400 font-mono pl-4">
                         좌표: {measurePoint.lat.toFixed(5)}, {measurePoint.lng.toFixed(5)}
                       </div>
                     </div>
 
                     {/* 🚨 상권보호 침범 / ✅ 안전 판정 카드 */}
                     {measureAnalysis.isStoreConflict ? (
-                      <div className="p-3.5 bg-gradient-to-br from-rose-50 to-red-50 border border-rose-200 rounded-xl space-y-2 text-rose-900 shadow-2xs">
-                        <div className="flex items-center gap-2 font-black text-rose-700 text-xs">
-                          <AlertTriangle size={15} />
-                          <span>⚠️ 상권보호 중복 침범 (영업 제한)</span>
+                      <div className="p-2.5 bg-gradient-to-br from-rose-50 to-red-50 border border-rose-200 rounded-xl space-y-1 text-rose-900 shadow-2xs">
+                        <div className="flex items-center gap-1.5 font-black text-rose-700 text-xs">
+                          <AlertTriangle size={14} />
+                          <span>⚠️ 상권보호 중복 침범 (신규 영업 불가)</span>
                         </div>
-                        <p className="text-[11px] leading-relaxed text-rose-800 font-medium">
-                          최근접 공식 가맹점 <strong>[{measureAnalysis.closestStore?.displayName}]</strong>과 거리{" "}
-                          <strong className="text-rose-950 font-mono font-black">{measureAnalysis.minStoreDistance}m</strong>로,{" "}
-                          500m 보호구역 내에 <strong>{measureAnalysis.overlapDistance}m</strong> 중복 침범됩니다.
+                        <p className="text-[10.5px] leading-snug text-rose-800 font-medium">
+                          가맹점 <strong>[{measureAnalysis.closestStore?.displayName}]</strong>과 거리{" "}
+                          <strong className="text-rose-950 font-mono font-black">{measureAnalysis.minStoreDistance}m</strong> (500m 보호구역 내 <strong>{measureAnalysis.overlapDistance}m</strong> 침범)
                         </p>
-                        <div className="text-[10px] text-rose-600 bg-white/70 p-1.5 rounded border border-rose-200">
-                          🚫 기존 공식 가맹점의 상권 보호를 위해 신규 체결이 제한되는 구역입니다.
-                        </div>
                       </div>
                     ) : (
-                      <div className="p-3.5 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl space-y-2 text-emerald-900 shadow-2xs">
-                        <div className="flex items-center gap-2 font-black text-emerald-700 text-xs">
-                          <CheckCircle2 size={15} />
+                      <div className="p-2.5 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl space-y-1 text-emerald-900 shadow-2xs">
+                        <div className="flex items-center gap-1.5 font-black text-emerald-700 text-xs">
+                          <CheckCircle2 size={14} />
                           <span>✅ 상권보호 안전 구역 (신규 영업 가능)</span>
                         </div>
-                        <p className="text-[11px] leading-relaxed text-emerald-800 font-medium">
-                          가장 가까운 공식 가맹점 <strong>[{measureAnalysis.closestStore?.displayName || "없음"}]</strong>과 거리{" "}
-                          <strong className="text-emerald-950 font-mono font-black">{measureAnalysis.minStoreDistance}m</strong>로,{" "}
-                          상권보호 기준 대비 <strong>{measureAnalysis.safeMargin}m</strong>의 안심 여유 거리를 확보했습니다!
+                        <p className="text-[10.5px] leading-snug text-emerald-800 font-medium">
+                          최근접 가맹점 <strong>[{measureAnalysis.closestStore?.displayName || "없음"}]</strong>과 거리{" "}
+                          <strong className="text-emerald-950 font-mono font-black">{measureAnalysis.minStoreDistance}m</strong> (안심 여유: <strong>{measureAnalysis.safeMargin}m</strong>)
                         </p>
-                        <div className="text-[10px] text-emerald-700 bg-white/70 p-1.5 rounded border border-emerald-200 font-bold">
-                          🌟 120겹파이 샵인샵 신규 가맹 유치 및 영업을 적극 추천합니다.
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 반경 내 가망 타겟 분석 현황 */}
-                    <div className="space-y-2 pt-1 border-t border-neutral-100">
-                      <div className="flex items-center justify-between">
-                        <span className="font-black text-slate-800 text-[11px] flex items-center gap-1.5">
-                          <Target size={13} className="text-indigo-600" />
-                          <span>반경 {measureRadius}m 내 발굴 타겟 ({measureAnalysis.totalNearbyTargets}개)</span>
-                        </span>
-                      </div>
-
-                      {/* 업종별 분포 뱃지 */}
-                      {measureAnalysis.totalNearbyTargets > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                          {Object.entries(measureAnalysis.categoryCounts).map(([cat, count]) => (
-                            <span
-                              key={cat}
-                              className="px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-bold"
-                            >
-                              {cat} <strong className="text-indigo-600 font-mono font-black">{count}</strong>
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-[11px] text-slate-400 py-1">
-                          반경 {measureRadius}m 내 등록된 가망 타겟 매장이 없습니다.
-                        </p>
-                      )}
-
-                      {/* 반경 내 매장 목록 미리보기 */}
-                      {measureAnalysis.nearbyTargets.length > 0 && (
-                        <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
-                          {measureAnalysis.nearbyTargets.slice(0, 5).map((target: any) => (
-                            <div
-                              key={target._id}
-                              onClick={() => {
-                                setSelectedTarget(target);
-                                if (naverMapRef.current && window.naver && window.naver.maps) {
-                                  naverMapRef.current.panTo(new window.naver.maps.LatLng(target.lat, target.lng), { duration: 250 });
-                                }
-                              }}
-                              className="p-2 rounded-lg bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 transition-colors cursor-pointer flex items-center justify-between text-[11px]"
-                            >
-                              <div className="truncate mr-2">
-                                <div className="font-black text-slate-800 truncate">{target.name}</div>
-                                <div className="text-[10px] text-slate-400 truncate">{target.roadAddress}</div>
-                              </div>
-                              <div className="shrink-0 text-right">
-                                <span className="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 font-mono font-black text-[10px]">
-                                  {target.distFromMeasure}m
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                          {measureAnalysis.nearbyTargets.length > 5 && (
-                            <p className="text-[10px] text-slate-400 text-center font-medium">
-                              외 {measureAnalysis.nearbyTargets.length - 5}개 매장이 더 있습니다.
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* 액션 버튼 */}
-                    {mode === "admin" && (
-                      <div className="pt-2 border-t border-neutral-100 space-y-1.5">
-                        <button
-                          onClick={handleRegisterFromMeasure}
-                          className="w-full py-2 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-xs border-0 cursor-pointer"
-                        >
-                          <Plus size={14} />
-                          <span>이 측정 위치를 신규 타겟으로 등록</span>
-                        </button>
                       </div>
                     )}
                   </div>
+
+                  {/* 타겟 헤더 & 카테고리 탭 & 검색 - shrink-0 */}
+                  <div className="shrink-0 px-3.5 pt-2.5 pb-2 bg-white border-b border-slate-100 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-black text-slate-800 text-[11px] flex items-center gap-1.5">
+                        <Target size={13} className="text-indigo-600" />
+                        <span>반경 {measureRadius}m 내 발굴 타겟</span>
+                        <span className="px-1.5 py-0.2 rounded-full bg-indigo-50 text-indigo-700 font-mono font-black text-[10px] border border-indigo-200">
+                          {displayedNearbyTargets.length}개 / 전체 {measureAnalysis.totalNearbyTargets}개
+                        </span>
+                      </span>
+
+                      {measureCategoryFilter !== "전체" && (
+                        <button
+                          onClick={() => setMeasureCategoryFilter("전체")}
+                          className="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold underline cursor-pointer border-0 bg-transparent"
+                        >
+                          전체 보기
+                        </button>
+                      )}
+                    </div>
+
+                    {/* 카테고리 필터 버튼들 (탭 형태 - 완벽한 카테고리 구분) */}
+                    {measureAnalysis.totalNearbyTargets > 0 && (
+                      <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[10px] scrollbar-thin">
+                        <button
+                          onClick={() => setMeasureCategoryFilter("전체")}
+                          className={`px-2.5 py-1 rounded-lg font-black shrink-0 transition-all border cursor-pointer ${
+                            measureCategoryFilter === "전체"
+                              ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
+                              : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200"
+                          }`}
+                        >
+                          전체 ({measureAnalysis.totalNearbyTargets})
+                        </button>
+                        {Object.entries(measureAnalysis.categoryCounts).map(([cat, count]) => {
+                          const isSelected = measureCategoryFilter === cat;
+                          const config = CATEGORY_CONFIG[cat] || CATEGORY_CONFIG["기타 샵인샵"];
+                          const CatIcon = config?.icon || Building2;
+                          return (
+                            <button
+                              key={cat}
+                              onClick={() => setMeasureCategoryFilter(isSelected ? "전체" : cat)}
+                              className={`px-2 py-1 rounded-lg font-bold shrink-0 transition-all flex items-center gap-1 border cursor-pointer ${
+                                isSelected
+                                  ? "bg-slate-900 text-white border-slate-900 shadow-2xs font-black ring-1 ring-slate-800"
+                                  : `${config.badgeBg} hover:brightness-95`
+                              }`}
+                            >
+                              <CatIcon size={11} className={isSelected ? "text-amber-400" : ""} />
+                              <span>{cat}</span>
+                              <span className={`font-mono font-black ${isSelected ? "text-amber-300" : ""}`}>{count}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* 빠른 검색창 (매장명 검색) */}
+                    {measureAnalysis.totalNearbyTargets > 5 && (
+                      <div className="relative">
+                        <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="text"
+                          value={measureSearchTerm}
+                          onChange={(e) => setMeasureSearchTerm(e.target.value)}
+                          placeholder="매장명 또는 주소 검색..."
+                          className="w-full pl-7 pr-7 py-1 bg-slate-100 focus:bg-white rounded-lg border border-slate-200 text-[11px] text-slate-800 placeholder-slate-400 outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
+                        />
+                        {measureSearchTerm && (
+                          <button
+                            onClick={() => setMeasureSearchTerm("")}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 border-0 bg-transparent cursor-pointer p-0.5"
+                          >
+                            <X size={12} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 🌟 반경 내 전체 매장 스크롤 리스트 (세로 최대치 활용: flex-1 min-h-0) */}
+                  <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-2 bg-slate-50/50">
+                    {displayedNearbyTargets.length > 0 ? (
+                      displayedNearbyTargets.map((target: any) => {
+                        const config = CATEGORY_CONFIG[target.category] || CATEGORY_CONFIG["기타 샵인샵"];
+                        const CatIcon = config?.icon || Building2;
+                        const isSelected = selectedTarget?._id === target._id;
+
+                        return (
+                          <div
+                            key={target._id}
+                            onClick={() => {
+                              setSelectedTarget(target);
+                              if (naverMapRef.current && window.naver && window.naver.maps) {
+                                naverMapRef.current.panTo(new window.naver.maps.LatLng(target.lat, target.lng), { duration: 250 });
+                              }
+                            }}
+                            className={`p-2.5 rounded-xl border transition-all cursor-pointer bg-white ${
+                              isSelected
+                                ? "border-indigo-500 ring-2 ring-indigo-200 shadow-md bg-indigo-50/30"
+                                : "border-slate-200 hover:border-indigo-300 hover:shadow-xs"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              {/* 좌측: 카테고리 뱃지 & 매장명 & 주소 */}
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                                  {/* 업종 뱃지 */}
+                                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black border ${config.badgeBg}`}>
+                                    <CatIcon size={10} />
+                                    <span>{target.category || "기타 샵인샵"}</span>
+                                  </span>
+
+                                  {/* 상권 상태 뱃지 */}
+                                  {target.isContracted ? (
+                                    <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-black text-[9px]">
+                                      🌟 체결
+                                    </span>
+                                  ) : target.isProtectedLocked ? (
+                                    <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200 font-bold text-[9px]">
+                                      🔒 500m 락
+                                    </span>
+                                  ) : (
+                                    <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-black text-[9px]">
+                                      🟢 영업 가능
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="font-black text-slate-900 text-xs truncate">
+                                  {target.name}
+                                </div>
+                                <div className="text-[10px] text-slate-500 truncate mt-0.5">
+                                  {target.roadAddress || "주소 미등록"}
+                                </div>
+                              </div>
+
+                              {/* 우측: 거리 및 네이버 링크 */}
+                              <div className="shrink-0 flex flex-col items-end gap-1.5">
+                                <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono font-black text-[10px]">
+                                  {target.distFromMeasure}m
+                                </span>
+                                <a
+                                  href={`https://map.naver.com/p/search/${encodeURIComponent(target.name)}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-[10px] text-emerald-600 hover:text-emerald-700 font-bold flex items-center gap-0.5 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200"
+                                  title="네이버 플레이스에서 확인"
+                                >
+                                  <Navigation size={10} />
+                                  <span>플레이스</span>
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="py-12 text-center text-slate-400 text-xs">
+                        <AlertCircle size={24} className="mx-auto mb-2 text-slate-300" />
+                        <p className="font-bold">조건에 맞는 발굴 매장이 없습니다.</p>
+                        {measureCategoryFilter !== "전체" && (
+                          <button
+                            onClick={() => setMeasureCategoryFilter("전체")}
+                            className="mt-2 text-[11px] text-indigo-600 font-black underline cursor-pointer bg-transparent border-0"
+                          >
+                            전체 카테고리 보기
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 패널 하단 액션 (관리자 모드일 때만) */}
+                  {mode === "admin" && (
+                    <div className="shrink-0 p-3 bg-white border-t border-slate-200">
+                      <button
+                        onClick={handleRegisterFromMeasure}
+                        className="w-full py-2 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-xs border-0 cursor-pointer"
+                      >
+                        <Plus size={14} />
+                        <span>이 측정 위치를 신규 타겟으로 등록</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
