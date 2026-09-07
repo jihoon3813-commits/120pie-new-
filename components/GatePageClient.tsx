@@ -14,11 +14,11 @@ const FRANCHISE_BG_URL = optimizeCloudinaryUrl(
   "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png"
 );
 
-export default function GatePageClient() {
+export default function GatePageClient({ className = "" }: { className?: string } = {}) {
   const [, setHoveredPanel] = useState<"brand" | "franchise" | null>(null);
 
   return (
-    <main className="h-[100dvh] w-full flex flex-col md:flex-row overflow-hidden bg-black font-sans select-none relative">
+    <main className={`w-full flex flex-col md:flex-row overflow-hidden bg-black font-sans select-none relative ${className || "h-[100dvh]"}`}>
       {/* Dynamic Cursor Follower */}
       <CursorFollower />
 
@@ -27,7 +27,7 @@ export default function GatePageClient() {
         href="/brand"
         onMouseEnter={() => setHoveredPanel("brand")}
         onMouseLeave={() => setHoveredPanel(null)}
-        className="relative flex-1 group overflow-hidden h-[50dvh] md:h-full transition-all duration-700 ease-out block"
+        className="relative flex-1 group overflow-hidden h-1/2 md:h-full transition-all duration-700 ease-out block"
       >
         {/* Background Image */}
         <div
@@ -78,7 +78,7 @@ export default function GatePageClient() {
         href="/franchise"
         onMouseEnter={() => setHoveredPanel("franchise")}
         onMouseLeave={() => setHoveredPanel(null)}
-        className="relative flex-1 group overflow-hidden h-[50dvh] md:h-full transition-all duration-700 ease-out block border-t md:border-t-0 md:border-l border-white/20"
+        className="relative flex-1 group overflow-hidden h-1/2 md:h-full transition-all duration-700 ease-out block border-t md:border-t-0 md:border-l border-white/20"
       >
         {/* Background Image */}
         <div

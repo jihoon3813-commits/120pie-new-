@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import LandingV6Client from "@/components/landing-v6/LandingV6Client";
+import GatePageClient from "@/components/GatePageClient";
 import { Phone, CheckCircle2, ShieldCheck, Sparkles, Building2 } from "lucide-react";
 
 const RESERVED_PATHS = new Set([
@@ -132,8 +132,10 @@ export default function PartnerBranchLandingPage() {
         </div>
       </div>
 
-      {/* 120겹파이 메인 가맹 랜딩페이지 */}
-      <LandingV6Client />
+      {/* 120겹파이 공식 메인 게이트웨이 페이지 */}
+      <div className="flex-1 w-full h-[calc(100dvh-44px)] overflow-hidden">
+        <GatePageClient className="h-full" />
+      </div>
     </div>
   );
 }
