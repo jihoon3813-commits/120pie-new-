@@ -931,10 +931,61 @@ export default function PortalPage() {
   // ==========================================
   // CONVEX REAL-TIME POPUP & FLOATING SYNC
   // ==========================================
+  // 1. Initial mount: Instant 0ms popup display using local cache
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isTestPopup = urlParams.get("test_popup") === "true";
+      const closedUntil = localStorage.getItem("120_popup_closed_until");
+      const isExpired = !closedUntil || Date.now() > parseInt(closedUntil, 10);
+
+      if (isTestPopup || isExpired) {
+        let popupsToUse: any[] | null = null;
+        const stored = localStorage.getItem("120_cached_popups_portal");
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) popupsToUse = parsed;
+          } catch (e) {}
+        }
+        if (!popupsToUse) {
+          const legacy = localStorage.getItem("120_popups");
+          if (legacy) {
+            try {
+              const parsed = JSON.parse(legacy);
+              if (parsed && parsed.isActive) popupsToUse = [parsed];
+            } catch (e) {}
+          }
+        }
+        if (popupsToUse && popupsToUse.length > 0) {
+          setCachedPopups(popupsToUse);
+          setShowPopup(true);
+          // Preload first image immediately into browser cache
+          if (popupsToUse[0]?.image) {
+            const img = new Image();
+            img.src = optimizeCloudinaryUrl(popupsToUse[0].image);
+          }
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  // 2. Real-time Convex Sync: Update cache & ensure accuracy
   useEffect(() => {
     if (convexActivePopups !== undefined) {
       if (convexActivePopups && convexActivePopups.length > 0) {
-        // Query string bypass parameter for testing (?test_popup=true)
+        setCachedPopups(convexActivePopups);
+        try {
+          localStorage.setItem("120_cached_popups_portal", JSON.stringify(convexActivePopups));
+          // Preload all active popup images
+          convexActivePopups.forEach((p: any) => {
+            if (p.image) {
+              const img = new Image();
+              img.src = optimizeCloudinaryUrl(p.image);
+            }
+          });
+        } catch (e) {}
+
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get("test_popup") === "true") {
           setShowPopup(true);
@@ -948,7 +999,12 @@ export default function PortalPage() {
           }
         }
       } else {
+        // DB confirms no active popups -> close
         setShowPopup(false);
+        setCachedPopups([]);
+        try {
+          localStorage.removeItem("120_cached_popups_portal");
+        } catch (e) {}
       }
     }
   }, [convexActivePopups]);
@@ -1017,6 +1073,7 @@ export default function PortalPage() {
   const [popupSettings, setPopupSettings] = useState<any>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [currentPopupIdx, setCurrentPopupIdx] = useState<number>(0);
+  const [cachedPopups, setCachedPopups] = useState<any[]>([]);
   const [floatingSettings, setFloatingSettings] = useState<any>(null);
   const [floatingOpen, setFloatingOpen] = useState<boolean>(false);
 
@@ -6106,8 +6163,14 @@ export default function PortalPage() {
       {/* ==========================================
           REAL-TIME 3:4 FULL-IMAGE POPUP MODAL (MULTI-POPUP SUPPORT)
          ========================================== */}
-      {showPopup && convexActivePopups && convexActivePopups.length > 0 && (() => {
-        const activePopupsList = convexActivePopups;
+      {(() => {
+        const displayPopupsList = (convexActivePopups !== undefined && convexActivePopups.length > 0)
+          ? convexActivePopups
+          : cachedPopups;
+
+        if (!showPopup || !displayPopupsList || displayPopupsList.length === 0) return null;
+
+        const activePopupsList = displayPopupsList;
         const safePopupIdx = Math.min(currentPopupIdx, Math.max(0, activePopupsList.length - 1));
         const currentActivePopup = activePopupsList[safePopupIdx];
         if (!currentActivePopup) return null;
@@ -6160,6 +6223,8 @@ export default function PortalPage() {
                   <img 
                     src={optimizeCloudinaryUrl(currentActivePopup.image)} 
                     alt={currentActivePopup.title} 
+                    loading="eager"
+                    decoding="sync"
                     className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-300"
                   />
                 ) : (

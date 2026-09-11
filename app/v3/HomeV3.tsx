@@ -1046,6 +1046,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   const [popupSettings, setPopupSettings] = useState<any>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [currentPopupIdx, setCurrentPopupIdx] = useState<number>(0);
+  const [cachedPopups, setCachedPopups] = useState<any[]>([]);
   const [floatingSettings, setFloatingSettings] = useState<any>(null);
   const [floatingOpen, setFloatingOpen] = useState<boolean>(false);
   const popupClosedInSessionRef = useRef<boolean>(false);
@@ -1130,10 +1131,10 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
   const addInquiry = useMutation(api.inquiries.add);
   const sendSmsAction = useAction(api.aligo.sendEventSms);
 
-  // Dynamic Popup & Floating data loading synced with Convex (fallback to localStorage if not yet loaded)
+  // Dynamic Popup & Floating data loading synced with Convex (fallback to localStorage for 0ms instant display)
+  // 1. Initial mount: Instant 0ms popup display using local cache
   useEffect(() => {
-    // Check if closed in current tab session or closed for 7 days
-    if (typeof window !== "undefined") {
+    try {
       const urlParams = new URLSearchParams(window.location.search);
       const isTestPopup = urlParams.get("test_popup") === "true";
       const isResetPopup = urlParams.get("reset_popup") === "true";
@@ -1149,34 +1150,79 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         // Bypass storage block checks
       } else {
         const closedInSession = sessionStorage.getItem("120_popup_closed_session");
-        if (closedInSession === "true") {
-          setShowPopup(false);
-          return;
-        }
+        if (closedInSession === "true") return;
         
         const closedUntil = localStorage.getItem("120_popup_closed_until");
         const isExpired = !closedUntil || Date.now() > parseInt(closedUntil, 10);
-        if (!isExpired) {
-          setShowPopup(false);
-          return;
+        if (!isExpired) return;
+      }
+
+      let popupsToUse: any[] | null = null;
+      const stored = localStorage.getItem("120_cached_popups_landing");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) popupsToUse = parsed;
+        } catch (e) {}
+      }
+      if (!popupsToUse) {
+        const legacy = localStorage.getItem("120_popups");
+        if (legacy) {
+          try {
+            const parsed = JSON.parse(legacy);
+            if (parsed && parsed.isActive) popupsToUse = [parsed];
+          } catch (e) {}
         }
       }
-    }
-
-    if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("test_popup") !== "true") {
-        if (popupClosedInSessionRef.current) return;
+      if (popupsToUse && popupsToUse.length > 0) {
+        setCachedPopups(popupsToUse);
+        setShowPopup(true);
+        if (popupsToUse[0]?.image) {
+          const img = new Image();
+          img.src = optimizeCloudinaryUrl(popupsToUse[0].image);
+        }
       }
-    } else {
-      if (popupClosedInSessionRef.current) return;
-    }
+    } catch (e) {}
+  }, []);
 
+  // 2. Real-time Convex Sync: Update cache & ensure accuracy
+  useEffect(() => {
     if (convexActivePopups !== undefined) {
       if (convexActivePopups && convexActivePopups.length > 0) {
-        setShowPopup(true);
+        setCachedPopups(convexActivePopups);
+        try {
+          localStorage.setItem("120_cached_popups_landing", JSON.stringify(convexActivePopups));
+          convexActivePopups.forEach((p: any) => {
+            if (p.image) {
+              const img = new Image();
+              img.src = optimizeCloudinaryUrl(p.image);
+            }
+          });
+        } catch (e) {}
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("test_popup") === "true") {
+          setShowPopup(true);
+        } else {
+          const closedInSession = sessionStorage.getItem("120_popup_closed_session");
+          if (closedInSession === "true") {
+            setShowPopup(false);
+            return;
+          }
+          const closedUntil = localStorage.getItem("120_popup_closed_until");
+          const isExpired = !closedUntil || Date.now() > parseInt(closedUntil, 10);
+          if (isExpired) {
+            setShowPopup(true);
+          } else {
+            setShowPopup(false);
+          }
+        }
       } else {
         setShowPopup(false);
+        setCachedPopups([]);
+        try {
+          localStorage.removeItem("120_cached_popups_landing");
+        } catch (e) {}
       }
     }
   }, [convexActivePopups]);
@@ -3578,8 +3624,14 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
       {/* ==========================================
           REAL-TIME 3:4 FULL-IMAGE POPUP MODAL (MULTI-POPUP SUPPORT)
          ========================================== */}
-      {showPopup && convexActivePopups && convexActivePopups.length > 0 && (() => {
-        const activePopupsList = convexActivePopups;
+      {(() => {
+        const displayPopupsList = (convexActivePopups !== undefined && convexActivePopups.length > 0)
+          ? convexActivePopups
+          : cachedPopups;
+
+        if (!showPopup || !displayPopupsList || displayPopupsList.length === 0) return null;
+
+        const activePopupsList = displayPopupsList;
         const safePopupIdx = Math.min(currentPopupIdx, Math.max(0, activePopupsList.length - 1));
         const currentActivePopup = activePopupsList[safePopupIdx];
         if (!currentActivePopup) return null;
@@ -3622,6 +3674,8 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                   <img 
                     src={optimizeCloudinaryUrl(currentActivePopup.image)} 
                     alt={currentActivePopup.title} 
+                    loading="eager"
+                    decoding="sync"
                     className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-300"
                   />
                 ) : (

@@ -4601,6 +4601,9 @@ export default function AdminPage() {
         localStorage.removeItem("120_popup_closed_until");
         localStorage.removeItem("120_popup_closed_date");
         localStorage.removeItem("120_popup_closed_title");
+        localStorage.removeItem("120_cached_popups_portal");
+        localStorage.removeItem("120_cached_popups_landing");
+        localStorage.removeItem("120_popups");
         sessionStorage.removeItem("120_popup_closed_session");
       }
 
