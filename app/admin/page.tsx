@@ -28,6 +28,7 @@ import {
   Video,
   FileText,
   ChevronRight,
+  ChevronLeft,
   Clock,
   CheckCircle2,
   Truck,
@@ -70,7 +71,9 @@ import {
   Printer,
   Award,
   Crosshair,
-  Save
+  Save,
+  Camera,
+  PhoneCall
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
 import RadarMap from "@/app/components/RadarMap";
@@ -92,6 +95,7 @@ const COLOR_PRESETS = {
 const DEFAULT_STATUS_COLORS: { [status: string]: string } = {
   "주문완료": "pink",
   "입금대기": "yellow",
+  "입금확인완료": "emerald",
   "결제완료": "emerald",
   "배송준비중": "orange",
   "배송중": "blue",
@@ -2351,7 +2355,7 @@ export default function AdminPage() {
   };
 
   // Settings & Status Management States
-  const [deliveryStatuses, setDeliveryStatuses] = useState<string[]>(["주문완료", "배송준비중", "배송중", "배송완료"]);
+  const [deliveryStatuses, setDeliveryStatuses] = useState<string[]>(["주문완료", "입금확인완료", "배송준비중", "배송중", "배송완료"]);
   const [newStatusName, setNewStatusName] = useState<string>("");
   const [adminIdSetting, setAdminIdSetting] = useState<string>("admin");
   const [adminPwSetting, setAdminPwSetting] = useState<string>("");
@@ -2399,7 +2403,10 @@ export default function AdminPage() {
       setPrs(loadState("120_prs", DEFAULT_PRS));
 
       // Settings and Status Load
-      const ds = loadState("120_delivery_statuses", ["주문완료", "배송준비중", "배송중", "배송완료"]);
+      const ds = loadState("120_delivery_statuses", ["주문완료", "입금확인완료", "배송준비중", "배송중", "배송완료"]);
+      if (Array.isArray(ds) && !ds.includes("입금확인완료")) {
+        ds.splice(1, 0, "입금확인완료");
+      }
       setDeliveryStatuses(ds);
       const storedAdminId = localStorage.getItem("120_admin_id") || "admin";
       setAdminIdSetting(storedAdminId);
@@ -4281,7 +4288,8 @@ export default function AdminPage() {
     reader.onloadend = async () => {
       if (typeof reader.result === "string") {
         try {
-          const compressed = await compressImage(reader.result, 800, 800, 0.7);
+          // 3:4 비율 (가로 900, 세로 1200) 압축 최적화
+          const compressed = await compressImage(reader.result, 900, 1200, 0.8);
           setPopupImage(compressed);
         } catch (err) {
           console.error("Popup image compression error:", err);
@@ -4561,26 +4569,22 @@ export default function AdminPage() {
 
   const handleSavePopup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!popupTitle || !popupDesc) {
-      alert("팝업 제목과 상세 본문을 모두 입력해 주세요.");
+    if (!popupTitle.trim()) {
+      alert("팝업 식별용 제목을 입력해 주세요.");
+      return;
+    }
+    if (!popupImage.trim()) {
+      alert("3:4 비율의 팝업 이미지를 등록하거나 업로드해 주세요.");
       return;
     }
 
     try {
       const payload: any = {
         isActive: popupActive,
-        title: popupTitle,
-        desc: popupDesc,
-        image: popupImage || undefined,
-        link: popupLink || undefined,
-        btnText: popupBtnText || undefined,
-        titleColor: popupTitleColor || undefined,
-        titleSize: popupTitleSize || undefined,
-        descColor: popupDescColor || undefined,
-        descSize: popupDescSize || undefined,
-        btnBgColor: popupBtnBgColor || undefined,
-        btnTextColor: popupBtnTextColor || undefined,
-        btnTextSize: popupBtnTextSize || undefined,
+        title: popupTitle.trim(),
+        desc: popupDesc.trim() || popupTitle.trim(),
+        image: popupImage.trim() || undefined,
+        link: popupLink.trim() || undefined,
         startDate: popupStartDate || undefined,
         endDate: popupEndDate || undefined,
         targetPage: popupTargetPage,
@@ -4594,6 +4598,7 @@ export default function AdminPage() {
       
       // Clear tab-specific local flags to force fresh loading on user-side
       if (typeof window !== "undefined") {
+        localStorage.removeItem("120_popup_closed_until");
         localStorage.removeItem("120_popup_closed_date");
         localStorage.removeItem("120_popup_closed_title");
         sessionStorage.removeItem("120_popup_closed_session");
@@ -4602,8 +4607,8 @@ export default function AdminPage() {
       setShowPopupModal(false);
       triggerToast(
         selectedPopupForEdit
-          ? "공지 팝업 수정이 성공적으로 완료되었습니다!"
-          : "신규 공지 팝업이 성공적으로 등록 및 배포되었습니다!"
+          ? "3:4 이미지 팝업 수정이 성공적으로 완료되었습니다!"
+          : "신규 3:4 이미지 팝업이 성공적으로 등록 및 배포되었습니다!"
       );
     } catch (err) {
       console.error("Popup save error:", err);
@@ -7749,7 +7754,7 @@ export default function AdminPage() {
 
                     <div className="bg-white rounded-lg p-5 border-0 shadow-md space-y-1">
                       <span className="text-xs font-bold text-slate-400">당월 총 발생 수수료</span>
-                      <div className="text-2xl font-black text-rose-600 font-mono">
+                      <div className="text-2xl font-black text-rose-600">
                         {convexPartners.reduce((sum: number, p: any) => sum + (p.currentMonthCommission || 0), 0).toLocaleString()} 원
                       </div>
                       <span className="text-[11px] text-slate-400 font-bold">익월 정산 대상</span>
@@ -7814,18 +7819,18 @@ export default function AdminPage() {
                                         <span className="text-xs text-slate-400 font-normal">({partner.companyName})</span>
                                       )}
                                     </div>
-                                    <div className="text-[11px] font-mono text-blue-600 font-bold">
+                                    <div className="text-[11px] text-blue-600 font-bold">
                                       ID: {partner.id} (PW: {partner.pw})
                                     </div>
                                   </td>
                                   <td className="py-3.5 px-3">
-                                    <div className="font-mono text-slate-700 font-bold">{partner.phone}</div>
+                                    <div className="text-slate-700 font-bold">{partner.phone}</div>
                                     <div className="text-[11px] text-slate-400">{partner.email || "-"}</div>
                                   </td>
                                   <td className="py-3.5 px-3">
                                     <div className="font-bold text-slate-800">
                                       {partner.bankName || "은행미등록"}{" "}
-                                      <span className="font-mono font-normal">{partner.accountNumber || "-"}</span>
+                                      <span className="font-normal">{partner.accountNumber || "-"}</span>
                                     </div>
                                     <div className="text-[11px] text-slate-400">
                                       예금주: {partner.accountHolder || partner.name}
@@ -7836,10 +7841,10 @@ export default function AdminPage() {
                                       {partner.storesCount || 0} 개점
                                     </span>
                                   </td>
-                                  <td className="py-3.5 px-3 text-right font-black text-amber-600 font-mono">
+                                  <td className="py-3.5 px-3 text-right font-black text-amber-600">
                                     {partner.currentMonthBoxes || 0} 박스
                                   </td>
-                                  <td className="py-3.5 px-3 text-right font-black text-[#0F172A] font-mono text-sm">
+                                  <td className="py-3.5 px-3 text-right font-black text-[#0F172A] text-sm">
                                     {(partner.currentMonthCommission || 0).toLocaleString()} 원
                                   </td>
                                   <td className="py-3.5 px-3 text-center">
@@ -7855,7 +7860,7 @@ export default function AdminPage() {
                                       {partner.status}
                                     </span>
                                   </td>
-                                  <td className="py-3.5 px-3 text-slate-400 font-mono">{partner.regDate}</td>
+                                  <td className="py-3.5 px-3 text-slate-400">{partner.regDate}</td>
                                   <td className="py-3.5 px-4 text-center">
                                     <div className="flex items-center justify-center gap-1.5">
                                       <button
@@ -7938,13 +7943,13 @@ export default function AdminPage() {
                           <tbody className="divide-y divide-neutral-100">
                             {allSettlements.map((st: any, idx: number) => (
                               <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                                <td className="py-3.5 px-3 font-mono font-black text-[#0F172A]">{st.yearMonth}</td>
+                                <td className="py-3.5 px-3 font-black text-[#0F172A]">{st.yearMonth}</td>
                                 <td className="py-3.5 px-3">
                                   <div className="font-bold text-[#0F172A]">
                                     {st.partnerName}{" "}
                                     {st.companyName && <span className="text-slate-400 font-normal">({st.companyName})</span>}
                                   </div>
-                                  <div className="text-[11px] text-slate-400 font-mono">{st.phone}</div>
+                                  <div className="text-[11px] text-slate-400">{st.phone}</div>
                                 </td>
                                 <td className="py-3.5 px-3">
                                   <div className="font-medium text-slate-800">
@@ -7957,13 +7962,13 @@ export default function AdminPage() {
                                 <td className="py-3.5 px-3 text-center font-bold text-slate-700">
                                   {st.storeCount} 개점
                                 </td>
-                                <td className="py-3.5 px-3 text-right font-black text-amber-600 font-mono">
+                                <td className="py-3.5 px-3 text-right font-black text-amber-600">
                                   {st.boxCount} 박스
                                 </td>
-                                <td className="py-3.5 px-3 text-right text-slate-500 font-mono">
+                                <td className="py-3.5 px-3 text-right text-slate-500">
                                   {(st.commissionUnit || 8000).toLocaleString()}원
                                 </td>
-                                <td className="py-3.5 px-3 text-right font-black text-rose-600 font-mono text-sm">
+                                <td className="py-3.5 px-3 text-right font-black text-rose-600 text-sm">
                                   {(st.commissionAmount || 0).toLocaleString()} 원
                                 </td>
                                 <td className="py-3.5 px-3 text-center">
@@ -7979,7 +7984,7 @@ export default function AdminPage() {
                                     {st.status}
                                   </span>
                                 </td>
-                                <td className="py-3.5 px-3 text-center font-mono text-slate-400">
+                                <td className="py-3.5 px-3 text-center text-slate-400">
                                   {st.paidDate || "-"}
                                 </td>
                                 <td className="py-3.5 px-4 text-center">
@@ -8692,6 +8697,7 @@ export default function AdminPage() {
                       <option value="all">전체 진행상태</option>
                       <option value="결제완료">결제완료</option>
                       <option value="입금대기">입금대기</option>
+                      <option value="입금확인완료">입금확인완료</option>
                       <option value="배송준비중">배송준비중</option>
                       <option value="배송중">배송중</option>
                       <option value="배송완료">배송완료</option>
@@ -8731,6 +8737,7 @@ export default function AdminPage() {
                     { key: "all", label: "전체", count: (orders || []).length },
                     { key: "결제완료", label: "결제완료", count: (orders || []).filter(o => o && o.status === "결제완료").length },
                     { key: "입금대기", label: "입금대기", count: (orders || []).filter(o => o && o.status === "입금대기").length },
+                    { key: "입금확인완료", label: "입금확인완료", count: (orders || []).filter(o => o && o.status === "입금확인완료").length },
                     { key: "배송준비중", label: "배송준비중", count: (orders || []).filter(o => o && o.status === "배송준비중").length },
                     { key: "배송중", label: "배송중", count: (orders || []).filter(o => o && o.status === "배송중").length },
                     { key: "배송완료", label: "배송완료", count: (orders || []).filter(o => o && o.status === "배송완료").length },
@@ -8842,6 +8849,16 @@ export default function AdminPage() {
                               </td>
                               <td className="p-4 sm:p-5 text-center whitespace-nowrap">
                                 <div className="flex items-center justify-center gap-1.5">
+                                  {order.status === "입금대기" && (
+                                    <button
+                                      type="button"
+                                      onClick={() => updateOrderStatus(order.id, "입금확인완료")}
+                                      className="px-2.5 py-1.5 rounded-md bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-[11px] font-black transition-all border border-emerald-200 hover:border-emerald-600 shadow-2xs cursor-pointer"
+                                      title="무통장입금 확인 완료 처리 (파트너 정산금 즉시 반영)"
+                                    >
+                                      입금확인
+                                    </button>
+                                  )}
                                   <button
                                     type="button"
                                     onClick={() => handleOpenOrderModal(order)}
@@ -9220,86 +9237,7 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Consultation Detail Modal */}
-          {selectedConsultation && (
-            <div 
-              className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
-              onClick={() => setSelectedConsultation(null)}
-            >
-              <div 
-                className="w-full max-w-lg bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="p-5 border-b border-neutral-200 flex items-center justify-between bg-slate-50">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 font-black">
-                      <MessageSquare size={16} />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-black text-slate-900">상담 신청 상세 내역</h3>
-                      <p className="text-[11px] text-slate-500">접수일: {selectedConsultation.regDate}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setSelectedConsultation(null)}
-                    className="p-1.5 text-slate-400 hover:text-slate-700 border-0 cursor-pointer bg-transparent rounded-lg"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
 
-                <div className="p-6 space-y-4 text-xs bg-white">
-                  <div className="grid grid-cols-2 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                    <div>
-                      <span className="text-slate-400 block text-[11px]">신청 고객명</span>
-                      <strong className="text-sm text-slate-900">{selectedConsultation.name}</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block text-[11px]">연락처</span>
-                      <strong className="text-sm text-slate-900">{selectedConsultation.phone}</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block text-[11px]">희망 유형</span>
-                      <span className="inline-block mt-0.5 px-2 py-0.5 rounded bg-white border border-slate-200 font-bold text-slate-700 text-[11px]">
-                        {selectedConsultation.storeType}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block text-[11px]">유치 파트너</span>
-                      <span className="inline-block mt-0.5 px-2 py-0.5 rounded bg-amber-50 border border-amber-200 font-bold text-amber-900 text-[11px]">
-                        {selectedConsultation.partnerName ? `🌟 ${selectedConsultation.partnerName}` : "🏢 본사 직속"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-500 block mb-1">상세 문의 내용</label>
-                    <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl whitespace-pre-wrap leading-relaxed text-slate-800">
-                      {selectedConsultation.message || "작성된 상세 문의 내용이 없습니다."}
-                    </div>
-                  </div>
-
-                  {selectedConsultation.partnerMemo && (
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-500 block mb-1">파트너 작성 상담 메모</label>
-                      <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-xl whitespace-pre-wrap leading-relaxed text-slate-700 text-[11px]">
-                        {selectedConsultation.partnerMemo}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-4 border-t border-neutral-200 bg-slate-50 flex justify-end">
-                  <button
-                    onClick={() => setSelectedConsultation(null)}
-                    className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl border-0 cursor-pointer shadow-xs"
-                  >
-                    닫기
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* ==========================================
               MENU: 6.8. HOMEPAGE ANALYTICS MANAGEMENT
@@ -9844,9 +9782,10 @@ export default function AdminPage() {
                         <thead>
                           <tr className="bg-[#F8F9FD] border-b border-[#EEF0F5]">
                             <th className="p-4 text-[11px] font-extrabold text-slate-500 w-20 text-center">노출 여부</th>
-                            <th className="p-4 text-[11px] font-extrabold text-slate-500">팝업 제목 및 본문 요약</th>
+                            <th className="p-4 text-[11px] font-extrabold text-slate-500 w-20 text-center">이미지(3:4)</th>
+                            <th className="p-4 text-[11px] font-extrabold text-slate-500">팝업 관리 제목 & 이동 링크</th>
                             <th className="p-4 text-[11px] font-extrabold text-slate-500 w-32">게시 대상 페이지</th>
-                            <th className="p-4 text-[11px] font-extrabold text-slate-500 w-48">게시 기간 (기간 필터)</th>
+                            <th className="p-4 text-[11px] font-extrabold text-slate-500 w-44">게시 기간 (기간 필터)</th>
                             <th className="p-4 text-[11px] font-extrabold text-slate-500 w-28">등록 일자</th>
                             <th className="p-4 text-[11px] font-extrabold text-slate-500 w-24 text-center">관리</th>
                           </tr>
@@ -9854,13 +9793,13 @@ export default function AdminPage() {
                         <tbody className="divide-y divide-slate-100 text-xs">
                           {convexPopupsList === undefined ? (
                             <tr>
-                              <td colSpan={6} className="p-8 text-center text-slate-400 font-bold">
+                              <td colSpan={7} className="p-8 text-center text-slate-400 font-bold">
                                 팝업 히스토리 데이터를 실시간 조회하는 중입니다...
                               </td>
                             </tr>
                           ) : convexPopupsList.length === 0 ? (
                             <tr>
-                              <td colSpan={6} className="p-8 text-center text-slate-400 font-bold">
+                              <td colSpan={7} className="p-8 text-center text-slate-400 font-bold">
                                 등록된 팝업 히스토리가 없습니다. 우측 상단의 [신규 팝업 등록] 버튼을 눌러 첫 팝업을 발행해 보세요!
                               </td>
                             </tr>
@@ -9874,10 +9813,10 @@ export default function AdminPage() {
                               let pageBadge = "bg-slate-100 text-slate-700";
                               let pageText = "전체 페이지";
                               if (pop.targetPage === "landing") {
-                                pageBadge = "bg-slate-100 text-slate-700";
+                                pageBadge = "bg-blue-50 text-blue-700 border border-blue-200/60";
                                 pageText = "💻 랜딩 페이지";
                               } else if (pop.targetPage === "portal") {
-                                pageBadge = "bg-slate-100 text-slate-700";
+                                pageBadge = "bg-amber-50 text-amber-700 border border-amber-200/60";
                                 pageText = "📢 점주 포털";
                               }
 
@@ -9890,40 +9829,64 @@ export default function AdminPage() {
                                       className={`w-10 h-5 rounded-full p-0.5 mx-auto transition-all duration-300 flex border-0 cursor-pointer ${
                                         pop.isActive ? "bg-[#FED422] justify-end" : "bg-slate-200 justify-start"
                                       }`}
+                                      title={pop.isActive ? "현재 활성화됨 (클릭하여 비활성화)" : "현재 비활성화됨 (클릭하여 활성화)"}
                                     >
                                       <span className="w-4 h-4 rounded-full bg-white shadow-2xs block"></span>
                                     </button>
                                   </td>
+                                  <td className="p-3 text-center">
+                                    {pop.image ? (
+                                      <div className="w-12 h-16 rounded-md overflow-hidden bg-slate-100 border border-slate-200 shadow-2xs mx-auto relative group cursor-pointer" onClick={() => handleOpenPopupModal(pop)}>
+                                        <img src={optimizeCloudinaryUrl(pop.image)} alt={pop.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                      </div>
+                                    ) : (
+                                      <div className="w-12 h-16 rounded-md bg-slate-100 border border-dashed border-slate-200 flex items-center justify-center text-slate-400 mx-auto">
+                                        <ImageIcon size={16} />
+                                      </div>
+                                    )}
+                                  </td>
                                   <td className="p-4 space-y-1">
-                                    <div className="font-extrabold text-[#0F172A] flex items-center gap-1.5">
-                                      {pop.title}
+                                    <div className="font-extrabold text-[#0F172A] flex items-center gap-1.5 flex-wrap">
+                                      <span>{pop.title}</span>
                                       {pop.isActive && isPeriodActive && (
-                                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500 text-white text-[9px] font-black animate-pulse whitespace-nowrap shrink-0 inline-block shadow-2xs">
+                                        <span className="px-2.5 py-0.5 rounded-md bg-emerald-500 text-white text-[9px] font-black animate-pulse whitespace-nowrap shrink-0 inline-block shadow-2xs">
                                           현재 게시중
                                         </span>
                                       )}
                                       {pop.isActive && !isPeriodActive && !isEnded && (
-                                        <span className="px-2.5 py-1 rounded-lg bg-amber-500 text-white text-[9px] font-black whitespace-nowrap shrink-0 inline-block shadow-2xs">
-                                          대기중
+                                        <span className="px-2.5 py-0.5 rounded-md bg-amber-500 text-white text-[9px] font-black whitespace-nowrap shrink-0 inline-block shadow-2xs">
+                                          게시 대기중
                                         </span>
                                       )}
                                       {isEnded && (
-                                        <span className="px-2.5 py-1 rounded-lg bg-slate-400 text-white text-[9px] font-black whitespace-nowrap shrink-0 inline-block shadow-2xs">
+                                        <span className="px-2.5 py-0.5 rounded-md bg-slate-400 text-white text-[9px] font-black whitespace-nowrap shrink-0 inline-block shadow-2xs">
                                           기간 종료
                                         </span>
                                       )}
+                                      {!pop.isActive && (
+                                        <span className="px-2.5 py-0.5 rounded-md bg-slate-200 text-slate-600 text-[9px] font-bold whitespace-nowrap shrink-0 inline-block">
+                                          비활성
+                                        </span>
+                                      )}
                                     </div>
-                                    <div className="text-[10px] text-slate-500 line-clamp-1 font-medium">{pop.desc}</div>
+                                    {pop.link ? (
+                                      <div className="text-[11px] text-blue-600 font-semibold flex items-center gap-1 truncate max-w-md">
+                                        <ExternalLink size={12} className="shrink-0 text-blue-500" />
+                                        <span className="truncate">{pop.link}</span>
+                                      </div>
+                                    ) : (
+                                      <div className="text-[10px] text-slate-400 font-medium">클릭 이동 링크 없음 (이미지만 표시)</div>
+                                    )}
                                   </td>
                                   <td className="p-4">
-                                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold border-0 shadow-2xs ${pageBadge}`}>
+                                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold shadow-2xs inline-block ${pageBadge}`}>
                                       {pageText}
                                     </span>
                                   </td>
-                                  <td className="p-4 font-mono text-[10px] text-slate-500 font-bold">
-                                    {pop.startDate || "무제한"} ~ {pop.endDate || "무제한"}
+                                  <td className="p-4 text-[11px] text-slate-600 font-semibold">
+                                    {pop.startDate || "무제한"} ~ {pop.endDate || "상시"}
                                   </td>
-                                  <td className="p-4 text-[10px] text-slate-500 font-bold">
+                                  <td className="p-4 text-[11px] text-slate-500 font-medium">
                                     {pop.createdAt ? pop.createdAt.substring(0, 10) : "-"}
                                   </td>
                                   <td className="p-4">
@@ -9957,53 +9920,49 @@ export default function AdminPage() {
 
                   {/* 팝업 등록 및 수정 모달 */}
                   {showPopupModal && (
-                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-md animate-fadeIn overflow-x-hidden">
-                      <div className="bg-white border-0 rounded-lg sm:rounded-lg w-full max-w-5xl max-w-[calc(100vw-24px)] max-h-[90vh] overflow-hidden shadow-2xl flex flex-col font-sans">
-                        <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
-                          <div>
-                            <h3 className="font-black text-base sm:text-lg text-[#0F172A] flex items-center gap-2">
-                              <span>📢 {selectedPopupForEdit ? "공지 팝업 설정 수정" : "신규 공지 팝업 등록 및 발행"}</span>
-                            </h3>
-                            <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">홈페이지 및 점주 포털에 팝업을 게시합니다.</p>
-                          </div>
+                    <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto">
+                      <div className="bg-white border border-slate-200/80 rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden shadow-2xl flex flex-col font-sans my-auto">
+                        {/* Header */}
+                        <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
                           <div className="flex items-center gap-3">
-                            <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
-                              팝업 설정
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setShowPopupModal(false)}
-                              className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
-                            >
-                              <X size={16} />
-                            </button>
+                            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100/80 flex items-center justify-center text-amber-600">
+                              <Bell size={18} />
+                            </div>
+                            <div>
+                              <h3 className="text-base font-bold text-slate-900">
+                                {selectedPopupForEdit ? "3:4 전면 이미지 팝업 설정 수정" : "신규 3:4 전면 이미지 팝업 등록"}
+                              </h3>
+                              <p className="text-xs text-slate-400 mt-0.5">3:4 세로형 전면 이미지 팝업을 등록하며, 이미지 클릭 시 설정된 링크로 즉시 이동합니다.</p>
+                            </div>
                           </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowPopupModal(false)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                          >
+                            <X size={18} />
+                          </button>
                         </div>
 
-                        <div className="flex flex-col md:flex-row flex-1 overflow-y-auto bg-[#f9fafb]">
+                        <div className="flex flex-col md:flex-row flex-1 overflow-y-auto bg-slate-50/50">
                           {/* Left: Input Form (60%) */}
-                          <form onSubmit={handleSavePopup} className="p-6 sm:p-7 space-y-4 flex-1 border-r border-slate-100 overflow-y-auto">
-                            {/* Card 1: Target & Status (Amber Accent) */}
-                            <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
-                              <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                                <div className="flex items-center gap-2.5">
-                                  <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
-                                    🎯
-                                  </div>
-                                  <span className="text-xs font-black text-[#0F172A] tracking-tight">게시 대상 및 활성화</span>
-                                </div>
-                                <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                                  게시 대상
+                          <form onSubmit={handleSavePopup} className="p-6 space-y-4 flex-1 border-r border-slate-200/70 overflow-y-auto">
+                            {/* Card 1: Target & Status */}
+                            <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <span className="text-xs font-bold text-slate-900">게시 대상 및 활성화</span>
+                                <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                                  설정 01
                                 </span>
                               </div>
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
-                                  <label className="text-xs font-extrabold text-[#0F172A] block">게시 대상 페이지 (필수)</label>
+                                  <label className="text-xs font-semibold text-slate-700 block">게시 대상 페이지 <span className="text-red-500">*</span></label>
                                   <select
                                     value={popupTargetPage}
                                     onChange={(e) => setPopupTargetPage(e.target.value)}
-                                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 cursor-pointer outline-none transition-all"
                                   >
                                     <option value="all">전체 페이지 노출 (landing + portal)</option>
                                     <option value="landing">💻 홈페이지 메인 랜딩 (landing)</option>
@@ -10011,166 +9970,201 @@ export default function AdminPage() {
                                   </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                  <label className="text-xs font-extrabold text-[#0F172A] block">즉시 활성화 설정</label>
-                                  <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-lg px-4 py-2.5 shadow-2xs">
+                                  <label className="text-xs font-semibold text-slate-700 block">노출 활성화 상태</label>
+                                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2">
                                     <button
                                       type="button"
                                       onClick={() => setPopupActive(!popupActive)}
-                                      className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 flex border-0 cursor-pointer ${
+                                      className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-200 flex border-0 cursor-pointer ${
                                         popupActive ? "bg-[#FED422] justify-end" : "bg-slate-300 justify-start"
                                       }`}
                                     >
-                                      <span className="w-4 h-4 rounded-full bg-white shadow-2xs block"></span>
+                                      <span className="w-4 h-4 rounded-full bg-white shadow-xs block"></span>
                                     </button>
-                                    <span className="text-xs font-extrabold text-[#0F172A]">
-                                      {popupActive ? "활성화 (노출 대상 편입)" : "비활성화 (임시 저장)"}
+                                    <span className={`text-xs font-medium ${popupActive ? "text-slate-900 font-semibold" : "text-slate-500"}`}>
+                                      {popupActive ? "활성화 (노출 대상)" : "비활성화 (임시 저장)"}
                                     </span>
                                   </div>
                                 </div>
                               </div>
                             </div>
 
-                            {/* Card 2: Period & Title (Blue Accent) */}
-                            <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
-                              <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                                <div className="flex items-center gap-2.5">
-                                  <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
-                                    📅
-                                  </div>
-                                  <span className="text-xs font-black text-[#0F172A] tracking-tight">게시 기간 및 제목</span>
-                                </div>
-                                <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                                  기본 정보
+                            {/* Card 2: Period & Title */}
+                            <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <span className="text-xs font-bold text-slate-900">게시 기간 및 관리 제목</span>
+                                <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                                  설정 02
                                 </span>
                               </div>
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
-                                  <label className="text-xs font-extrabold text-[#0F172A] block">게시 시작 날짜 (미설정 시 즉시게시)</label>
+                                  <label className="text-xs font-semibold text-slate-700 block">게시 시작 날짜 (미설정 시 즉시게시)</label>
                                   <input
                                     type="date"
                                     value={popupStartDate}
                                     onChange={(e) => setPopupStartDate(e.target.value)}
-                                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                                   />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <label className="text-xs font-extrabold text-[#0F172A] block">게시 종료 날짜 (미설정 시 상시게시)</label>
+                                  <label className="text-xs font-semibold text-slate-700 block">게시 종료 날짜 (미설정 시 상시게시)</label>
                                   <input
                                     type="date"
                                     value={popupEndDate}
                                     onChange={(e) => setPopupEndDate(e.target.value)}
-                                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                                   />
                                 </div>
                               </div>
 
                               <div className="space-y-1.5">
-                                <label className="text-xs font-extrabold text-[#0F172A] block">팝업 제목 (필수)</label>
+                                <label className="text-xs font-semibold text-slate-700 block">팝업 식별 제목 <span className="text-red-500">*</span></label>
                                 <input
                                   type="text"
-                                  placeholder="예시) 2026 하절기 신메뉴 런칭 및 프로모션 안내"
+                                  placeholder="예: 2026 하절기 신메뉴 망고파이 런칭 프로모션"
                                   value={popupTitle}
                                   onChange={(e) => setPopupTitle(e.target.value)}
                                   required
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                                 />
+                                <p className="text-[11px] text-slate-400">관리자 목록에서 식별하기 위한 제목입니다.</p>
                               </div>
                             </div>
 
-                            {/* Card 3: Image & Link (Emerald Accent) */}
-                            <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
-                              <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                                <div className="flex items-center gap-2.5">
-                                  <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
-                                    🖼️
-                                  </div>
-                                  <span className="text-xs font-black text-[#0F172A] tracking-tight">팝업 이미지 및 연결 링크</span>
-                                </div>
-                                <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                                  미디어 및 링크
+                            {/* Card 3: 3:4 Image & Click Link */}
+                            <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <span className="text-xs font-bold text-slate-900">3:4 전면 이미지 및 이동 링크</span>
+                                <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                                  설정 03
                                 </span>
                               </div>
 
-                              <div className="space-y-1.5">
-                                <label className="text-xs font-extrabold text-[#0F172A] block">팝업 이미지 파일 직접 업로드 *</label>
-                                <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-lg p-3 shadow-2xs">
+                              <div className="p-3 bg-amber-50/80 border border-amber-200/60 rounded-lg text-xs text-amber-900 space-y-1">
+                                <div className="font-bold flex items-center gap-1.5">
+                                  <Sparkles size={14} className="text-amber-600" />
+                                  3:4 비율 전면 이미지 안내
+                                </div>
+                                <p className="text-[11px] text-amber-800/90 leading-relaxed">
+                                  팝업 전체가 <strong>3:4 비율(권장 해상도: 900 × 1200px)</strong>의 이미지로 노출됩니다. 파일 업로드 시 3:4 크기로 자동 최적화 압축됩니다.
+                                </p>
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="text-xs font-semibold text-slate-700 block">3:4 팝업 이미지 파일 직접 업로드 <span className="text-red-500">*</span></label>
+                                <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
                                   <input
                                     type="file"
                                     accept="image/*"
                                     onChange={handlePopupImageUpload}
-                                    className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1"
+                                    className="text-xs text-slate-500 file:mr-2.5 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-slate-200 hover:file:bg-slate-300 file:text-slate-700 cursor-pointer flex-1"
                                   />
                                 </div>
                                 <input
                                   type="text"
-                                  placeholder="https://res.cloudinary.com/... 이미지 경로"
+                                  placeholder="https://res.cloudinary.com/... 또는 직접 이미지 URL 입력"
                                   value={popupImage}
                                   onChange={(e) => setPopupImage(e.target.value)}
                                   required
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 mt-2 outline-none transition-all shadow-2xs"
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                                 />
                               </div>
 
                               <div className="space-y-1.5">
-                                <label className="text-xs font-extrabold text-[#0F172A] block">클릭 시 이동할 링크 URL (선택사항)</label>
+                                <label className="text-xs font-semibold text-slate-700 block">이미지 클릭 시 이동할 링크 URL (선택)</label>
                                 <input
                                   type="text"
-                                  placeholder="예시) /portal/notice 또는 외부 URL"
+                                  placeholder="예: order (발주메뉴) 또는 https://... 또는 /portal?menu=orders"
                                   value={popupLink}
                                   onChange={(e) => setPopupLink(e.target.value)}
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all shadow-2xs"
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                                 />
+                                <p className="text-[11px] text-slate-400">
+                                  사용자가 팝업 이미지를 클릭했을 때 이동할 주소입니다. (외부 웹사이트는 https://... 입력, 미입력 시 이동 없음)
+                                </p>
                               </div>
                             </div>
 
-                            {/* Stage Flow Footer Bar */}
-                            <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
-                              <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span>팝업 발행 준비</span>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <button
-                                  type="button"
-                                  onClick={() => setShowPopupModal(false)}
-                                  className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0"
-                                >
-                                  취소
-                                </button>
-                                <button
-                                  type="submit"
-                                  className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
-                                >
-                                  <span>{selectedPopupForEdit ? "팝업 수정 저장" : "신규 팝업 발행"}</span>
-                                  <ArrowRight size={14} />
-                                </button>
-                              </div>
+                            {/* Footer inside form */}
+                            <div className="pt-2 flex items-center justify-end gap-2.5">
+                              <button
+                                type="button"
+                                onClick={() => setShowPopupModal(false)}
+                                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+                              >
+                                취소
+                              </button>
+                              <button
+                                type="submit"
+                                className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-900 text-xs font-bold rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <span>{selectedPopupForEdit ? "3:4 팝업 수정 저장" : "3:4 팝업 등록하기"}</span>
+                                <ArrowRight size={14} />
+                              </button>
                             </div>
                           </form>
 
                           {/* Right: Live Preview Panel */}
-                          <div className="w-full md:w-[380px] bg-[#F8FAFC] p-6 space-y-4 flex flex-col justify-center items-center border-t md:border-t-0 md:border-l border-slate-100">
-                            <span className="text-xs font-extrabold text-[#0F172A] self-start flex items-center gap-1.5">
-                              <Sparkles size={14} className="text-[#F5AC00]" />
-                              실시간 팝업 미리보기
-                            </span>
+                          <div className="w-full md:w-[380px] bg-slate-100/70 p-6 flex flex-col justify-start items-center border-t md:border-t-0 md:border-l border-slate-200/70">
+                            <div className="w-full flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-2">
+                                <Sparkles size={15} className="text-amber-500" />
+                                <span className="text-xs font-bold text-slate-800">실시간 3:4 전면 팝업 미리보기</span>
+                              </div>
+                              <span className="text-[10px] font-bold px-2 py-0.5 bg-amber-100 text-amber-800 rounded">
+                                비율 3:4
+                              </span>
+                            </div>
 
-                            <div className="w-full max-w-[300px] bg-white rounded-lg overflow-hidden shadow-md border border-slate-200/60 p-4 space-y-3">
-                              {popupImage ? (
-                                <img src={popupImage} alt="미리보기" className="w-full h-48 object-cover rounded-lg" />
-                              ) : (
-                                <div className="w-full h-48 bg-slate-100 rounded-lg flex flex-col items-center justify-center text-slate-400 gap-2">
-                                  <Upload size={24} />
-                                  <span className="text-xs font-bold">이미지를 등록해 주세요</span>
+                            {/* Popup Preview Container */}
+                            <div className="w-full max-w-[280px] bg-white rounded-2xl overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
+                              {/* 3:4 Image Area */}
+                              <div className="w-full aspect-[3/4] bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                                {popupImage ? (
+                                  <>
+                                    <img
+                                      src={optimizeCloudinaryUrl(popupImage)}
+                                      alt="미리보기"
+                                      className="w-full h-full object-cover"
+                                    />
+                                    {/* Link tooltip indicator badge */}
+                                    {popupLink && (
+                                      <div className="absolute top-3 left-3 bg-black/65 backdrop-blur-xs text-white text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                        <ExternalLink size={11} />
+                                        <span className="truncate max-w-[150px]">{popupLink}</span>
+                                      </div>
+                                    )}
+                                    {/* Multi-popup indicator simulation */}
+                                    <div className="absolute top-3 right-3 bg-black/65 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                                      1 / 1
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2 p-4 text-center border-2 border-dashed border-slate-200">
+                                    <Upload size={28} className="text-slate-300" />
+                                    <span className="text-xs font-bold text-slate-600">3:4 세로 이미지 필요</span>
+                                    <span className="text-[10px] text-slate-400">좌측에서 이미지 파일을 업로드하거나 URL을 입력하세요</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Minimal Footer Bar */}
+                              <div className="bg-[#F8FAFC] border-t border-slate-100 p-3 flex justify-between items-center px-4 text-xs font-bold text-slate-600 select-none">
+                                <div className="flex items-center gap-1.5 text-slate-600 text-[11px]">
+                                  <Check size={13} className="text-amber-500" />
+                                  <span>7일 동안 보지 않기</span>
                                 </div>
-                              )}
-                              <h5 className="font-black text-sm text-[#0F172A] truncate">{popupTitle || "팝업 제목이 표시됩니다"}</h5>
-                              <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold pt-2 border-t border-slate-100">
-                                <span>오늘 하루 보지 않기</span>
-                                <span className="text-[#0F172A] font-black">닫기 ✕</span>
+                                <span className="text-[11px] font-bold text-slate-700 hover:text-slate-900 cursor-pointer">
+                                  닫기
+                                </span>
                               </div>
                             </div>
+
+                            <p className="text-[11px] text-slate-400 font-medium text-center mt-4 leading-relaxed">
+                              사용자 화면에서는 별도의 버튼 없이 <strong>이미지 전체를 클릭</strong>하면 연결된 링크로 바로 이동합니다.
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -10857,76 +10851,70 @@ export default function AdminPage() {
 
                   {/* Form Modal for Creating/Editing Instagram Feed */}
                   {isInstaModalOpen && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn">
-                      <div className="w-full max-w-xl bg-white border-0 rounded-lg overflow-hidden shadow-2xl max-h-[90vh] flex flex-col font-sans">
-                        <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
-                          <div>
-                            <h3 className="font-black text-base sm:text-lg text-[#0F172A]">
-                              {instaId ? "📸 인스타 연동 피드 수정" : "📸 신규 인스타 피드 등록"}
-                            </h3>
-                            <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">브랜드 페이지에 연동할 인스타그램 게시물을 관리합니다.</p>
-                          </div>
+                    <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto">
+                      <div className="w-full max-w-xl bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans my-auto">
+                        {/* Header */}
+                        <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
                           <div className="flex items-center gap-3">
-                            <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
-                              인스타그램 피드
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setIsInstaModalOpen(false)}
-                              className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
-                            >
-                              <X size={16} />
-                            </button>
+                            <div className="w-10 h-10 rounded-xl bg-pink-50 border border-pink-100/80 flex items-center justify-center text-pink-600">
+                              <Camera size={18} />
+                            </div>
+                            <div>
+                              <h3 className="text-base font-bold text-slate-900">
+                                {instaId ? "인스타그램 피드 수정" : "신규 인스타그램 피드 등록"}
+                              </h3>
+                              <p className="text-xs text-slate-400 mt-0.5">브랜드 페이지에 연동할 인스타그램 게시물을 관리합니다.</p>
+                            </div>
                           </div>
+                          <button
+                            type="button"
+                            onClick={() => setIsInstaModalOpen(false)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                          >
+                            <X size={18} />
+                          </button>
                         </div>
 
-                        <form onSubmit={handleSaveInstagram} className="p-6 sm:p-7 overflow-y-auto space-y-4 text-left text-xs sm:text-sm flex-1 bg-[#f9fafb]">
+                        <form onSubmit={handleSaveInstagram} className="p-6 overflow-y-auto space-y-4 text-left text-xs sm:text-sm flex-1 bg-slate-50/50">
                           {/* Card 1: Feed Link & Image */}
-                          <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
-                            <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                              <div className="flex items-center gap-2.5">
-                                <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
-                                  🔗
-                                </div>
-                                <span className="text-xs font-black text-[#0F172A] tracking-tight">게시물 링크 및 미디어</span>
-                              </div>
-                              <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
+                          <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                              <span className="text-xs font-bold text-slate-900">게시물 링크 및 미디어</span>
+                              <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
                                 링크 및 썸네일
                               </span>
                             </div>
 
                             <div className="space-y-1.5">
-                              <label className="text-xs font-extrabold text-[#0F172A]">게시물 실제 링크 URL <span className="text-red-500">*</span></label>
-                              <div className="flex gap-2">
-                                <input
-                                  type="text"
-                                  required
-                                  value={instaLink}
-                                  onChange={async (e) => {
-                                    const url = e.target.value;
-                                    setInstaLink(url);
-                                    if (url.includes("instagram.com") || url.includes("instagr.am")) {
-                                      try {
-                                        const res = await fetch(`/api/instagram-thumb?url=${encodeURIComponent(url)}`);
-                                        const data = await res.json();
-                                        if (data.success && data.thumbnailUrl) {
-                                          setInstaImg(data.thumbnailUrl);
-                                        } else {
-                                          setInstaImg(getInstagramThumbnailUrl(url));
-                                        }
-                                      } catch {
+                              <label className="text-xs font-semibold text-slate-700 block">게시물 실제 링크 URL <span className="text-red-500">*</span></label>
+                              <input
+                                type="text"
+                                required
+                                value={instaLink}
+                                onChange={async (e) => {
+                                  const url = e.target.value;
+                                  setInstaLink(url);
+                                  if (url.includes("instagram.com") || url.includes("instagr.am")) {
+                                    try {
+                                      const res = await fetch(`/api/instagram-thumb?url=${encodeURIComponent(url)}`);
+                                      const data = await res.json();
+                                      if (data.success && data.thumbnailUrl) {
+                                        setInstaImg(data.thumbnailUrl);
+                                      } else {
                                         setInstaImg(getInstagramThumbnailUrl(url));
                                       }
+                                    } catch {
+                                      setInstaImg(getInstagramThumbnailUrl(url));
                                     }
-                                  }}
-                                  placeholder="https://www.instagram.com/p/xxxx 또는 reels/xxxx"
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
-                                />
-                              </div>
+                                  }
+                                }}
+                                placeholder="https://www.instagram.com/p/xxxx 또는 reels/xxxx"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
+                              />
                             </div>
 
                             <div className="space-y-1.5">
-                              <label className="text-xs font-extrabold text-[#0F172A]">썸네일 이미지 URL (또는 로컬 업로드) <span className="text-red-500">*</span></label>
+                              <label className="text-xs font-semibold text-slate-700 block">썸네일 이미지 URL (또는 직접 업로드) <span className="text-red-500">*</span></label>
                               <div className="flex gap-2 items-center">
                                 <input
                                   type="text"
@@ -10934,7 +10922,7 @@ export default function AdminPage() {
                                   value={instaImg}
                                   onChange={(e) => setInstaImg(e.target.value)}
                                   placeholder="https://res.cloudinary.com/... 이미지 주소"
-                                  className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                                  className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                                 />
                                 <div className="relative shrink-0">
                                   <input
@@ -10963,7 +10951,7 @@ export default function AdminPage() {
                                   />
                                   <button
                                     type="button"
-                                    className="px-3.5 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs transition-all border-0 cursor-pointer shadow-2xs"
+                                    className="px-3.5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors border border-slate-200 cursor-pointer"
                                   >
                                     파일 업로드
                                   </button>
@@ -10973,66 +10961,61 @@ export default function AdminPage() {
                           </div>
 
                           {/* Card 2: Feed Content & Date */}
-                          <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
-                            <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                              <div className="flex items-center gap-2.5">
-                                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
-                                  📝
-                                </div>
-                                <span className="text-xs font-black text-[#0F172A] tracking-tight">게시글 본문 및 게시일자</span>
-                              </div>
-                              <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
+                          <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                              <span className="text-xs font-bold text-slate-900">게시글 본문 및 게시일자</span>
+                              <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
                                 상세 본문
                               </span>
                             </div>
 
                             <div className="space-y-1.5">
-                              <label className="text-xs font-extrabold text-[#0F172A]">게시글 본문 요약 (노출 텍스트)</label>
+                              <label className="text-xs font-semibold text-slate-700 block">게시글 본문 요약 (노출 텍스트)</label>
                               <textarea
                                 rows={3}
                                 value={instaText}
                                 onChange={(e) => setInstaText(e.target.value)}
                                 placeholder="인스타그램에 등록된 게시글 본문 일부를 입력하세요."
-                                className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none resize-none shadow-2xs"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none resize-none"
                               />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                               <div className="space-y-1.5">
-                                <label className="text-xs font-extrabold text-[#0F172A]">게시 일자</label>
+                                <label className="text-xs font-semibold text-slate-700 block">게시 일자</label>
                                 <input
                                   type="date"
                                   value={instaDate}
                                   onChange={(e) => setInstaDate(e.target.value)}
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                                 />
                               </div>
                               <div className="space-y-1.5">
-                                <label className="text-xs font-extrabold text-[#0F172A]">노출 순서 (작을수록 앞순위)</label>
+                                <label className="text-xs font-semibold text-slate-700 block">노출 순서 (작을수록 앞순위)</label>
                                 <input
                                   type="number"
                                   value={instaOrder}
                                   onChange={(e) => setInstaOrder(parseInt(e.target.value) || 1)}
-                                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                                 />
                               </div>
                             </div>
                           </div>
 
                           {/* Submit Footer */}
-                          <div className="px-1 py-2 flex items-center justify-between border-t border-slate-100 pt-4">
+                          <div className="pt-2 flex items-center justify-end gap-2.5">
                             <button
                               type="button"
                               onClick={() => setIsInstaModalOpen(false)}
-                              className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-xs rounded-lg transition-all cursor-pointer border-0 shadow-2xs"
+                              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer"
                             >
                               취소
                             </button>
                             <button
                               type="submit"
-                              className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-lg transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
+                              className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                             >
-                              <span>{instaId ? "인스타 피드 정보 수정" : "신규 인스타 피드 등록"}</span>
+                              <span>{instaId ? "수정 저장" : "피드 등록"}</span>
                               <ArrowRight size={14} />
                             </button>
                           </div>
@@ -11896,72 +11879,67 @@ export default function AdminPage() {
           MODALS & FORM POPUPS
          ========================================== */}
 
-      {/* 0. Register/Edit Gallery Item Modal (Stage Flow Tech Card Style) */}
+      {/* 0. Register/Edit Gallery Item Modal */}
       {showGalleryModal && (
         <div
-          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setShowGalleryModal(false)}
         >
           <div
-            className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col max-h-[90vh] font-sans"
+            className="w-full max-w-lg bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] font-sans my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow Yellow Header */}
-            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
-              <div>
-                <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight">
-                  {selectedGalleryItem ? "갤러리 이미지 정보 수정" : "본사 공식 이미지 신규 등록"}
-                </h3>
-                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">가맹 매장에 공유할 갤러리 이미지를 등록합니다.</p>
-              </div>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
-                  갤러리 설정
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowGalleryModal(false)}
-                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
-                >
-                  <X size={16} />
-                </button>
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100/80 flex items-center justify-center text-amber-600">
+                  <ImageIcon size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {selectedGalleryItem ? "갤러리 이미지 정보 수정" : "본사 공식 이미지 신규 등록"}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">가맹 매장에 공유할 갤러리 이미지를 등록합니다.</p>
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={() => setShowGalleryModal(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            <form onSubmit={handleGallerySubmit} className="p-6 sm:p-7 overflow-y-auto space-y-4 text-xs sm:text-sm flex-1 bg-[#f9fafb]">
-              {/* Card 1: Name & Category (Amber Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
-                      🖼️
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">이미지 명칭 및 분류</span>
-                  </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
+            <form onSubmit={handleGallerySubmit} className="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm flex-1 bg-slate-50/50">
+              {/* Card 1: Name & Category */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">이미지 명칭 및 분류</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
                     기본 정보
                   </span>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold text-[#0F172A]">이미지명 *</label>
+                  <label className="text-xs font-semibold text-slate-700 block">이미지명 <span className="text-red-500">*</span></label>
                   <input
                     type="text"
-                    placeholder="이미지를 구별할 이름을 입력해 주세요 (e.g. 로제미트파이 연출컷)"
+                    placeholder="예: 로제미트파이 연출컷"
                     value={galleryItemName}
                     onChange={(e) => setGalleryItemName(e.target.value)}
                     required
-                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold text-[#0F172A]">카테고리 분류 *</label>
+                  <label className="text-xs font-semibold text-slate-700 block">카테고리 분류 <span className="text-red-500">*</span></label>
                   <select
                     value={galleryItemCategory}
                     onChange={(e) => setGalleryItemCategory(e.target.value)}
                     required
-                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 cursor-pointer outline-none transition-all"
                   >
                     {galleryCategories.map((cat) => (
                       <option key={cat} value={cat}>
@@ -11972,58 +11950,47 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Card 2: Upload File (Blue Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
-                      📁
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">이미지 파일 업로드</span>
-                  </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
+              {/* Card 2: Upload File */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">이미지 파일 업로드</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
                     파일 등록
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-lg p-3 shadow-2xs">
+                <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleGalleryImageUpload}
-                    className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1"
+                    className="text-xs text-slate-500 file:mr-2.5 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-slate-200 hover:file:bg-slate-300 file:text-slate-700 cursor-pointer flex-1"
                   />
                 </div>
                 {galleryItemUrl && (
-                  <div className="p-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-md flex items-center gap-3">
-                    <img src={galleryItemUrl} alt="미리보기" className="w-12 h-12 rounded-lg object-cover" />
-                    <span className="text-[10px] text-neutral-400 font-mono truncate flex-1">{galleryItemUrl}</span>
+                  <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center gap-3">
+                    <img src={galleryItemUrl} alt="미리보기" className="w-12 h-12 rounded-lg object-cover border border-slate-200" />
+                    <span className="text-[11px] text-slate-500 truncate flex-1">{galleryItemUrl}</span>
                   </div>
                 )}
               </div>
 
-              {/* Stage Flow Footer Bar */}
-              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
-                <div className="flex items-center gap-2 text-[10px] font-mono font-extrabold text-neutral-400 uppercase tracking-widest">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>GALLERY READY</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowGalleryModal(false)}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0"
-                  >
-                    취소
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
-                  >
-                    <span>{selectedGalleryItem ? "수정사항 저장" : "갤러리 이미지 추가"}</span>
-                    <ArrowRight size={14} />
-                  </button>
-                </div>
+              {/* Footer inside form */}
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowGalleryModal(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>{selectedGalleryItem ? "수정사항 저장" : "이미지 추가"}</span>
+                  <ArrowRight size={14} />
+                </button>
               </div>
             </form>
           </div>
@@ -12034,103 +12001,122 @@ export default function AdminPage() {
       {/* 1.5. Consultation Inquiry Detail Modal */}
       {selectedConsultation && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setSelectedConsultation(null)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-lg bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow Yellow Header */}
-            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
-              <div>
-                <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight">📞 창업 상담문의 상세 내역</h3>
-                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">신청자가 제출한 창업 상담 문의 정보를 확인합니다.</p>
-              </div>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
-                  CONSULTATION
-                </span>
-                <button 
-                  type="button"
-                  onClick={() => setSelectedConsultation(null)} 
-                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
-                >
-                  <X size={16} />
-                </button>
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100/80 flex items-center justify-center text-blue-600">
+                  <PhoneCall size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">창업 상담문의 상세 내역</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">신청자가 제출한 창업 상담 문의 정보입니다.</p>
+                </div>
               </div>
+              <button 
+                type="button"
+                onClick={() => setSelectedConsultation(null)} 
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            <div className="p-6 sm:p-7 overflow-y-auto space-y-4 text-xs sm:text-sm bg-[#f9fafb]">
-              {/* Card 1: Applicant Details (Amber Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3 font-semibold text-slate-600">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <span className="text-xs font-black text-[#0F172A] tracking-tight">신청인 및 연락처 정보</span>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    APPLICANT
+            <div className="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm bg-slate-50/50">
+              {/* Card 1: Applicant Details */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-3 font-medium text-slate-600">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">신청인 및 연락처 정보</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    신청 정보
                   </span>
                 </div>
-                <div className="flex justify-between border-b border-neutral-100 pb-2">
-                  <span>신청인</span>
-                  <span className="text-[#0F172A] font-black">{selectedConsultation.name}</span>
+                <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                  <span className="text-slate-500">신청인</span>
+                  <span className="text-slate-900 font-bold">{selectedConsultation.name}</span>
                 </div>
-                <div className="flex justify-between border-b border-neutral-100 pb-2">
-                  <span>연락처</span>
-                  <span className="text-[#0F172A] font-black flex items-center gap-1.5">
+                <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                  <span className="text-slate-500">연락처</span>
+                  <span className="text-slate-900 font-bold flex items-center gap-1.5">
                     {selectedConsultation.phone}
                     <button
                       type="button"
                       onClick={() => handleCopyToClipboard(selectedConsultation.phone, "연락처")}
-                      className="p-1 hover:text-[#0F172A] text-slate-400 bg-neutral-100 rounded cursor-pointer transition-colors border-0"
+                      className="p-1 hover:text-slate-900 text-slate-400 bg-slate-100 hover:bg-slate-200 rounded cursor-pointer transition-colors border-0"
                       title="복사하기"
                     >
-                      <Copy size={11} />
+                      <Copy size={12} />
                     </button>
                   </span>
                 </div>
-                <div className="flex justify-between border-b border-neutral-100 pb-2">
-                  <span>도입 희망 유형</span>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 font-black px-2.5 py-0.5 rounded-md text-[10px]">
+                <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                  <span className="text-slate-500">도입 희망 유형</span>
+                  <span className="bg-blue-50 text-blue-700 border border-blue-100 font-semibold px-2.5 py-0.5 rounded-md text-xs">
                     {selectedConsultation.storeType}
                   </span>
                 </div>
+                <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                  <span className="text-slate-500">유치 파트너</span>
+                  <span className="bg-amber-50 text-amber-800 border border-amber-200/80 font-semibold px-2.5 py-0.5 rounded-md text-xs">
+                    {selectedConsultation.partnerName ? `🌟 ${selectedConsultation.partnerName}` : "🏢 본사 직속"}
+                  </span>
+                </div>
                 {selectedConsultation.existingStoreName && (
-                  <div className="flex justify-between border-b border-neutral-100 pb-2">
-                    <span>기존 매장명</span>
-                    <span className="text-[#0F172A] font-black">{selectedConsultation.existingStoreName}</span>
+                  <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                    <span className="text-slate-500">기존 매장명</span>
+                    <span className="text-slate-900 font-bold">{selectedConsultation.existingStoreName}</span>
                   </div>
                 )}
-                <div className="flex justify-between">
-                  <span>신청일</span>
-                  <span className="text-[#0F172A] font-black">{selectedConsultation.regDate}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500">신청일</span>
+                  <span className="text-slate-900 font-semibold">{selectedConsultation.regDate}</span>
                 </div>
               </div>
 
-              {/* Card 2: Message Content (Blue Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <span className="text-xs font-black text-[#0F172A] tracking-tight">상세 문의 내용</span>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    MESSAGE
+              {/* Card 2: Message Content */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">상세 문의 내용</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    문의 사항
                   </span>
                 </div>
-                <div className="bg-[#e2e8f0] p-4 rounded-md min-h-[120px] max-h-[240px] overflow-y-auto border border-neutral-200/80">
-                  <p className="text-xs sm:text-sm text-[#0F172A] leading-relaxed whitespace-pre-wrap font-semibold">
+                <div className="bg-slate-50 p-4 rounded-lg min-h-[100px] max-h-[220px] overflow-y-auto border border-slate-200/70">
+                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
                     {selectedConsultation.message || "입력된 문의 내용이 없습니다."}
                   </p>
                 </div>
               </div>
 
-              {/* Stage Flow Footer */}
-              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-3">
-                <div className="flex items-center gap-2 text-[10px] font-mono font-extrabold text-neutral-400 uppercase tracking-widest">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>RECORD ACTIVE</span>
+              {/* Card 3: Partner Memo (if any) */}
+              {selectedConsultation.partnerMemo && (
+                <div className="bg-white rounded-xl p-5 border border-amber-200/80 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between border-b border-amber-100 pb-3">
+                    <span className="text-xs font-bold text-amber-900">파트너 작성 상담 메모</span>
+                    <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md">
+                      파트너 메모
+                    </span>
+                  </div>
+                  <div className="bg-amber-50/50 p-4 rounded-lg border border-amber-100">
+                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-wrap font-medium">
+                      {selectedConsultation.partnerMemo}
+                    </p>
+                  </div>
                 </div>
+              )}
+
+              {/* Footer */}
+              <div className="pt-2 flex items-center justify-end">
                 <button 
                   type="button"
                   onClick={() => setSelectedConsultation(null)}
-                  className="px-6 py-2.5 rounded-md bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
+                  className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-lg transition-colors border-0 cursor-pointer shadow-xs"
                 >
                   닫기
                 </button>
@@ -12140,78 +12126,81 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* 1. Inquiry Reply Writer Modal (Stage Flow Tech Card Style) */}
+      {/* 1. Inquiry Reply Writer Modal */}
       {selectedInquiry && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setSelectedInquiry(null)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-xl bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow Yellow Header */}
-            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
-              <div>
-                <h3 className="text-base sm:text-lg font-black tracking-tight text-[#0F172A]">💬 가맹점 1:1 문의 답변 작성</h3>
-                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">가맹점주 문의건에 대해 본사 공식 답변을 작성합니다.</p>
-              </div>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-mono font-bold tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
-                  INQUIRY REPLY
-                </span>
-                <button 
-                  type="button"
-                  onClick={() => setSelectedInquiry(null)} 
-                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
-                >
-                  <X size={16} />
-                </button>
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100/80 flex items-center justify-center text-indigo-600">
+                  <MessageSquare size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">가맹점 1:1 문의 답변 작성</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">가맹점주 문의건에 대해 본사 공식 답변을 작성합니다.</p>
+                </div>
               </div>
+              <button 
+                type="button"
+                onClick={() => setSelectedInquiry(null)} 
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            <form onSubmit={handleSubmitAnswer} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
-              {/* Card 1: Original Inquiry (Blue Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-2">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
+            <form onSubmit={handleSubmitAnswer} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-slate-50/50">
+              {/* Card 1: Original Inquiry */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="bg-slate-100 text-slate-700 font-semibold text-xs px-2.5 py-0.5 rounded-md">
                     {selectedInquiry.category}
                   </span>
-                  <span className="text-[10px] font-mono font-bold text-neutral-400">접수일자: {selectedInquiry.date}</span>
+                  <span className="text-xs text-slate-400">접수: {selectedInquiry.date}</span>
                 </div>
-                <h4 className="font-black text-xs text-[#0F172A] leading-tight pt-1">{selectedInquiry.title}</h4>
-                <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap font-medium">{selectedInquiry.content}</p>
+                <h4 className="font-bold text-sm text-slate-900 leading-tight">{selectedInquiry.title}</h4>
+                <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">{selectedInquiry.content}</p>
               </div>
 
-              {/* Card 2: Answer Input (Emerald Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-3">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
-                  <span className="text-xs font-black text-[#0F172A]">본사 공식 답변 내용 기입</span>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-mono font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    OFFICIAL ANSWER
+              {/* Card 2: Answer Input */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">본사 공식 답변 내용</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    답변 입력
                   </span>
                 </div>
                 <textarea 
                   rows={5}
-                  placeholder="가맹점주님이 현장에서 직면한 상황에 대해 구체적인 조치 결과(AS 일정 예약, 오배송 무료 재출고 완료 등)를 친절하고 명확하게 입력해 주시기 바랍니다."
+                  placeholder="가맹점주님이 현장에서 직면한 상황에 대해 구체적인 조치 결과(AS 일정 예약, 오배송 무료 재출고 완료 등)를 명확하게 입력해 주세요."
                   value={inquiryAnswerText}
                   onChange={(e) => setInquiryAnswerText(e.target.value)}
                   required
-                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 resize-none transition-all outline-none shadow-2xs"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 resize-none transition-all outline-none"
                 />
               </div>
 
-              {/* Stage Flow Footer Bar */}
-              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
-                <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>HQ RESPONSE READY</span>
-                </div>
+              {/* Footer */}
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setSelectedInquiry(null)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+                >
+                  취소
+                </button>
                 <button 
                   type="submit"
-                  className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs cursor-pointer border-0 flex items-center gap-2"
+                  className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>가맹 지원 답변 공식 등록</span>
+                  <span>답변 공식 등록</span>
                   <ArrowRight size={14} />
                 </button>
               </div>
@@ -12220,142 +12209,126 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* 2. Notice Creation Modal (Stage Flow Tech Card Style) */}
+      {/* 2. Notice Creation Modal */}
       {showNoticeModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={handleCloseNoticeModal}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-xl bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow Yellow Header */}
-            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
-              <div>
-                <h3 className="text-base sm:text-lg font-black tracking-tight text-[#0F172A]">
-                  {selectedNotice ? "가맹 공지사항 상세조회 및 수정" : "신규 가맹 공지사항 정식 작성"}
-                </h3>
-                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">전체 가맹점에 공지할 주요 가이드라인을 작성합니다.</p>
-              </div>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
-                  공지사항 작성 양식
-                </span>
-                <button 
-                  type="button"
-                  onClick={handleCloseNoticeModal} 
-                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
-                >
-                  <X size={16} />
-                </button>
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100/80 flex items-center justify-center text-amber-600">
+                  <Bell size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {selectedNotice ? "가맹 공지사항 상세 및 수정" : "신규 가맹 공지사항 작성"}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">전체 가맹점에 공지할 주요 안내사항을 작성합니다.</p>
+                </div>
               </div>
+              <button 
+                type="button"
+                onClick={handleCloseNoticeModal} 
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            <form onSubmit={handleCreateNotice} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
-              {/* Card 1: Notice Tag & Title (Amber Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
-                      📢
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">공지 구분 및 제목</span>
-                  </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
+            <form onSubmit={handleCreateNotice} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-slate-50/50">
+              {/* Card 1: Notice Tag & Title */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">공지 구분 및 제목</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
                     기본 설정
                   </span>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-extrabold text-[#0F172A]">공지 태그 선택</label>
+                  <label className="text-xs font-semibold text-slate-700 block">공지 태그 선택 <span className="text-red-500">*</span></label>
                   <select 
                     value={newNoticeTag}
                     onChange={(e) => setNewNoticeTag(e.target.value as any)}
-                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 cursor-pointer outline-none transition-all"
                   >
-                    <option value="필독">필독 (긴급 법정 안전 위생 점검 등)</option>
-                    <option value="일반">일반 안내 사항</option>
-                    <option value="이벤트">마케팅 / 런칭 이벤트 공지</option>
-                    <option value="물류">물류 배송 / 공휴일 정기 일정 조정</option>
+                    <option value="필독">🚨 필독 (긴급 법정 안전 위생 점검 등)</option>
+                    <option value="일반">📢 일반 안내 사항</option>
+                    <option value="이벤트">🎁 마케팅 / 런칭 이벤트 공지</option>
+                    <option value="물류">🚚 물류 배송 / 공휴일 정기 일정 조정</option>
                   </select>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-extrabold text-[#0F172A]">공지 제목</label>
+                  <label className="text-xs font-semibold text-slate-700 block">공지 제목 <span className="text-red-500">*</span></label>
                   <input 
                     type="text"
-                    placeholder="예시) 하절기 위생 합동 검열 대비 본부 가이드라인 수칙"
+                    placeholder="예: 하절기 위생 합동 검열 대비 본부 가이드라인 수칙"
                     value={newNoticeTitle}
                     onChange={(e) => setNewNoticeTitle(e.target.value)}
                     required
-                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                   />
                 </div>
               </div>
 
-              {/* Card 2: Notice Body Content (Blue Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
-                      📜
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">상세 공지 본문 내용</span>
-                  </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    본문 내용
+              {/* Card 2: Notice Body Content */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">상세 공지 내용</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    본문 작성
                   </span>
                 </div>
 
                 <textarea 
                   rows={5}
-                  placeholder="가맹점 전체에 전달할 상세 수칙 및 안내 내용을 명확히 적어주세요. 점주전용 포털 공지사항실에 실시간 동기화되어 배포됩니다."
+                  placeholder="가맹점 전체에 전달할 상세 수칙 및 안내 내용을 명확히 적어주세요. 점주 전용 포털에 실시간 동기화되어 배포됩니다."
                   value={newNoticeContent}
                   onChange={(e) => setNewNoticeContent(e.target.value)}
                   required
-                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 resize-none transition-all outline-none shadow-2xs"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 resize-none transition-all outline-none"
                 />
               </div>
 
-              {/* Stage Flow Footer Bar */}
-              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
-                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>전체 가맹점 공지 준비 완료</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handleCloseNoticeModal}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0 shadow-2xs"
-                  >
-                    취소
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2"
-                  >
-                    <span>{selectedNotice ? "공지사항 수정 저장" : "공지사항 공식 배포"}</span>
-                    <ArrowRight size={14} />
-                  </button>
-                </div>
+              {/* Footer */}
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={handleCloseNoticeModal}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>{selectedNotice ? "수정 저장" : "공지사항 배포"}</span>
+                  <ArrowRight size={14} />
+                </button>
               </div>
             </form>
 
             {selectedNotice && selectedNotice.title.includes("배달앱 메뉴 리뉴얼") && (
-              <div className="p-6 border-t border-slate-100 bg-[#F8FAFC] space-y-3 shrink-0">
+              <div className="p-6 border-t border-slate-100 bg-slate-50/70 space-y-3 shrink-0">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-black text-sm text-[#0F172A]">가맹점별 배달앱 계정 제출 현황</h4>
-                  <span className="text-xs font-bold text-[#0F172A] bg-amber-100 border-0 px-3 py-1 rounded-md">
+                  <h4 className="font-bold text-xs text-slate-800">가맹점별 배달앱 계정 제출 현황</h4>
+                  <span className="text-xs font-semibold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-md">
                     총 {submittedCredentials?.length || 0}건 접수
                   </span>
                 </div>
                 
-                <div className="border border-slate-200/60 rounded-lg overflow-hidden bg-white max-h-[220px] overflow-y-auto shadow-2xs">
+                <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-white max-h-[220px] overflow-y-auto shadow-xs">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="bg-[#F8FAFC] border-b border-slate-200/60 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                      <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-semibold text-slate-500">
                         <th className="p-3">가맹점명</th>
                         <th className="p-3">배달의민족 계정</th>
                         <th className="p-3">쿠팡이츠 계정</th>
@@ -12365,21 +12338,21 @@ export default function AdminPage() {
                     <tbody className="divide-y divide-slate-100">
                       {!submittedCredentials || submittedCredentials.length === 0 ? (
                         <tr>
-                          <td colSpan={4} className="p-5 text-center text-slate-400 font-bold">아직 제출된 가맹점 계정 정보가 없습니다.</td>
+                          <td colSpan={4} className="p-5 text-center text-slate-400 font-medium">아직 제출된 가맹점 계정 정보가 없습니다.</td>
                         </tr>
                       ) : (
                         submittedCredentials.map((cred: any) => (
-                          <tr key={cred._id} className="hover:bg-[#fff9fb] transition-colors">
-                            <td className="p-3 font-extrabold text-[#2d2026]">{cred.storeName}</td>
-                            <td className="p-3 text-[#735965] font-semibold">
-                              <div>ID: <span className="text-[#2d2026] font-bold">{cred.baeminId}</span></div>
-                              <div className="text-[11px] mt-0.5">PW: <span className="text-[#bf3e67] font-bold">{cred.baeminPw}</span></div>
+                          <tr key={cred._id} className="hover:bg-slate-50 transition-colors">
+                            <td className="p-3 font-bold text-slate-800">{cred.storeName}</td>
+                            <td className="p-3 text-slate-600">
+                              <div>ID: <span className="text-slate-900 font-semibold">{cred.baeminId}</span></div>
+                              <div className="text-[11px] mt-0.5">PW: <span className="text-rose-600 font-semibold">{cred.baeminPw}</span></div>
                             </td>
-                            <td className="p-3 text-[#735965] font-semibold">
-                              <div>ID: <span className="text-[#2d2026] font-bold">{cred.coupangId}</span></div>
-                              <div className="text-[11px] mt-0.5">PW: <span className="text-[#bf3e67] font-bold">{cred.coupangPw}</span></div>
+                            <td className="p-3 text-slate-600">
+                              <div>ID: <span className="text-slate-900 font-semibold">{cred.coupangId}</span></div>
+                              <div className="text-[11px] mt-0.5">PW: <span className="text-rose-600 font-semibold">{cred.coupangPw}</span></div>
                             </td>
-                            <td className="p-3 text-[#735965] font-bold whitespace-nowrap">{cred.submittedAt}</td>
+                            <td className="p-3 text-slate-500 whitespace-nowrap text-xs">{cred.submittedAt}</td>
                           </tr>
                         ))
                       )}
@@ -12392,182 +12365,165 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* 3. Store Registration / Detailed Modal (Stage Flow Tech Card Style) */}
+      {/* 3. Store Registration / Detailed Modal */}
       {showStoreModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setShowStoreModal(false)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-2xl bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow Yellow Header */}
-            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
-              <div>
-                <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
-                  <span>🏢 {selectedStore ? `가맹점 상세 정보 및 편집 [${selectedStore.name}]` : "가맹점 신규 등록 대장 작성"}</span>
-                </h3>
-                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">
-                  가맹점 기본 계정 및 가동 모듈을 관리합니다.
-                </p>
-              </div>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
-                  가맹점 관리
-                </span>
-                <button 
-                  type="button"
-                  onClick={() => setShowStoreModal(false)} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
-                >
-                  <X size={16} />
-                </button>
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100/80 flex items-center justify-center text-amber-600">
+                  <Store size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {selectedStore ? `가맹점 상세 및 수정 [${selectedStore.name}]` : "신규 가맹점 등록"}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">가맹점 기본 계정 및 가동 모듈을 관리합니다.</p>
+                </div>
               </div>
+              <button 
+                type="button"
+                onClick={() => setShowStoreModal(false)} 
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            <form onSubmit={handleCreateOrUpdateStore} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
-              {/* Card 1: Account Info (Amber Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
-                      🔑
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">로그인 계정 및 보안</span>
-                  </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    필수 입력
+            <form onSubmit={handleCreateOrUpdateStore} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-slate-50/50">
+              {/* Card 1: Account Info */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">로그인 계정 및 보안</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    기본 계정
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">로그인 계정 ID *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">로그인 계정 ID <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
-                      placeholder="계정 아이디를 입력해 주세요 (영문/숫자)"
+                      placeholder="계정 아이디 (영문/숫자)"
                       value={storeLoginId}
                       onChange={(e) => setStoreLoginId(e.target.value)}
                       required
                       disabled={!!selectedStore}
-                      className="w-full bg-[#F1F4F8] disabled:bg-[#F1F4F8] disabled:opacity-75 border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-slate-50 disabled:bg-slate-100 disabled:text-slate-400 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">가맹점명 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">가맹점명 <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
-                      placeholder="예시) 120겹파이 강남역삼점"
+                      placeholder="예: 120겹파이 강남역삼점"
                       value={storeName}
                       onChange={(e) => setStoreName(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">비밀번호 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">비밀번호 <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
                       placeholder="비밀번호 설정"
                       value={storePw}
                       onChange={(e) => setStorePw(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">비밀번호 확인 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">비밀번호 확인 <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
                       placeholder="동일 비밀번호 재입력"
                       value={storePwConfirm}
                       onChange={(e) => setStorePwConfirm(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Card 2: Owner Info (Blue Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
-                      👤
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">점주 정보 및 연락처</span>
-                  </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    점주 정보
+              {/* Card 2: Owner Info */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">점주 정보 및 연락처</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    대표자 정보
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">점주 실명 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">점주 실명 <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
                       placeholder="점주 대표자 성함"
                       value={storeOwner}
                       onChange={(e) => setStoreOwner(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">연락처 (하이픈 자동입력) *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">연락처 (자동 포맷) <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
-                      placeholder="휴대폰 혹은 대표번호"
+                      placeholder="010-0000-0000"
                       value={storePhone}
                       onChange={handlePhoneInputChange}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Card 3: Location & Status (Emerald Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
-                      📍
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">거래 상태 및 매장 주소</span>
-                  </div>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    위치 및 상태
+              {/* Card 3: Location & Status */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">거래 상태 및 매장 주소</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    운영 상태
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">가맹 거래 상태 구분 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">가맹 거래 상태 <span className="text-red-500">*</span></label>
                     <select 
                       value={storeStatus}
                       onChange={(e) => setStoreStatus(e.target.value as any)}
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:outline-none cursor-pointer transition-all shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 cursor-pointer outline-none transition-all"
                     >
-                      <option value="승인">승인 (정상 오퍼레이션 가동)</option>
+                      <option value="승인">승인 (정상 영업)</option>
                       <option value="대기">대기 (서류 검토 / 가맹 보류)</option>
                       <option value="보류">보류 (일시적 거래 홀딩)</option>
                       <option value="중지">중지 (본부 차단 / 경고 누적)</option>
-                      <option value="취소">취소 (정식 폐점 계약 해지)</option>
+                      <option value="취소">취소 (폐점 / 계약 해지)</option>
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">유치 영업 파트너</label>
+                    <label className="text-xs font-semibold text-slate-700 block">유치 영업 파트너</label>
                     <select 
                       value={storePartnerId}
                       onChange={(e) => setStorePartnerId(e.target.value)}
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:outline-none cursor-pointer transition-all shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 cursor-pointer outline-none transition-all"
                     >
                       <option value="">-- 본사 직영 / 파트너 없음 --</option>
                       {convexPartners.map((p: any) => (
@@ -12579,28 +12535,28 @@ export default function AdminPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-2 md:col-span-2">
                     <div className="flex flex-col gap-1.5">
-                      <label className="font-extrabold text-[#0F172A]">가맹 등록일</label>
+                      <label className="text-xs font-semibold text-slate-700 block">가맹 등록일</label>
                       <input 
                         type="date"
                         value={storeRegDate}
                         onChange={(e) => setStoreRegDate(e.target.value)}
-                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3 py-3 text-xs font-medium text-[#0F172A] focus:outline-none transition-all shadow-2xs"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="font-extrabold text-[#0F172A]">가맹 해지일</label>
+                      <label className="text-xs font-semibold text-slate-700 block">가맹 해지일</label>
                       <input 
                         type="date"
                         value={storeCancelDate}
                         onChange={(e) => setStoreCancelDate(e.target.value)}
-                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3 py-3 text-xs font-medium text-[#0F172A] focus:outline-none transition-all shadow-2xs"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                       />
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="font-extrabold text-[#0F172A] block">가맹 매장 도로명 주소 *</label>
+                  <label className="text-xs font-semibold text-slate-700 block">가맹 매장 도로명 주소 <span className="text-red-500">*</span></label>
                   <div className="flex gap-2">
                     <input 
                       type="text"
@@ -12608,41 +12564,36 @@ export default function AdminPage() {
                       value={storeRoadAddress}
                       onChange={(e) => setStoreRoadAddress(e.target.value)}
                       required
-                      className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                      className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => openDaumPostcode("store")}
-                      className="px-5 py-3 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] text-xs font-black rounded-lg transition-all cursor-pointer border-0 shrink-0 shadow-2xs"
+                      className="px-4 py-2.5 bg-[#FED422] hover:bg-amber-400 text-slate-900 text-xs font-bold rounded-lg transition-colors cursor-pointer shrink-0 shadow-xs"
                     >
                       주소 검색
                     </button>
                   </div>
                   <input 
                     type="text"
-                    placeholder="매장 상세 주소 (e.g. 1층 101호)"
+                    placeholder="매장 상세 주소 (예: 1층 101호)"
                     value={storeDetailAddress}
                     onChange={(e) => setStoreDetailAddress(e.target.value)}
-                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                   />
                 </div>
               </div>
 
-              {/* Card 4: Packages (Neutral Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-slate-400 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs">
-                      📦
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">도입 적용 패키지 브랜드 선택</span>
-                  </div>
-                  <span className="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    적용 패키지
+              {/* Card 4: Packages */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">도입 적용 패키지 브랜드</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    메뉴 패키지
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-md p-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-50 border border-slate-200 rounded-xl p-4">
                   {["120pie", "egg120", "츄러스120", "떡볶이120", "핫도그120", "120coffee"].map((menuKey) => {
                     const isChecked = storeAdoptionMenu.includes(menuKey);
                     return (
@@ -12657,75 +12608,77 @@ export default function AdminPage() {
                               setStoreAdoptionMenu(storeAdoptionMenu.filter((m) => m !== menuKey));
                             }
                           }}
-                          className="w-4 h-4 rounded text-amber-500 border-neutral-300 focus:ring-amber-500"
+                          className="w-4 h-4 rounded text-amber-500 border-slate-300 focus:ring-amber-400"
                         />
-                        <span className="text-xs font-bold text-[#0F172A]">{menuKey}</span>
+                        <span className="text-xs font-semibold text-slate-800">{menuKey}</span>
                       </label>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Stage Flow Footer Bar */}
-              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
-                <div className="flex items-center gap-2 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>시스템 정상 작동 · 본사 가맹점 관리</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowStoreModal(false)}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0"
-                  >
-                    취소
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-md active:scale-95 cursor-pointer border-0 flex items-center gap-2"
-                  >
-                    <span>가맹점 정보 저장</span>
-                    <ArrowRight size={14} />
-                  </button>
-                </div>
+              {/* Footer */}
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowStoreModal(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>가맹점 정보 저장</span>
+                  <ArrowRight size={14} />
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* 4. Address Popup Simulator Modal with Real Kakao API Embed (Yellow Header, border-0) */}
+      {/* 4. Address Popup Simulator Modal with Real Kakao API Embed */}
       {showAddressPopup && (
         <div 
-          className="fixed inset-0 z-[120] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[120] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setShowAddressPopup(false)}
         >
           <div 
-            className="w-full max-w-lg bg-white border-0 rounded-lg overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[85vh]"
+            className="w-full max-w-lg bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[600px] max-h-[88vh] my-auto font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Yellow Header */}
-            <div className="p-6 bg-[#FED422] text-[#0F172A] flex flex-col gap-3 shadow-xs">
+            {/* Header */}
+            <div className="p-5 bg-white border-b border-slate-100 flex flex-col gap-3 shrink-0">
               <div className="flex justify-between items-center">
-                <h4 className="text-sm sm:text-base font-black text-[#0F172A]">📍 도로명 주소 실시간 검색</h4>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100/80 flex items-center justify-center text-amber-600">
+                    <MapPin size={16} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">도로명 주소 검색</h4>
+                    <p className="text-[11px] text-slate-400">카카오 우편번호 서비스 또는 모의 검색을 이용합니다.</p>
+                  </div>
+                </div>
                 <button 
                   type="button"
                   onClick={() => setShowAddressPopup(false)} 
-                  className="p-2 text-[#0F172A]/80 hover:text-[#0F172A] bg-black/5 hover:bg-black/10 rounded-md transition-all border-0 cursor-pointer"
+                  className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer border-0"
                 >
                   <X size={16} />
                 </button>
               </div>
               
               {/* Dual-Mode Tabs */}
-              <div className="flex bg-black/10 p-1 rounded-lg border-0">
+              <div className="flex bg-slate-100 p-1 rounded-xl">
                 <button
                   type="button"
                   onClick={() => setAddressTab("kakao")}
-                  className={`flex-1 py-2 text-xs font-black rounded-md transition-all border-0 cursor-pointer ${
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all border-0 cursor-pointer ${
                     addressTab === "kakao" 
-                      ? "bg-[#0F172A] text-white shadow-xs" 
-                      : "text-[#0F172A]/70 hover:text-[#0F172A]"
+                      ? "bg-white text-slate-900 shadow-xs font-bold" 
+                      : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
                   카카오 우편번호 API
@@ -12733,10 +12686,10 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => setAddressTab("simulated")}
-                  className={`flex-1 py-2 text-xs font-black rounded-md transition-all border-0 cursor-pointer ${
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all border-0 cursor-pointer ${
                     addressTab === "simulated" 
-                      ? "bg-[#0F172A] text-white shadow-xs" 
-                      : "text-[#0F172A]/70 hover:text-[#0F172A]"
+                      ? "bg-white text-slate-900 shadow-xs font-bold" 
+                      : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
                   모의 간편 검색 (대안)
@@ -12746,30 +12699,30 @@ export default function AdminPage() {
 
             {/* Content Body based on active tab */}
             {addressTab === "kakao" ? (
-              <div className="flex-1 w-full bg-[#F8FAFC] overflow-hidden relative">
+              <div className="flex-1 w-full bg-slate-50 overflow-hidden relative">
                 <div 
                   id="daum-postcode-container" 
                   className="w-full h-full"
                 ></div>
               </div>
             ) : (
-              <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-[#F8FAFC]">
+              <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-slate-50/60">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold text-[#0F172A] block">지번/도로명 검색어 입력</label>
+                  <label className="text-xs font-semibold text-slate-700 block">지번/도로명 검색어 입력</label>
                   <input
                     type="text"
                     placeholder="예: 테헤란로, 엘에스로, 당동"
                     value={addressSearchKeyword}
                     onChange={(e) => handleAddressSearch(e.target.value)}
-                    className="w-full bg-[#F1F5F9] border-0 rounded-lg px-4 py-3 text-xs font-bold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#F5AC00]/50 placeholder-slate-400"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 placeholder-slate-400"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <span className="text-xs font-extrabold text-[#0F172A] block">검색 결과 목록 ({addressSearchResults.length}건)</span>
+                  <span className="text-xs font-semibold text-slate-700 block">검색 결과 목록 ({addressSearchResults.length}건)</span>
                   {addressSearchResults.length === 0 ? (
-                    <div className="p-8 text-center text-xs text-slate-400 bg-white border border-slate-200/60 rounded-lg font-bold">
-                      {addressSearchKeyword.trim() ? "일치하는 주소 후보가 없습니다." : "검색어를 입력하시면 모의 주소 리스트가 노출됩니다."}
+                    <div className="p-8 text-center text-xs text-slate-400 bg-white border border-slate-200/80 rounded-xl font-medium">
+                      {addressSearchKeyword.trim() ? "일치하는 주소 후보가 없습니다." : "검색어를 입력하시면 주소 후보 목록이 표시됩니다."}
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
@@ -12784,9 +12737,9 @@ export default function AdminPage() {
                               setStoreRoadAddress(addr);
                             }
                             setShowAddressPopup(false);
-                            triggerToast("모의 주소가 성공적으로 자동 선택 및 입력되었습니다!");
+                            triggerToast("주소가 성공적으로 입력되었습니다.");
                           }}
-                          className="w-full text-left p-3.5 bg-white hover:bg-amber-50 border border-slate-200/80 hover:border-amber-400 rounded-lg text-xs font-bold text-[#0F172A] transition-all cursor-pointer block hover:shadow-2xs"
+                          className="w-full text-left p-3.5 bg-white hover:bg-amber-50/60 border border-slate-200 hover:border-amber-300 rounded-xl text-xs font-medium text-slate-800 transition-colors cursor-pointer block shadow-2xs"
                         >
                           {addr}
                         </button>
@@ -12797,13 +12750,13 @@ export default function AdminPage() {
               </div>
             )}
             
-            <div className="p-4 bg-neutral-50 text-center border-t border-[#f2ccd7]/60">
+            <div className="p-3.5 bg-white text-center border-t border-slate-100 flex justify-end shrink-0">
               <button 
                 type="button"
                 onClick={() => setShowAddressPopup(false)}
-                className="px-5 py-2.5 rounded-md bg-white border border-[#f2ccd7] text-[11px] font-bold text-[#735965] hover:bg-[#fff1f5] cursor-pointer transition-colors"
+                className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 cursor-pointer transition-colors border-0"
               >
-                검색 창 닫기
+                닫기
               </button>
             </div>
           </div>
@@ -12811,63 +12764,55 @@ export default function AdminPage() {
       )}
 
       {/* 5. Product Registration / Edit Modal */}
-      {/* 4. Product Registration / Detailed Modal (Stage Flow Tech Card Style) */}
       {showProductModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setShowProductModal(false)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-2xl bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow Yellow Header */}
-            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
-              <div>
-                <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
-                  <span>📦 {selectedProduct ? `원/부자재 품목 명세 수정 [${selectedProduct.name}]` : "신규 식재료/부자재 물류 품목 추가"}</span>
-                </h3>
-                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">
-                  점주 발주몰에 노출할 제품 정보 및 가격을 설정합니다.
-                </p>
-              </div>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
-                  제품 등록 양식
-                </span>
-                <button 
-                  type="button"
-                  onClick={() => setShowProductModal(false)} 
-                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
-                >
-                  <X size={16} />
-                </button>
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100/80 flex items-center justify-center text-amber-600">
+                  <Package size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {selectedProduct ? `원/부자재 품목 수정 [${selectedProduct.name}]` : "신규 물류 품목 등록"}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">점주 발주몰에 노출할 제품 정보 및 가격을 설정합니다.</p>
+                </div>
               </div>
+              <button 
+                type="button"
+                onClick={() => setShowProductModal(false)} 
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            <form onSubmit={handleCreateOrUpdateProduct} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
-              {/* Card 1: Product Basic (Amber Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
-                      🏷️
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">품목 분류 및 제품명</span>
-                  </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    필수 입력
+            <form onSubmit={handleCreateOrUpdateProduct} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-slate-50/50">
+              {/* Card 1: Product Basic */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">품목 분류 및 제품명</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    기본 정보
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">카테고리 분류 선택 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">카테고리 분류 선택 <span className="text-red-500">*</span></label>
                     <select 
                       value={productCategory}
                       onChange={(e) => setProductCategory(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all cursor-pointer shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all cursor-pointer"
                     >
                       {categories.map((cat) => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -12875,38 +12820,38 @@ export default function AdminPage() {
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">품목 제품명 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">품목 제품명 <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
-                      placeholder="예시) 로제미트파이 생지"
+                      placeholder="예: 로제미트파이 생지"
                       value={productName}
                       onChange={(e) => setProductName(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">모델 고유 코드/모델명 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">모델 고유 코드/모델명 <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
-                      placeholder="예시) RP-DOUGH-01"
+                      placeholder="예: RP-DOUGH-01"
                       value={productModelName}
                       onChange={(e) => setProductModelName(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex flex-col gap-1.5">
-                      <label className="font-extrabold text-[#0F172A]">포장 단위 *</label>
+                      <label className="text-xs font-semibold text-slate-700 block">포장 단위 <span className="text-red-500">*</span></label>
                       <select 
                         value={productUnit}
                         onChange={(e) => setProductUnit(e.target.value as any)}
                         required
-                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none transition-all cursor-pointer shadow-2xs"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all cursor-pointer"
                       >
                         <option value="개">개</option>
                         <option value="박스">박스</option>
@@ -12917,99 +12862,94 @@ export default function AdminPage() {
                       </select>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="font-extrabold text-[#0F172A]">단위 수량/중량 *</label>
+                      <label className="text-xs font-semibold text-slate-700 block">단위 수량/중량 <span className="text-red-500">*</span></label>
                       <input 
                         type="number"
                         min={1}
                         value={productQty}
                         onChange={(e) => setProductQty(parseInt(e.target.value, 10) || 1)}
                         required
-                        className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 transition-all outline-none shadow-2xs"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                       />
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Card 2: Pricing & Status (Blue Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
-                      💰
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">가격 및 판매 상태</span>
-                  </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    가격 정보
+              {/* Card 2: Pricing & Status */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">가격 및 판매 상태</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    가격 정책
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">공급가 (원) *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">공급가 (원) <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
                       value={productSupplyPrice}
                       onChange={(e) => handlePriceInput(e.target.value, setProductSupplyPrice)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 text-right font-semibold focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">판매가 (원) *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">판매가 (원) <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
                       value={productPrice}
                       onChange={(e) => handlePriceInput(e.target.value, setProductPrice)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 text-right font-semibold focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">특별 할인액 (원)</label>
+                    <label className="text-xs font-semibold text-slate-700 block">특별 할인액 (원)</label>
                     <input 
                       type="text"
                       value={productDiscountAmount}
                       onChange={(e) => handlePriceInput(e.target.value, setProductDiscountAmount)}
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs text-[#0F172A] text-right font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 text-right font-semibold focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-neutral-400">실시간 할인 적용 공급가 (자동 계산)</label>
+                    <label className="text-xs font-semibold text-slate-500 block">실시간 할인 적용 공급가 (자동 계산)</label>
                     <input 
                       type="text"
                       value={`${getCalculatedDiscountedPrice().toLocaleString()} 원`}
                       readOnly
-                      className="w-full bg-amber-50 border border-amber-200/80 rounded-lg px-4 py-3 text-xs text-amber-700 font-bold text-right outline-none"
+                      className="w-full bg-amber-50/70 border border-amber-200 rounded-lg px-3.5 py-2.5 text-xs text-amber-900 font-bold text-right outline-none"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">제품 상태 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">제품 판매 상태 <span className="text-red-500">*</span></label>
                     <select
                       value={productStatus}
                       onChange={(e) => setProductStatus(e.target.value as "판매중" | "품절" | "단종")}
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs text-[#0F172A] font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all outline-none shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs text-slate-800 font-medium focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 cursor-pointer transition-all outline-none"
                     >
                       <option value="판매중">판매중</option>
-                      <option value="품절">품절 (가맹점 주문불가)</option>
-                      <option value="단종">단종 (가맹점 노출안됨)</option>
+                      <option value="품절">품절 (가맹점 주문 불가)</option>
+                      <option value="단종">단종 (가맹점 노출 안됨)</option>
                     </select>
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-md border-0 space-y-1">
-                  <label className="font-extrabold text-[#0F172A] flex items-center justify-between">
-                    <span>🚚 배송비 정책 선택 *</span>
-                    <span className="text-[10px] text-amber-600 font-bold">박스단위/기본/무료</span>
+                <div className="flex flex-col gap-1.5 bg-slate-50 p-4 rounded-xl border border-slate-200/70 space-y-1">
+                  <label className="text-xs font-semibold text-slate-800 flex items-center justify-between">
+                    <span>🚚 배송비 정책 선택 <span className="text-red-500">*</span></span>
+                    <span className="text-[11px] text-amber-700 font-bold">박스단위/기본/무료</span>
                   </label>
                   <select
                     value={productShippingType}
                     onChange={(e) => setProductShippingType(e.target.value as "free" | "A" | "B" | "C" | "BOX")}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-xs text-[#0F172A] font-bold focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all outline-none shadow-2xs"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 font-bold focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 cursor-pointer transition-all outline-none"
                   >
                     <option value="BOX">🧊 BOX단위 배송 (박스당 비례 부과 / 10박스당 {shippingFeeBox}원)</option>
                     <option value="A">📦 A타입 기본 배송 (기본 {shippingFeeA}원)</option>
@@ -13017,7 +12957,7 @@ export default function AdminPage() {
                     <option value="C">📦 C타입 기본 배송 (기본 {shippingFeeC}원)</option>
                     <option value="free">🎁 무료 배송 (배송비 0원)</option>
                   </select>
-                  <p className="text-[11px] text-slate-600 font-bold bg-white p-2.5 rounded-md border border-slate-200/80 leading-relaxed mt-1">
+                  <p className="text-[11px] text-slate-500 bg-white p-2.5 rounded-lg border border-slate-200/80 leading-relaxed mt-1">
                     {productShippingType === "BOX" && `🧊 [박스단위 배송] 냉동생지 등 부피/중량 화물로, 주문 수량 10박스당 ${shippingFeeBox}원씩 비례하여 배송비가 부과됩니다. (1~10박스: ${shippingFeeBox}원, 11~20박스: 2배...)`}
                     {productShippingType === "A" && `📦 [A타입 기본 배송] 일반 식자재/부자재 기본 배송비(${shippingFeeA}원)가 적용됩니다.`}
                     {productShippingType === "B" && `📦 [B타입 배송] 중량/부피 화물 B타입 배송비(${shippingFeeB}원)가 적용됩니다.`}
@@ -13027,24 +12967,19 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Card 3: Images & Description (Emerald Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
-                      🖼️
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">이미지 및 상세 설명</span>
-                  </div>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    이미지 및 콘텐츠
+              {/* Card 3: Images & Description */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">이미지 및 상세 설명</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    미디어 & 상세
                   </span>
                 </div>
 
-                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-md border-0 space-y-2">
+                <div className="flex flex-col gap-1.5 bg-slate-50 p-4 rounded-xl border border-slate-200/70 space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="font-extrabold text-[#0F172A]">썸네일 대표 이미지 (웹 URL 또는 직접 파일 업로드)</label>
-                    <span className="text-[10px] text-slate-400 font-medium">미입력 시 기본 대표 이미지 자동 적용</span>
+                    <label className="text-xs font-semibold text-slate-700 block">썸네일 대표 이미지 (웹 URL 또는 직접 파일 업로드)</label>
+                    <span className="text-[11px] text-slate-400">미입력 시 기본 이미지 자동 적용</span>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input 
@@ -13052,49 +12987,49 @@ export default function AdminPage() {
                       placeholder="https://res.cloudinary.com/... 이미지 웹 경로 (선택)"
                       value={productImg}
                       onChange={(e) => setProductImg(e.target.value)}
-                      className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
+                      className="flex-1 bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                     />
-                    <div className="flex items-center bg-[#F1F4F8] rounded-lg px-3 py-2 shrink-0 border-0 shadow-2xs">
+                    <div className="flex items-center bg-white rounded-lg px-3 py-1.5 shrink-0 border border-slate-200">
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleProductImgUpload}
-                        className="text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:hover:bg-slate-300 file:text-slate-700 cursor-pointer w-full max-w-[180px]"
+                        className="text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-slate-100 file:hover:bg-slate-200 file:text-slate-700 cursor-pointer w-full max-w-[180px]"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-md border-0 space-y-2">
-                  <label className="font-extrabold text-[#0F172A]">상세 상세페이지 이미지 (옵션)</label>
+                <div className="flex flex-col gap-1.5 bg-slate-50 p-4 rounded-xl border border-slate-200/70 space-y-2">
+                  <label className="text-xs font-semibold text-slate-700 block">상세페이지 이미지 (옵션)</label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input 
                       type="text"
                       placeholder="https://res.cloudinary.com/... 이미지 상세 웹 경로"
                       value={productDetailImg}
                       onChange={(e) => setProductDetailImg(e.target.value)}
-                      className="flex-1 bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
+                      className="flex-1 bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                     />
-                    <div className="flex items-center bg-[#F1F4F8] rounded-lg px-3 py-2 shrink-0 border-0 shadow-2xs">
+                    <div className="flex items-center bg-white rounded-lg px-3 py-1.5 shrink-0 border border-slate-200">
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleProductDetailImgUpload}
-                        className="text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:hover:bg-slate-300 file:text-slate-700 cursor-pointer w-full max-w-[180px]"
+                        className="text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-slate-100 file:hover:bg-slate-200 file:text-slate-700 cursor-pointer w-full max-w-[180px]"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Rich Text Editor */}
-                <div className="flex flex-col gap-1.5 bg-[#f8f9fa] p-4 rounded-md border-0 space-y-2">
-                  <label className="font-extrabold text-[#0F172A]">상세페이지 텍스트 편집 (크기, 색상, 정렬 등)</label>
-                  <div className="border-0 rounded-lg overflow-hidden bg-white shadow-2xs">
-                    <div className="flex flex-wrap items-center gap-1 p-2 bg-[#F1F4F8] border-b border-slate-100 text-xs">
+                <div className="flex flex-col gap-1.5 bg-slate-50 p-4 rounded-xl border border-slate-200/70 space-y-2">
+                  <label className="text-xs font-semibold text-slate-700 block">상세페이지 텍스트 편집</label>
+                  <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-xs">
+                    <div className="flex flex-wrap items-center gap-1.5 p-2 bg-slate-50 border-b border-slate-200 text-xs">
                       <button
                         type="button"
                         onClick={() => executeEditorCommand('bold')}
-                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 font-bold border-0 cursor-pointer shadow-2xs"
+                        className="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-md text-slate-700 font-bold border border-slate-200 cursor-pointer text-xs"
                         title="굵게"
                       >
                         가
@@ -13102,7 +13037,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => executeEditorCommand('italic')}
-                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 italic font-bold border-0 cursor-pointer shadow-2xs"
+                        className="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-md text-slate-700 italic font-bold border border-slate-200 cursor-pointer text-xs"
                         title="기울임"
                       >
                         가
@@ -13110,7 +13045,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => executeEditorCommand('underline')}
-                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 underline font-bold border-0 cursor-pointer shadow-2xs"
+                        className="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-md text-slate-700 underline font-bold border border-slate-200 cursor-pointer text-xs"
                         title="밑줄"
                       >
                         가
@@ -13119,21 +13054,21 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => executeEditorCommand('justifyLeft')}
-                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 text-[11px] font-bold border-0 cursor-pointer shadow-2xs"
+                        className="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-md text-slate-700 text-xs font-semibold border border-slate-200 cursor-pointer"
                       >
                         왼쪽
                       </button>
                       <button
                         type="button"
                         onClick={() => executeEditorCommand('justifyCenter')}
-                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 text-[11px] font-bold border-0 cursor-pointer shadow-2xs"
+                        className="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-md text-slate-700 text-xs font-semibold border border-slate-200 cursor-pointer"
                       >
                         가운데
                       </button>
                       <button
                         type="button"
                         onClick={() => executeEditorCommand('justifyRight')}
-                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 text-[11px] font-bold border-0 cursor-pointer shadow-2xs"
+                        className="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-md text-slate-700 text-xs font-semibold border border-slate-200 cursor-pointer"
                       >
                         오른쪽
                       </button>
@@ -13142,7 +13077,7 @@ export default function AdminPage() {
                         onChange={(e) => {
                           if (e.target.value) executeEditorCommand('fontSize', e.target.value);
                         }}
-                        className="px-2 py-1 bg-white rounded-lg text-slate-700 text-[11px] font-bold border-0 focus:outline-none cursor-pointer shadow-2xs"
+                        className="px-2 py-1 bg-white rounded-md text-slate-700 text-xs font-semibold border border-slate-200 focus:outline-none cursor-pointer"
                       >
                         <option value="">글자 크기</option>
                         <option value="2">작게 (12px)</option>
@@ -13155,7 +13090,7 @@ export default function AdminPage() {
                         onChange={(e) => {
                           if (e.target.value) executeEditorCommand('foreColor', e.target.value);
                         }}
-                        className="px-2 py-1 bg-white rounded-lg text-slate-700 text-[11px] font-bold border-0 focus:outline-none cursor-pointer shadow-2xs"
+                        className="px-2 py-1 bg-white rounded-md text-slate-700 text-xs font-semibold border border-slate-200 focus:outline-none cursor-pointer"
                       >
                         <option value="">글자 색상</option>
                         <option value="#0F172A">기본 검정계열</option>
@@ -13167,7 +13102,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => executeEditorCommand('insertUnorderedList')}
-                        className="px-2.5 py-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 text-[11px] font-bold border-0 cursor-pointer shadow-2xs"
+                        className="px-2.5 py-1 bg-white hover:bg-slate-100 rounded-md text-slate-700 text-xs font-semibold border border-slate-200 cursor-pointer"
                       >
                         • 리스트
                       </button>
@@ -13178,7 +13113,7 @@ export default function AdminPage() {
                           const ed = document.getElementById("product-detail-rich-editor");
                           if (ed) ed.innerHTML = "";
                         }}
-                        className="px-2.5 py-1 bg-white hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-bold border-0 ml-auto cursor-pointer shadow-2xs"
+                        className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-600 rounded-md text-xs font-semibold border border-slate-200 ml-auto cursor-pointer"
                       >
                         비우기
                       </button>
@@ -13190,36 +13125,30 @@ export default function AdminPage() {
                       suppressContentEditableWarning
                       onInput={(e: React.FormEvent<HTMLDivElement>) => setProductDetailText(e.currentTarget.innerHTML)}
                       data-placeholder="이곳에 제품 상세 안내 텍스트를 자유롭게 입력하고 편집하세요..."
-                      className="w-full min-h-[160px] p-4 text-xs font-semibold text-[#0F172A] focus:outline-none rich-content-view overflow-y-auto max-h-[300px]"
+                      className="w-full min-h-[160px] p-4 text-xs font-medium text-slate-900 focus:outline-none rich-content-view overflow-y-auto max-h-[300px]"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Stage Flow Footer Bar */}
-              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
-                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>시스템 정상 작동 · 본사 제품 관리</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    disabled={isProductSaving}
-                    onClick={() => setShowProductModal(false)}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0 shadow-2xs disabled:opacity-50"
-                  >
-                    취소
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isProductSaving}
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs active:scale-95 cursor-pointer border-0 flex items-center gap-2 disabled:opacity-70"
-                  >
-                    <span>{isProductSaving ? "저장 처리 중..." : (selectedProduct ? "수정 완료" : "등록 하기")}</span>
-                    <ArrowRight size={14} />
-                  </button>
-                </div>
+              {/* Footer */}
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  disabled={isProductSaving}
+                  onClick={() => setShowProductModal(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={isProductSaving}
+                  className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-70"
+                >
+                  <span>{isProductSaving ? "저장 처리 중..." : (selectedProduct ? "수정 저장" : "등록 하기")}</span>
+                  <ArrowRight size={14} />
+                </button>
               </div>
             </form>
           </div>
@@ -13227,47 +13156,42 @@ export default function AdminPage() {
       )}
 
 
-      {/* 6. Material Creation Modal (Stage Flow Tech Card Style) */}
+      {/* 6. Material Creation Modal */}
       {showMaterialModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setShowMaterialModal(false)}
         >
           <div 
-            className="w-full max-w-xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-xl bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow Yellow Header */}
-            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
-              <div>
-                <h3 className="text-base sm:text-lg font-black tracking-tight text-[#0F172A]">신규 가맹 지원 자료 등록</h3>
-                <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">점주 포털에 등록할 교육 및 홍보 자료를 추가합니다.</p>
-              </div>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-wider text-[#0F172A] uppercase px-3 py-1 rounded-md bg-black/5">
-                  자료 등록 양식
-                </span>
-                <button 
-                  type="button"
-                  onClick={() => setShowMaterialModal(false)} 
-                  className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
-                >
-                  <X size={16} />
-                </button>
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100/80 flex items-center justify-center text-amber-600">
+                  <FileText size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">가맹 지원 자료 등록</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">점주 포털에 등록할 교육 및 홍보 자료를 추가합니다.</p>
+                </div>
               </div>
+              <button 
+                type="button"
+                onClick={() => setShowMaterialModal(false)} 
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            <form onSubmit={handleCreateMaterial} className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
-              {/* Card 1: Type Selection (Amber Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-3">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
-                      📁
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">자료 유형 구분</span>
-                  </div>
-                  <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
+            <form onSubmit={handleCreateMaterial} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-slate-50/50">
+              {/* Card 1: Type Selection */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">자료 유형 구분</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
                     유형 선택
                   </span>
                 </div>
@@ -13276,10 +13200,10 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setMaterialType("training")}
-                    className={`py-3 rounded-lg border-0 text-xs font-black transition-all cursor-pointer ${
+                    className={`py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                       materialType === "training"
-                        ? "bg-[#FED422] text-[#0F172A] shadow-2xs"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        ? "bg-[#FED422] border-amber-400 text-slate-900 shadow-xs"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                     }`}
                   >
                     📖 교육자료실 등록
@@ -13287,132 +13211,120 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setMaterialType("pr")}
-                    className={`py-3 rounded-lg border-0 text-xs font-black transition-all cursor-pointer ${
+                    className={`py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                       materialType === "pr"
-                        ? "bg-[#FED422] text-[#0F172A] shadow-2xs"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        ? "bg-[#FED422] border-amber-400 text-slate-900 shadow-xs"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                     }`}
                   >
-                    🖼 홍보자료실 등록
+                    🖼️ 홍보자료실 등록
                   </button>
                 </div>
               </div>
 
-              {/* Card 2: Title & Specifications (Blue Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
-                      📜
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">제목 및 포맷 상세</span>
-                  </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
+              {/* Card 2: Title & Specifications */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">제목 및 세부 정보</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
                     상세 정보
                   </span>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-extrabold text-[#0F172A]">자료(파일명) 제목 *</label>
+                  <label className="text-xs font-semibold text-slate-700 block">자료(파일명) 제목 <span className="text-red-500">*</span></label>
                   <input 
                     type="text"
-                    placeholder="예시) 하절기 위생 종합 자가점검 진단서 엑셀 양식"
+                    placeholder="예: 하절기 위생 종합 자가점검 진단서 엑셀 양식"
                     value={newMaterialTitle}
                     onChange={(e) => setNewMaterialTitle(e.target.value)}
                     required
-                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-extrabold text-[#0F172A]">자료 상세 설명 (옵션)</label>
+                  <label className="text-xs font-semibold text-slate-700 block">자료 상세 설명 (선택)</label>
                   <input 
                     type="text"
-                    placeholder="예시) 매장 위생점검 수칙 및 필수 준수 사항 가이드라인"
+                    placeholder="예: 매장 위생점검 수칙 및 필수 준수 사항 가이드라인"
                     value={newMaterialDesc}
                     onChange={(e) => setNewMaterialDesc(e.target.value)}
-                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">파일 포맷 확장자 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">파일 포맷 확장자 <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
-                      placeholder="PDF, MP4, AI 등"
+                      placeholder="예: PDF, MP4, AI, XLSX"
                       value={newMaterialFormat}
                       onChange={(e) => setNewMaterialFormat(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-extrabold text-[#0F172A]">권장 크기 용량 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block">권장 크기/용량 <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
-                      placeholder="예시) 4.5 MB"
+                      placeholder="예: 4.5 MB"
                       value={newMaterialSize}
                       onChange={(e) => setNewMaterialSize(e.target.value)}
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all outline-none shadow-2xs"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Card 3: Files & Preview Image (Emerald Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
-                      📥
-                    </div>
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">파일 및 대표 썸네일</span>
-                  </div>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-md">
+              {/* Card 3: Files & Preview Image */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">파일 및 대표 썸네일</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
                     파일 첨부
                   </span>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-extrabold text-[#0F172A]">자료 대표 이미지 주소 (옵션)</label>
+                  <label className="text-xs font-semibold text-slate-700 block">자료 대표 이미지 주소 (선택)</label>
                   <input 
                     type="text"
                     placeholder="https://res.cloudinary.com/... 이미지 경로"
                     value={newMaterialImg}
                     onChange={(e) => setNewMaterialImg(e.target.value)}
-                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-4 py-3 text-xs font-medium text-[#0F172A] placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none shadow-2xs"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all outline-none"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-extrabold text-[#0F172A] flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-700 flex items-center justify-between">
                     <span className="flex items-center gap-1">
-                      📂 실제 자료 파일 직접 업로드
-                      <span className="text-[10px] text-amber-600 font-extrabold">(필수)</span>
+                      실제 자료 파일 직접 업로드 <span className="text-red-500">*</span>
                     </span>
                     {isUploadingMaterialFile && (
-                      <span className="text-[10px] text-amber-600 font-bold animate-pulse flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-spin"></span>
+                      <span className="text-[11px] text-amber-600 font-semibold animate-pulse flex items-center gap-1">
                         서버 업로드 중... ⏳
                       </span>
                     )}
                     {!isUploadingMaterialFile && newMaterialFileUrl && (
-                      <span className="text-[10px] text-emerald-600 font-extrabold flex items-center gap-1">
+                      <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
                         ✓ 서버 업로드 완료
                       </span>
                     )}
                   </label>
-                  <div className="flex items-center gap-3 bg-[#F1F4F8] border-0 rounded-lg p-3 shadow-2xs">
+                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
                     <input
                       type="file"
                       disabled={isUploadingMaterialFile}
                       onChange={handleMaterialFileUpload}
-                      className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-200 file:text-slate-700 cursor-pointer flex-1 disabled:opacity-50"
+                      className="text-xs text-slate-500 file:mr-2.5 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-slate-200 hover:file:bg-slate-300 file:text-slate-700 cursor-pointer flex-1 disabled:opacity-50"
                     />
                     {newMaterialFileName && (
-                      <div className="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2.5 py-1 rounded-md max-w-[150px] truncate" title={newMaterialFileName}>
+                      <div className="text-[11px] font-semibold text-slate-800 bg-amber-100 px-2.5 py-1 rounded-md max-w-[150px] truncate" title={newMaterialFileName}>
                         {newMaterialFileName}
                       </div>
                     )}
@@ -13424,7 +13336,7 @@ export default function AdminPage() {
                           setNewMaterialStorageId("");
                           setNewMaterialFileName("");
                         }}
-                        className="px-3 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 text-[10px] font-bold border-0 cursor-pointer shadow-2xs"
+                        className="px-2.5 py-1 rounded-md bg-white hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 cursor-pointer"
                       >
                         지우기
                       </button>
@@ -13433,79 +13345,69 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Stage Flow Footer Bar */}
-              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
-                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  <span className={`w-2 h-2 rounded-full ${isUploadingMaterialFile ? "bg-amber-500 animate-ping" : newMaterialFileUrl ? "bg-emerald-500 animate-pulse" : "bg-slate-300"}`}></span>
-                  <span>{isUploadingMaterialFile ? "대용량 파일 서버 업로드 중..." : newMaterialFileUrl ? "자료 업로드 준비 완료" : "자료 파일 선택 대기"}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowMaterialModal(false)}
-                    className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-extrabold text-xs rounded-md transition-all cursor-pointer border-0 shadow-2xs"
-                  >
-                    취소
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isUploadingMaterialFile}
-                    className="px-7 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] disabled:bg-slate-300 disabled:text-slate-500 text-[#0F172A] font-black text-xs rounded-md transition-all shadow-2xs active:scale-95 cursor-pointer disabled:cursor-not-allowed border-0 flex items-center gap-2"
-                  >
-                    <span>{isUploadingMaterialFile ? "업로드 중..." : "지원 자료 추가"}</span>
-                    <ArrowRight size={14} />
-                  </button>
-                </div>
+              {/* Footer */}
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowMaterialModal(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUploadingMaterialFile}
+                  className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 disabled:bg-slate-200 disabled:text-slate-400 text-slate-900 font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  <span>{isUploadingMaterialFile ? "업로드 중..." : "지원 자료 추가"}</span>
+                  <ArrowRight size={14} />
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* 7. Order Detail Popup Modal (Stage Flow Tech Card Style) */}
+      {/* 7. Order Detail Popup Modal (Modern & Clean Style) */}
       {showOrderModal && selectedOrder && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setShowOrderModal(false)}
         >
           <div 
-            className="w-full max-w-3xl bg-white border border-neutral-200/80 rounded-lg overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-3xl bg-white border border-slate-200/80 rounded-2xl shadow-2xl max-h-[92vh] flex flex-col font-sans overflow-hidden my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Stage Flow Yellow Header */}
-            <div className="px-7 py-5 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0 shadow-2xs">
+            {/* Clean Modern Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-md bg-black/10 text-[#0F172A] flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0">
                   <Package size={20} />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
-                    <span>발주 주문 상세 내역</span>
-                    <span className="text-[11px] px-2.5 py-0.5 rounded-md bg-black/10 text-[#0F172A] font-mono font-bold">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base font-bold text-slate-900 tracking-tight">발주 주문 상세 내역</h3>
+                    <span className="text-xs px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold border border-slate-200">
                       {selectedOrder.id}
                     </span>
-                  </h3>
-                  <p className="text-xs text-[#0F172A]/80 font-bold mt-0.5">가맹점 발주 품목 및 물류 배송 송장을 관리합니다.</p>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">가맹점 발주 품목 및 물류 배송 송장을 관리합니다.</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-block text-[10px] font-black tracking-widest text-[#0F172A] uppercase px-2.5 py-1 rounded-md bg-black/5">
-                  발주 상세
-                </span>
-                <button 
-                  type="button"
-                  onClick={() => setShowOrderModal(false)} 
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center border-0 cursor-pointer"
-                >
-                  <X size={16} />
-                </button>
-              </div>
+              <button 
+                type="button"
+                onClick={() => setShowOrderModal(false)} 
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors border-0 cursor-pointer"
+                title="닫기"
+              >
+                <X size={18} />
+              </button>
             </div>
 
             {/* Body */}
-            <div className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-[#f9fafb]">
+            <div className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-slate-50/60">
               
-              {/* Delivery Recipient Info Card (Amber Accent) */}
+              {/* Delivery Recipient Info Card */}
               {(() => {
                 const storeInfo = stores.find(s => s.id === selectedOrder.storeId) || {
                   name: selectedOrder.storeId === "owner" ? "본사 테스트" : "강남역삼점",
@@ -13517,87 +13419,88 @@ export default function AdminPage() {
                 const storeAddress = `${storeInfo.roadAddress} ${storeInfo.detailAddress}`.trim();
                 
                 return (
-                  <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-amber-500 space-y-4">
-                    <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+                  <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                       <div className="flex items-center gap-2">
-                        <Store size={16} className="text-amber-500" />
-                        <span className="text-xs font-black text-[#0F172A] tracking-tight">수령인 & 배송지 정보 (가맹점 정보)</span>
+                        <Store size={15} className="text-slate-600" />
+                        <span className="text-xs font-bold text-slate-900 tracking-tight">수령인 및 배송지 정보</span>
                       </div>
-                      <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
+                      <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                         가맹점 정보
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold text-slate-600">
-                      <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-medium text-slate-600">
+                      <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex justify-between items-center">
                         <div>
-                          <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">가맹점명</span>
-                          <strong className="text-[#0F172A] text-xs font-black">{storeInfo.name}</strong>
+                          <span className="block text-[10px] text-slate-400 mb-0.5 font-semibold">가맹점명</span>
+                          <strong className="text-slate-900 text-xs font-bold">{storeInfo.name}</strong>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleCopyToClipboard(storeInfo.name, "가맹점명")}
-                          className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-neutral-200/60 hover:bg-neutral-200 rounded-lg shrink-0 cursor-pointer border-0 transition-colors"
+                          className="p-1.5 hover:text-slate-900 text-slate-400 bg-white hover:bg-slate-100 rounded-md shrink-0 cursor-pointer border border-slate-200 transition-colors shadow-2xs"
                           title="복사하기"
                         >
                           <Copy size={12} />
                         </button>
                       </div>
 
-                      <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center">
+                      <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex justify-between items-center">
                         <div>
-                          <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">점주 대표자</span>
-                          <strong className="text-[#0F172A] text-xs font-black">{storeInfo.owner}</strong>
+                          <span className="block text-[10px] text-slate-400 mb-0.5 font-semibold">점주 대표자</span>
+                          <strong className="text-slate-900 text-xs font-bold">{storeInfo.owner}</strong>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleCopyToClipboard(storeInfo.owner, "대표자명")}
-                          className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-neutral-200/60 hover:bg-neutral-200 rounded-lg shrink-0 cursor-pointer border-0 transition-colors"
+                          className="p-1.5 hover:text-slate-900 text-slate-400 bg-white hover:bg-slate-100 rounded-md shrink-0 cursor-pointer border border-slate-200 transition-colors shadow-2xs"
                           title="복사하기"
                         >
                           <Copy size={12} />
                         </button>
                       </div>
 
-                      <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center">
+                      <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex justify-between items-center">
                         <div>
-                          <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">연락처</span>
-                          <strong className="text-[#0F172A] text-xs font-black">{storeInfo.phone}</strong>
+                          <span className="block text-[10px] text-slate-400 mb-0.5 font-semibold">연락처</span>
+                          <strong className="text-slate-900 text-xs font-bold">{storeInfo.phone}</strong>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleCopyToClipboard(storeInfo.phone, "연락처")}
-                          className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-neutral-200/60 hover:bg-neutral-200 rounded-lg shrink-0 cursor-pointer border-0 transition-colors"
+                          className="p-1.5 hover:text-slate-900 text-slate-400 bg-white hover:bg-slate-100 rounded-md shrink-0 cursor-pointer border border-slate-200 transition-colors shadow-2xs"
                           title="복사하기"
                         >
                           <Copy size={12} />
                         </button>
                       </div>
 
-                      <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center">
+                      <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex justify-between items-center">
                         <div>
-                          <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">주문 신청일</span>
-                          <strong className="text-[#0F172A] text-xs font-black">{formatOrderDate(selectedOrder.date, (selectedOrder as any)._creationTime)}</strong>
+                          <span className="block text-[10px] text-slate-400 mb-0.5 font-semibold">주문 신청일</span>
+                          <strong className="text-slate-900 text-xs font-bold">{formatOrderDate(selectedOrder.date, (selectedOrder as any)._creationTime)}</strong>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleCopyToClipboard(formatOrderDate(selectedOrder.date, (selectedOrder as any)._creationTime), "신청일")}
-                          className="p-1.5 hover:text-[#0F172A] text-slate-400 bg-neutral-200/60 hover:bg-neutral-200 rounded-lg shrink-0 cursor-pointer border-0 transition-colors"
+                          className="p-1.5 hover:text-slate-900 text-slate-400 bg-white hover:bg-slate-100 rounded-md shrink-0 cursor-pointer border border-slate-200 transition-colors shadow-2xs"
                           title="복사하기"
                         >
                           <Copy size={12} />
                         </button>
                       </div>
                     </div>
-                    <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex justify-between items-center gap-4">
+
+                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex justify-between items-center gap-4">
                       <div className="flex-1">
-                        <span className="block text-[10px] text-neutral-400 mb-0.5 font-bold">배송지 주소</span>
-                        <strong className="text-[#0F172A] text-xs font-black break-words leading-tight">{storeAddress}</strong>
+                        <span className="block text-[10px] text-slate-400 mb-0.5 font-semibold">배송지 주소</span>
+                        <strong className="text-slate-900 text-xs font-bold break-words leading-tight">{storeAddress}</strong>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleCopyToClipboard(storeAddress, "배송지 주소")}
-                        className="p-2 hover:bg-neutral-200 text-slate-600 bg-neutral-200/60 rounded-md shrink-0 cursor-pointer transition-all border-0 self-center"
+                        className="p-1.5 hover:bg-slate-100 text-slate-600 bg-white rounded-md shrink-0 cursor-pointer transition-all border border-slate-200 self-center shadow-2xs"
                         title="주소 복사"
                       >
                         <Copy size={14} />
@@ -13607,38 +13510,35 @@ export default function AdminPage() {
                 );
               })()}
 
-              {/* Order Item List Card (Blue Accent) */}
-              <div className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-blue-500 space-y-3">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+              {/* Order Item List Card */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                   <div className="flex items-center gap-2">
-                    <Package size={16} className="text-blue-500" />
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">발주 신청 품목 및 정산 내역 ({(selectedOrder.items || []).length})</span>
+                    <Package size={15} className="text-slate-600" />
+                    <span className="text-xs font-bold text-slate-900 tracking-tight">발주 신청 품목 및 정산 내역 ({(selectedOrder.items || []).length})</span>
                   </div>
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    품목 목록
-                  </span>
                 </div>
 
-                <div className="border border-neutral-200/90 rounded-md overflow-hidden bg-white shadow-2xs">
+                <div className="border border-slate-200 rounded-lg overflow-hidden bg-white">
                   <div className="overflow-x-auto w-full">
-                    <table className="w-full text-left border-collapse text-[11px] min-w-[480px] sm:min-w-0" style={{ tableLayout: 'fixed' }}>
+                    <table className="w-full text-left border-collapse text-xs min-w-[480px] sm:min-w-0" style={{ tableLayout: 'fixed' }}>
                       <thead>
-                        <tr className="bg-[#f8f9fa] border-b border-neutral-200/80 text-[10px] font-extrabold text-neutral-400 uppercase">
-                          <th className="px-4 py-3" style={{ width: '40%' }}>품목명</th>
-                          <th className="px-3 py-3 text-right" style={{ width: '20%' }}>단가</th>
-                          <th className="px-3 py-3 text-center" style={{ width: '15%' }}>수량</th>
-                          <th className="px-4 py-3 text-right" style={{ width: '25%' }}>금액</th>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500">
+                          <th className="px-4 py-2.5" style={{ width: '40%' }}>품목명</th>
+                          <th className="px-3 py-2.5 text-right" style={{ width: '20%' }}>단가</th>
+                          <th className="px-3 py-2.5 text-center" style={{ width: '15%' }}>수량</th>
+                          <th className="px-4 py-2.5 text-right" style={{ width: '25%' }}>금액</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-neutral-100">
+                      <tbody className="divide-y divide-slate-100">
                         {(selectedOrder.items || []).map((item, idx) => (
-                          <tr key={idx} className="hover:bg-neutral-50 font-medium">
-                            <td className="px-4 py-3 font-black text-[#0F172A] leading-tight break-words text-[11px] sm:text-xs" style={{ wordBreak: 'break-word' }}>
+                          <tr key={idx} className="hover:bg-slate-50/80 font-medium transition-colors">
+                            <td className="px-4 py-3 font-bold text-slate-900 leading-tight break-words text-xs" style={{ wordBreak: 'break-word' }}>
                               {item?.productName || "품목"}
                             </td>
-                            <td className="px-3 py-3 text-right text-slate-500 text-[11px] font-bold">{(item?.price || 0).toLocaleString()}</td>
-                            <td className="px-3 py-3 text-center font-black text-[#0F172A] text-[11px]">{item?.quantity || 0}</td>
-                            <td className="px-4 py-3 text-right font-black text-[#0F172A] text-[11px]">{((item?.price || 0) * (item?.quantity || 0)).toLocaleString()} 원</td>
+                            <td className="px-3 py-3 text-right text-slate-500 text-xs font-medium">{(item?.price || 0).toLocaleString()}</td>
+                            <td className="px-3 py-3 text-center font-bold text-slate-900 text-xs">{item?.quantity || 0}</td>
+                            <td className="px-4 py-3 text-right font-bold text-slate-900 text-xs">{((item?.price || 0) * (item?.quantity || 0)).toLocaleString()} 원</td>
                           </tr>
                         ))}
                       </tbody>
@@ -13647,61 +13547,71 @@ export default function AdminPage() {
                 </div>
 
                 {/* Status control and Total price summary */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                  <div className="space-y-1.5 bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80">
-                    <label className="text-xs font-black text-[#0F172A] block">상태값 변경 선택</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                  <div className="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+                    <label className="text-xs font-bold text-slate-800 block">진행 상태 변경</label>
                     <select
                       value={selectedOrder.status}
                       onChange={(e) => updateOrderStatus(selectedOrder.id, e.target.value)}
-                      className="w-full bg-[#e2e8f0] border-0 rounded-md px-4 py-2.5 text-xs text-[#0F172A] font-bold focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer outline-none transition-all"
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs text-slate-800 font-bold focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
                     >
-                      {deliveryStatuses.map((st) => (
+                      {Array.from(new Set(["입금대기", "입금확인완료", "결제완료", "주문완료", ...deliveryStatuses, "배송준비중", "배송중", "배송완료", "주문취소"])).map((st) => (
                         <option key={st} value={st}>{st}</option>
                       ))}
                     </select>
+
+                    {selectedOrder.status === "입금대기" && (
+                      <button
+                        type="button"
+                        onClick={() => updateOrderStatus(selectedOrder.id, "입금확인완료")}
+                        className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer border-0"
+                      >
+                        <CheckCircle2 size={14} />
+                        <span>입금 확인 완료 처리 (파트너 정산 즉시 반영)</span>
+                      </button>
+                    )}
                   </div>
 
-                  <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 flex flex-col justify-center items-end text-right">
-                    <span className="text-[10px] text-neutral-400 font-bold block mb-0.5">결제 수단 정보: <strong className="text-[#0F172A] font-black">{selectedOrder.payMethod === "card" || selectedOrder.payMethod === "CARD" ? "카드결제" : "현금 입금 진행"}</strong></span>
-                    <span className="text-[10px] text-neutral-400 font-bold block mb-0.5">총 결제 합계액 (부가세 포함)</span>
-                    <strong className="text-lg font-black text-amber-500">
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 flex flex-col justify-center items-end text-right">
+                    <span className="text-[11px] text-slate-400 font-medium block mb-0.5">
+                      결제 수단: <strong className="text-slate-800 font-bold">{selectedOrder.payMethod === "card" || selectedOrder.payMethod === "CARD" ? "카드결제" : "현금 / 무통장입금"}</strong>
+                    </span>
+                    <span className="text-xs text-slate-500 font-bold block mb-1">총 결제 합계액 (부가세 포함)</span>
+                    <strong className="text-xl font-black text-amber-500">
                       {(selectedOrder.totalPrice || 0).toLocaleString()} 원
                     </strong>
                   </div>
                 </div>
               </div>
 
-              {/* Delivery & Tracking Info Card (Emerald Accent) */}
-              <form onSubmit={handleUpdateOrderTracking} className="bg-white rounded-lg p-5 border border-neutral-200/90 shadow-2xs border-l-[5px] border-l-emerald-500 space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+              {/* Delivery & Tracking Info Card */}
+              <form onSubmit={handleUpdateOrderTracking} className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                   <div className="flex items-center gap-2">
-                    <Truck size={16} className="text-emerald-500" />
-                    <span className="text-xs font-black text-[#0F172A] tracking-tight">배송 물류 송장 정보 (다중 송장 지원)</span>
+                    <Truck size={15} className="text-slate-600" />
+                    <span className="text-xs font-bold text-slate-900 tracking-tight">배송 물류 송장 정보 (다중 송장 지원)</span>
                   </div>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-md">
-                    송장 관리
-                  </span>
                 </div>
                 
                 {/* Registered Tracking List */}
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-neutral-400 block">등록된 송장 목록 ({modalTrackingList.length})</label>
+                  <label className="text-[11px] font-semibold text-slate-400 block">등록된 송장 목록 ({modalTrackingList.length})</label>
                   {modalTrackingList.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {modalTrackingList.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between bg-[#f8f9fa] border border-neutral-200/80 px-3.5 py-2.5 rounded-md text-xs font-semibold text-[#0F172A]">
+                        <div key={idx} className="flex items-center justify-between bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-lg text-xs font-semibold text-slate-800">
                           <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-0.5 rounded-md bg-amber-100 text-[10px] font-black text-amber-900">
+                            <span className="px-2 py-0.5 rounded bg-amber-100 text-[10px] font-bold text-amber-900">
                               {item.courier}
                             </span>
-                            <span className="font-mono text-[#0F172A] font-black text-xs">{item.trackingNo}</span>
+                            <span className="text-slate-900 font-bold text-xs">{item.trackingNo}</span>
                           </div>
                           <button
                             type="button"
                             onClick={() => {
                               setModalTrackingList(modalTrackingList.filter((_, i) => i !== idx));
                             }}
-                            className="p-1 hover:bg-neutral-200 rounded-md text-slate-400 hover:text-rose-600 transition-colors cursor-pointer border-0"
+                            className="p-1 hover:bg-slate-200 rounded-md text-slate-400 hover:text-rose-600 transition-colors cursor-pointer border-0"
                             title="삭제"
                           >
                             <Trash2 size={13} />
@@ -13710,21 +13620,21 @@ export default function AdminPage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-3 bg-[#f8f9fa] border border-neutral-200/80 rounded-md text-[11px] font-bold text-neutral-400">
+                    <div className="text-center py-4 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-400">
                       등록된 송장 번호가 없습니다. 아래에서 송장을 등록해 주세요.
                     </div>
                   )}
                 </div>
 
                 {/* Add Tracking Form */}
-                <div className="bg-[#f8f9fa] p-3.5 rounded-md border border-neutral-200/80 space-y-3">
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                     <div className="sm:col-span-4 space-y-1">
-                      <label className="text-[10px] font-extrabold text-[#0F172A] block">택배사 선택</label>
+                      <label className="text-[11px] font-bold text-slate-700 block">택배사 선택</label>
                       <select
                         value={selectedCourier}
                         onChange={(e) => setSelectedCourier(e.target.value)}
-                        className="w-full bg-[#e2e8f0] border-0 rounded-md px-3 py-2.5 text-xs text-[#0F172A] font-bold focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 cursor-pointer outline-none transition-all"
+                        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs text-slate-800 font-medium focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none transition-all shadow-2xs"
                       >
                         <option value="CJ대한통운">CJ대한통운</option>
                         <option value="한진택배">한진택배</option>
@@ -13736,13 +13646,13 @@ export default function AdminPage() {
                     </div>
 
                     <div className="sm:col-span-6 space-y-1">
-                      <label className="text-[10px] font-extrabold text-[#0F172A] block">송장번호 입력</label>
+                      <label className="text-[11px] font-bold text-slate-700 block">송장번호 입력</label>
                       <input
                         type="text"
                         placeholder="하이픈(-) 없이 입력"
                         value={inputTrackingNo}
                         onChange={(e) => setInputTrackingNo(e.target.value)}
-                        className="w-full bg-[#e2e8f0] border-0 rounded-md px-3 py-2.5 text-xs text-[#0F172A] font-bold placeholder-neutral-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs text-slate-800 font-medium placeholder-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all shadow-2xs"
                       />
                     </div>
 
@@ -13750,7 +13660,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={handleToAddTracking}
-                        className="w-full py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black rounded-md transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1 border-0"
+                        className="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1 border-0"
                       >
                         <Plus size={14} />
                         추가
@@ -13759,86 +13669,92 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-1">
                   <button
                     type="submit"
-                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-md transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer border-0 active:scale-95"
+                    className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer border-0 active:scale-98"
                   >
-                    <Truck size={15} />
+                    <Truck size={14} />
                     송장 등록 및 배송중 상태 변경
                   </button>
                 </div>
               </form>
 
-              {/* Stage Flow Footer Bar */}
-              <div className="px-1 py-2 flex items-center justify-between border-t border-neutral-200/60 pt-4">
-                <div className="flex items-center gap-2 text-[10px] font-mono font-extrabold text-neutral-400 uppercase tracking-widest">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>ORDER SYSTEM ACTIVE</span>
-                </div>
-                <button 
-                  type="button"
-                  onClick={() => setShowOrderModal(false)}
-                  className="px-6 py-2.5 rounded-md bg-[#0F172A] hover:bg-slate-800 text-xs font-black text-white transition-colors border-0 cursor-pointer shadow-xs"
-                >
-                  닫기
-                </button>
-              </div>
+            </div>
+
+            {/* Clean Modern Footer */}
+            <div className="px-6 py-3.5 bg-white border-t border-slate-100 flex items-center justify-end shrink-0">
+              <button 
+                type="button"
+                onClick={() => setShowOrderModal(false)}
+                className="px-5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-colors border-0 cursor-pointer"
+              >
+                닫기
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {/* ==========================================
-          MODAL: PARTNER CREATE / EDIT
+          MODAL: PARTNER REGISTRATION / EDIT
       ========================================== */}
       {isPartnerFormOpen && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setIsPartnerFormOpen(false)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-neutral-200/80 rounded-xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col font-sans"
+            className="w-full max-w-2xl bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-4 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0">
-              <div className="flex items-center gap-2">
-                <Users size={20} className="text-[#0F172A]" />
-                <h3 className="text-base font-black text-[#0F172A]">
-                  {isPartnerEditMode ? `영업 파트너 정보 수정 [${partnerFormName}]` : "영업 파트너 신규 등록"}
-                </h3>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100/80 flex items-center justify-center text-amber-600">
+                  <Users size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {isPartnerEditMode ? `영업 파트너 정보 수정 [${partnerFormName}]` : "영업 파트너 신규 등록"}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">파트너 기본 정보 및 정산 수수료를 관리합니다.</p>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 {isPartnerEditMode && (
                   <button 
                     type="button"
                     onClick={() => window.open(`/partner?partnerId=${partnerFormId}`, '_blank')}
-                    className="px-3 py-1.5 bg-[#0F172A] hover:bg-slate-800 text-white rounded-lg text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-xs border-0"
+                    className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs border-0"
                     title="해당 파트너 계정으로 로그인된 어드민 포털 새 창 열기"
                   >
-                    <ExternalLink size={13} className="text-[#FED422]" />
-                    <span>파트너 어드민 접속 (자동 로그인)</span>
+                    <ExternalLink size={13} className="text-amber-400" />
+                    <span>파트너 어드민 접속</span>
                   </button>
                 )}
                 <button 
                   type="button"
                   onClick={() => setIsPartnerFormOpen(false)} 
-                  className="w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  <X size={16} />
+                  <X size={18} />
                 </button>
               </div>
             </div>
 
-            <form onSubmit={handleSavePartner} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs bg-[#f9fafb]">
+            <form onSubmit={handleSavePartner} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-slate-50/50">
               {/* 계정 정보 */}
-              <div className="bg-white rounded-lg p-4 border border-neutral-200 shadow-2xs space-y-3">
-                <h4 className="font-black text-slate-800 border-b border-neutral-100 pb-2 flex items-center gap-1.5">
-                  <span>🔑 파트너 로그인 계정 정보</span>
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">파트너 로그인 계정</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    계정 설정
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">파트너 로그인 ID *</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">파트너 로그인 ID <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
                       value={partnerFormId}
@@ -13846,126 +13762,132 @@ export default function AdminPage() {
                       disabled={isPartnerEditMode}
                       placeholder="예: partner1"
                       required
-                      className="w-full bg-[#F1F4F8] disabled:opacity-70 border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 disabled:bg-slate-100 disabled:text-slate-400 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">비밀번호 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">비밀번호 <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
                       value={partnerFormPw}
                       onChange={(e) => setPartnerFormPw(e.target.value)}
                       placeholder="접속 비밀번호"
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 기본 정보 */}
-              <div className="bg-white rounded-lg p-4 border border-neutral-200 shadow-2xs space-y-3">
-                <h4 className="font-black text-slate-800 border-b border-neutral-100 pb-2 flex items-center gap-1.5">
-                  <span>👤 파트너 기본 인적 / 영업 정보</span>
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">기본 인적 및 영업 정보</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    인적 사항
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">파트너명 (대표자) *</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">파트너명 (대표자) <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
                       value={partnerFormName}
                       onChange={(e) => setPartnerFormName(e.target.value)}
                       placeholder="예: 홍길동"
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">연락처 *</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">연락처 <span className="text-red-500">*</span></label>
                     <input 
                       type="text"
                       value={partnerFormPhone}
                       onChange={(e) => setPartnerFormPhone(e.target.value)}
                       placeholder="010-0000-0000"
                       required
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">소속 / 상호명 (선택)</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">소속 / 상호명 (선택)</label>
                     <input 
                       type="text"
                       value={partnerFormCompanyName}
                       onChange={(e) => setPartnerFormCompanyName(e.target.value)}
                       placeholder="예: 제이에이전시"
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">이메일 (선택)</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">이메일 (선택)</label>
                     <input 
                       type="email"
                       value={partnerFormEmail}
                       onChange={(e) => setPartnerFormEmail(e.target.value)}
                       placeholder="partner@example.com"
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 정산 계좌 및 수수료 설정 */}
-              <div className="bg-white rounded-lg p-4 border border-neutral-200 shadow-2xs space-y-3">
-                <h4 className="font-black text-slate-800 border-b border-neutral-100 pb-2 flex items-center gap-1.5">
-                  <span>💳 정산 계좌 및 수수료 단가 설정</span>
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-slate-900">정산 계좌 및 수수료 단가</span>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    정산 정보
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">은행명</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">은행명</label>
                     <input 
                       type="text"
                       value={partnerFormBankName}
                       onChange={(e) => setPartnerFormBankName(e.target.value)}
                       placeholder="예: 국민은행"
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">계좌번호</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">계좌번호</label>
                     <input 
                       type="text"
                       value={partnerFormAccountNumber}
                       onChange={(e) => setPartnerFormAccountNumber(e.target.value)}
                       placeholder="'-' 포함 입력"
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">예금주</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">예금주</label>
                     <input 
                       type="text"
                       value={partnerFormAccountHolder}
                       onChange={(e) => setPartnerFormAccountHolder(e.target.value)}
                       placeholder="예금주 성명"
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">생지 1박스당 수수료 (원, 부가세포함)</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">생지 1박스당 수수료 (원, 부가세포함)</label>
                     <input 
                       type="number"
                       value={partnerFormCommission}
                       onChange={(e) => setPartnerFormCommission(Number(e.target.value))}
                       placeholder="8000"
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">파트너 상태</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">파트너 상태</label>
                     <select
                       value={partnerFormStatus}
                       onChange={(e) => setPartnerFormStatus(e.target.value)}
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none cursor-pointer"
                     >
                       <option value="활동중">활동중</option>
                       <option value="대기">대기</option>
@@ -13973,35 +13895,43 @@ export default function AdminPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="font-extrabold text-slate-700 block mb-1">등록일자</label>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">등록일자</label>
                     <input 
                       type="date"
                       value={partnerFormRegDate}
                       onChange={(e) => setPartnerFormRegDate(e.target.value)}
-                      className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="font-extrabold text-slate-700 block mb-1">본사 관리 메모 (파트너에게 노출되지 않음)</label>
+                  <label className="text-xs font-semibold text-slate-700 block mb-1">본사 관리 메모 (비공개)</label>
                   <textarea
                     rows={2}
                     value={partnerFormMemo}
                     onChange={(e) => setPartnerFormMemo(e.target.value)}
                     placeholder="특이사항 및 담당 구역 등 메모"
-                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-none resize-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none resize-none transition-all"
                   />
                 </div>
               </div>
 
-              <div className="pt-2">
+              {/* Footer */}
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsPartnerFormOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+                >
+                  취소
+                </button>
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] text-xs font-black rounded-lg transition-all shadow-md cursor-pointer border-0 flex items-center justify-center gap-1.5"
+                  className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <CheckCircle2 size={16} />
-                  <span>{isPartnerEditMode ? "파트너 정보 수정 완료" : "신규 파트너 등록 완료"}</span>
+                  <span>{isPartnerEditMode ? "파트너 정보 수정" : "파트너 등록 완료"}</span>
                 </button>
               </div>
             </form>
@@ -14014,86 +13944,111 @@ export default function AdminPage() {
       ========================================== */}
       {settlementStatusEditTarget && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setSettlementStatusEditTarget(null)}
         >
           <div 
-            className="w-full max-w-md bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-2xl p-6 space-y-4 font-sans"
+            className="w-full max-w-md bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
-              <h3 className="text-sm font-black text-[#0F172A] flex items-center gap-1.5">
-                <DollarSign size={18} className="text-amber-500" />
-                <span>정산 및 지급 상태 변경</span>
-              </h3>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100/80 flex items-center justify-center text-amber-600">
+                  <DollarSign size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">정산 및 지급 상태 변경</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">파트너 수수료 정산 및 송금 상태를 업데이트합니다.</p>
+                </div>
+              </div>
               <button 
-                onClick={() => setSettlementStatusEditTarget(null)}
-                className="text-slate-400 hover:text-slate-700"
+                type="button"
+                onClick={() => setSettlementStatusEditTarget(null)} 
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="bg-[#F8FAFC] p-3.5 rounded-lg border border-neutral-200 text-xs space-y-1">
-              <div><strong>파트너:</strong> {settlementStatusEditTarget.partnerName} ({settlementStatusEditTarget.phone})</div>
-              <div><strong>정산 년월:</strong> {settlementStatusEditTarget.yearMonth}</div>
-              <div><strong>생지 수량 / 금액:</strong> {settlementStatusEditTarget.boxCount}박스 / {(settlementStatusEditTarget.commissionAmount || 0).toLocaleString()}원</div>
-              <div><strong>입금 계좌:</strong> {settlementStatusEditTarget.bankName} {settlementStatusEditTarget.accountNumber} ({settlementStatusEditTarget.accountHolder})</div>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="font-black text-slate-700 block mb-1">정산 상태 선택</label>
-                <select
-                  value={settlementNewStatus}
-                  onChange={(e) => setSettlementNewStatus(e.target.value)}
-                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
-                >
-                  <option value="정산대기">정산대기 (실시간 합산 중)</option>
-                  <option value="정산확정">정산확정 (월마감 검토 완료)</option>
-                  <option value="지급완료">지급완료 (계좌 입금 처리 완료)</option>
-                </select>
+            <div className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-slate-50/50">
+              {/* Target Summary Card */}
+              <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-xs space-y-2 text-xs">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                  <span className="text-slate-500 font-medium">파트너</span>
+                  <span className="font-bold text-slate-900">{settlementStatusEditTarget.partnerName} ({settlementStatusEditTarget.phone})</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                  <span className="text-slate-500 font-medium">정산 년월</span>
+                  <span className="font-bold text-slate-900">{settlementStatusEditTarget.yearMonth}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                  <span className="text-slate-500 font-medium">생지 수량 / 금액</span>
+                  <span className="font-bold text-amber-700">{settlementStatusEditTarget.boxCount}박스 / {(settlementStatusEditTarget.commissionAmount || 0).toLocaleString()}원</span>
+                </div>
+                <div className="flex justify-between items-center pt-0.5">
+                  <span className="text-slate-500 font-medium">입금 계좌</span>
+                  <span className="font-bold text-slate-800">{settlementStatusEditTarget.bankName} {settlementStatusEditTarget.accountNumber} ({settlementStatusEditTarget.accountHolder})</span>
+                </div>
               </div>
 
-              {settlementNewStatus === "지급완료" && (
+              {/* Form Card */}
+              <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-xs space-y-3.5 text-xs">
                 <div>
-                  <label className="font-black text-slate-700 block mb-1">실제 지급일자</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">정산 상태 선택</label>
+                  <select
+                    value={settlementNewStatus}
+                    onChange={(e) => setSettlementNewStatus(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-semibold text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all cursor-pointer"
+                  >
+                    <option value="정산대기">정산대기 (실시간 합산 중)</option>
+                    <option value="정산확정">정산확정 (월마감 검토 완료)</option>
+                    <option value="지급완료">지급완료 (계좌 입금 처리 완료)</option>
+                  </select>
+                </div>
+
+                {settlementNewStatus === "지급완료" && (
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">실제 지급일자</label>
+                    <input
+                      type="date"
+                      value={settlementPaidDate}
+                      onChange={(e) => setSettlementPaidDate(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-semibold text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">정산 메모</label>
                   <input
-                    type="date"
-                    value={settlementPaidDate}
-                    onChange={(e) => setSettlementPaidDate(e.target.value)}
-                    className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
+                    type="text"
+                    value={settlementNote}
+                    onChange={(e) => setSettlementNote(e.target.value)}
+                    placeholder="예: 5월 10일 국민은행 이체완료"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                   />
                 </div>
-              )}
-
-              <div>
-                <label className="font-black text-slate-700 block mb-1">정산 메모</label>
-                <input
-                  type="text"
-                  value={settlementNote}
-                  onChange={(e) => setSettlementNote(e.target.value)}
-                  placeholder="예: 5월 10일 국민은행 이체완료"
-                  className="w-full bg-[#F1F4F8] border-0 rounded-lg px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-none"
-                />
               </div>
-            </div>
 
-            <div className="pt-2 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setSettlementStatusEditTarget(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold transition-all border-0"
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveSettlementStatus}
-                className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all border-0 shadow-xs cursor-pointer"
-              >
-                저장하기
-              </button>
+              {/* Action Buttons */}
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSettlementStatusEditTarget(null)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer border-0"
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveSettlementStatus}
+                  className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer border-0"
+                >
+                  <CheckCircle2 size={15} />
+                  <span>저장하기</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -14104,89 +14059,114 @@ export default function AdminPage() {
       ========================================== */}
       {selectedSettlementForModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => setSelectedSettlementForModal(null)}
         >
           <div 
-            className="w-full max-w-2xl bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col font-sans text-slate-900"
+            className="w-full max-w-2xl bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans text-slate-900 my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-600">본사 가맹지원본부 파트너 정산 명세서</span>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
+                  <Printer size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">파트너 정산 명세서</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">본사 가맹지원본부 영업 파트너 수수료 정산서</p>
+                </div>
+              </div>
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   onClick={() => window.print()}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
                 >
                   <Printer size={14} />
                   <span>인쇄 / PDF 출력</span>
                 </button>
-                <button
-                  onClick={() => setSelectedSettlementForModal(null)}
-                  className="p-1.5 text-slate-500 hover:text-slate-800 rounded-lg"
+                <button 
+                  type="button"
+                  onClick={() => setSelectedSettlementForModal(null)} 
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
                   <X size={18} />
                 </button>
               </div>
             </div>
 
-            <div className="p-8 overflow-y-auto space-y-6 text-xs">
-              <div className="text-center border-b-2 border-slate-900 pb-4 space-y-1">
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight">영업 파트너 수수료 정산 명세서</h1>
-                <p className="text-slate-500 font-mono font-bold">정산 대상 월: {selectedSettlementForModal.yearMonth}</p>
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-xs bg-slate-50/50">
+              <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200/80 shadow-xs space-y-6">
+                <div className="text-center border-b border-slate-200 pb-4 space-y-1">
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">영업 파트너 수수료 정산 명세서</h1>
+                  <p className="text-slate-500 font-mono font-bold">정산 대상 월: {selectedSettlementForModal.yearMonth}</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-slate-200/80 p-4 rounded-xl bg-slate-50">
+                  <div className="space-y-1.5">
+                    <div><span className="text-slate-500 font-medium">파트너명:</span> <strong className="text-slate-800">{selectedSettlementForModal.partnerName}</strong></div>
+                    <div><span className="text-slate-500 font-medium">상호/소속:</span> <span className="font-semibold text-slate-800">{selectedSettlementForModal.companyName || "-"}</span></div>
+                    <div><span className="text-slate-500 font-medium">연락처:</span> <span className="font-semibold text-slate-800">{selectedSettlementForModal.phone}</span></div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div><span className="text-slate-500 font-medium">지급 은행:</span> <span className="font-semibold text-slate-800">{selectedSettlementForModal.bankName || "-"}</span></div>
+                    <div><span className="text-slate-500 font-medium">계좌번호:</span> <span className="font-semibold text-slate-800">{selectedSettlementForModal.accountNumber || "-"}</span></div>
+                    <div><span className="text-slate-500 font-medium">예금주:</span> <span className="font-semibold text-slate-800">{selectedSettlementForModal.accountHolder || selectedSettlementForModal.partnerName}</span></div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-slate-200 overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-100/80 border-b border-slate-200 font-bold text-slate-700">
+                        <th className="p-3 border-r border-slate-200">정산 항목</th>
+                        <th className="p-3 border-r border-slate-200 text-right">수량 (박스)</th>
+                        <th className="p-3 border-r border-slate-200 text-right">지급 단가</th>
+                        <th className="p-3 text-right">정산 금액 (VAT포함)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-slate-200">
+                        <td className="p-3 border-r border-slate-200 font-medium text-slate-800">
+                          유치 가맹점 패스트리 생지 주문 수수료
+                        </td>
+                        <td className="p-3 border-r border-slate-200 text-right font-mono font-bold text-slate-800">
+                          {selectedSettlementForModal.boxCount} 박스
+                        </td>
+                        <td className="p-3 border-r border-slate-200 text-right font-mono font-medium text-slate-700">
+                          {(selectedSettlementForModal.commissionUnit || 8000).toLocaleString()}원
+                        </td>
+                        <td className="p-3 text-right font-black font-mono text-sm text-slate-900">
+                          {(selectedSettlementForModal.commissionAmount || 0).toLocaleString()}원
+                        </td>
+                      </tr>
+                      <tr className="bg-amber-50/50 font-bold">
+                        <td colSpan={3} className="p-3 border-r border-slate-200 text-right text-slate-800">
+                          최종 정산 합계액
+                        </td>
+                        <td className="p-3 text-right font-black text-rose-600 text-base font-mono">
+                          {(selectedSettlementForModal.commissionAmount || 0).toLocaleString()}원
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="space-y-1 text-slate-500 text-[11px] leading-relaxed pt-2 border-t border-slate-100">
+                  <p>• 정산 상태: <strong className="text-slate-700">{selectedSettlementForModal.status}</strong> {selectedSettlementForModal.paidDate ? `(지급완료일: ${selectedSettlementForModal.paidDate})` : ""}</p>
+                  <p>• 발행처: 주식회사 120겹파이 가맹지원본부</p>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border border-slate-200 p-4 rounded-xl bg-slate-50">
-                <div className="space-y-1">
-                  <div><strong>파트너명:</strong> {selectedSettlementForModal.partnerName}</div>
-                  <div><strong>상호/소속:</strong> {selectedSettlementForModal.companyName || "-"}</div>
-                  <div><strong>연락처:</strong> {selectedSettlementForModal.phone}</div>
-                </div>
-                <div className="space-y-1">
-                  <div><strong>지급 은행:</strong> {selectedSettlementForModal.bankName || "-"}</div>
-                  <div><strong>계좌번호:</strong> {selectedSettlementForModal.accountNumber || "-"}</div>
-                  <div><strong>예금주:</strong> {selectedSettlementForModal.accountHolder || selectedSettlementForModal.partnerName}</div>
-                </div>
-              </div>
-
-              <table className="w-full text-left border-collapse border border-slate-300">
-                <thead>
-                  <tr className="bg-slate-100 border-b border-slate-300 font-bold">
-                    <th className="p-2.5 border-r border-slate-300">정산 항목</th>
-                    <th className="p-2.5 border-r border-slate-300 text-right">수량 (박스)</th>
-                    <th className="p-2.5 border-r border-slate-300 text-right">지급 단가</th>
-                    <th className="p-2.5 text-right">정산 금액 (VAT포함)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-slate-200">
-                    <td className="p-2.5 border-r border-slate-300 font-bold">
-                      유치 가맹점 패스트리 생지 주문 수수료
-                    </td>
-                    <td className="p-2.5 border-r border-slate-300 text-right font-mono font-bold">
-                      {selectedSettlementForModal.boxCount} 박스
-                    </td>
-                    <td className="p-2.5 border-r border-slate-300 text-right font-mono">
-                      {(selectedSettlementForModal.commissionUnit || 8000).toLocaleString()}원
-                    </td>
-                    <td className="p-2.5 text-right font-black font-mono text-sm">
-                      {(selectedSettlementForModal.commissionAmount || 0).toLocaleString()}원
-                    </td>
-                  </tr>
-                  <tr className="bg-slate-50 font-bold">
-                    <td colSpan={3} className="p-2.5 border-r border-slate-300 text-right">
-                      최종 정산 합계액
-                    </td>
-                    <td className="p-2.5 text-right font-black text-rose-600 text-base font-mono">
-                      {(selectedSettlementForModal.commissionAmount || 0).toLocaleString()}원
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div className="space-y-1 text-slate-500 text-[11px] leading-relaxed pt-2">
-                <p>• 정산 상태: <strong>{selectedSettlementForModal.status}</strong> {selectedSettlementForModal.paidDate ? `(지급완료일: ${selectedSettlementForModal.paidDate})` : ""}</p>
-                <p>• 발행처: 주식회사 120겹파이 가맹지원본부</p>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setSelectedSettlementForModal(null)}
+                  className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shadow-xs border-0"
+                >
+                  닫기
+                </button>
               </div>
             </div>
           </div>
@@ -14198,83 +14178,88 @@ export default function AdminPage() {
       ========================================== */}
       {isContractSmsModalOpen && selectedContract && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto"
           onClick={() => !isSendingContractSms && setIsContractSmsModalOpen(false)}
         >
           <div 
-            className="w-full max-w-lg bg-white border border-neutral-200/80 rounded-2xl overflow-hidden shadow-2xl flex flex-col font-sans"
+            className="w-full max-w-lg bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col font-sans my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-4 bg-[#FED422] text-[#0F172A] flex justify-between items-center shrink-0">
-              <div className="flex items-center gap-2">
-                <Send size={18} className="text-[#0F172A]" />
-                <h3 className="text-base font-black text-[#0F172A]">
-                  가맹계약서 전자서명 링크 문자 발송
-                </h3>
+            {/* Header */}
+            <div className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100/80 flex items-center justify-center text-blue-600">
+                  <Send size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">전자계약서 문자 발송</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">가맹계약서 전자서명 링크를 점주님께 알림톡/문자로 발송합니다.</p>
+                </div>
               </div>
               <button 
                 type="button"
                 onClick={() => !isSendingContractSms && setIsContractSmsModalOpen(false)} 
-                className="w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="p-6 space-y-4 text-xs bg-[#f9fafb]">
-              {/* Receiver Info */}
-              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2">
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-500">수신자 (가맹사업자)</span>
-                  <span className="font-black text-[#0F172A]">{selectedContract.ownerName}</span>
+            <div className="p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm bg-slate-50/50">
+              {/* Receiver Info Card */}
+              <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-xs space-y-2.5 text-xs">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                  <span className="font-medium text-slate-500">수신자 (가맹사업자)</span>
+                  <span className="font-bold text-slate-900">{selectedContract.ownerName}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-500">가맹점명</span>
-                  <span className="font-extrabold text-[#0F172A]">{selectedContract.storeName}</span>
+                <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                  <span className="font-medium text-slate-500">가맹점명</span>
+                  <span className="font-bold text-slate-900">{selectedContract.storeName}</span>
                 </div>
-                <div className="flex justify-between items-center py-1">
-                  <span className="font-bold text-slate-500">수신 휴대폰 번호</span>
-                  <span className="font-mono font-black text-amber-700 text-sm">{selectedContract.ownerPhone}</span>
+                <div className="flex justify-between items-center pt-0.5">
+                  <span className="font-medium text-slate-500">수신 휴대폰 번호</span>
+                  <span className="font-mono font-bold text-amber-700">{selectedContract.ownerPhone}</span>
                 </div>
               </div>
 
-              {/* Sender Info */}
-              <div>
-                <label className="block text-xs font-black text-slate-700 mb-1">
-                  발신 번호 (알리고에 등록된 대표번호)
-                </label>
-                <input
-                  type="text"
-                  value={contractSmsSender}
-                  onChange={(e) => setContractSmsSender(e.target.value)}
-                  placeholder="1566-3594"
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-500"
-                />
-              </div>
+              {/* Sender & Message Form Card */}
+              <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-xs space-y-3.5 text-xs">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    발신 번호 (알리고에 등록된 대표번호)
+                  </label>
+                  <input
+                    type="text"
+                    value={contractSmsSender}
+                    onChange={(e) => setContractSmsSender(e.target.value)}
+                    placeholder="1566-3594"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-semibold text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
+                  />
+                </div>
 
-              {/* Message Content */}
-              <div>
-                <label className="block text-xs font-black text-slate-700 mb-1">
-                  발송 메시지 내용 미리보기
-                </label>
-                <textarea
-                  rows={8}
-                  value={contractSmsMsg}
-                  onChange={(e) => setContractSmsMsg(e.target.value)}
-                  className="w-full p-3.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-medium text-slate-800 focus:outline-none focus:border-amber-500 resize-none leading-relaxed"
-                />
-                <span className="text-[11px] text-slate-400 block mt-1">
-                  * 80자 이상 시 장문(LMS)으로 자동 전환되어 알리고를 통해 발송됩니다.
-                </span>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    발송 메시지 내용 미리보기
+                  </label>
+                  <textarea
+                    rows={8}
+                    value={contractSmsMsg}
+                    onChange={(e) => setContractSmsMsg(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3.5 text-xs font-mono font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all resize-none leading-relaxed"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1.5 font-medium">
+                    * 80자 초과 시 장문(LMS)으로 자동 전환되어 알리고를 통해 안전하게 발송됩니다.
+                  </p>
+                </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-2 flex items-center justify-end gap-2.5">
+              <div className="pt-2 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   disabled={isSendingContractSms}
                   onClick={() => setIsContractSmsModalOpen(false)}
-                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold rounded-xl transition-all cursor-pointer border-0"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer border-0 disabled:opacity-50"
                 >
                   취소
                 </button>
@@ -14282,11 +14267,11 @@ export default function AdminPage() {
                   type="button"
                   disabled={isSendingContractSms}
                   onClick={handleSendContractSms}
-                  className="px-5 py-2.5 bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black rounded-xl transition-all flex items-center gap-2 shadow-xs cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 bg-[#FED422] hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer border-0 disabled:opacity-50"
                 >
                   {isSendingContractSms ? (
                     <>
-                      <div className="w-3.5 h-3.5 border-2 border-[#0F172A] border-t-transparent rounded-full animate-spin" />
+                      <div className="w-3.5 h-3.5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
                       <span>문자 전송 중...</span>
                     </>
                   ) : (

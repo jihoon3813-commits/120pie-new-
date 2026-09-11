@@ -5,7 +5,7 @@ export default defineSchema({
   popups: defineTable({
     isActive: v.boolean(),
     title: v.string(),
-    desc: v.string(),
+    desc: v.optional(v.string()),
     image: v.optional(v.string()),
     link: v.optional(v.string()),
     btnText: v.optional(v.string()),

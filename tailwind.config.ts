@@ -9,7 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Pretendard Variable", "Pretendard", "ui-sans-serif", "system-ui", "sans-serif"]
+        sans: ["Pretendard Variable", "Pretendard", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["Pretendard Variable", "Pretendard", "ui-sans-serif", "system-ui", "sans-serif"]
       },
       colors: {
         neutral: {

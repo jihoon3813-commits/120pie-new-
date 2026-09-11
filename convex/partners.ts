@@ -21,6 +21,56 @@ export function isPastryDoughItem(productName: string): boolean {
   return doughKeywords.some((kw) => name.includes(kw));
 }
 
+/**
+ * 파트너 정산금(수수료) 산정 대상 주문 판별 헬퍼
+ * - 주문 취소 및 결제 대기 건은 제외
+ * - 무통장입금(bank, cash 등)인 경우: "입금대기" 상태는 반영하지 않으며,
+ *   관리자가 주문/배송관리에서 "입금확인완료"(또는 배송준비중, 배송중, 배송완료, 결제완료, 주문완료)로 처리했을 때만 정산금에 반영
+ * - 카드 등 일반 결제: "결제대기", "입금대기" 상태 제외 ("결제완료", "주문완료", "배송준비중", "배송중", "배송완료" 반영)
+ */
+export function isSettlementEligibleOrder(order: any): boolean {
+  if (!order || !order.status) return false;
+
+  const status = String(order.status).trim();
+
+  // 주문취소 및 결제대기는 무조건 정산 제외
+  if (status === "주문취소" || status === "결제대기") {
+    return false;
+  }
+
+  const rawPay = String(order.payMethod || "").trim().toLowerCase();
+  const isBankTransfer =
+    rawPay === "bank" ||
+    rawPay === "cash" ||
+    rawPay === "vbank" ||
+    order.payMethod === "무통장입금" ||
+    order.payMethod === "무통장" ||
+    order.payMethod === "계좌이체" ||
+    status === "입금대기" ||
+    status === "입금확인완료";
+
+  if (isBankTransfer) {
+    // 무통장입금인 경우: "입금대기" 상태는 정산금에 반영하지 않고,
+    // 관리자가 "입금확인완료" (또는 이후 배송 단계)로 처리했을 때만 정산에 반영
+    const validBankStatuses = [
+      "입금확인완료",
+      "배송준비중",
+      "배송중",
+      "배송완료",
+      "결제완료",
+      "주문완료",
+    ];
+    return validBankStatuses.includes(status);
+  }
+
+  // 카드 결제 등 일반 결제: 입금대기 상태 제외
+  if (status === "입금대기") {
+    return false;
+  }
+
+  return true;
+}
+
 // 1. 전체 파트너 리스트 조회 (유치 가맹점 수, 당월/누적 생지 박스 수 및 수수료 집계 포함)
 export const get = query({
   args: {},
@@ -37,9 +87,9 @@ export const get = query({
       const myStores = stores.filter((s) => s.partnerId === p.id);
       const myStoreIds = new Set(myStores.map((s) => s.id));
 
-      // 해당 가맹점들의 유효 주문 내역 (취소 제외)
+      // 해당 가맹점들의 유효 주문 내역 (무통장입금은 입금확인완료 이상만 정산 반영)
       const validOrders = orders.filter(
-        (o) => o.storeId && myStoreIds.has(o.storeId) && o.status !== "주문취소"
+        (o) => o.storeId && myStoreIds.has(o.storeId) && isSettlementEligibleOrder(o)
       );
 
       let totalBoxes = 0;
@@ -210,7 +260,7 @@ export const getPartnerStores = query({
 
     const storesWithDetails = stores.map((s) => {
       const storeOrders = orders.filter(
-        (o) => o.storeId === s.id && o.status !== "주문취소"
+        (o) => o.storeId === s.id && isSettlementEligibleOrder(o)
       );
 
       let totalDoughBoxes = 0;
@@ -283,16 +333,18 @@ export const getPartnerOrders = query({
       if (!ord.storeId || !myStoreIds.has(ord.storeId)) return false;
       if (args.storeId && ord.storeId !== args.storeId) return false;
       if (args.yearMonth && ord.date && !ord.date.startsWith(args.yearMonth)) return false;
+      if (ord.status === "주문취소" || ord.status === "결제대기") return false;
       return true;
     });
 
     // 3) 주문별 패스트리 생지 박스 수 및 수수료 계산
     const enrichedOrders = filtered.map((ord) => {
-      let pastryDoughBoxes = 0;
+      const isEligible = isSettlementEligibleOrder(ord);
+      let rawPastryDoughBoxes = 0;
       const itemsWithDoughFlag = (ord.items || []).map((item) => {
         const isDough = isPastryDoughItem(item.productName);
         if (isDough) {
-          pastryDoughBoxes += item.quantity || 0;
+          rawPastryDoughBoxes += item.quantity || 0;
         }
         return {
           ...item,
@@ -300,14 +352,18 @@ export const getPartnerOrders = query({
         };
       });
 
+      // 정산금 산정 조건(무통장입금은 입금확인완료 이상) 충족 시에만 박스 수 및 수수료 반영
+      const pastryDoughBoxes = isEligible ? rawPastryDoughBoxes : 0;
       const commission = pastryDoughBoxes * 8000;
 
       return {
         ...ord,
         storeName: storeMap.get(ord.storeId || "") || "가맹점",
         items: itemsWithDoughFlag,
+        rawPastryDoughBoxes,
         pastryDoughBoxes,
         commission,
+        isSettlementEligible: isEligible,
       };
     });
 
@@ -341,7 +397,7 @@ export const getPartnerStats = query({
     }
 
     for (const ord of allOrders) {
-      if (!ord.storeId || !myStoreIds.has(ord.storeId) || ord.status === "주문취소") continue;
+      if (!ord.storeId || !myStoreIds.has(ord.storeId) || !isSettlementEligibleOrder(ord)) continue;
 
       const ym = (ord.date || "").slice(0, 7);
       if (monthlyMap[ym]) {
@@ -405,12 +461,12 @@ export const getSettlements = query({
       const myStoreIds = new Set(myStores.map((s) => s.id));
 
       for (const ym of yearMonths) {
-        // 해당 월의 주문들에서 생지 박스수 실시간 계산
+        // 해당 월의 주문들에서 생지 박스수 실시간 계산 (정산 대상 주문만 반영)
         const monthOrders = orders.filter(
           (o) =>
             o.storeId &&
             myStoreIds.has(o.storeId) &&
-            o.status !== "주문취소" &&
+            isSettlementEligibleOrder(o) &&
             o.date &&
             o.date.startsWith(ym)
         );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useModalBackHandler } from "@/components/MobileBackManager";
 import {
@@ -23,6 +23,7 @@ import {
   Download,
   FileText,
   ChevronRight,
+  ChevronLeft,
   Clock,
   CheckCircle2,
   Truck,
@@ -67,6 +68,7 @@ const COLOR_PRESETS = {
 const DEFAULT_STATUS_COLORS: { [status: string]: string } = {
   "주문완료": "pink",
   "입금대기": "yellow",
+  "입금확인완료": "emerald",
   "결제완료": "emerald",
   "배송준비중": "orange",
   "배송중": "blue",
@@ -549,7 +551,19 @@ export default function PortalPage() {
   // CONVEX REAL-TIME SYNC HOOKS
   // ==========================================
   const convexBanners = useQuery(api.banners.get);
-  const convexPopup = useQuery(api.popups.get, { targetPage: "portal" });
+  const convexPopupsList = useQuery(api.popups.list);
+  const convexActivePopups = useMemo(() => {
+    if (!convexPopupsList) return undefined;
+    const today = new Date().toISOString().split("T")[0];
+    return convexPopupsList.filter((p: any) => {
+      if (!p.isActive) return false;
+      const target = p.targetPage || "all";
+      if (target !== "all" && target !== "portal") return false;
+      if (p.startDate && p.startDate > today) return false;
+      if (p.endDate && p.endDate < today) return false;
+      return true;
+    });
+  }, [convexPopupsList]);
   const convexFloating = useQuery(api.floatings.get);
   const convexStores = useQuery(api.stores.get);
   const convexProducts = useQuery(api.products.get);
@@ -918,15 +932,8 @@ export default function PortalPage() {
   // CONVEX REAL-TIME POPUP & FLOATING SYNC
   // ==========================================
   useEffect(() => {
-    if (convexPopup !== undefined) {
-      setPopupSettings(convexPopup);
-      try {
-        localStorage.setItem("120_popups", JSON.stringify(convexPopup));
-      } catch (e) {
-        console.warn(e);
-      }
-
-      if (convexPopup && convexPopup.isActive) {
+    if (convexActivePopups !== undefined) {
+      if (convexActivePopups && convexActivePopups.length > 0) {
         // Query string bypass parameter for testing (?test_popup=true)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get("test_popup") === "true") {
@@ -944,7 +951,7 @@ export default function PortalPage() {
         setShowPopup(false);
       }
     }
-  }, [convexPopup]);
+  }, [convexActivePopups]);
 
   useEffect(() => {
     if (convexFloating !== undefined) {
@@ -1009,6 +1016,7 @@ export default function PortalPage() {
   // Popup & Floating Action states
   const [popupSettings, setPopupSettings] = useState<any>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [currentPopupIdx, setCurrentPopupIdx] = useState<number>(0);
   const [floatingSettings, setFloatingSettings] = useState<any>(null);
   const [floatingOpen, setFloatingOpen] = useState<boolean>(false);
 
@@ -6095,87 +6103,122 @@ export default function PortalPage() {
       {/* ==========================================
           REAL-TIME POPUP MODAL (ON-ENTRY)
          ========================================== */}
-      {/* 실시간 팝업 모달 (Yellow Header, border-0, Clean Style) */}
-      {showPopup && popupSettings && (
-        <div className="fixed inset-0 z-[120] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div 
-            className="w-full max-w-md bg-white border-0 rounded-lg overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh] animate-scaleUp"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header / Background visual */}
+      {/* ==========================================
+          REAL-TIME 3:4 FULL-IMAGE POPUP MODAL (MULTI-POPUP SUPPORT)
+         ========================================== */}
+      {showPopup && convexActivePopups && convexActivePopups.length > 0 && (() => {
+        const activePopupsList = convexActivePopups;
+        const safePopupIdx = Math.min(currentPopupIdx, Math.max(0, activePopupsList.length - 1));
+        const currentActivePopup = activePopupsList[safePopupIdx];
+        if (!currentActivePopup) return null;
+
+        const handlePopupClick = () => {
+          const link = currentActivePopup.link;
+          if (!link) return;
+          if (link.startsWith("http://") || link.startsWith("https://")) {
+            window.open(link, "_blank");
+          } else {
+            const cleanLink = link.startsWith("/") ? link.slice(1) : link;
+            const menuMapping: Record<string, string> = {
+              order: "orders",
+              orders: "orders",
+              training: "training",
+              material: "material",
+              inquiry: "inquiry",
+              notice: "notice",
+              dashboard: "dashboard"
+            };
+            if (menuMapping[cleanLink]) {
+              setCurrentMenu(menuMapping[cleanLink]);
+            } else if (cleanLink.startsWith("portal?menu=")) {
+              const targetMenu = cleanLink.split("menu=")[1];
+              if (targetMenu) setCurrentMenu(targetMenu);
+            } else if (cleanLink.startsWith("portal/")) {
+              const sub = cleanLink.replace("portal/", "");
+              if (menuMapping[sub]) setCurrentMenu(menuMapping[sub]);
+            } else {
+              window.location.href = link;
+            }
+            setShowPopup(false);
+          }
+        };
+
+        return (
+          <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
             <div 
-              className={`w-full relative flex flex-col justify-end p-6 text-white ${
-                popupSettings.image ? "aspect-[4/3]" : "min-h-[160px]"
-              } ${
-                popupSettings.image ? "" : "bg-[#F5AC00]"
-              }`}
-              style={popupSettings.image ? {
-                backgroundImage: `url(${optimizeCloudinaryUrl(popupSettings.image)})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center"
-              } : undefined}
+              className="w-full max-w-[360px] sm:max-w-[380px] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col relative animate-scaleUp select-none"
+              onClick={(e) => e.stopPropagation()}
             >
-              {popupSettings.image && <div className="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>}
-              <div className="relative z-10 space-y-1">
-                <h4 
-                  className="font-black leading-snug whitespace-pre-line"
-                  style={{
-                    color: popupSettings.image ? (popupSettings.titleColor || "#ffffff") : "#0F172A",
-                    fontSize: popupSettings.titleSize || "18px"
-                  }}
-                >
-                  {popupSettings.title}
-                </h4>
+              {/* 3:4 Full Image Area */}
+              <div 
+                className={`w-full aspect-[3/4] bg-slate-900 relative overflow-hidden flex items-center justify-center ${
+                  currentActivePopup.link ? "cursor-pointer group" : ""
+                }`}
+                onClick={handlePopupClick}
+              >
+                {currentActivePopup.image ? (
+                  <img 
+                    src={optimizeCloudinaryUrl(currentActivePopup.image)} 
+                    alt={currentActivePopup.title} 
+                    className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="p-6 text-center text-white space-y-2">
+                    <h4 className="font-bold text-lg">{currentActivePopup.title}</h4>
+                  </div>
+                )}
+
+                {/* Multi-Popup Carousel Controls (if active popups > 1) */}
+                {activePopupsList.length > 1 && (
+                  <>
+                    {/* Counter Badge (e.g. 1 / 3) */}
+                    <div className="absolute top-3.5 right-3.5 bg-black/65 backdrop-blur-sm text-white text-xs font-black px-2.5 py-1 rounded-full shadow-md z-20 pointer-events-none">
+                      {safePopupIdx + 1} / {activePopupsList.length}
+                    </div>
+
+                    {/* Left Nav Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentPopupIdx((prev) => (prev > 0 ? prev - 1 : activePopupsList.length - 1));
+                      }}
+                      className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-xs transition-all cursor-pointer z-20 shadow-md border-0"
+                      title="이전 팝업"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+
+                    {/* Right Nav Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentPopupIdx((prev) => (prev < activePopupsList.length - 1 ? prev + 1 : 0));
+                      }}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-xs transition-all cursor-pointer z-20 shadow-md border-0"
+                      title="다음 팝업"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+
+                    {/* Pagination Dots at bottom of image */}
+                    <div className="absolute bottom-3 inset-x-0 flex justify-center items-center gap-1.5 z-20 pointer-events-none">
+                      {activePopupsList.map((_: any, i: number) => (
+                        <span
+                          key={i}
+                          className={`h-1.5 rounded-full transition-all duration-300 ${
+                            i === safePopupIdx ? "w-5 bg-white shadow-xs" : "w-1.5 bg-white/50"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
 
-            {/* Body Description */}
-            <div 
-              className="p-6 overflow-y-auto font-bold leading-relaxed whitespace-pre-line text-slate-700"
-              style={{
-                color: popupSettings.descColor || "#334155",
-                fontSize: popupSettings.descSize || "13px"
-              }}
-            >
-              {popupSettings.desc}
-            </div>
-
-            {/* Action buttons & 'Today close' bar */}
-            <div className="border-t border-slate-100">
-              {popupSettings.link && (
-                <div className="p-4 border-b border-slate-100 bg-[#F8FAFC] text-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const link = popupSettings.link;
-                      if (link.startsWith("http")) {
-                        window.open(link, "_blank");
-                      } else {
-                        const menuMapping: Record<string, string> = {
-                          order: "orders",
-                          training: "training",
-                          material: "material",
-                          inquiry: "inquiry",
-                          notice: "notice"
-                        };
-                        setCurrentMenu(menuMapping[link] || "dashboard");
-                        setShowPopup(false);
-                      }
-                    }}
-                    className="w-full py-3.5 font-black rounded-md shadow-md transition-all cursor-pointer border-0"
-                    style={{
-                      backgroundColor: popupSettings.btnBgColor || "#F5AC00",
-                      color: popupSettings.btnTextColor || "#0F172A",
-                      fontSize: popupSettings.btnTextSize || "13px"
-                    }}
-                  >
-                    {popupSettings.btnText || "자세히 보기"}
-                  </button>
-                </div>
-              )}
-
-              {/* Close Footer bar */}
-              <div className="bg-[#F8FAFC] p-4 flex justify-between items-center px-6 text-xs font-bold text-slate-600 select-none">
+              {/* Bottom Controls Bar */}
+              <div className="bg-[#F8FAFC] border-t border-slate-100 py-3 px-5 flex justify-between items-center text-xs font-bold text-slate-600 select-none">
                 <button
                   type="button"
                   onClick={() => {
@@ -6183,22 +6226,22 @@ export default function PortalPage() {
                     localStorage.setItem("120_popup_closed_until", sevenDaysLater.toString());
                     setShowPopup(false);
                   }}
-                  className="hover:text-[#0F172A] transition-colors flex items-center gap-1 cursor-pointer border-0 bg-transparent font-bold"
+                  className="hover:text-slate-900 transition-colors flex items-center gap-1.5 cursor-pointer border-0 bg-transparent font-bold text-slate-600"
                 >
                   <Check size={14} className="text-[#F5AC00]" /> 7일 동안 보지 않기
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowPopup(false)}
-                  className="hover:text-rose-600 font-black transition-colors cursor-pointer border-0 bg-transparent"
+                  className="hover:text-rose-600 font-black transition-colors cursor-pointer border-0 bg-transparent text-slate-700"
                 >
                   닫기
                 </button>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ==========================================
           INTERACTIVE MULTI FLOATING BUTTONS

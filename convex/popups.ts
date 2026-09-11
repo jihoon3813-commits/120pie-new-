@@ -1,7 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-// 1. 특정 페이지에서 현재 노출할 팝업 가져오기 (게시 기간 + 노출 상태 + 타겟 페이지 필터)
+// 1. 특정 페이지에서 현재 노출할 팝업 가져오기 (게시 기간 + 노출 상태 + 타겟 페이지 필터 - 단일)
 export const get = query({
   args: { targetPage: v.optional(v.string()) }, // "landing" | "portal"
   handler: async (ctx: any, args: any) => {
@@ -38,6 +38,35 @@ export const get = query({
   }
 });
 
+// 1-1. 특정 페이지에서 현재 노출할 모든 활성 팝업 리스트 가져오기 (다중 팝업 지원)
+export const getAllActive = query({
+  args: { targetPage: v.optional(v.string()) }, // "landing" | "portal"
+  handler: async (ctx: any, args: any) => {
+    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    const popups = await ctx.db.query("popups").collect();
+
+    // 유효한 팝업 필터링
+    const activePopups = popups.filter((p: any) => {
+      if (!p.isActive) return false;
+
+      const target = p.targetPage || "all";
+      if (args.targetPage && target !== "all" && target !== args.targetPage) {
+        return false;
+      }
+
+      if (p.startDate && p.startDate > today) return false;
+      if (p.endDate && p.endDate < today) return false;
+
+      return true;
+    });
+
+    // 최신 등록순으로 정렬하여 전체 반환
+    return activePopups.sort((a: any, b: any) => 
+      (b.createdAt || "").localeCompare(a.createdAt || "")
+    );
+  }
+});
+
 // 2. 전체 팝업 히스토리 목록 조회 (어드민용)
 export const list = query({
   args: {},
@@ -53,7 +82,7 @@ export const createOrUpdate = mutation({
     _id: v.optional(v.id("popups")),
     isActive: v.boolean(),
     title: v.string(),
-    desc: v.string(),
+    desc: v.optional(v.string()),
     image: v.optional(v.string()),
     link: v.optional(v.string()),
     btnText: v.optional(v.string()),
@@ -77,6 +106,7 @@ export const createOrUpdate = mutation({
 
     const safeFields = {
       ...fields,
+      desc: fields.desc || "",
       targetPage: fields.targetPage || "all" // 기본값 설정
     };
 
