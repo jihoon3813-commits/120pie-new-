@@ -345,6 +345,50 @@ export const updateCoordinates = mutation({
   },
 });
 
+// Fix all 24 known stores with exact geocoded coordinates
+export const fixAllKnownStoreCoords = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const KNOWN_COORDS: Record<string, { lat: number; lng: number }> = {
+      lovely3381: { lat: 37.50381, lng: 127.096802 },
+      "120ak": { lat: 37.372865, lng: 126.944943 },
+      "120sk": { lat: 37.608765, lng: 127.061682 },
+      alla32: { lat: 37.489996, lng: 126.55179 },
+      su3164: { lat: 37.329411, lng: 127.988081 },
+      tjsdud7275: { lat: 37.734477, lng: 126.750681 },
+      w01011208: { lat: 37.538593, lng: 126.660898 },
+      ktt1222: { lat: 37.598769, lng: 126.889374 },
+      sodam28: { lat: 37.586727, lng: 127.029811 },
+      shadow9258: { lat: 37.288239, lng: 127.469536 },
+      woong777: { lat: 37.608765, lng: 127.061682 },
+      nuridal9: { lat: 37.513597, lng: 126.664682 },
+      iljin0404: { lat: 37.203261, lng: 126.826264 },
+      radies1221: { lat: 37.526014, lng: 126.80325 },
+      west0220: { lat: 37.481984, lng: 127.014575 },
+      mm6861: { lat: 37.519959, lng: 126.91223 },
+      song4276: { lat: 37.258486, lng: 126.958029 },
+      chgml9572: { lat: 34.817105, lng: 126.37973 },
+      sea2228: { lat: 37.487482, lng: 126.982899 },
+      db5548: { lat: 37.487685, lng: 126.939939 },
+      cafelune: { lat: 37.213251, lng: 126.953623 },
+      spa531: { lat: 37.207023, lng: 127.034276 },
+      kdy8706: { lat: 35.835809, lng: 128.732661 },
+      creperie: { lat: 37.496187, lng: 126.747776 },
+    };
+
+    const stores = await ctx.db.query("stores").collect();
+    let patched = 0;
+    for (const store of stores) {
+      const coords = KNOWN_COORDS[store.id];
+      if (coords) {
+        await ctx.db.patch(store._id, { lat: coords.lat, lng: coords.lng });
+        patched++;
+      }
+    }
+    return { success: true, total: stores.length, patched };
+  },
+});
+
 // Delete a store
 export const deleteStore = mutation({
   args: {

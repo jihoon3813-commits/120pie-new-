@@ -161,22 +161,61 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     deduplicateAndFixMutation().catch(() => {});
   }, []);
 
-  // 1-1. 실제 가맹점 관리(stores 테이블)의 승인된 120PIE 공식 가맹점 매핑
+  // 1-1. 실제 가맹점 관리(stores 테이블)의 승인된 120PIE 공식 가맹점 매핑 (정밀 지오코딩 좌표)
   const DEFAULT_STORE_COORDS: Record<string, { lat: number; lng: number }> = {
-    "120겹파이 DESSERT": { lat: 37.608765, lng: 127.061682 },
-    "카페101": { lat: 37.538593, lng: 126.660898 },
-    "120겹 파이 파주운정점": { lat: 37.734477, lng: 126.750681 },
+    // 1) 고유 ID 기반 매핑
+    lovely3381: { lat: 37.50381, lng: 127.096802 },
+    "120ak": { lat: 37.372865, lng: 126.944943 },
+    "120sk": { lat: 37.608765, lng: 127.061682 },
+    alla32: { lat: 37.489996, lng: 126.55179 },
+    su3164: { lat: 37.329411, lng: 127.988081 },
+    tjsdud7275: { lat: 37.734477, lng: 126.750681 },
+    w01011208: { lat: 37.538593, lng: 126.660898 },
+    ktt1222: { lat: 37.598769, lng: 126.889374 },
+    sodam28: { lat: 37.586727, lng: 127.029811 },
+    shadow9258: { lat: 37.288239, lng: 127.469536 },
+    woong777: { lat: 37.608765, lng: 127.061682 },
+    nuridal9: { lat: 37.513597, lng: 126.664682 },
+    iljin0404: { lat: 37.203261, lng: 126.826264 },
+    radies1221: { lat: 37.526014, lng: 126.80325 },
+    west0220: { lat: 37.481984, lng: 127.014575 },
+    mm6861: { lat: 37.519959, lng: 126.91223 },
+    song4276: { lat: 37.258486, lng: 126.958029 },
+    chgml9572: { lat: 34.817105, lng: 126.37973 },
+    sea2228: { lat: 37.487482, lng: 126.982899 },
+    db5548: { lat: 37.487685, lng: 126.939939 },
+    cafelune: { lat: 37.213251, lng: 126.953623 },
+    spa531: { lat: 37.207023, lng: 127.034276 },
+    kdy8706: { lat: 35.835809, lng: 128.732661 },
+    creperie: { lat: 37.496187, lng: 126.747776 },
+
+    // 2) 가맹점명 기반 매핑 (공백/접두사 변형 포용)
+    "120겹 파이 잠실점": { lat: 37.50381, lng: 127.096802 },
+    "120겹 파이 AK플라자 금정점": { lat: 37.372865, lng: 126.944943 },
+    "120겹 파이 석관점": { lat: 37.608765, lng: 127.061682 },
+    "120겹 파이 영종하늘도시점": { lat: 37.489996, lng: 126.55179 },
     "120겹 파이 원주혁신도시점": { lat: 37.329411, lng: 127.988081 },
-    "120겹 파이 영종하늘도시점": { lat: 37.489996, lng: 126.551790 },
-    "120겹파이 안암점(카페데일리)": { lat: 37.586727, lng: 127.029811 },
-    "120겹 파이 잠실점": { lat: 37.503810, lng: 127.096802 },
+    "120겹 파이 파주운정점": { lat: 37.734477, lng: 126.750681 },
+    "카페101": { lat: 37.538593, lng: 126.660898 },
     "120겹파이 향동점(다색냥)": { lat: 37.598769, lng: 126.889374 },
-    "120겹 파이 AK플라자 금정점": { lat: 37.372850, lng: 126.944923 },
+    "120겹파이 안암점(카페데일리)": { lat: 37.586727, lng: 127.029811 },
+    "120겹파이 이천갈산점(카페네계절)": { lat: 37.288239, lng: 127.469536 },
+    "120겹파이 DESSERT": { lat: 37.608765, lng: 127.061682 },
+    "120겹파이 누리달아흐레점": { lat: 37.513597, lng: 126.664682 },
+    "120겹파이 커피홀릭점": { lat: 37.203261, lng: 126.826264 },
+    "120겹파이 덮밥집점": { lat: 37.526014, lng: 126.80325 },
     "120겹파이 잼인브라운점": { lat: 37.481984, lng: 127.014575 },
+    "120겹파이 더네이버커피점": { lat: 37.519959, lng: 126.91223 },
     "120겹파이 카페멈점": { lat: 37.258486, lng: 126.958029 },
-    "120겹파이 더네이버커피점": { lat: 37.519959, lng: 126.912230 },
-    "홍대입구점": { lat: 37.556890, lng: 126.923674 },
-    "120겹파이 홍대입구점": { lat: 37.556890, lng: 126.923674 },
+    "120겹파이 세안종합병원점": { lat: 34.817105, lng: 126.37973 },
+    "120겹파이 서초점(샌드리아)": { lat: 37.487482, lng: 126.982899 },
+    "120겹파이 신림점(커피깡패)": { lat: 37.487685, lng: 126.939939 },
+    "120겹파이 협성대점(카페룬)": { lat: 37.213251, lng: 126.953623 },
+    "120겹파이 병점역점(스페이스531)": { lat: 37.207023, lng: 127.034276 },
+    "120겹파이 경산점": { lat: 35.835809, lng: 128.732661 },
+    "120겹파이 크레페리점": { lat: 37.496187, lng: 126.747776 },
+    "홍대입구점": { lat: 37.55689, lng: 126.923674 },
+    "120겹파이 홍대입구점": { lat: 37.55689, lng: 126.923674 },
     "강남역삼점": { lat: 37.500024, lng: 127.036509 },
     "120겹파이 강남역삼점": { lat: 37.500024, lng: 127.036509 },
     "부산서면점": { lat: 35.157764, lng: 129.059036 },
@@ -216,19 +255,42 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     return mergedStores
       .filter((s: any) => s && s.name && s.status !== "중지" && s.status !== "취소")
       .map((s: any) => {
-        const lat = typeof s.lat === "number" ? s.lat : DEFAULT_STORE_COORDS[s.name]?.lat;
-        const lng = typeof s.lng === "number" ? s.lng : DEFAULT_STORE_COORDS[s.name]?.lng;
+        const lookup =
+          (s.id && DEFAULT_STORE_COORDS[s.id]) ||
+          DEFAULT_STORE_COORDS[s.name] ||
+          DEFAULT_STORE_COORDS[s.name.replace(/^120(겹\s*파이|PIE)\s*/, "").trim()];
+        const lat = typeof s.lat === "number" && s.lat > 0 ? s.lat : lookup?.lat;
+        const lng = typeof s.lng === "number" && s.lng > 0 ? s.lng : lookup?.lng;
         return {
           ...s,
           isRealStore: true,
           isContracted: true,
-          lat: typeof lat === "number" ? lat : 37.5,
-          lng: typeof lng === "number" ? lng : 127.0,
+          lat,
+          lng,
           category: "120PIE 공식 가맹점",
           displayName: s.name.startsWith("120") || s.name.startsWith("카페") ? s.name : `120PIE ${s.name}`,
         };
-      });
+      })
+      .filter((s: any) => typeof s.lat === "number" && typeof s.lng === "number");
   }, [mergedStores]);
+
+  // 1-2. 미등록 좌표가 있는 가맹점이 있다면 네이버 지오코더로 실시간 좌표 취득 후 Convex DB 자동 동기화
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.naver?.maps?.Service?.geocode) return;
+    mergedStores.forEach((s: any) => {
+      if (s && s.id && s.roadAddress && (typeof s.lat !== "number" || typeof s.lng !== "number")) {
+        const cleanAddr = s.roadAddress.split("(")[0].trim();
+        window.naver.maps.Service.geocode({ query: cleanAddr }, (status: any, response: any) => {
+          if (status === window.naver.maps.Service.Status.OK && response.v2?.addresses?.[0]) {
+            const item = response.v2.addresses[0];
+            const newLat = parseFloat(parseFloat(item.y).toFixed(6));
+            const newLng = parseFloat(parseFloat(item.x).toFixed(6));
+            updateStoreCoordinatesMutation({ id: s.id, lat: newLat, lng: newLng }).catch(() => {});
+          }
+        });
+      }
+    });
+  }, [mergedStores, updateStoreCoordinatesMutation]);
 
   // 2. 필터 및 UI 상태
   const [selectedSido, setSelectedSido] = useState<string>("전체");
@@ -1240,7 +1302,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
               ⭐
             </div>
             <div style="margin-top: 4px; padding: 3px 9px; background: rgba(15, 23, 42, 0.95); border: 1.5px solid #F59E0B; border-radius: 6px; font-size: 11px; font-weight: 900; color: #FED422; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.4); z-index: 20;">
-              ${store.displayName} (공식 가맹점)
+              ${store.displayName}
             </div>
           </div>
         `;
