@@ -4328,7 +4328,7 @@ export default function AdminPage() {
       setPopupTitle("");
       setPopupDesc("");
       setPopupImage("");
-      setPopupLink("order");
+      setPopupLink("");
       setPopupBtnText("자재 주문하러 가기");
       setPopupTitleColor("#ffffff");
       setPopupTitleSize("18px");
@@ -10075,17 +10075,103 @@ export default function AdminPage() {
                                 />
                               </div>
 
-                              <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-slate-700 block">이미지 클릭 시 이동할 링크 URL (선택)</label>
-                                <input
-                                  type="text"
-                                  placeholder="예: order (발주메뉴) 또는 https://... 또는 /portal?menu=orders"
-                                  value={popupLink}
-                                  onChange={(e) => setPopupLink(e.target.value)}
-                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
-                                />
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <label className="text-xs font-semibold text-slate-700 block">
+                                    이미지 클릭 시 이동할 링크 (선택)
+                                  </label>
+                                  {popupLink && popupLink.trim() !== "" ? (
+                                    <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                                      🔗 클릭 시 이동 설정됨
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                      🚫 링크 없음 (안내 전용)
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* 빠른 선택 버튼 프리셋 */}
+                                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => setPopupLink("")}
+                                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border ${
+                                      !popupLink || popupLink.trim() === ""
+                                        ? "bg-slate-800 text-white border-slate-800 shadow-xs"
+                                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    <span>🚫 링크 없음</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setPopupLink("order")}
+                                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border ${
+                                      popupLink === "order"
+                                        ? "bg-amber-500 text-slate-900 border-amber-500 shadow-xs"
+                                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    <span>🛒 자재 발주 (order)</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setPopupLink("notice")}
+                                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border ${
+                                      popupLink === "notice"
+                                        ? "bg-amber-500 text-slate-900 border-amber-500 shadow-xs"
+                                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    <span>📢 공지사항 (notice)</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setPopupLink("training")}
+                                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border ${
+                                      popupLink === "training"
+                                        ? "bg-amber-500 text-slate-900 border-amber-500 shadow-xs"
+                                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    <span>🎓 교육자료 (training)</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setPopupLink("inquiry")}
+                                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border ${
+                                      popupLink === "inquiry"
+                                        ? "bg-amber-500 text-slate-900 border-amber-500 shadow-xs"
+                                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    <span>📞 가맹상담 (inquiry)</span>
+                                  </button>
+                                </div>
+
+                                {/* 직접 입력 인풋 */}
+                                <div className="relative">
+                                  <input
+                                    type="text"
+                                    placeholder="외부 링크(https://...) 또는 직접 입력 (비워두면 링크 없음)"
+                                    value={popupLink}
+                                    onChange={(e) => setPopupLink(e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-3.5 pr-16 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
+                                  />
+                                  {popupLink && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setPopupLink("")}
+                                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 text-[11px] font-bold px-2 py-1 rounded hover:bg-slate-100 transition-colors"
+                                      title="링크 제거 (링크 없음으로 변경)"
+                                    >
+                                      ✕ 지우기
+                                    </button>
+                                  )}
+                                </div>
                                 <p className="text-[11px] text-slate-400">
-                                  사용자가 팝업 이미지를 클릭했을 때 이동할 주소입니다. (외부 웹사이트는 https://... 입력, 미입력 시 이동 없음)
+                                  * <strong>[링크 없음]</strong> 선택 시 팝업 이미지를 클릭해도 페이지 이동 없이 화면에 팝업만 표시됩니다.
                                 </p>
                               </div>
                             </div>
@@ -10133,10 +10219,14 @@ export default function AdminPage() {
                                       className="w-full h-full object-cover"
                                     />
                                     {/* Link tooltip indicator badge */}
-                                    {popupLink && (
+                                    {popupLink && popupLink.trim() !== "" ? (
                                       <div className="absolute top-3 left-3 bg-black/65 backdrop-blur-xs text-white text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
                                         <ExternalLink size={11} />
                                         <span className="truncate max-w-[150px]">{popupLink}</span>
+                                      </div>
+                                    ) : (
+                                      <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-xs text-white/90 text-[10px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                        <span>🚫 링크 없음</span>
                                       </div>
                                     )}
                                     {/* Multi-popup indicator simulation */}
