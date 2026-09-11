@@ -409,6 +409,8 @@ export const syncStoresBatch = mutation({
         adoptionMenu: v.optional(v.array(v.string())),
         monthlySales: v.optional(v.number()),
         partnerId: v.optional(v.string()),
+        _id: v.optional(v.any()),
+        _creationTime: v.optional(v.any()),
       })
     ),
   },

@@ -975,7 +975,7 @@ export default function AdminPage() {
 
   const syncStoresBatchMutation = useMutation(api.stores.syncStoresBatch);
 
-  // Sync any stores in localStorage that aren't yet on Convex Cloud
+  // Sync any stores in localStorage that aren't yet on Convex Cloud (sanitize internal Convex fields)
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -983,7 +983,30 @@ export default function AdminPage() {
         if (raw) {
           const localStores = JSON.parse(raw);
           if (Array.isArray(localStores) && localStores.length > 0) {
-            syncStoresBatchMutation({ stores: localStores }).catch(() => {});
+            const cleanStores = localStores
+              .filter((s: any) => s && s.id && s.name)
+              .map((s: any) => ({
+                id: String(s.id),
+                pw: s.pw ? String(s.pw) : undefined,
+                pwConfirm: s.pwConfirm ? String(s.pwConfirm) : undefined,
+                name: String(s.name),
+                owner: s.owner ? String(s.owner) : undefined,
+                phone: s.phone ? String(s.phone) : undefined,
+                status: s.status ? String(s.status) : undefined,
+                roadAddress: s.roadAddress ? String(s.roadAddress) : undefined,
+                detailAddress: s.detailAddress ? String(s.detailAddress) : undefined,
+                lat: typeof s.lat === "number" ? s.lat : undefined,
+                lng: typeof s.lng === "number" ? s.lng : undefined,
+                regDate: s.regDate ? String(s.regDate) : undefined,
+                cancelDate: s.cancelDate ? String(s.cancelDate) : undefined,
+                adoptionMenu: Array.isArray(s.adoptionMenu) ? s.adoptionMenu : undefined,
+                monthlySales: typeof s.monthlySales === "number" ? s.monthlySales : undefined,
+                partnerId: s.partnerId ? String(s.partnerId) : undefined,
+              }));
+
+            if (cleanStores.length > 0) {
+              syncStoresBatchMutation({ stores: cleanStores }).catch(() => {});
+            }
           }
         }
       } catch (e) {}
