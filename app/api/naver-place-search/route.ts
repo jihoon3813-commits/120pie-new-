@@ -76,11 +76,19 @@ export async function POST(req: NextRequest) {
     const cLat = center.lat || 37.4981;
     const cLng = center.lng || 127.0283;
 
-    // 화면 영역 (Bounding Box)
-    const swLat = bounds?.sw?.lat !== undefined ? bounds.sw.lat : cLat - 0.004;
-    const swLng = bounds?.sw?.lng !== undefined ? bounds.sw.lng : cLng - 0.005;
-    const neLat = bounds?.ne?.lat !== undefined ? bounds.ne.lat : cLat + 0.004;
-    const neLng = bounds?.ne?.lng !== undefined ? bounds.ne.lng : cLng + 0.005;
+    // 반경(m)을 고려한 위경도 범위 환산 (1m ≈ 0.000009도, 25% 여유 버퍼)
+    const latDelta = (radius / 111000) * 1.25;
+    const lngDelta = (radius / (111000 * Math.cos((cLat * Math.PI) / 180))) * 1.25;
+
+    const minSwLat = cLat - latDelta;
+    const minSwLng = cLng - lngDelta;
+    const maxNeLat = cLat + latDelta;
+    const maxNeLng = cLng + lngDelta;
+
+    const effectiveSwLat = bounds?.sw?.lat !== undefined ? Math.min(bounds.sw.lat, minSwLat) : minSwLat;
+    const effectiveSwLng = bounds?.sw?.lng !== undefined ? Math.min(bounds.sw.lng, minSwLng) : minSwLng;
+    const effectiveNeLat = bounds?.ne?.lat !== undefined ? Math.max(bounds.ne.lat, maxNeLat) : maxNeLat;
+    const effectiveNeLng = bounds?.ne?.lng !== undefined ? Math.max(bounds.ne.lng, maxNeLng) : maxNeLng;
 
     const fetchTasks: Promise<KakaoDoc[]>[] = [];
 
@@ -153,8 +161,8 @@ export async function POST(req: NextRequest) {
       const lat = parseFloat(parseFloat(doc.y).toFixed(6));
       const lng = parseFloat(parseFloat(doc.x).toFixed(6));
 
-      // 엄격한 화면 영역(Bounding Box) 필터: 화면 밖 매장 제외
-      if (lat < swLat - 0.001 || lat > neLat + 0.001 || lng < swLng - 0.001 || lng > neLng + 0.001) {
+      // 반경 및 화면 영역 필터
+      if (lat < effectiveSwLat || lat > effectiveNeLat || lng < effectiveSwLng || lng > effectiveNeLng) {
         continue;
       }
 

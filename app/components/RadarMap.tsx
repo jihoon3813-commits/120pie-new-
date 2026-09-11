@@ -41,7 +41,9 @@ import {
   ShieldAlert,
   LocateFixed,
   Info,
-  ChevronRight
+  ChevronRight,
+  RefreshCw,
+  Loader2
 } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -364,6 +366,26 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
   const [isMeasurePanelOpen, setIsMeasurePanelOpen] = useState<boolean>(true);
   const [measureCategoryFilter, setMeasureCategoryFilter] = useState<string>("전체");
   const [measureSearchTerm, setMeasureSearchTerm] = useState<string>("");
+
+  // 마지막 발굴 실행 위치 및 반경 기록
+  const [lastDiscoveredPoint, setLastDiscoveredPoint] = useState<{
+    lat: number;
+    lng: number;
+    radius: number;
+  } | null>(null);
+
+  // 핀 또는 반경이 마지막 발굴 위치에서 40m 이상 이동/변경되었는지 실시간 판별
+  const isMovedSinceDiscovery = useMemo(() => {
+    if (!lastDiscoveredPoint || !measurePoint) return false;
+    const dist = calcDistance(
+      measurePoint.lat,
+      measurePoint.lng,
+      lastDiscoveredPoint.lat,
+      lastDiscoveredPoint.lng
+    );
+    const radiusDiff = measureRadius !== lastDiscoveredPoint.radius;
+    return dist > 40 || radiusDiff;
+  }, [measurePoint, lastDiscoveredPoint, measureRadius]);
 
   // 측정 오버레이 Ref
   const measureMarkerRef = useRef<any>(null);
@@ -1323,7 +1345,10 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
   // ====================================================
   // [가망대상 발굴]: 네이버 플레이스 등록 실존 매장 실시간 전수 발굴
   // ====================================================
-  const handleExecuteDiscover = async () => {
+  const handleExecuteDiscover = async (
+    targetPoint?: { lat: number; lng: number } | null | any,
+    targetRadius?: number
+  ) => {
     if (!naverMapRef.current) return;
     if (selectedDiscoverCats.length === 0) {
       alert("발굴할 타겟 업종을 1개 이상 선택해 주세요.");
@@ -1333,9 +1358,10 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     setIsDiscoverModalOpen(false);
     setIsDiscovering(true);
 
-    const center = naverMapRef.current.getCenter();
-    const cLat = center.lat();
-    const cLng = center.lng();
+    const hasValidPoint = targetPoint && typeof targetPoint.lat === "number" && typeof targetPoint.lng === "number";
+    const cLat = hasValidPoint ? targetPoint.lat : naverMapRef.current.getCenter().lat();
+    const cLng = hasValidPoint ? targetPoint.lng : naverMapRef.current.getCenter().lng();
+    const radiusToSearch = (typeof targetRadius === "number" && targetRadius > 0) ? targetRadius : (isMeasureMode ? measureRadius : 500);
 
     let boundsPayload = null;
     if (naverMapRef.current.getBounds) {
@@ -1346,7 +1372,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
       };
     }
 
-    // 1) 네이버 리버스 지오코더로 현재 화면 중앙의 시/도, 시/군/구, 읍/면/동 정밀 파악
+    // 1) 네이버 리버스 지오코더로 현재 화면/핀 중앙의 시/도, 시/군/구, 읍/면/동 정밀 파악
     let currentSido = selectedSido !== "전체" ? selectedSido : "서울특별시";
     let currentSigungu = "";
     let currentDong = "";
@@ -1380,22 +1406,28 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
           bounds: boundsPayload,
           center: { lat: cLat, lng: cLng },
           categories: selectedDiscoverCats,
-          radius: 500,
+          radius: radiusToSearch,
         }),
       });
 
       const data = await res.json();
+      const radiusLabel = radiusToSearch >= 1000 ? `${radiusToSearch / 1000}km` : `${radiusToSearch}m`;
+
       if (data.success && data.targets && data.targets.length > 0) {
         // 기존 위치의 미체결 매장 리셋 & 현재 위치의 실시간 발굴 매장으로 교체 (체결 가맹점은 영구 보존)
         const addRes = await replaceUncontractedTargetsMutation({ items: data.targets });
         setSelectedCategory("전체");
+        setLastDiscoveredPoint({ lat: cLat, lng: cLng, radius: radiusToSearch });
+        setIsMeasurePanelOpen(true);
 
         const locationName = currentDong || currentSigungu || currentSido;
         triggerToast(
-          `🎯 [${locationName}] 상권에서 실제 등록 매장 ${addRes.addedCount}개소를 발굴했습니다!`
+          `🎯 [${locationName}] 반경 ${radiusLabel} 상권에서 실제 등록 매장 ${addRes.addedCount}개소를 발굴했습니다!`
         );
       } else {
-        triggerToast("해당 지역의 등록 매장 정보를 성공적으로 확인했습니다.");
+        setLastDiscoveredPoint({ lat: cLat, lng: cLng, radius: radiusToSearch });
+        setIsMeasurePanelOpen(true);
+        triggerToast(`해당 위치 반경 ${radiusLabel} 내 등록 매장을 모두 확인했습니다.`);
       }
     } catch (err) {
       console.error(err);
@@ -2013,7 +2045,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     </div>
                   </div>
 
-                  {/* 📏 500m 반경 측정 도구 토글 버튼 */}
+                  {/* 📏 상권 반경 발굴 도구 토글 버튼 */}
                   <button
                     onClick={handleToggleMeasureMode}
                     className={`px-3 py-2 rounded-lg font-black text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-md ${
@@ -2021,10 +2053,10 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white border border-indigo-400 ring-2 ring-indigo-300 animate-pulse"
                         : "bg-white/95 hover:bg-slate-100 text-slate-800 border border-slate-300"
                     }`}
-                    title="지도의 임의 지점을 클릭하여 반경 500m를 측정하고 상권 침범/가망 매장을 정밀 분석합니다"
+                    title="지정 위치 기준 반경(300m/500m/1km)을 설정하고 실존 매장을 발굴합니다"
                   >
                     <Ruler size={14} className={isMeasureMode ? "rotate-45 transition-transform" : ""} />
-                    <span>{isMeasureMode ? "측정중" : "500m 측정"}</span>
+                    <span>{isMeasureMode ? "상권 설정중" : "상권 반경 발굴"}</span>
                   </button>
 
                   {/* 지도 내 빠른 발굴 버튼 */}
@@ -2097,10 +2129,10 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         ? "bg-indigo-600 text-white border-indigo-400 animate-pulse"
                         : "bg-white/95 active:bg-slate-100 text-slate-800 border-slate-200"
                     }`}
-                    title="반경 500m 거리 측정"
+                    title="반경 300m/500m/1km 상권 발굴 설정"
                   >
                     <Ruler size={16} className="shrink-0" />
-                    <span>{isMeasureMode ? "측정중" : "500m"}</span>
+                    <span>{isMeasureMode ? "설정중" : "상권 반경"}</span>
                   </button>
                 </div>
               )}
@@ -2112,11 +2144,26 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     <div className="flex items-center gap-1.5 min-w-0">
                       <span className="text-base shrink-0">📏</span>
                       <div className="min-w-0">
-                        <span className="font-black text-indigo-300 text-xs whitespace-nowrap">
-                          {measureRadius}m 측정기
-                        </span>
-                        <span className="hidden sm:inline text-slate-300 text-[11px] ml-1.5">
-                          지도 클릭 또는 보라색 핀 드래그
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-black text-amber-300 text-xs whitespace-nowrap">
+                            반경 {measureRadius >= 1000 ? "1km" : `${measureRadius}m`} 상권 설정
+                          </span>
+                          {isMovedSinceDiscovery ? (
+                            <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-400/50 text-[10px] font-bold animate-pulse">
+                              📍 위치 이동됨 (재발굴 필요)
+                            </span>
+                          ) : lastDiscoveredPoint ? (
+                            <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[10px] font-bold">
+                              ✓ 발굴 완료
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-slate-300 hidden md:inline">
+                              반경 선택 후 [발굴하기] 클릭
+                            </span>
+                          )}
+                        </div>
+                        <span className="hidden sm:inline text-slate-400 text-[10px]">
+                          지도 클릭 또는 보라색 핀 드래그로 반경 이동
                         </span>
                       </div>
                     </div>
@@ -2126,37 +2173,86 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                       <div className="flex items-center bg-slate-800 rounded-lg p-0.5 border border-slate-700">
                         <button
                           type="button"
-                          onClick={() => setMeasureRadius(300)}
+                          onClick={() => {
+                            setMeasureRadius(300);
+                            triggerToast("반경 300m가 설정되었습니다. [발굴하기]를 눌러 탐색하세요.");
+                          }}
                           className={`px-2 py-1 rounded text-[11px] font-bold transition-all border-0 cursor-pointer ${
-                            measureRadius === 300 ? "bg-indigo-600 text-white font-black" : "text-slate-400 hover:text-white"
+                            measureRadius === 300 ? "bg-indigo-600 text-white font-black shadow-xs" : "text-slate-400 hover:text-white"
                           }`}
                         >
                           300m
                         </button>
                         <button
                           type="button"
-                          onClick={() => setMeasureRadius(500)}
+                          onClick={() => {
+                            setMeasureRadius(500);
+                            triggerToast("반경 500m가 설정되었습니다. [발굴하기]를 눌러 탐색하세요.");
+                          }}
                           className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all border-0 cursor-pointer ${
-                            measureRadius === 500 ? "bg-indigo-600 text-white font-black" : "text-slate-400 hover:text-white"
+                            measureRadius === 500 ? "bg-indigo-600 text-white font-black shadow-xs" : "text-slate-400 hover:text-white"
                           }`}
                         >
                           500m
                         </button>
                         <button
                           type="button"
-                          onClick={() => setMeasureRadius(1000)}
+                          onClick={() => {
+                            setMeasureRadius(1000);
+                            triggerToast("반경 1km가 설정되었습니다. [발굴하기]를 눌러 탐색하세요.");
+                          }}
                           className={`px-2 py-1 rounded text-[11px] font-bold transition-all border-0 cursor-pointer ${
-                            measureRadius === 1000 ? "bg-indigo-600 text-white font-black" : "text-slate-400 hover:text-white"
+                            measureRadius === 1000 ? "bg-indigo-600 text-white font-black shadow-xs" : "text-slate-400 hover:text-white"
                           }`}
                         >
                           1km
                         </button>
                       </div>
 
+                      {/* 🚀 발굴하기 / 재발굴하기 버튼 */}
+                      <button
+                        type="button"
+                        onClick={() => handleExecuteDiscover(measurePoint, measureRadius)}
+                        disabled={isDiscovering}
+                        className={`h-7 px-3 rounded-lg text-xs font-black transition-all border-0 cursor-pointer flex items-center gap-1.5 shadow-md shrink-0 active:scale-95 ${
+                          isDiscovering
+                            ? "bg-slate-700 text-slate-400 cursor-not-allowed"
+                            : isMovedSinceDiscovery
+                            ? "bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 ring-2 ring-amber-300 animate-pulse font-black"
+                            : lastDiscoveredPoint
+                            ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+                            : "bg-[#FED422] hover:bg-amber-400 text-slate-900 font-black"
+                        }`}
+                        title="지정한 위치와 반경 내 실존 매장 실시간 발굴"
+                      >
+                        {isDiscovering ? (
+                          <>
+                            <Loader2 size={13} className="animate-spin" />
+                            <span>발굴 중...</span>
+                          </>
+                        ) : isMovedSinceDiscovery ? (
+                          <>
+                            <RefreshCw size={13} />
+                            <span>새 위치 재발굴하기</span>
+                          </>
+                        ) : lastDiscoveredPoint ? (
+                          <>
+                            <RefreshCw size={12} />
+                            <span>재발굴하기</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles size={13} className="text-amber-900" />
+                            <span>발굴하기</span>
+                          </>
+                        )}
+                      </button>
+
                       <button
                         type="button"
                         onClick={handleToggleMeasureMode}
-                        className="h-7 px-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-lg text-xs font-black transition-all border-0 cursor-pointer flex items-center gap-1 shrink-0"
+                        className="h-7 px-2.5 bg-slate-800 hover:bg-rose-600 active:scale-95 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all border border-slate-700 hover:border-rose-600 cursor-pointer flex items-center gap-1 shrink-0"
+                        title="상권 설정 모드 종료"
                       >
                         <X size={13} />
                         <span>종료</span>
@@ -2245,6 +2341,25 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         </p>
                       </div>
                     )}
+
+                    {/* 📍 반경 위치 이동 시 안내 및 재발굴 버튼 */}
+                    {isMovedSinceDiscovery && (
+                      <div className="p-2 bg-gradient-to-r from-amber-50 to-amber-100/80 border border-amber-300 rounded-xl flex items-center justify-between gap-2 text-amber-950 shadow-2xs">
+                        <div className="min-w-0 flex items-center gap-1.5 text-xs font-black text-amber-900">
+                          <span className="animate-bounce shrink-0">📍</span>
+                          <span className="truncate">반경 위치가 이동되었습니다</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleExecuteDiscover(measurePoint, measureRadius)}
+                          disabled={isDiscovering}
+                          className="px-2.5 py-1 bg-[#FED422] hover:bg-amber-400 active:scale-95 text-slate-900 font-black rounded-lg text-xs shrink-0 transition-all border-0 cursor-pointer shadow-xs flex items-center gap-1"
+                        >
+                          {isDiscovering ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
+                          <span>재발굴하기</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {/* 타겟 헤더 & 카테고리 탭 & 검색 - shrink-0 */}
@@ -2252,21 +2367,34 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     <div className="flex items-center justify-between">
                       <span className="font-black text-slate-800 text-[11px] flex items-center gap-1.5">
                         <Target size={12} className="text-indigo-600" />
-                        <span>반경 {measureRadius}m 내 발굴 타겟</span>
+                        <span>반경 {measureRadius >= 1000 ? "1km" : `${measureRadius}m`} 내 발굴 매장</span>
                         <span className="px-1.5 py-0.2 rounded-full bg-indigo-50 text-indigo-700 font-mono font-black text-[10px] border border-indigo-200">
                           {displayedNearbyTargets.length}개 / 전체 {measureAnalysis.totalNearbyTargets}개
                         </span>
                       </span>
 
-                      {measureCategoryFilter !== "전체" && (
+                      <div className="flex items-center gap-1.5">
                         <button
                           type="button"
-                          onClick={() => setMeasureCategoryFilter("전체")}
-                          className="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold underline cursor-pointer border-0 bg-transparent"
+                          onClick={() => handleExecuteDiscover(measurePoint, measureRadius)}
+                          disabled={isDiscovering}
+                          className="px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 cursor-pointer active:scale-95"
+                          title="현재 반경 내 매장 발굴/재발굴"
                         >
-                          전체 보기
+                          {isDiscovering ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+                          <span>{isMovedSinceDiscovery ? "새 위치 재발굴" : "재발굴"}</span>
                         </button>
-                      )}
+
+                        {measureCategoryFilter !== "전체" && (
+                          <button
+                            type="button"
+                            onClick={() => setMeasureCategoryFilter("전체")}
+                            className="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold underline cursor-pointer border-0 bg-transparent"
+                          >
+                            전체
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {/* 카테고리 필터 버튼들 (스크롤바 숨김) */}
@@ -2410,18 +2538,58 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         );
                       })
                     ) : (
-                      <div className="py-6 text-center text-slate-400 text-xs">
-                        <AlertCircle size={22} className="mx-auto mb-1.5 text-slate-300" />
-                        <p className="font-bold text-xs">조건에 맞는 발굴 매장이 없습니다.</p>
+                      <div className="py-6 px-3 text-center bg-white rounded-xl border border-dashed border-indigo-200 shadow-2xs space-y-2.5 my-1">
+                        <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-lg shadow-xs">
+                          <Search size={18} />
+                        </div>
+                        <div>
+                          <p className="font-black text-slate-800 text-xs">
+                            반경 {measureRadius >= 1000 ? "1km" : `${measureRadius}m`} 내 발굴된 매장이 없습니다.
+                          </p>
+                          <p className="text-[10px] text-slate-400 mt-0.5 leading-snug">
+                            [발굴하기] 버튼을 누르면 실시간으로 현재 반경 내의 실존 매장(카페, 디저트, PC방 등)을 탐색합니다.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleExecuteDiscover(measurePoint, measureRadius)}
+                          disabled={isDiscovering}
+                          className="w-full py-2.5 px-3 bg-gradient-to-r from-indigo-600 to-slate-900 hover:from-indigo-700 hover:to-slate-800 text-white rounded-lg text-xs font-black shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0 active:scale-95"
+                        >
+                          {isDiscovering ? (
+                            <>
+                              <Loader2 size={13} className="animate-spin" />
+                              <span>반경 {measureRadius >= 1000 ? "1km" : `${measureRadius}m`} 매장 발굴 중...</span>
+                            </>
+                          ) : isMovedSinceDiscovery ? (
+                            <>
+                              <RefreshCw size={13} className="text-amber-300" />
+                              <span>새 위치에서 재발굴하기</span>
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles size={13} className="text-amber-300" />
+                              <span>반경 {measureRadius >= 1000 ? "1km" : `${measureRadius}m`} 매장 발굴하기</span>
+                            </>
+                          )}
+                        </button>
                         {measureCategoryFilter !== "전체" && (
                           <button
                             type="button"
                             onClick={() => setMeasureCategoryFilter("전체")}
-                            className="mt-1.5 text-[11px] text-indigo-600 font-black underline cursor-pointer bg-transparent border-0"
+                            className="text-[11px] text-indigo-600 font-bold underline cursor-pointer bg-transparent border-0 block mx-auto pt-1"
                           >
                             전체 카테고리 보기
                           </button>
                         )}
+                      </div>
+                    )}
+
+                    {/* 하단 반경 이동 안내 팁 */}
+                    {displayedNearbyTargets.length > 0 && (
+                      <div className="p-2 rounded-lg bg-indigo-50/70 border border-indigo-100 text-[10px] text-indigo-800 flex items-center gap-1.5 font-medium">
+                        <Info size={12} className="shrink-0 text-indigo-500" />
+                        <span>지도를 클릭하거나 보라색 핀을 드래그하여 반경을 옮긴 후 <strong>[재발굴하기]</strong>를 누르세요.</span>
                       </div>
                     )}
                   </div>
@@ -3278,7 +3446,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
               <div className="pt-1 shrink-0">
                 <button
                   type="button"
-                  onClick={handleExecuteDiscover}
+                  onClick={() => handleExecuteDiscover()}
                   disabled={isDiscovering || selectedDiscoverCats.length === 0}
                   className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 disabled:opacity-50 text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-md cursor-pointer border-0 flex items-center justify-center gap-1.5 active:scale-98"
                 >
