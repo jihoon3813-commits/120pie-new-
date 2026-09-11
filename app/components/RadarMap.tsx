@@ -1335,6 +1335,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
     try {
       await resetAndSeedTargetsMutation();
       setSelectedTarget(approvedStores[0] || null);
+      setLastDiscoveredPoint(null);
       triggerToast("발굴 목록이 초기화되었습니다. 등록된 실제 가맹점만 표시됩니다.");
     } catch (err) {
       alert("초기화 중 오류가 발생했습니다.");
@@ -2045,7 +2046,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     </div>
                   </div>
 
-                  {/* 📏 상권 반경 발굴 도구 토글 버튼 */}
+                  {/* 📏 반경설정 도구 토글 버튼 */}
                   <button
                     onClick={handleToggleMeasureMode}
                     className={`px-3 py-2 rounded-lg font-black text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-md ${
@@ -2053,21 +2054,20 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white border border-indigo-400 ring-2 ring-indigo-300 animate-pulse"
                         : "bg-white/95 hover:bg-slate-100 text-slate-800 border border-slate-300"
                     }`}
-                    title="지정 위치 기준 반경(300m/500m/1km)을 설정하고 실존 매장을 발굴합니다"
+                    title="상권 반경(300m/500m/1km)을 설정하고 발굴합니다"
                   >
                     <Ruler size={14} className={isMeasureMode ? "rotate-45 transition-transform" : ""} />
-                    <span>{isMeasureMode ? "상권 설정중" : "상권 반경 발굴"}</span>
+                    <span>{isMeasureMode ? "반경설정중" : "반경설정"}</span>
                   </button>
 
-                  {/* 지도 내 빠른 발굴 버튼 */}
+                  {/* 🔄 발굴 매장 초기화 버튼 */}
                   <button
-                    onClick={() => setIsDiscoverModalOpen(true)}
-                    disabled={isDiscovering}
-                    className="px-3 py-2 rounded-lg bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white border border-rose-400 shadow-md font-black text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
-                    title="현재 보고 계신 네이버 지도 위치의 업종을 선택하여 발굴합니다"
+                    onClick={handleClearDiscoveredTargets}
+                    className="px-3 py-2 rounded-lg bg-white/95 hover:bg-slate-100 text-slate-700 hover:text-rose-600 border border-slate-300 shadow-md font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                    title="발굴된 매장 목록을 초기화하고 기본 등록 매장만 표시합니다"
                   >
-                    <Target size={14} className={isDiscovering ? "animate-spin" : ""} />
-                    <span>{isDiscovering ? "발굴중" : "가망발굴"}</span>
+                    <RotateCcw size={14} />
+                    <span>초기화</span>
                   </button>
 
                   {/* 전체화면 토글 버튼 */}
@@ -2113,18 +2113,8 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
 
                   <button
                     type="button"
-                    onClick={() => setIsDiscoverModalOpen(true)}
-                    disabled={isDiscovering}
-                    className="h-11 flex-1 min-w-0 px-2 bg-gradient-to-r from-rose-500 via-amber-500 to-amber-400 text-white font-black rounded-xl shadow-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer border-2 border-white whitespace-nowrap"
-                  >
-                    <Target size={17} className={isDiscovering ? "animate-spin shrink-0" : "shrink-0"} />
-                    <span className="truncate">{isDiscovering ? "발굴 중..." : "🎯 가망 매장 발굴"}</span>
-                  </button>
-
-                  <button
-                    type="button"
                     onClick={handleToggleMeasureMode}
-                    className={`h-11 px-3 font-black rounded-xl shadow-xl text-xs flex items-center gap-1.5 active:scale-95 cursor-pointer border-2 shrink-0 whitespace-nowrap ${
+                    className={`h-11 flex-1 min-w-0 px-3 font-black rounded-xl shadow-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer border-2 shrink-0 whitespace-nowrap ${
                       isMeasureMode
                         ? "bg-indigo-600 text-white border-indigo-400 animate-pulse"
                         : "bg-white/95 active:bg-slate-100 text-slate-800 border-slate-200"
@@ -2132,7 +2122,17 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     title="반경 300m/500m/1km 상권 발굴 설정"
                   >
                     <Ruler size={16} className="shrink-0" />
-                    <span>{isMeasureMode ? "설정중" : "상권 반경"}</span>
+                    <span>{isMeasureMode ? "반경설정중" : "반경설정"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleClearDiscoveredTargets}
+                    className="h-11 px-3 font-bold rounded-xl shadow-xl text-xs flex items-center justify-center gap-1 active:scale-95 cursor-pointer border-2 shrink-0 bg-white/95 active:bg-slate-100 text-slate-700 border-slate-200"
+                    title="발굴 목록 초기화"
+                  >
+                    <RotateCcw size={15} className="shrink-0" />
+                    <span>초기화</span>
                   </button>
                 </div>
               )}
@@ -2212,7 +2212,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                       {/* 🚀 발굴하기 / 재발굴하기 버튼 */}
                       <button
                         type="button"
-                        onClick={() => handleExecuteDiscover(measurePoint, measureRadius)}
+                        onClick={() => setIsDiscoverModalOpen(true)}
                         disabled={isDiscovering}
                         className={`h-7 px-3 rounded-lg text-xs font-black transition-all border-0 cursor-pointer flex items-center gap-1.5 shadow-md shrink-0 active:scale-95 ${
                           isDiscovering
@@ -2351,7 +2351,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleExecuteDiscover(measurePoint, measureRadius)}
+                          onClick={() => setIsDiscoverModalOpen(true)}
                           disabled={isDiscovering}
                           className="px-2.5 py-1 bg-[#FED422] hover:bg-amber-400 active:scale-95 text-slate-900 font-black rounded-lg text-xs shrink-0 transition-all border-0 cursor-pointer shadow-xs flex items-center gap-1"
                         >
@@ -2376,7 +2376,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
-                          onClick={() => handleExecuteDiscover(measurePoint, measureRadius)}
+                          onClick={() => setIsDiscoverModalOpen(true)}
                           disabled={isDiscovering}
                           className="px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 cursor-pointer active:scale-95"
                           title="현재 반경 내 매장 발굴/재발굴"
@@ -2552,7 +2552,7 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleExecuteDiscover(measurePoint, measureRadius)}
+                          onClick={() => setIsDiscoverModalOpen(true)}
                           disabled={isDiscovering}
                           className="w-full py-2.5 px-3 bg-gradient-to-r from-indigo-600 to-slate-900 hover:from-indigo-700 hover:to-slate-800 text-white rounded-lg text-xs font-black shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0 active:scale-95"
                         >
@@ -3371,7 +3371,9 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
                     가망대상 발굴 업종 선택 (중복 가능)
                   </h3>
                   <p className="text-[10px] sm:text-[11px] text-white/90 font-medium leading-tight truncate">
-                    현재 지도 영역 내에서 발굴할 업종들을 선택하세요
+                    {isMeasureMode
+                      ? `반경 ${measureRadius >= 1000 ? "1km" : `${measureRadius}m`} 상권 발굴 (${measurePoint?.address || "지정 위치"})`
+                      : "현재 지도 영역 내에서 발굴할 업종들을 선택하세요"}
                   </p>
                 </div>
               </div>
@@ -3446,13 +3448,17 @@ export default function RadarMap({ mode, partnerId, partnerName }: RadarMapProps
               <div className="pt-1 shrink-0">
                 <button
                   type="button"
-                  onClick={() => handleExecuteDiscover()}
+                  onClick={() => handleExecuteDiscover(isMeasureMode ? measurePoint : null, isMeasureMode ? measureRadius : 500)}
                   disabled={isDiscovering || selectedDiscoverCats.length === 0}
                   className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 disabled:opacity-50 text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-md cursor-pointer border-0 flex items-center justify-center gap-1.5 active:scale-98"
                 >
                   <Target size={16} className={isDiscovering ? "animate-spin shrink-0" : "shrink-0"} />
                   <span className="truncate">
-                    {isDiscovering ? "네이버 지도 화면 전수 발굴 중..." : `선택한 ${selectedDiscoverCats.length}개 업종 실시간 발굴 시작`}
+                    {isDiscovering
+                      ? "실시간 매장 발굴 중..."
+                      : isMeasureMode
+                      ? `선택한 ${selectedDiscoverCats.length}개 업종 반경 ${measureRadius >= 1000 ? "1km" : `${measureRadius}m`} 발굴 시작`
+                      : `선택한 ${selectedDiscoverCats.length}개 업종 실시간 발굴 시작`}
                   </span>
                 </button>
               </div>
