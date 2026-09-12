@@ -6,6 +6,7 @@ import { api } from "../../convex/_generated/api";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 import { getInstagramThumbnailUrl } from "@/app/utils/instagram";
 import Link from "next/link";
+import { getPartnerGradeName, PARTNER_GRADES } from "@/app/constants/partnerGrades";
 import { useModalBackHandler } from "@/components/MobileBackManager";
 import {
   LayoutDashboard,
@@ -73,12 +74,34 @@ import {
   Crosshair,
   Save,
   Camera,
-  PhoneCall
+  PhoneCall,
+  CornerDownRight
 } from "lucide-react";
 import Footer from "@/app/components/Footer";
 import RadarMap from "@/app/components/RadarMap";
 import { FranchiseContractDocument } from "@/components/contract/FranchiseContractDocument";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
+
+// 전화번호 자동 하이픈 변환 헬퍼 (010-XXXX-XXXX, 02-XXX-XXXX 등)
+function formatPhoneNumber(val: string): string {
+  if (!val) return "";
+  const clean = val.replace(/[^0-9]/g, "");
+  if (clean.length <= 3) {
+    return clean;
+  }
+  if (clean.startsWith("02")) {
+    if (clean.length <= 5) return `${clean.slice(0, 2)}-${clean.slice(2)}`;
+    if (clean.length <= 9) return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5)}`;
+    return `${clean.slice(0, 2)}-${clean.slice(2, 6)}-${clean.slice(6, 10)}`;
+  }
+  if (clean.length <= 7) {
+    return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+  }
+  if (clean.length <= 10) {
+    return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6)}`;
+  }
+  return `${clean.slice(0, 3)}-${clean.slice(3, 7)}-${clean.slice(7, 11)}`;
+}
 
 // ==========================================
 // TYPES DEFINITIONS
@@ -145,6 +168,7 @@ interface Product {
   labels?: string[]; // 라벨 (e.g. ["BEST", "추천", "신제품"])
   shippingType?: "free" | "A" | "B" | "C" | "BOX"; // 배송 정책 구분 (무료, A, B, C, BOX)
   options?: string[]; // 제품 선택 옵션 (홍보물 등)
+  gradePrices?: Record<string, number>; // 파트너 등급별(1~5등급) 판매가 정책
 }
 
 interface BannerSettings {
@@ -1300,6 +1324,14 @@ export default function AdminPage() {
   const [partnerFormStatus, setPartnerFormStatus] = useState<string>("활동중");
   const [partnerFormRegDate, setPartnerFormRegDate] = useState<string>("");
   const [partnerFormMemo, setPartnerFormMemo] = useState<string>("");
+  // 계층 / 상위 파트너 / 레벨 관리 상태
+  const [partnerFormParentId, setPartnerFormParentId] = useState<string>("");
+  const [partnerFormLevel, setPartnerFormLevel] = useState<number>(1);
+  const [partnerFormTierName, setPartnerFormTierName] = useState<string>("총판(1차)");
+  const [partnerFormGrade, setPartnerFormGrade] = useState<number>(1);
+  const [partnerParentSearchQuery, setPartnerParentSearchQuery] = useState<string>("");
+  const [isParentSearchDropdownOpen, setIsParentSearchDropdownOpen] = useState<boolean>(false);
+  const [partnerLevelFilter, setPartnerLevelFilter] = useState<"all" | "level1" | "sub">("all");
 
   // Settlement Management States (HQ Admin)
   const [settlementFilterYearMonth, setSettlementFilterYearMonth] = useState<string>("전체");
@@ -2067,6 +2099,15 @@ export default function AdminPage() {
   const [productIsActive, setProductIsActive] = useState<boolean>(true);
   const [productStatus, setProductStatus] = useState<"판매중" | "품절" | "단종">("판매중");
   const [productShippingType, setProductShippingType] = useState<"free" | "A" | "B" | "C" | "BOX">("A");
+  // 파트너 등급별(1~5등급) 단가 설정 상태
+  const [useGradePricing, setUseGradePricing] = useState<boolean>(false);
+  const [productGradePrices, setProductGradePrices] = useState<Record<string, string>>({
+    "1": "",
+    "2": "",
+    "3": "",
+    "4": "",
+    "5": "",
+  });
 
   // Product Search & Filter States
   const [adminProductSearch, setAdminProductSearch] = useState<string>("");
@@ -3479,6 +3520,12 @@ export default function AdminPage() {
       setPartnerFormStatus(partner.status || "활동중");
       setPartnerFormRegDate(partner.regDate || new Date().toISOString().split("T")[0]);
       setPartnerFormMemo(partner.memo || "");
+      setPartnerFormParentId(partner.parentId || "");
+      setPartnerFormLevel(partner.level || (partner.parentId ? 2 : 1));
+      setPartnerFormTierName(partner.tierName || (partner.parentId ? "지사(2차)" : "총판(1차)"));
+      setPartnerFormGrade(partner.grade || 1);
+      setPartnerParentSearchQuery("");
+      setIsParentSearchDropdownOpen(false);
     } else {
       setIsPartnerEditMode(false);
       setSelectedPartner(null);
@@ -3495,6 +3542,12 @@ export default function AdminPage() {
       setPartnerFormStatus("활동중");
       setPartnerFormRegDate(new Date().toISOString().split("T")[0]);
       setPartnerFormMemo("");
+      setPartnerFormParentId("");
+      setPartnerFormLevel(1);
+      setPartnerFormTierName("총판(1차)");
+      setPartnerFormGrade(1);
+      setPartnerParentSearchQuery("");
+      setIsParentSearchDropdownOpen(false);
     }
     setIsPartnerFormOpen(true);
   };
@@ -3503,6 +3556,12 @@ export default function AdminPage() {
     e.preventDefault();
     if (!partnerFormId || !partnerFormPw || !partnerFormName || !partnerFormPhone) {
       alert("아이디, 비밀번호, 파트너명, 연락처는 필수 입력 항목입니다.");
+      return;
+    }
+
+    // 본인을 상위 파트너로 지정하는 경우 방지
+    if (partnerFormParentId && partnerFormParentId === partnerFormId) {
+      alert("자기 자신을 상위 파트너로 지정할 수 없습니다.");
       return;
     }
 
@@ -3521,6 +3580,10 @@ export default function AdminPage() {
         status: partnerFormStatus,
         regDate: partnerFormRegDate || new Date().toISOString().split("T")[0],
         memo: partnerFormMemo || undefined,
+        parentId: partnerFormParentId || undefined,
+        level: partnerFormLevel || (partnerFormParentId ? 2 : 1),
+        tierName: partnerFormTierName || (partnerFormParentId ? "지사(2차)" : "총판(1차)"),
+        grade: partnerFormGrade || 1,
       });
 
       triggerToast(isPartnerEditMode ? "파트너 정보가 수정되었습니다." : "새 파트너가 성공적으로 등록되었습니다.");
@@ -3715,12 +3778,35 @@ export default function AdminPage() {
     return parseInt(val.replace(/[^0-9]/g, "") || "0", 10);
   };
 
-  // Calculate real-time discounted price
+  // Calculate real-time discounted price (기본 설정 판매가)
   const getCalculatedDiscountedPrice = () => {
     const priceNum = parseNumberFromCommas(productPrice);
     const discNum = parseNumberFromCommas(productDiscountAmount);
-    const finalPrice = priceNum - discNum;
-    return finalPrice < 0 ? 0 : finalPrice;
+    if (discNum > 0 && priceNum > discNum) {
+      return priceNum - discNum;
+    }
+    return priceNum > 0 ? priceNum : parseNumberFromCommas(productSupplyPrice);
+  };
+
+  // 등급별 단가 사용 여부 토글 핸들러 (체크 시 모든 등급에 기본 설정 가격을 자동 프리필)
+  const handleToggleGradePricing = (checked: boolean) => {
+    setUseGradePricing(checked);
+    if (checked) {
+      const basePrice = getCalculatedDiscountedPrice() || parseNumberFromCommas(productPrice) || parseNumberFromCommas(productSupplyPrice) || 0;
+      const formattedBase = basePrice > 0 ? basePrice.toLocaleString() : "";
+      setProductGradePrices((prev) => {
+        const next: Record<string, string> = {};
+        for (let i = 1; i <= 5; i++) {
+          const existing = prev[String(i)];
+          if (existing && existing.trim() !== "" && existing.trim() !== "0") {
+            next[String(i)] = existing;
+          } else {
+            next[String(i)] = formattedBase;
+          }
+        }
+        return next;
+      });
+    }
   };
 
   // Handler for price input change (formats commas dynamically)
@@ -3750,6 +3836,28 @@ export default function AdminPage() {
       setProductOptions(prod.options || []);
       setNewProductOption("");
 
+      const basePrice = (prod.discountedPrice && prod.discountedPrice > 0)
+        ? prod.discountedPrice
+        : ((prod.price && prod.price > 0) ? prod.price : (prod.supplyPrice || 0));
+      const formattedBase = basePrice > 0 ? basePrice.toLocaleString() : "";
+
+      if (prod.gradePrices && Object.keys(prod.gradePrices).length > 0) {
+        setUseGradePricing(true);
+        const gp: Record<string, string> = { "1": "", "2": "", "3": "", "4": "", "5": "" };
+        for (let i = 1; i <= 5; i++) {
+          const val = prod.gradePrices[String(i)];
+          if (val !== undefined && val !== null && Number(val) > 0) {
+            gp[String(i)] = Number(val).toLocaleString();
+          } else {
+            gp[String(i)] = formattedBase;
+          }
+        }
+        setProductGradePrices(gp);
+      } else {
+        setUseGradePricing(false);
+        setProductGradePrices({ "1": "", "2": "", "3": "", "4": "", "5": "" });
+      }
+
       // Load rich editor content on microtask
       setTimeout(() => {
         const editorDiv = document.getElementById("product-detail-rich-editor");
@@ -3776,6 +3884,8 @@ export default function AdminPage() {
       setProductShippingType("A");
       setProductOptions([]);
       setNewProductOption("");
+      setUseGradePricing(false);
+      setProductGradePrices({ "1": "", "2": "", "3": "", "4": "", "5": "" });
 
       // Reset rich editor content on microtask
       setTimeout(() => {
@@ -3816,7 +3926,24 @@ export default function AdminPage() {
       const priceVal = parseNumberFromCommas(productPrice);
       const discVal = parseNumberFromCommas(productDiscountAmount);
       const supplyVal = parseNumberFromCommas(productSupplyPrice);
-      const discountedPriceVal = priceVal - discVal;
+      // 특별할인액이 판매가 이상이어서 0원이 되는 왜곡 방지
+      const discountedPriceVal = (discVal > 0 && priceVal > discVal) ? (priceVal - discVal) : (priceVal > 0 ? priceVal : supplyVal);
+      const baseDefaultPrice = discountedPriceVal > 0 ? discountedPriceVal : (priceVal > 0 ? priceVal : supplyVal);
+
+      let finalGradePrices: Record<string, number> | undefined = undefined;
+      if (useGradePricing) {
+        const gpObj: Record<string, number> = {};
+        for (let i = 1; i <= 5; i++) {
+          const raw = productGradePrices[String(i)];
+          let num = raw && raw.trim() !== "" ? parseNumberFromCommas(raw) : 0;
+          // 특정 등급 가격을 비워두거나 0원인 경우 기본 설정 가격으로 자동 설정
+          if (num <= 0) {
+            num = baseDefaultPrice;
+          }
+          gpObj[String(i)] = num;
+        }
+        finalGradePrices = gpObj;
+      }
 
       const productData: Product = {
         id: selectedProduct ? selectedProduct.id : `prod-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
@@ -3839,7 +3966,8 @@ export default function AdminPage() {
         status: productStatus,
         labels: productLabels || [],
         shippingType: productShippingType || "A",
-        options: productOptions && productOptions.length > 0 ? productOptions : undefined
+        options: productOptions && productOptions.length > 0 ? productOptions : undefined,
+        gradePrices: finalGradePrices,
       };
 
       // Save to Convex Cloud DB (Primary Source of Truth)
@@ -3864,7 +3992,8 @@ export default function AdminPage() {
         status: productData.status,
         labels: productData.labels,
         shippingType: productData.shippingType,
-        options: productData.options
+        options: productData.options,
+        gradePrices: productData.gradePrices,
       });
 
       let updatedProducts: Product[];
@@ -7524,7 +7653,11 @@ export default function AdminPage() {
                               if (typeof window !== "undefined") {
                                 localStorage.setItem("120_owner_logged_in", "true");
                                 localStorage.setItem("120_active_store_id", store.id);
-                                window.open("/portal", "_blank");
+                                const p = (convexPartners || []).find((part: any) => part.id === store.partnerId);
+                                let url = `/portal?storeId=${encodeURIComponent(store.id)}`;
+                                if (store.partnerId) url += `&partnerId=${encodeURIComponent(store.partnerId)}`;
+                                if (p?.grade) url += `&partnerGrade=${encodeURIComponent(String(p.grade))}`;
+                                window.open(url, "_blank");
                               }
                             }}
                             className="px-2.5 py-1.5 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1 font-black text-xs shrink-0"
@@ -7651,7 +7784,11 @@ export default function AdminPage() {
                               if (typeof window !== "undefined") {
                                 localStorage.setItem("120_owner_logged_in", "true");
                                 localStorage.setItem("120_active_store_id", store.id);
-                                window.open("/portal", "_blank");
+                                const p = (convexPartners || []).find((part: any) => part.id === store.partnerId);
+                                let url = `/portal?storeId=${encodeURIComponent(store.id)}`;
+                                if (store.partnerId) url += `&partnerId=${encodeURIComponent(store.partnerId)}`;
+                                if (p?.grade) url += `&partnerGrade=${encodeURIComponent(String(p.grade))}`;
+                                window.open(url, "_blank");
                               }
                             }}
                             className="px-3.5 py-2 rounded-md bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] transition-all cursor-pointer border-0 shadow-2xs flex items-center gap-1.5 font-black text-xs"
@@ -7789,16 +7926,55 @@ export default function AdminPage() {
 
                   {/* Partner List Table */}
                   <div className="bg-white rounded-lg border-0 shadow-md overflow-hidden">
-                    <div className="p-5 border-b border-neutral-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <h3 className="text-sm font-black text-[#0F172A]">등록된 영업 파트너 명단</h3>
+                    <div className="p-5 border-b border-neutral-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <h3 className="text-sm font-black text-[#0F172A]">등록된 영업 파트너 명단</h3>
+                        {/* 레벨 계층 필터 */}
+                        <div className="flex items-center bg-slate-100 p-0.5 rounded-lg text-[11px] font-bold">
+                          <button
+                            type="button"
+                            onClick={() => setPartnerLevelFilter("all")}
+                            className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                              partnerLevelFilter === "all"
+                                ? "bg-white text-slate-900 shadow-2xs"
+                                : "text-slate-500 hover:text-slate-800"
+                            }`}
+                          >
+                            전체 ({convexPartners.length})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPartnerLevelFilter("level1")}
+                            className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                              partnerLevelFilter === "level1"
+                                ? "bg-white text-blue-700 shadow-2xs"
+                                : "text-slate-500 hover:text-slate-800"
+                            }`}
+                          >
+                            최상위 총판 ({convexPartners.filter((p: any) => !p.parentId || p.level === 1).length})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPartnerLevelFilter("sub")}
+                            className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                              partnerLevelFilter === "sub"
+                                ? "bg-white text-purple-700 shadow-2xs"
+                                : "text-slate-500 hover:text-slate-800"
+                            }`}
+                          >
+                            하위 조직 ({convexPartners.filter((p: any) => p.parentId && p.level > 1).length})
+                          </button>
+                        </div>
+                      </div>
+
                       <div className="relative">
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                           type="text"
                           value={partnerSearchQuery}
                           onChange={(e) => setPartnerSearchQuery(e.target.value)}
-                          placeholder="파트너명 / 아이디 / 상호 검색"
-                          className="pl-8 pr-3 py-1.5 bg-[#F1F4F8] border-0 rounded-lg text-xs font-medium text-[#0F172A] w-52 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
+                          placeholder="파트너명 / ID / 상호 / 연락처 검색"
+                          className="pl-8 pr-3 py-1.5 bg-[#F1F4F8] border-0 rounded-lg text-xs font-medium text-[#0F172A] w-56 focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
                         />
                       </div>
                     </div>
@@ -7812,7 +7988,9 @@ export default function AdminPage() {
                         <table className="w-full text-left text-xs">
                           <thead>
                             <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
-                              <th className="py-3 px-4">파트너 정보</th>
+                              <th className="py-3 px-4">파트너 및 계층 직급</th>
+                              <th className="py-3 px-3">소속 상위 파트너</th>
+                              <th className="py-3 px-3 text-center">직속 하위 파트너</th>
                               <th className="py-3 px-3">연락처 / 이메일</th>
                               <th className="py-3 px-3">정산 입금 계좌</th>
                               <th className="py-3 px-3 text-center">유치 가맹점</th>
@@ -7827,93 +8005,187 @@ export default function AdminPage() {
                             {(convexPartners || [])
                               .filter((p: any) => {
                                 if (!p) return false;
+                                if (partnerLevelFilter === "level1" && (p.parentId || (p.level && p.level > 1))) return false;
+                                if (partnerLevelFilter === "sub" && (!p.parentId || p.level === 1)) return false;
+
                                 const q = (partnerSearchQuery || "").trim().toLowerCase();
                                 if (!q) return true;
                                 return (
                                   (p.name || "").toLowerCase().includes(q) ||
                                   (p.id || "").toLowerCase().includes(q) ||
                                   (p.companyName || "").toLowerCase().includes(q) ||
-                                  (p.phone || "").includes(q)
+                                  (p.phone || "").includes(q) ||
+                                  (p.tierName || "").toLowerCase().includes(q) ||
+                                  (`${p.grade || 1}등급`).includes(q) ||
+                                  getPartnerGradeName(p.grade).toLowerCase().includes(q) ||
+                                  (p.parentPartner?.name || "").toLowerCase().includes(q)
                                 );
                               })
-                              .map((partner: any) => (
-                                <tr key={partner.id} className="hover:bg-slate-50/80 transition-colors">
-                                  <td className="py-3.5 px-4">
-                                    <div className="font-black text-[#0F172A] text-sm flex items-center gap-1.5">
-                                      <span>{partner.name}</span>
-                                      {partner.companyName && (
-                                        <span className="text-xs text-slate-400 font-normal">({partner.companyName})</span>
+                              .map((partner: any) => {
+                                const isTopLevel = !partner.parentId || partner.level === 1;
+                                return (
+                                  <tr 
+                                    key={partner.id} 
+                                    className={`transition-colors border-b ${
+                                      isTopLevel 
+                                        ? "bg-white hover:bg-slate-50/80 border-neutral-100" 
+                                        : "bg-purple-50/30 hover:bg-purple-50/60 border-purple-100/80 border-l-[4px] border-l-purple-500"
+                                    }`}
+                                  >
+                                    <td className="py-3.5 px-4">
+                                      {isTopLevel ? (
+                                        <div>
+                                          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                                            <span className="inline-flex items-center justify-center font-black text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                              Lv.{partner.level || 1} {partner.tierName || "총판(1차)"}
+                                            </span>
+                                            <span className="inline-flex items-center justify-center font-extrabold text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300">
+                                              {getPartnerGradeName(partner.grade)}
+                                            </span>
+                                          </div>
+                                          <div className="font-black text-[#0F172A] text-sm flex items-center gap-1.5">
+                                            <span>{partner.name}</span>
+                                            {partner.companyName && (
+                                              <span className="text-xs text-slate-400 font-normal">({partner.companyName})</span>
+                                            )}
+                                          </div>
+                                          <div className="text-[11px] text-slate-500 mt-0.5 font-mono">
+                                            ID: <span className="font-bold text-slate-700">{partner.id}</span>
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-start gap-2 pl-3 sm:pl-6">
+                                          <CornerDownRight size={15} className="text-purple-500 shrink-0 mt-1" />
+                                          <div>
+                                            <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                                              <span className="inline-flex items-center justify-center font-black text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+                                                Lv.{partner.level || 2} {partner.tierName || "지사(2차)"}
+                                              </span>
+                                              <span className="inline-flex items-center justify-center font-extrabold text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300">
+                                                {getPartnerGradeName(partner.grade)}
+                                              </span>
+                                              <span className="text-[10px] text-purple-700 bg-purple-50 border border-purple-200 px-1.5 py-0.2 rounded font-bold">
+                                                {partner.parentPartner?.name || "상위"} 산하
+                                              </span>
+                                            </div>
+                                            <div className="font-black text-[#0F172A] text-sm flex items-center gap-1.5">
+                                              <span>{partner.name}</span>
+                                              {partner.companyName && (
+                                                <span className="text-xs text-slate-400 font-normal">({partner.companyName})</span>
+                                              )}
+                                            </div>
+                                            <div className="text-[11px] text-slate-500 mt-0.5 font-mono">
+                                              ID: <span className="font-bold text-slate-700">{partner.id}</span>
+                                            </div>
+                                          </div>
+                                        </div>
                                       )}
-                                    </div>
-                                    <div className="text-[11px] text-blue-600 font-bold">
-                                      ID: {partner.id} (PW: {partner.pw})
-                                    </div>
-                                  </td>
-                                  <td className="py-3.5 px-3">
-                                    <div className="text-slate-700 font-bold">{partner.phone}</div>
-                                    <div className="text-[11px] text-slate-400">{partner.email || "-"}</div>
-                                  </td>
-                                  <td className="py-3.5 px-3">
-                                    <div className="font-bold text-slate-800">
-                                      {partner.bankName || "은행미등록"}{" "}
-                                      <span className="font-normal">{partner.accountNumber || "-"}</span>
-                                    </div>
-                                    <div className="text-[11px] text-slate-400">
-                                      예금주: {partner.accountHolder || partner.name}
-                                    </div>
-                                  </td>
-                                  <td className="py-3.5 px-3 text-center">
-                                    <span className="inline-block px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-black text-xs border border-blue-100">
-                                      {partner.storesCount || 0} 개점
-                                    </span>
-                                  </td>
-                                  <td className="py-3.5 px-3 text-right font-black text-amber-600">
-                                    {partner.currentMonthBoxes || 0} 박스
-                                  </td>
-                                  <td className="py-3.5 px-3 text-right font-black text-[#0F172A] text-sm">
-                                    {(partner.currentMonthCommission || 0).toLocaleString()} 원
-                                  </td>
-                                  <td className="py-3.5 px-3 text-center">
-                                    <span
-                                      className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold ${
-                                        partner.status === "활동중"
-                                          ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
-                                          : partner.status === "대기"
-                                          ? "bg-amber-50 text-amber-600 border border-amber-200"
-                                          : "bg-slate-100 text-slate-500 border border-slate-200"
-                                      }`}
-                                    >
-                                      {partner.status}
-                                    </span>
-                                  </td>
-                                  <td className="py-3.5 px-3 text-slate-400">{partner.regDate}</td>
-                                  <td className="py-3.5 px-4 text-center">
-                                    <div className="flex items-center justify-center gap-1.5">
-                                      <button
-                                        onClick={() => window.open(`/partner?partnerId=${partner.id}`, '_blank')}
-                                        className="px-2.5 py-1 bg-amber-50 hover:bg-[#FED422] text-[#0F172A] rounded text-xs font-black transition-all border border-amber-200 cursor-pointer flex items-center gap-1"
-                                        title="해당 파트너 계정으로 로그인된 어드민 포털 열기"
+                                    </td>
+
+                                    {/* 상위 파트너 정보 */}
+                                    <td className="py-3.5 px-3">
+                                      {partner.parentPartner ? (
+                                        <div className="p-1.5 rounded-lg bg-purple-50/80 border border-purple-100 inline-block">
+                                          <div className="font-bold text-purple-700 flex items-center gap-1 text-xs">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0"></span>
+                                            <span>{partner.parentPartner.name}</span>
+                                            {partner.parentPartner.companyName && (
+                                              <span className="text-[10px] text-slate-400 font-normal">({partner.parentPartner.companyName})</span>
+                                            )}
+                                          </div>
+                                          <div className="text-[10px] text-purple-600/80 font-mono mt-0.5">
+                                            상위 ID: {partner.parentPartner.id}
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <span className="inline-block px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-bold">
+                                          최상위 파트너
+                                        </span>
+                                      )}
+                                    </td>
+
+                                    {/* 직속 하위 파트너 */}
+                                    <td className="py-3.5 px-3 text-center">
+                                      {partner.subPartnersCount > 0 ? (
+                                        <div>
+                                          <span className="inline-block px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 font-extrabold text-[11px] border border-purple-300">
+                                            하위 {partner.subPartnersCount}명
+                                          </span>
+                                          <div className="text-[10px] text-purple-700 font-semibold mt-1 truncate max-w-[130px] mx-auto" title={(partner.childPartners || []).map((c: any) => c.name).join(", ")}>
+                                            {(partner.childPartners || []).map((c: any) => `ㄴ ${c.name}`).join(", ")}
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <span className="text-slate-300 text-xs">-</span>
+                                      )}
+                                    </td>
+
+                                    <td className="py-3.5 px-3">
+                                      <div className="text-slate-700 font-bold">{partner.phone}</div>
+                                      <div className="text-[11px] text-slate-400">{partner.email || "-"}</div>
+                                    </td>
+                                    <td className="py-3.5 px-3">
+                                      <div className="font-bold text-slate-800">
+                                        {partner.bankName || "은행미등록"}{" "}
+                                        <span className="font-normal">{partner.accountNumber || "-"}</span>
+                                      </div>
+                                      <div className="text-[11px] text-slate-400">
+                                        예금주: {partner.accountHolder || partner.name}
+                                      </div>
+                                    </td>
+                                    <td className="py-3.5 px-3 text-center">
+                                      <span className="inline-block px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-black text-xs border border-blue-100">
+                                        {partner.storesCount || 0} 개점
+                                      </span>
+                                    </td>
+                                    <td className="py-3.5 px-3 text-right font-black text-amber-600">
+                                      {partner.currentMonthBoxes || 0} 박스
+                                    </td>
+                                    <td className="py-3.5 px-3 text-right font-black text-[#0F172A] text-sm">
+                                      {(partner.currentMonthCommission || 0).toLocaleString()} 원
+                                    </td>
+                                    <td className="py-3.5 px-3 text-center">
+                                      <span
+                                        className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold ${
+                                          partner.status === "활동중"
+                                            ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                                            : partner.status === "대기"
+                                            ? "bg-amber-50 text-amber-600 border border-amber-200"
+                                            : "bg-slate-100 text-slate-500 border border-slate-200"
+                                        }`}
                                       >
-                                        <ExternalLink size={12} />
-                                        <span>어드민</span>
-                                      </button>
-                                      <button
-                                        onClick={() => handleOpenPartnerModal(partner)}
-                                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-bold transition-all border-0 cursor-pointer"
-                                      >
-                                        수정
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeletePartner(partner.id, partner.name)}
-                                        className="p-1 bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded transition-all border-0 cursor-pointer"
-                                        title="삭제"
-                                      >
-                                        <Trash2 size={14} />
-                                      </button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
+                                        {partner.status}
+                                      </span>
+                                    </td>
+                                    <td className="py-3.5 px-3 text-slate-400">{partner.regDate}</td>
+                                    <td className="py-3.5 px-4 text-center">
+                                      <div className="flex items-center justify-center gap-1.5">
+                                        <button
+                                          onClick={() => window.open(`/partner?partnerId=${partner.id}`, '_blank')}
+                                          className="px-2.5 py-1 bg-amber-50 hover:bg-[#FED422] text-[#0F172A] rounded text-xs font-black transition-all border border-amber-200 cursor-pointer flex items-center gap-1"
+                                          title="해당 파트너 계정으로 로그인된 어드민 포털 열기"
+                                        >
+                                          <ExternalLink size={12} />
+                                          <span>어드민</span>
+                                        </button>
+                                        <button
+                                          onClick={() => handleOpenPartnerModal(partner)}
+                                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-bold transition-all border-0 cursor-pointer"
+                                        >
+                                          수정
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeletePartner(partner.id, partner.name)}
+                                          className="p-1 bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded transition-all border-0 cursor-pointer"
+                                          title="삭제"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
                           </tbody>
                         </table>
                       </div>
@@ -8589,8 +8861,15 @@ export default function AdminPage() {
                               </td>
                               <td className="p-4 sm:p-5 text-slate-600 font-bold">{(p.supplyPrice || 0).toLocaleString()} 원</td>
                               <td className="p-4 sm:p-5">
-                                <div className="text-slate-400 font-bold line-through text-[10px]">{(p.price || 0).toLocaleString()} 원</div>
-                                <div className="text-[#0F172A] font-black text-xs">{(p.discountedPrice || 0).toLocaleString()} 원</div>
+                                 <div className="text-slate-400 font-bold line-through text-[10px]">{(p.price || 0).toLocaleString()} 원</div>
+                                 <div className="text-[#0F172A] font-black text-xs">{(p.discountedPrice && p.discountedPrice > 0 ? p.discountedPrice : (p.price || p.supplyPrice || 0)).toLocaleString()} 원</div>
+                                {p.gradePrices && Object.keys(p.gradePrices).length > 0 && (
+                                  <div className="mt-1">
+                                    <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-800 bg-amber-100/90 px-1.5 py-0.5 rounded border border-amber-300 whitespace-nowrap">
+                                      등급차등 {Object.keys(p.gradePrices).length}개
+                                    </span>
+                                  </div>
+                                )}
                               </td>
                               <td className="p-4 sm:p-5">
                                 {(() => {
@@ -13057,6 +13336,83 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                {/* 파트너 등급별 차등 판매가 설정 (스탠다드 ~ VIP) */}
+                <div className="bg-gradient-to-br from-amber-50/70 to-orange-50/50 p-4 rounded-xl border border-amber-200/90 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-900">파트너 등급별 차등 판매가 설정 (스탠다드 ~ VIP)</span>
+                      <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-extrabold">
+                        선택 옵션
+                      </span>
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <span className="text-xs font-semibold text-slate-700">
+                        {useGradePricing ? "파트너 등급별 단가 사용 중" : "기본 단가 동일 적용 (미사용)"}
+                      </span>
+                      <input 
+                        type="checkbox"
+                        checked={useGradePricing}
+                        onChange={(e) => handleToggleGradePricing(e.target.checked)}
+                        className="w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-400 cursor-pointer"
+                      />
+                    </label>
+                  </div>
+
+                  {useGradePricing ? (
+                    <div className="space-y-3 pt-2 border-t border-amber-200/60">
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        영업 파트너 등급(스탠다드, 프로, 엘리트, 마스터, VIP)에 따라 해당 파트너가 유치한 가맹점주에게 적용될 자재 단가를 개별 입력할 수 있습니다.
+                        <br />
+                        <span className="text-amber-800 font-bold">* 특정 등급을 비워두거나 변경하지 않으면 기본 설정 가격({getCalculatedDiscountedPrice().toLocaleString()}원)이 자동 적용됩니다.</span>
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-5 gap-2.5">
+                        {[1, 2, 3, 4, 5].map((g) => {
+                          const gInfo = PARTNER_GRADES[g];
+                          return (
+                            <div key={g} className="bg-white p-3 rounded-lg border border-amber-200/80 shadow-2xs flex flex-col gap-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-bold text-slate-800">{gInfo.name} 판매가</span>
+                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-extrabold">
+                                  {gInfo.enName}
+                                </span>
+                              </div>
+                              <div className="relative mt-1">
+                                <input 
+                                  type="text"
+                                  placeholder={getCalculatedDiscountedPrice().toLocaleString()}
+                                  value={productGradePrices[String(g)] || ""}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setProductGradePrices((prev) => ({
+                                      ...prev,
+                                      [String(g)]: formatNumberWithCommas(val)
+                                    }));
+                                  }}
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-md px-2.5 py-1.5 text-xs text-slate-900 text-right font-bold focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
+                                />
+                              </div>
+                              <div className="text-[10px] text-right mt-0.5 font-medium">
+                                {(() => {
+                                  const curVal = parseNumberFromCommas(productGradePrices[String(g)] || "");
+                                  const basePrice = getCalculatedDiscountedPrice() || parseNumberFromCommas(productPrice) || parseNumberFromCommas(productSupplyPrice) || 0;
+                                  if (curVal > 0 && curVal !== basePrice) {
+                                    return <span className="text-purple-600 font-bold">{curVal.toLocaleString()}원 (차등 단가)</span>;
+                                  }
+                                  return <span className="text-slate-500">{(curVal > 0 ? curVal : basePrice).toLocaleString()}원 (기본가)</span>;
+                                })()}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-500">
+                      체크박스를 활성화하면 파트너의 등급(스탠다드 ~ VIP)별로 가맹점에 판매할 자재 단가를 각각 다르게 지정할 수 있습니다.
+                    </p>
+                  )}
+                </div>
+
                 <div className="flex flex-col gap-1.5 bg-slate-50 p-4 rounded-xl border border-slate-200/70 space-y-1">
                   <label className="text-xs font-semibold text-slate-800 flex items-center justify-between">
                     <span>🚚 배송비 정책 선택 <span className="text-red-500">*</span></span>
@@ -13895,6 +14251,269 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* 상위 파트너 및 레벨(계층) 설정 */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900">상위 파트너 및 계층 레벨</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      partnerFormParentId
+                        ? "bg-purple-50 text-purple-700 border border-purple-200"
+                        : "bg-blue-50 text-blue-700 border border-blue-200"
+                    }`}>
+                      {partnerFormParentId ? `하위 파트너 (${partnerFormTierName})` : "최상위 총판 (1차 파트너)"}
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                    조직 계층 관리
+                  </span>
+                </div>
+
+                {/* 상위 파트너 선택 상태 */}
+                <div className="space-y-3">
+                  <label className="text-xs font-semibold text-slate-700 block">
+                    소속 상위 파트너 지정
+                    <span className="text-[11px] text-slate-400 font-normal ml-2">
+                      (지정 시 해당 상위 파트너가 본 파트너의 가맹점 및 영업 활동을 모니터링할 수 있습니다)
+                    </span>
+                  </label>
+
+                  {partnerFormParentId ? (
+                    (() => {
+                      const parent = (convexPartners || []).find((p: any) => p.id === partnerFormParentId);
+                      return (
+                        <div className="p-3.5 rounded-xl bg-purple-50/70 border border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
+                              Lv.{parent?.level || 1}
+                            </div>
+                            <div>
+                              <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                <span>{parent?.name || partnerFormParentId}</span>
+                                {parent?.companyName && (
+                                  <span className="text-[11px] text-slate-500 font-normal">({parent.companyName})</span>
+                                )}
+                                <span className="text-[10px] bg-purple-200 text-purple-800 px-1.5 py-0.5 rounded font-bold">
+                                  {parent?.tierName || "총판(1차)"}
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-purple-700 font-medium mt-0.5">
+                                상위 ID: <span className="font-bold">{partnerFormParentId}</span> | 연락처: {parent?.phone || "-"}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 self-end sm:self-auto">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPartnerFormParentId("");
+                                setPartnerFormLevel(1);
+                                setPartnerFormTierName("총판(1차)");
+                              }}
+                              className="px-3 py-1.5 bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                            >
+                              상위 해제 (최상위로 변경)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setIsParentSearchDropdownOpen(!isParentSearchDropdownOpen)}
+                              className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs border-0"
+                            >
+                              다른 상위 검색
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0"></span>
+                        <div>
+                          <div className="text-xs font-bold text-slate-800">최상위 파트너 (상위 파트너 없음)</div>
+                          <div className="text-[11px] text-slate-400 mt-0.5">
+                            본 파트너는 1차 총판/본부 자격으로 등록되며 하위 파트너들을 직속으로 둘 수 있습니다.
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsParentSearchDropdownOpen(!isParentSearchDropdownOpen)}
+                        className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 border-0 flex items-center justify-center gap-1.5"
+                      >
+                        <Search size={13} />
+                        <span>상위 파트너 검색 지정</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* 상위 파트너 검색 드롭다운/입력 UI */}
+                  {isParentSearchDropdownOpen && (
+                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 animate-fadeIn">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                          <Search size={14} className="text-amber-500" />
+                          <span>상위 파트너 검색</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setIsParentSearchDropdownOpen(false)}
+                          className="text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
+                        >
+                          닫기
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={partnerParentSearchQuery}
+                        onChange={(e) => setPartnerParentSearchQuery(e.target.value)}
+                        placeholder="파트너명 / ID / 상호명 / 연락처 검색..."
+                        className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
+                        autoFocus
+                      />
+
+                      <div className="max-h-48 overflow-y-auto space-y-1.5 border border-slate-200 bg-white rounded-lg p-1.5 divide-y divide-slate-100">
+                        {(convexPartners || [])
+                          .filter((p: any) => {
+                            if (!p) return false;
+                            if (p.id === partnerFormId) return false; // 본인 제외
+                            if (!partnerParentSearchQuery.trim()) return true;
+                            const q = partnerParentSearchQuery.trim().toLowerCase();
+                            return (
+                              (p.name || "").toLowerCase().includes(q) ||
+                              (p.id || "").toLowerCase().includes(q) ||
+                              (p.companyName || "").toLowerCase().includes(q) ||
+                              (p.phone || "").includes(q)
+                            );
+                          })
+                          .map((p: any) => (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => {
+                                setPartnerFormParentId(p.id);
+                                const newLevel = (p.level || 1) + 1;
+                                setPartnerFormLevel(newLevel);
+                                setPartnerFormTierName(
+                                  newLevel === 2 ? "지사(2차)" : newLevel === 3 ? "대리점(3차)" : `${newLevel}차 파트너`
+                                );
+                                setIsParentSearchDropdownOpen(false);
+                                setPartnerParentSearchQuery("");
+                              }}
+                              className={`w-full p-2.5 rounded-md text-left flex items-center justify-between hover:bg-purple-50 transition-colors cursor-pointer ${
+                                partnerFormParentId === p.id ? "bg-purple-50 border border-purple-200" : ""
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[10px]">
+                                  Lv.{p.level || 1}
+                                </span>
+                                <div>
+                                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                    <span>{p.name}</span>
+                                    {p.companyName && (
+                                      <span className="text-[11px] text-slate-400 font-normal">({p.companyName})</span>
+                                    )}
+                                    <span className="text-[10px] text-purple-700 bg-purple-100 px-1.5 py-0.2 rounded font-bold">
+                                      {p.tierName || "총판"}
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] text-slate-400">
+                                    ID: <span className="font-semibold text-slate-600">{p.id}</span> | {p.phone}
+                                  </div>
+                                </div>
+                              </div>
+                              <span className="text-xs font-bold text-purple-600 shrink-0">
+                                {partnerFormParentId === p.id ? "선택됨" : "선택"}
+                              </span>
+                            </button>
+                          ))}
+
+                        {(convexPartners || []).filter((p: any) => p.id !== partnerFormId).length === 0 && (
+                          <div className="p-4 text-center text-xs text-slate-400">
+                            지정 가능한 다른 파트너가 없습니다.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 계층 레벨 및 직급명 직접 조정 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 border-t border-slate-100">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">파트너 레벨 (계층 단계)</label>
+                    <select
+                      value={partnerFormLevel}
+                      onChange={(e) => {
+                        const lvl = Number(e.target.value);
+                        setPartnerFormLevel(lvl);
+                        if (lvl === 1) setPartnerFormTierName("총판(1차)");
+                        else if (lvl === 2) setPartnerFormTierName("지사(2차)");
+                        else if (lvl === 3) setPartnerFormTierName("대리점(3차)");
+                        else setPartnerFormTierName(`${lvl}차 파트너`);
+                      }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none cursor-pointer"
+                    >
+                      <option value={1}>Lv.1 - 최상위 총판 / 본부</option>
+                      <option value={2}>Lv.2 - 2차 지사 / 에이전시</option>
+                      <option value={3}>Lv.3 - 3차 대리점 / 영업팀</option>
+                      <option value={4}>Lv.4 - 4차 파트너 / 매니저</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">직급 / 티어 표시명</label>
+                    <input 
+                      type="text"
+                      value={partnerFormTierName}
+                      onChange={(e) => setPartnerFormTierName(e.target.value)}
+                      placeholder="예: 총판(1차), 수도권지사, 영업팀장"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* 파트너 단가 등급 (자재 단가 정책 구분) */}
+                <div className="pt-3 border-t border-slate-100 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <span>파트너 자재 단가 정책 등급</span>
+                      <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-extrabold border border-amber-300">
+                        {getPartnerGradeName(partnerFormGrade)}
+                      </span>
+                    </label>
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      * 계층 레벨과 별개로 자재 공급 단가를 다르게 책정하는 파트너십 등급입니다
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-5 gap-2">
+                    {[1, 2, 3, 4, 5].map((gradeNum) => {
+                      const gInfo = PARTNER_GRADES[gradeNum];
+                      return (
+                        <button
+                          key={gradeNum}
+                          type="button"
+                          onClick={() => setPartnerFormGrade(gradeNum)}
+                          className={`py-2 px-3 rounded-lg border text-xs font-bold transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
+                            partnerFormGrade === gradeNum
+                              ? "bg-[#FED422] text-[#0F172A] border-[#e5be1f] shadow-xs ring-2 ring-amber-400/40"
+                              : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                          }`}
+                        >
+                          <span className="text-xs font-black">{gInfo.name}</span>
+                          <span className={`text-[10px] font-normal ${partnerFormGrade === gradeNum ? "text-[#0F172A]/80 font-bold" : "text-slate-400"}`}>
+                            {gInfo.enName}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[11px] text-slate-500 bg-amber-50/50 p-2.5 rounded-lg border border-amber-200/60 leading-relaxed">
+                    💡 이 파트너가 유치한 가맹점주가 발주몰(/portal)에서 자재 주문 시, 자재 제품에 <strong className="text-amber-900 font-bold">[{getPartnerGradeName(partnerFormGrade)} 단가]</strong>가 책정되어 있으면 해당 우대 단가로 자동 적용되어 구매하게 됩니다. (미설정 품목은 기본 할인가 적용)
+                  </p>
+                </div>
+              </div>
+
               {/* 기본 정보 */}
               <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -13920,8 +14539,9 @@ export default function AdminPage() {
                     <input 
                       type="text"
                       value={partnerFormPhone}
-                      onChange={(e) => setPartnerFormPhone(e.target.value)}
+                      onChange={(e) => setPartnerFormPhone(formatPhoneNumber(e.target.value))}
                       placeholder="010-0000-0000"
+                      maxLength={13}
                       required
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />

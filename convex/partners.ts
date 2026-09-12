@@ -71,7 +71,7 @@ export function isSettlementEligibleOrder(order: any): boolean {
   return true;
 }
 
-// 1. 전체 파트너 리스트 조회 (유치 가맹점 수, 당월/누적 생지 박스 수 및 수수료 집계 포함)
+// 1. 전체 파트너 리스트 조회 (유치 가맹점 수, 당월/누적 생지 박스 수 및 수수료 집계 + 상위/하위 파트너 계층 정보 포함)
 export const get = query({
   args: {},
   handler: async (ctx) => {
@@ -81,6 +81,8 @@ export const get = query({
 
     const now = new Date();
     const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    const partnerMap = new Map(partners.map((p) => [p.id, p]));
 
     const results = partners.map((p) => {
       // 해당 파트너가 유치한 가맹점들
@@ -117,8 +119,44 @@ export const get = query({
       const totalCommission = totalBoxes * commissionUnit;
       const currentMonthCommission = currentMonthBoxes * commissionUnit;
 
+      // 상위 파트너 정보 매핑
+      const parentPartner = p.parentId ? partnerMap.get(p.parentId) : null;
+      const parentInfo = parentPartner
+        ? {
+            id: parentPartner.id,
+            name: parentPartner.name,
+            companyName: parentPartner.companyName,
+            level: parentPartner.level || 1,
+            tierName: parentPartner.tierName || "총판(1차)",
+          }
+        : null;
+
+      // 직속 하위 파트너들
+      const directChildren = partners
+        .filter((sub) => sub.parentId === p.id)
+        .map((sub) => ({
+          id: sub.id,
+          name: sub.name,
+          companyName: sub.companyName,
+          level: sub.level || (p.level ? p.level + 1 : 2),
+          tierName: sub.tierName || "지사(2차)",
+          status: sub.status,
+          phone: sub.phone,
+        }));
+
+      const computedLevel = p.level || (p.parentId ? 2 : 1);
+      const computedTierName =
+        p.tierName ||
+        (computedLevel === 1 ? "총판(1차)" : computedLevel === 2 ? "지사(2차)" : `${computedLevel}차 파트너`);
+
       return {
         ...p,
+        level: computedLevel,
+        tierName: computedTierName,
+        grade: p.grade || 1,
+        parentPartner: parentInfo,
+        subPartnersCount: directChildren.length,
+        childPartners: directChildren,
         storesCount: myStores.length,
         totalBoxes,
         currentMonthBoxes,
@@ -127,7 +165,44 @@ export const get = query({
       };
     });
 
-    return results.sort((a, b) => b.regDate.localeCompare(a.regDate));
+    // 4) 트리 계층 순서로 재배열 (최상위 파트너 바로 밑에 해당 하위 파트너들이 재귀적으로 붙도록)
+    const topLevelPartners = results
+      .filter((p) => !p.parentId || p.level === 1)
+      .sort((a, b) => b.regDate.localeCompare(a.regDate));
+
+    const childrenMap = new Map<string, typeof results>();
+    for (const p of results) {
+      if (p.parentId && p.level !== 1) {
+        const list = childrenMap.get(p.parentId) || [];
+        list.push(p);
+        childrenMap.set(p.parentId, list);
+      }
+    }
+
+    const treeOrdered: typeof results = [];
+    const traverse = (parent: any) => {
+      treeOrdered.push(parent);
+      const children = (childrenMap.get(parent.id) || []).sort(
+        (a, b) => (a.level || 1) - (b.level || 1) || b.regDate.localeCompare(a.regDate)
+      );
+      for (const child of children) {
+        traverse(child);
+      }
+    };
+
+    for (const top of topLevelPartners) {
+      traverse(top);
+    }
+
+    // 혹시 상위 파트너 ID가 삭제되었거나 매핑되지 않은 고아 하위 파트너가 있다면 뒤에 추가
+    const addedIds = new Set(treeOrdered.map((p) => p.id));
+    for (const p of results) {
+      if (!addedIds.has(p.id)) {
+        treeOrdered.push(p);
+      }
+    }
+
+    return treeOrdered;
   },
 });
 
@@ -135,14 +210,46 @@ export const get = query({
 export const getById = query({
   args: { id: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const partner = await ctx.db
       .query("partners")
       .withIndex("by_partner_id", (q) => q.eq("id", args.id))
       .first();
+
+    if (!partner) return null;
+
+    let parentInfo = null;
+    if (partner.parentId) {
+      const parent = await ctx.db
+        .query("partners")
+        .withIndex("by_partner_id", (q) => q.eq("id", partner.parentId!))
+        .first();
+      if (parent) {
+        parentInfo = {
+          id: parent.id,
+          name: parent.name,
+          companyName: parent.companyName,
+          level: parent.level || 1,
+          tierName: parent.tierName || "총판(1차)",
+        };
+      }
+    }
+
+    const computedLevel = partner.level || (partner.parentId ? 2 : 1);
+    const computedTierName =
+      partner.tierName ||
+      (computedLevel === 1 ? "총판(1차)" : computedLevel === 2 ? "지사(2차)" : `${computedLevel}차 파트너`);
+
+    return {
+      ...partner,
+      level: computedLevel,
+      tierName: computedTierName,
+      grade: partner.grade || 1,
+      parentPartner: parentInfo,
+    };
   },
 });
 
-// 3. 파트너 신규 등록 또는 정보 수정 (본사 어드민용)
+// 3. 파트너 신규 등록 또는 정보 수정 (본사 어드민용 - 상위 파트너 및 레벨 지정 포함)
 export const createOrUpdate = mutation({
   args: {
     id: v.string(), // 로그인 ID
@@ -158,8 +265,41 @@ export const createOrUpdate = mutation({
     status: v.string(), // "활동중" | "대기" | "정지"
     regDate: v.string(), // YYYY-MM-DD
     memo: v.optional(v.string()),
+    parentId: v.optional(v.string()), // 상위 파트너 ID
+    level: v.optional(v.number()), // 파트너 레벨 (1, 2, 3...)
+    tierName: v.optional(v.string()), // 직급/티어명 (예: "총판", "지사", "대리점")
+    grade: v.optional(v.number()), // 파트너 가격 정책 등급 (1~5등급)
   },
   handler: async (ctx, args) => {
+    // 본인을 상위 파트너로 지정하는 순환 오류 방어
+    const safeParentId = args.parentId && args.parentId !== args.id ? args.parentId : undefined;
+
+    let computedLevel = args.level;
+    let computedTierName = args.tierName;
+
+    if (safeParentId) {
+      const parent = await ctx.db
+        .query("partners")
+        .withIndex("by_partner_id", (q) => q.eq("id", safeParentId))
+        .first();
+
+      if (parent) {
+        const parentLevel = parent.level || 1;
+        computedLevel = computedLevel || parentLevel + 1;
+      } else {
+        computedLevel = computedLevel || 2;
+      }
+
+      if (!computedTierName || computedTierName.trim() === "") {
+        computedTierName = computedLevel === 2 ? "지사(2차)" : computedLevel === 3 ? "대리점(3차)" : `${computedLevel}차 파트너`;
+      }
+    } else {
+      computedLevel = computedLevel || 1;
+      if (!computedTierName || computedTierName.trim() === "") {
+        computedTierName = "총판(1차)";
+      }
+    }
+
     const existing = await ctx.db
       .query("partners")
       .withIndex("by_partner_id", (q) => q.eq("id", args.id))
@@ -181,6 +321,10 @@ export const createOrUpdate = mutation({
       status: args.status,
       regDate: args.regDate,
       memo: args.memo,
+      parentId: safeParentId,
+      level: computedLevel,
+      tierName: computedTierName,
+      grade: args.grade || 1,
     };
 
     if (existing) {
@@ -588,7 +732,274 @@ export const updatePartnerProfile = mutation({
   },
 });
 
-// 12. 초기 파트너 및 가맹점 매핑 시드 데이터 생성
+// 12. 특정 파트너의 하위 파트너 목록 조회 (직속 및 하위 전체 재귀 탐색)
+export const getSubPartners = query({
+  args: { partnerId: v.string() },
+  handler: async (ctx, args) => {
+    const allPartners = await ctx.db.query("partners").collect();
+    const partnerMap = new Map(allPartners.map((p) => [p.id, p]));
+
+    const subPartners: any[] = [];
+    const queue = [args.partnerId];
+    const visited = new Set<string>([args.partnerId]);
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      const directChildren = allPartners.filter((p) => p.parentId === currentId);
+      for (const child of directChildren) {
+        if (!visited.has(child.id)) {
+          visited.add(child.id);
+          const parent = child.parentId ? partnerMap.get(child.parentId) : null;
+          const computedLevel = child.level || (parent?.level ? parent.level + 1 : 2);
+          const computedTierName =
+            child.tierName ||
+            (computedLevel === 2 ? "지사(2차)" : computedLevel === 3 ? "대리점(3차)" : `${computedLevel}차 파트너`);
+
+          subPartners.push({
+            ...child,
+            level: computedLevel,
+            tierName: computedTierName,
+            isDirectChild: child.parentId === args.partnerId,
+            parentName: parent?.name || "상위 파트너",
+          });
+          queue.push(child.id);
+        }
+      }
+    }
+
+    return subPartners.sort((a, b) => (a.level || 1) - (b.level || 1) || b.regDate.localeCompare(a.regDate));
+  },
+});
+
+// 13. 상위 파트너 전용: 하위 파트너들의 활동 종합 모니터링 쿼리 (가맹점 유치, 주문/발주, 상담, 실적)
+export const getSubPartnerActivities = query({
+  args: { partnerId: v.string() },
+  handler: async (ctx, args) => {
+    const allPartners = await ctx.db.query("partners").collect();
+    const partnerMap = new Map(allPartners.map((p) => [p.id, p]));
+
+    // 1) 하위 파트너 추출 (직속 및 하위 전체 재귀)
+    const subPartners: any[] = [];
+    const queue = [args.partnerId];
+    const visited = new Set<string>([args.partnerId]);
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      const directChildren = allPartners.filter((p) => p.parentId === currentId);
+      for (const child of directChildren) {
+        if (!visited.has(child.id)) {
+          visited.add(child.id);
+          subPartners.push(child);
+          queue.push(child.id);
+        }
+      }
+    }
+
+    if (subPartners.length === 0) {
+      return {
+        subPartners: [],
+        stores: [],
+        orders: [],
+        inquiries: [],
+        summary: {
+          subPartnerCount: 0,
+          totalStoresCount: 0,
+          currentMonthBoxes: 0,
+          totalBoxes: 0,
+          inquiryCount: 0,
+        },
+      };
+    }
+
+    const subPartnerIds = new Set(subPartners.map((p) => p.id));
+    const subPartnerMap = new Map(subPartners.map((p) => [p.id, p]));
+
+    // 2) 가맹점 및 주문 데이터
+    const allStores = await ctx.db.query("stores").collect();
+    const allOrders = await ctx.db.query("orders").collect();
+    const allInquiries = await ctx.db.query("inquiries").collect();
+
+    const now = new Date();
+    const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    // 하위 파트너 ID 집합
+    const subStoreIdToPartnerMap = new Map<string, any>();
+
+    // 2-1) 하위 파트너 가맹점들의 전체 주문/구매 내역 추출
+    let currentMonthBoxesSum = 0;
+    let totalBoxesSum = 0;
+
+    const subStoresRaw = allStores.filter((s) => s.partnerId && subPartnerIds.has(s.partnerId));
+    const subStoreIds = new Set(subStoresRaw.map((s) => s.id));
+
+    for (const s of subStoresRaw) {
+      const ownerPartner = subPartnerMap.get(s.partnerId!);
+      subStoreIdToPartnerMap.set(s.id, {
+        storeName: s.name,
+        storeOwner: s.owner,
+        storePhone: s.phone,
+        partnerId: s.partnerId,
+        partnerName: ownerPartner?.name || "하위 파트너",
+        partnerCompany: ownerPartner?.companyName || "",
+        partnerPhone: ownerPartner?.phone || "",
+        partnerLevel: ownerPartner?.level || 2,
+        partnerTierName: ownerPartner?.tierName || "지사(2차)",
+      });
+    }
+
+    const subOrders = allOrders
+      .filter((o) => o.storeId && subStoreIds.has(o.storeId))
+      .map((ord) => {
+        const storeInfo = subStoreIdToPartnerMap.get(ord.storeId || "") || {};
+        const isEligible = isSettlementEligibleOrder(ord);
+
+        let rawDoughBoxes = 0;
+        const itemsWithFlags = (ord.items || []).map((it: any) => {
+          const isDough = isPastryDoughItem(it.productName);
+          if (isDough) {
+            rawDoughBoxes += it.quantity || 0;
+          }
+          return {
+            ...it,
+            isPastryDough: isDough,
+          };
+        });
+
+        const doughBoxes = isEligible ? rawDoughBoxes : 0;
+        if (isEligible) {
+          totalBoxesSum += doughBoxes;
+          if (ord.date && ord.date.startsWith(currentYearMonth)) {
+            currentMonthBoxesSum += doughBoxes;
+          }
+        }
+
+        return {
+          ...ord,
+          items: itemsWithFlags,
+          rawDoughBoxes,
+          doughBoxes,
+          isSettlementEligible: isEligible,
+          storeName: storeInfo.storeName || "가맹점",
+          storeOwner: storeInfo.storeOwner || "",
+          storePhone: storeInfo.storePhone || "",
+          partnerId: storeInfo.partnerId || "",
+          partnerName: storeInfo.partnerName || "하위 파트너",
+          partnerCompany: storeInfo.partnerCompany || "",
+          partnerTierName: storeInfo.partnerTierName || "지사(2차)",
+        };
+      })
+      .sort((a, b) => b.date.localeCompare(a.date));
+
+    // 2-2) 하위 파트너들이 유치한 가맹점별 상세 구매 실적 집계
+    const subStores = subStoresRaw
+      .map((s) => {
+        const ownerPartner = subPartnerMap.get(s.partnerId!);
+        const storeOrders = subOrders.filter((o) => o.storeId === s.id);
+        const validStoreOrders = storeOrders.filter((o) => o.isSettlementEligible);
+
+        let totalDoughBoxes = 0;
+        let monthDoughBoxes = 0;
+        let totalOrderAmount = 0;
+
+        for (const ord of validStoreOrders) {
+          totalDoughBoxes += ord.doughBoxes || 0;
+          if (ord.date && ord.date.startsWith(currentYearMonth)) {
+            monthDoughBoxes += ord.doughBoxes || 0;
+          }
+        }
+
+        for (const ord of storeOrders) {
+          if (ord.status !== "주문취소") {
+            totalOrderAmount += ord.totalPrice || 0;
+          }
+        }
+
+        const sortedOrders = [...storeOrders].sort((a, b) => b.date.localeCompare(a.date));
+        const latestOrder = sortedOrders[0] || null;
+
+        return {
+          ...s,
+          partnerName: ownerPartner?.name || "하위 파트너",
+          partnerCompany: ownerPartner?.companyName || "",
+          partnerPhone: ownerPartner?.phone || "",
+          partnerLevel: ownerPartner?.level || 2,
+          partnerTierName: ownerPartner?.tierName || "지사(2차)",
+          totalOrdersCount: storeOrders.length,
+          totalOrderAmount,
+          totalDoughBoxes,
+          monthDoughBoxes,
+          latestOrderDate: latestOrder ? latestOrder.date : "-",
+          orders: sortedOrders,
+        };
+      })
+      .sort((a, b) => b.regDate.localeCompare(a.regDate));
+
+    // 하위 파트너들의 상담 문의 내역
+    const subInquiries = allInquiries
+      .filter((inq) => inq.partnerId && subPartnerIds.has(inq.partnerId))
+      .map((inq) => {
+        const p = subPartnerMap.get(inq.partnerId!);
+        return {
+          ...inq,
+          partnerName: p?.name || inq.partnerName || "하위 파트너",
+          partnerCompany: p?.companyName || inq.partnerCompany || "",
+          partnerTierName: p?.tierName || "지사(2차)",
+        };
+      })
+      .sort((a, b) => b.regDate.localeCompare(a.regDate));
+
+    // 하위 파트너별 개별 실적 집계
+    const enrichedSubPartners = subPartners.map((p) => {
+      const pStores = subStores.filter((s) => s.partnerId === p.id);
+      const pStoreIds = new Set(pStores.map((s) => s.id));
+
+      const pOrders = subOrders.filter((o) => o.storeId && pStoreIds.has(o.storeId));
+      let pMonthBoxes = 0;
+      let pTotalBoxes = 0;
+
+      for (const ord of pOrders) {
+        pTotalBoxes += ord.doughBoxes || 0;
+        if (ord.date && ord.date.startsWith(currentYearMonth)) {
+          pMonthBoxes += ord.doughBoxes || 0;
+        }
+      }
+
+      const parent = p.parentId ? partnerMap.get(p.parentId) : null;
+      const computedLevel = p.level || (parent?.level ? parent.level + 1 : 2);
+      const computedTierName =
+        p.tierName ||
+        (computedLevel === 2 ? "지사(2차)" : computedLevel === 3 ? "대리점(3차)" : `${computedLevel}차 파트너`);
+
+      return {
+        ...p,
+        level: computedLevel,
+        tierName: computedTierName,
+        parentName: parent?.name || "상위 파트너",
+        isDirectChild: p.parentId === args.partnerId,
+        storesCount: pStores.length,
+        currentMonthBoxes: pMonthBoxes,
+        totalBoxes: pTotalBoxes,
+        currentMonthCommission: pMonthBoxes * (p.commissionPerBox || 8000),
+      };
+    });
+
+    return {
+      subPartners: enrichedSubPartners.sort((a, b) => (a.level || 1) - (b.level || 1) || b.currentMonthBoxes - a.currentMonthBoxes),
+      stores: subStores.sort((a, b) => b.regDate.localeCompare(a.regDate)),
+      orders: subOrders,
+      inquiries: subInquiries,
+      summary: {
+        subPartnerCount: subPartners.length,
+        totalStoresCount: subStores.length,
+        currentMonthBoxes: currentMonthBoxesSum,
+        totalBoxes: totalBoxesSum,
+        inquiryCount: subInquiries.length,
+      },
+    };
+  },
+});
+
+// 14. 초기 파트너 및 가맹점 매핑 시드 데이터 생성 (상위/하위 계층 지원)
 export const seedPartners = mutation({
   args: {},
   handler: async (ctx) => {
@@ -608,7 +1019,9 @@ export const seedPartners = mutation({
           commissionPerBox: 8000,
           status: "활동중",
           regDate: "2026-04-01",
-          memo: "수도권 권역 가맹점 유치 전문 파트너",
+          memo: "수도권 권역 가맹점 유치 전문 총판 파트너",
+          level: 1,
+          tierName: "총판(1차)",
         },
         {
           id: "partner2",
@@ -623,7 +1036,10 @@ export const seedPartners = mutation({
           commissionPerBox: 8000,
           status: "활동중",
           regDate: "2026-05-10",
-          memo: "영남권 가맹점 유치 전문 파트너",
+          memo: "영남권 가맹점 유치 지사 파트너 (김영업 총판 산하)",
+          parentId: "partner1",
+          level: 2,
+          tierName: "지사(2차)",
         },
       ];
 
@@ -645,6 +1061,29 @@ export const seedPartners = mutation({
 
       return { success: true, seeded: true };
     }
-    return { success: false, alreadySeeded: true };
+
+    // 기존 파트너가 있는 경우 레벨 및 계층 데이터 보정
+    let patchCount = 0;
+    for (const p of existingPartners) {
+      const patch: any = {};
+      if (p.level === undefined) {
+        patch.level = p.parentId ? 2 : 1;
+      }
+      if (!p.tierName) {
+        patch.tierName = patch.level === 1 || (!p.parentId && !patch.level) ? "총판(1차)" : "지사(2차)";
+      }
+      // 만약 partner2에 parentId가 없다면 partner1을 상위로 연계
+      if (p.id === "partner2" && !p.parentId) {
+        patch.parentId = "partner1";
+        patch.level = 2;
+        patch.tierName = "지사(2차)";
+      }
+      if (Object.keys(patch).length > 0) {
+        await ctx.db.patch(p._id, patch);
+        patchCount++;
+      }
+    }
+
+    return { success: true, alreadySeeded: true, patched: patchCount };
   },
 });

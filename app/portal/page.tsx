@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { useModalBackHandler } from "@/components/MobileBackManager";
 import {
@@ -140,6 +140,8 @@ interface Product {
   options?: string[]; // 추가된 제품 선택 옵션 필드
   status?: string;
   isActive?: boolean;
+  gradePrices?: Record<string, number>;
+  isGradePrice?: boolean;
 }
 
 interface CartItem {
@@ -476,12 +478,29 @@ export default function PortalPage() {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // Dynamic collections synced via localStorage
-  const [products, setProducts] = useState<Product[]>([]);
+  // Dynamic collections synced via localStorage & Convex
+  const [rawProducts, setRawProducts] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("120_products");
+        if (stored) return JSON.parse(stored);
+      } catch (e) {}
+    }
+    return [];
+  });
   const [stores, setStores] = useState<any[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [banner, setBanner] = useState<any>(null);
-  const [activeStoreId, setActiveStoreId] = useState<string>("owner");
+  const [activeStoreId, setActiveStoreId] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const qStore = sp.get("storeId");
+      if (qStore) return qStore;
+      const saved = localStorage.getItem("120_active_store_id");
+      if (saved) return saved;
+    }
+    return "owner";
+  });
 
   const [notices, setNotices] = useState<Notice[]>([]);
   const [trainings, setTrainings] = useState<Material[]>([]);
@@ -566,6 +585,7 @@ export default function PortalPage() {
   }, [convexPopupsList]);
   const convexFloating = useQuery(api.floatings.get);
   const convexStores = useQuery(api.stores.get);
+  const convexPartners = useQuery(api.partners.get);
   const convexProducts = useQuery(api.products.get);
   const convexOrders = useQuery(api.orders.list);
   const convexMaterials = useQuery(api.materials.list);
@@ -590,13 +610,113 @@ export default function PortalPage() {
   const sendSmsAction = useAction(api.aligo.sendSms);
   const sendEventSmsAction = useAction(api.aligo.sendEventSms);
 
+  // 활성 가맹점 및 담당 영업 파트너 등급 연동
+  const currentActiveStore = useMemo(() => {
+    const list = convexStores || stores || [];
+    const targetId = activeStoreId || (typeof window !== "undefined" ? localStorage.getItem("120_active_store_id") : null) || "owner";
+    return list.find((s: any) => s.id === targetId) || null;
+  }, [convexStores, stores, activeStoreId]);
+
+  const currentActivePartner = useMemo(() => {
+    // 가맹점에 등록된 파트너 ID 기준 조회 (매핑된 파트너가 없으면 본사 직영/일반 매장)
+    const pId = currentActiveStore?.partnerId;
+    if (!pId || !convexPartners) return null;
+    return convexPartners.find((p: any) => p.id === pId) || null;
+  }, [currentActiveStore, convexPartners]);
+
+  const partnerGrade = useMemo(() => {
+    // 가맹점과 매핑된 파트너의 등급
+    if (currentActivePartner?.grade && Number(currentActivePartner.grade) > 0) {
+      return Number(currentActivePartner.grade);
+    }
+    // 파트너가 없거나 매핑되지 않은 경우 기본 단가(1등급/공통)
+    return 1;
+  }, [currentActivePartner]);
+
+  // 파트너 등급에 따른 상품 유효 판매가 산출 헬퍼 함수
+  const resolveProductPrice = useCallback((p: any, grade: number) => {
+    // 담당 파트너가 매핑되어 있는 가맹점인 경우에만 해당 파트너 등급의 차등 단가 적용
+    if (currentActivePartner && p.gradePrices && (p.gradePrices[String(grade)] !== undefined || p.gradePrices[grade] !== undefined)) {
+      const val = p.gradePrices[String(grade)] !== undefined ? p.gradePrices[String(grade)] : p.gradePrices[grade];
+      const gPrice = Number(val);
+      if (gPrice > 0) {
+        return gPrice;
+      }
+    }
+    // 기본 판매가 폴백 (할인가 > 정상판매가 > 공급가 순으로 0보다 큰 유효 단가 채택)
+    if (p.discountedPrice !== undefined && p.discountedPrice !== null && Number(p.discountedPrice) > 0) {
+      return Number(p.discountedPrice);
+    }
+    if (p.price !== undefined && p.price !== null && Number(p.price) > 0) {
+      return Number(p.price);
+    }
+    return Number(p.supplyPrice) || 0;
+  }, [currentActivePartner]);
+
+  const isProductGradePricingActive = useCallback((p: any, grade: number) => {
+    if (!currentActivePartner) return false;
+    if (p.gradePrices && (p.gradePrices[String(grade)] !== undefined || p.gradePrices[grade] !== undefined)) {
+      const val = p.gradePrices[String(grade)] !== undefined ? p.gradePrices[String(grade)] : p.gradePrices[grade];
+      const gPrice = Number(val);
+      if (gPrice > 0) {
+        const basePrice = (p.discountedPrice && Number(p.discountedPrice) > 0)
+          ? Number(p.discountedPrice)
+          : (Number(p.price) > 0 ? Number(p.price) : (Number(p.supplyPrice) || 0));
+        return gPrice !== basePrice;
+      }
+    }
+    return false;
+  }, [currentActivePartner]);
+
+  // 파트너 등급에 따라 실시간 반응형으로 산출되는 상품 목록 (단일 진실 공급원)
+  const products: Product[] = useMemo(() => {
+    const source = (convexProducts && convexProducts.length > 0) ? convexProducts : rawProducts;
+    if (!source || source.length === 0) return [];
+    return source
+      .filter((p: any) => p && p.status !== "단종" && p.isActive !== false)
+      .map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        category: p.category,
+        price: resolveProductPrice(p, partnerGrade),
+        packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
+        img: p.img || "",
+        detailImg: p.detailImg || "",
+        detailText: p.detailText || "",
+        stock: p.stock || "in_stock",
+        desc: p.desc || "",
+        orderIndex: p.orderIndex || 99,
+        labels: p.labels || [],
+        shippingType: p.shippingType || "A",
+        options: p.options || [],
+        isActive: p.isActive !== false,
+        status: p.status || (p.isActive !== false ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종"),
+        gradePrices: p.gradePrices,
+        isGradePrice: isProductGradePricingActive(p, partnerGrade),
+      }))
+      .sort((a: any, b: any) => (a.orderIndex || 99) - (b.orderIndex || 99));
+  }, [convexProducts, rawProducts, partnerGrade, resolveProductPrice, isProductGradePricingActive]);
+
 
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const logged = localStorage.getItem("120_owner_logged_in");
-      if (logged === "true") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const queryStoreId = searchParams.get("storeId");
+      if (queryStoreId) {
+        localStorage.setItem("120_owner_logged_in", "true");
+        localStorage.setItem("120_active_store_id", queryStoreId);
+        setActiveStoreId(queryStoreId);
         setIsLoggedIn(true);
+      } else {
+        const logged = localStorage.getItem("120_owner_logged_in");
+        if (logged === "true") {
+          setIsLoggedIn(true);
+        }
+        const savedStore = localStorage.getItem("120_active_store_id");
+        if (savedStore) {
+          setActiveStoreId(savedStore);
+        }
       }
       setCheckingAuth(false);
     }
@@ -733,35 +853,14 @@ export default function PortalPage() {
     }
   }, [convexProductCategories]);
 
-  // Sync Convex products to React state and localStorage (Precedence over mock seed)
+  // Sync Convex products to rawProducts state and localStorage
   useEffect(() => {
     if (convexProducts !== undefined && convexProducts !== null) {
       if (convexProducts.length > 0) {
-        const mapped = convexProducts.map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          category: p.category,
-          price: p.discountedPrice !== undefined ? p.discountedPrice : p.price,
-          packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
-          img: p.img,
-          detailImg: p.detailImg,
-          detailText: p.detailText,
-          stock: p.stock || "in_stock",
-          desc: p.desc || "",
-          orderIndex: p.orderIndex || 99,
-          labels: p.labels || [],
-          shippingType: p.shippingType || "A",
-          options: p.options || [],
-          isActive: p.isActive !== false,
-          status: p.status || (p.isActive !== false ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종")
-        }))
-        .filter((p: any) => p.status !== "단종" && p.isActive !== false)
-        .sort((a: any, b: any) => a.orderIndex - b.orderIndex);
-
-        setProducts(mapped);
+        setRawProducts(convexProducts as any[]);
 
         // Extract unique categories from actual active products dynamically
-        const uniqueCats = Array.from(new Set(mapped.map((p: any) => p.category).filter(Boolean))) as string[];
+        const uniqueCats = Array.from(new Set(convexProducts.map((p: any) => p.category).filter(Boolean))) as string[];
         if (uniqueCats.length > 0) {
           setCategories((prev) => Array.from(new Set([...prev, ...uniqueCats])));
         }
@@ -781,30 +880,8 @@ export default function PortalPage() {
           try {
             const parsed = JSON.parse(stored);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              const mapped = parsed.map((p: any) => ({
-                id: p.id,
-                name: p.name,
-                category: p.category,
-                price: p.discountedPrice !== undefined ? p.discountedPrice : (p.price || 0),
-                packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
-                img: p.img || "",
-                detailImg: p.detailImg || "",
-                detailText: p.detailText || "",
-                stock: p.stock || "in_stock",
-                desc: p.desc || "",
-                orderIndex: p.orderIndex || 99,
-                labels: p.labels || [],
-                shippingType: p.shippingType || "A",
-                options: p.options || [],
-                isActive: p.isActive !== false,
-                status: p.status || (p.isActive !== false ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종")
-              }))
-              .filter((p: any) => p.status !== "단종" && p.isActive !== false)
-              .sort((a: any, b: any) => a.orderIndex - b.orderIndex);
-
-              setProducts(mapped);
-
-              const uniqueCats = Array.from(new Set(mapped.map((p: any) => p.category).filter(Boolean))) as string[];
+              setRawProducts(parsed);
+              const uniqueCats = Array.from(new Set(parsed.map((p: any) => p.category).filter(Boolean))) as string[];
               if (uniqueCats.length > 0) {
                 setCategories((prev) => Array.from(new Set([...prev, ...uniqueCats])));
               }
@@ -904,6 +981,7 @@ export default function PortalPage() {
     if (isHardcodedOwner) {
       localStorage.setItem("120_owner_logged_in", "true");
       localStorage.setItem("120_active_store_id", "owner");
+      setActiveStoreId("owner");
       setIsLoggedIn(true);
       triggerToast("강남역삼점 파트너님, 환영합니다!");
     } else if (matchedStore) {
@@ -913,6 +991,7 @@ export default function PortalPage() {
       }
       localStorage.setItem("120_owner_logged_in", "true");
       localStorage.setItem("120_active_store_id", matchedStore.id);
+      setActiveStoreId(matchedStore.id);
       setIsLoggedIn(true);
       triggerToast(`${matchedStore.name} 파트너님, 환영합니다!`);
     } else {
@@ -931,60 +1010,34 @@ export default function PortalPage() {
   // ==========================================
   // CONVEX REAL-TIME POPUP & FLOATING SYNC
   // ==========================================
-  // 1. Initial mount: Instant 0ms popup display using local cache
+  // Dynamic Popup data loading synced with Convex (verified real-time display, no stale cache flash)
+  // 1. Initial mount: Purge any legacy stale popup caches
   useEffect(() => {
     try {
       const urlParams = new URLSearchParams(window.location.search);
-      const isTestPopup = urlParams.get("test_popup") === "true";
-      const closedUntil = localStorage.getItem("120_popup_closed_until");
-      const isExpired = !closedUntil || Date.now() > parseInt(closedUntil, 10);
+      const isResetPopup = urlParams.get("reset_popup") === "true";
 
-      if (isTestPopup || isExpired) {
-        let popupsToUse: any[] | null = null;
-        const stored = localStorage.getItem("120_cached_popups_portal");
-        if (stored) {
-          try {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed) && parsed.length > 0) popupsToUse = parsed;
-          } catch (e) {}
-        }
-        if (!popupsToUse) {
-          const legacy = localStorage.getItem("120_popups");
-          if (legacy) {
-            try {
-              const parsed = JSON.parse(legacy);
-              if (parsed && parsed.isActive) popupsToUse = [parsed];
-            } catch (e) {}
-          }
-        }
-        if (popupsToUse && popupsToUse.length > 0) {
-          setCachedPopups(popupsToUse);
-          setShowPopup(true);
-          // Preload first image immediately into browser cache
-          if (popupsToUse[0]?.image) {
-            const img = new Image();
-            img.src = optimizeCloudinaryUrl(popupsToUse[0].image);
-          }
-        }
+      if (isResetPopup) {
+        localStorage.removeItem("120_popup_closed_until");
       }
+
+      // Purge legacy popup caches from localStorage to eliminate any stale popup flicker
+      localStorage.removeItem("120_cached_popups_portal");
+      localStorage.removeItem("120_popups");
     } catch (e) {}
   }, []);
 
-  // 2. Real-time Convex Sync: Update cache & ensure accuracy
+  // 2. Real-time Convex Sync: Display verified active popup only after Convex data resolves
   useEffect(() => {
     if (convexActivePopups !== undefined) {
       if (convexActivePopups && convexActivePopups.length > 0) {
-        setCachedPopups(convexActivePopups);
-        try {
-          localStorage.setItem("120_cached_popups_portal", JSON.stringify(convexActivePopups));
-          // Preload all active popup images
-          convexActivePopups.forEach((p: any) => {
-            if (p.image) {
-              const img = new Image();
-              img.src = optimizeCloudinaryUrl(p.image);
-            }
-          });
-        } catch (e) {}
+        // Preload all active popup images
+        convexActivePopups.forEach((p: any) => {
+          if (p.image) {
+            const img = new Image();
+            img.src = optimizeCloudinaryUrl(p.image);
+          }
+        });
 
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get("test_popup") === "true") {
@@ -1001,10 +1054,6 @@ export default function PortalPage() {
       } else {
         // DB confirms no active popups -> close
         setShowPopup(false);
-        setCachedPopups([]);
-        try {
-          localStorage.removeItem("120_cached_popups_portal");
-        } catch (e) {}
       }
     }
   }, [convexActivePopups]);
@@ -1070,10 +1119,8 @@ export default function PortalPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Popup & Floating Action states
-  const [popupSettings, setPopupSettings] = useState<any>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [currentPopupIdx, setCurrentPopupIdx] = useState<number>(0);
-  const [cachedPopups, setCachedPopups] = useState<any[]>([]);
   const [floatingSettings, setFloatingSettings] = useState<any>(null);
   const [floatingOpen, setFloatingOpen] = useState<boolean>(false);
 
@@ -1374,24 +1421,7 @@ export default function PortalPage() {
         }
       }
 
-      const mapped = pr.map((p: any) => ({
-        id: p.id || `prod-${Math.floor(100 + Math.random() * 900)}`,
-        name: p.name || "이름 없는 상품",
-        category: p.category || "냉동생지/자재",
-        price: p.discountedPrice !== undefined ? p.discountedPrice : (p.price || 0),
-        packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
-        img: p.img || "",
-        detailImg: p.detailImg || "",
-        detailText: p.detailText || "",
-        stock: p.stock || "in_stock",
-        desc: p.desc || "",
-        orderIndex: p.orderIndex || 99,
-        labels: p.labels || [],
-        shippingType: p.shippingType || "A",
-        options: p.options || []
-      })).sort((a: any, b: any) => a.orderIndex - b.orderIndex);
-      
-      setProducts(mapped);
+      setRawProducts(pr);
       localStorage.setItem("120_products", JSON.stringify(pr));
 
       const policySettings = loadState("120_shipping_settings", {
@@ -1418,7 +1448,7 @@ export default function PortalPage() {
     }
   }, [cart]);
 
-  // Poll LocalStorage to simulate real-time updates when switching tabs or active
+  // Sync LocalStorage settings when switching tabs or focusing window
   useEffect(() => {
     const handleStorageChange = () => {
       if (typeof window !== "undefined") {
@@ -1449,28 +1479,7 @@ export default function PortalPage() {
           try {
             const parsed = JSON.parse(storedPrRaw);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              const mapped = parsed.map((p: any) => ({
-                id: p.id,
-                name: p.name,
-                category: p.category,
-                price: p.discountedPrice !== undefined ? p.discountedPrice : (p.price || 0),
-                packSize: p.packSize || `${p.unit || '박스'} (${p.qty || 1}개입)`,
-                img: p.img || "",
-                detailImg: p.detailImg || "",
-                detailText: p.detailText || "",
-                stock: p.stock || "in_stock",
-                desc: p.desc || "",
-                orderIndex: p.orderIndex || 99,
-                labels: p.labels || [],
-                shippingType: p.shippingType || "A",
-                options: p.options || [],
-                isActive: p.isActive !== false,
-                status: p.status || (p.isActive !== false ? (p.stock === "out_of_stock" ? "품절" : "판매중") : "단종")
-              }))
-              .filter((p: any) => p.status !== "단종" && p.isActive !== false)
-              .sort((a: any, b: any) => a.orderIndex - b.orderIndex);
-
-              setProducts(mapped);
+              setRawProducts(parsed);
             }
           } catch (e) {}
         }
@@ -1484,8 +1493,11 @@ export default function PortalPage() {
           }
         }
         
-        const activeId = localStorage.getItem("120_active_store_id") || "owner";
-        setActiveStoreId(activeId);
+        const searchParams = new URLSearchParams(window.location.search);
+        if (!searchParams.get("storeId")) {
+          const activeId = localStorage.getItem("120_active_store_id") || "owner";
+          setActiveStoreId(activeId);
+        }
 
         const ps = localStorage.getItem("120_shipping_settings");
         if (ps) {
@@ -1505,11 +1517,9 @@ export default function PortalPage() {
     };
 
     window.addEventListener("focus", handleStorageChange);
-    const interval = setInterval(handleStorageChange, 1500);
 
     return () => {
       window.removeEventListener("focus", handleStorageChange);
-      clearInterval(interval);
     };
   }, []);
 
@@ -2467,7 +2477,7 @@ export default function PortalPage() {
   // ==========================================
   // PACKAGE DATA
   // ==========================================
-  const activeStore = stores.find((s) => s.id === activeStoreId) || {
+  const activeStore = (convexStores || stores || []).find((s: any) => s.id === (activeStoreId || "owner")) || {
     id: "owner",
     name: "120겹파이 강남역삼점",
     owner: "김지훈",
@@ -2661,8 +2671,10 @@ export default function PortalPage() {
 
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <div className="hidden md:flex flex-col items-end text-right">
-            <span className="font-black text-xs text-[#0F172A]">{activeStore.name}</span>
-            <span className="text-[10px] text-slate-400 font-bold">{activeStore.owner} 사장님 (정상 파트너)</span>
+            <div className="flex items-center gap-1.5 justify-end">
+              <span className="font-black text-xs text-[#0F172A]">{activeStore.name}</span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-bold">{activeStore.owner} 사장님</span>
           </div>
           
           <div className="h-6 w-px bg-slate-200 hidden md:block"></div>
@@ -2968,8 +2980,9 @@ export default function PortalPage() {
                   </p>
                 </div>
 
-                {/* 우측 시네마틱 글래스모피즘 토글 박스 2개 */}
-                <div className="flex items-center gap-3 shrink-0 relative z-10">
+                {/* 우측 시네마틱 글래스모피즘 토글 박스 */}
+                <div className="flex items-center gap-3 shrink-0 relative z-10 flex-wrap">
+
                   <div className="bg-black/60 backdrop-blur-md border border-white/15 px-5 py-3 rounded-lg text-center min-w-[120px] shadow-xl">
                     <span className="text-[10px] text-slate-400 font-extrabold block mb-0.5">매장 고유 코드</span>
                     <strong className="text-xs font-mono font-black text-[#F5A623] tracking-wider">#{activeStore.id}</strong>
@@ -3310,8 +3323,20 @@ export default function PortalPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               
               {/* Left Side: Category tabs & Product Box grid (3 Columns) */}
-              <div className="lg:col-span-8 space-y-6">
+              <div className="lg:col-span-8 space-y-4">
                 
+                {/* Store & Partner Grade Notice Banner */}
+                <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200/90 px-4 py-2.5 rounded-lg shadow-2xs text-left">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-black text-xs text-[#0F172A]">
+                      {activeStore.name} 전용 발주몰
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-400 font-semibold">
+                    120겹 파이 정품 원자재 및 부자재 공식 발주처
+                  </span>
+                </div>
+
                 {/* Category selector (Stage Flow Card Style) */}
                 <div className="flex sm:flex-wrap overflow-x-auto sm:overflow-x-visible flex-nowrap whitespace-nowrap gap-1.5 sm:gap-2 bg-white border border-neutral-200/80 p-2 sm:p-2.5 rounded-lg shadow-2xs scrollbar-none">
                   {["전체", ...categories].map((cat) => (
@@ -3364,7 +3389,9 @@ export default function PortalPage() {
                             </div>
 
                             <div className="flex items-center justify-between mt-1">
-                              <strong className="text-xs text-[#0F172A] font-black">{p.price.toLocaleString()}원</strong>
+                              <div className="flex items-center gap-1 flex-wrap">
+                                <strong className="text-xs text-[#0F172A] font-black">{p.price.toLocaleString()}원</strong>
+                              </div>
                               
                               <div onClick={(e) => e.stopPropagation()} className="shrink-0">
                                 {p.stock === "out_of_stock" ? (
@@ -5507,7 +5534,9 @@ export default function PortalPage() {
                       </tr>
                       <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
                         <td className="px-4 py-3 bg-[#F8FAFC] font-extrabold text-slate-400">공급 단가</td>
-                        <td className="px-4 py-3 font-black text-[#0F172A]">{selectedProductDetail.price.toLocaleString()} 원</td>
+                        <td className="px-4 py-3">
+                          <span className="font-black text-[#0F172A]">{selectedProductDetail.price.toLocaleString()} 원</span>
+                        </td>
                       </tr>
                       <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
                         <td className="px-4 py-3 bg-[#F8FAFC] font-extrabold text-slate-400">배송 정책</td>
@@ -6164,13 +6193,8 @@ export default function PortalPage() {
           REAL-TIME 3:4 FULL-IMAGE POPUP MODAL (MULTI-POPUP SUPPORT)
          ========================================== */}
       {(() => {
-        const displayPopupsList = (convexActivePopups !== undefined && convexActivePopups.length > 0)
-          ? convexActivePopups
-          : cachedPopups;
-
-        if (!showPopup || !displayPopupsList || displayPopupsList.length === 0) return null;
-
-        const activePopupsList = displayPopupsList;
+        const activePopupsList = convexActivePopups || [];
+        if (!showPopup || activePopupsList.length === 0) return null;
         const safePopupIdx = Math.min(currentPopupIdx, Math.max(0, activePopupsList.length - 1));
         const currentActivePopup = activePopupsList[safePopupIdx];
         if (!currentActivePopup) return null;

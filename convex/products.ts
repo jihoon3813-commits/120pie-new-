@@ -34,6 +34,7 @@ export const createOrUpdate = mutation({
     labels: v.optional(v.array(v.string())),
     shippingType: v.optional(v.string()),
     options: v.optional(v.array(v.string())),
+    gradePrices: v.optional(v.record(v.string(), v.number())),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -63,6 +64,7 @@ export const createOrUpdate = mutation({
       labels: args.labels || [],
       shippingType: args.shippingType || "A",
       options: args.options || undefined,
+      gradePrices: args.gradePrices || undefined,
     };
 
     // 새로운 카테고리가 등록될 때 productCategories 테이블에 자동 추가하여 동기화
@@ -147,6 +149,7 @@ export const syncProducts = mutation({
         labels: v.optional(v.array(v.string())),
         shippingType: v.optional(v.string()),
         options: v.optional(v.array(v.string())),
+        gradePrices: v.optional(v.record(v.string(), v.number())),
       })
     ),
   },
@@ -179,6 +182,7 @@ export const syncProducts = mutation({
         labels: p.labels,
         shippingType: p.shippingType,
         options: p.options,
+        gradePrices: (p as any).gradePrices || undefined,
       };
 
       // 새로운 카테고리가 등록될 때 productCategories 테이블에 자동 추가하여 동기화

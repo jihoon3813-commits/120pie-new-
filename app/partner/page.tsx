@@ -43,12 +43,17 @@ import {
   Crosshair,
   MessageSquare,
   Copy,
-  Lock
+  Lock,
+  Users,
+  GitBranch,
+  Layers,
+  Activity
 } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import Footer from "@/app/components/Footer";
 import RadarMap from "@/app/components/RadarMap";
+import { getPartnerGradeName, PARTNER_GRADES } from "@/app/constants/partnerGrades";
 
 const STATUS_BADGES: { [key: string]: { bg: string; text: string; border: string } } = {
   "정산대기": { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200" },
@@ -67,6 +72,20 @@ const STATUS_BADGES: { [key: string]: { bg: string; text: string; border: string
   "입금대기": { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200" },
   "주문취소": { bg: "bg-slate-100", text: "text-slate-400", border: "border-slate-200" },
 };
+
+function formatPhoneNumber(val: string): string {
+  if (!val) return "";
+  const clean = val.replace(/[^0-9]/g, "");
+  if (clean.length <= 3) return clean;
+  if (clean.startsWith("02")) {
+    if (clean.length <= 5) return `${clean.slice(0, 2)}-${clean.slice(2)}`;
+    if (clean.length <= 9) return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5)}`;
+    return `${clean.slice(0, 2)}-${clean.slice(2, 6)}-${clean.slice(6, 10)}`;
+  }
+  if (clean.length <= 7) return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+  if (clean.length <= 10) return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6)}`;
+  return `${clean.slice(0, 3)}-${clean.slice(3, 7)}-${clean.slice(7, 11)}`;
+}
 
 export default function PartnerPortalPage() {
   // 1. 세션 및 인증 상태
@@ -116,6 +135,13 @@ export default function PartnerPortalPage() {
     api.inquiries.listByPartner,
     partnerId ? { partnerId } : "skip"
   ) || [];
+  // 상위 파트너 전용: 하위 파트너 조직 및 활동 모니터링 쿼리
+  const subPartnerActivities = useQuery(
+    api.partners.getSubPartnerActivities,
+    partnerId ? { partnerId } : "skip"
+  );
+  const [subpartnerSubTab, setSubpartnerSubTab] = useState<"overview" | "stores" | "orders" | "inquiries">("overview");
+  const [subpartnerSearchQuery, setSubpartnerSearchQuery] = useState<string>("");
 
   const updateProfileMutation = useMutation(api.partners.updatePartnerProfile);
   const seedPartnersMutation = useMutation(api.partners.seedPartners);
@@ -304,6 +330,24 @@ export default function PartnerPortalPage() {
     }
   };
 
+  const handleGoToStorePortal = (store: any) => {
+    if (!store || !store.id) {
+      alert("가맹점 식별 정보(ID)를 찾을 수 없습니다.");
+      return;
+    }
+    if (typeof window !== "undefined") {
+      localStorage.setItem("120_owner_logged_in", "true");
+      localStorage.setItem("120_active_store_id", store.id);
+      const targetPartnerId = partnerId || store.partnerId || "";
+      const targetGrade = currentPartner?.grade || 2;
+      let url = `/portal?storeId=${encodeURIComponent(store.id)}`;
+      if (targetPartnerId) url += `&partnerId=${encodeURIComponent(targetPartnerId)}`;
+      if (targetGrade) url += `&partnerGrade=${encodeURIComponent(String(targetGrade))}`;
+      window.open(url, "_blank");
+      triggerToast(`[${store.name || store.id}] 점주 포털로 바로 이동합니다.`);
+    }
+  };
+
   const handleConsultationStatusChange = async (id: any, newStatus: string) => {
     try {
       await updateConsultationStatusMutation({ _id: id, status: newStatus });
@@ -436,9 +480,12 @@ export default function PartnerPortalPage() {
   // ==========================================
   // 2. 파트너 포털 메인 뷰 (본사 어드민과 동일한 밝고 정돈된 라이트 테마)
   // ==========================================
+  const subPartnerCount = subPartnerActivities?.summary?.subPartnerCount || 0;
+
   const menuItems = [
     { key: "dashboard", label: "대시보드", icon: LayoutDashboard },
     { key: "stores", label: "가맹점 관리", icon: Store, badge: myStores.length },
+    { key: "subpartners", label: "하위 파트너 활동", icon: Users, badge: subPartnerCount },
     { key: "consultation", label: "상담문의 관리", icon: MessageSquare, badge: partnerConsultations.length },
     { key: "radar", label: "상권보호 레이더", icon: Crosshair },
     { key: "settlement", label: "정산 관리", icon: CreditCard },
@@ -462,12 +509,12 @@ export default function PartnerPortalPage() {
       <header className="h-16 bg-white border-b border-neutral-200/90 px-4 sm:px-8 flex items-center justify-between z-40 sticky top-0 shadow-2xs">
         {/* 좌측: 타이틀 텍스트 (모바일에서는 동그란 아이콘 숨김) */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="hidden sm:flex w-8 h-8 rounded-full bg-gradient-to-tr from-[#FED422] to-amber-500 items-center justify-center text-[#0F172A] shadow-xs">
+          <div className="hidden sm:flex w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 items-center justify-center text-white shadow-xs">
             <Building2 size={16} />
           </div>
           <div>
             <h1 className="font-black text-base sm:text-base text-[#0F172A] tracking-tight flex items-center gap-2">
-              120겹파이 <span className="bg-[#FED422] text-[#0F172A] text-[10px] font-black px-2 py-0.5 rounded-md">PARTNER</span>
+              120겹파이 <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md">PARTNER</span>
             </h1>
           </div>
         </div>
@@ -478,12 +525,18 @@ export default function PartnerPortalPage() {
             <div className="text-xs font-black text-[#0F172A] flex items-center justify-end gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>{currentPartner?.name || "영업 파트너"}</span>
+              <span className="text-[10px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.2 rounded border border-purple-200">
+                Lv.{currentPartner?.level || 1} {currentPartner?.tierName || "총판"}
+              </span>
+              <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.2 rounded">
+                {getPartnerGradeName(currentPartner?.grade)}
+              </span>
               {currentPartner?.companyName && (
                 <span className="text-slate-400 font-medium">({currentPartner.companyName})</span>
               )}
             </div>
-            <span className="text-[11px] text-amber-600 font-bold">
-              패스트리 생지 8,000원 / 박스
+            <span className="text-[11px] text-purple-700 font-bold">
+              패스트리 생지 {(currentPartner?.commissionPerBox || 8000).toLocaleString()}원 / 박스
             </span>
           </div>
 
@@ -510,38 +563,80 @@ export default function PartnerPortalPage() {
       {/* CORE WORKSPACE (Full Width Flex Container) */}
       <div className="flex-1 flex w-full relative items-stretch min-h-0 overflow-hidden bg-[#F4F6F8]">
         
-        {/* SIDEBAR NAVIGATION (본사 어드민과 동일한 다크 사이드바) */}
-        <aside className="bg-[#0B0F17] py-5 px-0 flex flex-col justify-between hidden lg:flex shrink-0 w-[240px] shadow-2xl relative z-30 overflow-hidden">
+        {/* SIDEBAR NAVIGATION (본사 어드민 / 점주 메뉴와 동일한 1:1 정사각형 매장 파사드 배경 적용, 파트너 전용 퍼플/인디고 테마) */}
+        <aside className="bg-[#0B0F17] py-5 px-0 flex flex-col justify-between hidden lg:flex shrink-0 w-[260px] shadow-2xl rounded-tr-[40px] relative z-30 overflow-hidden">
+          {/* Authentic Bottom Aurora Gradient Panel (파트너 전용 로열 퍼플/인디고 오로라) */}
+          <div 
+            className="absolute bottom-[-5%] left-[-15%] right-[-15%] h-[260px] pointer-events-none rounded-t-[50%]"
+            style={{
+              background: 'radial-gradient(circle at 30% 80%, rgba(168, 85, 247, 0.4) 0%, rgba(99, 102, 241, 0.28) 50%, rgba(139, 92, 246, 0.15) 80%, transparent 100%)',
+              filter: 'blur(30px)'
+            }}
+          ></div>
+
           <div className="space-y-5 overflow-y-auto overflow-x-hidden no-scrollbar relative z-10 w-full">
             
-            {/* Header Brand Logo */}
-            <div className="flex items-center gap-3 px-5 pt-1">
-              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-md border border-slate-700 bg-black">
+            {/* Header Brand Logo (지정 로고 아이콘 적용 - 클릭 시 대시보드 이동) */}
+            <button
+              type="button"
+              onClick={() => setCurrentMenu("dashboard")}
+              className="flex items-center gap-3 px-5 pt-1 w-full text-left bg-transparent border-0 cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-md border border-slate-700 bg-black group-hover:scale-105 transition-transform">
                 <img
                   src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784730823/120%ED%8C%8C%EC%9D%B4_%EC%BB%A4%ED%94%BC_%EA%B8%88%EC%A0%95%EC%A0%90_%EC%B1%84%EB%84%90%EC%82%AC%EC%9D%B8_%EB%94%94%EC%9E%90%EC%9D%B8_250828_5_eadptv.png"
-                  alt="120 Logo Icon"
+                  alt="120PIE Partner Logo"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="min-w-0">
-                <h3 className="font-black text-sm text-white tracking-tight truncate">120Partner</h3>
-                <p className="text-[10px] text-slate-400 font-bold truncate">영업 파트너 포털</p>
+                <h3 className="font-black text-sm text-white tracking-tight truncate group-hover:text-purple-300 transition-colors">120PIE Partner</h3>
+                <p className="text-[10px] text-purple-300 font-bold truncate">영업 파트너십 포털</p>
+              </div>
+            </button>
+
+            {/* 1:1 Authentic Square Facade Profile Section (본사/점주 메뉴와 100% 동일한 매장 연출컷 배경 + 파트너 전용 퍼플 테마) */}
+            <div className="relative w-full aspect-square my-2 border-0 rounded-none overflow-hidden group bg-[#0B0F17] flex flex-col justify-end">
+              {/* 전체 프로필 정사각형 배경 이미지 (어드민 / 점주 메뉴와 동일) */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center opacity-85 group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                style={{
+                  backgroundImage: `url('https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png')`
+                }}
+              ></div>
+              
+              {/* 시네마틱 그라데이션 페이드 오버레이 */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17] via-[#0B0F17]/55 to-[#0B0F17]/10 pointer-events-none"></div>
+
+              {/* 파트너 정보 텍스트 & 퍼플 #PARTNER-ID 뱃지 */}
+              <div className="relative z-10 flex flex-col items-center text-center gap-1.5 p-5 pb-6">
+                <div className="w-full truncate space-y-0.5 drop-shadow-md">
+                  <h4 className="font-black text-lg text-white truncate tracking-tight">
+                    {currentPartner?.companyName || (currentPartner?.name ? `${currentPartner.name} 파트너` : "120겹파이 파트너")}
+                  </h4>
+                  <p className="text-xs text-purple-300 font-bold truncate drop-shadow-xs">
+                    {currentPartner?.name ? `${currentPartner.name} 파트너님` : "공식 영업 파트너"}
+                  </p>
+                </div>
+
+                {/* 계층 레벨 & 단가 등급 뱃지 */}
+                <div className="flex items-center gap-1.5 flex-wrap justify-center mt-0.5">
+                  <span className="bg-purple-950/80 text-purple-200 border border-purple-500/40 text-[10px] font-black px-2 py-0.5 rounded shadow-xs">
+                    Lv.{currentPartner?.level || 1} {currentPartner?.tierName || "총판"}
+                  </span>
+                  <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded shadow-xs">
+                    {getPartnerGradeName(currentPartner?.grade)}
+                  </span>
+                </div>
+
+                {/* 파트너 ID 뱃지 (점주 #owner, 본사 #HQ-MASTER 와 차별화된 로열 퍼플 뱃지) */}
+                <span className="mt-1 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 text-white text-[11px] font-black px-4 py-1 rounded-md shadow-lg tracking-wider font-mono border border-purple-400/40">
+                  #{currentPartner?.id || "partner"}
+                </span>
               </div>
             </div>
 
-            {/* Profile Section with Badge */}
-            <div className="relative w-full aspect-[4/3] my-1 overflow-hidden bg-[#121824] border-y border-slate-800 flex flex-col justify-center items-center text-center p-4">
-              <div className="w-12 h-12 rounded-full bg-[#FED422]/20 border border-[#FED422]/40 flex items-center justify-center text-[#FED422] font-black text-base shadow-lg mb-2">
-                {currentPartner?.name ? currentPartner.name.slice(0, 1) : "P"}
-              </div>
-              <h4 className="font-black text-sm text-white truncate w-full">{currentPartner?.name}</h4>
-              <p className="text-[11px] text-slate-400 truncate w-full mt-0.5">{currentPartner?.companyName || "공식 영업 파트너"}</p>
-              <span className="mt-2 bg-[#FED422] text-[#0F172A] text-[10px] font-black px-3 py-0.5 rounded-md shadow-xs">
-                #PARTNER-PRO
-              </span>
-            </div>
-
-            {/* Navigation Menu Links */}
+            {/* Navigation Menu Links (파트너 전용 퍼플 테마 액티브 스타일) */}
             <nav className="flex flex-col gap-1.5 px-4">
               {menuItems.map(({ key, label, icon: Icon, badge }) => {
                 const isActive = currentMenu === key;
@@ -551,17 +646,17 @@ export default function PartnerPortalPage() {
                     onClick={() => setCurrentMenu(key)}
                     className={`w-full px-4 py-3 rounded-lg flex items-center justify-between text-xs font-bold transition-all cursor-pointer border-0 outline-none ${
                       isActive
-                        ? "bg-[#FED422] text-[#0F172A] shadow-md font-black"
+                        ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-950/50 font-black"
                         : "text-[#94A3B8] hover:text-white hover:bg-white/5 bg-transparent"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon size={17} className={isActive ? "text-[#0F172A]" : "text-[#94A3B8]"} />
+                      <Icon size={17} className={isActive ? "text-white" : "text-[#94A3B8]"} />
                       <span>{label}</span>
                     </div>
                     {badge !== undefined && badge > 0 && (
                       <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                        isActive ? "bg-[#0F172A] text-[#FED422]" : "bg-[#1E293B] text-[#94A3B8]"
+                        isActive ? "bg-white text-purple-700 font-black shadow-xs" : "bg-[#1E293B] text-[#94A3B8]"
                       }`}>
                         {badge}
                       </span>
@@ -590,26 +685,60 @@ export default function PartnerPortalPage() {
             onClick={() => setMobileMenuOpen(false)}
           >
             <div 
-              className="w-72 bg-[#0B0F17] text-white h-full p-6 flex flex-col justify-between shadow-2xl border-r border-slate-800 animate-in slide-in-from-left duration-200" 
+              className="w-72 bg-[#0B0F17] text-white h-full p-0 flex flex-col justify-between shadow-2xl border-r border-slate-800 animate-in slide-in-from-left duration-200 overflow-hidden relative" 
               onClick={(e) => e.stopPropagation()} 
             >
-              <div className="space-y-6 overflow-y-auto no-scrollbar">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-[#FED422] text-[#0F172A] flex items-center justify-center font-black text-xs">
-                      {currentPartner?.name ? currentPartner.name.slice(0, 1) : "P"}
-                    </div>
-                    <div>
-                      <h4 className="font-black text-xs text-white leading-tight">{currentPartner?.name || "영업 파트너"}</h4>
-                      <p className="text-[10px] text-slate-400 font-bold">{currentPartner?.companyName || "120Partner"}</p>
+              {/* Bottom Aurora Gradient Panel */}
+              <div 
+                className="absolute bottom-[-5%] left-[-15%] right-[-15%] h-[240px] pointer-events-none rounded-t-[50%]"
+                style={{
+                  background: 'radial-gradient(circle at 30% 80%, rgba(168, 85, 247, 0.35) 0%, rgba(99, 102, 241, 0.25) 50%, transparent 100%)',
+                  filter: 'blur(30px)'
+                }}
+              ></div>
+
+              <div className="space-y-4 overflow-y-auto no-scrollbar relative z-10">
+                {/* Mobile Drawer Header with Store Facade */}
+                <div className="relative w-full aspect-[16/10] overflow-hidden bg-[#0B0F17] flex flex-col justify-between p-4">
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-85 pointer-events-none"
+                    style={{
+                      backgroundImage: `url('https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784705760/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_22%EC%9D%BC_%EC%98%A4%ED%9B%84_04_35_22_2_mpdbps.png')`
+                    }}
+                  ></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17] via-[#0B0F17]/60 to-black/30 pointer-events-none"></div>
+
+                  <div className="relative z-10 flex items-center justify-between">
+                    <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-xs">
+                      PARTNER
+                    </span>
+                    <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 text-white/80 hover:text-white border-0 bg-black/40 rounded-full cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="relative z-10 text-center space-y-1">
+                    <h4 className="font-black text-base text-white truncate drop-shadow-md">
+                      {currentPartner?.companyName || currentPartner?.name || "120겹파이 파트너"}
+                    </h4>
+                    <p className="text-xs text-purple-300 font-bold truncate drop-shadow-xs">
+                      {currentPartner?.name ? `${currentPartner.name} 파트너님` : "공식 영업 파트너"}
+                    </p>
+                    <div className="flex items-center justify-center gap-1.5 pt-0.5 flex-wrap">
+                      <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] font-black px-3 py-0.5 rounded shadow-xs font-mono">
+                        #{currentPartner?.id || "partner"}
+                      </span>
+                      <span className="bg-purple-900/80 text-purple-200 text-[9px] font-bold px-1.5 py-0.5 rounded border border-purple-500/30">
+                        Lv.{currentPartner?.level || 1}
+                      </span>
+                      <span className="bg-amber-400 text-slate-950 text-[9px] font-black px-1.5 py-0.5 rounded">
+                        {getPartnerGradeName(currentPartner?.grade)}
+                      </span>
                     </div>
                   </div>
-                  <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 text-slate-400 hover:text-white border-0 bg-transparent cursor-pointer">
-                    <X size={18} />
-                  </button>
                 </div>
 
-                <nav className="flex flex-col gap-1.5">
+                <nav className="flex flex-col gap-1.5 px-4 pb-4">
                   {menuItems.map(({ key, label, icon: Icon, badge }) => {
                     const isActive = currentMenu === key;
                     return (
@@ -621,17 +750,17 @@ export default function PartnerPortalPage() {
                         }}
                         className={`w-full px-4 py-3 rounded-lg flex items-center justify-between text-xs font-bold transition-all border-0 ${
                           isActive
-                            ? "bg-[#FED422] text-[#0F172A] shadow-md font-black"
+                            ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md font-black"
                             : "text-[#94A3B8] hover:bg-white/5"
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <Icon size={18} className={isActive ? "text-[#0F172A]" : "text-[#94A3B8]"} />
+                          <Icon size={18} className={isActive ? "text-white" : "text-[#94A3B8]"} />
                           <span>{label}</span>
                         </div>
                         {badge !== undefined && (
                           <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                            isActive ? "bg-[#0F172A] text-[#FED422]" : "bg-[#1E293B] text-[#94A3B8]"
+                            isActive ? "bg-white text-purple-700" : "bg-[#1E293B] text-[#94A3B8]"
                           }`}>
                             {badge}
                           </span>
@@ -640,20 +769,20 @@ export default function PartnerPortalPage() {
                     );
                   })}
                 </nav>
+              </div>
 
-                {/* 📱 더보기 메뉴 안의 로그아웃 버튼 */}
-                <div className="border-t border-slate-800 pt-4 mt-2">
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleLogout();
-                    }}
-                    className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-xs font-black text-rose-400 hover:text-white bg-rose-500/10 hover:bg-rose-500/20 transition-all border border-rose-500/20 cursor-pointer"
-                  >
-                    <LogOut size={16} />
-                    <span>로그아웃</span>
-                  </button>
-                </div>
+              {/* 📱 더보기 메뉴 안의 로그아웃 버튼 */}
+              <div className="border-t border-slate-800 pt-4 p-4 relative z-10">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full px-4 py-3 rounded-xl flex items-center gap-3 text-xs font-black text-rose-400 hover:text-white bg-rose-500/10 hover:bg-rose-500/20 transition-all border border-rose-500/20 cursor-pointer"
+                >
+                  <LogOut size={16} />
+                  <span>로그아웃</span>
+                </button>
               </div>
             </div>
           </div>
@@ -999,7 +1128,24 @@ export default function PartnerPortalPage() {
                               {myOrders.slice(0, 5).map((ord: any) => (
                                 <tr key={ord.id} className="hover:bg-slate-50 transition-colors">
                                   <td className="py-3.5 px-3 text-slate-500 tabular-nums">{ord.date}</td>
-                                  <td className="py-3.5 px-3 font-black text-[#0F172A]">{ord.storeName}</td>
+                                  <td className="py-3.5 px-3 font-black text-[#0F172A]">
+                                    <div className="flex items-center gap-1.5">
+                                      <span>{ord.storeName}</span>
+                                      {ord.storeId && (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleGoToStorePortal({ id: ord.storeId, name: ord.storeName });
+                                          }}
+                                          className="p-1 text-purple-600 hover:text-purple-800 hover:bg-purple-100/60 rounded transition-colors cursor-pointer border-0 bg-transparent inline-flex items-center"
+                                          title={`${ord.storeName} 점주포털 바로가기 (새 탭)`}
+                                        >
+                                          <ExternalLink size={12} />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </td>
                                   <td className="py-3.5 px-3 text-slate-600 max-w-[180px] truncate">
                                     {ord.items && ord.items.length > 0
                                       ? `${ord.items[0].productName} ${ord.items.length > 1 ? `외 ${ord.items.length - 1}건` : ""}`
@@ -1071,6 +1217,36 @@ export default function PartnerPortalPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* 하위 파트너 조직 실적 요약 위젯 (하위 파트너가 있을 때 노출) */}
+                {(subPartnerActivities?.summary?.subPartnerCount || 0) > 0 && (
+                  <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-2xl p-5 sm:p-6 border border-purple-500/30 text-white shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-purple-500/30 border border-purple-400/40 text-purple-200 text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <Users size={12} />
+                          <span>내 하위 파트너 조직 네트워크</span>
+                        </span>
+                      </div>
+                      <h3 className="text-base sm:text-lg font-black text-white">
+                        소속 하위 파트너 {subPartnerActivities?.summary?.subPartnerCount}명이 활동 중입니다.
+                      </h3>
+                      <p className="text-xs text-purple-200/80 font-medium">
+                        하위 파트너 유치 매장: <span className="text-amber-300 font-bold">{subPartnerActivities?.summary?.totalStoresCount}개점</span> | 
+                        당월 하위 조직 생지 발주: <span className="text-amber-300 font-bold">{subPartnerActivities?.summary?.currentMonthBoxes}박스</span>
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentMenu("subpartners")}
+                      className="px-4 py-2.5 bg-[#FED422] hover:bg-amber-400 text-slate-900 text-xs font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 shrink-0 border-0 cursor-pointer active:scale-95"
+                    >
+                      <Users size={14} />
+                      <span>하위 파트너 활동 모니터링</span>
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1158,13 +1334,24 @@ export default function PartnerPortalPage() {
                               </div>
                             </div>
 
-                            <button
-                              onClick={() => setSelectedStoreForOrders(store)}
-                              className="w-full py-2 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-2xs flex items-center justify-center gap-1.5 active:scale-95"
-                            >
-                              <FileText size={13} />
-                              <span>재료 발주 내역 보기</span>
-                            </button>
+                            <div className="grid grid-cols-2 gap-2 pt-1">
+                              <button
+                                onClick={() => handleGoToStorePortal(store)}
+                                className="w-full py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-xs flex items-center justify-center gap-1.5 active:scale-95"
+                                title={`${store.name} 점주포털 바로가기 (새 탭)`}
+                              >
+                                <ExternalLink size={13} />
+                                <span>점주포털 바로가기</span>
+                              </button>
+                              <button
+                                onClick={() => setSelectedStoreForOrders(store)}
+                                className="w-full py-2 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-2xs flex items-center justify-center gap-1.5 active:scale-95"
+                                title="재료 발주 내역 보기"
+                              >
+                                <FileText size={13} />
+                                <span>발주 내역</span>
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -1181,7 +1368,7 @@ export default function PartnerPortalPage() {
                               <th className="py-3.5 px-3">등록일자</th>
                               <th className="py-3.5 px-3 text-right">당월 생지 주문</th>
                               <th className="py-3.5 px-3 text-right">누적 생지 주문</th>
-                              <th className="py-3.5 px-4 text-center">재료 주문내역</th>
+                              <th className="py-3.5 px-4 text-center">점주포털 / 발주내역</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-neutral-100">
@@ -1215,13 +1402,24 @@ export default function PartnerPortalPage() {
                                   {store.totalDoughBoxes || 0} 박스
                                 </td>
                                 <td className="py-4 px-4 text-center">
-                                  <button
-                                    onClick={() => setSelectedStoreForOrders(store)}
-                                    className="px-3 py-1.5 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-2xs inline-flex items-center gap-1.5"
-                                  >
-                                    <FileText size={13} />
-                                    <span>주문 내역 보기</span>
-                                  </button>
+                                  <div className="flex items-center justify-center gap-1.5">
+                                    <button
+                                      onClick={() => handleGoToStorePortal(store)}
+                                      className="px-2.5 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-xs inline-flex items-center gap-1 shrink-0 active:scale-95"
+                                      title={`${store.name} 점주포털 바로가기 (새 탭)`}
+                                    >
+                                      <ExternalLink size={12} />
+                                      <span>점주포털</span>
+                                    </button>
+                                    <button
+                                      onClick={() => setSelectedStoreForOrders(store)}
+                                      className="px-2.5 py-1.5 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-2xs inline-flex items-center gap-1 shrink-0 active:scale-95"
+                                      title="재료 발주 내역 보기"
+                                    >
+                                      <FileText size={12} />
+                                      <span>발주내역</span>
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                             ))}
@@ -1229,6 +1427,531 @@ export default function PartnerPortalPage() {
                         </table>
                       </div>
                     </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ==========================================
+                2-1) 하위 파트너 활동 모니터링 뷰 (상위 파트너 전용)
+            ========================================== */}
+            {currentMenu === "subpartners" && (
+              <div className="space-y-4 sm:space-y-6">
+                {/* 상단 헤더 */}
+                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                      <Users size={20} className="text-purple-600" />
+                      <span>하위 파트너 활동 모니터링</span>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-900 border border-purple-300 font-mono">
+                        총 {subPartnerActivities?.summary?.subPartnerCount || 0}명
+                      </span>
+                    </h2>
+                    <p className="text-xs text-slate-400 font-bold mt-1">
+                      {currentPartner?.name} 파트너님 산하의 하위 파트너 조직 현황, 유치 가맹점 및 실시간 발주 활동을 모니터링합니다.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <span className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1.5">
+                      <GitBranch size={13} />
+                      <span>내 직급: Lv.{currentPartner?.level || 1} {currentPartner?.tierName || "총판"}</span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* 4대 주요 지표 카드 */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+                  <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col justify-between space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-400 truncate">소속 하위 파트너</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold shrink-0">
+                        <Users size={16} />
+                      </div>
+                    </div>
+                    <div className="text-base sm:text-2xl font-black text-purple-700 tracking-tight my-0.5">
+                      {subPartnerActivities?.summary?.subPartnerCount || 0} <span className="text-[11px] sm:text-sm font-bold text-slate-400 font-sans">명</span>
+                    </div>
+                    <span className="text-[10px] sm:text-[11px] text-purple-600 font-bold truncate">
+                      직속 및 하위 조직
+                    </span>
+                  </div>
+
+                  <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col justify-between space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-400 truncate">하위 유치 가맹점</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0">
+                        <Store size={16} />
+                      </div>
+                    </div>
+                    <div className="text-base sm:text-2xl font-black text-[#0F172A] tracking-tight my-0.5">
+                      {subPartnerActivities?.summary?.totalStoresCount || 0} <span className="text-[11px] sm:text-sm font-bold text-slate-400 font-sans">개점</span>
+                    </div>
+                    <span className="text-[10px] sm:text-[11px] text-blue-600 font-bold truncate">
+                      하위 파트너 연계 매장
+                    </span>
+                  </div>
+
+                  <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col justify-between space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-400 truncate">당월 하위 생지 발주</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold shrink-0">
+                        <Package size={16} />
+                      </div>
+                    </div>
+                    <div className="text-base sm:text-2xl font-black text-amber-600 tracking-tight my-0.5">
+                      {(subPartnerActivities?.summary?.currentMonthBoxes || 0).toLocaleString()} <span className="text-[11px] sm:text-sm font-bold text-slate-400 font-sans">박스</span>
+                    </div>
+                    <span className="text-[10px] sm:text-[11px] text-slate-400 font-bold truncate">
+                      누적 {(subPartnerActivities?.summary?.totalBoxes || 0).toLocaleString()}박스
+                    </span>
+                  </div>
+
+                  <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs sm:shadow-md flex flex-col justify-between space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-400 truncate">하위 가맹 상담 건수</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shrink-0">
+                        <MessageSquare size={16} />
+                      </div>
+                    </div>
+                    <div className="text-base sm:text-2xl font-black text-emerald-600 tracking-tight my-0.5">
+                      {subPartnerActivities?.summary?.inquiryCount || 0} <span className="text-[11px] sm:text-sm font-bold text-slate-400 font-sans">건</span>
+                    </div>
+                    <span className="text-[10px] sm:text-[11px] text-emerald-600 font-bold truncate">
+                      하위 파트너 상담 활동
+                    </span>
+                  </div>
+                </div>
+
+                {/* 하위 파트너 활동 컨텐츠 탭 & 검색 */}
+                <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs sm:shadow-md overflow-hidden">
+                  <div className="p-4 sm:p-5 border-b border-neutral-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    {/* 서브 탭 버튼군 */}
+                    <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                      <button
+                        type="button"
+                        onClick={() => setSubpartnerSubTab("overview")}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border-0 ${
+                          subpartnerSubTab === "overview"
+                            ? "bg-white text-purple-700 shadow-2xs font-black"
+                            : "text-slate-500 hover:text-slate-800 bg-transparent"
+                        }`}
+                      >
+                        조직 현황 ({subPartnerActivities?.subPartners?.length || 0})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSubpartnerSubTab("stores")}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border-0 ${
+                          subpartnerSubTab === "stores"
+                            ? "bg-white text-purple-700 shadow-2xs font-black"
+                            : "text-slate-500 hover:text-slate-800 bg-transparent"
+                        }`}
+                      >
+                        유치 가맹점 ({subPartnerActivities?.stores?.length || 0})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSubpartnerSubTab("orders")}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border-0 ${
+                          subpartnerSubTab === "orders"
+                            ? "bg-white text-purple-700 shadow-2xs font-black"
+                            : "text-slate-500 hover:text-slate-800 bg-transparent"
+                        }`}
+                      >
+                        가맹점 발주 내역 ({subPartnerActivities?.orders?.length || 0})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSubpartnerSubTab("inquiries")}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border-0 ${
+                          subpartnerSubTab === "inquiries"
+                            ? "bg-white text-purple-700 shadow-2xs font-black"
+                            : "text-slate-500 hover:text-slate-800 bg-transparent"
+                        }`}
+                      >
+                        가맹 상담 활동 ({subPartnerActivities?.inquiries?.length || 0})
+                      </button>
+                    </div>
+
+                    {/* 실시간 검색창 */}
+                    <div className="relative">
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        value={subpartnerSearchQuery}
+                        onChange={(e) => setSubpartnerSearchQuery(e.target.value)}
+                        placeholder="파트너명 / 매장명 / 검색..."
+                        className="pl-8 pr-3 py-1.5 bg-[#F1F4F8] border-0 rounded-lg text-xs font-medium text-[#0F172A] w-full sm:w-56 focus:bg-white focus:ring-2 focus:ring-purple-500/20 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 하위 파트너가 없는 경우 */}
+                  {(!subPartnerActivities?.subPartners || subPartnerActivities.subPartners.length === 0) ? (
+                    <div className="p-16 text-center text-slate-400 space-y-3">
+                      <div className="w-14 h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                        <Users size={28} />
+                      </div>
+                      <div className="text-sm font-bold text-slate-700">등록된 하위 파트너가 없습니다.</div>
+                      <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+                        본사 관리자에게 하위 파트너 등록 또는 상위 파트너 지정을 요청하시면, 하위 파트너의 가맹점 유치 및 발주 활동을 이곳에서 실시간으로 모니터링하실 수 있습니다.
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      {/* 서브탭 1: 하위 조직 목록 (총판/지사 계층) */}
+                      {subpartnerSubTab === "overview" && (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs">
+                            <thead>
+                              <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
+                                <th className="py-3.5 px-4">하위 파트너</th>
+                                <th className="py-3.5 px-3">직급 / 레벨</th>
+                                <th className="py-3.5 px-3">연락처 / 이메일</th>
+                                <th className="py-3.5 px-3 text-center">직속 상위</th>
+                                <th className="py-3.5 px-3 text-center">유치 가맹점</th>
+                                <th className="py-3.5 px-3 text-right">당월 생지 발주</th>
+                                <th className="py-3.5 px-3 text-right">누적 생지 발주</th>
+                                <th className="py-3.5 px-3 text-center">상태</th>
+                                <th className="py-3.5 px-4 text-center">가맹점 관리</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-neutral-100">
+                              {subPartnerActivities.subPartners
+                                .filter((p: any) => {
+                                  if (!subpartnerSearchQuery.trim()) return true;
+                                  const q = subpartnerSearchQuery.trim().toLowerCase();
+                                  return (
+                                    (p.name || "").toLowerCase().includes(q) ||
+                                    (p.id || "").toLowerCase().includes(q) ||
+                                    (p.companyName || "").toLowerCase().includes(q) ||
+                                    (p.phone || "").includes(q)
+                                  );
+                                })
+                                .map((partner: any) => (
+                                  <tr key={partner.id} className="hover:bg-purple-50/30 transition-colors">
+                                    <td className="py-3.5 px-4">
+                                      <div className="font-black text-[#0F172A] text-sm flex items-center gap-1.5">
+                                        <span>{partner.name}</span>
+                                        {partner.companyName && (
+                                          <span className="text-xs text-slate-400 font-normal">({partner.companyName})</span>
+                                        )}
+                                      </div>
+                                      <div className="text-[11px] text-slate-500 font-mono mt-0.5">
+                                        ID: <span className="font-bold text-slate-700">{partner.id}</span>
+                                      </div>
+                                    </td>
+                                    <td className="py-3.5 px-3">
+                                      <span className="inline-block px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 font-extrabold text-[10px] border border-purple-200">
+                                        Lv.{partner.level} {partner.tierName}
+                                      </span>
+                                    </td>
+                                    <td className="py-3.5 px-3">
+                                      <div className="text-slate-800 font-bold">{partner.phone}</div>
+                                      <div className="text-[11px] text-slate-400">{partner.email || "-"}</div>
+                                    </td>
+                                    <td className="py-3.5 px-3 text-center">
+                                      <span className="text-slate-600 font-medium">
+                                        {partner.isDirectChild ? (
+                                          <span className="text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded text-[10px]">
+                                            나의 직속
+                                          </span>
+                                        ) : (
+                                          <span className="text-slate-500 text-[10px]">
+                                            {partner.parentName} 산하
+                                          </span>
+                                        )}
+                                      </span>
+                                    </td>
+                                    <td className="py-3.5 px-3 text-center">
+                                      <span className="inline-block px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-black text-xs border border-blue-100">
+                                        {partner.storesCount || 0} 개점
+                                      </span>
+                                    </td>
+                                    <td className="py-3.5 px-3 text-right font-black text-amber-600 text-sm tabular-nums">
+                                      {(partner.currentMonthBoxes || 0).toLocaleString()} 박스
+                                    </td>
+                                    <td className="py-3.5 px-3 text-right font-black text-slate-800 text-sm tabular-nums">
+                                      {(partner.totalBoxes || 0).toLocaleString()} 박스
+                                    </td>
+                                    <td className="py-3.5 px-3 text-center">
+                                      <span
+                                        className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold ${
+                                          partner.status === "활동중"
+                                            ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                                             : "bg-slate-100 text-slate-500 border border-slate-200"
+                                        }`}
+                                      >
+                                        {partner.status}
+                                      </span>
+                                    </td>
+                                    <td className="py-3.5 px-4 text-center">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSubpartnerSearchQuery(partner.name);
+                                          setSubpartnerSubTab("stores");
+                                        }}
+                                        className="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 font-black text-xs border border-purple-200 transition-all cursor-pointer inline-flex items-center gap-1 shadow-2xs"
+                                        title={`${partner.name} 유치 매장 및 구매 이력 보기`}
+                                      >
+                                        <Store size={12} />
+                                        <span>유치매장 보기</span>
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {/* 서브탭 2: 하위 유치 가맹점 목록 & 구매/발주 실적 */}
+                      {subpartnerSubTab === "stores" && (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs">
+                            <thead>
+                              <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
+                                <th className="py-3.5 px-4">가맹점명</th>
+                                <th className="py-3.5 px-3">담당 하위 파트너</th>
+                                <th className="py-3.5 px-3">점주 / 연락처</th>
+                                <th className="py-3.5 px-3 text-center">가맹 상태</th>
+                                <th className="py-3.5 px-3 text-right">당월 생지 발주</th>
+                                <th className="py-3.5 px-3 text-right">누적 생지 발주</th>
+                                <th className="py-3.5 px-3 text-right">총 발주액 (건수)</th>
+                                <th className="py-3.5 px-4 text-center">점주포털 / 구매이력</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-neutral-100">
+                              {subPartnerActivities.stores
+                                .filter((s: any) => {
+                                  if (!subpartnerSearchQuery.trim()) return true;
+                                  const q = subpartnerSearchQuery.trim().toLowerCase();
+                                  return (
+                                    (s.name || "").toLowerCase().includes(q) ||
+                                    (s.owner || "").toLowerCase().includes(q) ||
+                                    (s.partnerName || "").toLowerCase().includes(q) ||
+                                    (s.roadAddress || "").toLowerCase().includes(q)
+                                  );
+                                })
+                                .map((store: any) => (
+                                  <tr key={store.id} className="hover:bg-slate-50 transition-colors">
+                                    <td className="py-3.5 px-4">
+                                      <div className="font-black text-[#0F172A] text-sm">{store.name}</div>
+                                      <div className="text-[11px] text-slate-400 truncate max-w-xs">{store.roadAddress} {store.detailAddress}</div>
+                                    </td>
+                                    <td className="py-3.5 px-3">
+                                      <div className="font-bold text-purple-700 flex items-center gap-1.5">
+                                        <span>{store.partnerName}</span>
+                                        <span className="text-[10px] bg-purple-50 px-1.5 py-0.2 rounded border border-purple-200 font-extrabold">
+                                          {store.partnerTierName}
+                                        </span>
+                                      </div>
+                                      <div className="text-[10px] text-slate-400">연락처: {store.partnerPhone || "-"}</div>
+                                    </td>
+                                    <td className="py-3.5 px-3">
+                                      <div className="text-slate-800 font-bold">{store.owner}</div>
+                                      <div className="text-[11px] text-slate-400">{store.phone}</div>
+                                    </td>
+                                    <td className="py-3.5 px-3 text-center">
+                                      <span
+                                        className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold ${
+                                          store.status === "승인"
+                                            ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                                            : "bg-amber-50 text-amber-600 border border-amber-200"
+                                        }`}
+                                      >
+                                        {store.status}
+                                      </span>
+                                    </td>
+                                    <td className="py-3.5 px-3 text-right font-black text-amber-600 text-sm tabular-nums">
+                                      {store.monthDoughBoxes || 0} 박스
+                                    </td>
+                                    <td className="py-3.5 px-3 text-right font-black text-slate-800 text-sm tabular-nums">
+                                      {store.totalDoughBoxes || 0} 박스
+                                    </td>
+                                    <td className="py-3.5 px-3 text-right tabular-nums">
+                                      <div className="font-black text-slate-900 text-xs">
+                                        {(store.totalOrderAmount || 0).toLocaleString()}원
+                                      </div>
+                                      <div className="text-[10px] text-slate-400">
+                                        총 {store.totalOrdersCount || 0}건 주문
+                                      </div>
+                                    </td>
+                                    <td className="py-3.5 px-4 text-center">
+                                      <div className="flex items-center justify-center gap-1.5">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleGoToStorePortal(store)}
+                                          className="px-2.5 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-xs inline-flex items-center gap-1 shrink-0 active:scale-95"
+                                          title={`${store.name} 점주포털 바로가기 (새 탭)`}
+                                        >
+                                          <ExternalLink size={12} />
+                                          <span>점주포털</span>
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => setSelectedStoreForOrders(store)}
+                                          className="px-2.5 py-1.5 bg-[#FED422] hover:bg-amber-400 text-[#0F172A] rounded-lg text-xs font-black transition-all cursor-pointer border-0 shadow-2xs inline-flex items-center gap-1 shrink-0 active:scale-95"
+                                          title="상세 구매 이력 보기"
+                                        >
+                                          <FileText size={12} />
+                                          <span>구매이력</span>
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {/* 서브탭 3: 가맹점 발주 내역 */}
+                      {subpartnerSubTab === "orders" && (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs">
+                            <thead>
+                              <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
+                                <th className="py-3.5 px-4">주문일자 / ID</th>
+                                <th className="py-3.5 px-3">발주 가맹점</th>
+                                <th className="py-3.5 px-3">담당 하위 파트너</th>
+                                <th className="py-3.5 px-3 text-right">생지 발주량</th>
+                                <th className="py-3.5 px-3 text-right">주문 총액</th>
+                                <th className="py-3.5 px-3 text-center">주문 상태</th>
+                                <th className="py-3.5 px-4 text-center">가맹점 이력</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-neutral-100">
+                              {subPartnerActivities.orders
+                                .filter((o: any) => {
+                                  if (!subpartnerSearchQuery.trim()) return true;
+                                  const q = subpartnerSearchQuery.trim().toLowerCase();
+                                  return (
+                                    (o.storeName || "").toLowerCase().includes(q) ||
+                                    (o.partnerName || "").toLowerCase().includes(q) ||
+                                    (o.id || "").toLowerCase().includes(q)
+                                  );
+                                })
+                                .map((ord: any) => {
+                                  const matchingStore = subPartnerActivities?.stores?.find((s: any) => s.id === ord.storeId);
+                                  return (
+                                    <tr key={ord.id} className="hover:bg-slate-50 transition-colors">
+                                      <td className="py-3.5 px-4">
+                                        <div className="font-bold text-slate-900">{ord.date}</div>
+                                        <div className="text-[10px] text-slate-400 font-mono">{ord.id}</div>
+                                      </td>
+                                      <td className="py-3.5 px-3">
+                                        <div className="font-bold text-slate-800">{ord.storeName}</div>
+                                        <div className="text-[10px] text-slate-400">점주: {ord.storeOwner}</div>
+                                      </td>
+                                      <td className="py-3.5 px-3">
+                                        <span className="font-bold text-purple-700">{ord.partnerName}</span>
+                                        <span className="text-[10px] text-slate-400 ml-1">({ord.partnerTierName})</span>
+                                      </td>
+                                      <td className="py-3.5 px-3 text-right font-black text-amber-600 text-sm tabular-nums">
+                                        {ord.doughBoxes} 박스
+                                      </td>
+                                      <td className="py-3.5 px-3 text-right font-black text-slate-900 tabular-nums">
+                                        {(ord.totalPrice || 0).toLocaleString()} 원
+                                      </td>
+                                      <td className="py-3.5 px-3 text-center">
+                                        <span
+                                          className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold ${
+                                            STATUS_BADGES[ord.status]?.bg || "bg-slate-100"
+                                          } ${STATUS_BADGES[ord.status]?.text || "text-slate-600"} border ${
+                                            STATUS_BADGES[ord.status]?.border || "border-slate-200"
+                                          }`}
+                                        >
+                                          {ord.status}
+                                        </span>
+                                      </td>
+                                      <td className="py-3.5 px-4 text-center">
+                                        {matchingStore && (
+                                          <button
+                                            type="button"
+                                            onClick={() => setSelectedStoreForOrders(matchingStore)}
+                                            className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-black text-xs border border-slate-200 transition-all cursor-pointer inline-flex items-center gap-1 shadow-2xs"
+                                            title="해당 가맹점 전체 발주 내역 열기"
+                                          >
+                                            <FileText size={12} />
+                                            <span>전체 발주</span>
+                                          </button>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {/* 서브탭 4: 가맹 상담/문의 활동 */}
+                      {subpartnerSubTab === "inquiries" && (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs">
+                            <thead>
+                              <tr className="bg-[#F8FAFC] border-b border-neutral-200/80 text-slate-500 font-bold">
+                                <th className="py-3.5 px-4">접수일시</th>
+                                <th className="py-3.5 px-3">고객명 / 연락처</th>
+                                <th className="py-3.5 px-3">점포 유형 / 매장명</th>
+                                <th className="py-3.5 px-3">담당 하위 파트너</th>
+                                <th className="py-3.5 px-3 text-center">진행 상태</th>
+                                <th className="py-3.5 px-4">상담 메모</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-neutral-100">
+                              {subPartnerActivities.inquiries
+                                .filter((inq: any) => {
+                                  if (!subpartnerSearchQuery.trim()) return true;
+                                  const q = subpartnerSearchQuery.trim().toLowerCase();
+                                  return (
+                                    (inq.name || "").toLowerCase().includes(q) ||
+                                    (inq.phone || "").includes(q) ||
+                                    (inq.partnerName || "").toLowerCase().includes(q)
+                                  );
+                                })
+                                .map((inq: any) => (
+                                  <tr key={inq._id} className="hover:bg-slate-50 transition-colors">
+                                    <td className="py-3.5 px-4 text-slate-500 font-medium">
+                                      {inq.regDate}
+                                    </td>
+                                    <td className="py-3.5 px-3">
+                                      <div className="font-bold text-slate-900">{inq.name}</div>
+                                      <div className="text-[11px] text-slate-400">{inq.phone}</div>
+                                    </td>
+                                    <td className="py-3.5 px-3">
+                                      <span className="font-bold text-slate-800">{inq.storeType}</span>
+                                      {inq.existingStoreName && (
+                                        <div className="text-[10px] text-slate-400">({inq.existingStoreName})</div>
+                                      )}
+                                    </td>
+                                    <td className="py-3.5 px-3">
+                                      <span className="font-bold text-purple-700">{inq.partnerName}</span>
+                                      <span className="text-[10px] text-slate-400 ml-1">({inq.partnerTierName})</span>
+                                    </td>
+                                    <td className="py-3.5 px-3 text-center">
+                                      <span
+                                        className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold ${
+                                          STATUS_BADGES[inq.status || "대기"]?.bg || "bg-amber-50"
+                                        } ${STATUS_BADGES[inq.status || "대기"]?.text || "text-amber-600"} border ${
+                                          STATUS_BADGES[inq.status || "대기"]?.border || "border-amber-200"
+                                        }`}
+                                      >
+                                        {inq.status || "대기"}
+                                      </span>
+                                    </td>
+                                    <td className="py-3.5 px-4 text-slate-500 text-[11px] max-w-[240px] truncate">
+                                      {inq.partnerMemo || inq.message || "-"}
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -1870,8 +2593,9 @@ export default function PartnerPortalPage() {
                         <input
                           type="text"
                           value={settingPhone}
-                          onChange={(e) => setSettingPhone(e.target.value)}
+                          onChange={(e) => setSettingPhone(formatPhoneNumber(e.target.value))}
                           placeholder="010-0000-0000"
+                          maxLength={13}
                           className="w-full h-10 px-3.5 bg-[#F1F4F8] border-0 rounded-lg text-xs font-bold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
                         />
                       </div>
@@ -1998,28 +2722,54 @@ export default function PartnerPortalPage() {
               <div className="flex items-center gap-2.5">
                 <Store size={20} className="text-[#0F172A]" />
                 <div>
-                  <h3 className="text-base font-black text-[#0F172A]">
-                    {selectedStoreForOrders.name} - 재료 발주 내역
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-black text-[#0F172A]">
+                      {selectedStoreForOrders.name} - 재료 발주 내역
+                    </h3>
+                    {selectedStoreForOrders.partnerName && selectedStoreForOrders.partnerId !== currentPartner?.id && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-900 text-purple-100 text-[10px] font-extrabold shadow-2xs">
+                        <Users size={10} />
+                        담당: {selectedStoreForOrders.partnerName} ({selectedStoreForOrders.partnerTierName || "하위 파트너"})
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-[#0F172A]/80 font-bold">
                     점주: {selectedStoreForOrders.owner} ({selectedStoreForOrders.phone})
+                    {selectedStoreForOrders.roadAddress && (
+                      <span className="ml-2 text-slate-700 font-medium">| {selectedStoreForOrders.roadAddress}</span>
+                    )}
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setSelectedStoreForOrders(null)}
-                className="w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
-              >
-                <X size={16} />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleGoToStorePortal(selectedStoreForOrders)}
+                  className="px-3 py-1.5 rounded-lg bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-black flex items-center gap-1.5 border-0 cursor-pointer shadow-xs transition-all active:scale-95"
+                  title={`${selectedStoreForOrders.name} 점주포털 바로가기 (새 탭)`}
+                >
+                  <ExternalLink size={13} className="text-amber-400" />
+                  <span className="hidden sm:inline">점주포털 바로가기</span>
+                  <span className="sm:hidden">점주포털</span>
+                </button>
+                <button
+                  onClick={() => setSelectedStoreForOrders(null)}
+                  className="w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 text-[#0F172A] transition-all flex items-center justify-center border-0 cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#F8FAFC]">
               {(() => {
-                const storeSpecificOrders = myOrders.filter(
-                  (o: any) => o.storeId === selectedStoreForOrders.id
-                );
+                // 내 직속 가맹점 또는 하위 파트너 가맹점 발주 내역을 모두 지원
+                const storeSpecificOrders = (selectedStoreForOrders.orders && selectedStoreForOrders.orders.length > 0)
+                  ? selectedStoreForOrders.orders
+                  : [
+                      ...(myOrders || []),
+                      ...((subPartnerActivities?.orders as any[]) || []),
+                    ].filter((o: any) => o.storeId === selectedStoreForOrders.id);
 
                 if (storeSpecificOrders.length === 0) {
                   return (
@@ -2031,69 +2781,85 @@ export default function PartnerPortalPage() {
 
                 return (
                   <div className="space-y-3">
-                    {storeSpecificOrders.map((ord: any) => (
-                      <div
-                        key={ord.id}
-                        className="p-4 rounded-lg bg-white border border-neutral-200/90 shadow-2xs space-y-3"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-2.5">
-                          <div className="flex items-center gap-2.5">
-                            <span className="text-xs font-black text-[#0F172A]">{ord.id}</span>
-                            <span className="text-xs text-slate-400">{ord.date}</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span
-                              className={`px-2 py-0.5 rounded text-[10px] font-extrabold border ${
-                                (STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).bg
-                              } ${(STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).text} ${
-                                (STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).border
-                              }`}
-                            >
-                              {ord.status}
-                            </span>
-                            <span className="text-xs font-black text-[#0F172A] tabular-nums">
-                              주문총액 {(ord.totalPrice || 0).toLocaleString()}원
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* 아이템 목록 */}
-                        <div className="space-y-1.5">
-                          {ord.items &&
-                            ord.items.map((item: any, iIdx: number) => (
-                              <div
-                                key={iIdx}
-                                className="flex items-center justify-between text-xs py-1.5 px-3 rounded bg-[#F8FAFC] border border-neutral-100"
+                    {storeSpecificOrders.map((ord: any) => {
+                      const displayDoughBoxes = ord.doughBoxes ?? ord.pastryDoughBoxes ?? 0;
+                      return (
+                        <div
+                          key={ord.id}
+                          className="p-4 rounded-lg bg-white border border-neutral-200/90 shadow-2xs space-y-3"
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-2.5">
+                            <div className="flex items-center gap-2.5">
+                              <span className="text-xs font-black text-[#0F172A]">{ord.id}</span>
+                              <span className="text-xs text-slate-400">{ord.date}</span>
+                              {ord.partnerName && ord.partnerId !== currentPartner?.id && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 font-bold border border-purple-200">
+                                  관리: {ord.partnerName}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span
+                                className={`px-2 py-0.5 rounded text-[10px] font-extrabold border ${
+                                  (STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).bg
+                                } ${(STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).text} ${
+                                  (STATUS_BADGES[ord.status] || STATUS_BADGES["대기"]).border
+                                }`}
                               >
-                                <div className="flex items-center gap-2">
-                                  <span className="font-bold text-slate-800">{item.productName}</span>
-                                  {item.isPastryDough && (
-                                    <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-300">
-                                      패스트리 생지 수수료 대상 (+8,000원/박스)
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="text-slate-500 font-bold tabular-nums">
-                                  {item.quantity}개 / 박스 · {(item.price * item.quantity).toLocaleString()}원
-                                </div>
-                              </div>
-                            ))}
-                        </div>
+                                {ord.status}
+                              </span>
+                              <span className="text-xs font-black text-[#0F172A] tabular-nums">
+                                주문총액 {(ord.totalPrice || 0).toLocaleString()}원
+                              </span>
+                            </div>
+                          </div>
 
-                        {/* 합계 */}
-                        <div className="flex items-center justify-between pt-1 text-xs font-bold text-slate-700 bg-amber-50/60 p-2.5 rounded-md border border-amber-100">
-                          <span>패스트리 생지 합계: <strong className="text-amber-700 font-bold">{ord.pastryDoughBoxes}박스</strong></span>
-                          <span>발생 파트너 수수료: <strong className="text-rose-600 font-bold text-sm tabular-nums">+{((ord.commission || 0)).toLocaleString()}원</strong></span>
+                          {/* 아이템 목록 */}
+                          <div className="space-y-1.5">
+                            {ord.items &&
+                              ord.items.map((item: any, iIdx: number) => (
+                                <div
+                                  key={iIdx}
+                                  className="flex items-center justify-between text-xs py-1.5 px-3 rounded bg-[#F8FAFC] border border-neutral-100"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold text-slate-800">{item.productName}</span>
+                                    {item.isPastryDough && (
+                                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-300">
+                                        패스트리 생지 수수료 대상 (+8,000원/박스)
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-slate-500 font-bold tabular-nums">
+                                    {item.quantity}개 / 박스 · {(item.price * item.quantity).toLocaleString()}원
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+
+                          {/* 합계 */}
+                          <div className="flex items-center justify-between pt-1 text-xs font-bold text-slate-700 bg-amber-50/60 p-2.5 rounded-md border border-amber-100">
+                            <span>패스트리 생지 합계: <strong className="text-amber-700 font-bold">{displayDoughBoxes}박스</strong></span>
+                            <span>발생 파트너 수수료: <strong className="text-rose-600 font-bold text-sm tabular-nums">+{((ord.commission || displayDoughBoxes * 8000)).toLocaleString()}원</strong></span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 );
               })()}
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-neutral-200 bg-white flex justify-end">
+            <div className="p-4 border-t border-neutral-200 bg-white flex items-center justify-between gap-3">
+              <button
+                onClick={() => handleGoToStorePortal(selectedStoreForOrders)}
+                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs rounded-lg transition-all border-0 cursor-pointer shadow-xs flex items-center gap-1.5 active:scale-95"
+                title={`${selectedStoreForOrders.name} 점주포털 바로가기 (새 탭)`}
+              >
+                <ExternalLink size={14} />
+                <span>[{selectedStoreForOrders.name}] 점주 포털 바로가기</span>
+              </button>
               <button
                 onClick={() => setSelectedStoreForOrders(null)}
                 className="px-5 py-2 bg-[#0F172A] hover:bg-slate-800 text-white font-bold text-xs rounded-lg transition-all border-0 cursor-pointer shadow-xs"
@@ -2320,13 +3086,13 @@ export default function PartnerPortalPage() {
               key={key}
               onClick={() => setCurrentMenu(key)}
               className={`flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all relative border-0 bg-transparent cursor-pointer ${
-                isActive ? "text-[#0F172A] font-black" : "text-slate-400 font-bold hover:text-slate-600"
+                isActive ? "text-purple-700 font-black" : "text-slate-400 font-bold hover:text-slate-600"
               }`}
             >
               <div className="relative">
                 <div
                   className={`w-9 h-7 rounded-lg flex items-center justify-center transition-all ${
-                    isActive ? "bg-[#FED422] text-[#0F172A] shadow-xs scale-105" : ""
+                    isActive ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-950/20 scale-105" : ""
                   }`}
                 >
                   <Icon size={18} />

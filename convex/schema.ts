@@ -94,6 +94,7 @@ export default defineSchema({
     labels: v.optional(v.array(v.string())),
     shippingType: v.optional(v.string()), // "free" | "A" | "B" | "C"
     options: v.optional(v.array(v.string())),
+    gradePrices: v.optional(v.record(v.string(), v.number())), // 파트너 등급별(1~5등급) 판매가 정책 (e.g. {"1": 42000, "2": 40000})
   }).index("by_prod_id", ["id"])
     .index("by_orderIndex", ["orderIndex"]),
   orders: defineTable({
@@ -263,7 +264,12 @@ export default defineSchema({
     status: v.string(), // "활동중" | "대기" | "정지"
     regDate: v.string(), // 등록일자 (YYYY-MM-DD)
     memo: v.optional(v.string()), // 본사 메모
-  }).index("by_partner_id", ["id"]),
+    parentId: v.optional(v.string()), // 상위 파트너 로그인 ID
+    level: v.optional(v.number()), // 파트너 레벨 (1: 1차 총판, 2: 2차 지사/에이전시, 3: 3차 매니저 등)
+    tierName: v.optional(v.string()), // 직급/티어명 (예: "총판", "지사", "대리점", "매니저" 등)
+    grade: v.optional(v.number()), // 파트너 가격 정책 등급 (1 ~ 5등급, 기본: 1)
+  }).index("by_partner_id", ["id"])
+    .index("by_parent_id", ["parentId"]),
   partnerSettlements: defineTable({
     partnerId: v.string(), // 파트너 ID
     yearMonth: v.string(), // 정산 년월 (YYYY-MM)
