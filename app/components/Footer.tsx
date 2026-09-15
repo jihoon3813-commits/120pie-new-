@@ -147,43 +147,68 @@ export default function Footer({ theme }: FooterProps) {
             </div>
           </div>
         </div>
-        <div className={`pt-6 text-xs font-medium flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${
-          isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
-        }`}>
-          <p>Copyright(c)2026 GOWELL-LIFE Co.,Ltd. All Right Reserved.</p>
-          <div className="flex items-center gap-3">
-            <a
-              href="/portal"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`hover:underline transition-colors text-[11px] ${
-                isPinkVariant ? "text-[#7c5d6c] hover:text-[#4c2d3a]" : isYellowVariant ? "text-[#576575] hover:text-[#0d233a]" : "text-neutral-500 hover:text-neutral-300"
-              }`}
-            >
-              점주포털
-            </a>
-            <span className={isPinkVariant ? "text-neutral-300" : isYellowVariant ? "text-neutral-300" : "text-neutral-850"}>|</span>
-            <a
-              href="/partner"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`hover:underline transition-colors text-[11px] ${
-                isPinkVariant ? "text-[#7c5d6c] hover:text-[#4c2d3a]" : isYellowVariant ? "text-[#576575] hover:text-[#0d233a]" : "text-neutral-500 hover:text-neutral-300"
-              }`}
-            >
-              파트너포털
-            </a>
-            <span className={isPinkVariant ? "text-neutral-300" : isYellowVariant ? "text-neutral-300" : "text-neutral-850"}>|</span>
-            <a
-              href="/admin"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`hover:underline transition-colors text-[11px] ${
-                isPinkVariant ? "text-[#7c5d6c] hover:text-[#4c2d3a]" : isYellowVariant ? "text-[#576575] hover:text-[#0d233a]" : "text-neutral-500 hover:text-neutral-300"
-              }`}
-            >
-              본사 어드민
-            </a>
+        {/* 관리자 및 점주/파트너 포털 바로가기 버튼 그룹 (모바일 최적화 반응형 버튼) */}
+        <div className="pt-6 border-t border-neutral-200/20 dark:border-neutral-800/60">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className={`text-xs font-medium ${
+              isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-500"
+            }`}>
+              Copyright(c)2026 GOWELL-LIFE Co.,Ltd. All Right Reserved.
+            </p>
+
+            {/* 3대 전용 포털 바로가기 버튼 그리드 (모바일 3분할 꽉 찬 버튼, 데스크탑 인라인 버튼) */}
+            <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+              <a
+                href="/portal"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-black transition-all shadow-xs active:scale-95 text-center ${
+                  isPinkVariant 
+                    ? "bg-rose-50 hover:bg-rose-100 text-[#4c2d3a] border border-[#f2ccd7]/70" 
+                    : isYellowVariant 
+                    ? "bg-amber-50 hover:bg-amber-100 text-[#0d233a] border border-[#e6dfc3]" 
+                    : "bg-neutral-800/90 hover:bg-neutral-700 text-neutral-200 hover:text-white border border-neutral-700"
+                }`}
+                title="120겹파이 점주 전용 포털 시스템"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
+                <span className="truncate">점주포털</span>
+              </a>
+
+              <a
+                href="/partner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-black transition-all shadow-xs active:scale-95 text-center ${
+                  isPinkVariant 
+                    ? "bg-rose-50 hover:bg-rose-100 text-[#4c2d3a] border border-[#f2ccd7]/70" 
+                    : isYellowVariant 
+                    ? "bg-amber-50 hover:bg-amber-100 text-[#0d233a] border border-[#e6dfc3]" 
+                    : "bg-neutral-800/90 hover:bg-neutral-700 text-neutral-200 hover:text-white border border-neutral-700"
+                }`}
+                title="120겹파이 영업 파트너 전용 포털 시스템"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0"></span>
+                <span className="truncate">파트너포털</span>
+              </a>
+
+              <a
+                href="/admin"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-black transition-all shadow-xs active:scale-95 text-center ${
+                  isPinkVariant 
+                    ? "bg-rose-50 hover:bg-rose-100 text-[#4c2d3a] border border-[#f2ccd7]/70" 
+                    : isYellowVariant 
+                    ? "bg-amber-50 hover:bg-amber-100 text-[#0d233a] border border-[#e6dfc3]" 
+                    : "bg-neutral-800/90 hover:bg-neutral-700 text-neutral-200 hover:text-white border border-neutral-700"
+                }`}
+                title="120겹파이 본사 통합 최고관리자 어드민"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+                <span className="truncate">본사 어드민</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>

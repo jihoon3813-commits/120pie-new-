@@ -443,9 +443,31 @@ export default function PortalPage() {
   const [loginPw, setLoginPw] = useState<string>("");
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  const [currentMenu, setCurrentMenu] = useState<string>("dashboard");
+  const [currentMenu, setCurrentMenu] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const qMenu = sp.get("menu");
+      if (qMenu && ["dashboard", "order", "history", "notice", "inquiry", "training", "pr", "profile"].includes(qMenu)) {
+        return qMenu;
+      }
+    }
+    return "dashboard";
+  });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const mainContentRef = useRef<HTMLElement | null>(null);
+
+  // 메뉴 변경 헬퍼 (URL 쿼리 파라미터 동기화로 모바일 리프레시/뒤로가기 시 상태 유지)
+  const switchMenu = useCallback((menuKey: string) => {
+    const validMenu = menuKey === "orders" || menuKey === "material" || menuKey === "materials" ? "order" : menuKey;
+    setCurrentMenu(validMenu);
+    if (typeof window !== "undefined") {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set("menu", validMenu);
+        window.history.replaceState(null, "", url.toString());
+      } catch (e) {}
+    }
+  }, []);
 
   // 메뉴 변경 시 메인 화면 및 윈도우 스크롤을 항상 최상단(top=0)으로 즉시 초기화
   useEffect(() => {
@@ -716,6 +738,13 @@ export default function PortalPage() {
         const savedStore = localStorage.getItem("120_active_store_id");
         if (savedStore) {
           setActiveStoreId(savedStore);
+        }
+      }
+      const queryMenu = searchParams.get("menu");
+      if (queryMenu) {
+        const validMenu = queryMenu === "orders" || queryMenu === "material" || queryMenu === "materials" ? "order" : queryMenu;
+        if (["dashboard", "order", "history", "notice", "inquiry", "training", "pr", "profile"].includes(validMenu)) {
+          setCurrentMenu(validMenu);
         }
       }
       setCheckingAuth(false);
@@ -2655,7 +2684,10 @@ export default function PortalPage() {
 
           <button 
             type="button"
-            onClick={() => setCurrentMenu("dashboard")}
+            onClick={(e) => {
+              e.preventDefault();
+              switchMenu("dashboard");
+            }}
             className="flex items-center gap-1.5 sm:gap-2 group shrink-0 min-w-0 bg-transparent border-0 cursor-pointer p-0 text-left"
           >
             <img
@@ -2679,13 +2711,17 @@ export default function PortalPage() {
           
           <div className="h-6 w-px bg-slate-200 hidden md:block"></div>
 
-          {/* 자재주문 바로가기 버튼 */}
+          {/* 자재주문 바로가기 버튼 (모바일 터치 안전 적용 및 switchMenu 연동) */}
           <button
             type="button"
-            onClick={() => setCurrentMenu("order")}
-            className="px-3 py-1.5 rounded-md bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-xs font-black transition-all flex items-center gap-1.5 shadow-sm shrink-0 whitespace-nowrap border-0 cursor-pointer active:scale-95"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              switchMenu("order");
+            }}
+            className="px-2.5 sm:px-3 py-1.5 rounded-md bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-[11px] sm:text-xs font-black transition-all flex items-center gap-1 sm:gap-1.5 shadow-sm shrink-0 whitespace-nowrap border-0 cursor-pointer active:scale-95 touch-manipulation"
           >
-            <ShoppingBag size={14} className="text-[#0F172A] shrink-0" />
+            <ShoppingBag size={13} className="text-[#0F172A] shrink-0" />
             <span>자재주문 바로가기</span>
           </button>
 
@@ -2789,7 +2825,7 @@ export default function PortalPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setCurrentMenu(key);
+                        switchMenu(key);
                         setMobileMenuOpen(false);
                       }}
                       className={`w-full ${
@@ -2853,7 +2889,7 @@ export default function PortalPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      setCurrentMenu("dashboard");
+                      switchMenu("dashboard");
                       setMobileMenuOpen(false);
                     }}
                     className="flex items-center gap-2 bg-transparent border-0 cursor-pointer p-0 text-left"
@@ -2898,7 +2934,7 @@ export default function PortalPage() {
                       key={key}
                       type="button"
                       onClick={() => {
-                        setCurrentMenu(key);
+                        switchMenu(key);
                         setMobileMenuOpen(false);
                       }}
                       className={`w-full px-4 py-3 rounded-lg flex items-center justify-between text-sm font-black transition-all border-0 cursor-pointer ${
@@ -3179,7 +3215,7 @@ export default function PortalPage() {
                           if (target.startsWith("http")) {
                             window.open(target, "_blank");
                           } else {
-                            setCurrentMenu(target);
+                            switchMenu(target);
                           }
                         }}
                         className="px-5 py-2.5 rounded-md bg-[#F5AC00] hover:bg-[#e09d00] text-[#0F172A] text-xs font-black transition-all inline-flex items-center gap-2 shadow-lg cursor-pointer border-0 active:scale-98"
@@ -3200,7 +3236,7 @@ export default function PortalPage() {
                       <button
                         key={btn.key}
                         type="button"
-                        onClick={() => setCurrentMenu(btn.key)}
+                        onClick={() => switchMenu(btn.key)}
                         className={`p-5 flex flex-col justify-between min-h-[120px] text-left transition-all shadow-2xs rounded-lg border-0 cursor-pointer relative overflow-hidden group ${btn.color}`}
                       >
                         <div className="flex items-center justify-between w-full">
@@ -6207,24 +6243,30 @@ export default function PortalPage() {
           } else {
             const cleanLink = link.startsWith("/") ? link.slice(1) : link;
             const menuMapping: Record<string, string> = {
-              order: "orders",
-              orders: "orders",
+              order: "order",
+              orders: "order",
+              material: "order",
+              materials: "order",
               training: "training",
-              material: "material",
               inquiry: "inquiry",
               notice: "notice",
-              dashboard: "dashboard"
+              dashboard: "dashboard",
+              history: "history",
+              pr: "pr",
+              profile: "profile"
             };
             if (menuMapping[cleanLink]) {
-              setCurrentMenu(menuMapping[cleanLink]);
+              switchMenu(menuMapping[cleanLink]);
             } else if (cleanLink.startsWith("portal?menu=")) {
               const targetMenu = cleanLink.split("menu=")[1];
-              if (targetMenu) setCurrentMenu(targetMenu);
+              if (targetMenu) switchMenu(targetMenu);
             } else if (cleanLink.startsWith("portal/")) {
               const sub = cleanLink.replace("portal/", "");
-              if (menuMapping[sub]) setCurrentMenu(menuMapping[sub]);
+              if (menuMapping[sub]) switchMenu(menuMapping[sub]);
+            } else if (cleanLink === "order" || cleanLink.includes("order") || cleanLink.includes("material")) {
+              switchMenu("order");
             } else {
-              window.location.href = link;
+              switchMenu("order");
             }
             setShowPopup(false);
           }
@@ -6677,10 +6719,18 @@ export default function PortalPage() {
                 <button 
                   type="button"
                   onClick={() => {
-                    closeModal(() => setMobileCartOpen(false));
-                    placeOrder();
+                    setMobileCartOpen(false);
+                    if (!recipientName) {
+                      const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+                      setRecipientName(activeStore?.owner || "");
+                    }
+                    if (!recipientPhone) {
+                      const activeStore = (stores || []).find((s: any) => s.id === (activeStoreId || "owner"));
+                      setRecipientPhone(activeStore?.phone || "");
+                    }
+                    setShowCheckoutModal(true);
                   }}
-                  className="w-full py-3.5 bg-[#F5AC00] hover:bg-[#E69D00] text-[#0F172A] text-sm font-black rounded-md transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-98"
+                  className="w-full py-3.5 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-sm font-black rounded-md transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-98"
                 >
                   <CheckCircle2 size={18} />
                   <span>{cartTotal.toLocaleString()}원 결제 진행하기</span>
