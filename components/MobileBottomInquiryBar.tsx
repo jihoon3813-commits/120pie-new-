@@ -1,7 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Phone, Send, Sparkles } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface MobileBottomInquiryBarProps {
   onOpenConsultation?: () => void;
@@ -11,9 +13,33 @@ interface MobileBottomInquiryBarProps {
 
 export default function MobileBottomInquiryBar({
   onOpenConsultation,
-  phoneNo = "1566-3594",
+  phoneNo,
   buttonText = "빠른 창업 상담 신청",
 }: MobileBottomInquiryBarProps) {
+  const [partnerId, setPartnerId] = useState<string>("");
+  const [localPartnerPhone, setLocalPartnerPhone] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const pid = localStorage.getItem("120_referral_partner_id") || "";
+      const pphone = localStorage.getItem("120_referral_partner_phone") || "";
+      if (pid) setPartnerId(pid);
+      if (pphone) setLocalPartnerPhone(pphone);
+    }
+  }, []);
+
+  const partnerData = useQuery(
+    api.partners.getById,
+    partnerId ? { id: partnerId } : "skip"
+  );
+
+  const displayPhone =
+    phoneNo ||
+    partnerData?.consultationPhone ||
+    partnerData?.phone ||
+    localPartnerPhone ||
+    "1566-3594";
+
   const handleConsultClick = () => {
     if (onOpenConsultation) {
       onOpenConsultation();
@@ -29,11 +55,11 @@ export default function MobileBottomInquiryBar({
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-[95] bg-neutral-950/95 backdrop-blur-md px-3 py-2 sm:px-4 sm:py-2.5 border-t border-neutral-800 flex items-center justify-between gap-2 shadow-[0_-10px_30px_rgba(0,0,0,0.6)] select-none">
       {/* Left side: Quick Call Link */}
       <a
-        href={`tel:${phoneNo.replace(/[^0-9]/g, "")}`}
+        href={`tel:${displayPhone.replace(/[^0-9]/g, "")}`}
         className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-neutral-900 border border-neutral-800 text-neutral-200 hover:text-white transition-colors shrink-0 text-xs font-bold"
       >
         <Phone size={14} className="text-[#fbc400] animate-pulse" />
-        <span className="tabular-nums">{phoneNo}</span>
+        <span className="tabular-nums">{displayPhone}</span>
       </a>
 
       {/* Right side: Primary CTA Button */}

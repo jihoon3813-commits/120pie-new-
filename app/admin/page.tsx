@@ -86,19 +86,33 @@ import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/
 function formatPhoneNumber(val: string): string {
   if (!val) return "";
   const clean = val.replace(/[^0-9]/g, "");
-  if (clean.length <= 3) {
-    return clean;
+  if (clean.length <= 3) return clean;
+
+  // 1. 전국 대표번호 (15xx, 16xx, 18xx, 17xx, 14xx 등 8자리 번호)
+  if (/^1[4-8]/.test(clean)) {
+    if (clean.length <= 4) return clean;
+    return `${clean.slice(0, 4)}-${clean.slice(4, 8)}`;
   }
+
+  // 2. 서울 지역번호 (02)
   if (clean.startsWith("02")) {
+    if (clean.length <= 2) return clean;
     if (clean.length <= 5) return `${clean.slice(0, 2)}-${clean.slice(2)}`;
     if (clean.length <= 9) return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5)}`;
     return `${clean.slice(0, 2)}-${clean.slice(2, 6)}-${clean.slice(6, 10)}`;
   }
-  if (clean.length <= 7) {
-    return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+
+  // 3. 050 안심번호 (11~12자리)
+  if (clean.startsWith("050") && clean.length > 8) {
+    if (clean.length <= 4) return clean;
+    if (clean.length <= 8) return `${clean.slice(0, 4)}-${clean.slice(4)}`;
+    return `${clean.slice(0, 4)}-${clean.slice(4, 8)}-${clean.slice(8, 12)}`;
   }
+
+  // 4. 일반 휴대폰 및 지역번호 (010, 031, 070 등)
+  if (clean.length <= 6) return `${clean.slice(0, 3)}-${clean.slice(3)}`;
   if (clean.length <= 10) {
-    return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6)}`;
+    return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6, 10)}`;
   }
   return `${clean.slice(0, 3)}-${clean.slice(3, 7)}-${clean.slice(7, 11)}`;
 }
@@ -1315,6 +1329,7 @@ export default function AdminPage() {
   const [partnerFormPw, setPartnerFormPw] = useState<string>("");
   const [partnerFormName, setPartnerFormName] = useState<string>("");
   const [partnerFormPhone, setPartnerFormPhone] = useState<string>("");
+  const [partnerFormConsultationPhone, setPartnerFormConsultationPhone] = useState<string>("");
   const [partnerFormEmail, setPartnerFormEmail] = useState<string>("");
   const [partnerFormCompanyName, setPartnerFormCompanyName] = useState<string>("");
   const [partnerFormBankName, setPartnerFormBankName] = useState<string>("");
@@ -3511,6 +3526,7 @@ export default function AdminPage() {
       setPartnerFormPw(partner.pw || "");
       setPartnerFormName(partner.name || "");
       setPartnerFormPhone(partner.phone || "");
+      setPartnerFormConsultationPhone(partner.consultationPhone || "");
       setPartnerFormEmail(partner.email || "");
       setPartnerFormCompanyName(partner.companyName || "");
       setPartnerFormBankName(partner.bankName || "");
@@ -3533,6 +3549,7 @@ export default function AdminPage() {
       setPartnerFormPw("partner1234");
       setPartnerFormName("");
       setPartnerFormPhone("");
+      setPartnerFormConsultationPhone("");
       setPartnerFormEmail("");
       setPartnerFormCompanyName("");
       setPartnerFormBankName("");
@@ -3571,6 +3588,7 @@ export default function AdminPage() {
         pw: partnerFormPw,
         name: partnerFormName,
         phone: partnerFormPhone,
+        consultationPhone: partnerFormConsultationPhone || undefined,
         email: partnerFormEmail || undefined,
         companyName: partnerFormCompanyName || undefined,
         bankName: partnerFormBankName || undefined,
@@ -14545,6 +14563,21 @@ export default function AdminPage() {
                       required
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
+                  </div>
+                  <div className="bg-amber-500/5 p-3 rounded-lg border border-amber-500/20">
+                    <label className="text-xs font-bold text-amber-950 flex items-center justify-between mb-1">
+                      <span>분양몰 하단 상담바 가맹문의 전화번호 (선택)</span>
+                      <span className="text-[10px] text-amber-700 font-semibold bg-amber-100 px-1.5 py-0.2 rounded">분양몰 노출용</span>
+                    </label>
+                    <input 
+                      type="text"
+                      value={partnerFormConsultationPhone}
+                      onChange={(e) => setPartnerFormConsultationPhone(formatPhoneNumber(e.target.value))}
+                      placeholder="미입력 시 휴대폰 번호 또는 본사 대표번호 노출"
+                      maxLength={14}
+                      className="w-full bg-white border border-amber-200 rounded-lg px-3.5 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1">해당 파트너의 분양 링크 접속 시 하단 상담바의 &apos;가맹문의&apos; 직통 번호로 노출됩니다.</p>
                   </div>
                   <div>
                     <label className="text-xs font-semibold text-slate-700 block mb-1">소속 / 상호명 (선택)</label>

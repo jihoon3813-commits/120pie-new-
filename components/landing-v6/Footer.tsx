@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
 
 interface FooterProps {
@@ -16,6 +18,9 @@ export default function Footer({
   const pathname = usePathname();
   const isSubpage = pathname !== "/landing-v6";
 
+  const [partnerId, setPartnerId] = useState<string>("");
+  const [localPartnerPhone, setLocalPartnerPhone] = useState<string>("");
+
   const [terms, setTerms] = useState("");
   const [privacy, setPrivacy] = useState("");
   const [refund, setRefund] = useState("");
@@ -26,8 +31,24 @@ export default function Footer({
       setTerms(localStorage.getItem("120_terms_of_use") || DEFAULT_TERMS);
       setPrivacy(localStorage.getItem("120_privacy_policy") || DEFAULT_PRIVACY);
       setRefund(localStorage.getItem("120_refund_policy") || DEFAULT_REFUND);
+
+      const pid = localStorage.getItem("120_referral_partner_id") || "";
+      const pphone = localStorage.getItem("120_referral_partner_phone") || "";
+      if (pid) setPartnerId(pid);
+      if (pphone) setLocalPartnerPhone(pphone);
     }
   }, []);
+
+  const partnerData = useQuery(
+    api.partners.getById,
+    partnerId ? { id: partnerId } : "skip"
+  );
+
+  const displayPhone =
+    partnerData?.consultationPhone ||
+    partnerData?.phone ||
+    localPartnerPhone ||
+    "1566-3594";
 
   const openPolicyModal = (type: "terms" | "privacy" | "refund") => {
     if (typeof window !== "undefined") {
@@ -106,8 +127,12 @@ export default function Footer({
             <div className="space-y-2 text-xs leading-relaxed font-medium">
               <p>(주)고우웰라이프 | 대표 : 이사근</p>
               <p>사업자번호: 787-88-00444</p>
-              <p>주소: 경기 군포시 엘에스로 143 1층 1001호</p>
-              <p>E-mail: 120piecoffee@gmail.com | Tel: 1566-3594</p>
+              <p>
+                E-mail: 120piecoffee@gmail.com | Tel:{" "}
+                <a href={`tel:${displayPhone.replace(/[^0-9]/g, "")}`} className="hover:text-amber-500 transition-colors font-bold">
+                  {displayPhone}
+                </a>
+              </p>
               <p>개인정보보호책임자: 이사근</p>
             </div>
           </div>
@@ -131,6 +156,10 @@ export default function Footer({
             <span className="text-neutral-800">|</span>
             <a href="/portal" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-400">
               점주포털
+            </a>
+            <span className="text-neutral-800">|</span>
+            <a href="/partner" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-400">
+              파트너포털
             </a>
             <span className="text-neutral-800">|</span>
             <a href="/admin" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-400">

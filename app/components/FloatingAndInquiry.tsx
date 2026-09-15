@@ -118,13 +118,29 @@ export function InquiryModal({
 
 function formatPhoneNumber(value: string) {
   if (!value) return value;
-  const phoneNumber = value.replace(/[^\d]/g, "");
-  const phoneNumberLength = phoneNumber.length;
-  if (phoneNumberLength < 4) return phoneNumber;
-  if (phoneNumberLength < 8) {
-    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+  const clean = value.replace(/[^\d]/g, "");
+  if (clean.length <= 3) return clean;
+
+  // 1. 전국 대표번호 (15xx, 16xx, 18xx 등)
+  if (/^1[4-8]/.test(clean)) {
+    if (clean.length <= 4) return clean;
+    return `${clean.slice(0, 4)}-${clean.slice(4, 8)}`;
   }
-  return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`;
+
+  // 2. 서울 지역번호 (02)
+  if (clean.startsWith("02")) {
+    if (clean.length <= 2) return clean;
+    if (clean.length <= 5) return `${clean.slice(0, 2)}-${clean.slice(2)}`;
+    if (clean.length <= 9) return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5)}`;
+    return `${clean.slice(0, 2)}-${clean.slice(2, 6)}-${clean.slice(6, 10)}`;
+  }
+
+  // 3. 일반 휴대폰 및 지역번호 (010, 031 등)
+  if (clean.length <= 6) return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+  if (clean.length <= 10) {
+    return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6, 10)}`;
+  }
+  return `${clean.slice(0, 3)}-${clean.slice(3, 7)}-${clean.slice(7, 11)}`;
 }
 
 export default function FloatingAndInquiry({

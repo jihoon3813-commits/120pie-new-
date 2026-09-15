@@ -255,6 +255,7 @@ export default defineSchema({
     pw: v.string(), // 비밀번호
     name: v.string(), // 파트너 이름 / 대표자명
     phone: v.string(), // 연락처
+    consultationPhone: v.optional(v.string()), // 분양몰 하단 상담바 노출 직통 전화번호
     email: v.optional(v.string()), // 이메일
     companyName: v.optional(v.string()), // 상호명 / 소속
     bankName: v.optional(v.string()), // 정산 은행명

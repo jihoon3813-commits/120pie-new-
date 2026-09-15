@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/policies";
 
 interface FooterProps {
@@ -12,6 +14,9 @@ interface FooterProps {
 export default function Footer({ theme }: FooterProps) {
   const isPinkVariant = theme === "pink";
   const isYellowVariant = theme === "yellow";
+
+  const [partnerId, setPartnerId] = useState<string>("");
+  const [localPartnerPhone, setLocalPartnerPhone] = useState<string>("");
 
   const [terms, setTerms] = useState("");
   const [privacy, setPrivacy] = useState("");
@@ -23,8 +28,24 @@ export default function Footer({ theme }: FooterProps) {
       setTerms(localStorage.getItem("120_terms_of_use") || DEFAULT_TERMS);
       setPrivacy(localStorage.getItem("120_privacy_policy") || DEFAULT_PRIVACY);
       setRefund(localStorage.getItem("120_refund_policy") || DEFAULT_REFUND);
+
+      const pid = localStorage.getItem("120_referral_partner_id") || "";
+      const pphone = localStorage.getItem("120_referral_partner_phone") || "";
+      if (pid) setPartnerId(pid);
+      if (pphone) setLocalPartnerPhone(pphone);
     }
   }, []);
+
+  const partnerData = useQuery(
+    api.partners.getById,
+    partnerId ? { id: partnerId } : "skip"
+  );
+
+  const displayPhone =
+    partnerData?.consultationPhone ||
+    partnerData?.phone ||
+    localPartnerPhone ||
+    "1566-3594";
 
   const openPolicyModal = (type: "terms" | "privacy" | "refund") => {
     if (typeof window !== "undefined") {
@@ -80,8 +101,12 @@ export default function Footer({ theme }: FooterProps) {
               isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-400"
             }`}>
               <p>대표 : 이사근 | 사업자번호: 787-88-00444</p>
-              <p>경기 군포시 엘에스로 143 1층 1001호</p>
-              <p>E-mail: 120piecoffee@gmail.com | Tel: 1566-3594</p>
+              <p>
+                E-mail: 120piecoffee@gmail.com | Tel:{" "}
+                <a href={`tel:${displayPhone.replace(/[^0-9]/g, "")}`} className="hover:underline transition-colors font-bold">
+                  {displayPhone}
+                </a>
+              </p>
               <p>개인정보보호책임자: 이사근</p>
             </div>
           </div>
@@ -96,12 +121,12 @@ export default function Footer({ theme }: FooterProps) {
                 Customer Center
               </span>
               <a
-                href="tel:1566-3594"
+                href={`tel:${displayPhone.replace(/[^0-9]/g, "")}`}
                 className={`text-3xl sm:text-4xl font-black tracking-tight transition-colors block mb-3 ${
                   isPinkVariant ? "text-[#4c2d3a] hover:text-rose-500" : isYellowVariant ? "text-[#0d233a] hover:text-amber-600" : "text-white hover:text-amber-400"
                 }`}
               >
-                1566-3594
+                {displayPhone}
               </a>
               <p className={`inline-flex items-center gap-2 text-sm font-bold ${
                 isPinkVariant ? "text-[#7c5d6c]" : isYellowVariant ? "text-[#576575]" : "text-neutral-300"
@@ -136,6 +161,17 @@ export default function Footer({ theme }: FooterProps) {
               }`}
             >
               점주포털
+            </a>
+            <span className={isPinkVariant ? "text-neutral-300" : isYellowVariant ? "text-neutral-300" : "text-neutral-850"}>|</span>
+            <a
+              href="/partner"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hover:underline transition-colors text-[11px] ${
+                isPinkVariant ? "text-[#7c5d6c] hover:text-[#4c2d3a]" : isYellowVariant ? "text-[#576575] hover:text-[#0d233a]" : "text-neutral-500 hover:text-neutral-300"
+              }`}
+            >
+              파트너포털
             </a>
             <span className={isPinkVariant ? "text-neutral-300" : isYellowVariant ? "text-neutral-300" : "text-neutral-850"}>|</span>
             <a

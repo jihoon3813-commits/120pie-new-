@@ -256,6 +256,7 @@ export const createOrUpdate = mutation({
     pw: v.string(), // 비밀번호
     name: v.string(), // 파트너 이름 / 대표자명
     phone: v.string(), // 연락처
+    consultationPhone: v.optional(v.string()), // 분양몰 하단 상담바 노출 직통 전화번호
     email: v.optional(v.string()),
     companyName: v.optional(v.string()),
     bankName: v.optional(v.string()),
@@ -312,6 +313,7 @@ export const createOrUpdate = mutation({
       pw: args.pw,
       name: args.name,
       phone: args.phone,
+      consultationPhone: args.consultationPhone,
       email: args.email,
       companyName: args.companyName,
       bankName: args.bankName,
@@ -702,6 +704,7 @@ export const updatePartnerProfile = mutation({
     id: v.string(),
     pw: v.optional(v.string()),
     phone: v.optional(v.string()),
+    consultationPhone: v.optional(v.string()),
     email: v.optional(v.string()),
     companyName: v.optional(v.string()),
     bankName: v.optional(v.string()),
@@ -721,6 +724,7 @@ export const updatePartnerProfile = mutation({
     const patch: any = {};
     if (args.pw !== undefined && args.pw.trim() !== "") patch.pw = args.pw;
     if (args.phone !== undefined) patch.phone = args.phone;
+    if (args.consultationPhone !== undefined) patch.consultationPhone = args.consultationPhone;
     if (args.email !== undefined) patch.email = args.email;
     if (args.companyName !== undefined) patch.companyName = args.companyName;
     if (args.bankName !== undefined) patch.bankName = args.bankName;

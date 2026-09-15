@@ -1,16 +1,41 @@
 "use client";
 
 import { useState, FormEvent, useEffect, useRef } from "react";
-import { useMutation, useAction } from "convex/react";
+import { useMutation, useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 interface QuickInquiryBarProps {
   isFixed?: boolean;
+  phoneNo?: string;
 }
 
-export default function QuickInquiryBar({ isFixed = true }: QuickInquiryBarProps) {
+export default function QuickInquiryBar({ isFixed = true, phoneNo }: QuickInquiryBarProps) {
   const addInquiry = useMutation(api.inquiries.add);
   const sendEventSmsAction = useAction(api.aligo.sendEventSms);
+
+  const [partnerId, setPartnerId] = useState<string>("");
+  const [localPartnerPhone, setLocalPartnerPhone] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const pid = localStorage.getItem("120_referral_partner_id") || "";
+      const pphone = localStorage.getItem("120_referral_partner_phone") || "";
+      if (pid) setPartnerId(pid);
+      if (pphone) setLocalPartnerPhone(pphone);
+    }
+  }, []);
+
+  const partnerData = useQuery(
+    api.partners.getById,
+    partnerId ? { id: partnerId } : "skip"
+  );
+
+  const displayPhone =
+    phoneNo ||
+    partnerData?.consultationPhone ||
+    partnerData?.phone ||
+    localPartnerPhone ||
+    "1566-3594";
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -88,6 +113,16 @@ export default function QuickInquiryBar({ isFixed = true }: QuickInquiryBarProps
 
     setSubmitting(true);
     try {
+      let referralPartnerId = partnerId;
+      let referralPartnerName = partnerData?.name;
+      let referralPartnerCompany = partnerData?.companyName;
+
+      if (typeof window !== "undefined" && !referralPartnerId) {
+        referralPartnerId = localStorage.getItem("120_referral_partner_id") || "";
+        referralPartnerName = localStorage.getItem("120_referral_partner_name") || undefined;
+        referralPartnerCompany = localStorage.getItem("120_referral_partner_company") || undefined;
+      }
+
       // 1. Convex DB 저장
       await addInquiry({
         name: name.trim(),
@@ -95,7 +130,10 @@ export default function QuickInquiryBar({ isFixed = true }: QuickInquiryBarProps
         storeType: storeType,
         existingStoreName: "",
         message: "[빠른상담바 신청]",
-        regDate: new Date().toISOString().split("T")[0]
+        regDate: new Date().toISOString().split("T")[0],
+        partnerId: referralPartnerId || undefined,
+        partnerName: referralPartnerName || undefined,
+        partnerCompany: referralPartnerCompany || undefined,
       });
 
       // 2. Aligo SMS 알림 전송 (Convex DB 연동 및 본사/고객 자동 발송)
@@ -176,7 +214,12 @@ export default function QuickInquiryBar({ isFixed = true }: QuickInquiryBarProps
         />
         <div className="flex flex-col text-left">
           <span className="text-[10px] text-neutral-800 font-extrabold uppercase tracking-widest leading-none mb-1">120PIE Premium franchise</span>
-          <a href="tel:1566-3594" className="text-sm font-black text-black tracking-tight leading-none hover:text-amber-900 transition-colors">가맹문의 1566-3594</a>
+          <a
+            href={`tel:${displayPhone.replace(/[^0-9]/g, "")}`}
+            className="text-sm font-black text-black tracking-tight leading-none hover:text-amber-900 transition-colors"
+          >
+            가맹문의 {displayPhone}
+          </a>
         </div>
       </div>
 

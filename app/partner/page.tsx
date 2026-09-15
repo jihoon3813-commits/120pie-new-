@@ -77,13 +77,33 @@ function formatPhoneNumber(val: string): string {
   if (!val) return "";
   const clean = val.replace(/[^0-9]/g, "");
   if (clean.length <= 3) return clean;
+
+  // 1. 전국 대표번호 (15xx, 16xx, 18xx, 17xx, 14xx 등 8자리 번호)
+  if (/^1[4-8]/.test(clean)) {
+    if (clean.length <= 4) return clean;
+    return `${clean.slice(0, 4)}-${clean.slice(4, 8)}`;
+  }
+
+  // 2. 서울 지역번호 (02)
   if (clean.startsWith("02")) {
+    if (clean.length <= 2) return clean;
     if (clean.length <= 5) return `${clean.slice(0, 2)}-${clean.slice(2)}`;
     if (clean.length <= 9) return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5)}`;
     return `${clean.slice(0, 2)}-${clean.slice(2, 6)}-${clean.slice(6, 10)}`;
   }
-  if (clean.length <= 7) return `${clean.slice(0, 3)}-${clean.slice(3)}`;
-  if (clean.length <= 10) return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6)}`;
+
+  // 3. 050 안심번호 (11~12자리)
+  if (clean.startsWith("050") && clean.length > 8) {
+    if (clean.length <= 4) return clean;
+    if (clean.length <= 8) return `${clean.slice(0, 4)}-${clean.slice(4)}`;
+    return `${clean.slice(0, 4)}-${clean.slice(4, 8)}-${clean.slice(8, 12)}`;
+  }
+
+  // 4. 일반 휴대폰 및 지역번호 (010, 031, 070 등)
+  if (clean.length <= 6) return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+  if (clean.length <= 10) {
+    return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6, 10)}`;
+  }
   return `${clean.slice(0, 3)}-${clean.slice(3, 7)}-${clean.slice(7, 11)}`;
 }
 
@@ -220,6 +240,7 @@ export default function PartnerPortalPage() {
   const [settlementYearMonth, setSettlementYearMonth] = useState<string>("전체");
 
   const [settingPhone, setSettingPhone] = useState<string>("");
+  const [settingConsultationPhone, setSettingConsultationPhone] = useState<string>("");
   const [settingEmail, setSettingEmail] = useState<string>("");
   const [settingBankName, setSettingBankName] = useState<string>("");
   const [settingAccountNumber, setSettingAccountNumber] = useState<string>("");
@@ -230,6 +251,7 @@ export default function PartnerPortalPage() {
   useEffect(() => {
     if (currentPartner) {
       setSettingPhone(currentPartner.phone || "");
+      setSettingConsultationPhone(currentPartner.consultationPhone || "");
       setSettingEmail(currentPartner.email || "");
       setSettingBankName(currentPartner.bankName || "");
       setSettingAccountNumber(currentPartner.accountNumber || "");
@@ -249,6 +271,7 @@ export default function PartnerPortalPage() {
         id: partnerId,
         pw: settingNewPw ? settingNewPw : undefined,
         phone: settingPhone,
+        consultationPhone: settingConsultationPhone,
         email: settingEmail,
         bankName: settingBankName,
         accountNumber: settingAccountNumber,
@@ -2608,6 +2631,32 @@ export default function PartnerPortalPage() {
                           placeholder="partner@example.com"
                           className="w-full h-10 px-3.5 bg-[#F1F4F8] border-0 rounded-lg text-xs font-bold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
                         />
+                      </div>
+
+                      {/* 🌟 분양몰 하단 상담바 전용 가맹문의 전화번호 */}
+                      <div className="sm:col-span-2 bg-amber-500/5 p-4 rounded-xl border border-amber-500/25 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                            <Phone size={14} className="text-amber-600" />
+                            <span>분양몰 하단 상담바 가맹문의 전화번호</span>
+                          </label>
+                          <span className="text-[10px] font-black text-amber-800 bg-amber-200/80 px-2 py-0.5 rounded shadow-2xs">
+                            분양몰 하단 노출용
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          value={settingConsultationPhone}
+                          onChange={(e) => setSettingConsultationPhone(formatPhoneNumber(e.target.value))}
+                          placeholder="예: 010-1234-5678 또는 대표번호"
+                          maxLength={14}
+                          className="w-full h-10 px-3.5 bg-white border border-amber-300/80 rounded-lg text-xs font-bold text-[#0F172A] focus:ring-2 focus:ring-amber-500/30 outline-none placeholder:text-slate-400"
+                        />
+                        <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
+                          💡 고객이 내 분양 링크(<strong className="text-amber-800 font-mono">/{partnerId}</strong>)로 접속 시, 화면 하단 상담바의 <strong>&quot;가맹문의 [전화번호]&quot;</strong>에 이 번호가 표시되고 바로 전화 연결됩니다.
+                          <br />
+                          (미입력 시 휴대폰 번호 또는 본사 대표번호 1566-3594가 노출됩니다.)
+                        </p>
                       </div>
                     </div>
                   </div>

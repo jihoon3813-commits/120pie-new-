@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import GatePageClient from "@/components/GatePageClient";
-import { Phone, CheckCircle2, ShieldCheck, Sparkles, Building2 } from "lucide-react";
+import { Building2 } from "lucide-react";
 
 const RESERVED_PATHS = new Set([
   "admin",
@@ -47,6 +47,7 @@ export default function PartnerBranchLandingPage() {
         localStorage.setItem("120_referral_partner_id", partner.id);
         localStorage.setItem("120_referral_partner_name", partner.name);
         localStorage.setItem("120_referral_partner_company", partner.companyName || "");
+        localStorage.setItem("120_referral_partner_phone", partner.consultationPhone || partner.phone || "");
       }
     }
   }, [partner]);
@@ -92,50 +93,5 @@ export default function PartnerBranchLandingPage() {
     );
   }
 
-  const partnerDisplayName = partner.companyName
-    ? `${partner.companyName} (${partner.name} 파트너)`
-    : `${partner.name} 공식 파트너`;
-
-  return (
-    <div className="relative">
-      {/* 🌟 상단 고정 파트너 전담 분양 안심 웰컴 바 */}
-      <div className="sticky top-0 z-50 bg-gradient-to-r from-amber-500 via-[#FED422] to-amber-400 text-[#0F172A] shadow-md border-b border-amber-400/50">
-        <div className="max-w-7xl mx-auto px-3.5 py-2.5 flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#0F172A] text-[#FED422] text-[10px] font-black shrink-0 shadow-2xs">
-              <Sparkles size={11} className="text-amber-400" />
-              <span>공식 분양 채널</span>
-            </span>
-            <div className="flex items-center gap-1.5 truncate">
-              <ShieldCheck size={15} className="text-[#0F172A] shrink-0" />
-              <span className="truncate font-black text-xs sm:text-[13px] text-[#0F172A]">
-                <strong>{partnerDisplayName}</strong> 전담 상담 채널
-              </span>
-              <span className="hidden md:inline text-[11px] font-bold text-amber-950">
-                · 본 파트너를 통한 1:1 맞춤 창업 지원 및 특별 혜택 제공
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            {partner.phone && (
-              <a
-                href={`tel:${partner.phone.replace(/[^0-9]/g, "")}`}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-[#0F172A] hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-lg shadow-sm transition-all no-underline shrink-0"
-                title="담당 파트너 직통 전화 연결"
-              >
-                <Phone size={12} className="text-amber-300" />
-                <span>파트너 직통전화</span>
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* 120겹파이 공식 메인 게이트웨이 페이지 */}
-      <div className="flex-1 w-full h-[calc(100dvh-44px)] overflow-hidden">
-        <GatePageClient className="h-full" />
-      </div>
-    </div>
-  );
+  return <GatePageClient />;
 }
