@@ -162,16 +162,16 @@ export default function Footer({ theme }: FooterProps) {
                 href="/portal"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-black transition-all shadow-xs active:scale-95 text-center ${
+                className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-black transition-all shadow-sm active:scale-95 text-center ${
                   isPinkVariant 
-                    ? "bg-rose-50 hover:bg-rose-100 text-[#4c2d3a] border border-[#f2ccd7]/70" 
+                    ? "bg-rose-100/80 hover:bg-rose-200/80 text-[#4c2d3a] border border-[#f2ccd7]" 
                     : isYellowVariant 
-                    ? "bg-amber-50 hover:bg-amber-100 text-[#0d233a] border border-[#e6dfc3]" 
-                    : "bg-neutral-800/90 hover:bg-neutral-700 text-neutral-200 hover:text-white border border-neutral-700"
+                    ? "bg-[#FED422] hover:bg-[#e6be1f] text-[#0d233a] border border-amber-300 shadow-xs" 
+                    : "bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700"
                 }`}
                 title="120겹파이 점주 전용 포털 시스템"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isYellowVariant ? "bg-[#0d233a]" : "bg-amber-400"}`}></span>
                 <span className="truncate">점주포털</span>
               </a>
 
@@ -179,12 +179,12 @@ export default function Footer({ theme }: FooterProps) {
                 href="/partner"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-black transition-all shadow-xs active:scale-95 text-center ${
+                className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-black transition-all shadow-sm active:scale-95 text-center ${
                   isPinkVariant 
-                    ? "bg-rose-50 hover:bg-rose-100 text-[#4c2d3a] border border-[#f2ccd7]/70" 
+                    ? "bg-rose-50 hover:bg-rose-100 text-[#4c2d3a] border border-[#f2ccd7]" 
                     : isYellowVariant 
-                    ? "bg-amber-50 hover:bg-amber-100 text-[#0d233a] border border-[#e6dfc3]" 
-                    : "bg-neutral-800/90 hover:bg-neutral-700 text-neutral-200 hover:text-white border border-neutral-700"
+                    ? "bg-white hover:bg-slate-50 text-[#0d233a] border border-[#d2d8e0] shadow-2xs" 
+                    : "bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-500"
                 }`}
                 title="120겹파이 영업 파트너 전용 포털 시스템"
               >
@@ -196,12 +196,12 @@ export default function Footer({ theme }: FooterProps) {
                 href="/admin"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-black transition-all shadow-xs active:scale-95 text-center ${
+                className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-black transition-all shadow-sm active:scale-95 text-center ${
                   isPinkVariant 
-                    ? "bg-rose-50 hover:bg-rose-100 text-[#4c2d3a] border border-[#f2ccd7]/70" 
+                    ? "bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700" 
                     : isYellowVariant 
-                    ? "bg-amber-50 hover:bg-amber-100 text-[#0d233a] border border-[#e6dfc3]" 
-                    : "bg-neutral-800/90 hover:bg-neutral-700 text-neutral-200 hover:text-white border border-neutral-700"
+                    ? "bg-[#0d233a] hover:bg-[#1a3854] text-white border border-[#0d233a]" 
+                    : "bg-neutral-800 hover:bg-neutral-700 text-neutral-100 hover:text-white border border-neutral-700"
                 }`}
                 title="120겹파이 본사 통합 최고관리자 어드민"
               >

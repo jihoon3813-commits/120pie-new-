@@ -139,32 +139,67 @@ export default function Footer({
         </div>
 
         {/* Bottom Area */}
-        <div className="pt-8 mt-12 border-t border-neutral-900 flex flex-col sm:flex-row items-center justify-between text-[10px] text-neutral-600">
-          <p>&copy; {new Date().getFullYear()} GOWELL-LIFE Co.,Ltd. All Rights Reserved.</p>
-          <div className="flex gap-4 mt-4 sm:mt-0">
-            <button onClick={() => openPolicyModal("privacy")} className="hover:text-neutral-400 font-bold">
-              개인정보처리방침
-            </button>
-            <span className="text-neutral-800">|</span>
-            <button onClick={() => openPolicyModal("terms")} className="hover:text-neutral-400">
-              이용약관
-            </button>
-            <span className="text-neutral-800">|</span>
-            <button onClick={() => openPolicyModal("refund")} className="hover:text-neutral-400">
-              환불정책
-            </button>
-            <span className="text-neutral-800">|</span>
-            <a href="/portal" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-400">
-              점주포털
-            </a>
-            <span className="text-neutral-800">|</span>
-            <a href="/partner" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-400">
-              파트너포털
-            </a>
-            <span className="text-neutral-800">|</span>
-            <a href="/admin" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-400">
-              본사어드민
-            </a>
+        <div className="pt-8 mt-12 border-t border-neutral-900 flex flex-col gap-6">
+          {/* 3대 전용 포털 바로가기 전용 버튼 박스 (모바일/PC 눈에 잘 띄는 버튼형 디자인) */}
+          <div className="bg-neutral-900/80 border border-neutral-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 shadow-lg">
+            <div className="text-left space-y-0.5">
+              <span className="text-[10px] font-extrabold text-amber-500 tracking-wider uppercase">Official Portal</span>
+              <h5 className="text-xs sm:text-sm font-black text-white">가맹점주 및 비즈니스 파트너 전용 시스템</h5>
+            </div>
+
+            {/* 버튼 3종 (모바일 3분할 꽉 찬 그리드, PC 가로 정렬 버튼) */}
+            <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+              <a
+                href="/portal"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs transition-all shadow-md active:scale-95 text-center border-0"
+                title="120겹파이 가맹점 점주포털 바로가기"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-neutral-950 shrink-0"></span>
+                <span className="truncate">점주포털</span>
+              </a>
+
+              <a
+                href="/partner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition-all shadow-md active:scale-95 text-center border-0"
+                title="120겹파이 영업 파트너포털 바로가기"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0"></span>
+                <span className="truncate">파트너포털</span>
+              </a>
+
+              <a
+                href="/admin"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-100 hover:text-white border border-neutral-700 font-black text-xs transition-all shadow-md active:scale-95 text-center"
+                title="120겹파이 본사 어드민 관리자 바로가기"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+                <span className="truncate">본사어드민</span>
+              </a>
+            </div>
+          </div>
+
+          {/* 정책 및 카피라이트 */}
+          <div className="flex flex-col sm:flex-row items-center justify-between text-[11px] text-neutral-500 gap-3">
+            <p>&copy; {new Date().getFullYear()} GOWELL-LIFE Co.,Ltd. All Rights Reserved.</p>
+            <div className="flex items-center gap-3">
+              <button onClick={() => openPolicyModal("privacy")} className="hover:text-neutral-300 font-bold transition-colors cursor-pointer border-0 bg-transparent text-[11px] text-neutral-400">
+                개인정보처리방침
+              </button>
+              <span className="text-neutral-800">|</span>
+              <button onClick={() => openPolicyModal("terms")} className="hover:text-neutral-300 transition-colors cursor-pointer border-0 bg-transparent text-[11px] text-neutral-500">
+                이용약관
+              </button>
+              <span className="text-neutral-800">|</span>
+              <button onClick={() => openPolicyModal("refund")} className="hover:text-neutral-300 transition-colors cursor-pointer border-0 bg-transparent text-[11px] text-neutral-500">
+                환불정책
+              </button>
+            </div>
           </div>
         </div>
       </div>
