@@ -2668,41 +2668,38 @@ export default function PartnerPortalPage() {
                         <Wallet size={15} className="text-amber-500" />
                         <span>수수료 입금 정산 계좌 정보</span>
                       </h3>
-                      <span className="text-[11px] text-amber-600 font-bold">매월 수수료가 이 계좌로 지급됩니다</span>
+                      <span className="text-[11px] text-slate-500 font-medium">수수료 지급 시 필요한 계좌 정보입니다 (추후 입력 가능)</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">은행명</label>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">은행명 (선택)</label>
                         <input
                           type="text"
                           value={settingBankName}
                           onChange={(e) => setSettingBankName(e.target.value)}
                           placeholder="예: 국민은행"
                           className="w-full h-10 px-3.5 bg-[#F1F4F8] border-0 rounded-lg text-xs font-bold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
-                          required
                         />
                       </div>
                       <div className="sm:col-span-2">
-                        <label className="block text-xs font-bold text-slate-700 mb-1">계좌번호</label>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">계좌번호 (선택)</label>
                         <input
                           type="text"
                           value={settingAccountNumber}
                           onChange={(e) => setSettingAccountNumber(e.target.value)}
                           placeholder="'-' 포함 계좌번호 입력"
                           className="w-full h-10 px-3.5 bg-[#F1F4F8] border-0 rounded-lg text-xs font-bold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
-                          required
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">예금주명</label>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">예금주명 (선택)</label>
                         <input
                           type="text"
                           value={settingAccountHolder}
                           onChange={(e) => setSettingAccountHolder(e.target.value)}
                           placeholder="예금주명"
                           className="w-full h-10 px-3.5 bg-[#F1F4F8] border-0 rounded-lg text-xs font-bold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 outline-none"
-                          required
                         />
                       </div>
                     </div>
