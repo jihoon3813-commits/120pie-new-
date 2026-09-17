@@ -343,13 +343,33 @@ export default function PartnerPortalPage() {
     });
   }, [partnerConsultations, consultationSearch, consultationStatusFilter]);
 
-  const handleCopyBranchLink = () => {
-    const url = typeof window !== "undefined" ? `${window.location.origin}/${partnerId}` : `https://120pie.com/${partnerId}`;
+  const handleCopyBranchLink = (typeOrEvent?: "default" | "kakao" | "sms" | any) => {
+    const type: "default" | "kakao" | "sms" = typeof typeOrEvent === "string" && (typeOrEvent === "kakao" || typeOrEvent === "sms") ? typeOrEvent : "default";
+    const baseUrl = typeof window !== "undefined" ? `${window.location.origin}/${partnerId}` : `https://120pie.com/${partnerId}`;
+    let targetUrl = baseUrl;
+    let label = "기본 분양 링크";
+
+    if (type === "kakao") {
+      targetUrl = `${baseUrl}?source=kakao`;
+      label = "카카오톡 전용 분양 링크";
+    } else if (type === "sms") {
+      targetUrl = `${baseUrl}?source=sms`;
+      label = "문자(SMS) 전용 분양 링크";
+    }
+
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(url);
-      triggerToast("내 전용 분양 링크가 복사되었습니다!");
+      navigator.clipboard.writeText(targetUrl);
+      triggerToast(`${label}가 클립보드에 복사되었습니다!`);
     } else {
-      triggerToast(url);
+      triggerToast(targetUrl);
+    }
+
+    if (type === "sms" && typeof window !== "undefined") {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        const smsText = `[120겹파이] 공식 분양 안내 페이지:\n${targetUrl}`;
+        window.location.href = `sms:?body=${encodeURIComponent(smsText)}`;
+      }
     }
   };
 
@@ -881,32 +901,59 @@ export default function PartnerPortalPage() {
                       </div>
 
                       {/* 액션 버튼 */}
-                      <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
-                        <button
-                          type="button"
-                          onClick={handleCopyBranchLink}
-                          className="px-4 py-2.5 bg-[#FED422] hover:bg-amber-400 active:scale-95 text-[#0F172A] rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer border-0 transition-all"
-                        >
-                          <Copy size={14} />
-                          <span>분양 링크 복사</span>
-                        </button>
-                        <a
-                          href={`/${partnerId}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 border border-slate-700 no-underline transition-all shadow-sm"
-                        >
-                          <ExternalLink size={14} />
-                          <span>사이트 열기</span>
-                        </a>
-                        <button
-                          type="button"
-                          onClick={() => setCurrentMenu("consultation")}
-                          className="px-3 py-2 text-xs text-slate-400 hover:text-amber-300 font-bold flex items-center gap-1 cursor-pointer bg-transparent border-0 underline ml-auto sm:ml-0"
-                        >
-                          <span>상담문의 내역 ({partnerConsultations.length}건)</span>
-                          <ChevronRight size={13} />
-                        </button>
+                      <div className="flex flex-col gap-2 pt-0.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleCopyBranchLink("kakao")}
+                            className="px-3.5 py-2.5 bg-[#FEE500] hover:bg-[#FDD800] active:scale-95 text-[#371D1E] rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer border-0 transition-all"
+                            title="고객에게 카카오톡 대화방으로 링크를 보낼 때 사용"
+                          >
+                            <MessageSquare size={14} className="fill-[#371D1E]" />
+                            <span>카톡으로 공유 (카톡 링크)</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyBranchLink("sms")}
+                            className="px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer border-0 transition-all"
+                            title="고객에게 일반 문자(SMS)로 링크를 보낼 때 사용"
+                          >
+                            <Phone size={14} />
+                            <span>문자로 공유 (문자 링크)</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyBranchLink("default")}
+                            className="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white rounded-xl text-xs font-bold flex items-center gap-1.5 border border-slate-700 shadow-sm cursor-pointer transition-all"
+                            title="기본 URL 복사"
+                          >
+                            <Copy size={13} />
+                            <span>기본 링크 복사</span>
+                          </button>
+                          <a
+                            href={`/${partnerId}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 border border-slate-700 no-underline transition-all shadow-sm"
+                          >
+                            <ExternalLink size={13} />
+                            <span>사이트 열기</span>
+                          </a>
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-[11px] text-amber-300/80 font-medium flex items-center gap-1.5 m-0">
+                            <span>💡</span>
+                            <span>카톡 또는 문자로 링크를 전송하시면, 고객 방문 시 <strong>카톡 유입</strong>인지 <strong>문자 유입</strong>인지 통계에 정확히 기록됩니다.</span>
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setCurrentMenu("consultation")}
+                            className="px-2.5 py-1 text-xs text-slate-400 hover:text-amber-300 font-bold flex items-center gap-1 cursor-pointer bg-transparent border-0 underline shrink-0"
+                          >
+                            <span>상담문의 ({partnerConsultations.length}건)</span>
+                            <ChevronRight size={13} />
+                          </button>
+                        </div>
                       </div>
                     </div>
 

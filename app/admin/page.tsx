@@ -824,6 +824,8 @@ export default function AdminPage() {
   const [analyticsEndDate, setAnalyticsEndDate] = useState<string>("");
   const [ipSearchQuery, setIpSearchQuery] = useState<string>("");
   const [ipListPage, setIpListPage] = useState<number>(1);
+  const [selectedAnalyticsDate, setSelectedAnalyticsDate] = useState<string | null>(null);
+  const [dateDetailFilterTab, setDateDetailFilterTab] = useState<"all" | "customer" | "store" | "partner">("all");
 
   // Rich Text Editor Selection Preservation & Command Execution
   const savedRangeRef = React.useRef<Range | null>(null);
@@ -5576,6 +5578,177 @@ export default function AdminPage() {
     return ok;
   });
 
+  // 파트너 ID -> 파트너 정보 매핑 맵
+  const partnerLookupMap = useMemo(() => {
+    const map: Record<string, any> = {};
+    (convexPartners || []).forEach((p: any) => {
+      if (p.id) map[p.id] = p;
+    });
+    return map;
+  }, [convexPartners]);
+
+  // 가맹점 ID -> 가맹점 정보 매핑 맵
+  const storeLookupMap = useMemo(() => {
+    const map: Record<string, any> = {};
+    (convexStores || []).forEach((s: any) => {
+      if (s.id) map[s.id] = s;
+    });
+    return map;
+  }, [convexStores]);
+
+  // 방문자 유형 판별 헬퍼
+  const getEventVisitorType = (e: any): "customer" | "store" | "partner" | "admin" => {
+    if (e.visitorType === "store" || (e.path && e.path.startsWith("/portal"))) return "store";
+    if (e.visitorType === "partner" || (e.path && e.path.startsWith("/partner") && !e.path.includes("["))) return "partner";
+    if (e.visitorType === "admin" || (e.path && e.path.startsWith("/admin"))) return "admin";
+    if (e.visitorType === "customer") return "customer";
+    return "customer";
+  };
+
+  // 채널 및 소스 상세 정보 판별 헬퍼
+  const getEventChannelInfo = (e: any) => {
+    const ua = (e.userAgent || "").toUpperCase();
+    const source = (e.source || "").toLowerCase();
+    const channel = (e.channel || "").toLowerCase();
+    const ref = (e.referrer || "").toLowerCase();
+    const path = e.path || "";
+
+    const pathSegments = path.split("/").filter(Boolean);
+    const RESERVED = new Set([
+      "admin", "api", "brand", "contract", "costs", "faq", "franchise",
+      "gateway", "login", "menu", "partner", "portal", "proposal",
+      "proposal2", "stores", "v3", "pink", "landing-v2", "landing-v4", "landing-v6"
+    ]);
+    const isBranch = !!e.partnerId || (pathSegments.length === 1 && !RESERVED.has(pathSegments[0]?.toLowerCase()));
+    const branchPartnerId = e.partnerId || (isBranch && pathSegments[0] ? pathSegments[0] : "");
+    const partnerObj = branchPartnerId ? partnerLookupMap[branchPartnerId] : null;
+    const partnerDisplayName = partnerObj ? `${partnerObj.name} (${branchPartnerId})` : branchPartnerId;
+
+    if (channel === "kakao" || source === "kakao" || source === "kakaotalk" || ua.includes("KAKAOTALK") || ref.includes("talk.kakao.com")) {
+      return {
+        key: "kakao",
+        label: isBranch ? `카카오톡 공유 링크 (${partnerDisplayName})` : "카카오톡 링크 유입",
+        badge: "카카오톡",
+        color: "bg-[#FEE500] text-[#371D1E]",
+        icon: "💬",
+        isBranch,
+        branchPartnerId,
+        partnerDisplayName,
+        detail: isBranch ? `파트너 [${partnerDisplayName}] 분양페이지 카톡 공유 링크로 접속` : "카카오톡 링크를 통한 접속",
+      };
+    }
+
+    if (channel === "sms" || source === "sms" || source === "text" || source === "message") {
+      return {
+        key: "sms",
+        label: isBranch ? `문자(SMS) 공유 링크 (${partnerDisplayName})` : "문자(SMS) 링크 유입",
+        badge: "문자(SMS)",
+        color: "bg-emerald-100 text-emerald-800",
+        icon: "📱",
+        isBranch,
+        branchPartnerId,
+        partnerDisplayName,
+        detail: isBranch ? `파트너 [${partnerDisplayName}] 분양페이지 문자 링크로 접속` : "문자(SMS) 링크를 통한 접속",
+      };
+    }
+
+    if (isBranch && branchPartnerId) {
+      return {
+        key: "branch_direct",
+        label: `파트너 분양페이지 (${partnerDisplayName})`,
+        badge: "분양페이지",
+        color: "bg-amber-100 text-amber-800",
+        icon: "🤝",
+        isBranch,
+        branchPartnerId,
+        partnerDisplayName,
+        detail: `파트너 [${partnerDisplayName}] 분양페이지 직접 접속/기타 유입`,
+      };
+    }
+
+    if (channel === "naver" || ref.includes("naver.com")) {
+      return {
+        key: "naver",
+        label: "네이버 검색 / 플레이스",
+        badge: "네이버",
+        color: "bg-green-100 text-green-800",
+        icon: "🟢",
+        isBranch: false,
+        detail: e.referrer || "네이버를 통한 유입",
+      };
+    }
+
+    if (channel === "google" || ref.includes("google.com")) {
+      return {
+        key: "google",
+        label: "구글 검색",
+        badge: "구글",
+        color: "bg-blue-100 text-blue-800",
+        icon: "🔵",
+        isBranch: false,
+        detail: e.referrer || "구글을 통한 유입",
+      };
+    }
+
+    if (channel === "instagram" || ref.includes("instagram.com")) {
+      return {
+        key: "instagram",
+        label: "인스타그램",
+        badge: "인스타",
+        color: "bg-pink-100 text-pink-800",
+        icon: "🟣",
+        isBranch: false,
+        detail: e.referrer || "인스타그램을 통한 유입",
+      };
+    }
+
+    if (channel === "youtube" || ref.includes("youtube.com")) {
+      return {
+        key: "youtube",
+        label: "유튜브",
+        badge: "유튜브",
+        color: "bg-red-100 text-red-800",
+        icon: "🔴",
+        isBranch: false,
+        detail: e.referrer || "유튜브를 통한 유입",
+      };
+    }
+
+    if (channel === "daangn" || ref.includes("daangn.com")) {
+      return {
+        key: "daangn",
+        label: "당근마켓",
+        badge: "당근",
+        color: "bg-orange-100 text-orange-800",
+        icon: "🥕",
+        isBranch: false,
+        detail: e.referrer || "당근마켓을 통한 유입",
+      };
+    }
+
+    if (ref && ref !== "direct") {
+      return {
+        key: "referral",
+        label: `외부 링크 (${ref.replace(/^https?:\/\//, '').split('/')[0]})`,
+        badge: "외부링크",
+        color: "bg-slate-100 text-slate-800",
+        icon: "🌐",
+        isBranch: false,
+        detail: ref,
+      };
+    }
+
+    return {
+      key: "direct",
+      label: "직접 접속 / 즐겨찾기",
+      badge: "직접접속",
+      color: "bg-slate-100 text-slate-600",
+      icon: "🔗",
+      isBranch: false,
+      detail: "URL 직접 입력 또는 즐겨찾기 북마크 접속",
+    };
+  };
+
   // 2. Count metrics
   const totalVisits = analyticsEvents.filter(e => e.type === "visit").length;
   const totalInquiries = filteredConsultations.length;
@@ -5584,11 +5757,101 @@ export default function AdminPage() {
   // 3. Generate daily trend data
   const dateList = getDatesInRange(analyticsStartDate, analyticsEndDate);
   const dailyData = dateList.map(date => {
-    const visits = analyticsEvents.filter(e => e.type === "visit" && e.date === date).length;
+    const dayVisits = analyticsEvents.filter(e => e.type === "visit" && e.date === date);
+    const visits = dayVisits.length;
     const inquiries = filteredConsultations.filter(inq => inq.regDate === date).length;
     const menuViews = analyticsEvents.filter(e => e.type === "menu_view" && e.date === date).length;
-    return { date, visits, inquiries, menuViews };
+
+    let customerCount = 0;
+    let storeCount = 0;
+    let partnerCount = 0;
+    let adminCount = 0;
+
+    dayVisits.forEach(e => {
+      const role = getEventVisitorType(e);
+      if (role === "customer") customerCount++;
+      else if (role === "store") storeCount++;
+      else if (role === "partner") partnerCount++;
+      else if (role === "admin") adminCount++;
+    });
+
+    return {
+      date,
+      visits,
+      inquiries,
+      menuViews,
+      customerCount,
+      storeCount,
+      partnerCount,
+      adminCount,
+    };
   });
+
+  // 3-1. 선택된 날짜 상세 분석 데이터 (모달용)
+  const selectedDateEvents = useMemo(() => {
+    if (!selectedAnalyticsDate) return [];
+    return analyticsEvents.filter((e: any) => e.date === selectedAnalyticsDate && e.type === "visit");
+  }, [selectedAnalyticsDate, analyticsEvents]);
+
+  const selectedDateDetail = useMemo(() => {
+    if (!selectedAnalyticsDate) return null;
+
+    let customers = 0;
+    let stores = 0;
+    let partners = 0;
+    let admins = 0;
+
+    const channelCounts: Record<string, { key: string; label: string; icon: string; count: number; badge: string; color: string; isBranch: boolean }> = {};
+    const partnerBranchStats: Record<string, { partnerName: string; kakao: number; sms: number; other: number; total: number }> = {};
+
+    selectedDateEvents.forEach((e: any) => {
+      const vType = getEventVisitorType(e);
+      if (vType === "customer") customers++;
+      else if (vType === "store") stores++;
+      else if (vType === "partner") partners++;
+      else if (vType === "admin") admins++;
+
+      if (vType === "customer") {
+        const cInfo = getEventChannelInfo(e);
+        const groupKey = cInfo.isBranch ? `branch_${cInfo.key}` : cInfo.key;
+        if (!channelCounts[groupKey]) {
+          channelCounts[groupKey] = {
+            key: groupKey,
+            label: cInfo.label,
+            icon: cInfo.icon,
+            count: 0,
+            badge: cInfo.badge,
+            color: cInfo.color,
+            isBranch: cInfo.isBranch,
+          };
+        }
+        channelCounts[groupKey].count++;
+
+        if (cInfo.isBranch && cInfo.branchPartnerId) {
+          const pid = cInfo.branchPartnerId;
+          const pName = cInfo.partnerDisplayName;
+          if (!partnerBranchStats[pid]) {
+            partnerBranchStats[pid] = { partnerName: pName, kakao: 0, sms: 0, other: 0, total: 0 };
+          }
+          partnerBranchStats[pid].total++;
+          if (cInfo.key === "kakao") partnerBranchStats[pid].kakao++;
+          else if (cInfo.key === "sms") partnerBranchStats[pid].sms++;
+          else partnerBranchStats[pid].other++;
+        }
+      }
+    });
+
+    return {
+      date: selectedAnalyticsDate,
+      total: selectedDateEvents.length,
+      customers,
+      stores,
+      partners,
+      admins,
+      channels: Object.values(channelCounts).sort((a, b) => b.count - a.count),
+      partnerBranches: Object.entries(partnerBranchStats).map(([pid, val]) => ({ pid, ...val })).sort((a, b) => b.total - a.total),
+    };
+  }, [selectedDateEvents, selectedAnalyticsDate, partnerLookupMap]);
 
   // 4. Referrer Ranking
   const referrerCounts: Record<string, number> = {};
@@ -9679,33 +9942,70 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Daily Table (7 columns) */}
                 <div className="lg:col-span-7 bg-white border-0 rounded-lg shadow-md flex flex-col overflow-hidden">
-                  <div className="p-5 border-b border-slate-100 bg-[#F8F9FD]">
-                    <h3 className="text-sm font-black text-[#0F172A]">일자별 상세 지표</h3>
+                  <div className="p-5 border-b border-slate-100 bg-[#F8F9FD] flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-black text-[#0F172A]">일자별 상세 지표</h3>
+                      <p className="text-[11px] text-slate-400 font-bold mt-0.5">날짜를 클릭하면 해당 일자의 고객/점주/파트너 방문 및 카톡/문자 유입 경로를 정밀 분석합니다.</p>
+                    </div>
+                    <span className="text-[10px] font-extrabold bg-amber-100 text-amber-900 px-2.5 py-1 rounded-md">
+                      날짜 클릭 시 상세분석
+                    </span>
                   </div>
-                  <div className="overflow-x-auto flex-1 max-h-[350px]">
+                  <div className="overflow-x-auto flex-1 max-h-[380px]">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-[#F8F9FD] border-b border-slate-100 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider sticky top-0 z-10">
-                          <th className="p-3.5">일자</th>
-                          <th className="p-3.5 text-right">방문자수 (인입)</th>
-                          <th className="p-3.5 text-right">창업 상담문의</th>
-                          <th className="p-3.5 text-right">메뉴 상세 뷰수</th>
+                          <th className="p-3.5">일자 (클릭 시 상세분석)</th>
+                          <th className="p-3.5 text-center">방문자수 (인입)</th>
+                          <th className="p-3.5">방문자 구성 (고객 / 점주 / 파트너)</th>
+                          <th className="p-3.5 text-right">창업 문의</th>
+                          <th className="p-3.5 text-right">메뉴 상세뷰</th>
                           <th className="p-3.5 text-right">합계</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-xs">
                         {dailyData.length === 0 ? (
                           <tr>
-                            <td colSpan={5} className="p-8 text-center text-slate-400 font-bold">기간 내 조회된 통계가 없습니다.</td>
+                            <td colSpan={6} className="p-8 text-center text-slate-400 font-bold">기간 내 조회된 통계가 없습니다.</td>
                           </tr>
                         ) : (
                           dailyData.map((row) => (
-                            <tr key={row.date} className="hover:bg-slate-50 transition-colors">
-                              <td className="p-3.5 text-[#0F172A] font-extrabold">{row.date}</td>
-                              <td className="p-3.5 text-right text-slate-600 font-semibold">{row.visits.toLocaleString()}</td>
+                            <tr
+                              key={row.date}
+                              onClick={() => {
+                                setSelectedAnalyticsDate(row.date);
+                                setDateDetailFilterTab("all");
+                              }}
+                              className="hover:bg-amber-50/50 transition-colors cursor-pointer group"
+                              title="클릭 시 해당 일자의 방문자 정밀 분석 모달이 열립니다"
+                            >
+                              <td className="p-3.5">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[#0F172A] font-black group-hover:text-amber-600 underline decoration-amber-300 underline-offset-4 decoration-2">
+                                    {row.date}
+                                  </span>
+                                  <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    상세보기 →
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="p-3.5 text-center text-[#0F172A] font-black">{row.visits.toLocaleString()}회</td>
+                              <td className="p-3.5">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    👤 고객 {row.customerCount}
+                                  </span>
+                                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200">
+                                    🏪 점주 {row.storeCount}
+                                  </span>
+                                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-50 text-purple-700 border border-purple-200">
+                                    🤝 파트너 {row.partnerCount}
+                                  </span>
+                                </div>
+                              </td>
                               <td className="p-3.5 text-right text-[#0F172A] font-black">{row.inquiries.toLocaleString()}</td>
                               <td className="p-3.5 text-right text-slate-600 font-semibold">{row.menuViews.toLocaleString()}</td>
-                              <td className="p-3.5 text-right text-[#0F172A] font-black bg-slate-50">
+                              <td className="p-3.5 text-right text-[#0F172A] font-black bg-slate-50 group-hover:bg-amber-100/50">
                                 {(row.visits + row.inquiries + row.menuViews).toLocaleString()}
                               </td>
                             </tr>
@@ -9898,6 +10198,382 @@ export default function AdminPage() {
                   </div>
                 )}
               </div>
+
+              {/* ============================================================
+                  DATE DETAIL ANALYTICS MODAL (일자별 방문자 정밀 분석 모달)
+                 ============================================================ */}
+              {selectedAnalyticsDate && selectedDateDetail && (
+                <div
+                  className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
+                  onClick={() => setSelectedAnalyticsDate(null)}
+                >
+                  <div
+                    className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col my-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Modal Header */}
+                    <div className="p-5 sm:p-6 bg-gradient-to-r from-slate-900 via-[#1E293B] to-slate-900 text-white flex items-center justify-between shrink-0">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-[#FED422] text-[#0F172A] flex items-center justify-center font-black shadow-md">
+                          <Calendar size={20} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-lg font-black tracking-tight text-white">
+                              {selectedAnalyticsDate} 방문자 정밀 분석 리포트
+                            </h3>
+                            <span className="text-[11px] font-extrabold bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full">
+                              총 {selectedDateDetail.total}회 방문
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-400 mt-0.5">
+                            방문자 유형(고객/점주/파트너) 및 고객 유입 경로(카톡/문자/포털)를 상세 분석합니다.
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedAnalyticsDate(null)}
+                        className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer border-0 transition-all"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+
+                    {/* Modal Body - Scrollable */}
+                    <div className="p-6 overflow-y-auto flex-1 space-y-6 bg-slate-50/50">
+                      {/* 1. 방문자 유형 3분할 통계 카드 */}
+                      <div>
+                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                          <span>1. 방문자 유형 구분 (누가 방문했는가?)</span>
+                        </h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                          {/* 고객 */}
+                          <div className="bg-white border-2 border-emerald-200 rounded-xl p-4 shadow-sm relative overflow-hidden">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-black text-emerald-800 flex items-center gap-1.5">
+                                <span className="text-base">👤</span> 일반 고객 / 예비창업자
+                              </span>
+                              <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                                {Math.round((selectedDateDetail.customers / (selectedDateDetail.total || 1)) * 100)}%
+                              </span>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                              <strong className="text-3xl font-black text-slate-900">
+                                {selectedDateDetail.customers.toLocaleString()}
+                              </strong>
+                              <span className="text-xs font-bold text-slate-400">명 방문</span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 font-medium mt-1">
+                              홈페이지, 메뉴, 분양페이지 등을 탐색한 잠재 고객
+                            </p>
+                          </div>
+
+                          {/* 가맹점주 */}
+                          <div className="bg-white border-2 border-blue-200 rounded-xl p-4 shadow-sm relative overflow-hidden">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-black text-blue-800 flex items-center gap-1.5">
+                                <span className="text-base">🏪</span> 가맹점주 (점주)
+                              </span>
+                              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                                {Math.round((selectedDateDetail.stores / (selectedDateDetail.total || 1)) * 100)}%
+                              </span>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                              <strong className="text-3xl font-black text-slate-900">
+                                {selectedDateDetail.stores.toLocaleString()}
+                              </strong>
+                              <span className="text-xs font-bold text-slate-400">명 방문</span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 font-medium mt-1">
+                              점주 포털 접속 및 발주, 공지사항을 확인한 가맹점주
+                            </p>
+                          </div>
+
+                          {/* 파트너 */}
+                          <div className="bg-white border-2 border-purple-200 rounded-xl p-4 shadow-sm relative overflow-hidden">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-black text-purple-800 flex items-center gap-1.5">
+                                <span className="text-base">🤝</span> 영업 / 분양 파트너
+                              </span>
+                              <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md">
+                                {Math.round((selectedDateDetail.partners / (selectedDateDetail.total || 1)) * 100)}%
+                              </span>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                              <strong className="text-3xl font-black text-slate-900">
+                                {selectedDateDetail.partners.toLocaleString()}
+                              </strong>
+                              <span className="text-xs font-bold text-slate-400">명 방문</span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 font-medium mt-1">
+                              파트너 포털에 로그인하여 실적 및 상담을 관리한 파트너
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 2. 고객 유입 경로 정밀 분석 (파트너 분양페이지 카톡/문자 vs 일반 홈페이지 유입) */}
+                      <div>
+                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                          <span>2. 고객 유입 경로 분석 (어떤 경로로 타고 들어왔는가?)</span>
+                        </h4>
+
+                        {/* 파트너 분양페이지 카톡 vs 문자 유입 강조 박스 */}
+                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 sm:p-5 mb-4 shadow-xs">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                            <h5 className="text-sm font-black text-amber-950 flex items-center gap-2">
+                              <span>⭐</span>
+                              <span>파트너 분양페이지 유입 (카카오톡 vs 문자 발송 상세)</span>
+                            </h5>
+                            <span className="text-xs font-bold text-amber-800">
+                              분양페이지 총 유입:{" "}
+                              <strong>
+                                {(selectedDateDetail.partnerBranches || []).reduce((acc, curr) => acc + curr.total, 0)}
+                              </strong>
+                              건
+                            </span>
+                          </div>
+
+                          {selectedDateDetail.partnerBranches && selectedDateDetail.partnerBranches.length > 0 ? (
+                            <div className="overflow-x-auto bg-white rounded-lg border border-amber-200/80 shadow-2xs">
+                              <table className="w-full text-left text-xs border-collapse">
+                                <thead>
+                                  <tr className="bg-amber-100/50 border-b border-amber-200 text-amber-900 font-black text-[11px]">
+                                    <th className="p-3">파트너 (ID)</th>
+                                    <th className="p-3 text-center">💬 카카오톡 공유 링크</th>
+                                    <th className="p-3 text-center">📱 문자(SMS) 공유 링크</th>
+                                    <th className="p-3 text-center">🌐 기타/직접 분양 접속</th>
+                                    <th className="p-3 text-right">파트너 총 유입</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-amber-100">
+                                  {selectedDateDetail.partnerBranches.map((pb) => (
+                                    <tr key={pb.pid} className="hover:bg-amber-50/40 font-medium">
+                                      <td className="p-3 font-bold text-slate-900 flex items-center gap-1.5">
+                                        <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+                                        <span>{pb.partnerName}</span>
+                                      </td>
+                                      <td className="p-3 text-center">
+                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-black text-[11px] bg-[#FEE500] text-[#371D1E]">
+                                          💬 {pb.kakao}건
+                                        </span>
+                                      </td>
+                                      <td className="p-3 text-center">
+                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-black text-[11px] bg-emerald-100 text-emerald-800">
+                                          📱 {pb.sms}건
+                                        </span>
+                                      </td>
+                                      <td className="p-3 text-center text-slate-500 font-bold">
+                                        {pb.other > 0 ? `🌐 ${pb.other}건` : "-"}
+                                      </td>
+                                      <td className="p-3 text-right font-black text-amber-950">
+                                        {pb.total}건
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          ) : (
+                            <div className="bg-white/80 rounded-lg p-4 text-center text-xs text-amber-800/80 font-bold border border-amber-200/50">
+                              해당 날짜에는 파트너 분양페이지를 통한 고객 유입 기록이 없습니다.
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 전체 고객 유입 채널 랭킹 카드 */}
+                        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                          <h5 className="text-xs font-black text-slate-700 mb-3 flex items-center justify-between">
+                            <span>전체 고객 유입 채널별 순위</span>
+                            <span className="text-slate-400 font-bold">총 {selectedDateDetail.customers}명 대상</span>
+                          </h5>
+                          {selectedDateDetail.channels.length === 0 ? (
+                            <p className="text-xs text-slate-400 font-bold text-center py-4">조회된 고객 유입 데이터가 없습니다.</p>
+                          ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                              {selectedDateDetail.channels.map((ch) => {
+                                const percent = Math.round((ch.count / (selectedDateDetail.customers || 1)) * 100);
+                                return (
+                                  <div key={ch.key} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                                      <span className="text-base shrink-0">{ch.icon}</span>
+                                      <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-1.5">
+                                          <span className="text-xs font-bold text-slate-900 truncate">{ch.label}</span>
+                                          {ch.isBranch && (
+                                            <span className="text-[9px] font-extrabold bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded shrink-0">
+                                              분양몰
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="text-right shrink-0 pl-2">
+                                      <strong className="text-xs font-black text-slate-900">{ch.count}건</strong>
+                                      <span className="text-[10px] text-slate-400 ml-1">({percent}%)</span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 3. 해당 일자의 실시간 상세 방문 로그 테이블 */}
+                      <div>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                          <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                            <span>3. 실시간 상세 방문 로그 (전체 {selectedDateEvents.length}건)</span>
+                          </h4>
+                          {/* 탭 필터 */}
+                          <div className="flex items-center gap-1 bg-slate-200/80 p-1 rounded-lg">
+                            {[
+                              { key: "all", label: "전체", count: selectedDateEvents.length },
+                              { key: "customer", label: "👤 고객만", count: selectedDateDetail.customers },
+                              { key: "store", label: "🏪 점주만", count: selectedDateDetail.stores },
+                              { key: "partner", label: "🤝 파트너만", count: selectedDateDetail.partners },
+                            ].map((tab) => (
+                              <button
+                                key={tab.key}
+                                type="button"
+                                onClick={() => setDateDetailFilterTab(tab.key as any)}
+                                className={`px-2.5 py-1 text-[11px] font-black rounded-md transition-all cursor-pointer border-0 ${
+                                  dateDetailFilterTab === tab.key
+                                    ? "bg-white text-slate-950 shadow-xs"
+                                    : "text-slate-600 hover:text-slate-900"
+                                }`}
+                              >
+                                {tab.label} ({tab.count})
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 로그 테이블 */}
+                        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                          <div className="overflow-x-auto max-h-[320px]">
+                            <table className="w-full text-left text-xs border-collapse">
+                              <thead>
+                                <tr className="bg-[#F8F9FD] border-b border-slate-200 text-[10px] font-black text-slate-500 uppercase sticky top-0 z-10">
+                                  <th className="p-3 w-24">시간</th>
+                                  <th className="p-3 w-28">방문자 구분</th>
+                                  <th className="p-3 w-36">사용자 식별</th>
+                                  <th className="p-3">방문 페이지 / 분양페이지</th>
+                                  <th className="p-3">유입 경로 및 수단 (카톡/문자/포털)</th>
+                                  <th className="p-3 w-32">접속 IP</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {selectedDateEvents
+                                  .filter((e: any) => {
+                                    if (dateDetailFilterTab === "all") return true;
+                                    return getEventVisitorType(e) === dateDetailFilterTab;
+                                  })
+                                  .sort((a: any, b: any) => (b._creationTime || 0) - (a._creationTime || 0))
+                                  .map((ev: any, idx: number) => {
+                                    const vRole = getEventVisitorType(ev);
+                                    const cInfo = getEventChannelInfo(ev);
+                                    const dateObj = new Date(ev._creationTime || 0);
+                                    const timeStr = !isNaN(dateObj.getTime())
+                                      ? dateObj.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })
+                                      : "-";
+
+                                    // 사용자 식별 텍스트
+                                    let userDesc = "일반 고객";
+                                    if (vRole === "store") {
+                                      const storeObj = ev.visitorId ? storeLookupMap[ev.visitorId] : null;
+                                      userDesc = storeObj ? `${storeObj.name} 점주` : (ev.visitorId || "가맹점주");
+                                    } else if (vRole === "partner") {
+                                      const partnerObj = ev.visitorId ? partnerLookupMap[ev.visitorId] : null;
+                                      userDesc = partnerObj ? `${partnerObj.name} 파트너` : (ev.visitorId || "파트너");
+                                    } else if (vRole === "admin") {
+                                      userDesc = "본사 관리자";
+                                    }
+
+                                    return (
+                                      <tr key={idx} className="hover:bg-slate-50 font-medium">
+                                        <td className="p-3 font-mono text-slate-500 font-bold whitespace-nowrap">
+                                          {timeStr}
+                                        </td>
+                                        <td className="p-3 whitespace-nowrap">
+                                          {vRole === "customer" && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-100 text-emerald-800">
+                                              👤 고객
+                                            </span>
+                                          )}
+                                          {vRole === "store" && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black bg-blue-100 text-blue-800">
+                                              🏪 점주
+                                            </span>
+                                          )}
+                                          {vRole === "partner" && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black bg-purple-100 text-purple-800">
+                                              🤝 파트너
+                                            </span>
+                                          )}
+                                          {vRole === "admin" && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black bg-slate-200 text-slate-800">
+                                              🛠️ 관리자
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td className="p-3 text-slate-800 font-bold whitespace-nowrap">
+                                          {userDesc}
+                                        </td>
+                                        <td className="p-3">
+                                          <div className="flex items-center gap-1.5 flex-wrap">
+                                            <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                                              {ev.path || "/"}
+                                            </span>
+                                            {cInfo.isBranch && cInfo.partnerDisplayName && (
+                                              <span className="text-[10px] font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
+                                                ★ [{cInfo.partnerDisplayName}] 분양페이지
+                                              </span>
+                                            )}
+                                          </div>
+                                        </td>
+                                        <td className="p-3">
+                                          <div className="flex items-center gap-1.5 flex-wrap">
+                                            <span className={`inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded ${cInfo.color}`}>
+                                              <span>{cInfo.icon}</span>
+                                              <span>{cInfo.badge}</span>
+                                            </span>
+                                            <span className="text-[11px] text-slate-600 font-medium">
+                                              {cInfo.detail}
+                                            </span>
+                                          </div>
+                                        </td>
+                                        <td className="p-3 font-mono text-[11px] text-slate-500 whitespace-nowrap">
+                                          {ev.ip || "127.0.0.1"}
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Modal Footer */}
+                    <div className="p-4 bg-slate-100 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+                      <p className="text-xs text-slate-500 font-medium m-0">
+                        ※ 파트너가 전용 링크(카톡: <code className="text-amber-700 font-bold">?source=kakao</code>, 문자: <code className="text-emerald-700 font-bold">?source=sms</code>)를 통해 공유한 접속이 실시간 감지되어 분류됩니다.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedAnalyticsDate(null)}
+                        className="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-black transition-all cursor-pointer border-0 shadow-sm"
+                      >
+                        닫기
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

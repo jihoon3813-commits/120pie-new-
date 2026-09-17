@@ -9,6 +9,12 @@ export const trackEvent = mutation({
     referrer: v.optional(v.string()),
     ip: v.string(),
     date: v.string(),
+    visitorType: v.optional(v.string()),
+    visitorId: v.optional(v.string()),
+    partnerId: v.optional(v.string()),
+    channel: v.optional(v.string()),
+    source: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const eventId = await ctx.db.insert("analytics", args);

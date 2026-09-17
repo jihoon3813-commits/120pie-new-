@@ -170,7 +170,15 @@ export default defineSchema({
     referrer: v.optional(v.string()), // 유입경로
     ip: v.string(), // 접속 IP 주소
     date: v.string(), // YYYY-MM-DD
-  }).index("by_date", ["date"]),
+    visitorType: v.optional(v.string()), // "customer" | "store" | "partner" | "admin"
+    visitorId: v.optional(v.string()), // 가맹점 ID 또는 파트너 ID
+    partnerId: v.optional(v.string()), // 분양페이지 대상 파트너 ID (e.g. "partner1")
+    channel: v.optional(v.string()), // 유입 채널: "kakao" | "sms" | "naver" | "google" | "instagram" | "youtube" | "direct" | "etc"
+    source: v.optional(v.string()), // URL 파라미터 source (e.g. "kakao", "sms")
+    userAgent: v.optional(v.string()), // 브라우저 및 기기 정보
+  }).index("by_date", ["date"])
+    .index("by_visitorType", ["visitorType"])
+    .index("by_date_and_type", ["date", "visitorType"]),
   banners: defineTable({
     mainTag: v.string(),
     mainTitle: v.string(),
