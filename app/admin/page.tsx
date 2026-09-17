@@ -5444,141 +5444,7 @@ export default function AdminPage() {
   const pendingInquiriesCount = inquiries.filter((i) => i.status === "답변대기").length;
   const incomingOrdersCount = orders.filter((o) => o.status === "주문완료").length;
 
-  if (checkingAuth) {
-    return (
-      <div id="admin-portal" className="h-screen bg-[#0B0F17] flex flex-col items-center justify-center font-bold text-white gap-4">
-        <div className="w-10 h-10 border-3 border-[#FF6B4A] border-t-transparent rounded-full animate-spin"></div>
-        <span className="text-xs font-black tracking-widest text-slate-300">인증 상태 확인 중...</span>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn) {
-    return (
-      <div id="admin-portal" className="min-h-screen w-screen bg-[#0B0F17] text-white flex flex-col font-sans select-none antialiased justify-center items-center p-4 relative overflow-hidden">
-        {/* Soft Warm Ambient Yellow Glow */}
-        <div 
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: "radial-gradient(circle at 50% 30%, rgba(254, 212, 34, 0.12) 0%, rgba(11, 15, 23, 0) 70%)"
-          }}
-        />
-
-        {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-5 py-3.5 rounded-lg font-black text-sm shadow-[0_8px_30px_rgba(254,212,34,0.3)] flex items-center gap-2.5 animate-bounce">
-            <CheckCircle2 size={18} className="text-[#0F172A]" />
-            {toastMessage}
-          </div>
-        )}
-        
-        <div className="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-lg p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] space-y-7 relative overflow-hidden text-left z-10">
-          {/* Top Yellow Brand Accent Line */}
-          <div className="absolute top-0 left-0 right-0 h-2 bg-[#FED422]" />
-          
-          <div className="text-center space-y-3.5 pt-2">
-            {/* Prominent Large Brand Logo */}
-            <div className="flex justify-center mb-1">
-              <img
-                src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
-                alt="120PIE 로고"
-                className="h-10 sm:h-12 w-auto object-contain drop-shadow-md"
-              />
-            </div>
-            
-            <div className="space-y-1.5">
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">120PIE HEAD OFFICE</h2>
-              <span className="inline-block text-xs font-black text-[#0F172A] bg-[#FED422] px-4 py-1 rounded-md shadow-2xs">
-                통합 본사 어드민 포털
-              </span>
-            </div>
-            
-            <p className="text-xs text-slate-400 font-semibold leading-relaxed max-w-xs mx-auto">
-              본 시스템은 120겹파이 가맹본부 관리자용 전용 제어 시스템입니다. 인가된 본사 계정으로 로그인해 주세요.
-            </p>
-          </div>
-
-          <form onSubmit={handleLoginSubmit} className="space-y-4 pt-1">
-            {loginError && (
-              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-lg p-3.5 text-xs font-bold flex items-center gap-2">
-                <AlertCircle size={16} className="shrink-0 text-rose-400" />
-                <span>{loginError}</span>
-              </div>
-            )}
-            
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-200 block">본사 관리자 ID</label>
-              <input
-                type="text"
-                placeholder="관리자 ID를 입력하세요"
-                value={loginId}
-                onChange={(e) => setLoginId(e.target.value)}
-                required
-                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-lg px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-200 block">보안 비밀번호</label>
-              <input
-                type="password"
-                placeholder="비밀번호를 입력하세요"
-                value={loginPw}
-                onChange={(e) => setLoginPw(e.target.value)}
-                required
-                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-lg px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-4 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-sm sm:text-base font-black rounded-lg transition-all shadow-lg shadow-[#FED422]/20 flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.99] mt-2"
-            >
-              <span>로그인 완료</span>
-              <ArrowRight size={18} className="text-[#0F172A]" />
-            </button>
-          </form>
-
-          <div className="text-center pt-2">
-            <Link href="/" className="text-xs text-slate-400 hover:text-white font-bold transition-colors inline-flex items-center gap-1.5">
-              <ArrowLeft size={13} />
-              <span>메인 랜딩 페이지로 돌아가기</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Product Real-time Filtered List Calculation
-  const filteredProducts = (products || []).filter((p) => {
-    if (!p) return false;
-    const matchesCategory =
-      adminProductCategoryFilter === "전체" || p.category === adminProductCategoryFilter;
-
-    const searchKeyword = (adminProductSearch || "").trim().toLowerCase();
-    const matchesSearch =
-      searchKeyword === "" ||
-      (p.name || "").toLowerCase().includes(searchKeyword) ||
-      (p.modelName || "").toLowerCase().includes(searchKeyword);
-
-    return matchesCategory && matchesSearch;
-  });
-
-  const isProductFiltering = adminProductSearch.trim() !== "" || adminProductCategoryFilter !== "전체";
-
-  // ==========================================
-  // ANALYTICS DATA PROCESSING & COMPUTATION
-  // ==========================================
-  // 1. Filter consultations (inquiries) for the selected period
-  const filteredConsultations = consultations.filter((inq) => {
-    if (!inq.regDate) return false;
-    let ok = true;
-    if (analyticsStartDate) ok = ok && inq.regDate >= analyticsStartDate;
-    if (analyticsEndDate) ok = ok && inq.regDate <= analyticsEndDate;
-    return ok;
-  });
-
-  // 파트너 ID -> 파트너 정보 매핑 맵
+  // 파트너 ID -> 파트너 정보 매핑 맵 (React Hooks 규칙 준수를 위해 early return 이전에 배치)
   const partnerLookupMap = useMemo(() => {
     const map: Record<string, any> = {};
     (convexPartners || []).forEach((p: any) => {
@@ -5749,45 +5615,7 @@ export default function AdminPage() {
     };
   };
 
-  // 2. Count metrics
-  const totalVisits = analyticsEvents.filter(e => e.type === "visit").length;
-  const totalInquiries = filteredConsultations.length;
-  const totalMenuViews = analyticsEvents.filter(e => e.type === "menu_view").length;
-
-  // 3. Generate daily trend data
-  const dateList = getDatesInRange(analyticsStartDate, analyticsEndDate);
-  const dailyData = dateList.map(date => {
-    const dayVisits = analyticsEvents.filter(e => e.type === "visit" && e.date === date);
-    const visits = dayVisits.length;
-    const inquiries = filteredConsultations.filter(inq => inq.regDate === date).length;
-    const menuViews = analyticsEvents.filter(e => e.type === "menu_view" && e.date === date).length;
-
-    let customerCount = 0;
-    let storeCount = 0;
-    let partnerCount = 0;
-    let adminCount = 0;
-
-    dayVisits.forEach(e => {
-      const role = getEventVisitorType(e);
-      if (role === "customer") customerCount++;
-      else if (role === "store") storeCount++;
-      else if (role === "partner") partnerCount++;
-      else if (role === "admin") adminCount++;
-    });
-
-    return {
-      date,
-      visits,
-      inquiries,
-      menuViews,
-      customerCount,
-      storeCount,
-      partnerCount,
-      adminCount,
-    };
-  });
-
-  // 3-1. 선택된 날짜 상세 분석 데이터 (모달용)
+  // 선택된 날짜 상세 분석 데이터 (모달용 훅 - early return 이전에 선언)
   const selectedDateEvents = useMemo(() => {
     if (!selectedAnalyticsDate) return [];
     return analyticsEvents.filter((e: any) => e.date === selectedAnalyticsDate && e.type === "visit");
@@ -5852,6 +5680,178 @@ export default function AdminPage() {
       partnerBranches: Object.entries(partnerBranchStats).map(([pid, val]) => ({ pid, ...val })).sort((a, b) => b.total - a.total),
     };
   }, [selectedDateEvents, selectedAnalyticsDate, partnerLookupMap]);
+
+  if (checkingAuth) {
+    return (
+      <div id="admin-portal" className="h-screen bg-[#0B0F17] flex flex-col items-center justify-center font-bold text-white gap-4">
+        <div className="w-10 h-10 border-3 border-[#FF6B4A] border-t-transparent rounded-full animate-spin"></div>
+        <span className="text-xs font-black tracking-widest text-slate-300">인증 상태 확인 중...</span>
+      </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <div id="admin-portal" className="min-h-screen w-screen bg-[#0B0F17] text-white flex flex-col font-sans select-none antialiased justify-center items-center p-4 relative overflow-hidden">
+        {/* Soft Warm Ambient Yellow Glow */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(circle at 50% 30%, rgba(254, 212, 34, 0.12) 0%, rgba(11, 15, 23, 0) 70%)"
+          }}
+        />
+
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-[150] bg-[#FED422] text-[#0F172A] px-5 py-3.5 rounded-lg font-black text-sm shadow-[0_8px_30px_rgba(254,212,34,0.3)] flex items-center gap-2.5 animate-bounce">
+            <CheckCircle2 size={18} className="text-[#0F172A]" />
+            {toastMessage}
+          </div>
+        )}
+        
+        <div className="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-lg p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] space-y-7 relative overflow-hidden text-left z-10">
+          {/* Top Yellow Brand Accent Line */}
+          <div className="absolute top-0 left-0 right-0 h-2 bg-[#FED422]" />
+          
+          <div className="text-center space-y-3.5 pt-2">
+            {/* Prominent Large Brand Logo */}
+            <div className="flex justify-center mb-1">
+              <img
+                src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
+                alt="120PIE 로고"
+                className="h-10 sm:h-12 w-auto object-contain drop-shadow-md"
+              />
+            </div>
+            
+            <div className="space-y-1.5">
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">120PIE HEAD OFFICE</h2>
+              <span className="inline-block text-xs font-black text-[#0F172A] bg-[#FED422] px-4 py-1 rounded-md shadow-2xs">
+                통합 본사 어드민 포털
+              </span>
+            </div>
+            
+            <p className="text-xs text-slate-400 font-semibold leading-relaxed max-w-xs mx-auto">
+              본 시스템은 120겹파이 가맹본부 관리자용 전용 제어 시스템입니다. 인가된 본사 계정으로 로그인해 주세요.
+            </p>
+          </div>
+
+          <form onSubmit={handleLoginSubmit} className="space-y-4 pt-1">
+            {loginError && (
+              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-lg p-3.5 text-xs font-bold flex items-center gap-2">
+                <AlertCircle size={16} className="shrink-0 text-rose-400" />
+                <span>{loginError}</span>
+              </div>
+            )}
+            
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-200 block">본사 관리자 ID</label>
+              <input
+                type="text"
+                placeholder="관리자 ID를 입력하세요"
+                value={loginId}
+                onChange={(e) => setLoginId(e.target.value)}
+                required
+                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-lg px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-200 block">보안 비밀번호</label>
+              <input
+                type="password"
+                placeholder="비밀번호를 입력하세요"
+                value={loginPw}
+                onChange={(e) => setLoginPw(e.target.value)}
+                required
+                className="w-full bg-slate-800/60 border border-slate-700/80 rounded-lg px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 font-extrabold focus:outline-none focus:border-[#FED422] focus:ring-2 focus:ring-[#FED422]/30 transition-all"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-4 bg-[#FED422] hover:bg-[#e6be1f] text-[#0F172A] text-sm sm:text-base font-black rounded-lg transition-all shadow-lg shadow-[#FED422]/20 flex items-center justify-center gap-2 cursor-pointer border-0 active:scale-[0.99] mt-2"
+            >
+              <span>로그인 완료</span>
+              <ArrowRight size={18} className="text-[#0F172A]" />
+            </button>
+          </form>
+
+          <div className="text-center pt-2">
+            <Link href="/" className="text-xs text-slate-400 hover:text-white font-bold transition-colors inline-flex items-center gap-1.5">
+              <ArrowLeft size={13} />
+              <span>메인 랜딩 페이지로 돌아가기</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Product Real-time Filtered List Calculation
+  const filteredProducts = (products || []).filter((p) => {
+    if (!p) return false;
+    const matchesCategory =
+      adminProductCategoryFilter === "전체" || p.category === adminProductCategoryFilter;
+
+    const searchKeyword = (adminProductSearch || "").trim().toLowerCase();
+    const matchesSearch =
+      searchKeyword === "" ||
+      (p.name || "").toLowerCase().includes(searchKeyword) ||
+      (p.modelName || "").toLowerCase().includes(searchKeyword);
+
+    return matchesCategory && matchesSearch;
+  });
+
+  const isProductFiltering = adminProductSearch.trim() !== "" || adminProductCategoryFilter !== "전체";
+
+  // ==========================================
+  // ANALYTICS DATA PROCESSING & COMPUTATION
+  // ==========================================
+  // 1. Filter consultations (inquiries) for the selected period
+  const filteredConsultations = consultations.filter((inq) => {
+    if (!inq.regDate) return false;
+    let ok = true;
+    if (analyticsStartDate) ok = ok && inq.regDate >= analyticsStartDate;
+    if (analyticsEndDate) ok = ok && inq.regDate <= analyticsEndDate;
+    return ok;
+  });
+
+  // 2. Count metrics
+  const totalVisits = analyticsEvents.filter(e => e.type === "visit").length;
+  const totalInquiries = filteredConsultations.length;
+  const totalMenuViews = analyticsEvents.filter(e => e.type === "menu_view").length;
+
+  // 3. Generate daily trend data
+  const dateList = getDatesInRange(analyticsStartDate, analyticsEndDate);
+  const dailyData = dateList.map(date => {
+    const dayVisits = analyticsEvents.filter(e => e.type === "visit" && e.date === date);
+    const visits = dayVisits.length;
+    const inquiries = filteredConsultations.filter(inq => inq.regDate === date).length;
+    const menuViews = analyticsEvents.filter(e => e.type === "menu_view" && e.date === date).length;
+
+    let customerCount = 0;
+    let storeCount = 0;
+    let partnerCount = 0;
+    let adminCount = 0;
+
+    dayVisits.forEach(e => {
+      const role = getEventVisitorType(e);
+      if (role === "customer") customerCount++;
+      else if (role === "store") storeCount++;
+      else if (role === "partner") partnerCount++;
+      else if (role === "admin") adminCount++;
+    });
+
+    return {
+      date,
+      visits,
+      inquiries,
+      menuViews,
+      customerCount,
+      storeCount,
+      partnerCount,
+      adminCount,
+    };
+  });
 
   // 4. Referrer Ranking
   const referrerCounts: Record<string, number> = {};
