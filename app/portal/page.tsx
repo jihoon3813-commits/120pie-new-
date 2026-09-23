@@ -3356,9 +3356,9 @@ export default function PortalPage() {
               MENU CONTENT: 2. ORDER MATERIALS
              ========================================== */}
           {currentMenu === "order" && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-8">
               
-              {/* Left Side: Category tabs & Product Box grid (3 Columns) */}
+              {/* Left Side: Category tabs & Product Box grid (2 cols on lg, 3 cols on xl) */}
               <div className="lg:col-span-8 space-y-4">
                 
                 {/* Store & Partner Grade Notice Banner */}
@@ -3391,8 +3391,8 @@ export default function PortalPage() {
                   ))}
                 </div>
 
-                {/* Product Box Grid (3 Columns on Desktop: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Product Box Grid (Responsive: 1 col on mobile, 2 cols on sm/tablet-lg, 3 cols on xl desktop) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4">
                   {filteredProducts.map((p) => {
                     const cartQty = cart.find((item) => item.productId === p.id)?.quantity || 0;
                     return (
@@ -3443,7 +3443,7 @@ export default function PortalPage() {
                                 ) : cartQty > 0 ? (
                                   <div className="flex items-center border border-slate-200 bg-slate-50 rounded-lg p-0.5">
                                     <button 
-                                      type="button"
+                                      type="button" 
                                       onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
                                       className="p-0.5 hover:text-[#0F172A] text-slate-500 border-0 cursor-pointer"
                                     >
@@ -3451,7 +3451,7 @@ export default function PortalPage() {
                                     </button>
                                     <span className="px-2 text-[10px] font-bold text-[#0F172A] w-4 text-center">{cartQty}</span>
                                     <button 
-                                      type="button"
+                                      type="button" 
                                       onClick={() => updateCartQty(p.id, undefined, cartQty + 1)}
                                       className="p-0.5 hover:text-[#0F172A] text-slate-500 border-0 cursor-pointer"
                                     >
@@ -3472,13 +3472,13 @@ export default function PortalPage() {
                           </div>
                         </div>
 
-                        {/* 2. Desktop 3-Column Grid Card View */}
+                        {/* 2. Desktop/Tablet Grid Card View (Responsive flexible layout, never cuts off menu title) */}
                         <div 
                           onClick={() => setSelectedProductDetail(p)}
-                          className="hidden sm:flex bg-white border border-neutral-200/90 hover:border-[#FED422] transition-all rounded-lg overflow-hidden flex-col justify-between shadow-2xs cursor-pointer hover:shadow-md hover:-translate-y-0.5 aspect-[4/5] w-full relative min-h-0"
+                          className="hidden sm:flex bg-white border border-neutral-200/90 hover:border-[#FED422] transition-all rounded-lg overflow-hidden flex-col justify-between shadow-2xs cursor-pointer hover:shadow-md hover:-translate-y-0.5 w-full h-full relative"
                         >
-                          {/* Thumbnail image & stock state badge (Generous 64% height for clean white backdrop) */}
-                          <div className="h-[64%] w-full relative bg-white overflow-hidden shrink-0 border-b border-neutral-100 flex items-center justify-center p-3">
+                          {/* Thumbnail image & stock state badge (Clean 4:3 aspect ratio) */}
+                          <div className="relative w-full aspect-[4/3] bg-white overflow-hidden shrink-0 border-b border-neutral-100 flex items-center justify-center p-3">
                             <img 
                               src={optimizeCloudinaryUrl(p.img)} 
                               alt={p.name} 
@@ -3503,8 +3503,8 @@ export default function PortalPage() {
                             </span>
                           </div>
 
-                          {/* Compact Product Info Block */}
-                          <div className="h-[36%] w-full shrink-0 flex flex-col justify-between p-3.5 min-h-0 relative overflow-hidden bg-white">
+                          {/* Product Info Block (Flexible height, never squashes menu name) */}
+                          <div className="flex-1 w-full flex flex-col justify-between p-3 sm:p-3.5 relative bg-white min-h-[120px]">
                             {p.labels && p.labels.length > 0 && (
                               <div className="absolute top-2.5 right-2.5 flex flex-wrap gap-1 w-fit justify-end z-10">
                                 {p.labels.map((l) => {
@@ -3522,21 +3522,21 @@ export default function PortalPage() {
                             )}
                             
                             {/* Product Info Area */}
-                            <div className="space-y-0.5 pr-8 min-h-0 overflow-hidden text-left">
-                              <span className="text-[9px] text-slate-400 font-bold block whitespace-nowrap truncate">{p.packSize}</span>
-                              <h3 className="font-extrabold text-xs sm:text-sm text-[#0F172A] leading-snug truncate">{p.name}</h3>
-                              <p className="text-[10px] text-slate-500 font-medium leading-tight truncate mt-0.5">{p.desc}</p>
+                            <div className="space-y-0.5 pr-8 text-left">
+                              <span className="text-[9px] sm:text-[10px] text-slate-400 font-bold block whitespace-nowrap truncate">{p.packSize}</span>
+                              <h3 className="font-extrabold text-xs sm:text-sm text-[#0F172A] leading-snug line-clamp-2 break-keep" title={p.name}>{p.name}</h3>
+                              <p className="text-[10px] text-slate-500 font-medium leading-tight line-clamp-1 mt-0.5" title={p.desc}>{p.desc}</p>
                             </div>
 
                             {/* Price & Action Area - NO horizontal border line, clean gap layout */}
-                            <div className="flex items-center justify-between mt-2 pt-1 shrink-0">
-                              <div className="flex flex-col">
+                            <div className="flex items-center justify-between mt-2.5 pt-1 shrink-0 gap-1.5">
+                              <div className="flex flex-col min-w-0">
                                 <span className="text-[9px] text-slate-400 font-bold -mb-0.5">공급가</span>
-                                <strong className="text-sm sm:text-base text-[#0F172A] font-black whitespace-nowrap">{p.price.toLocaleString()}<span className="text-xs font-bold ml-0.5">원</span></strong>
+                                <strong className="text-xs sm:text-base text-[#0F172A] font-black whitespace-nowrap">{p.price.toLocaleString()}<span className="text-[10px] sm:text-xs font-bold ml-0.5">원</span></strong>
                               </div>
                               
                               {p.stock === "out_of_stock" ? (
-                                <span className="bg-slate-100 text-slate-400 font-extrabold text-xs px-3 py-1.5 rounded-md whitespace-nowrap shrink-0">일시품절</span>
+                                <span className="bg-slate-100 text-slate-400 font-extrabold text-[11px] sm:text-xs px-2.5 sm:px-3 py-1.5 rounded-md whitespace-nowrap shrink-0">일시품절</span>
                               ) : p.options && p.options.length > 0 ? (
                                 <button
                                   type="button"
@@ -3544,26 +3544,26 @@ export default function PortalPage() {
                                     e.stopPropagation();
                                     setSelectedProductDetail(p);
                                   }}
-                                  className="px-4 py-2 rounded-md bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-xs font-black transition-all shadow-xs hover:shadow-md shrink-0 whitespace-nowrap border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
+                                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-md bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] text-[11px] sm:text-xs font-black transition-all shadow-xs hover:shadow-md shrink-0 whitespace-nowrap border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
                                 >
                                   옵션 선택
                                 </button>
                               ) : cartQty > 0 ? (
-                                <div className="flex items-center border border-slate-200 bg-slate-50 rounded-md p-1 shrink-0 shadow-2xs" onClick={(e) => e.stopPropagation()}>
+                                <div className="flex items-center border border-slate-200 bg-slate-50 rounded-md p-0.5 sm:p-1 shrink-0 shadow-2xs" onClick={(e) => e.stopPropagation()}>
                                   <button 
-                                    type="button"
+                                    type="button" 
                                     onClick={() => updateCartQty(p.id, undefined, cartQty - 1)}
-                                    className="w-6 h-6 rounded-lg bg-white hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center transition-colors border-0 cursor-pointer shadow-2xs"
+                                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-white hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center transition-colors border-0 cursor-pointer shadow-2xs"
                                   >
-                                    <Minus size={12} />
+                                    <Minus size={11} />
                                   </button>
-                                  <span className="px-2.5 text-xs font-black text-[#0F172A] min-w-[20px] text-center">{cartQty}</span>
+                                  <span className="px-1.5 sm:px-2.5 text-[11px] sm:text-xs font-black text-[#0F172A] min-w-[16px] sm:min-w-[20px] text-center">{cartQty}</span>
                                   <button 
-                                    type="button"
+                                    type="button" 
                                     onClick={() => updateCartQty(p.id, undefined, cartQty + 1)}
-                                    className="w-6 h-6 rounded-lg bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] font-bold flex items-center justify-center transition-colors border-0 cursor-pointer shadow-2xs"
+                                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-[#FED422] hover:bg-[#f5c800] text-[#0F172A] font-bold flex items-center justify-center transition-colors border-0 cursor-pointer shadow-2xs"
                                   >
-                                    <Plus size={12} />
+                                    <Plus size={11} />
                                   </button>
                                 </div>
                               ) : (
@@ -3573,10 +3573,10 @@ export default function PortalPage() {
                                     e.stopPropagation();
                                     addToCart(p.id);
                                   }}
-                                  className="px-4 py-2 rounded-md bg-[#FED422] hover:bg-[#f5c800] border-0 text-xs font-black text-[#0F172A] transition-all shrink-0 whitespace-nowrap cursor-pointer shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5"
+                                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-md bg-[#FED422] hover:bg-[#f5c800] border-0 text-[11px] sm:text-xs font-black text-[#0F172A] transition-all shrink-0 whitespace-nowrap cursor-pointer shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1 sm:gap-1.5"
                                 >
-                                  <ShoppingBag size={13} />
-                                  담기
+                                  <ShoppingBag size={12} className="sm:w-3.5 sm:h-3.5" />
+                                  <span>담기</span>
                                 </button>
                               )}
                             </div>
