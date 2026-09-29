@@ -2299,7 +2299,7 @@ export default function PartnerPortalPage() {
 
                   <div className="px-3.5 py-2 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 font-bold flex items-center gap-2 self-start sm:self-auto">
                     <Award size={15} className="text-amber-600 shrink-0" />
-                    <span className="text-[11px] sm:text-xs">패스트리 생지 1박스 당 8,000원 (VAT포함)</span>
+                    <span className="text-[11px] sm:text-xs">패스트리 생지 1박스 당 8,000원 (VAT포함 / 속재료 등 기타자재 미적용)</span>
                   </div>
                 </div>
 
@@ -2917,22 +2917,29 @@ export default function PartnerPortalPage() {
                                 >
                                   <div className="flex items-center gap-2">
                                     <span className="font-bold text-slate-800">{item.productName}</span>
-                                    {item.isPastryDough && (
+                                    {item.isPastryDough ? (
                                       <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-300">
                                         패스트리 생지 수수료 대상 (+8,000원/박스)
+                                      </span>
+                                    ) : (
+                                      <span className="text-[9px] font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-400 border border-slate-200">
+                                        수수료 미적용 (속재료/기타자재)
                                       </span>
                                     )}
                                   </div>
                                   <div className="text-slate-500 font-bold tabular-nums">
-                                    {item.quantity}개 / 박스 · {(item.price * item.quantity).toLocaleString()}원
+                                    {item.isPastryDough ? `${item.quantity}박스` : `${item.quantity}개`} · {(item.price * item.quantity).toLocaleString()}원
                                   </div>
                                 </div>
                               ))}
                           </div>
 
                           {/* 합계 */}
-                          <div className="flex items-center justify-between pt-1 text-xs font-bold text-slate-700 bg-amber-50/60 p-2.5 rounded-md border border-amber-100">
-                            <span>패스트리 생지 합계: <strong className="text-amber-700 font-bold">{displayDoughBoxes}박스</strong></span>
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pt-1 text-xs font-bold text-slate-700 bg-amber-50/60 p-2.5 rounded-md border border-amber-100">
+                            <div>
+                              <span>패스트리 생지 합계: <strong className="text-amber-700 font-bold">{displayDoughBoxes}박스</strong></span>
+                              <span className="text-[10px] text-slate-400 font-normal ml-2">(속재료 및 일반 자재 미적용)</span>
+                            </div>
                             <span>발생 파트너 수수료: <strong className="text-rose-600 font-bold text-sm tabular-nums">+{((ord.commission || displayDoughBoxes * 8000)).toLocaleString()}원</strong></span>
                           </div>
                         </div>

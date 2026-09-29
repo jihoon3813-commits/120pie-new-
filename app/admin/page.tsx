@@ -8485,7 +8485,7 @@ export default function AdminPage() {
                       <div>
                         <h4 className="text-xs font-black text-amber-900">영업 파트너 수수료 정산 정책 가이드</h4>
                         <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                          • 유치 가맹점이 발주한 <strong>패스트리 생지 1박스 당 8,000원(부가세포함)</strong>을 월 단위로 합산하여 정산합니다.<br />
+                          • 유치 가맹점이 발주한 <strong>패스트리 생지 1박스 당 8,000원(부가세포함)</strong>을 월 단위로 합산하여 정산합니다. (속재료, 토핑, 믹스, 포장재 등 기타 자재 일체 미적용)<br />
                           • 상태 흐름: <strong>[정산대기]</strong> → 실적 검토 후 <strong>[정산확정]</strong> → 실제 계좌 입금 후 <strong>[지급완료]</strong> 처리
                         </p>
                       </div>

@@ -2,21 +2,51 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 // 패스트리 생지 판별 헬퍼 함수
+// - 파트너 정산 수수료는 오직 가맹점 발주 '생지(Dough)' 품목에만 1박스당 8,000원이 지급됨.
+// - 속재료(필링, 토핑, 소스, 믹스, 파우더, 치즈 등) 및 부자재/포장재/기기 등은 절대 생지 박스로 산정되지 않도록 엄격 필터링.
 export function isPastryDoughItem(productName: string): boolean {
   if (!productName) return false;
   const name = productName.toLowerCase().replace(/\s+/g, "");
-  // 파이/생지/츄러스생지 등 패스트리 생지 관련 품목 필터링
+
+  // 1) 속재료, 토핑, 필링, 소스, 믹스, 파우더, 부자재, 포장재 등 생지가 아닌 품목 명시적 제외
+  const nonDoughKeywords = [
+    "속재료",
+    "필링",
+    "토핑",
+    "소스",
+    "믹스",
+    "파우더",
+    "시럽",
+    "부자재",
+    "포장",
+    "포장재",
+    "포장박스",
+    "종이박스",
+    "단상자",
+    "스티커",
+    "포스터",
+    "배너",
+    "용기",
+    "컵",
+    "홀더",
+    "빨대",
+    "원두",
+    "커피",
+    "음료",
+    "기기",
+    "오븐",
+    "설비",
+    "소모품",
+  ];
+  if (nonDoughKeywords.some((kw) => name.includes(kw))) {
+    return false;
+  }
+
+  // 2) 순수 생지(도우) 품목 여부만 엄격 판별 (품목명에 '생지', '도우', 'dough' 등이 포함되어 있어야 함)
   const doughKeywords = [
     "생지",
-    "파이",
-    "미트파이",
-    "애플시나몬",
-    "콘치즈",
-    "츄러스",
-    "페이스트리",
-    "패스트리",
-    "로제미트",
-    "크림치즈"
+    "도우",
+    "dough",
   ];
   return doughKeywords.some((kw) => name.includes(kw));
 }
