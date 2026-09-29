@@ -2,27 +2,40 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 // 패스트리 생지 판별 헬퍼 함수
-// - 파트너 정산 수수료는 오직 가맹점 발주 '생지(Dough)' 품목에만 1박스당 8,000원이 지급됨.
-// - 속재료(필링, 토핑, 소스, 믹스, 파우더, 치즈 등) 및 부자재/포장재/기기 등은 절대 생지 박스로 산정되지 않도록 엄격 필터링.
+// 패스트리 생지 판별 헬퍼 함수
+// - 파트너 정산 수수료는 오직 가맹점 발주 '생지(Dough)' 품목에만 박스당 수수료(기본 8,000원 등)가 지급됨.
+// - 속재료(파이 소, 필링, 토핑, 소스, 믹스, 파우더, 치즈 등) 및 부자재/포장재/기기 등은 절대 생지 박스로 산정되지 않도록 엄격 필터링.
+// - "생지 외에 다른건 반영되면 안돼" 원칙에 따라, 품목명에 '생지'가 반드시 포함되어야 함.
 export function isPastryDoughItem(productName: string): boolean {
   if (!productName) return false;
   const name = productName.toLowerCase().replace(/\s+/g, "");
 
-  // 1) 속재료, 토핑, 필링, 소스, 믹스, 파우더, 부자재, 포장재 등 생지가 아닌 품목 명시적 제외
+  // 1) 품목명에 '생지'가 없으면 무조건 미적용 (파이 소, 믹스, 부자재, 완제품 등 배제)
+  if (!name.includes("생지")) {
+    return false;
+  }
+
+  // 2) 혹시 품목명에 '생지'가 들어가더라도 속재료/토핑/부자재/포장재가 포함되어 있으면 제외
   const nonDoughKeywords = [
     "속재료",
+    "파이소",
     "필링",
     "토핑",
     "소스",
+    "시즈닝",
     "믹스",
+    "반죽",
     "파우더",
     "시럽",
+    "치즈",
     "부자재",
     "포장",
     "포장재",
     "포장박스",
     "종이박스",
+    "선물박스",
     "단상자",
+    "봉투",
     "스티커",
     "포스터",
     "배너",
@@ -34,21 +47,18 @@ export function isPastryDoughItem(productName: string): boolean {
     "커피",
     "음료",
     "기기",
+    "코팅판",
     "오븐",
     "설비",
     "소모품",
+    "떡",
+    "핫도그",
   ];
   if (nonDoughKeywords.some((kw) => name.includes(kw))) {
     return false;
   }
 
-  // 2) 순수 생지(도우) 품목 여부만 엄격 판별 (품목명에 '생지', '도우', 'dough' 등이 포함되어 있어야 함)
-  const doughKeywords = [
-    "생지",
-    "도우",
-    "dough",
-  ];
-  return doughKeywords.some((kw) => name.includes(kw));
+  return true;
 }
 
 /**
@@ -434,6 +444,12 @@ export const getPartnerStores = query({
     const now = new Date();
     const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
+    const currentPartner = await ctx.db
+      .query("partners")
+      .filter((q) => q.eq(q.field("id"), args.partnerId))
+      .first();
+    const commissionUnit = currentPartner?.commissionPerBox || 8000;
+
     const storesWithDetails = stores.map((s) => {
       const storeOrders = orders.filter(
         (o) => o.storeId === s.id && isSettlementEligibleOrder(o)
@@ -469,7 +485,7 @@ export const getPartnerStores = query({
         totalOrderAmount,
         totalDoughBoxes,
         monthDoughBoxes,
-        monthCommission: monthDoughBoxes * 8000,
+        monthCommission: monthDoughBoxes * commissionUnit,
         latestOrderDate: latestOrder ? latestOrder.date : "-",
       };
     });
@@ -505,6 +521,12 @@ export const getPartnerOrders = query({
     // 2) 주문 내역 조회
     const allOrders = await ctx.db.query("orders").collect();
 
+    const currentPartner = await ctx.db
+      .query("partners")
+      .filter((q) => q.eq(q.field("id"), args.partnerId))
+      .first();
+    const commissionUnit = currentPartner?.commissionPerBox || 8000;
+
     const filtered = allOrders.filter((ord) => {
       if (!ord.storeId || !myStoreIds.has(ord.storeId)) return false;
       if (args.storeId && ord.storeId !== args.storeId) return false;
@@ -530,7 +552,7 @@ export const getPartnerOrders = query({
 
       // 정산금 산정 조건(무통장입금은 입금확인완료 이상) 충족 시에만 박스 수 및 수수료 반영
       const pastryDoughBoxes = isEligible ? rawPastryDoughBoxes : 0;
-      const commission = pastryDoughBoxes * 8000;
+      const commission = pastryDoughBoxes * commissionUnit;
 
       return {
         ...ord,
@@ -555,6 +577,12 @@ export const getPartnerStats = query({
       .query("stores")
       .filter((q) => q.eq(q.field("partnerId"), args.partnerId))
       .collect();
+
+    const currentPartner = await ctx.db
+      .query("partners")
+      .filter((q) => q.eq(q.field("id"), args.partnerId))
+      .first();
+    const commissionUnit = currentPartner?.commissionPerBox || 8000;
 
     const myStoreIds = new Set(myStores.map((s) => s.id));
     const allOrders = await ctx.db.query("orders").collect();
@@ -585,7 +613,7 @@ export const getPartnerStats = query({
             }
           }
         }
-        monthlyMap[ym].commission = monthlyMap[ym].boxCount * 8000;
+        monthlyMap[ym].commission = monthlyMap[ym].boxCount * commissionUnit;
       }
     }
 

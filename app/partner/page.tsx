@@ -1073,7 +1073,7 @@ export default function PartnerPortalPage() {
                       {currentMonthEstimatedCommission.toLocaleString()} <span className="text-[11px] sm:text-sm font-bold text-slate-600 font-sans">원</span>
                     </div>
                     <span className="text-[10px] sm:text-[11px] text-amber-600 font-bold truncate">
-                      생지 {currentMonthDoughBoxes}박스 × 8,000원
+                      생지 {currentMonthDoughBoxes}박스 × {commissionPerBox.toLocaleString()}원
                     </span>
                   </div>
 
@@ -1465,7 +1465,7 @@ export default function PartnerPortalPage() {
                                 <td className="py-4 px-3 text-right font-black text-amber-600 tabular-nums">
                                   {store.monthDoughBoxes || 0} 박스
                                   <div className="text-[10px] text-slate-400 font-normal">
-                                    (+{((store.monthDoughBoxes || 0) * 8000).toLocaleString()}원)
+                                    (+{((store.monthDoughBoxes || 0) * commissionPerBox).toLocaleString()}원)
                                   </div>
                                 </td>
                                 <td className="py-4 px-3 text-right font-black text-[#0F172A] text-sm tabular-nums">
@@ -2940,7 +2940,7 @@ export default function PartnerPortalPage() {
                               <span>패스트리 생지 합계: <strong className="text-amber-700 font-bold">{displayDoughBoxes}박스</strong></span>
                               <span className="text-[10px] text-slate-400 font-normal ml-2">(속재료 및 일반 자재 미적용)</span>
                             </div>
-                            <span>발생 파트너 수수료: <strong className="text-rose-600 font-bold text-sm tabular-nums">+{((ord.commission || displayDoughBoxes * 8000)).toLocaleString()}원</strong></span>
+                            <span>발생 파트너 수수료: <strong className="text-rose-600 font-bold text-sm tabular-nums">+{(ord.commission !== undefined ? ord.commission : displayDoughBoxes * commissionPerBox).toLocaleString()}원</strong></span>
                           </div>
                         </div>
                       );
