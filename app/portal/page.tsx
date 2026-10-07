@@ -1753,6 +1753,7 @@ export default function PortalPage() {
         cancelDate: activeStore.cancelDate || "",
         adoptionMenu: activeStore.adoptionMenu || [],
         monthlySales: activeStore.monthlySales || 0,
+        partnerId: activeStore.partnerId || undefined,
       });
 
       if (response.success) {

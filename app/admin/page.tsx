@@ -992,6 +992,7 @@ export default function AdminPage() {
   const convexStores = useQuery(api.stores.get);
   const saveStoreMutation = useMutation(api.stores.createOrUpdate);
   const deleteStoreMutation = useMutation(api.stores.deleteStore);
+  const batchAssignPartnerMutation = useMutation(api.stores.batchAssignPartner);
 
   // SMS Settings Convex Hooks
   const convexSmsSettings = useQuery(api.smsSettings.get);
@@ -1015,17 +1016,18 @@ export default function AdminPage() {
 
   const syncStoresBatchMutation = useMutation(api.stores.syncStoresBatch);
 
-  // Sync any stores in localStorage that aren't yet on Convex Cloud (sanitize internal Convex fields)
+  // Sync any stores in localStorage that aren't yet on Convex Cloud (새로운 가맹점만 추가, 기존 가맹점 덮어쓰기 방지)
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && convexStores && convexStores.length > 0) {
       try {
         const raw = localStorage.getItem("120_stores");
         if (raw) {
           const localStores = JSON.parse(raw);
           if (Array.isArray(localStores) && localStores.length > 0) {
-            const cleanStores = localStores
-              .filter((s: any) => s && s.id && s.name)
-              .map((s: any) => ({
+            const existingIds = new Set(convexStores.map((s: any) => s.id));
+            const newStoresOnly = localStores.filter((s: any) => s && s.id && s.name && !existingIds.has(s.id));
+            if (newStoresOnly.length > 0) {
+              const cleanStores = newStoresOnly.map((s: any) => ({
                 id: String(s.id),
                 pw: s.pw ? String(s.pw) : undefined,
                 pwConfirm: s.pwConfirm ? String(s.pwConfirm) : undefined,
@@ -1044,14 +1046,13 @@ export default function AdminPage() {
                 partnerId: s.partnerId ? String(s.partnerId) : undefined,
               }));
 
-            if (cleanStores.length > 0) {
               syncStoresBatchMutation({ stores: cleanStores }).catch(() => {});
             }
           }
         }
       } catch (e) {}
     }
-  }, [syncStoresBatchMutation]);
+  }, [convexStores, syncStoresBatchMutation]);
 
   useEffect(() => {
     if (convexStores) {
@@ -2052,8 +2053,12 @@ export default function AdminPage() {
   // Store management filter, sort and view mode states
   const [storeSearchQuery, setStoreSearchQuery] = useState<string>("");
   const [storeStatusFilter, setStoreStatusFilter] = useState<string>("전체");
+  const [storePartnerFilter, setStorePartnerFilter] = useState<string>("전체");
   const [storeSortOrder, setStoreSortOrder] = useState<"latest" | "oldest">("latest");
   const [storeViewMode, setStoreViewMode] = useState<"1col" | "2col" | "3col">("3col");
+  const [selectedStoreIds, setSelectedStoreIds] = useState<string[]>([]);
+  const [batchTargetPartnerId, setBatchTargetPartnerId] = useState<string>("");
+  const [isBatchAssigning, setIsBatchAssigning] = useState<boolean>(false);
 
   // Computed filtered and sorted stores (Default: Latest registration date on top)
   const filteredAndSortedStores = useMemo(() => {
@@ -2062,6 +2067,14 @@ export default function AdminPage() {
         // Status filter
         if (storeStatusFilter !== "전체" && store.status !== storeStatusFilter) {
           return false;
+        }
+        // Partner filter
+        if (storePartnerFilter !== "전체") {
+          if (storePartnerFilter === "none") {
+            if (store.partnerId) return false;
+          } else if (store.partnerId !== storePartnerFilter) {
+            return false;
+          }
         }
         // Search query filter
         if (storeSearchQuery.trim()) {
@@ -3515,6 +3528,68 @@ export default function AdminPage() {
     setStores(updatedStores);
     localStorage.setItem("120_stores", JSON.stringify(updatedStores));
     setShowStoreModal(false);
+  };
+
+  // 가맹점 일괄 파트너 배정/해제 핸들러
+  const handleBatchAssignPartner = async () => {
+    if (selectedStoreIds.length === 0) {
+      alert("배정할 가맹점을 1개 이상 선택해 주세요.");
+      return;
+    }
+    const targetPartner = convexPartners.find((p: any) => p.id === batchTargetPartnerId);
+    const targetPartnerName = batchTargetPartnerId === "" 
+      ? "본사 직영 / 미배정(해제)" 
+      : (targetPartner ? `${targetPartner.name} (${targetPartner.companyName || targetPartner.id})` : batchTargetPartnerId);
+
+    const confirmed = confirm(
+      `선택한 ${selectedStoreIds.length}개 가맹점의 유치 영업 파트너를\n'${targetPartnerName}'(으)로 일괄 변경하시겠습니까?`
+    );
+    if (!confirmed) return;
+
+    setIsBatchAssigning(true);
+    try {
+      await batchAssignPartnerMutation({
+        storeIds: selectedStoreIds,
+        partnerId: batchTargetPartnerId === "" ? undefined : batchTargetPartnerId,
+      });
+
+      // 로컬 state 업데이트
+      const updated = stores.map((s) => {
+        if (selectedStoreIds.includes(s.id)) {
+          return {
+            ...s,
+            partnerId: batchTargetPartnerId === "" ? undefined : batchTargetPartnerId,
+          };
+        }
+        return s;
+      });
+      setStores(updated);
+      localStorage.setItem("120_stores", JSON.stringify(updated));
+
+      triggerToast(`${selectedStoreIds.length}개 가맹점이 '${targetPartnerName}'(으)로 일괄 배정되었습니다.`);
+      setSelectedStoreIds([]);
+    } catch (err: any) {
+      console.error("일괄 배정 실패:", err);
+      alert("일괄 배정 중 오류가 발생했습니다.");
+    } finally {
+      setIsBatchAssigning(false);
+    }
+  };
+
+  // 전체 선택 / 해제 토글
+  const handleToggleSelectAllStores = () => {
+    if (selectedStoreIds.length === filteredAndSortedStores.length) {
+      setSelectedStoreIds([]);
+    } else {
+      setSelectedStoreIds(filteredAndSortedStores.map((s) => s.id));
+    }
+  };
+
+  // 개별 매장 선택 토글
+  const handleToggleSelectStore = (storeId: string) => {
+    setSelectedStoreIds((prev) =>
+      prev.includes(storeId) ? prev.filter((id) => id !== storeId) : [...prev, storeId]
+    );
   };
 
   // ==========================================
@@ -7771,6 +7846,27 @@ export default function AdminPage() {
                       })}
                     </div>
 
+                    {/* Partner Filter Dropdown */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-slate-500 shrink-0">파트너:</span>
+                      <select
+                        value={storePartnerFilter}
+                        onChange={(e) => setStorePartnerFilter(e.target.value)}
+                        className="bg-[#F1F4F8] border-0 rounded-lg px-3 py-2 text-xs font-extrabold text-[#0F172A] focus:bg-white focus:ring-2 focus:ring-amber-500/20 cursor-pointer outline-none shadow-2xs transition-all"
+                      >
+                        <option value="전체">전체 파트너 ({stores.length})</option>
+                        <option value="none">본사 직영 / 미배정 ({stores.filter((s) => !s.partnerId).length})</option>
+                        {convexPartners.map((p: any) => {
+                          const count = stores.filter((s) => s.partnerId === p.id).length;
+                          return (
+                            <option key={p.id} value={p.id}>
+                              {p.name} {p.companyName ? `(${p.companyName})` : ""} ({count})
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
+
                     {/* View Mode Toggle (1열 보기 / 2열 보기 / 3열 보기, 기본: 3열 보기) */}
                     <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-lg shadow-2xs border-0">
                       <button
@@ -7824,14 +7920,68 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* Batch Partner Assignment Bar */}
+              <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-extrabold text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={filteredAndSortedStores.length > 0 && selectedStoreIds.length === filteredAndSortedStores.length}
+                      onChange={handleToggleSelectAllStores}
+                      className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer"
+                    />
+                    <span>현재 목록 전체 선택 ({selectedStoreIds.length} / {filteredAndSortedStores.length}개)</span>
+                  </label>
+                  {selectedStoreIds.length > 0 && (
+                    <button
+                      onClick={() => setSelectedStoreIds([])}
+                      className="text-[11px] text-slate-400 hover:text-slate-600 underline cursor-pointer border-0 bg-transparent"
+                    >
+                      선택 해제
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-slate-600">선택한 매장 유치 파트너 배정:</span>
+                  <select
+                    value={batchTargetPartnerId}
+                    onChange={(e) => setBatchTargetPartnerId(e.target.value)}
+                    className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-800 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 cursor-pointer outline-none"
+                  >
+                    <option value="">-- 배정 해제 (본사 직영) --</option>
+                    {convexPartners.map((p: any) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} {p.companyName ? `(${p.companyName})` : ""} - {p.id}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleBatchAssignPartner}
+                    disabled={selectedStoreIds.length === 0 || isBatchAssigning}
+                    className="px-4 py-1.5 rounded-lg bg-[#FED422] hover:bg-[#e5be1f] text-[#0F172A] font-black text-xs transition-all cursor-pointer border-0 shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                  >
+                    <span>{isBatchAssigning ? "배정 중..." : "일괄 배정 적용"}</span>
+                  </button>
+                </div>
+              </div>
+
               {/* Stores List / Grid Container */}
               {storeViewMode === "1col" ? (
                 /* 1열 보기 (List Mode) */
                 <div className="space-y-3">
                   {/* Column Table Header */}
                   <div className="hidden lg:grid grid-cols-12 gap-3 px-6 py-2 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider items-center">
-                    <div className="col-span-2">등록일</div>
-                    <div className="col-span-4">가맹점명 / ID / 주소</div>
+                    <div className="col-span-2 flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={filteredAndSortedStores.length > 0 && selectedStoreIds.length === filteredAndSortedStores.length}
+                        onChange={handleToggleSelectAllStores}
+                        className="w-3.5 h-3.5 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer"
+                      />
+                      <span>등록일</span>
+                    </div>
+                    <div className="col-span-4">가맹점명 / ID / 유치 파트너 / 주소</div>
                     <div className="col-span-1.5">점주명</div>
                     <div className="col-span-1.5">연락처</div>
                     <div className="col-span-1.5">도입 메뉴</div>
@@ -7845,34 +7995,56 @@ export default function AdminPage() {
                       <p className="text-xs">조건에 해당하는 가맹점 데이터가 없습니다.</p>
                     </div>
                   ) : (
-                    filteredAndSortedStores.map((store) => (
-                      <div 
-                        key={store.id} 
-                        className="bg-white rounded-lg p-4 sm:p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-3 items-start lg:items-center"
-                      >
-                        {/* Registration Date */}
-                        <div className="col-span-2 flex items-center gap-2">
-                          <span className="lg:hidden text-xs text-slate-400 font-semibold">등록일:</span>
-                          <span className="text-xs font-extrabold text-slate-600 bg-[#F1F4F8] rounded-md px-3 py-1.5 shadow-2xs border-0">
-                            {store.regDate || "2026-07-28"}
-                          </span>
-                        </div>
-
-                        {/* Store Name, ID & Address */}
-                        <div className="col-span-4 min-w-0 space-y-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="font-black text-sm text-[#0F172A] truncate">{store.name}</h4>
-                            <span className="text-[11px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                              ID: {store.id}
+                    filteredAndSortedStores.map((store) => {
+                      const isSelected = selectedStoreIds.includes(store.id);
+                      const partnerObj = (convexPartners || []).find((part: any) => part.id === store.partnerId);
+                      return (
+                        <div 
+                          key={store.id} 
+                          className={`rounded-lg p-4 sm:p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-3 items-start lg:items-center ${
+                            isSelected ? "bg-amber-50/60 ring-2 ring-amber-400/80" : "bg-white"
+                          }`}
+                        >
+                          {/* Selection Checkbox & Registration Date */}
+                          <div className="col-span-2 flex items-center gap-2.5">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleToggleSelectStore(store.id)}
+                              className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer shrink-0"
+                            />
+                            <span className="lg:hidden text-xs text-slate-400 font-semibold">등록일:</span>
+                            <span className="text-xs font-extrabold text-slate-600 bg-[#F1F4F8] rounded-md px-2.5 py-1 shadow-2xs border-0">
+                              {store.regDate || "2026-07-28"}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-400 font-extrabold flex items-center gap-1.5 truncate">
-                            <MapPin size={13} className="text-amber-500 shrink-0" />
-                            <span className="truncate">
-                              {store.roadAddress ? `${store.roadAddress} ${store.detailAddress || ""}`.trim() : "주소 정보 미등록"}
-                            </span>
-                          </p>
-                        </div>
+
+                          {/* Store Name, ID, Partner Badge & Address */}
+                          <div className="col-span-4 min-w-0 space-y-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="font-black text-sm text-[#0F172A] truncate">{store.name}</h4>
+                              <span className="text-[11px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                                ID: {store.id}
+                              </span>
+                              {store.partnerId ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black bg-amber-50 text-amber-900 border border-amber-300" title={`유치 파트너: ${partnerObj?.name || store.partnerId}`}>
+                                  <span>👑</span>
+                                  <span>{partnerObj?.name || store.partnerId}</span>
+                                  {partnerObj?.companyName && <span className="text-[9px] text-amber-700 font-normal">({partnerObj.companyName})</span>}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold text-slate-400 bg-slate-100">
+                                  본사 직영
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-400 font-extrabold flex items-center gap-1.5 truncate">
+                              <MapPin size={13} className="text-amber-500 shrink-0" />
+                              <span className="truncate">
+                                {store.roadAddress ? `${store.roadAddress} ${store.detailAddress || ""}`.trim() : "주소 정보 미등록"}
+                              </span>
+                            </p>
+                          </div>
 
                         {/* Owner */}
                         <div className="col-span-1.5 text-xs font-extrabold text-[#0F172A]">
@@ -7963,9 +8135,10 @@ export default function AdminPage() {
                           </button>
                         </div>
                       </div>
-                    ))
-                  )}
-                </div>
+                    );
+                  })
+                )}
+              </div>
               ) : (
                 /* 2열 보기 / 3열 보기 (Grid Mode) - DEFAULT: 3col */
                 filteredAndSortedStores.length === 0 ? (
@@ -7975,27 +8148,51 @@ export default function AdminPage() {
                   </div>
                 ) : (
                   <div className={storeViewMode === "3col" ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" : "grid grid-cols-1 md:grid-cols-2 gap-4"}>
-                    {filteredAndSortedStores.map((store) => (
+                    {filteredAndSortedStores.map((store) => {
+                      const isSelected = selectedStoreIds.includes(store.id);
+                      const partnerObj = (convexPartners || []).find((part: any) => part.id === store.partnerId);
+                      return (
                       <div 
                         key={store.id}
-                        className="bg-white rounded-lg p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col justify-between space-y-4"
+                        className={`rounded-lg p-5 border-0 shadow-md hover:shadow-lg transition-all flex flex-col justify-between space-y-4 ${
+                          isSelected ? "bg-amber-50/60 ring-2 ring-amber-400/80" : "bg-white"
+                        }`}
                       >
                         {/* Card Top: Store Header & Status */}
                         <div className="space-y-2.5">
                           <div className="flex items-start justify-between gap-2">
-                            <div className="space-y-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="font-black text-base text-[#0F172A] truncate">{store.name}</h4>
-                                <span className="text-[11px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                                  ID: {store.id}
-                                </span>
+                            <div className="flex items-start gap-2.5 min-w-0">
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => handleToggleSelectStore(store.id)}
+                                className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer shrink-0 mt-1"
+                              />
+                              <div className="space-y-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h4 className="font-black text-base text-[#0F172A] truncate">{store.name}</h4>
+                                  <span className="text-[11px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                                    ID: {store.id}
+                                  </span>
+                                  {store.partnerId ? (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black bg-amber-50 text-amber-900 border border-amber-300" title={`유치 파트너: ${partnerObj?.name || store.partnerId}`}>
+                                      <span>👑</span>
+                                      <span>{partnerObj?.name || store.partnerId}</span>
+                                      {partnerObj?.companyName && <span className="text-[9px] text-amber-700 font-normal">({partnerObj.companyName})</span>}
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold text-slate-400 bg-slate-100">
+                                      본사 직영
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-slate-400 font-extrabold flex items-center gap-1.5 truncate">
+                                  <MapPin size={13} className="text-amber-500 shrink-0" />
+                                  <span className="truncate">
+                                    {store.roadAddress ? `${store.roadAddress} ${store.detailAddress || ""}`.trim() : "주소 정보 미등록"}
+                                  </span>
+                                </p>
                               </div>
-                              <p className="text-xs text-slate-400 font-extrabold flex items-center gap-1.5 truncate">
-                                <MapPin size={13} className="text-amber-500 shrink-0" />
-                                <span className="truncate">
-                                  {store.roadAddress ? `${store.roadAddress} ${store.detailAddress || ""}`.trim() : "주소 정보 미등록"}
-                                </span>
-                              </p>
                             </div>
 
                             {/* Status Badge */}
@@ -8098,7 +8295,8 @@ export default function AdminPage() {
                           </div>
                         </div>
                       </div>
-                    ))}
+                    );
+                  })}
                   </div>
                 )
               )}
@@ -8415,9 +8613,17 @@ export default function AdminPage() {
                                       </div>
                                     </td>
                                     <td className="py-3.5 px-3 text-center">
-                                      <span className="inline-block px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-black text-xs border border-blue-100">
-                                        {partner.storesCount || 0} 개점
-                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setStorePartnerFilter(partner.id);
+                                          setCurrentMenu("stores");
+                                        }}
+                                        className="inline-block px-2.5 py-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-black text-xs border border-blue-200 transition-all cursor-pointer"
+                                        title={`${partner.name} 유치 가맹점 목록 조회 및 관리로 이동`}
+                                      >
+                                        {partner.storesCount || 0} 개점 ↗
+                                      </button>
                                     </td>
                                     <td className="py-3.5 px-3 text-right font-black text-amber-600">
                                       {partner.currentMonthBoxes || 0} 박스

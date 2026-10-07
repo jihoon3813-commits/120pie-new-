@@ -293,6 +293,14 @@ export const createOrUpdate = mutation({
       .filter((q) => q.eq(q.field("id"), args.id))
       .first();
 
+    // partnerId 처리: undefined이면 기존 값 유지, 빈 문자열이면 해제(undefined), 값이 있으면 해당 파트너 배정
+    let resolvedPartnerId: string | undefined = undefined;
+    if (args.partnerId !== undefined) {
+      resolvedPartnerId = args.partnerId.trim() === "" ? undefined : args.partnerId.trim();
+    } else {
+      resolvedPartnerId = existing?.partnerId;
+    }
+
     const fields = {
       pw: args.pw,
       pwConfirm: args.pwConfirm,
@@ -308,7 +316,7 @@ export const createOrUpdate = mutation({
       cancelDate: args.cancelDate,
       adoptionMenu: args.adoptionMenu,
       monthlySales: args.monthlySales,
-      partnerId: args.partnerId,
+      partnerId: resolvedPartnerId,
     };
 
     if (existing) {
@@ -422,6 +430,7 @@ export const seedStores = mutation({
           ...store,
           lat: store.lat,
           lng: store.lng,
+          partnerId: existing.partnerId, // 기존 파트너 연결 보존
         });
       } else {
         await ctx.db.insert("stores", store);
@@ -465,6 +474,14 @@ export const syncStoresBatch = mutation({
     for (const store of args.stores) {
       if (!store.id || !store.name) continue;
       const ex = existingMap.get(store.id);
+
+      // 클라이언트 로컬스토리지에서 partnerId가 전달되지 않았거나 undefined이면
+      // 기존 DB에 저장되어 있던 partnerId를 절대 지우지 않고 유지!
+      const resolvedPartnerId =
+        store.partnerId !== undefined && store.partnerId !== ""
+          ? store.partnerId
+          : (ex?.partnerId || undefined);
+
       const fields = {
         pw: store.pw || "1234",
         pwConfirm: store.pwConfirm || "1234",
@@ -480,7 +497,7 @@ export const syncStoresBatch = mutation({
         cancelDate: store.cancelDate || "",
         adoptionMenu: store.adoptionMenu || ["120pie"],
         monthlySales: store.monthlySales || 0,
-        partnerId: store.partnerId,
+        partnerId: resolvedPartnerId,
       };
 
       if (ex) {
@@ -493,5 +510,29 @@ export const syncStoresBatch = mutation({
       }
     }
     return { success: true, count: args.stores.length };
+  },
+});
+
+// 다중 가맹점을 특정 파트너에게 일괄 배정 및 일괄 해제
+export const batchAssignPartner = mutation({
+  args: {
+    storeIds: v.array(v.string()),
+    partnerId: v.optional(v.string()), // undefined 또는 "" 이면 해제
+  },
+  handler: async (ctx, args) => {
+    const targetPartnerId = args.partnerId && args.partnerId.trim() !== "" ? args.partnerId.trim() : undefined;
+    const allStores = await ctx.db.query("stores").collect();
+    const storeMap = new Map(allStores.map((s) => [s.id, s]));
+
+    let updatedCount = 0;
+    for (const sid of args.storeIds) {
+      const store = storeMap.get(sid);
+      if (store) {
+        await ctx.db.patch(store._id, { partnerId: targetPartnerId });
+        updatedCount++;
+      }
+    }
+
+    return { success: true, count: updatedCount };
   },
 });
