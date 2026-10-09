@@ -1186,18 +1186,24 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
 
   useEffect(() => {
     if (convexFloating) {
-      setFloatingSettings({ ...convexFloating, isActive: true });
+      const fixedInsta = convexFloating.instaUrl && convexFloating.instaUrl.includes("120pie77")
+        ? "https://www.instagram.com/120piecoffee"
+        : convexFloating.instaUrl;
+      setFloatingSettings({ ...convexFloating, instaUrl: fixedInsta, isActive: true });
     } else {
       if (typeof window !== "undefined") {
         const storedFloat = localStorage.getItem("120_floatings");
         if (storedFloat) {
           try {
             const parsed = JSON.parse(storedFloat);
+            if (parsed.instaUrl && parsed.instaUrl.includes("120pie77")) {
+              parsed.instaUrl = "https://www.instagram.com/120piecoffee";
+            }
             setFloatingSettings({ ...parsed, isActive: true });
           } catch (e) {
             setFloatingSettings({
               isActive: true,
-              instaUrl: "https://www.instagram.com/120pie77/",
+              instaUrl: "https://www.instagram.com/120piecoffee",
               youtubeUrl: "https://youtube.com",
               chatUrl: "https://kakao.com",
               phoneNo: "1566-3594",
@@ -1208,7 +1214,7 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
         } else {
           setFloatingSettings({
             isActive: true,
-            instaUrl: "https://www.instagram.com/120pie77/",
+            instaUrl: "https://www.instagram.com/120piecoffee",
             youtubeUrl: "https://youtube.com",
             chatUrl: "https://kakao.com",
             phoneNo: "1566-3594",
@@ -1280,6 +1286,10 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
       { label: "ORIGINAL", id: "original" },
       { label: "MEAT", id: "meat" },
       { label: "PIZZA", id: "pizza" }
+    ],
+    "120스프": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "신메뉴", id: "new" }
     ],
     "에그120": [
       { label: "전체 메뉴", id: "all" },
@@ -1993,7 +2003,12 @@ export default function HomeV3({ variant = "v3" }: { variant?: "v3" | "v4" | "v5
                         />
                       )}
                       <span className="relative z-20 flex items-center justify-center gap-1 sm:gap-1.5">
-                        {MENU_DATA[tabId].label}
+                        <span>{MENU_DATA[tabId].label}</span>
+                        {tabId === "120스프" && (
+                          <span className="px-1.5 py-0.5 text-[9px] font-black bg-rose-500 text-white rounded-full leading-none shadow-xs">
+                            NEW
+                          </span>
+                        )}
                       </span>
                     </button>
                   );

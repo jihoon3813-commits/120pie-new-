@@ -7,22 +7,34 @@ import { api } from "../convex/_generated/api";
 
 interface RightFloatingQuickBarProps {
   onOpenConsultation?: () => void;
+  hasBanner?: boolean;
 }
 
 export default function RightFloatingQuickBar({
   onOpenConsultation,
+  hasBanner,
 }: RightFloatingQuickBarProps) {
-  const [isBannerClosed, setIsBannerClosed] = useState(false);
+  const [isBannerClosed, setIsBannerClosed] = useState(hasBanner === false);
   const convexFloating = useQuery(api.floatings.get);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const todayStr = new Date().toISOString().split("T")[0];
-      const hideDate = localStorage.getItem("hide_right_inquiry_banner_date");
-      if (hideDate === todayStr) {
+      if (hasBanner === false) {
+        setIsBannerClosed(true);
+        return;
+      }
+
+      const bannerEl = document.getElementById("right-side-inquiry-banner");
+      if (!bannerEl && hasBanner === undefined) {
         setIsBannerClosed(true);
       } else {
-        setIsBannerClosed(false);
+        const todayStr = new Date().toISOString().split("T")[0];
+        const hideDate = localStorage.getItem("hide_right_inquiry_banner_date");
+        if (hideDate === todayStr) {
+          setIsBannerClosed(true);
+        } else {
+          setIsBannerClosed(false);
+        }
       }
 
       const handleBannerChange = (e: Event) => {
@@ -37,13 +49,13 @@ export default function RightFloatingQuickBar({
         window.removeEventListener("right-inquiry-banner-change", handleBannerChange);
       };
     }
-  }, []);
+  }, [hasBanner]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const instaTarget = convexFloating?.instaUrl || "https://www.instagram.com/120pie77/";
+  const instaTarget = convexFloating?.instaUrl || "https://www.instagram.com/120piecoffee";
   const blogTarget = convexFloating?.blogUrl || "https://blog.naver.com/120pie_coffee";
   const youtubeTarget = convexFloating?.youtubeUrl || "https://www.youtube.com";
   const phoneTarget = convexFloating?.phoneNo ? `tel:${convexFloating.phoneNo}` : "tel:1566-3594";

@@ -7,6 +7,7 @@ import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 
 const categoryLabels: Record<string, { label: string; param: string }> = {
   "120겹파이": { label: "120겹 파이", param: "pie" },
+  "120스프": { label: "120스프", param: "soup" },
   "에그120": { label: "에그120 계란빵", param: "egg" },
   "기타": { label: "츄러스 & 사이드", param: "side" },
   "coffee120": { label: "커피 & 음료", param: "coffee" },
@@ -78,13 +79,18 @@ export default function MenuGallery() {
                 <button
                   key={catId}
                   onClick={() => setActiveTab(catId)}
-                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer ${
+                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                     isActive
                       ? "bg-white text-neutral-950 shadow-sm font-extrabold"
                       : "text-white/80 hover:text-white"
                   }`}
                 >
-                  {info.label}
+                  <span>{info.label}</span>
+                  {catId === "120스프" && (
+                    <span className="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-black bg-rose-500 text-white rounded-full tracking-wider leading-none shadow-xs">
+                      NEW
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -133,7 +139,7 @@ export default function MenuGallery() {
                   <h3 className="text-sm sm:text-lg font-bold text-neutral-955 group-hover:text-amber-600 transition-colors line-clamp-1">
                     {item.name}
                   </h3>
-                  <p className="text-[11px] sm:text-xs text-neutral-600 leading-snug sm:leading-relaxed min-h-[2rem] sm:min-h-[3rem] line-clamp-2">
+                  <p className="text-[11px] sm:text-xs text-neutral-600 leading-snug sm:leading-relaxed min-h-[2rem] sm:min-h-[2.5rem] line-clamp-2 overflow-hidden">
                     {item.desc}
                   </p>
                 </div>

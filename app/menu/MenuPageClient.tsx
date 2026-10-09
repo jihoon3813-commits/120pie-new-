@@ -138,6 +138,10 @@ export default function MenuPageClient() {
       { label: "MEAT", id: "meat" },
       { label: "PIZZA", id: "pizza" }
     ],
+    "120스프": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "신메뉴", id: "new" }
+    ],
     "에그120": [
       { label: "전체 메뉴", id: "all" },
       { label: "짭짤 & 고소", id: "savory" },
@@ -193,6 +197,10 @@ export default function MenuPageClient() {
           items = items.filter(item => item.badge === "MEAT");
         } else if (subFilter === "pizza") {
           items = items.filter(item => item.badge === "PIZZA");
+        }
+      } else if (activeTab === "120스프") {
+        if (subFilter === "new") {
+          items = items.filter(item => item.badge === "NEW");
         }
       } else if (activeTab === "에그120") {
         if (subFilter === "savory") {
@@ -409,10 +417,16 @@ export default function MenuPageClient() {
                     )}
                     <span className="relative z-20 flex items-center justify-center gap-1 sm:gap-1.5">
                       {tabId === "120겹파이" && <ShoppingBag size={14} />}
+                      {tabId === "120스프" && <Sparkles size={14} />}
                       {tabId === "에그120" && <Utensils size={14} />}
                       {tabId === "기타" && <Sparkles size={14} />}
                       {tabId === "coffee120" && <Coffee size={14} />}
-                      {MENU_DATA[tabId].label}
+                      <span>{MENU_DATA[tabId].label}</span>
+                      {tabId === "120스프" && (
+                        <span className="px-1.5 py-0.5 text-[9px] font-black bg-rose-500 text-white rounded-full leading-none shadow-xs">
+                          NEW
+                        </span>
+                      )}
                     </span>
                   </button>
                 );

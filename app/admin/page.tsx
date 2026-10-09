@@ -244,7 +244,7 @@ const DEFAULT_POPUP: PopupSettings = {
 
 const DEFAULT_FLOATING: FloatingSettings = {
   isActive: true,
-  instaUrl: "https://www.instagram.com/120pie77/",
+  instaUrl: "https://www.instagram.com/120piecoffee",
   youtubeUrl: "https://youtube.com",
   chatUrl: "https://kakao.com",
   phoneNo: "1566-3594",

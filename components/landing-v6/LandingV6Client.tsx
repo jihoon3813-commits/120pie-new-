@@ -26,7 +26,6 @@ import Footer from "./Footer";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import QuickInquiryBar from "./QuickInquiryBar";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
-import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 import MobileBottomInquiryBar from "@/components/MobileBottomInquiryBar";
 import { useModalBackHandler } from "@/components/MobileBackManager";
 
@@ -125,10 +124,7 @@ export default function LandingV6Client() {
       <ContactForm isModal isOpen={isContactModalOpen} onClose={closeContactModal} />
 
       {/* Right Floating Quick Docking Bar (Matching Brand Page) */}
-      <RightFloatingQuickBar onOpenConsultation={openContactModal} />
-
-      {/* Right Side Inquiry Banner (300px width) */}
-      <RightSideInquiryBanner />
+      <RightFloatingQuickBar onOpenConsultation={openContactModal} hasBanner={false} />
 
       {/* 모바일 상시 고정 하단 상담신청바 */}
       <MobileBottomInquiryBar onOpenConsultation={openContactModal} />

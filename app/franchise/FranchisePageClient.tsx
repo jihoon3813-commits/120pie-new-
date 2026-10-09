@@ -40,7 +40,6 @@ import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
 import MobileBottomInquiryBar from "@/components/MobileBottomInquiryBar";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
-import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 import { useModalBackHandler } from "@/components/MobileBackManager";
 import { api } from "@/convex/_generated/api";
 import { triggerConsultationSms } from "@/app/utils/sms";
@@ -2396,8 +2395,7 @@ export default function FranchisePageClient() {
 
       <FloatingAndInquiry isPink={isPink} />
       <Footer theme={isPink ? "black" : "yellow"} />
-      <RightFloatingQuickBar />
-      <RightSideInquiryBanner />
+      <RightFloatingQuickBar hasBanner={false} />
       <MobileBottomInquiryBar />
     </div>
   );

@@ -16,6 +16,12 @@ export const get = query({
         blogUrl: "https://blog.naver.com/120piecoffee"
       };
     }
+    if (floating.instaUrl && floating.instaUrl.includes("120pie77")) {
+      return {
+        ...floating,
+        instaUrl: "https://www.instagram.com/120piecoffee",
+      };
+    }
     return floating;
   },
 });

@@ -4,6 +4,7 @@ import { Sparkles } from "lucide-react";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 
 const POSTER_IMAGES_ROW1 = [
+  "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1787887644/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_27%EC%9D%BC_%EC%98%A4%ED%9B%84_10_42_55_bjhd9o.png",
   "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471150/120%ED%8C%8C%EC%9D%B4-%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%93%9C-%ED%8F%AC%EC%8A%A4%ED%84%B0__231003_kxtdte.jpg",
   "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471118/KakaoTalk_20260209_200759426_p6hfm2.png",
   "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785471119/120%ED%8C%8C%EC%9D%B4-%EA%B3%A0%EA%B5%AC%EB%A7%88-%ED%8F%AC%EC%8A%A4%ED%84%B0__230917_t4wokx.jpg",

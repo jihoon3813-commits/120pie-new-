@@ -179,19 +179,25 @@ export default function FloatingAndInquiry({
   // Load floating settings from Convex
   useEffect(() => {
     if (convexFloating) {
-      setFloatingSettings({ ...convexFloating, isActive: true });
+      const fixedInsta = convexFloating.instaUrl && convexFloating.instaUrl.includes("120pie77")
+        ? "https://www.instagram.com/120piecoffee"
+        : convexFloating.instaUrl;
+      setFloatingSettings({ ...convexFloating, instaUrl: fixedInsta, isActive: true });
     } else {
       if (typeof window !== "undefined") {
         const storedFloat = localStorage.getItem("120_floatings");
         if (storedFloat) {
           try {
             const parsed = JSON.parse(storedFloat);
+            if (parsed.instaUrl && parsed.instaUrl.includes("120pie77")) {
+              parsed.instaUrl = "https://www.instagram.com/120piecoffee";
+            }
             setFloatingSettings({ ...parsed, isActive: true });
           } catch (e) {
             console.error(e);
             setFloatingSettings({
               isActive: true,
-              instaUrl: "https://www.instagram.com/120pie77/",
+              instaUrl: "https://www.instagram.com/120piecoffee",
               youtubeUrl: "https://youtube.com",
               chatUrl: "https://kakao.com",
               phoneNo: "1566-3594",
@@ -202,7 +208,7 @@ export default function FloatingAndInquiry({
         } else {
           setFloatingSettings({
             isActive: true,
-            instaUrl: "https://www.instagram.com/120pie77/",
+            instaUrl: "https://www.instagram.com/120piecoffee",
             youtubeUrl: "https://youtube.com",
             chatUrl: "https://kakao.com",
             phoneNo: "1566-3594",

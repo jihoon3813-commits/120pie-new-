@@ -49,6 +49,10 @@ export default function MenuSubpage() {
       { label: "MEAT", id: "meat" },
       { label: "PIZZA", id: "pizza" }
     ],
+    "120스프": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "신메뉴", id: "new" }
+    ],
     "에그120": [
       { label: "전체 메뉴", id: "all" },
       { label: "짭짤 & 고소", id: "savory" },
@@ -190,13 +194,18 @@ export default function MenuSubpage() {
               <button
                 key={tabId}
                 onClick={() => handleTabChange(tabId)}
-                className={`px-5 py-2.5 rounded-full text-sm font-black whitespace-nowrap transition-all duration-200 ${
+                className={`px-5 py-2.5 rounded-full text-sm font-black whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 cursor-pointer ${
                   activeTab === tabId
                     ? "bg-amber-400 text-neutral-950 shadow-sm"
                     : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
                 }`}
               >
-                {tabId}
+                <span>{tabId}</span>
+                {tabId === "120스프" && (
+                  <span className="px-1.5 py-0.5 text-[10px] font-black bg-rose-500 text-white rounded-full tracking-wider leading-none shadow-xs">
+                    NEW
+                  </span>
+                )}
               </button>
             ))}
           </div>

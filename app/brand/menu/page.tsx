@@ -108,7 +108,10 @@ const toEnglishSub = (name: string): string => {
     "흑당 크로플": "Black Sugar Croffle",
     "산딸기 마카롱": "Raspberry Macaron",
     "블루베리 마카롱": "Blueberry Macaron",
-    "초코 마카롱": "Ganache Chocolate Macaron"
+    "초코 마카롱": "Ganache Chocolate Macaron",
+    "토마토 스프": "Rich Tomato Soup",
+    "콩크림 스프": "Creamy Soy Bean Soup",
+    "양송이 스프": "Classic Mushroom Soup"
   };
   return map[name] || `${name} Edition`;
 };
@@ -116,6 +119,7 @@ const toEnglishSub = (name: string): string => {
 const getCategoryEnglishTitle = (cat: string): string => {
   const map: Record<string, string> = {
     "120겹파이": "Signature 120 Layer Pie Edition",
+    "120스프": "120 Signature Soup Edition",
     "에그120": "Egg 120 Bread Edition",
     "기타": "Side & Snack Menu Edition",
     "coffee120": "Coffee & Beverage Edition",
@@ -157,6 +161,10 @@ export default function BrandMenuPage() {
       { label: "ORIGINAL", id: "original" },
       { label: "MEAT", id: "meat" },
       { label: "PIZZA", id: "pizza" },
+    ],
+    "120스프": [
+      { label: "전체 메뉴", id: "all" },
+      { label: "신메뉴", id: "new" },
     ],
     "에그120": [
       { label: "전체 메뉴", id: "all" },
@@ -213,6 +221,10 @@ export default function BrandMenuPage() {
           items = items.filter((item) => item.badge === "MEAT");
         } else if (subFilter === "pizza") {
           items = items.filter((item) => item.badge === "PIZZA");
+        }
+      } else if (activeTab === "120스프") {
+        if (subFilter === "new") {
+          items = items.filter((item) => item.badge === "NEW");
         }
       } else if (activeTab === "에그120") {
         if (subFilter === "savory") {
@@ -318,13 +330,18 @@ export default function BrandMenuPage() {
               <button
                 key={tabId}
                 onClick={() => handleTabChange(tabId)}
-                className={`px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-black whitespace-nowrap transition-all duration-200 shrink-0 cursor-pointer ${
+                className={`px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-black whitespace-nowrap transition-all duration-200 shrink-0 cursor-pointer flex items-center gap-1.5 ${
                   activeTab === tabId
                     ? "bg-[#FBC400] text-neutral-950 shadow-md scale-102 border border-[#FBC400]"
                     : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900 border border-neutral-200/60"
                 }`}
               >
-                {tabId}
+                <span>{tabId}</span>
+                {tabId === "120스프" && (
+                  <span className="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-black bg-rose-500 text-white rounded-full tracking-wider leading-none shadow-xs">
+                    NEW
+                  </span>
+                )}
               </button>
             ))}
           </div>
