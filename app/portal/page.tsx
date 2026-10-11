@@ -510,7 +510,15 @@ export default function PortalPage() {
     }
     return [];
   });
-  const [stores, setStores] = useState<any[]>([]);
+  const [stores, setStores] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("120_stores");
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return [];
+  });
   const [categories, setCategories] = useState<string[]>([]);
   const [banner, setBanner] = useState<any>(null);
   const [activeStoreId, setActiveStoreId] = useState<string>(() => {
@@ -607,7 +615,69 @@ export default function PortalPage() {
   }, [convexPopupsList]);
   const convexFloating = useQuery(api.floatings.get);
   const convexStores = useQuery(api.stores.get);
-  const convexPartners = useQuery(api.partners.get);
+
+  // 활성 가맹점 연동 (stores 캐시와 convexStores 결합으로 0ms 즉각 반환)
+  const currentActiveStore = useMemo(() => {
+    const list = (convexStores && convexStores.length > 0) ? convexStores : (stores || []);
+    const targetId = activeStoreId || (typeof window !== "undefined" ? localStorage.getItem("120_active_store_id") : null) || "owner";
+    return list.find((s: any) => s.id === targetId) || null;
+  }, [convexStores, stores, activeStoreId]);
+
+  // 가맹점의 담당 영업 파트너 ID
+  const currentPartnerId = useMemo(() => {
+    return currentActiveStore?.partnerId || null;
+  }, [currentActiveStore]);
+
+  // 전체 파트너를 전수 순회하는 무거운 쿼리 대신, 인덱스를 타는 초경량 단일 파트너 쿼리 (수 밀리초 완료)
+  const convexActivePartner = useQuery(
+    api.partners.getById,
+    currentPartnerId ? { id: currentPartnerId } : "skip"
+  );
+
+  // 브라우저 첫 진입/새로고침 즉시 0ms만에 이전 등급을 복원하여 기본 정가가 섣불리 노출되는 깜빡임 완전 방지
+  const [cachedPartnerGrade, setCachedPartnerGrade] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const targetId = activeStoreId || localStorage.getItem("120_active_store_id") || "owner";
+        const savedGrade = localStorage.getItem(`120_store_partner_grade_${targetId}`);
+        if (savedGrade && !isNaN(Number(savedGrade)) && Number(savedGrade) > 0) {
+          return Number(savedGrade);
+        }
+      } catch (e) {}
+    }
+    return 1;
+  });
+
+  // 실시간 파트너 정보가 도착하면 등급 캐시 즉시 업데이트
+  useEffect(() => {
+    if (convexActivePartner?.grade) {
+      const g = Number(convexActivePartner.grade);
+      if (g > 0) {
+        setCachedPartnerGrade(g);
+        if (typeof window !== "undefined") {
+          const targetId = activeStoreId || localStorage.getItem("120_active_store_id") || "owner";
+          localStorage.setItem(`120_store_partner_grade_${targetId}`, String(g));
+        }
+      }
+    }
+  }, [convexActivePartner, activeStoreId]);
+
+  const currentActivePartner = useMemo(() => {
+    if (convexActivePartner) return convexActivePartner;
+    if (currentPartnerId) {
+      return { id: currentPartnerId, grade: cachedPartnerGrade };
+    }
+    return null;
+  }, [convexActivePartner, currentPartnerId, cachedPartnerGrade]);
+
+  const partnerGrade = useMemo(() => {
+    // 가맹점과 매핑된 파트너의 등급 (실시간 파트너 등급 > 캐시된 파트너 등급 > 기본 1)
+    if (convexActivePartner?.grade && Number(convexActivePartner.grade) > 0) {
+      return Number(convexActivePartner.grade);
+    }
+    return cachedPartnerGrade || 1;
+  }, [convexActivePartner, cachedPartnerGrade]);
+
   const convexProducts = useQuery(api.products.get);
   const convexOrders = useQuery(api.orders.list);
   const convexMaterials = useQuery(api.materials.list);
@@ -632,33 +702,11 @@ export default function PortalPage() {
   const sendSmsAction = useAction(api.aligo.sendSms);
   const sendEventSmsAction = useAction(api.aligo.sendEventSms);
 
-  // 활성 가맹점 및 담당 영업 파트너 등급 연동
-  const currentActiveStore = useMemo(() => {
-    const list = convexStores || stores || [];
-    const targetId = activeStoreId || (typeof window !== "undefined" ? localStorage.getItem("120_active_store_id") : null) || "owner";
-    return list.find((s: any) => s.id === targetId) || null;
-  }, [convexStores, stores, activeStoreId]);
-
-  const currentActivePartner = useMemo(() => {
-    // 가맹점에 등록된 파트너 ID 기준 조회 (매핑된 파트너가 없으면 본사 직영/일반 매장)
-    const pId = currentActiveStore?.partnerId;
-    if (!pId || !convexPartners) return null;
-    return convexPartners.find((p: any) => p.id === pId) || null;
-  }, [currentActiveStore, convexPartners]);
-
-  const partnerGrade = useMemo(() => {
-    // 가맹점과 매핑된 파트너의 등급
-    if (currentActivePartner?.grade && Number(currentActivePartner.grade) > 0) {
-      return Number(currentActivePartner.grade);
-    }
-    // 파트너가 없거나 매핑되지 않은 경우 기본 단가(1등급/공통)
-    return 1;
-  }, [currentActivePartner]);
-
   // 파트너 등급에 따른 상품 유효 판매가 산출 헬퍼 함수
   const resolveProductPrice = useCallback((p: any, grade: number) => {
-    // 담당 파트너가 매핑되어 있는 가맹점인 경우에만 해당 파트너 등급의 차등 단가 적용
-    if (currentActivePartner && p.gradePrices && (p.gradePrices[String(grade)] !== undefined || p.gradePrices[grade] !== undefined)) {
+    // 담당 파트너가 매핑되어 있는 가맹점인 경우 해당 파트너 등급의 차등 단가 최우선 적용
+    const hasPartner = Boolean(currentPartnerId || currentActivePartner || currentActiveStore?.partnerId);
+    if (hasPartner && p.gradePrices && (p.gradePrices[String(grade)] !== undefined || p.gradePrices[grade] !== undefined)) {
       const val = p.gradePrices[String(grade)] !== undefined ? p.gradePrices[String(grade)] : p.gradePrices[grade];
       const gPrice = Number(val);
       if (gPrice > 0) {
@@ -673,10 +721,11 @@ export default function PortalPage() {
       return Number(p.price);
     }
     return Number(p.supplyPrice) || 0;
-  }, [currentActivePartner]);
+  }, [currentPartnerId, currentActivePartner, currentActiveStore]);
 
   const isProductGradePricingActive = useCallback((p: any, grade: number) => {
-    if (!currentActivePartner) return false;
+    const hasPartner = Boolean(currentPartnerId || currentActivePartner || currentActiveStore?.partnerId);
+    if (!hasPartner) return false;
     if (p.gradePrices && (p.gradePrices[String(grade)] !== undefined || p.gradePrices[grade] !== undefined)) {
       const val = p.gradePrices[String(grade)] !== undefined ? p.gradePrices[String(grade)] : p.gradePrices[grade];
       const gPrice = Number(val);
@@ -688,7 +737,7 @@ export default function PortalPage() {
       }
     }
     return false;
-  }, [currentActivePartner]);
+  }, [currentPartnerId, currentActivePartner, currentActiveStore]);
 
   // 파트너 등급에 따라 실시간 반응형으로 산출되는 상품 목록 (단일 진실 공급원)
   const products: Product[] = useMemo(() => {
@@ -3394,7 +3443,33 @@ export default function PortalPage() {
 
                 {/* Product Box Grid (Responsive: 1 col on mobile, 2 cols on sm/tablet-lg, 3 cols on xl desktop) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4">
-                  {filteredProducts.map((p) => {
+                  {convexProducts === undefined ? (
+                    // 최신 단가 및 자재 실시간 동기화 스켈레톤 (기존 단가 노출 및 인터벌 깜빡임 원천 차단)
+                    Array.from({ length: 6 }).map((_, idx) => (
+                      <div 
+                        key={`product-skeleton-${idx}`}
+                        className="bg-white border border-neutral-200/80 rounded-lg p-3 sm:p-4 shadow-2xs animate-pulse flex sm:flex-col gap-3 justify-between min-h-[90px] sm:min-h-[260px]"
+                      >
+                        <div className="w-16 h-16 sm:w-full sm:aspect-[4/3] rounded-md bg-slate-100 shrink-0" />
+                        <div className="flex-1 flex flex-col justify-between space-y-2 w-full">
+                          <div className="space-y-1.5">
+                            <div className="h-3 bg-slate-100 rounded w-1/4" />
+                            <div className="h-4 bg-slate-200 rounded w-3/4" />
+                            <div className="h-2.5 bg-slate-100 rounded w-1/2 hidden sm:block" />
+                          </div>
+                          <div className="flex items-center justify-between pt-2">
+                            <div className="h-5 bg-amber-100/70 rounded w-20" />
+                            <div className="h-6 sm:h-8 bg-slate-100 rounded w-12 sm:w-16" />
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : filteredProducts.length === 0 ? (
+                    <div className="col-span-full py-16 text-center text-slate-400 font-bold text-xs">
+                      등록된 자재 상품이 없습니다.
+                    </div>
+                  ) : (
+                    filteredProducts.map((p) => {
                     const cartQty = cart.find((item) => item.productId === p.id)?.quantity || 0;
                     return (
                       <React.Fragment key={p.id}>
@@ -3585,7 +3660,8 @@ export default function PortalPage() {
                         </div>
                       </React.Fragment>
                     );
-                  })}
+                  })
+                )}
                 </div>
 
               </div>
