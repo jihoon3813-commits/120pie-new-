@@ -1,12 +1,14 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// 모든 자재 제품 리스트 정렬 조회
+// 모든 자재 제품 리스트 정렬 조회 (인덱스 활용 초고속 조회)
 export const get = query({
   args: {},
   handler: async (ctx) => {
-    const products = await ctx.db.query("products").collect();
-    return products.sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+    return await ctx.db
+      .query("products")
+      .withIndex("by_orderIndex")
+      .collect();
   },
 });
 

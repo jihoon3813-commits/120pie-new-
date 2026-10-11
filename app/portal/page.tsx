@@ -2576,11 +2576,12 @@ export default function PortalPage() {
     { name: "120coffee", label: "120coffee", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785158864/Group_9_iskk3b.png", active: adoptionMenu.includes("120coffee"), desc: adoptionMenu.includes("120coffee") ? "스페셜티 가성비 음료 가동중" : "가맹 도입 대기" },
   ];
 
-  // Filtering Products
-  const filteredProducts =
-    activeCategory === "전체"
-      ? products
-      : products.filter((p) => p.category === activeCategory);
+  // Filtering Products (useMemo로 렌더링 성능 최적화)
+  const filteredProducts = useMemo(() => {
+    if (!products || products.length === 0) return [];
+    if (activeCategory === "전체") return products;
+    return products.filter((p) => p.category === activeCategory);
+  }, [products, activeCategory]);
 
   const activePackageCount = PACKAGES.filter((p) => p.active).length;
   const newNoticesCount = notices.length;
@@ -3443,8 +3444,8 @@ export default function PortalPage() {
 
                 {/* Product Box Grid (Responsive: 1 col on mobile, 2 cols on sm/tablet-lg, 3 cols on xl desktop) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4">
-                  {convexProducts === undefined ? (
-                    // 최신 단가 및 자재 실시간 동기화 스켈레톤 (기존 단가 노출 및 인터벌 깜빡임 원천 차단)
+                  {products.length === 0 && convexProducts === undefined ? (
+                    // 데이터가 전혀 없을 때만 부드러운 스켈레톤 노출 (캐시가 있으면 0ms 즉시 렌더링)
                     Array.from({ length: 6 }).map((_, idx) => (
                       <div 
                         key={`product-skeleton-${idx}`}
@@ -3480,7 +3481,13 @@ export default function PortalPage() {
                         >
                           {/* Left: Thumbnail & Stock State */}
                           <div className="w-16 h-16 rounded-md bg-white overflow-hidden shrink-0 border border-neutral-200/60 relative">
-                            <img src={optimizeCloudinaryUrl(p.img)} alt={p.name} className="w-full h-full object-contain p-1" />
+                            <img 
+                              src={optimizeCloudinaryUrl(p.img)} 
+                              alt={p.name} 
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-contain p-1" 
+                            />
                             {p.stock === "out_of_stock" && (
                               <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
                                 <span className="text-white font-black text-[9px] px-1 py-0.5 rounded bg-red-500 shadow-sm">품절</span>
@@ -3558,6 +3565,8 @@ export default function PortalPage() {
                             <img 
                               src={optimizeCloudinaryUrl(p.img)} 
                               alt={p.name} 
+                              loading="lazy"
+                              decoding="async"
                               className={`w-full h-full object-contain transition-all duration-300 ${
                                 p.stock === "out_of_stock" ? "brightness-50 grayscale" : ""
                               }`} 
