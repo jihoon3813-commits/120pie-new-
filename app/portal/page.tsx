@@ -3509,7 +3509,11 @@ export default function PortalPage() {
 
                             <div className="flex items-center justify-between mt-1">
                               <div className="flex items-center gap-1 flex-wrap">
-                                <strong className="text-xs text-[#0F172A] font-black">{p.price.toLocaleString()}원</strong>
+                                {convexProducts === undefined ? (
+                                  <span className="inline-block h-3.5 w-14 bg-slate-200/90 rounded animate-pulse" />
+                                ) : (
+                                  <strong className="text-xs text-[#0F172A] font-black">{p.price.toLocaleString()}원</strong>
+                                )}
                               </div>
                               
                               <div onClick={(e) => e.stopPropagation()} className="shrink-0">
@@ -3617,7 +3621,11 @@ export default function PortalPage() {
                             <div className="flex items-center justify-between mt-2.5 pt-1 shrink-0 gap-1.5">
                               <div className="flex flex-col min-w-0">
                                 <span className="text-[9px] text-slate-400 font-bold -mb-0.5">공급가</span>
-                                <strong className="text-xs sm:text-base text-[#0F172A] font-black whitespace-nowrap">{p.price.toLocaleString()}<span className="text-[10px] sm:text-xs font-bold ml-0.5">원</span></strong>
+                                {convexProducts === undefined ? (
+                                  <span className="inline-block h-4 sm:h-5 w-16 sm:w-20 bg-slate-200/90 rounded animate-pulse my-0.5" />
+                                ) : (
+                                  <strong className="text-xs sm:text-base text-[#0F172A] font-black whitespace-nowrap">{p.price.toLocaleString()}<span className="text-[10px] sm:text-xs font-bold ml-0.5">원</span></strong>
+                                )}
                               </div>
                               
                               {p.stock === "out_of_stock" ? (
