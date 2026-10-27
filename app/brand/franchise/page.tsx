@@ -13,7 +13,6 @@ import ConsultationForm from "@/components/ConsultationForm";
 import Footer from "@/app/components/Footer";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
-import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 import BrandHeader from "@/components/BrandHeader";
 
 // Cloudinary assets with f_auto,q_auto
@@ -1033,10 +1032,7 @@ export default function BrandFranchisePage() {
       <QuickInquiryBar />
 
       {/* Right Floating Quick Docking Bar */}
-      <RightFloatingQuickBar onOpenConsultation={() => setIsConsulting(true)} />
-
-      {/* Right Side Inquiry Banner (300px width) */}
-      <RightSideInquiryBanner />
+      <RightFloatingQuickBar onOpenConsultation={() => setIsConsulting(true)} hasBanner={false} />
     </div>
   );
 }

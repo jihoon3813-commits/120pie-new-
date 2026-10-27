@@ -11,7 +11,6 @@ import Script from "next/script";
 import ConsultationForm from "@/components/ConsultationForm";
 import QuickInquiryBar from "@/components/landing-v6/QuickInquiryBar";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
-import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 import BrandHeader from "@/components/BrandHeader";
 
 const logoUrlBlack = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png";
@@ -977,10 +976,7 @@ export default function StoresPageClient() {
       <Footer theme="yellow" />
 
       {/* Right Floating Quick Docking Bar */}
-      <RightFloatingQuickBar onOpenConsultation={() => setInquiryForcedOpen(true)} />
-
-      {/* Right Side Inquiry Banner (300px width) */}
-      <RightSideInquiryBanner />
+      <RightFloatingQuickBar onOpenConsultation={() => setInquiryForcedOpen(true)} hasBanner={false} />
     </div>
   );
 }

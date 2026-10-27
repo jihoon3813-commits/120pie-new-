@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import FloatingAndInquiry from "@/app/components/FloatingAndInquiry";
 import Footer from "@/app/components/Footer";
 import RightFloatingQuickBar from "@/components/RightFloatingQuickBar";
-import RightSideInquiryBanner from "@/components/RightSideInquiryBanner";
 import { optimizeCloudinaryUrl } from "@/app/utils/cloudinary";
 
 const getCloudinaryResizedUrl = (url: string, width = 300, height = 300) => {
@@ -975,8 +974,7 @@ export default function CostsPageClient() {
         </div>
       </main>
       <Footer theme={isPink ? "black" : "yellow"} />
-      <RightFloatingQuickBar />
-      <RightSideInquiryBanner />
+      <RightFloatingQuickBar hasBanner={false} />
     </div>
   );
 }
