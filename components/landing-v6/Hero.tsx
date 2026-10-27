@@ -17,7 +17,7 @@ export default function Hero() {
   ];
 
   const mobileSlides = [
-    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1793089458/%EA%B3%A0%EC%86%8C%ED%95%9C_%EB%A6%AC%EC%96%BC%EA%B3%84%EB%9E%80%EB%B9%B5_%EA%B4%91%EA%B3%A0_%EB%B0%B0%EB%84%88_mbm6yd.png",
+    "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1793091197/%EB%93%A0%EB%93%A0%ED%95%9C_%EB%A6%AC%EC%96%BC%EA%B3%84%EB%9E%80%EB%B9%B5_%ED%95%9C%EC%9E%85_g0ruka.png",
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1788178798/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_31%EC%9D%BC_%EC%98%A4%ED%9B%84_09_19_47_keqhel.png",
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1785389600/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_30%EC%9D%BC_%EC%98%A4%ED%9B%84_02_33_00_hek4ng.png",
     "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784392071/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_19%EC%9D%BC_%EC%98%A4%EC%A0%84_12_49_00_1_3_igjpyk.png",
