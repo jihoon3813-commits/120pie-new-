@@ -1633,8 +1633,8 @@ export default function BrandHome() {
         {/* Large Centered Image (4x * 1.5x size, static margin block below text with downward translation) */}
         <div className="mt-16 md:mt-20 z-10 w-[450px] sm:w-[750px] md:w-[1140px] translate-y-4 md:translate-y-8 pointer-events-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.15)] animate-float flex justify-center">
           <img
-            src={optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/v1784615116/ChatGPT_Image_2026%EB%85%84_7%EC%9B%94_21%EC%9D%BC_%EC%98%A4%ED%9B%84_03_12_26_1_prg0iy.png")}
-            alt="120pie 신규 아메리카노 컵"
+            src={optimizeCloudinaryUrl("https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1793146673/Group_1_qgowsk.png")}
+            alt="120PIE&COFFEE 대표 메뉴"
             className="w-full h-auto object-contain"
           />
         </div>
