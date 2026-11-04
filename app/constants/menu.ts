@@ -48,6 +48,13 @@ export const MENU_DATA: Record<string, MenuCategory> = {
     desc: "신선한 재료로 정성스럽게 끓여낸 깊고 풍성한 맛. 120겹 파이와 함께 페어링하면 더욱 완벽한 한 끼 식사가 완성됩니다.",
     items: [
       {
+        name: "120 앙쿠르트",
+        desc: "바삭하게 부풀어 오른 120겹 패스츄리 돔을 톡 깨트려 진하고 풍부한 크림 스프와 함께 즐기는 시그니처 앙쿠르트입니다.",
+        img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1793777395/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_27%EC%9D%BC_%EC%98%A4%ED%9B%84_01_00_42_1_uwfzmm.png",
+        badge: "NEW",
+        tag: "시그니처"
+      },
+      {
         name: "토마토 스프",
         desc: "신선한 토마토의 상큼함과 향긋한 바질이 어우러진 산뜻한 홈메이드 스프입니다.",
         img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1791521399/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_27%EC%9D%BC_%EC%98%A4%ED%9B%84_12_31_26_5_gd9bj5.png",

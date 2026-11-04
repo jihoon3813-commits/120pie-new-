@@ -108,6 +108,7 @@ const toEnglishSub = (name: string): string => {
     "산딸기 마카롱": "Raspberry Macaron",
     "블루베리 마카롱": "Blueberry Macaron",
     "초코 마카롱": "Ganache Chocolate Macaron",
+    "120 앙쿠르트": "120 En Croûte",
     "토마토 스프": "Rich Tomato Soup",
     "콩크림 스프": "Creamy Soy Bean Soup",
     "양송이 스프": "Classic Mushroom Soup"

@@ -63,6 +63,8 @@ export default function MenuPageClient() {
         const urlTab = params.get("tab");
         if (urlTab === "pie") {
           setActiveTab("120겹파이");
+        } else if (urlTab === "soup") {
+          setActiveTab("120스프");
         } else if (urlTab === "egg") {
           setActiveTab("에그120");
         } else if (urlTab === "side" || urlTab === "others" || urlTab === "etc") {
@@ -96,7 +98,8 @@ export default function MenuPageClient() {
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
       let tabParam = "pie";
-      if (tabId === "에그120") tabParam = "egg";
+      if (tabId === "120스프") tabParam = "soup";
+      else if (tabId === "에그120") tabParam = "egg";
       else if (tabId === "기타") tabParam = "side";
       else if (tabId === "coffee120") tabParam = "coffee";
       else if (tabId === "스콘/머핀/쿠키") tabParam = "bakery";

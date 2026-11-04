@@ -8,6 +8,7 @@ import GatePageClient from "@/components/GatePageClient";
 import { Building2 } from "lucide-react";
 
 const RESERVED_PATHS = new Set([
+  "ad",
   "admin",
   "api",
   "brand",
@@ -16,6 +17,7 @@ const RESERVED_PATHS = new Set([
   "faq",
   "franchise",
   "gateway",
+  "landing-ad",
   "login",
   "menu",
   "partner",

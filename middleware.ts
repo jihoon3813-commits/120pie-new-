@@ -7,6 +7,12 @@ export function middleware(request: NextRequest) {
 
   // 서브도메인 감지 (new.120pie.com, v6.120pie.com 또는 로컬 테스트용 new.localhost, v6.localhost)
   const isNewSubdomain = host.startsWith("new.") || host.startsWith("v6.");
+  const isAdSubdomain = host.startsWith("ad.");
+
+  if (isAdSubdomain && url.pathname === "/") {
+    url.pathname = "/ad";
+    return NextResponse.rewrite(url);
+  }
 
   if (isNewSubdomain) {
     // 루트 경로('/')로 접근 시 내부적으로 새로 만든 v6 랜딩페이지('/landing-v6')로 포워딩(Rewrite)

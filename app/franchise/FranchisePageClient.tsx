@@ -97,7 +97,7 @@ export default function FranchisePageClient() {
 
   useModalBackHandler("franchise-page-mobile-nav", mobileNavOpen, () => setMobileNavOpen(false));
   const [selectedPlanTab, setSelectedPlanTab] = useState<"8py" | "10py">("8py");
-  const [activeMenuTab, setActiveMenuTab] = useState<"pie" | "egg" | "churros" | "side" | "drink" | "bakery" | "croffle">("pie");
+  const [activeMenuTab, setActiveMenuTab] = useState<"pie" | "soup" | "egg" | "churros" | "side" | "drink" | "bakery" | "croffle">("pie");
   
   // Helper to optimize Cloudinary images (downscales large images to look crisp and clean)
   const getOptimizedImg = (url: string, width = 300) => {
@@ -1041,26 +1041,24 @@ export default function FranchisePageClient() {
             </div>
 
             {/* Tabs Navigation */}
-            <div className="grid grid-cols-3 gap-2 max-w-3xl mx-auto mb-8 select-none">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-3xl mx-auto mb-8 select-none">
               {[
                 { key: "pie", label: "120겹 파이 시리즈", emoji: "🥐" },
+                { key: "soup", label: "120스프 & 앙쿠르트", emoji: "🥣" },
                 { key: "egg", label: "에그 120 시리즈", emoji: "🥚" },
                 { key: "churros", label: "츄러스 120 시리즈", emoji: "🥨" },
                 { key: "side", label: "떡볶이 & 핫도그", emoji: "🌭" },
                 { key: "drink", label: "커피 & 음료", emoji: "☕" },
                 { key: "bakery", label: "스콘/머핀/쿠키", emoji: "🍪" },
                 { key: "croffle", label: "크로플/마카롱", emoji: "🧇" }
-              ].map((tab, idx) => {
+              ].map((tab) => {
                 const isActive = activeMenuTab === tab.key;
-                const isLast = idx === 6;
                 return (
                   <button
                     key={tab.key}
                     type="button"
                     onClick={() => setActiveMenuTab(tab.key as any)}
                     className={`flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer border ${
-                      isLast ? "col-span-3" : ""
-                    } ${
                       isActive
                         ? isPink
                           ? "bg-rose-500 border-rose-500 text-white shadow-md shadow-rose-500/10"
@@ -1100,6 +1098,28 @@ export default function FranchisePageClient() {
                     { name: "콘치즈 파이", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076390/edited-photo_-_2026-07-06T123519.769_mjtemz.png" },
                     { name: "커스터드 파이", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076389/edited-photo_-_2026-07-06T123308.924_oddurc.png" },
                     { name: "블루베리 파이", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784076393/edited-photo_-_2026-07-06T123432.204_ood7n2.png" }
+                  ].map((item, idx) => (
+                    <div key={idx} className="group flex flex-col items-center">
+                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">
+                        <img 
+                          src={getOptimizedImg(item.img, 300)} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-95"
+                        />
+                      </div>
+                      <span className={`text-xs sm:text-sm font-black ${textTitle} text-center mt-2 px-1 block truncate w-full`}>{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeMenuTab === "soup" && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-3xl mx-auto">
+                  {[
+                    { name: "120 앙쿠르트", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1793777395/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_27%EC%9D%BC_%EC%98%A4%ED%9B%84_01_00_42_1_uwfzmm.png" },
+                    { name: "토마토 스프", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1791521399/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_27%EC%9D%BC_%EC%98%A4%ED%9B%84_12_31_26_5_gd9bj5.png" },
+                    { name: "콩크림 스프", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1791521399/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_27%EC%9D%BC_%EC%98%A4%ED%9B%84_12_31_26_3_pxd5rx.png" },
+                    { name: "양송이 스프", img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1791521399/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_27%EC%9D%BC_%EC%98%A4%ED%9B%84_12_31_26_6_arohc8.png" }
                   ].map((item, idx) => (
                     <div key={idx} className="group flex flex-col items-center">
                       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-neutral-200/20 shadow-md bg-neutral-950 relative group-hover:border-amber-400 transition-all duration-300">

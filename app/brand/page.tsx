@@ -21,6 +21,12 @@ import Footer from "@/app/components/Footer";
 
 const SIGNATURE_MENUS = [
   {
+    name: "120 앙쿠르트",
+    subName: "120 En Croûte",
+    label: "NEW",
+    img: "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1793777395/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_27%EC%9D%BC_%EC%98%A4%ED%9B%84_01_00_42_1_uwfzmm.png",
+  },
+  {
     name: "꿀호떡파이",
     subName: "Honey Hotteok Pie",
     label: "NEW",
@@ -256,7 +262,7 @@ export default function BrandHome() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedMenuItem, setSelectedMenuItem] = useState<any>(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [menuIndex, setMenuIndex] = useState(9);
+  const [menuIndex, setMenuIndex] = useState(SIGNATURE_MENUS.length);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [moveStep, setMoveStep] = useState(33.333);
   
