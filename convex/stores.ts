@@ -271,6 +271,7 @@ export const get = query({
 export const createOrUpdate = mutation({
   args: {
     id: v.string(), // 로그인 ID
+    oldId: v.optional(v.string()), // 변경 전 로그인 ID (ID 수정 시)
     pw: v.string(), // 비밀번호
     pwConfirm: v.string(), // 비밀번호 확인
     name: v.string(), // 가맹점명
@@ -288,10 +289,19 @@ export const createOrUpdate = mutation({
     partnerId: v.optional(v.string()), // 영업 파트너 ID
   },
   handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("stores")
-      .filter((q) => q.eq(q.field("id"), args.id))
-      .first();
+    let existing = null;
+    if (args.oldId) {
+      existing = await ctx.db
+        .query("stores")
+        .filter((q) => q.eq(q.field("id"), args.oldId))
+        .first();
+    }
+    if (!existing) {
+      existing = await ctx.db
+        .query("stores")
+        .filter((q) => q.eq(q.field("id"), args.id))
+        .first();
+    }
 
     // partnerId 처리: undefined이면 기존 값 유지, 빈 문자열이면 해제(undefined), 값이 있으면 해당 파트너 배정
     let resolvedPartnerId: string | undefined = undefined;
@@ -302,6 +312,7 @@ export const createOrUpdate = mutation({
     }
 
     const fields = {
+      id: args.id,
       pw: args.pw,
       pwConfirm: args.pwConfirm,
       name: args.name,
@@ -321,12 +332,40 @@ export const createOrUpdate = mutation({
 
     if (existing) {
       await ctx.db.patch(existing._id, fields);
+
+      // 만약 ID가 변경되었다면 연관된 테이블들의 storeId도 함께 업데이트
+      if (args.oldId && args.oldId !== args.id) {
+        // 1. orders
+        const orders = await ctx.db
+          .query("orders")
+          .filter((q) => q.eq(q.field("storeId"), args.oldId))
+          .collect();
+        for (const order of orders) {
+          await ctx.db.patch(order._id, { storeId: args.id });
+        }
+
+        // 2. deliveryCredentials
+        const creds = await ctx.db
+          .query("deliveryCredentials")
+          .filter((q) => q.eq(q.field("storeId"), args.oldId))
+          .collect();
+        for (const cred of creds) {
+          await ctx.db.patch(cred._id, { storeId: args.id });
+        }
+
+        // 3. storeInquiries
+        const inqs = await ctx.db
+          .query("storeInquiries")
+          .filter((q) => q.eq(q.field("storeId"), args.oldId))
+          .collect();
+        for (const inq of inqs) {
+          await ctx.db.patch(inq._id, { storeId: args.id });
+        }
+      }
+
       return { success: true, action: "updated", storeId: args.id };
     } else {
-      await ctx.db.insert("stores", {
-        id: args.id,
-        ...fields,
-      });
+      await ctx.db.insert("stores", fields);
       return { success: true, action: "created", storeId: args.id };
     }
   },

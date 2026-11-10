@@ -10,10 +10,18 @@ import { DEFAULT_TERMS, DEFAULT_PRIVACY, DEFAULT_REFUND } from "@/app/constants/
 
 interface FooterProps {
   logoUrl?: string;
+  hidePortalBox?: boolean;
+  className?: string;
+  logoClassName?: string;
+  logoStyle?: React.CSSProperties;
 }
 
 export default function Footer({
   logoUrl = "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png",
+  hidePortalBox = false,
+  className = "",
+  logoClassName = "h-6 sm:h-7 w-auto object-contain",
+  logoStyle,
 }: FooterProps) {
   const pathname = usePathname();
   const isSubpage = pathname !== "/landing-v6";
@@ -78,12 +86,17 @@ export default function Footer({
   };
 
   return (
-    <footer className="bg-neutral-950 text-neutral-400 py-16 border-t border-neutral-900">
+    <footer className={`bg-neutral-950 text-neutral-400 py-16 border-t border-neutral-900 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
           {/* Logo and Info */}
           <div className="md:col-span-5 space-y-6">
-            <img src={logoUrl} alt="120pie Logo" className="h-5 sm:h-7 w-auto object-contain" />
+            <img
+              src={logoUrl}
+              alt="120pie Logo"
+              className={logoClassName}
+              style={{ height: "24px", width: "auto", maxWidth: "180px", objectFit: "contain", ...logoStyle }}
+            />
             <p className="text-xs leading-relaxed max-w-sm">
               120pie는 독창적인 120겹 페이스트리 노하우와 엄선된 원두의 스페셜티 커피를 통해 고객님들께 행복한 미식 경험을 전합니다.
             </p>
@@ -141,48 +154,50 @@ export default function Footer({
         {/* Bottom Area */}
         <div className="pt-8 mt-12 border-t border-neutral-900 flex flex-col gap-6">
           {/* 3대 전용 포털 바로가기 전용 버튼 박스 (모바일/PC 눈에 잘 띄는 버튼형 디자인) */}
-          <div className="bg-neutral-900/80 border border-neutral-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 shadow-lg">
-            <div className="text-left space-y-0.5">
-              <span className="text-[10px] font-extrabold text-amber-500 tracking-wider uppercase">Official Portal</span>
-              <h5 className="text-xs sm:text-sm font-black text-white">가맹점주 및 비즈니스 파트너 전용 시스템</h5>
+          {!hidePortalBox && (
+            <div className="bg-neutral-900/80 border border-neutral-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 shadow-lg">
+              <div className="text-left space-y-0.5">
+                <span className="text-[10px] font-extrabold text-amber-500 tracking-wider uppercase">Official Portal</span>
+                <h5 className="text-xs sm:text-sm font-black text-white">가맹점주 및 비즈니스 파트너 전용 시스템</h5>
+              </div>
+
+              {/* 버튼 3종 (모바일 3분할 꽉 찬 그리드, PC 가로 정렬 버튼) */}
+              <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+                <a
+                  href="/portal"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs transition-all shadow-md active:scale-95 text-center border-0"
+                  title="120겹파이 가맹점 점주포털 바로가기"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-950 shrink-0"></span>
+                  <span className="truncate">점주포털</span>
+                </a>
+
+                <a
+                  href="/partner"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition-all shadow-md active:scale-95 text-center border-0"
+                  title="120겹파이 영업 파트너포털 바로가기"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0"></span>
+                  <span className="truncate">파트너포털</span>
+                </a>
+
+                <a
+                  href="/admin"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-100 hover:text-white border border-neutral-700 font-black text-xs transition-all shadow-md active:scale-95 text-center"
+                  title="120겹파이 본사 어드민 관리자 바로가기"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+                  <span className="truncate">본사어드민</span>
+                </a>
+              </div>
             </div>
-
-            {/* 버튼 3종 (모바일 3분할 꽉 찬 그리드, PC 가로 정렬 버튼) */}
-            <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 w-full sm:w-auto">
-              <a
-                href="/portal"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs transition-all shadow-md active:scale-95 text-center border-0"
-                title="120겹파이 가맹점 점주포털 바로가기"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-neutral-950 shrink-0"></span>
-                <span className="truncate">점주포털</span>
-              </a>
-
-              <a
-                href="/partner"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition-all shadow-md active:scale-95 text-center border-0"
-                title="120겹파이 영업 파트너포털 바로가기"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0"></span>
-                <span className="truncate">파트너포털</span>
-              </a>
-
-              <a
-                href="/admin"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-100 hover:text-white border border-neutral-700 font-black text-xs transition-all shadow-md active:scale-95 text-center"
-                title="120겹파이 본사 어드민 관리자 바로가기"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-                <span className="truncate">본사어드민</span>
-              </a>
-            </div>
-          </div>
+          )}
 
           {/* 정책 및 카피라이트 */}
           <div className="flex flex-col sm:flex-row items-center justify-between text-[11px] text-neutral-500 gap-3">

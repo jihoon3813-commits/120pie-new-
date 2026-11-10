@@ -3,13 +3,14 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./styles.css";
 import { optimizeCloudinaryUrl } from "../utils/cloudinary";
+import DeliveryImageSlider from "./DeliveryImageSlider";
+import Footer from "@/components/landing-v6/Footer";
 
 type SubmitStatus = "" | "pending" | "success" | "duplicate" | "error";
 
 export default function AdLandingClient() {
   const heroRef = useRef<HTMLElement | null>(null);
   const consultRef = useRef<HTMLElement | null>(null);
-  const guideRef = useRef<HTMLDialogElement | null>(null);
   const messageRef = useRef<HTMLParagraphElement | null>(null);
 
   const ownerRef = useRef<HTMLInputElement | null>(null);
@@ -17,6 +18,9 @@ export default function AdLandingClient() {
   const regionRef = useRef<HTMLInputElement | null>(null);
   const typeRef = useRef<HTMLSelectElement | null>(null);
   const consentRef = useRef<HTMLInputElement | null>(null);
+
+  type CostTabId = "shop120" | "shopegg120" | "shopegg" | "hybrid" | "franchise";
+  const [costTab, setCostTab] = useState<CostTabId>("shop120");
 
   const [fixedHidden, setFixedHidden] = useState(true);
   const [name, setName] = useState("");
@@ -44,6 +48,170 @@ export default function AdLandingClient() {
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("");
   const lastSubmittedKeyRef = useRef<string>("");
 
+  // Consultation Modal Popup State
+  const [isConsultModalOpen, setIsConsultModalOpen] = useState(false);
+  const [modalName, setModalName] = useState("");
+  const [modalPhone, setModalPhone] = useState("");
+  const [modalRegion, setModalRegion] = useState("");
+  const [modalStoreType, setModalStoreType] = useState("기존 카페 운영 중");
+  const [modalConsent, setModalConsent] = useState(false);
+  const [modalErrors, setModalErrors] = useState<{
+    owner: string;
+    phone: string;
+    region: string;
+    type: string;
+    consent: string;
+  }>({
+    owner: "",
+    phone: "",
+    region: "",
+    type: "",
+    consent: "",
+  });
+  const [modalIsSubmitting, setModalIsSubmitting] = useState(false);
+  const [modalSubmitStatus, setModalSubmitStatus] = useState<SubmitStatus>("");
+  const [modalStatusMessage, setModalStatusMessage] = useState("");
+
+  const openConsultModal = () => {
+    setIsConsultModalOpen(true);
+    setModalSubmitStatus("");
+    setModalStatusMessage("");
+    setModalErrors({
+      owner: "",
+      phone: "",
+      region: "",
+      type: "",
+      consent: "",
+    });
+  };
+
+  const closeConsultModal = () => {
+    setIsConsultModalOpen(false);
+  };
+
+  useEffect(() => {
+    if (!isConsultModalOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeConsultModal();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isConsultModalOpen]);
+
+  // Back button trap on Ad page: Show consultation modal instead of exit popup
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      window.history.pushState({ isAdPage: true }, "", window.location.href);
+    } catch (_) {}
+
+    const handleAdPopState = () => {
+      setIsConsultModalOpen((prev) => {
+        if (!prev) {
+          try {
+            window.history.pushState({ isAdPage: true }, "", window.location.href);
+          } catch (_) {}
+          return true;
+        }
+        return false;
+      });
+    };
+
+    window.addEventListener("popstate", handleAdPopState);
+    return () => {
+      window.removeEventListener("popstate", handleAdPopState);
+    };
+  }, []);
+
+  const handleModalSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (modalIsSubmitting) return;
+
+    const nextErrors = {
+      owner: modalName.trim() ? "" : "성함을 입력해 주세요.",
+      phone: "",
+      region: modalRegion.trim() ? "" : "희망 도입 지역을 입력해 주세요.",
+      type: modalStoreType.trim() ? "" : "현재 매장 상황을 선택해 주세요.",
+      consent: modalConsent ? "" : "개인정보 수집·이용 안내를 확인하고 동의해 주세요.",
+    };
+
+    const cleanPhone = modalPhone.replace(/[\s-]/g, "");
+    if (!cleanPhone) {
+      nextErrors.phone = "연락처를 입력해 주세요.";
+    } else if (!/^01[016789]\d{7,8}$/.test(cleanPhone)) {
+      nextErrors.phone = "휴대전화 번호를 다시 확인해 주세요.";
+    }
+
+    setModalErrors(nextErrors);
+    if (Object.values(nextErrors).some(Boolean)) return;
+
+    setModalIsSubmitting(true);
+    setModalSubmitStatus("pending");
+
+    let partnerId: string | undefined;
+    let partnerName: string | undefined;
+    let partnerCompany: string | undefined;
+    try {
+      partnerId = localStorage.getItem("120_referral_partner_id") || undefined;
+      partnerName = localStorage.getItem("120_referral_partner_name") || undefined;
+      partnerCompany = localStorage.getItem("120_referral_partner_company") || undefined;
+    } catch (_) {}
+
+    try {
+      const response = await fetch("/api/ad-inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: modalName.trim(),
+          phone: modalPhone.trim(),
+          region: modalRegion.trim(),
+          type: modalStoreType.trim(),
+          consent: modalConsent,
+          partnerId,
+          partnerName,
+          partnerCompany,
+          path: typeof window !== "undefined" ? window.location.pathname : "/ad",
+          referrer: typeof document !== "undefined" ? document.referrer || "direct" : "direct",
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (response.ok && data?.success) {
+        setModalSubmitStatus("success");
+        setModalStatusMessage(
+          data.message ||
+            "우리 동네 도입 상담이 정상 접수되었습니다. 담당자가 상권 현황을 확인하여 빠르게 연락드리겠습니다."
+        );
+        fireConversionTracking();
+      } else if (response.status === 409 || data?.code === "DUPLICATE_SUBMISSION") {
+        setModalSubmitStatus("duplicate");
+        setModalStatusMessage(
+          data?.message ||
+            "이미 동일한 내용으로 상담 신청이 접수되었습니다. 담당자가 확인 후 연락드리겠습니다."
+        );
+      } else {
+        setModalSubmitStatus("error");
+        setModalStatusMessage(
+          data?.message || "접수 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요."
+        );
+      }
+    } catch (_) {
+      setModalSubmitStatus("error");
+      setModalStatusMessage("접수 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setModalIsSubmitting(false);
+    }
+  };
+
   // Capture referral partner code from URL query params if present
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -65,16 +233,13 @@ export default function AdLandingClient() {
     if (typeof window === "undefined") return;
     const heroEl = heroRef.current;
     const consultEl = consultRef.current;
-    const guideEl = guideRef.current;
     if (!heroEl || !consultEl) return;
 
     const formFocus = consultEl.contains(document.activeElement);
-    const isGuideOpen = Boolean(guideEl?.open);
     const shouldHide =
       heroEl.getBoundingClientRect().bottom > 100 ||
       consultEl.getBoundingClientRect().top < window.innerHeight ||
-      formFocus ||
-      isGuideOpen;
+      formFocus;
 
     setFixedHidden(shouldHide);
   }, []);
@@ -95,35 +260,40 @@ export default function AdLandingClient() {
     };
   }, [updateFixed]);
 
-  const openGuide = () => {
-    const dialog = guideRef.current;
-    if (dialog && typeof dialog.showModal === "function" && !dialog.open) {
-      dialog.showModal();
-      updateFixed();
-    }
-  };
+  // Scroll reveal animation observer
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-  const closeGuide = () => {
-    const dialog = guideRef.current;
-    if (dialog && dialog.open) {
-      dialog.close();
-      updateFixed();
-    }
-  };
+    const elements = document.querySelectorAll<HTMLElement>(
+      "#ad-landing-root .scroll-reveal"
+    );
 
-  const handleDialogBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
-    const dialog = guideRef.current;
-    if (!dialog || e.target !== dialog) return;
-    const r = dialog.getBoundingClientRect();
-    if (
-      e.clientX < r.left ||
-      e.clientX > r.right ||
-      e.clientY < r.top ||
-      e.clientY > r.bottom
-    ) {
-      closeGuide();
+    if (!("IntersectionObserver" in window)) {
+      elements.forEach((el) => el.classList.add("is-visible"));
+      return;
     }
-  };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.08,
+        rootMargin: "0px 0px -40px 0px",
+      }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const formatPhoneInput = (value: string) => {
     const digits = value.replace(/[^\d]/g, "").slice(0, 11);
@@ -302,26 +472,24 @@ export default function AdLandingClient() {
       <a className="skip" href="#main" data-editorial="true">
         본문 바로가기
       </a>
-      <div className="notice">
-        클라이언트 검토용 카피·구성 시안 · 상담 신청은 (주)고우웰라이프 상담 시스템으로 실제 접수됩니다 · 실적 및 상권 보호 조건은 자료 확인 후 확정
-      </div>
       <header className="bar" id="top">
         <div className="wrap">
           <a className="brand" href="#top" aria-label="120PIE 처음으로">
-            120<span>PIE</span>
+            <img
+              src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784536582/Group_2_ma3j8j.png"
+              alt="120PIE Logo"
+              className="w-auto object-contain"
+            />
           </a>
           <div className="header-actions">
             <button
-              className="guide-open"
               type="button"
-              data-editorial="true"
-              onClick={openGuide}
+              className="header-cta"
+              onClick={openConsultModal}
+              style={{ cursor: "pointer", border: 0 }}
             >
-              이미지 가이드 <span>13</span>
-            </button>
-            <a className="header-cta" href="#consult">
               우리 지역 도입 상담 ↗
-            </a>
+            </button>
           </div>
         </div>
       </header>
@@ -342,9 +510,14 @@ export default function AdLandingClient() {
               옆집 카페의 신메뉴로 만나기 전에. <br />
               <b>120겹 파이를 우리 매장의 무기로 만드세요.</b>
             </p>
-            <a className="cta" href="#consult">
+            <button
+              type="button"
+              className="cta"
+              onClick={openConsultModal}
+              style={{ cursor: "pointer", border: 0 }}
+            >
               우리 동네 도입 가능 여부 확인<span>↗</span>
-            </a>
+            </button>
             <div className="hero-visual">
               <div
                 className="asset has-image"
@@ -376,7 +549,7 @@ export default function AdLandingClient() {
 
         {/* 2. COMPETITION */}
         <section className="s-competition section white" id="competition">
-          <div className="wrap">
+          <div className="wrap scroll-reveal">
             <span className="eyebrow">01 / 사장님의 진짜 경쟁</span>
             <h2>
               손님이 디저트 사러 <br />
@@ -387,7 +560,7 @@ export default function AdLandingClient() {
               음료만 팔던 메뉴판에 파이 한 가지가 더해지면 <br />
               제안할 수 있는 장면도 달라집니다.
             </p>
-            <div className="comparison">
+            <div className="comparison scroll-reveal-delay-1">
               <div className="compare">
                 <small>지금의 고민</small>
                 <h3>
@@ -417,128 +590,174 @@ export default function AdLandingClient() {
         {/* 3. PROOF */}
         <section className="s-proof section" id="proof">
           <div className="wrap center">
-            <span className="eyebrow">02 / 매장 선택의 근거</span>
-            <h2>
-              한 매장의 아이디어를 넘어, <br />
-              <span className="yellow">전국으로 퍼진 파이.</span>
-            </h2>
-            <div className="large-stat">
-              200<small>호점</small>
+            <div className="scroll-reveal">
+              <span className="eyebrow">02 / 매장 선택의 근거</span>
+              <h2>
+                <span className="title-line">한 매장의 아이디어를 넘어,</span>
+                <span className="yellow title-line">전국으로 퍼진 파이.</span>
+              </h2>
+              <div className="large-stat">
+                200<small>호점</small>
+              </div>
+              <p className="lead" style={{ marginTop: "25px" }}>
+                내 매장에도 맞을까? <br />
+                중요한 건 숫자 다음의 이야기입니다. <br />
+                어떤 매장이, 어떻게 판매하고 운영하는지 확인하세요.
+              </p>
             </div>
-            <span className="pending">
-              공식 홈페이지 게시 수치 · 집계 범위·기준일 확인 예정
-            </span>
-            <p className="lead" style={{ marginTop: "25px" }}>
-              내 매장에도 맞을까? <br />
-              중요한 건 숫자 다음의 이야기입니다. <br />
-              어떤 매장이, 어떻게 판매하고 운영하는지 확인하세요.
-            </p>
-            <div className="proof-grid">
-              <div className="proof">
+            <div className="proof-grid scroll-reveal scroll-reveal-delay-1">
+              <div className="proof scroll-reveal-item">
                 <div
-                  className="asset"
-                  id="asset-02"
-                  data-editorial="true"
-                  data-asset="02"
-                  role="img"
-                  aria-label="실제 도입 매장 삽입 영역"
+                  className="asset has-image"
+                  id="asset-proof-01"
                 >
-                  <div className="asset-top">
-                    <span>IMAGE 02</span>
-                    <span>4:3</span>
-                  </div>
-                  <div className="asset-center">
-                    <span className="asset-cross" aria-hidden="true">
-                      ＋
-                    </span>
-                    <strong>실제 도입 매장</strong>
-                    <p>장비와 작업대가 함께 보이는 실제 매장 사진</p>
-                  </div>
-                  <div className="asset-bottom">
-                    <span>1200 × 900 px</span>
-                    <span>필수</span>
-                  </div>
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1794196987/%EB%B2%BD%EB%8F%8C_%EA%B3%A8%EB%AA%A9%EC%9D%98_120PIE_COFFEE_%EC%B9%B4%ED%8E%98-2_1_vtmbaf.png"
+                    )}
+                    alt="120PIE 감성 골목 로드샵 외관"
+                    className="asset-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div className="proof-copy">
-                  <span className="num">CHECK 01</span>
-                  <b>실제 도입 매장</b>
+                  <span className="num">STORE 01</span>
+                  <b>감성 골목 로드샵</b>
                   <p>
-                    기존 카페에 어떻게 설치하고 <br />
-                    어떤 메뉴로 시작했는지.
+                    클래식한 벽돌과 옐로우의 조화 <br />
+                    골목길 발걸음을 멈추게 하는 감성 매장.
                   </p>
                 </div>
               </div>
-              <div className="proof">
+
+              <div className="proof scroll-reveal-item">
                 <div
-                  className="asset"
-                  id="asset-03"
-                  data-editorial="true"
-                  data-asset="03"
-                  role="img"
-                  aria-label="실제 운영 장면 삽입 영역"
+                  className="asset has-image"
+                  id="asset-proof-02"
                 >
-                  <div className="asset-top">
-                    <span>IMAGE 03</span>
-                    <span>4:3</span>
-                  </div>
-                  <div className="asset-center">
-                    <span className="asset-cross" aria-hidden="true">
-                      ＋
-                    </span>
-                    <strong>실제 운영 장면</strong>
-                    <p>점주가 파이를 굽거나 포장하는 장면</p>
-                  </div>
-                  <div className="asset-bottom">
-                    <span>1200 × 900 px</span>
-                    <span>권장</span>
-                  </div>
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1794196986/%EB%85%B8%EB%9E%80_%ED%8C%8C%EC%82%AC%EB%93%9C%EC%9D%98_120PIE_%EC%BD%94%EB%84%88_%EC%B9%B4%ED%8E%98-1_1_zxttjl.png"
+                    )}
+                    alt="120PIE 코너 상가 랜드마크형 외관"
+                    className="asset-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div className="proof-copy">
-                  <span className="num">CHECK 02</span>
-                  <b>실제 운영 경험</b>
+                  <span className="num">STORE 02</span>
+                  <b>코너 상가 랜드마크형</b>
                   <p>
-                    조리·보관·피크타임 대응은 <br />
-                    어떻게 하고 있는지.
+                    양면 통유리로 가시성을 극대화하여 <br />
+                    사거리 보행자 시선을 사로잡는 코너 매장.
                   </p>
                 </div>
               </div>
-              <div className="proof">
+
+              <div className="proof scroll-reveal-item">
                 <div
-                  className="asset"
-                  id="asset-04"
-                  data-editorial="true"
-                  data-asset="04"
-                  role="img"
-                  aria-label="실제 판매 자료 삽입 영역"
+                  className="asset has-image"
+                  id="asset-proof-03"
                 >
-                  <div className="asset-top">
-                    <span>IMAGE 04</span>
-                    <span>4:3</span>
-                  </div>
-                  <div className="asset-center">
-                    <span className="asset-cross" aria-hidden="true">
-                      ＋
-                    </span>
-                    <strong>실제 판매 자료</strong>
-                    <p>매장·기간을 확인할 수 있는 판매 자료</p>
-                  </div>
-                  <div className="asset-bottom">
-                    <span>1200 × 900 px</span>
-                    <span>자료 확인</span>
-                  </div>
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1794196986/%EB%94%B0%EB%9C%BB%ED%95%9C_%EB%8F%99%EB%84%A4_120PIE_%EC%B9%B4%ED%8E%98_%EC%99%B8%EA%B4%80-3_1_pfjci1.png"
+                    )}
+                    alt="120PIE 주거 상권 동네 카페형 외관"
+                    className="asset-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div className="proof-copy">
-                  <span className="num">CHECK 03</span>
-                  <b>실제 판매 자료</b>
+                  <span className="num">STORE 03</span>
+                  <b>주거 상권 동네 카페형</b>
                   <p>
-                    홀·포장·배달에서 <br />
-                    어떤 반응을 얻고 있는지.
+                    원목 벤치와 따뜻한 조명 연출로 <br />
+                    이웃 주민이 매일 편안히 찾는 사랑방 매장.
+                  </p>
+                </div>
+              </div>
+
+              <div className="proof scroll-reveal-item">
+                <div
+                  className="asset has-image"
+                  id="asset-proof-04"
+                >
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1794196985/OpenAI_Playground_2026-11-03_at_14.05.50_0_5_calh8y.png"
+                    )}
+                    alt="120PIE 교외·대로변 드라이브형 외관"
+                    className="asset-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div className="proof-copy">
+                  <span className="num">STORE 04</span>
+                  <b>교외·대로변 드라이브형</b>
+                  <p>
+                    전용 주차 공간과 와이드 파사드로 <br />
+                    차량 이동 고객 유입에 최적화된 로드사이드.
+                  </p>
+                </div>
+              </div>
+
+              <div className="proof scroll-reveal-item">
+                <div
+                  className="asset has-image"
+                  id="asset-proof-05"
+                >
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1794196984/OpenAI_Playground_2026-11-03_at_14.05.50_0_2_jy7wni.png"
+                    )}
+                    alt="120PIE 도심 번화가 스트리트형 외관"
+                    className="asset-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div className="proof-copy">
+                  <span className="num">STORE 05</span>
+                  <b>도심 번화가 스트리트형</b>
+                  <p>
+                    돌출 간판과 A형 입간판으로 시선 집중 <br />
+                    유동인구 빠른 테이크아웃 수요를 잡는 매장.
+                  </p>
+                </div>
+              </div>
+
+              <div className="proof scroll-reveal-item">
+                <div
+                  className="asset has-image"
+                  id="asset-proof-06"
+                >
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1794196984/OpenAI_Playground_2026-11-03_at_14.05.50_0_1_pdb8ct.png"
+                    )}
+                    alt="120PIE 대형 복합 쇼핑몰 인샵형 외관"
+                    className="asset-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div className="proof-copy">
+                  <span className="num">STORE 06</span>
+                  <b>복합 쇼핑몰 인샵(In-Mall)형</b>
+                  <p>
+                    세련된 오픈 파사드로 내부 고객 유입 <br />
+                    쇼핑과 여유로운 디저트 타임을 함께 제공.
                   </p>
                 </div>
               </div>
             </div>
             <div className="review-note">
-              최종 콘텐츠: 실제 도입 매장 사진·점주 인터뷰·운영 자료 삽입. ‘전국 200개 샵인샵’ 표현은 샵인샵만의 집계가 확인된 뒤 사용합니다.
+              골목 상권, 코너 상가, 주거지, 로드사이드, 번화가, 복합몰 등 다양한 상권에 최적화된 120PIE 매장 외관 연출 예시입니다.
             </div>
           </div>
         </section>
@@ -546,42 +765,35 @@ export default function AdLandingClient() {
         {/* 4. MENU */}
         <section className="s-menu section yellow-section" id="menu">
           <div className="wrap">
-            <span className="eyebrow">03 / 고객을 멈춰 세울 한 입</span>
-            <h2>
-              흔한 디저트로는 <br />
-              못 뺏는 시선. <br />이 파이로 <u>잡으세요.</u>
-            </h2>
-            <p className="lead">
-              바삭한 페이스트리와 풍성한 필링. <br />
-              “커피만 주세요”에 멈추지 않도록, <br />
-              함께 고르고 싶은 메뉴를 보여주세요.
-            </p>
-            <div className="menu-grid">
-              <article>
+            <div className="scroll-reveal">
+              <span className="eyebrow">03 / 고객을 멈춰 세울 한 입</span>
+              <h2>
+                흔한 디저트로는 <br />
+                못 뺏는 시선. <br />이 파이로 <u>잡으세요.</u>
+              </h2>
+              <p className="lead">
+                바삭한 페이스트리와 풍성한 필링. <br />
+                “커피만 주세요”에 멈추지 않도록, <br />
+                함께 고르고 싶은 메뉴를 보여주세요.
+              </p>
+            </div>
+            <div className="menu-grid scroll-reveal scroll-reveal-delay-1">
+              <article className="scroll-reveal-item">
                 <div className="menu-photo">
                   <div
-                    className="asset"
+                    className="asset has-image"
                     id="asset-05"
-                    data-editorial="true"
                     data-asset="05"
-                    role="img"
-                    aria-label="애플파이 삽입 영역"
                   >
-                    <div className="asset-top">
-                      <span>IMAGE 05</span>
-                      <span>4:5</span>
-                    </div>
-                    <div className="asset-center">
-                      <span className="asset-cross" aria-hidden="true">
-                        ＋
-                      </span>
-                      <strong>애플파이</strong>
-                      <p>페이스트리 결·사과 필링이 보이는 단면</p>
-                    </div>
-                    <div className="asset-bottom">
-                      <span>1200 × 1500 px</span>
-                      <span>필수</span>
-                    </div>
+                    <img
+                      src={optimizeCloudinaryUrl(
+                        "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1793681734/%EB%94%B0%EB%9C%BB%ED%95%9C_%EC%98%A4%ED%9B%84%EC%9D%98_%EC%95%A0%ED%94%8C%ED%8C%8C%EC%9D%B4%EC%99%80_%EB%9D%BC%EB%96%BC-2_z4kwbk.png"
+                      )}
+                      alt="120PIE 애플파이와 라떼"
+                      className="asset-img"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </div>
                 </div>
                 <div className="copy">
@@ -592,31 +804,22 @@ export default function AdLandingClient() {
                   </p>
                 </div>
               </article>
-              <article>
+              <article className="scroll-reveal-item">
                 <div className="menu-photo">
                   <div
-                    className="asset"
+                    className="asset has-image"
                     id="asset-06"
-                    data-editorial="true"
                     data-asset="06"
-                    role="img"
-                    aria-label="불고기파이 삽입 영역"
                   >
-                    <div className="asset-top">
-                      <span>IMAGE 06</span>
-                      <span>4:5</span>
-                    </div>
-                    <div className="asset-center">
-                      <span className="asset-cross" aria-hidden="true">
-                        ＋
-                      </span>
-                      <strong>불고기파이</strong>
-                      <p>불고기 필링과 제품 크기가 드러나는 컷</p>
-                    </div>
-                    <div className="asset-bottom">
-                      <span>1200 × 1500 px</span>
-                      <span>필수</span>
-                    </div>
+                    <img
+                      src={optimizeCloudinaryUrl(
+                        "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1793681735/%EC%B9%B4%ED%8E%98%EC%9D%98_%EB%B6%88%EA%B3%A0%EA%B8%B0_%ED%8C%8C%EC%9D%B4%EC%99%80_%EC%95%84%EC%9D%B4%EC%8A%A4_%EC%95%84%EB%A9%94%EB%A6%AC%EC%B9%B4%EB%85%B8_cm7g5z.png"
+                      )}
+                      alt="120PIE 불고기파이와 아이스 아메리카노"
+                      className="asset-img"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </div>
                 </div>
                 <div className="copy">
@@ -627,31 +830,22 @@ export default function AdLandingClient() {
                   </p>
                 </div>
               </article>
-              <article>
+              <article className="scroll-reveal-item">
                 <div className="menu-photo">
                   <div
-                    className="asset"
+                    className="asset has-image"
                     id="asset-07"
-                    data-editorial="true"
                     data-asset="07"
-                    role="img"
-                    aria-label="페페로니 피자파이 삽입 영역"
                   >
-                    <div className="asset-top">
-                      <span>IMAGE 07</span>
-                      <span>4:5</span>
-                    </div>
-                    <div className="asset-center">
-                      <span className="asset-cross" aria-hidden="true">
-                        ＋
-                      </span>
-                      <strong>페페로니 피자파이</strong>
-                      <p>치즈와 페페로니가 보이는 제품 단면</p>
-                    </div>
-                    <div className="asset-bottom">
-                      <span>1200 × 1500 px</span>
-                      <span>필수</span>
-                    </div>
+                    <img
+                      src={optimizeCloudinaryUrl(
+                        "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1793681736/%EC%B9%B4%ED%8E%98%EC%97%90%EC%84%9C_%EC%A6%90%EA%B8%B0%EB%8A%94_%ED%99%A9%EA%B8%88_%ED%8E%98%ED%8D%BC%EB%A1%9C%EB%8B%88_%ED%8C%8C%EC%9D%B4-3_xmppmi.png"
+                      )}
+                      alt="120PIE 카페에서 즐기는 황금 페퍼로니 파이"
+                      className="asset-img"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </div>
                 </div>
                 <div className="copy">
@@ -672,45 +866,41 @@ export default function AdLandingClient() {
         {/* 5. OPERATION */}
         <section className="s-operation section" id="operation">
           <div className="wrap">
-            <span className="eyebrow">04 / 운영의 장벽을 낮추다</span>
-            <h2>
-              사장님이 될 건 <br />
-              파티시에가 아니라, <br />
-              <span className="yellow">파이를 파는 사장님.</span>
-            </h2>
-            <p className="lead">
-              반죽부터 배우는 베이킹 대신, <br />
-              본사 공급 제품과 전용 장비를 활용하는 운영 방식. <br />
-              <b style={{ color: "white" }}>
-                만드는 건 간편하게. 내놓는 건 근사하게.
-              </b>
-            </p>
-            <div
-              className="asset"
-              id="asset-08"
-              data-editorial="true"
-              data-asset="08"
-              role="img"
-              aria-label="실제 조리 영상 삽입 영역"
-            >
-              <div className="asset-top">
-                <span>VIDEO 08</span>
-                <span>16:9</span>
-              </div>
-              <div className="asset-center">
-                <span className="asset-cross" aria-hidden="true">
-                  ＋
-                </span>
-                <strong>실제 조리 영상</strong>
-                <p>준비 → 굽기 → 포장, 끊김 없이 보여주는 실제 과정</p>
-              </div>
-              <div className="asset-bottom">
-                <span>1920 × 1080 px · MP4</span>
-                <span>필수</span>
-              </div>
+            <div className="scroll-reveal">
+              <span className="eyebrow">04 / 운영의 장벽을 낮추다</span>
+              <h2>
+                사장님이 될 건 <br />
+                파티시에가 아니라, <br />
+                <span className="yellow">파이를 파는 사장님.</span>
+              </h2>
+              <p className="lead">
+                반죽부터 배우는 베이킹 대신, <br />
+                본사 공급 제품과 전용 장비를 활용하는 운영 방식. <br />
+                <b style={{ color: "white" }}>
+                  만드는 건 간편하게. 내놓는 건 근사하게.
+                </b>
+              </p>
             </div>
-            <div className="step-grid">
-              <div className="step">
+            <div
+              className="asset has-media scroll-reveal scroll-reveal-delay-1"
+              id="asset-08"
+              data-asset="08"
+            >
+              <video
+                src={optimizeCloudinaryUrl(
+                  "https://res.cloudinary.com/mmo2pulq/video/upload/f_auto,q_auto/v1793681885/Video_Project_15-2.mp4"
+                )}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                className="asset-img"
+                aria-label="120겹 파이 실제 조리 및 운영 과정 영상"
+              />
+            </div>
+            <div className="step-grid scroll-reveal scroll-reveal-delay-2">
+              <div className="step scroll-reveal-item">
                 <span className="number">01</span>
                 <h3>준비하고</h3>
                 <p>
@@ -718,7 +908,7 @@ export default function AdLandingClient() {
                   매뉴얼에 맞춰 준비.
                 </p>
               </div>
-              <div className="step">
+              <div className="step scroll-reveal-item">
                 <span className="number">02</span>
                 <h3>굽고</h3>
                 <p>
@@ -726,7 +916,7 @@ export default function AdLandingClient() {
                   매장에서 파이를 완성.
                 </p>
               </div>
-              <div className="step">
+              <div className="step scroll-reveal-item">
                 <span className="number">03</span>
                 <h3>담아내고</h3>
                 <p>
@@ -735,104 +925,83 @@ export default function AdLandingClient() {
                 </p>
               </div>
             </div>
-            <p className="punch">
+            <p className="punch scroll-reveal">
               복잡한 기술보다, <br />
               <span className="yellow">반복할 수 있는 운영이 먼저입니다.</span>
             </p>
-            <div className="review-note">
-              이 구간에는 실제 준비 → 굽기 → 포장 영상을 배치합니다. ‘와플처럼 간편한 조리’는 영상으로 전달하고, 정확한 조리 시간·전처리·청소 조건은 확인 후 표기합니다.
-            </div>
           </div>
         </section>
 
         {/* 6. REVIEWS */}
         <section className="s-reviews section white" id="reviews">
           <div className="wrap">
-            <span className="eyebrow">05 / 고객의 선택을 증명</span>
-            <h2>
-              본사 말 백 마디보다, <br />
-              고객이 남긴 <u>한 줄.</u>
-            </h2>
-            <p className="lead">
-              맛은 설명할 수 있습니다. <br />
-              다시 찾는 이유는 고객의 목소리로 보여줘야 합니다.
-            </p>
-            <div className="reviews">
-              <article className="review">
-                <small>고객 반응 · 배치 예시</small>
+            <div className="scroll-reveal">
+              <span className="eyebrow">05 / 고객의 선택을 증명</span>
+              <h2>
+                본사 말 백 마디보다, <br />
+                고객이 남긴 <u>한 줄.</u>
+              </h2>
+              <p className="lead">
+                맛은 설명할 수 있습니다. <br />
+                다시 찾는 이유는 고객의 목소리로 보여줘야 합니다.
+              </p>
+            </div>
+            <div className="reviews scroll-reveal scroll-reveal-delay-1">
+              <article className="review scroll-reveal-item">
+                <small>실제 고객 후기 · 맛과 조합</small>
                 <h3>
-                  “왜 이 파이를 골랐는가”를 <br />
-                  보여주는 실제 후기.
+                  “치즈와 애플잼 조합이 <br />
+                  이렇게 좋을 줄 몰랐어요.”
                 </h3>
                 <p>
-                  맛·식감·커피와의 조합이 드러나는 리뷰를 <br />
-                  원문 그대로 배치할 예정입니다.
+                  바삭한 120겹 페스츄리 속 달콤한 잼과 고소한 치즈. <br />
+                  커피와 함께 곁들이기 좋은 디저트로 손꼽히는 이유입니다.
                 </p>
                 <div
-                  className="asset"
+                  className="asset has-image"
                   id="asset-09"
-                  data-editorial="true"
                   data-asset="09"
-                  role="img"
-                  aria-label="실제 구매 고객 리뷰 삽입 영역"
                 >
-                  <div className="asset-top">
-                    <span>IMAGE 09</span>
-                    <span>4:3</span>
-                  </div>
-                  <div className="asset-center">
-                    <span className="asset-cross" aria-hidden="true">
-                      ＋
-                    </span>
-                    <strong>실제 구매 고객 리뷰</strong>
-                    <p>맛·식감·커피와의 조합이 드러나는 원문</p>
-                  </div>
-                  <div className="asset-bottom">
-                    <span>1200 × 900 px</span>
-                    <span>필수</span>
-                  </div>
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1794204089/%EC%95%A0%ED%94%8C%EC%9E%BC%EA%B3%BC_%EB%AA%A8%EC%A7%9C%EB%A0%90%EB%9D%BC_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%ED%9B%84%EA%B8%B0_1_ks7zkd.png"
+                    )}
+                    alt="120겹파이 실제 고객 후기 - 애플잼과 모짜렐라 치즈 조합"
+                    className="asset-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
-                <div className="empty">실제 리뷰 캡처 삽입 예정</div>
               </article>
-              <article className="review">
-                <small>구매 경험 · 배치 예시</small>
+              <article className="review scroll-reveal-item">
+                <small>실제 고객 후기 · 포장 경험</small>
                 <h3>
-                  “포장 후에도 만족했는가”를 <br />
-                  보여주는 실제 후기.
+                  “포장도 깔끔하게 해주셔서 <br />
+                  선물하기에도 딱 좋아요.”
                 </h3>
                 <p>
-                  포장 상태·배달 경험·재주문 이유를 <br />
-                  확인할 수 있는 리뷰를 배치할 예정입니다.
+                  매장 취식뿐 아니라 테이크아웃과 선물용 수요까지. <br />
+                  단정하고 위생적인 전용 패키지로 완성도를 높였습니다.
                 </p>
                 <div
-                  className="asset"
+                  className="asset has-image"
                   id="asset-10"
-                  data-editorial="true"
                   data-asset="10"
-                  role="img"
-                  aria-label="실제 포장·배달 리뷰 삽입 영역"
                 >
-                  <div className="asset-top">
-                    <span>IMAGE 10</span>
-                    <span>4:3</span>
-                  </div>
-                  <div className="asset-center">
-                    <span className="asset-cross" aria-hidden="true">
-                      ＋
-                    </span>
-                    <strong>실제 포장·배달 리뷰</strong>
-                    <p>포장 상태와 재주문 이유가 드러나는 원문</p>
-                  </div>
-                  <div className="asset-bottom">
-                    <span>1200 × 900 px</span>
-                    <span>필수</span>
-                  </div>
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1794204088/%EA%B9%94%EB%81%94%ED%95%9C_%ED%8F%AC%EC%9E%A5_120%EA%B2%B9%ED%8C%8C%EC%9D%B4_%EA%B3%A0%EA%B0%9D_%ED%9B%84%EA%B8%B0_1_kg9qgd.png"
+                    )}
+                    alt="120겹파이 실제 고객 후기 - 깔끔한 포장과 테이크아웃 패키지"
+                    className="asset-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
-                <div className="empty">실제 배달 리뷰 삽입 예정</div>
               </article>
             </div>
             <p className="small">
-              위 문장은 고객 인용이 아닌 콘텐츠 배치 설명입니다. 리뷰 원문·출처·사용 권한 확인 후 교체합니다.
+              실제 매장을 방문하고 포장 구매한 고객님들의 솔직한 이용 후기입니다.
             </p>
           </div>
         </section>
@@ -840,77 +1009,61 @@ export default function AdLandingClient() {
         {/* 7. DELIVERY */}
         <section className="s-delivery section" id="delivery">
           <div className="wrap">
-            <span className="eyebrow">06 / 매장 밖의 주문까지</span>
-            <h2>
-              홀 손님만 기다릴 건가요? <br />
-              <span className="yellow">
-                배달앱에도 <br />
-                우리 파이를 띄우세요.
-              </span>
-            </h2>
-            <div className="split">
+            <div className="scroll-reveal">
+              <span className="eyebrow">06 / 매장 밖의 주문까지</span>
+              <h2>
+                홀 손님만 기다릴 건가요? <br />
+                <span className="yellow">
+                  배달앱에도 <br />
+                  우리 파이를 띄우세요.
+                </span>
+              </h2>
+            </div>
+            <div className="split scroll-reveal scroll-reveal-delay-1">
               <div className="photo">
                 <div
-                  className="asset"
+                  className="asset has-image"
                   id="asset-11"
-                  data-editorial="true"
                   data-asset="11"
-                  role="img"
-                  aria-label="포장·커피 세트 삽입 영역"
+                  aria-label="포장·커피 세트 이미지 슬라이더"
                 >
-                  <div className="asset-top">
-                    <span>IMAGE 11</span>
-                    <span>4:5</span>
-                  </div>
-                  <div className="asset-center">
-                    <span className="asset-cross" aria-hidden="true">
-                      ＋
-                    </span>
-                    <strong>포장·커피 세트</strong>
-                    <p>실제 판매 가능한 구성과 패키지를 함께 촬영</p>
-                  </div>
-                  <div className="asset-bottom">
-                    <span>1200 × 1500 px</span>
-                    <span>필수</span>
-                  </div>
+                  <DeliveryImageSlider />
                 </div>
                 <div
-                  className="asset phone-asset"
+                  className="asset phone-asset has-image"
                   id="asset-12"
-                  data-editorial="true"
                   data-asset="12"
                   role="img"
-                  aria-label="실제 배달앱 메뉴 화면 삽입 영역"
+                  aria-label="실제 배달앱 메뉴 화면"
                 >
-                  <div className="asset-top">
-                    <span>IMAGE 12</span>
-                    <span>9:16</span>
-                  </div>
-                  <div className="asset-center">
-                    <span className="asset-cross" aria-hidden="true">
-                      ＋
-                    </span>
-                    <strong>실제 배달앱 메뉴 화면</strong>
-                    <p>운영 중인 매장의 메뉴 화면, 개인정보는 제외</p>
-                  </div>
-                  <div className="asset-bottom">
-                    <span>1080 × 1920 px</span>
-                    <span>권장</span>
-                  </div>
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1794204305/120_PIE_%ED%8C%8C%EC%9D%B4%EC%99%80_%EC%BB%A4%ED%94%BC_%EB%A9%94%EB%89%B4-5_tpwtgy.png"
+                    )}
+                    alt="실제 배달앱 메뉴 화면 - 120 PIE 파이와 커피 메뉴"
+                    className="asset-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
               </div>
               <div>
                 <p className="lead">
-                  한 가지 제품을, <br />더 많은 주문 장면으로.
+                  한 가지 제품으로, <br />더 다양한 매출 기회를.
                 </p>
                 <ul className="checks">
                   <li>커피와 함께 제안하는 세트 구성</li>
                   <li>집과 사무실로 가져가는 포장 메뉴</li>
                   <li>배달 메뉴판에 추가할 디저트 선택지</li>
                 </ul>
-                <a className="cta" href="#consult">
+                <button
+                  type="button"
+                  className="cta"
+                  onClick={openConsultModal}
+                  style={{ cursor: "pointer", border: 0 }}
+                >
                   우리 매장 판매 구성 상담<span>↗</span>
-                </a>
+                </button>
               </div>
             </div>
             <div className="review-note">
@@ -922,41 +1075,36 @@ export default function AdLandingClient() {
         {/* 8. TERRITORY */}
         <section className="s-territory section yellow-section" id="territory">
           <div className="wrap">
-            <span className="eyebrow">07 / 지금 문의할 이유</span>
-            <h2>
-              같은 동네, 같은 파이. <br />
-              경쟁점 메뉴판에서 <br />
-              <u>먼저 보시겠습니까?</u>
-            </h2>
-            <p className="lead">
-              메뉴를 고민했다면, <br />
-              이제 우리 지역의 도입 조건을 확인할 차례입니다.
-            </p>
-            <div className="territory">
+            <div className="scroll-reveal">
+              <span className="eyebrow">07 / 지금 문의할 이유</span>
+              <h2>
+                같은 동네, 같은 파이. <br />
+                경쟁점 메뉴판에서 <br />
+                <u>먼저 보시겠습니까?</u>
+              </h2>
+              <p className="lead">
+                메뉴를 고민했다면, <br />
+                이제 우리 지역의 도입 조건을 확인할 차례입니다.
+              </p>
+            </div>
+            <div className="territory scroll-reveal scroll-reveal-delay-1">
               <div className="map">
                 <div
-                  className="asset"
+                  className="asset has-image"
                   id="asset-13"
-                  data-editorial="true"
                   data-asset="13"
                   role="img"
-                  aria-label="상권 보호 안내 그래픽 삽입 영역"
+                  aria-label="120 PIE 매장 상권 보호 구역 그래픽"
                 >
-                  <div className="asset-top">
-                    <span>IMAGE 13</span>
-                    <span>4:3</span>
-                  </div>
-                  <div className="asset-center">
-                    <span className="asset-cross" aria-hidden="true">
-                      ＋
-                    </span>
-                    <strong>상권 보호 안내 그래픽</strong>
-                    <p>확정된 약정 기준으로 제작할 설명용 지도</p>
-                  </div>
-                  <div className="asset-bottom">
-                    <span>1600 × 1200 px</span>
-                    <span>조건 확정 후</span>
-                  </div>
+                  <img
+                    src={optimizeCloudinaryUrl(
+                      "https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1794204306/120_PIE_%EC%B9%B4%ED%8E%98%EC%9D%98_%EB%85%B8%EB%9E%80_%EB%B3%B4%ED%98%B8_%EA%B5%AC%EC%97%AD_vogn53.png"
+                    )}
+                    alt="120 PIE 매장 상권 보호 구역 그래픽"
+                    className="asset-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div className="ring">
                   <span>클라이언트 제안 조건</span>
@@ -983,10 +1131,14 @@ export default function AdLandingClient() {
                 </p>
               </div>
             </div>
-            <div style={{ marginTop: "35px" }}>
-              <a className="cta" href="#consult">
+            <div className="scroll-reveal scroll-reveal-delay-2 territory-cta-wrap">
+              <button
+                type="button"
+                className="cta"
+                onClick={openConsultModal}
+              >
                 우리 동네 도입 가능 여부 확인<span>↗</span>
-              </a>
+              </button>
             </div>
           </div>
         </section>
@@ -994,54 +1146,581 @@ export default function AdLandingClient() {
         {/* 9. PACKAGE */}
         <section className="s-package section white" id="package">
           <div className="wrap center">
-            <span className="eyebrow">08 / 도입 전 확인할 것</span>
-            <h2>
-              마음만 급하게 말고, <br />
-              <u>조건까지 확실하게.</u>
-            </h2>
-            <p className="lead">
-              맛과 운영 방식이 마음에 들었다면, <br />내 매장에서 필요한 준비를 확인하세요.
-            </p>
-            <div className="table">
-              <div className="row">
-                <span>파이 패키지</span>
-                <strong>
-                  440만원 <small>VAT 포함</small>
-                </strong>
-              </div>
-              <div className="row">
-                <span>포함 구성</span>
-                <span>전용 머신 · 초도 원재료 · 매장 홍보물 · 설치 및 조리 교육</span>
-              </div>
-              <div className="row">
-                <span>매장 준비</span>
-                <span>작업 공간 · 전원 · 냉동 보관 환경 확인</span>
-              </div>
-              <div className="row">
-                <span>상담 확인</span>
-                <span>공급 단가 · 최소 발주 · 배송 조건 · 별도 비용 · 상권 보호 적용 여부</span>
-              </div>
+            <div className="scroll-reveal">
+              <span className="eyebrow">08 / 창업 및 도입 비용 안내</span>
+              <h2>
+                마음만 급하게 말고, <br />
+                <u>조건과 비용까지 확실하게.</u>
+              </h2>
+              <p className="lead">
+                내 매장 상황과 예산에 맞춰 가장 효과적인 모델을 선택하세요. <br />
+                본사 공식 공시 기준 거품 없는 투명한 5가지 창업 플랜을 투명하게 안내합니다.
+              </p>
             </div>
-            <p className="small">
-              공식 홈페이지 게시 가격·구성을 반영한 검토용 안내입니다. 적용 기간과 세부 포함 항목은 최종 확인이 필요합니다.
-            </p>
-            <div className="faq">
+
+            {/* 5종 모델 탭 네비게이션 */}
+            <div className="package-tabs scroll-reveal scroll-reveal-delay-1" role="tablist" aria-label="창업 모델 선택">
+              {[
+                { id: "shop120" as const, label: "샵인샵 (120pie)", badge: "디저트 단일", price: "440만원", desc: "120겹파이 올인원" },
+                { id: "shopegg120" as const, label: "샵인샵 (egg120)", badge: "계란빵 단일", price: "330만원", desc: "에그120 프리미엄" },
+                { id: "shopegg" as const, label: "샵인샵 (pie & egg)", badge: "파이+에그 듀얼", price: "690만원", desc: "결합 할인 80만원" },
+                { id: "hybrid" as const, label: "하이브리드 창업", badge: "업종 전환", price: "980만원", desc: "기존 매장 리뉴얼" },
+                { id: "franchise" as const, label: "신규 가맹 창업", badge: "15평 표준", price: "6,518만원", desc: "단독 가맹 표준 개설" },
+              ].map((tab) => {
+                const isActive = costTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    className={`package-tab-btn${isActive ? " is-active" : ""}`}
+                    onClick={() => setCostTab(tab.id)}
+                  >
+                    <span className="package-tab-badge">{tab.badge}</span>
+                    <span className="package-tab-label">{tab.label}</span>
+                    <span className="package-tab-price">{tab.price}</span>
+                    <span className="package-tab-desc">{tab.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 활성 탭별 상세 카드 */}
+            <div className="package-card scroll-reveal scroll-reveal-delay-1">
+              
+              {/* 1. 샵인샵 (120pie) */}
+              {costTab === "shop120" && (
+                <>
+                  <div className="package-card-header">
+                    <div className="package-header-left">
+                      <span className="package-header-badge">Shop-in-Shop Package</span>
+                      <h3 className="package-header-title">120겹파이 올인원 패키지 도입 비용</h3>
+                      <p className="package-header-desc">
+                        자체 금형 전용 베이킹 머신과 초도 원재료, 홍보물 및 1:1 현장 조리 교육까지 원스톱 지원
+                      </p>
+                    </div>
+                    <div className="package-header-right">
+                      <div className="package-price-origin">정가 5,500,000원</div>
+                      <div className="package-price-main">
+                        <span className="package-price-tag">도입 할인가</span>
+                        <strong className="package-price-num">440</strong>
+                        <span className="package-price-unit">만원</span>
+                      </div>
+                      <div className="package-price-sub">VAT 포함 · 110만원 할인 적용</div>
+                    </div>
+                  </div>
+
+                  <div className="package-row">
+                    <span className="package-col-cat">전용 베이킹 인프라</span>
+                    <span className="package-col-detail">자체 금형 오리지널 파이 머신 1ea</span>
+                    <span className="package-col-note">120겹 파이 결을 살리는 전용 베이킹 머신</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">초도 원재료 패키지</span>
+                    <span className="package-col-detail">시그니처 패스트리 생지 1box + 프리미엄 필링 9종 각 1kg</span>
+                    <span className="package-col-note">파이 약 200개 조리 분량 생지 및 필링 초도 지원</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">매장 홍보물 세트</span>
+                    <span className="package-col-detail">공식 실사 X배너 2종 + 카운터/테이블 POP 5종 + 홍보 포스터 8종</span>
+                    <span className="package-col-note">매장 내외부 시선 집중 오프라인 홍보물 일체</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">판매 촉진 비주얼 세트</span>
+                    <span className="package-col-detail">실물 파이 모형 4종 + 배달 플랫폼(배민/쿠팡/요기요) 전용 실사 이미지</span>
+                    <span className="package-col-note">쇼케이스 진열 모형 및 배달앱 등록용 고화질 컷</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">운영 정착 밀착 지원</span>
+                    <span className="package-col-detail">전용 포장 부자재 세트 + 본사 전문 인력 방문 머신 설치 및 1:1 조리 교육</span>
+                    <span className="package-col-note">초보자도 15분 완성 가능한 1:1 현장 실습</span>
+                  </div>
+                  <div className="package-row is-highlight">
+                    <span className="package-col-cat">매장 준비 조건</span>
+                    <span className="package-col-detail">카운터 내 조리 공간 (가로 60cm 이상) · 220V 일반 전원 · 냉동고 (-18℃ 이하)</span>
+                    <span className="package-col-note">기존 카페 주방에 즉시 배치 가능</span>
+                  </div>
+                  <div className="package-row is-highlight">
+                    <span className="package-col-cat">상권 보호 정책</span>
+                    <span className="package-col-detail">반경 1km 독점 보호망 및 1동 1점 원칙 철저 적용</span>
+                    <span className="package-col-note">상담 신청 시 실시간 상권 조회</span>
+                  </div>
+
+                  <div className="package-card-action">
+                    <div className="package-action-info">
+                      <strong>120겹파이 단일 라인업으로 객단가와 마진을 극대화하세요.</strong> <br />
+                      전화 문의: 1566-3594 · 선착순 상권 배정 진행 중
+                    </div>
+                    <button
+                      type="button"
+                      className="package-action-btn"
+                      onClick={() => {
+                        setStoreType("운영 중인 매장에 샵인샵 도입");
+                        setModalStoreType("기존 카페 운영 중");
+                        const el = document.getElementById("consult");
+                        if (el) {
+                          el.scrollIntoView({ behavior: "smooth" });
+                          setTimeout(() => ownerRef.current?.focus(), 450);
+                        }
+                      }}
+                    >
+                      120겹파이 샵인샵 상담 신청하기 ↗
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* 2. 샵인샵 (egg120) */}
+              {costTab === "shopegg120" && (
+                <>
+                  <div className="package-card-header">
+                    <div className="package-header-left">
+                      <span className="package-header-badge">Shop-in-Shop Package</span>
+                      <h3 className="package-header-title">에그120 프리미엄 패키지 도입 비용</h3>
+                      <p className="package-header-desc">
+                        10구 전용 조리 머신과 반죽 30kg, 토핑 4종, 동물복지 유정란 120알 초도 지원
+                      </p>
+                    </div>
+                    <div className="package-header-right">
+                      <div className="package-price-origin">정가 4,400,000원</div>
+                      <div className="package-price-main">
+                        <span className="package-price-tag">도입 할인가</span>
+                        <strong className="package-price-num">330</strong>
+                        <span className="package-price-unit">만원</span>
+                      </div>
+                      <div className="package-price-sub">VAT 포함 · 110만원 할인 적용</div>
+                    </div>
+                  </div>
+
+                  <div className="package-row">
+                    <span className="package-col-cat">전용 조리 인프라</span>
+                    <span className="package-col-detail">에그120 계란빵 전용 머신 1대</span>
+                    <span className="package-col-note">10구 동시 조리가 가능한 에그120 전용 기기</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">초도 원재료 패키지</span>
+                    <span className="package-col-detail">시그니처 전용 반죽 30kg + 토핑 식재료 4종 + 동물복지 유정란 120ea</span>
+                    <span className="package-col-note">계란빵 약 720개 조리 분량 반죽 및 핵심 재료 초도 지원</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">매장 홍보물 세트</span>
+                    <span className="package-col-detail">공식 X배너 1ea + 테이블/카운터 POP 1ea + 홍보 포스터 3종</span>
+                    <span className="package-col-note">매장 내외부 egg120 시그니처 홍보물 구성</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">판매 촉진 비주얼 세트</span>
+                    <span className="package-col-detail">계란빵 모형 4종 + 전용 미니 쇼케이스 + 동물복지 인증 매장 판넬</span>
+                    <span className="package-col-note">카운터 진열 및 주문 유도를 위한 시각 자료 완비</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">운영 정착 밀착 지원</span>
+                    <span className="package-col-detail">배달 플랫폼 셋업 대행 + 포장/부자재 패키지 + 기기 설치 및 1:1 교육</span>
+                    <span className="package-col-note">배달 3사 등록 대행 및 현장 조리 교육 포함</span>
+                  </div>
+                  <div className="package-row is-highlight">
+                    <span className="package-col-cat">매장 준비 조건</span>
+                    <span className="package-col-detail">카운터 즉석 조리 공간 · 220V 단독 전원 콘센트 · 냉장/냉동 보관 환경</span>
+                    <span className="package-col-note">소형 매장 및 테이크아웃 창구 완벽 호환</span>
+                  </div>
+                  <div className="package-row is-highlight">
+                    <span className="package-col-cat">상권 보호 정책</span>
+                    <span className="package-col-detail">반경 1km 독점 보호망 및 1동 1점 원칙 철저 적용</span>
+                    <span className="package-col-note">상담 신청 시 실시간 상권 조회</span>
+                  </div>
+
+                  <div className="package-card-action">
+                    <div className="package-action-info">
+                      <strong>사계절 남녀노소 사랑받는 프리미엄 계란빵 라인업을 확보하세요.</strong> <br />
+                      전화 문의: 1566-3594 · 선착순 상권 배정 진행 중
+                    </div>
+                    <button
+                      type="button"
+                      className="package-action-btn"
+                      onClick={() => {
+                        setStoreType("운영 중인 매장에 샵인샵 도입");
+                        setModalStoreType("기존 카페 운영 중");
+                        const el = document.getElementById("consult");
+                        if (el) {
+                          el.scrollIntoView({ behavior: "smooth" });
+                          setTimeout(() => ownerRef.current?.focus(), 450);
+                        }
+                      }}
+                    >
+                      에그120 샵인샵 상담 신청하기 ↗
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* 3. 샵인샵 (pie & egg 듀얼 결합) */}
+              {costTab === "shopegg" && (
+                <>
+                  <div className="package-card-header">
+                    <div className="package-header-left">
+                      <span className="package-header-badge">Dual Brand Package</span>
+                      <h3 className="package-header-title">120겹파이 & 에그120 듀얼 결합 패키지 도입</h3>
+                      <p className="package-header-desc">
+                        파이 패키지(440만원) + 계란빵 패키지(330만원) 결합 시 80만원 특별 추가 할인 혜택
+                      </p>
+                    </div>
+                    <div className="package-header-right">
+                      <div className="package-price-origin">정상 합산 7,700,000원</div>
+                      <div className="package-price-main">
+                        <span className="package-price-tag">총 결합 도입가</span>
+                        <strong className="package-price-num">690</strong>
+                        <span className="package-price-unit">만원</span>
+                      </div>
+                      <div className="package-price-sub">VAT 포함 · 결합 특가 (80만원 할인)</div>
+                    </div>
+                  </div>
+
+                  <div className="package-dual-wrap">
+                    <div className="package-dual-box">
+                      <div className="package-dual-box-header">
+                        <h4 className="package-dual-box-title">120겹파이 올인원 패키지</h4>
+                        <span className="package-dual-box-price">단독 440만원 구성</span>
+                      </div>
+                      <ul className="package-dual-list">
+                        <li><strong>자체 금형 오리지널 파이 머신</strong> 1ea</li>
+                        <li><strong>시그니처 패스트리 생지</strong> 1box (약 200개 분량)</li>
+                        <li><strong>프리미엄 필링 9종</strong> 각 1kg (총 9kg)</li>
+                        <li><strong>공식 실사 X배너 2종 + POP 5종 + 포스터 8종</strong></li>
+                        <li><strong>실물 파이 모형 4종 + 배달앱 전용 실사 컷</strong></li>
+                        <li><strong>전용 포장 부자재 세트 + 1:1 현장 조리 교육</strong></li>
+                      </ul>
+                    </div>
+
+                    <div className="package-dual-box">
+                      <div className="package-dual-box-header">
+                        <h4 className="package-dual-box-title">에그120 프리미엄 패키지</h4>
+                        <span className="package-dual-box-price">단독 330만원 구성</span>
+                      </div>
+                      <ul className="package-dual-list">
+                        <li><strong>에그120 계란빵 10구 전용 머신</strong> 1대</li>
+                        <li><strong>시그니처 전용 반죽 30kg</strong> (약 720개 분량)</li>
+                        <li><strong>토핑 식재료 4종 + 동물복지 유정란</strong> 120ea</li>
+                        <li><strong>공식 X배너 1ea + POP 1ea + 포스터 3종</strong></li>
+                        <li><strong>계란빵 모형 4종 + 미니 쇼케이스 + 인증 판넬</strong></li>
+                        <li><strong>배달 3사 셋업 대행 + 포장재 + 1:1 현장 교육</strong></li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="package-row">
+                    <span className="package-col-cat">올데이 매출 시너지</span>
+                    <span className="package-col-detail">오전 식사/브런치 대용(에그120) + 오후 티타임/디저트(120겹파이) 완벽 연계</span>
+                    <span className="package-col-note">오전부터 야간까지 빈틈없는 객단가 상승</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">배달 플랫폼 통합 지원</span>
+                    <span className="package-col-detail">배민·쿠팡이츠·요기요 양대 브랜드 듀얼 카테고리 입점 및 메뉴 세팅 무상 대행</span>
+                    <span className="package-col-note">배달 매출 2배 확장 구조 세팅</span>
+                  </div>
+                  <div className="package-row is-highlight">
+                    <span className="package-col-cat">상권 보호 정책</span>
+                    <span className="package-col-detail">반경 1km 내 120겹파이 및 에그120 2개 브랜드 동시 독점권 확보</span>
+                    <span className="package-col-note">우리 동네 유일 듀얼 매장 선점</span>
+                  </div>
+
+                  <div className="package-card-action">
+                    <div className="package-action-info">
+                      <strong>가장 많은 점주님들이 선택하시는 최고 인기 결합 패키지입니다.</strong> <br />
+                      전화 문의: 1566-3594 · 선착순 상권 배정 진행 중
+                    </div>
+                    <button
+                      type="button"
+                      className="package-action-btn"
+                      onClick={() => {
+                        setStoreType("운영 중인 매장에 샵인샵 도입");
+                        setModalStoreType("기존 카페 운영 중");
+                        const el = document.getElementById("consult");
+                        if (el) {
+                          el.scrollIntoView({ behavior: "smooth" });
+                          setTimeout(() => ownerRef.current?.focus(), 450);
+                        }
+                      }}
+                    >
+                      듀얼 결합 패키지 상담 신청하기 ↗
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* 4. 하이브리드 창업 (업종 전환) */}
+              {costTab === "hybrid" && (
+                <>
+                  <div className="package-card-header">
+                    <div className="package-header-left">
+                      <span className="package-header-badge">Hybrid Startup Model</span>
+                      <h3 className="package-header-title">소자본 하이브리드 도입 비용 합계</h3>
+                      <p className="package-header-desc">
+                        기존 매장 인테리어와 집기를 100% 살려 간판·메뉴 교체만으로 완성하는 실속형 업종 전환 모델
+                      </p>
+                    </div>
+                    <div className="package-header-right">
+                      <div className="package-price-main">
+                        <span className="package-price-tag">소자본 전환 비용</span>
+                        <strong className="package-price-num">980</strong>
+                        <span className="package-price-unit">만원</span>
+                      </div>
+                      <div className="package-price-sub">VAT 포함 · 월 로열티 면제</div>
+                    </div>
+                  </div>
+
+                  <div className="package-hybrid-concept">
+                    <div className="package-concept-pills">
+                      <div className="package-concept-pill">
+                        <strong>✓ 인테리어/주방 신설비 0원</strong>
+                        <p>기존 인테리어, 냉장고, 싱크대, 커피 머신 등 기존 기물을 그대로 활용하여 공사비 거품을 제거합니다.</p>
+                      </div>
+                      <div className="package-concept-pill">
+                        <strong>✓ 간판·사인물 교체 중심</strong>
+                        <p>전면 돌출 실사 어닝 및 브랜드 외부 사인을 전면 교체하여 신규 매장의 강력한 시각적 효과를 냅니다.</p>
+                      </div>
+                      <div className="package-concept-pill">
+                        <strong>✓ 월 고정 유지비 면제</strong>
+                        <p>매월 고정적으로 나가는 가맹 로열티 및 관리 수수료를 영구 면제하여 점주님의 순수익을 극대화합니다.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="package-row">
+                    <span className="package-col-cat">가맹비 (100만원)</span>
+                    <span className="package-col-detail">120겹파이 브랜드에 대한 상권 내 독점 사용권, 본사 교육 및 개점 지원 등</span>
+                    <span className="package-col-note">소멸성</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">전용 장비 (150만원)</span>
+                    <span className="package-col-detail">파이 머신, 계란빵 머신 외 주요 조리 전용 인프라 장비 일체</span>
+                    <span className="package-col-note">기본 품목 외 별도</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">간판 및 사인 (300만원)</span>
+                    <span className="package-col-detail">전면 돌출 실사 어닝 및 공식 브랜드 외부 사인 일체</span>
+                    <span className="package-col-note">현장 상황별 상이</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">초도 물품 (300만원)</span>
+                    <span className="package-col-detail">식재료, 원부자재, 유니폼, 메뉴판, 배너, 현수막, 시트지 및 각종 홍보물</span>
+                    <span className="package-col-note">오픈 물품 일체</span>
+                  </div>
+                  <div className="package-row">
+                    <span className="package-col-cat">런칭 홍보비 (130만원)</span>
+                    <span className="package-col-detail">사전 이벤트, 네이버 플레이스 등록, 배달플랫폼(배민/쿠팡/요기요) 세팅 대행, SNS 및 타깃 마케팅</span>
+                    <span className="package-col-note">초기 고객 유치 지원</span>
+                  </div>
+                  <div className="package-row is-highlight">
+                    <span className="package-col-cat">총 합계 금액</span>
+                    <span className="package-col-detail" style={{ fontWeight: 900, color: "#fa4a29" }}>980만원 (VAT 포함)</span>
+                    <span className="package-col-note">월 고정 로열티 0원</span>
+                  </div>
+
+                  <div className="package-card-action">
+                    <div className="package-action-info">
+                      <strong>매출 정체 매장의 구원투수! 저비용 고효율 하이브리드 리뉴얼을 상담하세요.</strong> <br />
+                      전화 문의: 1566-3594 · 실시간 매장 진단 지원
+                    </div>
+                    <button
+                      type="button"
+                      className="package-action-btn"
+                      onClick={() => {
+                        setStoreType("브랜드·업종 전환 검토");
+                        setModalStoreType("업종 변경/리뉴얼");
+                        const el = document.getElementById("consult");
+                        if (el) {
+                          el.scrollIntoView({ behavior: "smooth" });
+                          setTimeout(() => ownerRef.current?.focus(), 450);
+                        }
+                      }}
+                    >
+                      하이브리드 업종 전환 상담 신청하기 ↗
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* 5. 신규 가맹 창업 (15평 기준) */}
+              {costTab === "franchise" && (
+                <>
+                  <div className="package-card-header">
+                    <div className="package-header-left">
+                      <span className="package-header-badge">Standard Franchise Estimate</span>
+                      <h3 className="package-header-title">표준 창업 개설 비용 합계 (15평 기준)</h3>
+                      <p className="package-header-desc">
+                        15평 표준 매장 기준 기본 가맹 비용(1,040만)과 시설/인테리어 일체(5,478만)의 투명한 공시 내역
+                      </p>
+                    </div>
+                    <div className="package-header-right">
+                      <div className="package-price-main">
+                        <span className="package-price-tag">표준 창업 합계</span>
+                        <strong className="package-price-num">6,518</strong>
+                        <span className="package-price-unit">만원</span>
+                      </div>
+                      <div className="package-price-sub">VAT 포함 · 15평 표준 기준</div>
+                    </div>
+                  </div>
+
+                  <div className="package-franchise-wrap">
+                    {/* 기본 비용 서브테이블 */}
+                    <div className="package-subtable-box">
+                      <div className="package-subtable-header">
+                        <h4>기본 비용 명세</h4>
+                        <span>1,040만원 (VAT 포함)</span>
+                      </div>
+                      <table className="package-subtable-table">
+                        <thead>
+                          <tr>
+                            <th style={{ width: "26%" }}>구분</th>
+                            <th style={{ width: "48%" }}>세부 내용</th>
+                            <th style={{ width: "26%", textAlign: "right" }}>금액</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><strong>가맹비</strong></td>
+                            <td>상권 내 독점 사용권, 상표 사용권, 교육 및 개점 준비 지원 (소멸성)</td>
+                            <td style={{ textAlign: "right", fontWeight: 800, color: "#fa4a29" }}>500만원</td>
+                          </tr>
+                          <tr>
+                            <td><strong>초도 물품비</strong></td>
+                            <td>원부자재 초도 패키지, 유니폼, 메뉴판, 배너, 홍보물 일체</td>
+                            <td style={{ textAlign: "right", fontWeight: 800, color: "#fa4a29" }}>440만원</td>
+                          </tr>
+                          <tr>
+                            <td><strong>계약이행 보증금</strong></td>
+                            <td>가맹 계약 준수 및 이행을 위한 보증 자금 (만기 시 전액 환급)</td>
+                            <td style={{ textAlign: "right", fontWeight: 800, color: "#fa4a29" }}>100만원</td>
+                          </tr>
+                          <tr>
+                            <td><strong>로열티</strong></td>
+                            <td>매월 고정 발생하는 가맹본부 상표권 및 시스템 이용료</td>
+                            <td style={{ textAlign: "right", fontWeight: 800, color: "#fa4a29" }}>월 11만원</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* 기타 시설 비용 서브테이블 */}
+                    <div className="package-subtable-box">
+                      <div className="package-subtable-header">
+                        <h4>시설 및 인테리어 비용</h4>
+                        <span>5,478만원 (VAT 포함)</span>
+                      </div>
+                      <table className="package-subtable-table">
+                        <thead>
+                          <tr>
+                            <th style={{ width: "30%" }}>구분</th>
+                            <th style={{ width: "44%" }}>세부 내용</th>
+                            <th style={{ width: "26%", textAlign: "right" }}>금액</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><strong>인테리어 / 시설</strong></td>
+                            <td>목공, 전기, 도장, 조명, 타일, 미장, 설계 및 감리 (15평 기준, 평당 190만원)</td>
+                            <td style={{ textAlign: "right", fontWeight: 800, color: "#fa4a29" }}>2,850만원</td>
+                          </tr>
+                          <tr>
+                            <td><strong>주방 / 집기류</strong></td>
+                            <td>오븐기, 베이킹 머신, 싱크대, 디스펜서, 제빙기, 냉장고 등 기본 세팅</td>
+                            <td style={{ textAlign: "right", fontWeight: 800, color: "#fa4a29" }}>2,200만원</td>
+                          </tr>
+                          <tr>
+                            <td><strong>간판 및 사인물</strong></td>
+                            <td>전면 LED 채널 간판, 돌출 간판, 내부 그래픽 사인 일체</td>
+                            <td style={{ textAlign: "right", fontWeight: 800, color: "#fa4a29" }}>330만원</td>
+                          </tr>
+                          <tr>
+                            <td><strong>기타 집기</strong></td>
+                            <td>키오스크 무인 결제기, 포스(POS), 주방 관련 소집기, 홀 의탁자</td>
+                            <td style={{ textAlign: "right", fontWeight: 800, color: "#fa4a29" }}>440만원</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="package-card-action">
+                    <div className="package-action-info">
+                      <strong>자체 인테리어 직접 시공 가능 (도면 설계 및 감리비 별도). 15평형 표준 단독 매장 개설.</strong> <br />
+                      전화 문의: 1566-3594 · 추천 입지 상권 브리핑 지원
+                    </div>
+                    <button
+                      type="button"
+                      className="package-action-btn"
+                      onClick={() => {
+                        setStoreType("신규 오픈 준비");
+                        setModalStoreType("신규 창업 준비 중");
+                        const el = document.getElementById("consult");
+                        if (el) {
+                          el.scrollIntoView({ behavior: "smooth" });
+                          setTimeout(() => ownerRef.current?.focus(), 450);
+                        }
+                      }}
+                    >
+                      15평 가맹 창업 상담 신청하기 ↗
+                    </button>
+                  </div>
+                </>
+              )}
+
+            </div>
+
+            {/* 개설 유의사항 안내 박스 */}
+            <div className="package-notes-box scroll-reveal scroll-reveal-delay-2">
+              <div className="package-notes-title">
+                <span>⚠️</span>
+                <span>개설 유의사항 및 기본 안내</span>
+              </div>
+              <ul className="package-notes-list">
+                <li>
+                  신규 가맹 창업 비용은 15평 표준 매장을 기준으로 설계되었으며 점포의 실면적, 상권 입지 조건, 건물 노후화 등에 따라 공사 항목별 금액 변동이 있을 수 있습니다.
+                </li>
+                <li>
+                  인테리어 시공은 점주님께서 알고 계신 업체를 통하여 <strong>자체 직접 시공</strong>(개별 인테리어)이 가능하며, 이 경우 본사의 도면 설계 및 정밀 감리 비용이 별도로 발생합니다.
+                </li>
+                <li>
+                  별도 공사항목(외부 가스 관로 인입 및 계량기 신설, 주방 메인 급배수 배관설비 신설, 전기 증설 및 승압 공사, 냉난방 기기 도입, 철거 및 소방 인허가 등)은 임차 점포 조건에 따라 본사 별도 정산 또는 개인 시공을 필요로 합니다.
+                </li>
+              </ul>
+            </div>
+
+            {/* 자주 묻는 질문 (FAQ) */}
+            <div className="faq scroll-reveal scroll-reveal-delay-2">
               <details>
-                <summary>기존 카페를 운영하면서 도입할 수 있나요?</summary>
+                <summary>기존 카페 운영 중인데 샵인샵 3종(파이, 에그, 듀얼) 중 어떤 패키지가 가장 알맞나요?</summary>
                 <p>
-                  기존 매장을 활용하는 샵인샵 모델을 상담할 수 있습니다. 현재 설비와 작업 동선, 보관 환경에 따라 도입 조건이 달라집니다.
+                  커피 주문 고객의 디저트 부가 주문율과 객단가 상승이 목적이라면 <strong>120겹파이 단일(440만원)</strong>,
+                  출근길 직장인 및 학생 테이크아웃 간식 수요가 높은 상권이라면 <strong>egg120(330만원)</strong>을 권장합니다.
+                  오전 식사 대용부터 오후 티타임까지 올데이 매출을 공략하고 80만원 특별 결합 할인 혜택을 누리시려면 <strong>듀얼 패키지(690만원)</strong>의 만족도가 가장 높습니다.
                 </p>
               </details>
               <details>
-                <summary>브랜드 전환도 상담할 수 있나요?</summary>
+                <summary>기존 매장을 운영 중인데 하이브리드(업종 전환)는 어떻게 진행되나요?</summary>
                 <p>
-                  원본 브랜드 안내에는 업종 전환 모델도 포함되어 있습니다. 샵인샵과 브랜드 전환은 비용·시설·계약 조건이 다르므로 현재 매장 상황을 기준으로 확인합니다.
+                  기존 매장의 인테리어와 냉장고, 싱크대, 커피 머신 등 사용 가능한 집기를 최대한 그대로 유지합니다.
+                  외부 전면 돌출 어닝 및 브랜드 간판 사인 전면 교체, 파이/계란빵 조리 인프라 머신 입고, 초도 원부자재 세팅과 배달 3사(배민/쿠팡/요기요) 등록 대행까지 총 <strong>980만원(VAT 포함)</strong>으로 불필요한 공사비와 월 로열티 부담 없이 빠르고 경제적인 브랜드 전환을 완성합니다.
                 </p>
               </details>
               <details>
-                <summary>상담하면 바로 계약해야 하나요?</summary>
+                <summary>신규 가맹 매장 창업 시 인테리어를 자체 직접 시공해도 되나요?</summary>
                 <p>
-                  이 페이지는 도입 조건 상담을 제안하는 검토용 시안입니다. 최종 운영 시 상담 절차와 계약 검토 과정을 구체적으로 안내합니다.
+                  네, 얼마든지 가능합니다. 점주님께서 신뢰하시는 시공 업체를 통해 <strong>개별 직접 시공</strong>하실 수 있으며,
+                  이 경우 본사의 120PIE 공식 표준 디자인 설계 도면 제공 및 정밀 감리 비용만 별도로 정산되어 인테리어 비용을 크게 절감하실 수 있습니다.
+                </p>
+              </details>
+              <details>
+                <summary>상권 보호(1동 1점 / 반경 1km 독점)는 어떻게 보장되나요?</summary>
+                <p>
+                  120PIE는 가맹점주의 상권 내 매출과 수익을 끝까지 보호하기 위해 반경 1km 및 1동 1점 상권 보호제를 철저히 준수합니다.
+                  상담 신청 시 희망 매장 주소를 알려주시면 본사 상권분석 전산 시스템으로 해당 구역 계약 가능 여부를 즉시 확인해 드립니다.
+                </p>
+              </details>
+              <details>
+                <summary>상담을 신청하면 바로 계약해야 하나요?</summary>
+                <p>
+                  전혀 아닙니다. 상담 신청 시 전문 창업 컨설턴트가 배정되어 우리 동네 상권 분석 현황, 점포 실측 가이드, 예상 마진율과 무료 시식 및 장비 시연 기회를 먼저 제공합니다. 충분히 검토하시고 확신이 드셨을 때 계약을 결정하시면 됩니다.
                 </p>
               </details>
             </div>
@@ -1051,17 +1730,19 @@ export default function AdLandingClient() {
         {/* 10. CONSULT */}
         <section className="s-consult consult" id="consult" ref={consultRef}>
           <div className="wrap center">
-            <span className="eyebrow">다음 메뉴는 고민 중. 다음 행동은 지금.</span>
-            <h2>
-              우리 동네 디저트 손님, <br />
-              누가 먼저 잡을까요?
-            </h2>
-            <p className="lead">
-              내 매장에 맞는 메뉴부터 도입 조건까지. <br />
-              <b>우리 지역에서 시작할 수 있는지 확인하세요.</b>
-            </p>
+            <div className="scroll-reveal">
+              <span className="eyebrow">다음 메뉴는 고민 중. 다음 행동은 지금.</span>
+              <h2>
+                <span className="title-line">우리 동네 디저트 손님,</span>
+                <span className="title-line">누가 먼저 잡을까요?</span>
+              </h2>
+              <p className="lead">
+                내 매장에 맞는 메뉴부터 도입 조건까지. <br />
+                <b>우리 지역에서 시작할 수 있는지 확인하세요.</b>
+              </p>
+            </div>
             <form
-              className="form"
+              className="form scroll-reveal scroll-reveal-delay-1"
               id="demo-form"
               noValidate
               aria-busy={isSubmitting}
@@ -1251,25 +1932,11 @@ export default function AdLandingClient() {
         </section>
       </main>
 
-      <footer>
-        <div className="wrap footer-row">
-          <div className="brand">
-            120<span>PIE</span>
-          </div>
-          <div>
-            클라이언트 검토용 · 지역 선점 메시지 중심 상품 상세페이지형 시안 · 운영주체: (주)고우웰라이프 (1566-3594) <br />
-            실적·리뷰·상권 보호는 자료 확인 후 확정합니다. 사업 성과를 보장하지 않습니다. <br />
-            제품 이미지 및 패키지 안내 출처:{" "}
-            <a
-              href="https://120piecoffee.com/franchise"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              120PIE 공식 홈페이지 ↗
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer
+        hidePortalBox={true}
+        className="pb-28 sm:pb-32"
+        logoStyle={{ height: "24px", width: "auto", maxWidth: "180px", objectFit: "contain", display: "block" }}
+      />
 
       <div
         className={`fixed${fixedHidden ? " is-hidden" : ""}`}
@@ -1280,237 +1947,208 @@ export default function AdLandingClient() {
             우리 동네, 내가 먼저.
             <small>(주)고우웰라이프 · 실시간 상담 접수 연동</small>
           </strong>
-          <a className="cta" href="#consult">
+          <button
+            type="button"
+            className="cta"
+            onClick={openConsultModal}
+            style={{ cursor: "pointer", border: 0 }}
+          >
             우리 지역 도입 가능 여부 확인<span>↗</span>
-          </a>
+          </button>
         </div>
       </div>
 
-      <dialog
-        ref={guideRef}
-        id="image-guide"
-        aria-labelledby="guide-title"
-        data-editorial="true"
-        onClose={updateFixed}
-        onClick={handleDialogBackdropClick}
-      >
-        <div className="guide-top">
-          <div>
-            <span className="mini">ASSET DIRECTION</span>
-            <h2 id="guide-title">이 페이지를 완성할 이미지.</h2>
-          </div>
-          <button
-            type="button"
-            className="guide-close"
-            aria-label="이미지 가이드 닫기"
-            onClick={closeGuide}
-          >
-            ×
-          </button>
-        </div>
-        <p className="guide-intro">
-          첫 화면과 메뉴는 맛을 보여주고, 매장·조리·리뷰는 믿을 근거를 보여줘야 합니다. 이 역할은 글자와 도형만으로 채울 수 없습니다.
-        </p>
-        <div className="guide-priority">
-          <b>먼저 준비할 3가지</b>
-          <span>① 메인 단면 사진</span>
-          <span>② 메뉴별 제품 사진 3장</span>
-          <span>③ 실제 조리 영상</span>
-        </div>
-        <div className="guide-table">
-          <table>
-            <thead>
-              <tr>
-                <th>번호</th>
-                <th>필요한 이미지</th>
-                <th>권장 규격</th>
-                <th>우선순위</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>01</td>
-                <td>
-                  <a href="#asset-01" className="guide-jump" onClick={closeGuide}>
-                    메인 제품 키비주얼 ↗
-                  </a>
-                  <small>파이 단면을 크게, 커피와 포장 박스는 보조로</small>
-                </td>
-                <td>
-                  4:5<small>1600 × 2000 px</small>
-                </td>
-                <td>필수</td>
-              </tr>
-              <tr>
-                <td>02</td>
-                <td>
-                  <a href="#asset-02" className="guide-jump" onClick={closeGuide}>
-                    실제 도입 매장 ↗
-                  </a>
-                  <small>장비와 작업대가 함께 보이는 실제 매장 사진</small>
-                </td>
-                <td>
-                  4:3<small>1200 × 900 px</small>
-                </td>
-                <td>필수</td>
-              </tr>
-              <tr>
-                <td>03</td>
-                <td>
-                  <a href="#asset-03" className="guide-jump" onClick={closeGuide}>
-                    실제 운영 장면 ↗
-                  </a>
-                  <small>점주가 파이를 굽거나 포장하는 장면</small>
-                </td>
-                <td>
-                  4:3<small>1200 × 900 px</small>
-                </td>
-                <td>권장</td>
-              </tr>
-              <tr>
-                <td>04</td>
-                <td>
-                  <a href="#asset-04" className="guide-jump" onClick={closeGuide}>
-                    실제 판매 자료 ↗
-                  </a>
-                  <small>매장·기간을 확인할 수 있는 판매 자료</small>
-                </td>
-                <td>
-                  4:3<small>1200 × 900 px</small>
-                </td>
-                <td>자료 확인</td>
-              </tr>
-              <tr>
-                <td>05</td>
-                <td>
-                  <a href="#asset-05" className="guide-jump" onClick={closeGuide}>
-                    애플파이 ↗
-                  </a>
-                  <small>페이스트리 결·사과 필링이 보이는 단면</small>
-                </td>
-                <td>
-                  4:5<small>1200 × 1500 px</small>
-                </td>
-                <td>필수</td>
-              </tr>
-              <tr>
-                <td>06</td>
-                <td>
-                  <a href="#asset-06" className="guide-jump" onClick={closeGuide}>
-                    불고기파이 ↗
-                  </a>
-                  <small>불고기 필링과 제품 크기가 드러나는 컷</small>
-                </td>
-                <td>
-                  4:5<small>1200 × 1500 px</small>
-                </td>
-                <td>필수</td>
-              </tr>
-              <tr>
-                <td>07</td>
-                <td>
-                  <a href="#asset-07" className="guide-jump" onClick={closeGuide}>
-                    페페로니 피자파이 ↗
-                  </a>
-                  <small>치즈와 페페로니가 보이는 제품 단면</small>
-                </td>
-                <td>
-                  4:5<small>1200 × 1500 px</small>
-                </td>
-                <td>필수</td>
-              </tr>
-              <tr>
-                <td>08</td>
-                <td>
-                  <a href="#asset-08" className="guide-jump" onClick={closeGuide}>
-                    실제 조리 영상 ↗
-                  </a>
-                  <small>준비 → 굽기 → 포장, 끊김 없이 보여주는 실제 과정</small>
-                </td>
-                <td>
-                  16:9<small>1920 × 1080 px · MP4</small>
-                </td>
-                <td>필수</td>
-              </tr>
-              <tr>
-                <td>09</td>
-                <td>
-                  <a href="#asset-09" className="guide-jump" onClick={closeGuide}>
-                    실제 구매 고객 리뷰 ↗
-                  </a>
-                  <small>맛·식감·커피와의 조합이 드러나는 원문</small>
-                </td>
-                <td>
-                  4:3<small>1200 × 900 px</small>
-                </td>
-                <td>필수</td>
-              </tr>
-              <tr>
-                <td>10</td>
-                <td>
-                  <a href="#asset-10" className="guide-jump" onClick={closeGuide}>
-                    실제 포장·배달 리뷰 ↗
-                  </a>
-                  <small>포장 상태와 재주문 이유가 드러나는 원문</small>
-                </td>
-                <td>
-                  4:3<small>1200 × 900 px</small>
-                </td>
-                <td>필수</td>
-              </tr>
-              <tr>
-                <td>11</td>
-                <td>
-                  <a href="#asset-11" className="guide-jump" onClick={closeGuide}>
-                    포장·커피 세트 ↗
-                  </a>
-                  <small>실제 판매 가능한 구성과 패키지를 함께 촬영</small>
-                </td>
-                <td>
-                  4:5<small>1200 × 1500 px</small>
-                </td>
-                <td>필수</td>
-              </tr>
-              <tr>
-                <td>12</td>
-                <td>
-                  <a href="#asset-12" className="guide-jump" onClick={closeGuide}>
-                    실제 배달앱 메뉴 화면 ↗
-                  </a>
-                  <small>운영 중인 매장의 메뉴 화면, 개인정보는 제외</small>
-                </td>
-                <td>
-                  9:16<small>1080 × 1920 px</small>
-                </td>
-                <td>권장</td>
-              </tr>
-              <tr>
-                <td>13</td>
-                <td>
-                  <a href="#asset-13" className="guide-jump" onClick={closeGuide}>
-                    상권 보호 안내 그래픽 ↗
-                  </a>
-                  <small>확정된 약정 기준으로 제작할 설명용 지도</small>
-                </td>
-                <td>
-                  4:3<small>1600 × 1200 px</small>
-                </td>
-                <td>조건 확정 후</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p className="guide-foot">
-          리뷰·판매 자료는 실제 원문을 사용하고, 상권 그래픽은 약정 확정 후 제작하세요. 사진에는 문구를 넣지 않고 여백을 확보하면 모바일에서도 활용하기 좋습니다.
-        </p>
-        <button
-          type="button"
-          className="cta guide-close-button"
-          onClick={closeGuide}
+      {/* CONSULTATION POPUP MODAL */}
+      {isConsultModalOpen && (
+        <div
+          className="consult-modal-backdrop"
+          onClick={closeConsultModal}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="consult-modal-title"
         >
-          화면으로 돌아가기 <span>↗</span>
-        </button>
-      </dialog>
+          <div
+            className="consult-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="consult-modal-close"
+              onClick={closeConsultModal}
+              aria-label="팝업 닫기"
+            >
+              ×
+            </button>
+
+            {modalSubmitStatus === "success" ? (
+              <div className="consult-modal-success">
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "16px" }}>
+                  <img
+                    src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
+                    alt="120PIE 로고"
+                    style={{ height: "26px", width: "auto", maxWidth: "160px", objectFit: "contain", display: "block" }}
+                  />
+                </div>
+                <div className="consult-modal-success-icon">✓</div>
+                <h3>상담 신청이 접수되었습니다</h3>
+                <p>
+                  {modalStatusMessage ||
+                    "희망 지역의 상권 현황 및 도입 조건을 신속히 확인하여 연락드리겠습니다."}
+                </p>
+                <button
+                  type="button"
+                  className="cta"
+                  onClick={closeConsultModal}
+                  style={{ width: "100%", justifyContent: "center" }}
+                >
+                  확인
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="consult-modal-header">
+                  <div style={{ display: "flex", alignItems: "center", marginBottom: "14px" }}>
+                    <img
+                      src="https://res.cloudinary.com/lyjyvy54/image/upload/f_auto,q_auto/v1784533894/Group_1_4_jl4rlr.png"
+                      alt="120PIE 로고"
+                      style={{ height: "24px", width: "auto", maxWidth: "160px", objectFit: "contain", display: "block" }}
+                    />
+                  </div>
+                  <span className="consult-modal-badge">07 / 상권 보호 및 도입 상담</span>
+                  <h3 id="consult-modal-title" className="consult-modal-title">
+                    우리 동네 디저트, <br />
+                    도입 가능 여부 확인
+                  </h3>
+                  <p className="consult-modal-desc">
+                    희망 지역과 매장 정보를 남겨주시면, 인근 매장 현황과 상권 보호 반경 적용 조건을 빠르게 안내해 드립니다.
+                  </p>
+                </div>
+
+                <form onSubmit={handleModalSubmit} noValidate>
+                  <div className="form-grid">
+                    <label htmlFor="modal-owner">
+                      성함
+                      <input
+                        id="modal-owner"
+                        name="name"
+                        autoComplete="name"
+                        placeholder="성함"
+                        required
+                        value={modalName}
+                        aria-invalid={Boolean(modalErrors.owner)}
+                        onChange={(e) => {
+                          setModalName(e.target.value);
+                          if (modalErrors.owner) setModalErrors((p) => ({ ...p, owner: "" }));
+                        }}
+                      />
+                      <span className="field-error">{modalErrors.owner}</span>
+                    </label>
+
+                    <label htmlFor="modal-phone">
+                      연락처
+                      <input
+                        id="modal-phone"
+                        name="phone"
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        maxLength={14}
+                        placeholder="010-0000-0000"
+                        required
+                        value={modalPhone}
+                        aria-invalid={Boolean(modalErrors.phone)}
+                        onChange={(e) => {
+                          setModalPhone(formatPhoneInput(e.target.value));
+                          if (modalErrors.phone) setModalErrors((p) => ({ ...p, phone: "" }));
+                        }}
+                      />
+                      <span className="field-error">{modalErrors.phone}</span>
+                    </label>
+
+                    <label htmlFor="modal-region">
+                      희망 도입 지역
+                      <input
+                        id="modal-region"
+                        name="region"
+                        placeholder="예: 서울 마포구 합정동"
+                        required
+                        value={modalRegion}
+                        aria-invalid={Boolean(modalErrors.region)}
+                        onChange={(e) => {
+                          setModalRegion(e.target.value);
+                          if (modalErrors.region) setModalErrors((p) => ({ ...p, region: "" }));
+                        }}
+                      />
+                      <span className="field-error">{modalErrors.region}</span>
+                    </label>
+
+                    <label htmlFor="modal-store-type">
+                      현재 매장 상황
+                      <select
+                        id="modal-store-type"
+                        name="storeType"
+                        value={modalStoreType}
+                        aria-invalid={Boolean(modalErrors.type)}
+                        onChange={(e) => {
+                          setModalStoreType(e.target.value);
+                          if (modalErrors.type) setModalErrors((p) => ({ ...p, type: "" }));
+                        }}
+                      >
+                        <option value="기존 카페 운영 중">기존 카페 운영 중 (디저트 라인업 추가)</option>
+                        <option value="신규 창업 준비 중">신규 카페 창업 준비 중</option>
+                        <option value="업종 변경/리뉴얼">기타 외식업 운영 (업종 변경/리뉴얼)</option>
+                        <option value="기타/단독 매장">기타 / 전용 매장 오픈 검토</option>
+                      </select>
+                      <span className="field-error">{modalErrors.type}</span>
+                    </label>
+                  </div>
+
+                  <label className="check" htmlFor="modal-consent">
+                    <input
+                      type="checkbox"
+                      id="modal-consent"
+                      name="consent"
+                      checked={modalConsent}
+                      aria-invalid={Boolean(modalErrors.consent)}
+                      onChange={(e) => {
+                        setModalConsent(e.target.checked);
+                        if (modalErrors.consent) setModalErrors((p) => ({ ...p, consent: "" }));
+                      }}
+                    />
+                    <span>
+                      [필수] 개인정보 수집 및 이용 동의 (상권 분석 및 도입 상담 안내 목적)
+                    </span>
+                  </label>
+                  <span className="field-error" style={{ marginBottom: "12px", display: "block" }}>
+                    {modalErrors.consent}
+                  </span>
+
+                  {modalSubmitStatus === "error" && (
+                    <div className="status-msg is-error" style={{ marginBottom: "16px" }}>
+                      {modalStatusMessage}
+                    </div>
+                  )}
+
+                  {modalSubmitStatus === "duplicate" && (
+                    <div className="status-msg is-duplicate" style={{ marginBottom: "16px" }}>
+                      {modalStatusMessage}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="cta"
+                    disabled={modalIsSubmitting}
+                  >
+                    <span>{modalIsSubmitting ? "접수 진행 중..." : "상담 신청하기"}</span>
+                    <span>↗</span>
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -58,8 +58,8 @@ export default function MobileBackManager() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Do NOT push trap state on Gate Page (`/`)
-    if (pathname === "/") return;
+    // Do NOT push trap state on Gate Page (`/`) or Ad Landing pages (`/ad`, `/landing-ad`)
+    if (pathname === "/" || pathname?.startsWith("/ad") || pathname?.startsWith("/landing-ad")) return;
 
     const trapHistory = () => {
       try {

@@ -3473,6 +3473,12 @@ export default function AdminPage() {
     let updatedStores: StoreInfo[];
     if (selectedStore) {
       // Editing
+      if (selectedStore.id !== storeLoginId) {
+        if (stores.some((s) => s.id === storeLoginId)) {
+          alert("이미 존재하는 아이디입니다. 다른 아이디를 사용해 주세요.");
+          return;
+        }
+      }
       updatedStores = stores.map((s) => (s.id === selectedStore.id ? storeData : s));
       triggerToast(`'${storeName}' 정보가 성공적으로 수정되었습니다.`);
     } else {
@@ -3489,6 +3495,7 @@ export default function AdminPage() {
     const saveToConvex = (lat?: number, lng?: number) => {
       saveStoreMutation({
         id: storeLoginId,
+        oldId: selectedStore?.id,
         pw: storePw,
         pwConfirm: storePwConfirm,
         name: storeName,
@@ -13711,8 +13718,7 @@ export default function AdminPage() {
                       value={storeLoginId}
                       onChange={(e) => setStoreLoginId(e.target.value)}
                       required
-                      disabled={!!selectedStore}
-                      className="w-full bg-slate-50 disabled:bg-slate-100 disabled:text-slate-400 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
