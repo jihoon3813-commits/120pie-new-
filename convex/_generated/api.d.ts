@@ -20,6 +20,7 @@ import type * as gallery from "../gallery.js";
 import type * as http from "../http.js";
 import type * as inquiries from "../inquiries.js";
 import type * as instagram from "../instagram.js";
+import type * as landingPages from "../landingPages.js";
 import type * as materials from "../materials.js";
 import type * as notices from "../notices.js";
 import type * as orders from "../orders.js";
@@ -51,6 +52,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   inquiries: typeof inquiries;
   instagram: typeof instagram;
+  landingPages: typeof landingPages;
   materials: typeof materials;
   notices: typeof notices;
   orders: typeof orders;

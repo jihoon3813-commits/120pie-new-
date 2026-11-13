@@ -11,5 +11,13 @@ export const metadata: Metadata = {
 };
 
 export default function LandingAdPage() {
-  return <AdLandingClient />;
+  return (
+    <AdLandingClient
+      landingConfig={{
+        slug: "landing-ad",
+        title: "기본 광고 랜딩 (우리 동네 디저트, 내가 먼저)",
+        channel: "direct",
+      }}
+    />
+  );
 }

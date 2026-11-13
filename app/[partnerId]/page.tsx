@@ -17,6 +17,7 @@ const RESERVED_PATHS = new Set([
   "faq",
   "franchise",
   "gateway",
+  "l",
   "landing-ad",
   "login",
   "menu",

@@ -43,19 +43,31 @@ export default function TrackPageView() {
     let channel = "direct";
     let source = "";
     let partnerId = "";
+    let utmMedium = "";
+    let utmCampaign = "";
+    let landingSlug = "";
 
     if (typeof window !== "undefined") {
       try {
         const urlParams = new URLSearchParams(window.location.search);
         source = (urlParams.get("source") || urlParams.get("utm_source") || urlParams.get("ref") || "").toLowerCase();
+        utmMedium = urlParams.get("utm_medium") || "";
+        utmCampaign = urlParams.get("utm_campaign") || "";
         const queryPartnerId = urlParams.get("partnerId") || urlParams.get("partner_id") || "";
+
+        if (pathname === "/landing-ad" || pathname === "/ad") {
+          landingSlug = "landing-ad";
+        } else if (pathname.startsWith("/l/")) {
+          landingSlug = pathname.slice(3).split("/")[0].toLowerCase();
+        }
 
         // 경로 기반 파트너 분양페이지 감지 (예: /partner1)
         const pathSegments = pathname.split("/").filter(Boolean);
         const RESERVED = new Set([
-          "admin", "api", "brand", "contract", "costs", "faq", "franchise",
-          "gateway", "login", "menu", "partner", "portal", "proposal",
-          "proposal2", "stores", "v3", "pink", "landing-v2", "landing-v4", "landing-v6"
+          "ad", "admin", "api", "brand", "contract", "costs", "faq", "franchise",
+          "gateway", "l", "landing-ad", "login", "menu", "partner", "portal",
+          "proposal", "proposal2", "stores", "v3", "pink", "yellow",
+          "landing-v2", "landing-v4", "landing-v5", "landing-v6"
         ]);
 
         if (pathSegments.length === 1 && !RESERVED.has(pathSegments[0].toLowerCase())) {
@@ -111,6 +123,9 @@ export default function TrackPageView() {
         channel,
         source,
         userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+        ...(landingSlug ? { landingSlug } : {}),
+        ...(utmMedium ? { utmMedium } : {}),
+        ...(utmCampaign ? { utmCampaign } : {}),
       }),
     }).catch((err) => console.error("PageView tracking failed:", err));
 

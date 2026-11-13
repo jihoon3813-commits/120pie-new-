@@ -8,7 +8,21 @@ import Footer from "@/components/landing-v6/Footer";
 
 type SubmitStatus = "" | "pending" | "success" | "duplicate" | "error";
 
-export default function AdLandingClient() {
+export interface LandingConfigProp {
+  _id?: string;
+  slug?: string;
+  title?: string;
+  channel?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+}
+
+export default function AdLandingClient({
+  landingConfig,
+}: {
+  landingConfig?: LandingConfigProp;
+}) {
   const heroRef = useRef<HTMLElement | null>(null);
   const consultRef = useRef<HTMLElement | null>(null);
   const messageRef = useRef<HTMLParagraphElement | null>(null);
@@ -178,6 +192,12 @@ export default function AdLandingClient() {
           partnerId,
           partnerName,
           partnerCompany,
+          landingSlug: landingConfig?.slug,
+          landingTitle: landingConfig?.title,
+          adChannel: landingConfig?.channel,
+          utmSource: landingConfig?.utmSource,
+          utmMedium: landingConfig?.utmMedium,
+          utmCampaign: landingConfig?.utmCampaign,
           path: typeof window !== "undefined" ? window.location.pathname : "/ad",
           referrer: typeof document !== "undefined" ? document.referrer || "direct" : "direct",
         }),
@@ -337,6 +357,31 @@ export default function AdLandingClient() {
         w.karrotPixel.track("SubmitApplication");
       }
     } catch (_) {}
+    try {
+      const currentPath = window.location.pathname;
+      const derivedSlug =
+        landingConfig?.slug ||
+        (currentPath === "/landing-ad" || currentPath === "/ad"
+          ? "landing-ad"
+          : currentPath.startsWith("/l/")
+            ? currentPath.slice(3).split("/")[0].toLowerCase()
+            : undefined);
+      fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "conversion",
+          path: currentPath,
+          referrer: document.referrer || "direct",
+          landingSlug: derivedSlug,
+          landingId: landingConfig?._id,
+          channel: landingConfig?.channel,
+          source: landingConfig?.utmSource,
+          utmMedium: landingConfig?.utmMedium,
+          utmCampaign: landingConfig?.utmCampaign,
+        }),
+      }).catch(() => {});
+    } catch (_) {}
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -411,6 +456,12 @@ export default function AdLandingClient() {
           partnerId,
           partnerName,
           partnerCompany,
+          landingSlug: landingConfig?.slug,
+          landingTitle: landingConfig?.title,
+          adChannel: landingConfig?.channel,
+          utmSource: landingConfig?.utmSource,
+          utmMedium: landingConfig?.utmMedium,
+          utmCampaign: landingConfig?.utmCampaign,
           path: typeof window !== "undefined" ? window.location.pathname : "/ad",
           referrer: typeof document !== "undefined" ? document.referrer || "direct" : "direct",
         }),

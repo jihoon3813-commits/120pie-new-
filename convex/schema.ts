@@ -42,7 +42,14 @@ export default defineSchema({
     partnerCompany: v.optional(v.string()), // 파트너 상호명 (e.g. 와우프랜차이즈에이전시)
     status: v.optional(v.string()), // 상담 상태 ("대기" | "상담중" | "계약완료" | "보류")
     partnerMemo: v.optional(v.string()), // 파트너 개별 상담 메모
-  }).index("by_partner_id", ["partnerId"]),
+    landingSlug: v.optional(v.string()), // 유입 랜딩페이지 슬러그 (e.g. "landing-ad", "naver-01")
+    landingTitle: v.optional(v.string()), // 유입 랜딩페이지 관리명
+    adChannel: v.optional(v.string()), // 유입 광고 채널 (e.g. "naver", "instagram", "daangn")
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
+  }).index("by_partner_id", ["partnerId"])
+    .index("by_landing_slug", ["landingSlug"]),
   gallery: defineTable({
     name: v.string(),
     category: v.string(),
@@ -176,9 +183,14 @@ export default defineSchema({
     channel: v.optional(v.string()), // 유입 채널: "kakao" | "sms" | "naver" | "google" | "instagram" | "youtube" | "direct" | "etc"
     source: v.optional(v.string()), // URL 파라미터 source (e.g. "kakao", "sms")
     userAgent: v.optional(v.string()), // 브라우저 및 기기 정보
+    landingSlug: v.optional(v.string()), // 유입 랜딩 슬러그 (e.g. "landing-ad", "insta-01")
+    landingId: v.optional(v.string()), // landingPages 문서 ID
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
   }).index("by_date", ["date"])
     .index("by_visitorType", ["visitorType"])
-    .index("by_date_and_type", ["date", "visitorType"]),
+    .index("by_date_and_type", ["date", "visitorType"])
+    .index("by_landingSlug_and_date", ["landingSlug", "date"]),
   banners: defineTable({
     mainTag: v.string(),
     mainTitle: v.string(),
@@ -320,4 +332,25 @@ export default defineSchema({
     settings: v.any(),
     updatedAt: v.optional(v.string()),
   }),
+  landingPages: defineTable({
+    slug: v.string(), // 고유 URL 슬러그 (e.g. "landing-ad", "naver-cpc-01")
+    title: v.string(), // 관리용 랜딩페이지 이름
+    templateKey: v.string(), // 템플릿 키 ("landing-ad" 등)
+    isBase: v.boolean(), // 기본 랜딩페이지 여부
+    parentId: v.optional(v.id("landingPages")), // 복제 원본 랜딩페이지 ID
+    channel: v.string(), // 광고 채널 ("direct" | "naver" | "instagram" | "meta" | "kakao" | "daangn" | "google" | "youtube" | "tiktok" | "sms" | "offline" | "etc")
+    campaignName: v.optional(v.string()), // 캠페인 / 광고세트명
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
+    customTitle: v.optional(v.string()), // 브라우저 탭 제목 커스텀
+    customDescription: v.optional(v.string()), // 메타 설명 커스텀
+    memo: v.optional(v.string()), // 관리자 메모
+    isActive: v.boolean(), // 활성 상태
+    createdAt: v.string(), // YYYY-MM-DD HH:mm:ss
+    updatedAt: v.optional(v.string()),
+  }).index("by_slug", ["slug"])
+    .index("by_parentId", ["parentId"])
+    .index("by_channel", ["channel"])
+    .index("by_isBase", ["isBase"]),
 });

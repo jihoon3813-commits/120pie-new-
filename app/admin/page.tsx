@@ -75,8 +75,10 @@ import {
   Save,
   Camera,
   PhoneCall,
-  CornerDownRight
+  CornerDownRight,
+  Rocket
 } from "lucide-react";
+import LandingManager from "./LandingManager";
 import Footer from "@/app/components/Footer";
 import RadarMap from "@/app/components/RadarMap";
 import { FranchiseContractDocument } from "@/components/contract/FranchiseContractDocument";
@@ -6151,6 +6153,7 @@ export default function AdminPage() {
                 { key: "notice", label: "공지사항 관리", icon: Megaphone },
                 { key: "inquiry", label: "1:1 AS 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
                 { key: "consultation", label: "창업 상담문의 관리", icon: Headphones },
+                { key: "landing", label: "랜딩페이지 관리", icon: Rocket },
                 { key: "analytics", label: "통계관리", icon: BarChart3 },
                 { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
                 { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
@@ -6272,6 +6275,7 @@ export default function AdminPage() {
                     { key: "notice", label: "공지사항 관리", icon: Megaphone },
                     { key: "inquiry", label: "1:1 AS 문의 관리", icon: MessageSquare, badge: pendingInquiriesCount > 0 ? pendingInquiriesCount : undefined },
                     { key: "consultation", label: "창업 상담문의 관리", icon: Headphones },
+                    { key: "landing", label: "랜딩페이지 관리", icon: Rocket },
                     { key: "analytics", label: "통계관리", icon: BarChart3 },
                     { key: "material", label: "교육/홍보물 관리", icon: BookOpen },
                     { key: "banner", label: "팝업/배너/버튼 관리", icon: Monitor },
@@ -9941,10 +9945,18 @@ export default function AdminPage() {
                                     )}
                                   </div>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 font-bold text-[11px] inline-flex items-center gap-1 border border-slate-200">
-                                    <span>🏢</span>
-                                    <span>본사 직속</span>
-                                  </span>
+                                  <div className="inline-flex flex-col gap-1">
+                                    <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 font-bold text-[11px] inline-flex items-center gap-1 border border-slate-200 w-fit">
+                                      <span>🏢</span>
+                                      <span>본사 직속</span>
+                                    </span>
+                                    {inq.landingSlug && (
+                                      <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold text-[10px] w-fit">
+                                        {inq.adChannel ? `[${inq.adChannel}] ` : ""}
+                                        {inq.landingSlug === "landing-ad" ? "/landing-ad" : `/l/${inq.landingSlug}`}
+                                      </span>
+                                    )}
+                                  </div>
                                 )}
                               </td>
                               <td className="p-4 sm:p-5 font-bold text-[#0F172A] whitespace-nowrap">{inq.name}</td>
@@ -10037,6 +10049,10 @@ export default function AdminPage() {
           )}
 
 
+
+          {currentMenu === "landing" && (
+            <LandingManager inquiries={inquiries} onTriggerToast={triggerToast} />
+          )}
 
           {/* ==========================================
               MENU: 6.8. HOMEPAGE ANALYTICS MANAGEMENT

@@ -61,6 +61,21 @@ export async function POST(request: NextRequest) {
     const partnerCompany =
       typeof body.partnerCompany === "string" && body.partnerCompany.trim() ? body.partnerCompany.trim() : undefined;
 
+    let landingSlug = typeof body.landingSlug === "string" && body.landingSlug.trim() ? body.landingSlug.trim().toLowerCase() : undefined;
+    const rawPath = typeof body.path === "string" ? body.path : "";
+    if (!landingSlug) {
+      if (rawPath === "/landing-ad" || rawPath === "/ad") {
+        landingSlug = "landing-ad";
+      } else if (rawPath.startsWith("/l/")) {
+        landingSlug = rawPath.slice(3).split("/")[0].toLowerCase() || undefined;
+      }
+    }
+    let landingTitle = typeof body.landingTitle === "string" && body.landingTitle.trim() ? body.landingTitle.trim() : undefined;
+    let adChannel = typeof body.adChannel === "string" && body.adChannel.trim() ? body.adChannel.trim() : undefined;
+    let utmSource = typeof body.utmSource === "string" && body.utmSource.trim() ? body.utmSource.trim() : undefined;
+    let utmMedium = typeof body.utmMedium === "string" && body.utmMedium.trim() ? body.utmMedium.trim() : undefined;
+    let utmCampaign = typeof body.utmCampaign === "string" && body.utmCampaign.trim() ? body.utmCampaign.trim() : undefined;
+
     const fieldErrors: Record<string, string> = {};
     if (!name) fieldErrors.owner = "성함을 입력해 주세요.";
     const cleanPhone = rawPhoneInput.replace(/[\s-]/g, "");
@@ -110,6 +125,19 @@ export async function POST(request: NextRequest) {
     const regDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
     const convex = new ConvexHttpClient(convexUrl);
 
+    if (landingSlug && (!landingTitle || !adChannel)) {
+      try {
+        const landingDoc = await convex.query(api.landingPages.getBySlug, { slug: landingSlug });
+        if (landingDoc) {
+          if (!landingTitle) landingTitle = landingDoc.title;
+          if (!adChannel) adChannel = landingDoc.channel;
+          if (!utmSource && landingDoc.utmSource) utmSource = landingDoc.utmSource;
+          if (!utmMedium && landingDoc.utmMedium) utmMedium = landingDoc.utmMedium;
+          if (!utmCampaign && landingDoc.utmCampaign) utmCampaign = landingDoc.utmCampaign;
+        }
+      } catch (_) {}
+    }
+
     const inquiryId = await convex.mutation(api.inquiries.add, {
       name,
       phone: formattedPhone,
@@ -120,6 +148,12 @@ export async function POST(request: NextRequest) {
       partnerId,
       partnerName,
       partnerCompany,
+      landingSlug,
+      landingTitle,
+      adChannel,
+      utmSource,
+      utmMedium,
+      utmCampaign,
     });
 
     recentSubmissions.set(dedupKey, now);

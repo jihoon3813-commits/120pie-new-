@@ -15,10 +15,40 @@ export const trackEvent = mutation({
     channel: v.optional(v.string()),
     source: v.optional(v.string()),
     userAgent: v.optional(v.string()),
+    landingSlug: v.optional(v.string()),
+    landingId: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const eventId = await ctx.db.insert("analytics", args);
     return eventId;
+  },
+});
+
+export const listByLandingSlug = query({
+  args: {
+    landingSlug: v.string(),
+    startDate: v.optional(v.string()),
+    endDate: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const q = ctx.db.query("analytics");
+    if (args.startDate && args.endDate) {
+      return await q
+        .withIndex("by_landingSlug_and_date", (idx) =>
+          idx
+            .eq("landingSlug", args.landingSlug)
+            .gte("date", args.startDate!)
+            .lte("date", args.endDate!)
+        )
+        .collect();
+    }
+    return await q
+      .withIndex("by_landingSlug_and_date", (idx) =>
+        idx.eq("landingSlug", args.landingSlug)
+      )
+      .collect();
   },
 });
 

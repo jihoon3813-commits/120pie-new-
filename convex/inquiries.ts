@@ -37,6 +37,12 @@ export const add = mutation({
     partnerCompany: v.optional(v.string()),
     status: v.optional(v.string()),
     partnerMemo: v.optional(v.string()),
+    landingSlug: v.optional(v.string()),
+    landingTitle: v.optional(v.string()),
+    adChannel: v.optional(v.string()),
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
   },
   handler: async (ctx: any, args: any) => {
     let pName = args.partnerName;
@@ -66,13 +72,22 @@ export const add = mutation({
       partnerCompany: pCompany || undefined,
       status: args.status || "대기",
       partnerMemo: args.partnerMemo || undefined,
+      landingSlug: args.landingSlug || undefined,
+      landingTitle: args.landingTitle || undefined,
+      adChannel: args.adChannel || undefined,
+      utmSource: args.utmSource || undefined,
+      utmMedium: args.utmMedium || undefined,
+      utmCampaign: args.utmCampaign || undefined,
     };
 
     const id = await ctx.db.insert("inquiries", doc);
 
-    // 디스코드 알림 발송 (파트너 유입 여부 메시지에 표기)
+    // 디스코드 알림 발송 (파트너 및 광고 랜딩 유입 여부 표기)
     const discordMessage = [
       args.message || "",
+      args.landingSlug
+        ? `\n[유입 랜딩: ${args.landingTitle ? `${args.landingTitle} ` : ""}(/${args.landingSlug === "landing-ad" ? "landing-ad" : `l/${args.landingSlug}`})${args.adChannel ? ` · 채널: ${args.adChannel}` : ""}]`
+        : "",
       args.partnerId
         ? `\n[유치 파트너: ${pName || args.partnerId}${pCompany ? ` (${pCompany})` : ""} - 전용 분양 사이트 접수]`
         : "",
@@ -99,6 +114,12 @@ export const updateStatus = mutation({
     _id: v.id("inquiries"),
     status: v.optional(v.string()),
     partnerMemo: v.optional(v.string()),
+    landingSlug: v.optional(v.string()),
+    landingTitle: v.optional(v.string()),
+    adChannel: v.optional(v.string()),
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
   },
   handler: async (ctx: any, args: any) => {
     const patch: any = {};

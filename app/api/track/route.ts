@@ -19,6 +19,10 @@ export async function POST(request: NextRequest) {
       channel: clientChannel,
       source: clientSource,
       userAgent: clientUserAgent,
+      landingSlug: clientLandingSlug,
+      landingId: clientLandingId,
+      utmMedium: clientUtmMedium,
+      utmCampaign: clientUtmCampaign,
     } = body;
 
     const xForwardedFor = request.headers.get("x-forwarded-for");
@@ -64,6 +68,40 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // 랜딩페이지 슬러그 자동 판별
+    const normalizedPath = typeof path === "string" ? path : "";
+    let landingSlug = typeof clientLandingSlug === "string" && clientLandingSlug.trim()
+      ? clientLandingSlug.trim().toLowerCase()
+      : undefined;
+    if (!landingSlug) {
+      if (normalizedPath === "/landing-ad" || normalizedPath === "/ad") {
+        landingSlug = "landing-ad";
+      } else if (normalizedPath.startsWith("/l/")) {
+        landingSlug = normalizedPath.slice(3).split("/")[0].toLowerCase() || undefined;
+      }
+    }
+
+    let landingId = typeof clientLandingId === "string" && clientLandingId.trim() ? clientLandingId.trim() : undefined;
+    let utmMedium = typeof clientUtmMedium === "string" && clientUtmMedium.trim() ? clientUtmMedium.trim() : undefined;
+    let utmCampaign = typeof clientUtmCampaign === "string" && clientUtmCampaign.trim() ? clientUtmCampaign.trim() : undefined;
+
+    if (landingSlug && convexUrl && !convexUrl.includes("dummy-url")) {
+      try {
+        const landingDoc = await convex.query(api.landingPages.getBySlug, { slug: landingSlug });
+        if (landingDoc) {
+          if (!landingId) landingId = String(landingDoc._id);
+          if ((!channel || channel === "direct") && landingDoc.channel && landingDoc.channel !== "direct") {
+            channel = landingDoc.channel;
+          }
+          if (!source && landingDoc.utmSource) source = landingDoc.utmSource;
+          if (!utmMedium && landingDoc.utmMedium) utmMedium = landingDoc.utmMedium;
+          if (!utmCampaign && landingDoc.utmCampaign) utmCampaign = landingDoc.utmCampaign;
+        }
+      } catch (_) {
+        // 랜딩 메타 조회 실패 시 기본 트래킹은 계속 진행
+      }
+    }
+
     await convex.mutation(api.analytics.trackEvent, {
       type,
       path,
@@ -77,6 +115,10 @@ export async function POST(request: NextRequest) {
       channel,
       source,
       userAgent: userAgent.slice(0, 300), // 길이 제한
+      landingSlug,
+      landingId,
+      utmMedium,
+      utmCampaign,
     });
 
     return NextResponse.json({ success: true });
