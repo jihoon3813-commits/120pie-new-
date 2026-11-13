@@ -10051,7 +10051,7 @@ export default function AdminPage() {
 
 
           {currentMenu === "landing" && (
-            <LandingManager inquiries={inquiries} onTriggerToast={triggerToast} />
+            <LandingManager inquiries={consultations} onTriggerToast={triggerToast} />
           )}
 
           {/* ==========================================

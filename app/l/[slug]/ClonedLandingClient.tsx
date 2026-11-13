@@ -6,7 +6,34 @@ import { api } from "@/convex/_generated/api";
 import AdLandingClient from "@/app/ad/AdLandingClient";
 import Link from "next/link";
 
+class ClonedLandingErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return <AdLandingClient />;
+    }
+    return this.props.children;
+  }
+}
+
 export default function ClonedLandingClient({ slug }: { slug: string }) {
+  return (
+    <ClonedLandingErrorBoundary>
+      <ClonedLandingClientInner slug={slug} />
+    </ClonedLandingErrorBoundary>
+  );
+}
+
+function ClonedLandingClientInner({ slug }: { slug: string }) {
   const normalizedSlug = slug.trim().toLowerCase();
   const landingPage = useQuery(api.landingPages.getBySlug, { slug: normalizedSlug });
 

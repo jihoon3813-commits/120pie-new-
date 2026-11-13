@@ -102,8 +102,57 @@ interface LandingManagerProps {
   onTriggerToast: (msg: string) => void;
 }
 
-export default function LandingManager({ inquiries, onTriggerToast }: LandingManagerProps) {
-  const landingPages = useQuery(api.landingPages.list) || [];
+class LandingErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; errorMsg: string }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, errorMsg: "" };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, errorMsg: error?.message || "알 수 없는 오류" };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="bg-white rounded-2xl border border-red-200 p-8 text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto font-black text-lg">
+            !
+          </div>
+          <h3 className="text-base font-black text-slate-900">
+            랜딩페이지 데이터를 불러오는 중 오류가 발생했습니다
+          </h3>
+          <p className="text-xs text-slate-500 max-w-lg mx-auto break-all">
+            {this.state.errorMsg}
+          </p>
+          <p className="text-[11px] text-slate-400">
+            Convex 백엔드 배포(`npx convex deploy` 또는 `npx convex dev`) 상태를 확인한 후 새로고침해 주세요.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 rounded-lg bg-[#0F172A] text-[#FED422] text-xs font-black cursor-pointer"
+          >
+            새로고침
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function LandingManager(props: LandingManagerProps) {
+  return (
+    <LandingErrorBoundary>
+      <LandingManagerInner {...props} />
+    </LandingErrorBoundary>
+  );
+}
+
+function LandingManagerInner({ inquiries, onTriggerToast }: LandingManagerProps) {
+  const rawLandingPages = useQuery(api.landingPages.list);
+  const landingPages = rawLandingPages ?? [];
   const ensureDefaultBase = useMutation(api.landingPages.ensureDefaultBase);
   const createLanding = useMutation(api.landingPages.create);
   const cloneLanding = useMutation(api.landingPages.clone);
@@ -115,8 +164,8 @@ export default function LandingManager({ inquiries, onTriggerToast }: LandingMan
   const [seeded, setSeeded] = useState(false);
   useEffect(() => {
     if (seeded) return;
-    if (landingPages !== undefined) {
-      const hasBase = landingPages.some((p: any) => p.slug === "landing-ad");
+    if (rawLandingPages !== undefined) {
+      const hasBase = rawLandingPages.some((p: any) => p.slug === "landing-ad");
       if (!hasBase) {
         setSeeded(true);
         ensureDefaultBase().catch(() => {});
@@ -124,7 +173,7 @@ export default function LandingManager({ inquiries, onTriggerToast }: LandingMan
         setSeeded(true);
       }
     }
-  }, [landingPages, seeded, ensureDefaultBase]);
+  }, [rawLandingPages, seeded, ensureDefaultBase]);
 
   // Date range state
   const [datePreset, setDatePreset] = useState<string>("week");
